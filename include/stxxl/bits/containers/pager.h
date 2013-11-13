@@ -24,7 +24,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup stlcontinternals
+//! \addtogroup stlcont_vector
 //! \{
 
 enum pager_type

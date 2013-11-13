@@ -41,8 +41,9 @@ __STXXL_BEGIN_NAMESPACE
 //! Containers with STL-compatible interface
 
 
-//! \defgroup stlcontinternals Internals
+//! \defgroup stlcont_vector vector
 //! \ingroup stlcont
+//! Vector and support classes
 //! \{
 
 template <typename size_type, size_type modulo2, size_type modulo1>
@@ -273,14 +274,17 @@ template <typename ValueType, typename AllocStr, typename SizeType, typename Dif
           unsigned BlockSize, typename PagerType, unsigned PageSize>
 class vector_iterator
 {
-    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _Self;
-    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _CIterator;
+    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> self_type;
+    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> const_self_type;
 
     friend class const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
 
 public:
-    typedef _CIterator const_iterator;
-    typedef _Self iterator;
+    //! @name Types
+    //! \{
+
+    typedef self_type iterator;
+    typedef const_self_type const_iterator;
 
     typedef unsigned block_offset_type;
     typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> vector_type;
@@ -300,202 +304,231 @@ public:
     typedef typename vector_type::pointer pointer;
     typedef typename vector_type::const_pointer const_pointer;
 
+    //! \}
+
 protected:
     blocked_index_type offset;
     vector_type * p_vector;
 
 private:
-    vector_iterator(vector_type * v, size_type o) : offset(o),
-                                                    p_vector(v)
+    //! private constructor for initializing other iterators
+    vector_iterator(vector_type * v, size_type o)
+        : offset(o), p_vector(v)
     { }
 
 public:
-    vector_iterator() : offset(0), p_vector(NULL) { }
-    vector_iterator(const _Self & a) :
-        offset(a.offset),
-        p_vector(a.p_vector) { }
+    //! constructs invalid iterator
+    vector_iterator()
+        : offset(0), p_vector(NULL)
+    { }
+    //! copy-constructor
+    vector_iterator(const self_type & a)
+        : offset(a.offset),
+          p_vector(a.p_vector)
+    { }
+
+    //! \name Iterator Properties
+    //! \{
 
     //! return pointer to vector containing iterator
     vector_type* parent_vector() const
     {
         return p_vector;
     }
+    //! return block offset of current element
     block_offset_type block_offset() const
     {
         return static_cast<block_offset_type>(offset.get_offset());
     }
+    //! return iterator to BID containg current element
     bids_container_iterator bid() const
     {
         return p_vector->bid(offset);
     }
 
-    difference_type operator - (const _Self & a) const
-    {
-        return offset - a.offset;
-    }
+    //! \}
 
-    difference_type operator - (const const_iterator & a) const
-    {
-        return offset - a.offset;
-    }
+    //! \name Access Operators
+    //! \{
 
-    _Self operator - (size_type op) const
-    {
-        return _Self(p_vector, offset.get_pos() - op);
-    }
-
-    _Self operator + (size_type op) const
-    {
-        return _Self(p_vector, offset.get_pos() + op);
-    }
-
-    _Self & operator -= (size_type op)
-    {
-        offset -= op;
-        return *this;
-    }
-
-    _Self & operator += (size_type op)
-    {
-        offset += op;
-        return *this;
-    }
-
+    //! return current element
     reference operator * ()
     {
         return p_vector->element(offset);
     }
-
+    //! return pointer to current element
     pointer operator -> ()
     {
         return &(p_vector->element(offset));
     }
-
+    //! return const reference to current element
     const_reference operator * () const
     {
         return p_vector->const_element(offset);
     }
-
+    //! return const pointer to current element
     const_pointer operator -> () const
     {
         return &(p_vector->const_element(offset));
     }
-
-    reference operator [] (size_type op)
+    //! return mutable reference to element +i after the current element
+    reference operator [] (size_type i)
     {
-        return p_vector->element(offset.get_pos() + op);
+        return p_vector->element(offset.get_pos() + i);
+    }
+    //! return const reference to element +i after the current element
+    const_reference operator [] (size_type i) const
+    {
+        return p_vector->const_element(offset.get_pos() + i);
     }
 
-    const_reference operator [] (size_type op) const
+    //! \}
+
+    //! \name Relative Calculation of Iterators
+    //! \{
+
+    //! calculate different between two iterator
+    difference_type operator - (const self_type & a) const
     {
-        return p_vector->const_element(offset.get_pos() + op);
+        return offset - a.offset;
     }
+    //! calculate different between two iterator
+    difference_type operator - (const const_self_type & a) const
+    {
+        return offset - a.offset;
+    }
+    //! return iterator advanced -i positions in the vector
+    self_type operator - (size_type i) const
+    {
+        return self_type(p_vector, offset.get_pos() - i);
+    }
+    //! return iterator advanced +i positions in the vector
+    self_type operator + (size_type i) const
+    {
+        return self_type(p_vector, offset.get_pos() + i);
+    }
+    //! advance this iterator -i positions in the vector
+    self_type & operator -= (size_type i)
+    {
+        offset -= i;
+        return *this;
+    }
+    //! advance this iterator +i positions in the vector
+    self_type & operator += (size_type i)
+    {
+        offset += i;
+        return *this;
+    }
+    //! advance this iterator to next position in the vector
+    self_type & operator ++ ()
+    {
+        offset++;
+        return *this;
+    }
+    //! advance this iterator to next position in the vector
+    self_type operator ++ (int)
+    {
+        self_type tmp = *this;
+        offset++;
+        return tmp;
+    }
+    //! advance this iterator to preceding position in the vector
+    self_type & operator -- ()
+    {
+        offset--;
+        return *this;
+    }
+    //! advance this iterator to preceding position in the vector
+    self_type operator -- (int)
+    {
+        self_type tmp = *this;
+        offset--;
+        return tmp;
+    }
+
+    //! \}
+
+    //! \name Comparison Operators
+    //! \{
+
+    bool operator == (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset == a.offset;
+    }
+    bool operator != (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset != a.offset;
+    }
+    bool operator < (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset < a.offset;
+    }
+    bool operator <= (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
+    bool operator > (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset > a.offset;
+    }
+    bool operator >= (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset >= a.offset;
+    }
+
+    bool operator == (const const_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset == a.offset;
+    }
+    bool operator != (const const_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset != a.offset;
+    }
+    bool operator < (const const_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset < a.offset;
+    }
+    bool operator <= (const const_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
+    bool operator > (const const_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset > a.offset;
+    }
+    bool operator >= (const const_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset >= a.offset;
+    }
+
+    //! \}
+
+    //! \name Flushing Operation
+    //! \{
 
     void block_externally_updated()
     {
         p_vector->block_externally_updated(offset);
     }
 
-    _STXXL_DEPRECATED(void touch())
-    {
-        block_externally_updated();
-    }
-
-    _Self & operator ++ ()
-    {
-        offset++;
-        return *this;
-    }
-    _Self operator ++ (int)
-    {
-        _Self __tmp = *this;
-        offset++;
-        return __tmp;
-    }
-    _Self & operator -- ()
-    {
-        offset--;
-        return *this;
-    }
-    _Self operator -- (int)
-    {
-        _Self __tmp = *this;
-        offset--;
-        return __tmp;
-    }
-    bool operator == (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset == a.offset;
-    }
-    bool operator != (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset != a.offset;
-    }
-    bool operator < (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset < a.offset;
-    }
-    bool operator <= (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset <= a.offset;
-    }
-    bool operator > (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset > a.offset;
-    }
-    bool operator >= (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset >= a.offset;
-    }
-
-    bool operator == (const const_iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset == a.offset;
-    }
-    bool operator != (const const_iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset != a.offset;
-    }
-    bool operator < (const const_iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset < a.offset;
-    }
-    bool operator <= (const const_iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset <= a.offset;
-    }
-    bool operator > (const const_iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset > a.offset;
-    }
-    bool operator >= (const const_iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset >= a.offset;
-    }
-
     void flush()
     {
         p_vector->flush();
     }
-#if 0
-    std::ostream & operator << (std::ostream & o) const
-    {
-        o << "vectorpointer: " << ((void *)p_vector) << " offset: " << offset;
-        return o;
-    }
-#endif
+
+    //! \}
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -505,14 +538,17 @@ template <typename ValueType, typename AllocStr, typename SizeType, typename Dif
           unsigned BlockSize, typename PagerType, unsigned PageSize>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _Self;
-    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _NonConstIterator;
+    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> self_type;
+    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> mutable_self_type;
 
     friend class vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
 
 public:
-    typedef _Self const_iterator;
-    typedef _NonConstIterator iterator;
+    //! @name Types
+    //! \{
+
+    typedef self_type const_iterator;
+    typedef mutable_self_type iterator;
 
     typedef unsigned block_offset_type;
     typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> vector_type;
@@ -532,181 +568,211 @@ public:
     typedef typename vector_type::const_pointer pointer;
     typedef typename vector_type::const_pointer const_pointer;
 
+    //! \}
+
 protected:
     blocked_index_type offset;
     const vector_type * p_vector;
 
 private:
-    const_vector_iterator(const vector_type * v, size_type o) : offset(o),
-                                                                p_vector(v)
+    //! private constructor for initializing other iterators
+    const_vector_iterator(const vector_type * v, size_type o)
+        : offset(o), p_vector(v)
     { }
 
 public:
-    const_vector_iterator() : offset(0), p_vector(NULL)
+    //! constructs invalid iterator
+    const_vector_iterator()
+        : offset(0), p_vector(NULL)
     { }
-    const_vector_iterator(const _Self & a) :
-        offset(a.offset),
-        p_vector(a.p_vector)
+    //! copy-constructor
+    const_vector_iterator(const self_type & a)
+        : offset(a.offset), p_vector(a.p_vector)
+    { }
+    //! copy-constructor from mutable iterator
+    const_vector_iterator(const mutable_self_type & a)
+        : offset(a.offset), p_vector(a.p_vector)
     { }
 
-    const_vector_iterator(const iterator & a) :
-        offset(a.offset),
-        p_vector(a.p_vector)
-    { }
+    //! \name Iterator Properties
+    //! \{
 
     //! return pointer to vector containing iterator
     const vector_type* parent_vector() const
     {
         return p_vector;
     }
+    //! return block offset of current element
     block_offset_type block_offset() const
     {
         return static_cast<block_offset_type>(offset.get_offset());
     }
+    //! return iterator to BID containg current element
     bids_container_iterator bid() const
     {
         return ((vector_type *)p_vector)->bid(offset);
     }
 
-    difference_type operator - (const _Self & a) const
-    {
-        return offset - a.offset;
-    }
+    //! \}
 
-    difference_type operator - (const iterator & a) const
-    {
-        return offset - a.offset;
-    }
+    //! \name Access Operators
+    //! \{
 
-    _Self operator - (size_type op) const
-    {
-        return _Self(p_vector, offset.get_pos() - op);
-    }
-
-    _Self operator + (size_type op) const
-    {
-        return _Self(p_vector, offset.get_pos() + op);
-    }
-
-    _Self & operator -= (size_type op)
-    {
-        offset -= op;
-        return *this;
-    }
-
-    _Self & operator += (size_type op)
-    {
-        offset += op;
-        return *this;
-    }
-
+    //! return current element
     const_reference operator * () const
     {
         return p_vector->const_element(offset);
     }
-
+    //! return pointer to current element
     const_pointer operator -> () const
     {
         return &(p_vector->const_element(offset));
     }
-
-    const_reference operator [] (size_type op) const
+    //! return const reference to element +i after the current element
+    const_reference operator [] (size_type i) const
     {
-        return p_vector->const_element(offset.get_pos() + op);
+        return p_vector->const_element(offset.get_pos() + i);
     }
+
+    //! \}
+
+    //! \name Relative Calculation of Iterators
+    //! \{
+
+    //! calculate different between two iterator
+    difference_type operator - (const self_type & a) const
+    {
+        return offset - a.offset;
+    }
+    //! calculate different between two iterator
+    difference_type operator - (const mutable_self_type & a) const
+    {
+        return offset - a.offset;
+    }
+    //! return iterator advanced -i positions in the vector
+    self_type operator - (size_type i) const
+    {
+        return self_type(p_vector, offset.get_pos() - i);
+    }
+    //! return iterator advanced +i positions in the vector
+    self_type operator + (size_type i) const
+    {
+        return self_type(p_vector, offset.get_pos() + i);
+    }
+    //! advance this iterator -i positions in the vector
+    self_type & operator -= (size_type i)
+    {
+        offset -= i;
+        return *this;
+    }
+    //! advance this iterator +i positions in the vector
+    self_type & operator += (size_type i)
+    {
+        offset += i;
+        return *this;
+    }
+    //! advance this iterator to next position in the vector
+    self_type & operator ++ ()
+    {
+        offset++;
+        return *this;
+    }
+    //! advance this iterator to next position in the vector
+    self_type operator ++ (int)
+    {
+        self_type tmp_ = *this;
+        offset++;
+        return tmp_;
+    }
+    //! advance this iterator to preceding position in the vector
+    self_type & operator -- ()
+    {
+        offset--;
+        return *this;
+    }
+    //! advance this iterator to preceding position in the vector
+    self_type operator -- (int)
+    {
+        self_type tmp = *this;
+        offset--;
+        return tmp;
+    }
+
+    //! \}
+
+    //! \name Comparison Operators
+    //! \{
+
+    bool operator == (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset == a.offset;
+    }
+    bool operator != (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset != a.offset;
+    }
+    bool operator < (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset < a.offset;
+    }
+    bool operator <= (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
+    bool operator > (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset > a.offset;
+    }
+    bool operator >= (const self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset >= a.offset;
+    }
+
+    bool operator == (const mutable_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset == a.offset;
+    }
+    bool operator != (const mutable_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset != a.offset;
+    }
+    bool operator < (const mutable_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset < a.offset;
+    }
+    bool operator <= (const mutable_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
+    bool operator > (const mutable_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset > a.offset;
+    }
+    bool operator >= (const mutable_self_type & a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset >= a.offset;
+    }
+
+    //! \}
+
+    //! \name Flushing Operation
+    //! \{
 
     void block_externally_updated()
     {
         p_vector->block_externally_updated(offset);
-    }
-
-    _STXXL_DEPRECATED(void touch())
-    {
-        block_externally_updated();
-    }
-
-    _Self & operator ++ ()
-    {
-        offset++;
-        return *this;
-    }
-    _Self operator ++ (int)
-    {
-        _Self tmp_ = *this;
-        offset++;
-        return tmp_;
-    }
-    _Self & operator -- ()
-    {
-        offset--;
-        return *this;
-    }
-    _Self operator -- (int)
-    {
-        _Self __tmp = *this;
-        offset--;
-        return __tmp;
-    }
-    bool operator == (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset == a.offset;                 // or (offset + stxxl::int64(p_vector))
-    }
-    bool operator != (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset != a.offset;
-    }
-    bool operator < (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset < a.offset;
-    }
-    bool operator <= (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset <= a.offset;
-    }
-    bool operator > (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset > a.offset;
-    }
-    bool operator >= (const _Self & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset >= a.offset;
-    }
-
-    bool operator == (const iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset == a.offset; // or (offset + stxxl::int64(p_vector))
-    }
-    bool operator != (const iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset != a.offset;
-    }
-    bool operator < (const iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset < a.offset;
-    }
-    bool operator <= (const iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset <= a.offset;
-    }
-    bool operator > (const iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset > a.offset;
-    }
-    bool operator >= (const iterator & a) const
-    {
-        assert(p_vector == a.p_vector);
-        return offset >= a.offset;
     }
 
     void flush()
@@ -714,20 +780,14 @@ public:
         p_vector->flush();
     }
 
-#if 0
-    std::ostream & operator << (std::ostream & o) const
-    {
-        o << "vector pointer: " << ((void *)p_vector) << " offset: " << offset;
-        return o;
-    }
-#endif
+    //! \}
 };
 
 ////////////////////////////////////////////////////////////////////////////
 
 //! \brief External vector container. \n
-//! <b> Introduction </b> to vector container: see \ref tutorial_vector tutorial. \n
-//! <b> Design and Internals </b> of vector container: see \ref design_vector
+//! <b>Introduction</b> to vector container: see \ref tutorial_vector tutorial. \n
+//! <b>Design and Internals</b> of vector container: see \ref design_vector
 //!
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
@@ -752,6 +812,9 @@ template <
 class vector
 {
 public:
+    //! \name Standard Types
+    //! \{
+
     //! The type of elements stored in the vector.
     typedef ValueType value_type;
     //! reference to value_type
@@ -787,6 +850,11 @@ public:
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+    //! \}
+
+    //! \name Extra Types
+    //! \{
+
     //! vector_bufwriter compatible with this vector
     typedef vector_bufwriter<iterator> bufwriter_type;
 
@@ -814,25 +882,28 @@ public:
 
     //! type of the block used in disk-memory transfers
     typedef typed_block<BlockSize, ValueType> block_type;
+    //! double-index type to reference individual elements in a block
     typedef double_blocked_index<SizeType, PageSize, block_type::size> blocked_index_type;
 
-private:
-    alloc_strategy_type alloc_strategy;
-    size_type _size;
-    bids_container_type _bids;
-    mutable pager_type pager;
+    //! \}
 
+private:
+    alloc_strategy_type m_alloc_strategy;
+    size_type m_size;
+    bids_container_type m_bids;
+    mutable pager_type m_pager;
+
+    // enum specifying status of a page of the vector
     enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
     //! status of each page (valid_on_disk, uninitialized or dirty)
-    mutable std::vector<unsigned char> _page_status;
-    mutable std::vector<int_type> _page_to_slot;
-    mutable simple_vector<int_type> _slot_to_page;
-    mutable std::queue<int_type> _free_slots;
-    mutable simple_vector<block_type> * _cache;
-    file * _from;
-    block_manager * bm;
-    config * cfg;
-    bool exported;
+    mutable std::vector<unsigned char> m_page_status;
+    mutable std::vector<int_type> m_page_to_slot;
+    mutable simple_vector<int_type> m_slot_to_page;
+    mutable std::queue<int_type> m_free_slots;
+    mutable simple_vector<block_type> * m_cache;
+    file * m_from;
+    block_manager * m_bm;
+    bool m_exported;
 
     size_type size_from_file_length(stxxl::uint64 file_length) const
     {
@@ -856,78 +927,93 @@ private:
     }
 
 public:
-    //! \brief Constructs external vector with n elements.
+    //! Constructs external vector with n elements.
     //!
     //! \param n Number of elements.
     //! \param npages Number of cached pages.
-    vector(size_type n = 0, unsigned_type npages = pager_type().size()) :
-        _size(n),
-        _bids((size_t)div_ceil(n, block_type::size)),
-        pager (npages),
-        _page_status(div_ceil(_bids.size(), page_size)),
-        _page_to_slot(div_ceil(_bids.size(), page_size)),
-        _slot_to_page(npages),
-        _cache(NULL),
-        _from(NULL),
-        exported(false)
+    vector(size_type n = 0, unsigned_type npages = pager_type().size())
+        : m_size(n),
+          m_bids((size_t)div_ceil(n, block_type::size)),
+          m_pager(npages),
+          m_page_status(div_ceil(m_bids.size(), page_size)),
+          m_page_to_slot(div_ceil(m_bids.size(), page_size)),
+          m_slot_to_page(npages),
+          m_cache(NULL),
+          m_from(NULL),
+          m_exported(false)
     {
-        bm = block_manager::get_instance();
-        cfg = config::get_instance();
+        m_bm = block_manager::get_instance();
 
         allocate_page_cache();
 
-        for (unsigned_type i = 0; i < _page_status.size(); ++i)
+        for (size_t i = 0; i < m_page_status.size(); ++i)
         {
-            _page_status[i] = uninitialized;
-            _page_to_slot[i] = on_disk;
+            m_page_status[i] = uninitialized;
+            m_page_to_slot[i] = on_disk;
         }
 
         for (unsigned_type i = 0; i < numpages(); ++i)
-            _free_slots.push(i);
+            m_free_slots.push(i);
 
-        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
+        m_bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end(), 0);
     }
 
     void swap(vector & obj)
     {
-        std::swap(alloc_strategy, obj.alloc_strategy);
-        std::swap(_size, obj._size);
-        std::swap(_bids, obj._bids);
-        std::swap(pager, obj.pager);
-        std::swap(_page_status, obj._page_status);
-        std::swap(_page_to_slot, obj._page_to_slot);
-        std::swap(_slot_to_page, obj._slot_to_page);
-        std::swap(_free_slots, obj._free_slots);
-        std::swap(_cache, obj._cache);
-        std::swap(_from, obj._from);
-        std::swap(exported, obj.exported);
+        std::swap(m_alloc_strategy, obj.m_alloc_strategy);
+        std::swap(m_size, obj.m_size);
+        std::swap(m_bids, obj.m_bids);
+        std::swap(m_pager, obj.m_pager);
+        std::swap(m_page_status, obj.m_page_status);
+        std::swap(m_page_to_slot, obj.m_page_to_slot);
+        std::swap(m_slot_to_page, obj.m_slot_to_page);
+        std::swap(m_free_slots, obj.m_free_slots);
+        std::swap(m_cache, obj.m_cache);
+        std::swap(m_from, obj.m_from);
+        std::swap(m_exported, obj.m_exported);
     }
 
+    //! Allocate page cache, must be called to allow access to elements.
     void allocate_page_cache() const
     {
         //  numpages() might be zero
-        if (!_cache && numpages() > 0)
-            _cache = new simple_vector<block_type> (numpages() * page_size);
+        if (!m_cache && numpages() > 0)
+            m_cache = new simple_vector<block_type> (numpages() * page_size);
     }
 
-    //! allows to free the cache, but you may not access any element until call allocate_pacge_cache() again
+    //! allows to free the cache, but you may not access any element until call
+    //! allocate_page_cache() again
     void deallocate_page_cache() const
     {
         flush();
-        delete _cache;
-        _cache = NULL;
+        delete m_cache;
+        m_cache = NULL;
+    }
+
+    //! \name Size and Capacity
+    //! \{
+
+    //! return the size of the vector.
+    size_type size() const
+    {
+        return m_size;
+    }
+    //! true if the vector's size is zero.
+    bool empty() const
+    {
+        return (!m_size);
     }
 
     //! Return the number of elelemtsn for which \a external memory has been
     //! allocated. capacity() is always greator than or equal to size().
     size_type capacity() const
     {
-        return size_type(_bids.size()) * block_type::size;
+        return size_type(m_bids.size()) * block_type::size;
     }
     //! Returns the number of bytes that the vector has allocated on disks.
     size_type raw_capacity() const
     {
-        return size_type(_bids.size()) * block_type::raw_size;
+        return size_type(m_bids.size()) * block_type::raw_size;
     }
 
     /*! \brief Reserves at least n elements in external memory.
@@ -943,29 +1029,31 @@ public:
         if (n <= capacity())
             return;
 
-        unsigned_type old_bids_size = _bids.size();
+        unsigned_type old_bids_size = m_bids.size();
         unsigned_type new_bids_size = (unsigned_type)div_ceil(n, block_type::size);
         unsigned_type new_pages = div_ceil(new_bids_size, page_size);
-        _page_status.resize(new_pages, uninitialized);
-        _page_to_slot.resize(new_pages, on_disk);
+        m_page_status.resize(new_pages, uninitialized);
+        m_page_to_slot.resize(new_pages, on_disk);
 
-        _bids.resize(new_bids_size);
-        if (_from == NULL)
+        m_bids.resize(new_bids_size);
+        if (m_from == NULL)
         {
-            bm->new_blocks(alloc_strategy, _bids.begin() + old_bids_size, _bids.end(), old_bids_size);
+            m_bm->new_blocks(m_alloc_strategy,
+                             m_bids.begin() + old_bids_size, m_bids.end(),
+                             old_bids_size);
         }
         else
         {
             size_type offset = size_type(old_bids_size) * size_type(block_type::raw_size);
-            bids_container_iterator it = _bids.begin() + old_bids_size;
-            for ( ; it != _bids.end(); ++it, offset += size_type(block_type::raw_size))
+            for (bids_container_iterator it = m_bids.begin() + old_bids_size;
+                 it != m_bids.end(); ++it, offset += size_type(block_type::raw_size))
             {
-                (*it).storage = _from;
+                (*it).storage = m_from;
                 (*it).offset = offset;
             }
-            STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " << ((void *)_from) << " to "
-                                                                       << offset);
-            _from->set_size(offset);
+            STXXL_VERBOSE_VECTOR("reserve(): Changing size of file "
+                                 << ((void *)m_from) << " to " << offset);
+            m_from->set_size(offset);
         }
     }
 
@@ -987,29 +1075,31 @@ public:
             _resize(n);
     }
 
+    //! \}
+
 private:
     //! Resize vector, only allow capacity growth.
     void _resize(size_type n)
     {
         reserve(n);
-        if (n < _size) {
+        if (n < m_size) {
             // mark excess pages as uninitialized and evict them from cache
             unsigned_type first_page_to_evict = (unsigned_type)div_ceil(n, block_type::size * page_size);
-            for (unsigned_type i = first_page_to_evict; i < _page_status.size(); ++i) {
-                if (_page_to_slot[i] != on_disk) {
-                    _free_slots.push(_page_to_slot[i]);
-                    _page_to_slot[i] = on_disk;
+            for (size_t i = first_page_to_evict; i < m_page_status.size(); ++i) {
+                if (m_page_to_slot[i] != on_disk) {
+                    m_free_slots.push(m_page_to_slot[i]);
+                    m_page_to_slot[i] = on_disk;
                 }
-                _page_status[i] = uninitialized;
+                m_page_status[i] = uninitialized;
             }
         }
-        _size = n;
+        m_size = n;
     }
 
     //! Resize vector, also allow reduction of external memory capacity.
     void _resize_shrink_capacity(size_type n)
     {
-        unsigned_type old_bids_size = _bids.size();
+        unsigned_type old_bids_size = m_bids.size();
         unsigned_type new_bids_size = div_ceil(n, block_type::size);
 
         if (new_bids_size > old_bids_size)
@@ -1022,63 +1112,68 @@ private:
 
             STXXL_VERBOSE_VECTOR("shrinking from " << old_bids_size << " to "
                                  << new_bids_size << " blocks = from "
-                                 << _page_status.size() << " to "
+                                 << m_page_status.size() << " to "
                                  << new_pages_size << " pages");
 
             // release blocks
-            if (_from != NULL)
-                _from->set_size(new_bids_size * block_type::raw_size);
+            if (m_from != NULL)
+                m_from->set_size(new_bids_size * block_type::raw_size);
             else
-                bm->delete_blocks(_bids.begin() + old_bids_size, _bids.end());
+                m_bm->delete_blocks(m_bids.begin() + old_bids_size, m_bids.end());
 
-            _bids.resize(new_bids_size);
+            m_bids.resize(new_bids_size);
 
-            // don't resize _page_to_slot or _page_status, because it is still
-            // needed to check page status and match the mapping _slot_to_page
+            // don't resize m_page_to_slot or m_page_status, because it is
+            // still needed to check page status and match the mapping
+            // m_slot_to_page
 
             // clear dirty flag, so these pages will be never written
-            std::fill(_page_status.begin() + new_pages_size,
-                      _page_status.end(), (unsigned char)valid_on_disk);
+            std::fill(m_page_status.begin() + new_pages_size,
+                      m_page_status.end(), (unsigned char)valid_on_disk);
         }
 
-        _size = n;
+        m_size = n;
     }
 
 public:
-    //! Erases all of the elements and deallocates all external memory that is occupied.
+    //! Erases all of the elements and deallocates all external memory that is
+    //! occupied.
     void clear()
     {
-        _size = 0;
-        if (_from == NULL)
-            bm->delete_blocks(_bids.begin(), _bids.end());
+        m_size = 0;
+        if (m_from == NULL)
+            m_bm->delete_blocks(m_bids.begin(), m_bids.end());
 
-        _bids.clear();
-        _page_status.clear();
-        _page_to_slot.clear();
-        while (!_free_slots.empty())
-            _free_slots.pop();
+        m_bids.clear();
+        m_page_status.clear();
+        m_page_to_slot.clear();
+        while (!m_free_slots.empty())
+            m_free_slots.pop();
 
         for (unsigned_type i = 0; i < numpages(); ++i)
-            _free_slots.push(i);
+            m_free_slots.push(i);
     }
+
+    //! \name Front and Back Access
+    //! \{
 
     //! Append a new element at the end.
     void push_back(const_reference obj)
     {
-        size_type old_size = _size;
+        size_type old_size = m_size;
         resize(old_size + 1);
         element(old_size) = obj;
     }
     //! Removes the last element (without returning it, see back()).
     void pop_back()
     {
-        resize(_size - 1);
+        resize(m_size - 1);
     }
 
     //! Returns a reference to the last element, see \ref design_vector_notes.
     reference back()
     {
-        return element(_size - 1);
+        return element(m_size - 1);
     }
     //! Returns a reference to the first element, see \ref design_vector_notes.
     reference front()
@@ -1088,13 +1183,15 @@ public:
     //! Returns a constant reference to the last element, see \ref design_vector_notes.
     const_reference back() const
     {
-        return const_element(_size - 1);
+        return const_element(m_size - 1);
     }
     //! Returns a constant reference to the first element, see \ref design_vector_notes.
     const_reference front() const
     {
         return const_element(0);
     }
+
+    //! \}
 
     //! \brief Construct vector from a file.
     //! \param from file to be constructed from
@@ -1103,45 +1200,44 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    vector(file * from, size_type size = size_type(-1), unsigned_type npages = pager_type ().size ()) :
-        _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-        _bids((size_t)div_ceil(_size, size_type(block_type::size))),
-        pager(npages),
-        _page_status(div_ceil(_bids.size(), page_size)),
-        _page_to_slot(div_ceil(_bids.size(), page_size)),
-        _slot_to_page(npages),
-        _cache(NULL),
-        _from(from),
-        exported(false)
+    vector(file * from, size_type size = size_type(-1), unsigned_type npages = pager_type().size())
+        : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
+          m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
+          m_pager(npages),
+          m_page_status(div_ceil(m_bids.size(), page_size)),
+          m_page_to_slot(div_ceil(m_bids.size(), page_size)),
+          m_slot_to_page(npages),
+          m_cache(NULL),
+          m_from(from),
+          m_exported(false)
     {
         // initialize from file
         if (!block_type::has_only_data)
         {
-            std::ostringstream str_;
-            str_ << "The block size for a vector that is mapped to a file must be a multiple of the element size (" <<
+            std::ostringstream str;
+            str << "The block size for a vector that is mapped to a file must be a multiple of the element size (" <<
             sizeof(value_type) << ") and the page size (4096).";
-            throw std::runtime_error(str_.str());
+            throw std::runtime_error(str.str());
         }
 
-        bm = block_manager::get_instance();
-        cfg = config::get_instance();
+        m_bm = block_manager::get_instance();
 
         allocate_page_cache();
 
-        for (unsigned_type i = 0; i < _page_status.size(); ++i)
+        for (size_t i = 0; i < m_page_status.size(); ++i)
         {
-            _page_status[i] = valid_on_disk;
-            _page_to_slot[i] = on_disk;
+            m_page_status[i] = valid_on_disk;
+            m_page_to_slot[i] = on_disk;
         }
 
         for (unsigned_type i = 0; i < numpages(); ++i)
-            _free_slots.push(i);
+            m_free_slots.push(i);
 
 
-        //allocate blocks equidistantly and in-order
+        // allocate blocks equidistantly and in-order
         size_type offset = 0;
-        bids_container_iterator it = _bids.begin();
-        for ( ; it != _bids.end(); ++it, offset += size_type(block_type::raw_size))
+        for (bids_container_iterator it = m_bids.begin();
+             it != m_bids.end(); ++it, offset += size_type(block_type::raw_size))
         {
             (*it).storage = from;
             (*it).offset = offset;
@@ -1150,33 +1246,32 @@ public:
     }
 
     //! copy-constructor
-    vector(const vector & obj) :
-        _size(obj.size()),
-        _bids((size_t)div_ceil(obj.size(), block_type::size)),
-        pager(obj.numpages ()),
-        _page_status(div_ceil(_bids.size(), page_size)),
-        _page_to_slot(div_ceil(_bids.size(), page_size)),
-        _slot_to_page(obj.numpages ()),
-        _cache(NULL),
-        _from(NULL),
-        exported(false)
+    vector(const vector & obj)
+        : m_size(obj.size()),
+          m_bids((size_t)div_ceil(obj.size(), block_type::size)),
+          m_pager(obj.numpages ()),
+          m_page_status(div_ceil(m_bids.size(), page_size)),
+          m_page_to_slot(div_ceil(m_bids.size(), page_size)),
+          m_slot_to_page(obj.numpages ()),
+          m_cache(NULL),
+          m_from(NULL),
+          m_exported(false)
     {
-        assert(!obj.exported);
-        bm = block_manager::get_instance();
-        cfg = config::get_instance();
+        assert(!obj.m_exported);
+        m_bm = block_manager::get_instance();
 
         allocate_page_cache();
 
-        for (unsigned_type i = 0; i < _page_status.size(); ++i)
+        for (size_t i = 0; i < m_page_status.size(); ++i)
         {
-            _page_status[i] = uninitialized;
-            _page_to_slot[i] = on_disk;
+            m_page_status[i] = uninitialized;
+            m_page_to_slot[i] = on_disk;
         }
 
         for (unsigned_type i = 0; i < numpages(); ++i)
-            _free_slots.push(i);
+            m_free_slots.push(i);
 
-        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
+        m_bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end(), 0);
 
         const_iterator inbegin = obj.begin();
         const_iterator inend = obj.end();
@@ -1194,16 +1289,9 @@ public:
         return *this;
     }
 
-    //! return the size of the vector.
-    size_type size() const
-    {
-        return _size;
-    }
-    //! true if the vector's size is zero.
-    bool empty() const
-    {
-        return (!_size);
-    }
+    //! \name Iterator Construction
+    //! \{
+
     //! returns an iterator pointing to the beginning of the vector, see \ref design_vector_notes.
     iterator begin()
     {
@@ -1222,12 +1310,12 @@ public:
     //! returns an iterator pointing beyond the end of the vector, see \ref design_vector_notes.
     iterator end()
     {
-        return iterator(this, _size);
+        return iterator(this, m_size);
     }
     //! returns a const_iterator pointing beyond the end of the vector, see \ref design_vector_notes.
     const_iterator end() const
     {
-        return const_iterator(this, _size);
+        return const_iterator(this, m_size);
     }
     //! returns a const_iterator pointing beyond the end of the vector, see \ref design_vector_notes.
     const_iterator cend() const
@@ -1235,44 +1323,73 @@ public:
         return end();
     }
 
+    //! returns a reverse_iterator pointing to the end of the vector.
     reverse_iterator rbegin()
     {
         return reverse_iterator(end());
     }
+    //! returns a reverse_iterator pointing to the end of the vector.
     const_reverse_iterator rbegin() const
     {
         return const_reverse_iterator(end());
     }
+    //! returns a reverse_iterator pointing to the end of the vector.
     const_reverse_iterator crbegin() const
     {
         return const_reverse_iterator(end());
     }
+    //! returns a reverse_iterator pointing beyond the beginning of the vector.
     reverse_iterator rend()
     {
         return reverse_iterator(begin());
     }
+    //! returns a reverse_iterator pointing beyond the beginning of the vector.
     const_reverse_iterator rend() const
     {
         return const_reverse_iterator(begin());
     }
+    //! returns a reverse_iterator pointing beyond the beginning of the vector.
     const_reverse_iterator crend() const
     {
         return const_reverse_iterator(begin());
     }
 
+    //! \}
+
+    //! \name Direct Element Access
+    //! \{
+
+    //! access the element at the given vector's offset
     reference operator [] (size_type offset)
     {
         return element(offset);
     }
+    //! access the element at the given vector's offset
     const_reference operator [] (size_type offset) const
     {
         return const_element(offset);
     }
 
+    //! access the element at the given vector's offset
+    reference at(size_type offset)
+    {
+        assert(offset < (size_type)size());
+        return element(offset);
+    }
+    //! access the element at the given vector's offset
+    const_reference at(size_type offset) const
+    {
+        assert(offset < (size_type)size());
+        return const_element(offset);
+    }
+
+    //! return true if the given vector offset is in cache
     bool is_element_cached(size_type offset) const
     {
         return is_page_cached(blocked_index_type(offset));
     }
+
+    //! \}
 
     //! Flushes the cache pages to the external memory.
     void flush() const
@@ -1282,23 +1399,23 @@ public:
         for (unsigned_type i = 0; i < numpages(); i++)
             non_free_slots[i] = true;
 
-        while (!_free_slots.empty())
+        while (!m_free_slots.empty())
         {
-            non_free_slots[_free_slots.front()] = false;
-            _free_slots.pop();
+            non_free_slots[m_free_slots.front()] = false;
+            m_free_slots.pop();
         }
 
         for (unsigned_type i = 0; i < numpages(); i++)
         {
-            _free_slots.push(i);
-            int_type page_no = _slot_to_page[i];
+            m_free_slots.push(i);
+            int_type page_no = m_slot_to_page[i];
             if (non_free_slots[i])
             {
                 STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address "
                                      << (int64(page_no) * int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
-                _page_to_slot[page_no] = on_disk;
+                m_page_to_slot[page_no] = on_disk;
             }
         }
     }
@@ -1319,18 +1436,19 @@ public:
             STXXL_ERRMSG("Exception thrown in ~vector()");
         }
 
-        if (!exported)
+        if (!m_exported)
         {
-            if (_from == NULL)
-                bm->delete_blocks(_bids.begin(), _bids.end());
-            else        // file must be truncated
+            if (m_from == NULL) {
+                m_bm->delete_blocks(m_bids.begin(), m_bids.end());
+            }
+            else // file must be truncated
             {
-                STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " << ((void *)_from) << " to "
-                                                                   << file_length());
+                STXXL_VERBOSE_VECTOR("~vector(): Changing size of file "
+                                     << ((void *)m_from) << " to " << file_length());
                 STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
                 try
                 {
-                    _from->set_size(file_length());
+                    m_from->set_size(file_length());
                 }
                 catch (...)
                 {
@@ -1338,7 +1456,7 @@ public:
                 }
             }
         }
-        delete _cache;
+        delete m_cache;
     }
 
     //! Export data such that it is persistent on the file system. Resulting
@@ -1346,23 +1464,23 @@ public:
     void export_files(std::string filename_prefix)
     {
         int64 no = 0;
-        for (bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
+        for (bids_container_iterator i = m_bids.begin(); i != m_bids.end(); ++i) {
             std::ostringstream number;
             number << std::setw(9) << std::setfill('0') << no;
             size_type current_block_size =
-                ((i + 1) == _bids.end() && _size % block_type::size > 0) ?
-                (_size % block_type::size) * sizeof(value_type) :
+                ((i + 1) == m_bids.end() && m_size % block_type::size > 0) ?
+                (m_size % block_type::size) * sizeof(value_type) :
                 block_type::size * sizeof(value_type);
             (*i).storage->export_files((*i).offset, current_block_size, filename_prefix + number.str());
             ++no;
         }
-        exported = true;
+        m_exported = true;
     }
 
     //! Get the file associated with this vector, or NULL.
     file * get_file() const
     {
-        return _from;
+        return m_from;
     }
 
     //! Set the blocks and the size of this container explicitly.
@@ -1371,59 +1489,59 @@ public:
     void set_content(const ForwardIterator & bid_begin, const ForwardIterator & bid_end, size_type n)
     {
         unsigned_type new_bids_size = div_ceil(n, block_type::size);
-        _bids.resize(new_bids_size);
-        std::copy(bid_begin, bid_end, _bids.begin());
+        m_bids.resize(new_bids_size);
+        std::copy(bid_begin, bid_end, m_bids.begin());
         unsigned_type new_pages = div_ceil(new_bids_size, page_size);
-        _page_status.resize(new_pages, valid_on_disk);
-        _page_to_slot.resize(new_pages, on_disk);
-        _size = n;
+        m_page_status.resize(new_pages, valid_on_disk);
+        m_page_to_slot.resize(new_pages, on_disk);
+        m_size = n;
     }
 
     //! Number of pages used by the pager.
     inline unsigned_type numpages() const
     {
-      return pager.size ();
+      return m_pager.size ();
     }
 
 private:
     bids_container_iterator bid(const size_type & offset)
     {
-        return (_bids.begin() +
+        return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
     bids_container_iterator bid(const blocked_index_type & offset)
     {
-        return (_bids.begin() +
+        return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset.get_block2() * PageSize + offset.get_block1()));
     }
     const_bids_container_iterator bid(const size_type & offset) const
     {
-        return (_bids.begin() +
+        return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
     const_bids_container_iterator bid(const blocked_index_type & offset) const
     {
-        return (_bids.begin() +
+        return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset.get_block2() * PageSize + offset.get_block1()));
     }
 
     void read_page(int_type page_no, int_type cache_slot) const
     {
-        assert(page_no < (int_type)_page_status.size());
-        if (_page_status[page_no] == uninitialized)
+        assert(page_no < (int_type)m_page_status.size());
+        if (m_page_status[page_no] == uninitialized)
             return;
         STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
-        int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
+        int_type last_block = STXXL_MIN(block_no + page_size, int_type(m_bids.size()));
         int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
-            reqs[j] = (*_cache)[i].read(_bids[block_no]);
+            reqs[j] = (*m_cache)[i].read(m_bids[block_no]);
         }
         assert(last_block - page_no * page_size > 0);
         wait_all(reqs, last_block - page_no * page_size);
@@ -1431,20 +1549,20 @@ private:
     }
     void write_page(int_type page_no, int_type cache_slot) const
     {
-        assert(page_no < (int_type)_page_status.size());
-        if (!(_page_status[page_no] & dirty))
+        assert(page_no < (int_type)m_page_status.size());
+        if (!(m_page_status[page_no] & dirty))
             return;
         STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
-        int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
+        int_type last_block = STXXL_MIN(block_no + page_size, int_type(m_bids.size()));
         assert(block_no < last_block);
         int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
-            reqs[j] = (*_cache)[i].write(_bids[block_no]);
+            reqs[j] = (*m_cache)[i].write(m_bids[block_no]);
         }
-        _page_status[page_no] = valid_on_disk;
+        m_page_status[page_no] = valid_on_disk;
         assert(last_block - page_no * page_size > 0);
         wait_all(reqs, last_block - page_no * page_size);
         delete[] reqs;
@@ -1452,58 +1570,58 @@ private:
 
     reference element(size_type offset)
     {
-        #ifdef STXXL_RANGE_CHECK
+#ifdef STXXL_RANGE_CHECK
         assert(offset < (size_type)size());
-        #endif
+#endif
         return element(blocked_index_type(offset));
     }
 
     reference element(const blocked_index_type & offset)
     {
-        #ifdef STXXL_RANGE_CHECK
+#ifdef STXXL_RANGE_CHECK
         assert(offset.get_pos() < size());
-        #endif
+#endif
         unsigned_type page_no = offset.get_block2();
-        assert(page_no < _page_to_slot.size());   // fails if offset is too large, out of bound access
-        int_type cache_slot = _page_to_slot[page_no];
+        assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
+        int_type cache_slot = m_page_to_slot[page_no];
         if (cache_slot < 0)                                 // == on_disk
         {
-            if (_free_slots.empty())                        // has to kick
+            if (m_free_slots.empty())                        // has to kick
             {
-                int_type kicked_slot = pager.kick();
-                pager.hit(kicked_slot);
-                int_type old_page_no = _slot_to_page[kicked_slot];
-                _page_to_slot[page_no] = kicked_slot;
-                _page_to_slot[old_page_no] = on_disk;
-                _slot_to_page[kicked_slot] = page_no;
+                int_type kicked_slot = m_pager.kick();
+                m_pager.hit(kicked_slot);
+                int_type old_page_no = m_slot_to_page[kicked_slot];
+                m_page_to_slot[page_no] = kicked_slot;
+                m_page_to_slot[old_page_no] = on_disk;
+                m_slot_to_page[kicked_slot] = page_no;
 
                 write_page(old_page_no, kicked_slot);
                 read_page(page_no, kicked_slot);
 
-                _page_status[page_no] = dirty;
+                m_page_status[page_no] = dirty;
 
-                return (*_cache)[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*m_cache)[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
-                int_type free_slot = _free_slots.front();
-                _free_slots.pop();
-                pager.hit(free_slot);
-                _page_to_slot[page_no] = free_slot;
-                _slot_to_page[free_slot] = page_no;
+                int_type free_slot = m_free_slots.front();
+                m_free_slots.pop();
+                m_pager.hit(free_slot);
+                m_page_to_slot[page_no] = free_slot;
+                m_slot_to_page[free_slot] = page_no;
 
                 read_page(page_no, free_slot);
 
-                _page_status[page_no] = dirty;
+                m_page_status[page_no] = dirty;
 
-                return (*_cache)[free_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*m_cache)[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
-            _page_status[page_no] = dirty;
-            pager.hit(cache_slot);
-            return (*_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
+            m_page_status[page_no] = dirty;
+            m_pager.hit(cache_slot);
+            return (*m_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 
@@ -1511,19 +1629,19 @@ private:
     void page_externally_updated(unsigned_type page_no) const
     {
         // fails if offset is too large, out of bound access
-        assert(page_no < _page_status.size());
+        assert(page_no < m_page_status.size());
         // "A dirty page has been marked as newly initialized. The page content will be lost."
-        assert(!(_page_status[page_no] & dirty));
-        if (_page_to_slot[page_no] != on_disk) {
+        assert(!(m_page_status[page_no] & dirty));
+        if (m_page_to_slot[page_no] != on_disk) {
             // remove page from cache
-            _free_slots.push(_page_to_slot[page_no]);
-            _page_to_slot[page_no] = on_disk;
+            m_free_slots.push(m_page_to_slot[page_no]);
+            m_page_to_slot[page_no] = on_disk;
             STXXL_VERBOSE_VECTOR("page_externally_updated(): page_no=" << page_no << " flushed from cache.");
         }
         else {
             STXXL_VERBOSE_VECTOR("page_externally_updated(): page_no=" << page_no << " no need to flush.");
         }
-        _page_status[page_no] = valid_on_disk;
+        m_page_status[page_no] = valid_on_disk;
     }
 
     void block_externally_updated(size_type offset) const
@@ -1536,16 +1654,6 @@ private:
         page_externally_updated(offset.get_block2());
     }
 
-    _STXXL_DEPRECATED(void touch(size_type offset) const)
-    {
-        page_externally_updated(offset / (block_type::size * page_size));
-    }
-
-    _STXXL_DEPRECATED(void touch(const blocked_index_type & offset) const)
-    {
-        page_externally_updated(offset.get_block2());
-    }
-
     const_reference const_element(size_type offset) const
     {
         return const_element(blocked_index_type(offset));
@@ -1554,49 +1662,49 @@ private:
     const_reference const_element(const blocked_index_type & offset) const
     {
         unsigned_type page_no = offset.get_block2();
-        assert(page_no < _page_to_slot.size());   // fails if offset is too large, out of bound access
-        int_type cache_slot = _page_to_slot[page_no];
+        assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
+        int_type cache_slot = m_page_to_slot[page_no];
         if (cache_slot < 0)                                 // == on_disk
         {
-            if (_free_slots.empty())                        // has to kick
+            if (m_free_slots.empty())                        // has to kick
             {
-                int_type kicked_slot = pager.kick();
-                pager.hit(kicked_slot);
-                int_type old_page_no = _slot_to_page[kicked_slot];
-                _page_to_slot[page_no] = kicked_slot;
-                _page_to_slot[old_page_no] = on_disk;
-                _slot_to_page[kicked_slot] = page_no;
+                int_type kicked_slot = m_pager.kick();
+                m_pager.hit(kicked_slot);
+                int_type old_page_no = m_slot_to_page[kicked_slot];
+                m_page_to_slot[page_no] = kicked_slot;
+                m_page_to_slot[old_page_no] = on_disk;
+                m_slot_to_page[kicked_slot] = page_no;
 
                 write_page(old_page_no, kicked_slot);
                 read_page(page_no, kicked_slot);
 
-                return (*_cache)[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*m_cache)[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
-                int_type free_slot = _free_slots.front();
-                _free_slots.pop();
-                pager.hit(free_slot);
-                _page_to_slot[page_no] = free_slot;
-                _slot_to_page[free_slot] = page_no;
+                int_type free_slot = m_free_slots.front();
+                m_free_slots.pop();
+                m_pager.hit(free_slot);
+                m_page_to_slot[page_no] = free_slot;
+                m_slot_to_page[free_slot] = page_no;
 
                 read_page(page_no, free_slot);
 
-                return (*_cache)[free_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*m_cache)[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
-            pager.hit(cache_slot);
-            return (*_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
+            m_pager.hit(cache_slot);
+            return (*m_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 
     bool is_page_cached(const blocked_index_type & offset) const
     {
         unsigned_type page_no = offset.get_block2();
-        assert(page_no < _page_to_slot.size());   // fails if offset is too large, out of bound access
-        int_type cache_slot = _page_to_slot[page_no];
+        assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
+        int_type cache_slot = m_page_to_slot[page_no];
         return (cache_slot >= 0);                           // on_disk == -1
     }
 };
@@ -1690,8 +1798,6 @@ inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize
 {
     return !(a < b);
 }
-
-//! \}
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -2393,9 +2499,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
-
-//! \addtogroup stlcont
-//! \{
 
 //! \brief External vector type generator.
 //!
