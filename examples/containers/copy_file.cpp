@@ -20,11 +20,11 @@
 
 void copy_file(const char* input_path, const char* output_path, unsigned int method)
 {
-    unlink(output_path); // delete output file
+    using stxxl::file;
+
+    file::unlink(output_path); // delete output file
 
     stxxl::timer tm(true); // start a timer
-
-    using stxxl::file;
 
     // input file object
     stxxl::syscall_file InputFile(input_path, file::RDONLY | file::DIRECT);

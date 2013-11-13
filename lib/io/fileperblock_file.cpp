@@ -22,6 +22,7 @@
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
 #include <stxxl/bits/common/error_handling.h>
+#include "ufs_platform.h"
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -17,6 +17,8 @@
 
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/error_handling.h>
+#include "ufs_platform.h"
+#include <sys/mman.h>
 
 
 __STXXL_BEGIN_NAMESPACE

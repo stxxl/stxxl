@@ -22,43 +22,6 @@
  #define STXXL_CHECK_BLOCK_ALIGNING
 #endif
 
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#if STXXL_WINDOWS
-// this is not stxxl/bits/io/io.h !
- #include <io.h>
-#else
- #include <unistd.h>
-#endif
-
-
-#ifndef O_SYNC
- #define O_SYNC 0
-#endif
-#ifndef O_RSYNC
- #define O_RSYNC 0
-#endif
-#ifndef O_DSYNC
- #define O_DSYNC 0
-#endif
-
-#if defined (__linux__)
- #if ! defined(O_DIRECT)
-  #error O_DIRECT is not defined while __linux__ is - PLEASE REPORT THIS BUG
- #endif
-// FIXME: In which conditions is this not defined? Why only i386 and alpha? Why not amd64?
- #if !defined (O_DIRECT) && (defined (__alpha__) || defined (__i386__))
-  #define O_DIRECT 040000       /* direct disk access */
- #endif
-#endif
-
-#ifndef O_DIRECT
- #define O_DIRECT O_SYNC
-#endif
-
-
 #include <cassert>
 
 #include <stxxl/bits/libstxxl.h>
@@ -211,6 +174,20 @@ public:
     {
         return "none";
     }
+
+public:
+
+    //! \name Static Functions for Platform Abstraction
+    //! \{
+
+    //! unlink path from filesystem
+    static int unlink(const char* path);
+
+    //! truncate a path to given length. Use this only if you dont have a
+    //! fileio-specific object, which provides truncate().
+    static int truncate(const char* path, external_size_type length);
+
+    //! \}
 };
 
 //! \defgroup fileimpl File I/O Implementations

@@ -15,18 +15,10 @@
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/error_handling.h>
+#include "ufs_platform.h"
 
 
 __STXXL_BEGIN_NAMESPACE
-
-#if STXXL_WINDOWS
-  #ifndef lseek
-    #define lseek _lseeki64
-  #endif
-  #ifndef off_t
-    #define off_t int64
-  #endif
-#endif
 
 void syscall_file::serve(const request * req) throw (io_error)
 {

@@ -26,6 +26,7 @@ set(LIBSTXXL_SOURCES
   io/boostfd_file.cpp
   io/create_file.cpp
   io/disk_queued_file.cpp
+  io/file.cpp
   io/fileperblock_file.cpp
   io/iostats.cpp
   io/mem_file.cpp

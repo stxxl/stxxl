@@ -45,13 +45,15 @@ void testIO()
 
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
-    unlink(paths[0]);
-    unlink(paths[1]);
+#if !STXXL_WINDOWS
+    file1.close_remove();
+#endif
+    file2.close_remove();
 }
 
 void testIOException()
 {
-    unlink("TestFile");
+    stxxl::file::unlink("TestFile");
     // try to open non-existing files
     STXXL_CHECK_THROW( stxxl::mmap_file file1("TestFile", stxxl::file::RDWR, 0), stxxl::io_error );
     STXXL_CHECK_THROW( stxxl::syscall_file file1("TestFile", stxxl::file::RDWR, 0), stxxl::io_error );

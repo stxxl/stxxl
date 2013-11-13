@@ -83,8 +83,8 @@ int main()
 
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
-    unlink(paths[0]);
-    unlink(paths[1]);
+    file1.close_remove();
+    file2.close_remove();
 
     return 0;
 }

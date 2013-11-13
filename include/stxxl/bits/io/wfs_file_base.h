@@ -23,10 +23,6 @@
 
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
-#ifndef NOMINMAX
-  #define NOMINMAX
-#endif
-#include <windows.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -38,6 +34,8 @@ __STXXL_BEGIN_NAMESPACE
 class wfs_file_base : public virtual file
 {
 protected:
+    typedef void* HANDLE;
+
     mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode

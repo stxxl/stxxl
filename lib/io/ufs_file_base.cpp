@@ -16,22 +16,7 @@
 
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/common/error_handling.h>
-
-#if STXXL_WINDOWS || defined(__MINGW32__)
-  #ifndef NOMINMAX
-    #define NOMINMAX
-  #endif
-  #include <windows.h>
-#else
-  #include <unistd.h>
-  #include <fcntl.h>
-#endif
-#include <cstdio>
-
-// for systems that don't know anything about block devices.
-#ifndef S_ISBLK
-  #define S_ISBLK(x) 0
-#endif
+#include "ufs_platform.h"
 
 __STXXL_BEGIN_NAMESPACE
 

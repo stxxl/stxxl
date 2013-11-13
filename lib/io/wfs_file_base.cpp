@@ -17,6 +17,11 @@
 
 #if STXXL_WINDOWS
 
+#ifndef NOMINMAX
+  #define NOMINMAX
+#endif
+#include <windows.h>
+
 __STXXL_BEGIN_NAMESPACE
 
 
