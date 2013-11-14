@@ -36,19 +36,21 @@ file * create_file(const std::string & io_impl,
     return create_file(cfg, options, disk_allocator_id);
 }
 
-file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
+file * create_file(disk_config & cfg, int mode, int disk_allocator_id)
 {
     // apply disk_config settings to open mode
 
     mode &= ~(file::DIRECT | file::REQUIRE_DIRECT); // clear DIRECT and REQUIRE_DIRECT
 
-    switch(cfg.direct) {
+    switch (cfg.direct) {
     case disk_config::DIRECT_OFF:
         break;
     case disk_config::DIRECT_TRY:
-        mode |= file::DIRECT; break;
+        mode |= file::DIRECT;
+        break;
     case disk_config::DIRECT_ON:
-        mode |= file::DIRECT | file::REQUIRE_DIRECT; break;
+        mode |= file::DIRECT | file::REQUIRE_DIRECT;
+        break;
     }
 
     // *** Select fileio Implementation

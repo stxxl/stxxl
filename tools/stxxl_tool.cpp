@@ -54,42 +54,60 @@ extern int do_mallinfo(int argc, char * argv[]);
 
 struct SubTool
 {
-    const char* name;
-    int (*func)(int argc, char* argv[]);
+    const char * name;
+    int (* func)(int argc, char * argv[]);
     bool shortline;
-    const char* description;
+    const char * description;
 };
 
 struct SubTool subtools[] = {
-    { "info", &stxxl_info, false,
-      "Print out information about the build system and which optional "
-      "modules where compiled into STXXL." },
-    { "create_files", &create_files, false,
-      "Precreate large files to keep file system allocation time out to measurements." },
-    { "benchmark_disks", &benchmark_disks, false,
-      "This program will benchmark the disks configured by the standard "
-      ".stxxl disk configuration files mechanism." },
-    { "benchmark_files", &benchmark_files, false,
-      "Benchmark different file access methods, e.g. syscall or mmap_files." },
-    { "benchmark_sort", &benchmark_sort, false,
-      "Run benchmark tests of different sorting methods in STXXL" },
-    { "benchmark_disks_random", &benchmark_disks_random, false,
-      "Benchmark random block access time to .stxxl configured disks." },
-    { "benchmark_pqueue", &benchmark_pqueue, false,
-      "Benchmark priority queue implementation using sequence of operations." },
-    { "mlock", &do_mlock, true,
-      "Lock physical memory." },
-    { "mallinfo", &do_mallinfo, true,
-      "Show mallinfo statistics." },
+    {
+        "info", &stxxl_info, false,
+        "Print out information about the build system and which optional "
+        "modules where compiled into STXXL."
+    },
+    {
+        "create_files", &create_files, false,
+        "Precreate large files to keep file system allocation time out to measurements."
+    },
+    {
+        "benchmark_disks", &benchmark_disks, false,
+        "This program will benchmark the disks configured by the standard "
+        ".stxxl disk configuration files mechanism."
+    },
+    {
+        "benchmark_files", &benchmark_files, false,
+        "Benchmark different file access methods, e.g. syscall or mmap_files."
+    },
+    {
+        "benchmark_sort", &benchmark_sort, false,
+        "Run benchmark tests of different sorting methods in STXXL"
+    },
+    {
+        "benchmark_disks_random", &benchmark_disks_random, false,
+        "Benchmark random block access time to .stxxl configured disks."
+    },
+    {
+        "benchmark_pqueue", &benchmark_pqueue, false,
+        "Benchmark priority queue implementation using sequence of operations."
+    },
+    {
+        "mlock", &do_mlock, true,
+        "Lock physical memory."
+    },
+    {
+        "mallinfo", &do_mallinfo, true,
+        "Show mallinfo statistics."
+    },
     { NULL, NULL, false, NULL }
 };
 
-int main_usage(const char* arg0)
+int main_usage(const char * arg0)
 {
     STXXL_MSG(stxxl::get_version_string_long());
 
     std::cout << "Usage: " << arg0 << " <subtool> ..." << std::endl
-              << "Available subtools: " <<  std::endl;
+              << "Available subtools: " << std::endl;
 
     size_t shortlen = 0;
 
@@ -110,7 +128,7 @@ int main_usage(const char* arg0)
     for (unsigned int i = 0; subtools[i].name; ++i)
     {
         if (!subtools[i].shortline) continue;
-        std::cout << "  " << std::left << std::setw(shortlen+2)
+        std::cout << "  " << std::left << std::setw(shortlen + 2)
                   << subtools[i].name << subtools[i].description << std::endl;
     }
     std::cout << std::endl;
@@ -118,7 +136,7 @@ int main_usage(const char* arg0)
     return 0;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
     char progsub[256];
 
@@ -134,7 +152,7 @@ int main(int argc, char **argv)
                 // replace argv[1] with call string of subtool.
                 snprintf(progsub, sizeof(progsub), "%s %s", argv[0], argv[1]);
                 argv[1] = progsub;
-                return subtools[i].func(argc-1, argv+1);
+                return subtools[i].func(argc - 1, argv + 1);
             }
         }
         std::cout << "Unknown subtool '" << argv[1] << "'" << std::endl;

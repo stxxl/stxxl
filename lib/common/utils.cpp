@@ -56,16 +56,16 @@ bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit)
         switch(def_unit)
         {
         default: break;
-        case 'k': power = 1; base = 1000; break;
-        case 'm': power = 2; base = 1000; break;
-        case 'g': power = 3; base = 1000; break;
-        case 't': power = 4; base = 1000; break;
-        case 'p': power = 5; base = 1000; break;
-        case 'K': power = 1; base = 1024; break;
-        case 'M': power = 2; base = 1024; break;
-        case 'G': power = 3; base = 1024; break;
-        case 'T': power = 4; base = 1024; break;
-        case 'P': power = 5; base = 1024; break;
+        case 'k': power = 1, base = 1000, break;
+        case 'm': power = 2, base = 1000, break;
+        case 'g': power = 3, base = 1000, break;
+        case 't': power = 4, base = 1000, break;
+        case 'p': power = 5, base = 1000, break;
+        case 'K': power = 1, base = 1024, break;
+        case 'M': power = 2, base = 1024, break;
+        case 'G': power = 3, base = 1024, break;
+        case 'T': power = 4, base = 1024, break;
+        case 'P': power = 5, base = 1024, break;
         }
     }
 

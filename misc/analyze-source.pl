@@ -31,6 +31,8 @@ sub filter_uncrustify($) {
 
     return 1 if $path =~ m"^tests/";
     return 1 if $path =~ m"^examples/";
+    return 1 if $path =~ m"^tools/";
+    return 1 if $path =~ m"^lib/";
 
     return 0;
 }

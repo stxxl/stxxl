@@ -793,7 +793,8 @@ typedef AMI_STREAM<el_t> stream_t;
 
 char dummy;
 
-class MyFilter {
+class MyFilter
+{
 public:
     bool operator () (const el_t & v) const
     {
