@@ -28,24 +28,24 @@
 
 #include <stxxl/cmdline>
 
-int do_mlock(int argc, char * argv[])
+int do_mlock(int argc, char* argv[])
 {
     // parse command line
     stxxl::cmdline_parser cp;
 
     cp.set_description("Allocate some memory and mlock() it to consume physical memory. "
                        "Needs to run as root to block more than 64 KiB in default settings."
-        );
+                       );
     cp.set_author("Andreas Beckmann <beckmann@cs.uni-frankfurt.de>");
 
     stxxl::uint64 M;
     cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 4GiB)", M);
 
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     // allocate and fill
-    char * c = (char *)malloc(M);
+    char* c = (char*)malloc(M);
     memset(c, 42, M);
 
     if (mlock(c, M) == 0)
@@ -62,7 +62,7 @@ int do_mlock(int argc, char * argv[])
 
 #else // !STXXL_HAVE_MLOCK_PROTO
 
-int do_mlock(int, char *[])
+int do_mlock(int, char*[])
 {
     STXXL_MSG("Sorry, mlock() is not supported on this platform.");
     return -1;

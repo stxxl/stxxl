@@ -32,15 +32,15 @@ __STXXL_BEGIN_NAMESPACE
 
 class set_switch_handler
 {
-    onoff_switch & switch_;
+    onoff_switch& switch_;
     completion_handler on_compl;
 
 public:
-    set_switch_handler(onoff_switch & switch__, const completion_handler & on_compl)
+    set_switch_handler(onoff_switch& switch__, const completion_handler& on_compl)
         : switch_(switch__), on_compl(on_compl)
     { }
 
-    void operator () (request * req)
+    void operator () (request* req)
     {
         on_compl(req);  //call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
         switch_.on();
@@ -62,19 +62,19 @@ protected:
     bid_iterator_type consume_seq_end;
     unsigned_type seq_length;
 
-    int_type * prefetch_seq;
+    int_type* prefetch_seq;
 
     unsigned_type nextread;
     unsigned_type nextconsume;
 
     const int_type nreadblocks;
 
-    block_type * read_buffers;
-    request_ptr * read_reqs;
-    bid_type * read_bids;
+    block_type* read_buffers;
+    request_ptr* read_reqs;
+    bid_type* read_bids;
 
-    onoff_switch * completed;
-    int_type * pref_buffer;
+    onoff_switch* completed;
+    int_type* pref_buffer;
 
     completion_handler do_after_fetch;
 
@@ -104,7 +104,7 @@ public:
     block_prefetcher(
         bid_iterator_type _cons_begin,
         bid_iterator_type _cons_end,
-        int_type * _pref_seq,
+        int_type* _pref_seq,
         int_type _prefetch_buf_size,
         completion_handler do_after_fetch = default_completion_handler()
         ) :
@@ -158,7 +158,7 @@ public:
     //!        contains valid pointer to the next unconsumed prefetched buffer.
     //! \remark parameter \c buffer must be value returned by \c pull_block() or \c block_consumed() methods
     //! \return \c false if there are no blocks to prefetch left, \c true if consumption sequence is not emptied
-    bool block_consumed(block_type * & buffer)
+    bool block_consumed(block_type*& buffer)
     {
         int_type ibuffer = buffer - read_buffers;
         STXXL_VERBOSE1("block_prefetcher: buffer " << ibuffer << " consumed");

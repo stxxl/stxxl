@@ -98,14 +98,14 @@ protected:
 
 public:
     //! Constructor allocation memory_to_use bytes in ram for sorted runs.
-    sorter(const cmp_type & cmp, unsigned_type memory_to_use)
+    sorter(const cmp_type& cmp, unsigned_type memory_to_use)
         : m_state(STATE_INPUT),
           m_runs_creator(cmp, memory_to_use),
           m_runs_merger(cmp, memory_to_use)
     { }
 
     //! Constructor variant with differently sizes runs_creator and runs_merger
-    sorter(const cmp_type & cmp, unsigned_type creator_memory_to_use, unsigned_type merger_memory_to_use)
+    sorter(const cmp_type& cmp, unsigned_type creator_memory_to_use, unsigned_type merger_memory_to_use)
         : m_state(STATE_INPUT),
           m_runs_creator(cmp, creator_memory_to_use),
           m_runs_merger(cmp, merger_memory_to_use)
@@ -122,7 +122,7 @@ public:
     }
 
     //! Push another item (only callable during input state).
-    void push(const value_type & val)
+    void push(const value_type& val)
     {
         assert(m_state == STATE_INPUT);
         m_runs_creator.push(val);
@@ -214,20 +214,20 @@ public:
     }
 
     //! Standard stream method
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         assert(m_state == STATE_OUTPUT);
         return *m_runs_merger;
     }
 
     //! Standard stream method
-    const value_type * operator -> () const
+    const value_type* operator -> () const
     {
         return &(operator * ());
     }
 
     //! Standard stream method (preincrement operator)
-    sorter & operator ++ ()
+    sorter& operator ++ ()
     {
         assert(m_state == STATE_OUTPUT);
         ++m_runs_merger;

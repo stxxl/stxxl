@@ -33,7 +33,7 @@ void disk_allocator::dump() const
 
 void disk_allocator::deallocation_error(
     stxxl::int64 block_pos, stxxl::int64 block_size,
-    const sortseq::iterator & pred, const sortseq::iterator & succ) const
+    const sortseq::iterator& pred, const sortseq::iterator& succ) const
 {
     STXXL_ERRMSG("Error deallocating block at " << block_pos << " size " << block_size);
     STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));

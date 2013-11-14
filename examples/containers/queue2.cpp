@@ -23,7 +23,7 @@ int main()
 
     unsigned int random;
     stxxl::random_number32 rand32;  // define random number generator
-    stxxl::uint64 number_of_elements = (long long int)(1*64) * (long long int)(1024 * 1024);
+    stxxl::uint64 number_of_elements = (long long int)(1 * 64) * (long long int)(1024 * 1024);
 
     // push random values in the queue
     for (stxxl::uint64 i = 0; i < number_of_elements; i++)
@@ -36,7 +36,7 @@ int main()
     STXXL_MSG("last element inserted: " << last_inserted);
 
     // identify smaller element than first_inserted, search in growth-direction (front->back)
-    while(!my_queue.empty())
+    while (!my_queue.empty())
     {
         if (last_inserted > my_queue.front())
         {

@@ -20,9 +20,9 @@ __STXXL_BEGIN_NAMESPACE
 
 
 serving_request::serving_request(
-    const completion_handler & on_cmpl,
-    file * f,
-    void * buf,
+    const completion_handler& on_cmpl,
+    file* f,
+    void* buf,
     offset_type off,
     size_type b,
     request_type t) :
@@ -40,7 +40,7 @@ void serving_request::serve()
 {
     check_nref();
     STXXL_VERBOSE2(
-        "[" << static_cast<void *>(this) << "] serving_request::serve(): " <<
+        "[" << static_cast<void*>(this) << "] serving_request::serve(): " <<
         buffer << " @ [" <<
         file_ << "|" << file_->get_allocator_id() << "]0x" <<
         std::hex << std::setfill('0') << std::setw(8) <<
@@ -51,7 +51,7 @@ void serving_request::serve()
     {
         file_->serve(this);
     }
-    catch (const io_error & ex)
+    catch (const io_error& ex)
     {
         error_occured(ex.what());
     }
@@ -63,13 +63,13 @@ void serving_request::serve()
 
 void serving_request::completed()
 {
-    STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] serving_request::completed()");
+    STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] serving_request::completed()");
     _state.set_to(DONE);
     request_with_state::completed();
     _state.set_to(READY2DIE);
 }
 
-const char * serving_request::io_type() const
+const char* serving_request::io_type() const
 {
     return file_->io_type();
 }

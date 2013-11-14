@@ -18,7 +18,7 @@
 // comparison struct for priority queue where top() returns the smallest contained value:
 struct ComparatorGreater
 {
-    bool operator () (const int & a, const int & b) const
+    bool operator () (const int& a, const int& b) const
     { return (a > b); }
 
     int min_value() const
@@ -27,7 +27,7 @@ struct ComparatorGreater
 
 int main()
 {
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128 *1024 *1024, 1024 *1024>::result pqueue_type;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
     typedef pqueue_type::block_type block_type;
 
     // block_type::raw_size = 262144 bytes

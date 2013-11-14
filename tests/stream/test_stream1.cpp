@@ -30,7 +30,7 @@ struct Input
     {
         return value == 1;
     }
-    Input & operator ++ ()
+    Input& operator ++ ()
     {
         --value;
         rnd_value = rnd();
@@ -39,7 +39,7 @@ struct Input
 
         return *this;
     }
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         return rnd_value;
     }
@@ -48,7 +48,7 @@ struct Input
 struct Cmp : std::binary_function<unsigned, unsigned, bool>
 {
     typedef unsigned value_type;
-    bool operator () (const value_type & a, const value_type & b) const
+    bool operator () (const value_type& a, const value_type& b) const
     {
         return a < b;
     }
@@ -66,10 +66,10 @@ struct Cmp : std::binary_function<unsigned, unsigned, bool>
 
 int main()
 {
-    typedef stxxl::stream::runs_creator<Input, Cmp, 4096 * MULT, stxxl::RC> CreateRunsAlg;
+    typedef stxxl::stream::runs_creator<Input, Cmp, 4096* MULT, stxxl::RC> CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
-    stxxl::stats * s = stxxl::stats::get_instance();
+    stxxl::stats* s = stxxl::stats::get_instance();
 
     std::cout << *s;
 

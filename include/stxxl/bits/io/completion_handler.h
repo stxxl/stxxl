@@ -27,7 +27,7 @@ class request;
 class completion_handler_impl
 {
 public:
-    virtual void operator () (request *) = 0;
+    virtual void operator () (request*) = 0;
     virtual completion_handler_impl * clone() const = 0;
     virtual ~completion_handler_impl() { }
 };
@@ -39,12 +39,12 @@ private:
     handler_type handler_;
 
 public:
-    completion_handler1(const handler_type & handler__) : handler_(handler__) { }
+    completion_handler1(const handler_type& handler__) : handler_(handler__) { }
     completion_handler1 * clone() const
     {
         return new completion_handler1(*this);
     }
-    void operator () (request * req)
+    void operator () (request* req)
     {
         handler_(req);
     }
@@ -65,26 +65,26 @@ class completion_handler
 
 public:
     completion_handler() :
-        sp_impl_(static_cast<completion_handler_impl *>(0))
+        sp_impl_(static_cast<completion_handler_impl*>(0))
     { }
 
-    completion_handler(const completion_handler & obj) :
+    completion_handler(const completion_handler& obj) :
         sp_impl_(obj.sp_impl_.get()->clone())
     { }
 
     template <typename handler_type>
-    completion_handler(const handler_type & handler__) :
+    completion_handler(const handler_type& handler__) :
         sp_impl_(new completion_handler1<handler_type>(handler__))
     { }
 
-    completion_handler & operator = (const completion_handler & obj)
+    completion_handler& operator = (const completion_handler& obj)
     {
         sp_impl_.reset(obj.sp_impl_.get()->clone());
         return *this;
     }
-    void operator () (request * req)
+    void operator () (request* req)
     {
-        (*sp_impl_)(req);
+        (* sp_impl_)(req);
     }
 };
 
@@ -93,7 +93,7 @@ public:
 struct default_completion_handler
 {
     //! An operator that does nothing.
-    void operator () (request *) { }
+    void operator () (request*) { }
 };
 
 __STXXL_END_NAMESPACE

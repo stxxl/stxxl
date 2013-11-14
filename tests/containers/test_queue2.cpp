@@ -22,7 +22,7 @@ typedef stxxl::uint64 my_type;
 // forced instantiation
 template class stxxl::queue<my_type>;
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 2)
     {
@@ -46,9 +46,9 @@ int main(int argc, char ** argv)
 
         q.push(in++);
 
-	STXXL_CHECK(q.front() == out);
+        STXXL_CHECK(q.front() == out);
         q.pop();
-	++out;
+        ++out;
 
         q.push(in++);
     }
@@ -58,15 +58,15 @@ int main(int argc, char ** argv)
         if ((i % mega) == 0)
             STXXL_MSG("Remove " << i);
 
-	STXXL_CHECK(q.front() == out);
+        STXXL_CHECK(q.front() == out);
         q.pop();
-	++out;
+        ++out;
 
         q.push(in++);
 
-	STXXL_CHECK(q.front() == out);
+        STXXL_CHECK(q.front() == out);
         q.pop();
-	++out;
+        ++out;
     }
     STXXL_CHECK(q.empty());
     STXXL_CHECK(in == out);

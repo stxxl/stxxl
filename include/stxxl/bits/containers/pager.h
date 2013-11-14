@@ -92,7 +92,7 @@ public:
         history.splice(history.begin(), history, history_entry[ipage]);
     }
 
-    void swap(lru_pager & obj)
+    void swap(lru_pager& obj)
     {
         history.swap(obj.history);
         history_entry.swap(obj.history_entry);
@@ -111,8 +111,8 @@ __STXXL_END_NAMESPACE
 namespace std {
 
 template <unsigned npages_>
-void swap(stxxl::lru_pager<npages_> & a,
-          stxxl::lru_pager<npages_> & b)
+void swap(stxxl::lru_pager<npages_>& a,
+          stxxl::lru_pager<npages_>& b)
 {
     a.swap(b);
 }

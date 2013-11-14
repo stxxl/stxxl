@@ -25,13 +25,13 @@ using stxxl::file;
 
 struct my_handler
 {
-    void operator () (stxxl::request * ptr)
+    void operator () (stxxl::request* ptr)
     {
         STXXL_MSG("Request completed: " << ptr);
     }
 };
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 2)
     {
@@ -43,9 +43,9 @@ int main(int argc, char ** argv)
     tempfilename[0] = std::string(argv[1]) + "/test_io_1.dat";
     tempfilename[1] = std::string(argv[1]) + "/test_io_2.dat";
 
-    std::cout << sizeof(void *) << std::endl;
+    std::cout << sizeof(void*) << std::endl;
     const int size = 1024 * 384;
-    char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
+    char* buffer = (char*)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
 #if STXXL_HAVE_MMAP_FILE

@@ -113,7 +113,7 @@ public:
     }
 
     //! implicit cast to the enclosed pointer.
-    operator Type * () const
+    operator Type* () const
     { return m_ptr; }
 
     //! return the enclosed pointer.
@@ -121,11 +121,11 @@ public:
     { return m_ptr; }
 
     //! test equality of only the pointer values.
-    bool operator == (const counting_ptr & other_ptr) const
+    bool operator == (const counting_ptr& other_ptr) const
     { return m_ptr == other_ptr.m_ptr; }
 
     //! test inequality of only the pointer values.
-    bool operator != (const counting_ptr & other_ptr) const
+    bool operator != (const counting_ptr& other_ptr) const
     { return m_ptr != other_ptr.m_ptr; }
 
     //! cast to bool check for a NULL pointer
@@ -159,7 +159,8 @@ public:
 };
 
 //! swap enclosed object with another counting pointer (no reference counts need change)
-template<class A> void swap(counting_ptr<A> & a1, counting_ptr<A> & a2)
+template <class A>
+void swap(counting_ptr<A>& a1, counting_ptr<A>& a2)
 {
     a1.swap(a2);
 }
@@ -261,7 +262,7 @@ public:
     }
 
     //! implicit cast to the enclosed pointer.
-    operator const Type * () const
+    operator const Type* () const
     { return m_ptr; }
 
     //! return the enclosed pointer.
@@ -269,19 +270,19 @@ public:
     { return m_ptr; }
 
     //! test equality of only the pointer values.
-    bool operator == (const const_counting_ptr & other_ptr) const
+    bool operator == (const const_counting_ptr& other_ptr) const
     { return m_ptr == other_ptr.m_ptr; }
 
     //! test inequality of only the pointer values.
-    bool operator != (const const_counting_ptr & other_ptr) const
+    bool operator != (const const_counting_ptr& other_ptr) const
     { return m_ptr != other_ptr.m_ptr; }
 
     //! test equality of only the pointer values.
-    bool operator == (const counting_ptr<Type> & other_ptr) const
+    bool operator == (const counting_ptr<Type>& other_ptr) const
     { return m_ptr == other_ptr.get(); }
 
     //! test inequality of only the pointer values.
-    bool operator != (const counting_ptr<Type> & other_ptr) const
+    bool operator != (const counting_ptr<Type>& other_ptr) const
     { return m_ptr != other_ptr.get(); }
 
     //! cast to bool check for a NULL pointer
@@ -308,7 +309,8 @@ public:
 };
 
 //! swap enclosed object with another const_counting pointer (no reference counts need change)
-template<class A> void swap(const_counting_ptr<A> & a1, const_counting_ptr<A> & a2)
+template <class A>
+void swap(const_counting_ptr<A>& a1, const_counting_ptr<A>& a2)
 {
     a1.swap(a2);
 }
@@ -332,14 +334,14 @@ private:
 public:
     //! new objects have zero reference count
     counted_object()
-        : m_reference_count(0) {}
+        : m_reference_count(0) { }
 
     //! coping still creates a new object with zero reference count
-    counted_object(const counted_object &)
-        : m_reference_count(0) {}
+    counted_object(const counted_object&)
+        : m_reference_count(0) { }
 
     //! assignment operator, leaves pointers unchanged
-    counted_object & operator = (const counted_object &)
+    counted_object& operator = (const counted_object&)
     { return *this; } // changing the contents leaves pointers unchanged
 
     ~counted_object()
@@ -392,14 +394,14 @@ private:
 public:
     //! new objects have zero reference count
     atomic_counted_object()
-        : m_reference_count(0) {}
+        : m_reference_count(0) { }
 
     //! coping still creates a new object with zero reference count
-    atomic_counted_object(const atomic_counted_object &)
-        : m_reference_count(0) {}
+    atomic_counted_object(const atomic_counted_object&)
+        : m_reference_count(0) { }
 
     //! assignment operator, leaves pointers unchanged
-    atomic_counted_object & operator = (const atomic_counted_object &)
+    atomic_counted_object& operator = (const atomic_counted_object&)
     { return *this; } // changing the contents leaves pointers unchanged
 
     ~atomic_counted_object()
@@ -467,14 +469,14 @@ private:
 public:
     //! new objects have zero reference count
     atomic_counted_object()
-        : m_reference_count(0) {}
+        : m_reference_count(0) { }
 
     //! coping still creates a new object with zero reference count
-    atomic_counted_object(const atomic_counted_object &)
-        : m_reference_count(0) {}
+    atomic_counted_object(const atomic_counted_object&)
+        : m_reference_count(0) { }
 
     //! assignment operator, leaves pointers unchanged
-    atomic_counted_object & operator = (const atomic_counted_object &)
+    atomic_counted_object& operator = (const atomic_counted_object&)
     { return *this; } // changing the contents leaves pointers unchanged
 
     ~atomic_counted_object()

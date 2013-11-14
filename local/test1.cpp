@@ -23,8 +23,8 @@
 
 struct my_less_int : std::less<int>
 {
-    int min_value() const { return std::numeric_limits<int>::min(); };
-    int max_value() const { return std::numeric_limits<int>::max(); };
+    int min_value() const { return std::numeric_limits<int>::min(); }
+    int max_value() const { return std::numeric_limits<int>::max(); }
 };
 
 int main()
@@ -35,12 +35,12 @@ int main()
     // fill vector with random integers
     stxxl::random_number32 random;
 
-    for (size_t i = 0; i < 100*1024*1024; ++i) {
+    for (size_t i = 0; i < 100 * 1024 * 1024; ++i) {
         vector.push_back(random());
     }
 
     // sort vector using 16 MiB RAM
-    stxxl::sort(vector.begin(), vector.end(), my_less_int(), 16*1024*1024);
+    stxxl::sort(vector.begin(), vector.end(), my_less_int(), 16 * 1024 * 1024);
 
     // output first and last items:
     std::cout << vector.size() << " items sorted ranging from "

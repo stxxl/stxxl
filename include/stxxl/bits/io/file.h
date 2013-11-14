@@ -63,15 +63,15 @@ public:
     //! converted to this set of acceptable modes
     enum open_mode
     {
-        RDONLY = 1,       //!< only reading of the file is allowed
-        WRONLY = 2,       //!< only writing of the file is allowed
-        RDWR = 4,         //!< read and write of the file are allowed
-        CREAT = 8,        //!< in case file does not exist no error occurs and file is newly created
-        DIRECT = 16,      //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O.
-                          //!< Tries to open with appropriate flags, if fails print warning and open normally.
-        TRUNC = 32,       //!< once file is opened its length becomes zero
-        SYNC = 64,        //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
-        NO_LOCK = 128,    //!< do not aquire an exclusive lock by default
+        RDONLY = 1,          //!< only reading of the file is allowed
+        WRONLY = 2,          //!< only writing of the file is allowed
+        RDWR = 4,            //!< read and write of the file are allowed
+        CREAT = 8,           //!< in case file does not exist no error occurs and file is newly created
+        DIRECT = 16,         //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O.
+                             //!< Tries to open with appropriate flags, if fails print warning and open normally.
+        TRUNC = 32,          //!< once file is opened its length becomes zero
+        SYNC = 64,           //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
+        NO_LOCK = 128,       //!< do not aquire an exclusive lock by default
         REQUIRE_DIRECT = 256 //!< implies DIRECT, fail if opening with DIRECT flag does not work.
     };
 
@@ -85,8 +85,8 @@ public:
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr request object, which can be used to track the status of the operation
-    virtual request_ptr aread(void * buffer, offset_type pos, size_type bytes,
-                              const completion_handler & on_cmpl) = 0;
+    virtual request_ptr aread(void* buffer, offset_type pos, size_type bytes,
+                              const completion_handler& on_cmpl) = 0;
 
     //! Schedules an asynchronous write request to the file.
     //! \param buffer pointer to memory buffer to write from
@@ -94,10 +94,10 @@ public:
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr request object, which can be used to track the status of the operation
-    virtual request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
-                               const completion_handler & on_cmpl) = 0;
+    virtual request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
+                               const completion_handler& on_cmpl) = 0;
 
-    virtual void serve(const request * req) throw (io_error) = 0;
+    virtual void serve(const request* req) throw (io_error) = 0;
 
     void add_request_ref()
     {
@@ -176,7 +176,6 @@ public:
     }
 
 public:
-
     //! \name Static Functions for Platform Abstraction
     //! \{
 

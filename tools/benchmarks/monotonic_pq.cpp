@@ -58,21 +58,21 @@ struct my_type
     my_type(key_type __key, key_type __load) : key(__key), load(__load) { }
 #endif
 
-    void operator = (const key_type & __key) { key = __key; }
+    void operator = (const key_type& __key) { key = __key; }
 #if LOAD
-    void operator = (const my_type & mt)
+    void operator = (const my_type& mt)
     {
         key = mt.key;
         load = mt.load;
     }
-    bool operator == (const my_type & mt) { return (key == mt.key) && (load = mt.load); }
+    bool operator == (const my_type& mt) { return (key == mt.key) && (load = mt.load); }
 #else
-    void operator = (const my_type & mt) { key = mt.key; }
-    bool operator == (const my_type & mt) { return key == mt.key; }
+    void operator = (const my_type& mt) { key = mt.key; }
+    bool operator == (const my_type& mt) { return key == mt.key; }
 #endif
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj.key;
 #if LOAD
@@ -89,7 +89,7 @@ struct my_cmp /*: public std::binary_function<my_type, my_type, bool>*/ // great
     typedef my_type second_argument_type;
     typedef bool result_type;
 
-    bool operator () (const my_type & a, const my_type & b) const
+    bool operator () (const my_type& a, const my_type& b) const
     {
         return a.key > b.key;
     }
@@ -112,14 +112,14 @@ struct my_cmp /*: public std::binary_function<my_type, my_type, bool>*/ // great
     }
 };
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 3)
     {
         std::cout << "Usage: " << argv[0] << " [n in MiB]"
-#if defined(STXXL_PARALLEL)
+            #if defined(STXXL_PARALLEL)
                   << " [p threads]"
-#endif
+            #endif
                   << std::endl;
         return -1;
     }
@@ -192,18 +192,18 @@ int main(int argc, char * argv[])
     const unsigned ExtKMAX = 8;                    // maximal arity for external mergers
     const unsigned ExtLevels = 2;                  // number of external levels
     typedef stxxl::priority_queue<
-        stxxl::priority_queue_config<
-            my_type,
-            my_cmp,
-            BufferSize1,
-            N,
-            IntKMAX,
-            IntLevels,
-            BlockSize,
-            ExtKMAX,
-            ExtLevels
-            >
-        > pq_type;
+            stxxl::priority_queue_config<
+                my_type,
+                my_cmp,
+                BufferSize1,
+                N,
+                IntKMAX,
+                IntLevels,
+                BlockSize,
+                ExtKMAX,
+                ExtLevels
+                >
+            > pq_type;
 #elif MANUAL_PQ
     stxxl::STXXL_UNUSED(mem_for_queue);
     const unsigned BufferSize1 = 32;                    // equalize procedure call overheads etc.
@@ -214,18 +214,18 @@ int main(int argc, char * argv[])
     const unsigned ExtKMAX = 32;                        // maximal arity for external mergers
     const unsigned ExtLevels = 2;                       // number of external levels
     typedef stxxl::priority_queue<
-        stxxl::priority_queue_config<
-            my_type,
-            my_cmp,
-            BufferSize1,
-            N,
-            IntKMAX,
-            IntLevels,
-            BlockSize,
-            ExtKMAX,
-            ExtLevels
-            >
-        > pq_type;
+            stxxl::priority_queue_config<
+                my_type,
+                my_cmp,
+                BufferSize1,
+                N,
+                IntKMAX,
+                IntLevels,
+                BlockSize,
+                ExtKMAX,
+                ExtLevels
+                >
+            > pq_type;
 #else
     const stxxl::uint64 volume = stxxl::uint64(200000) * mega;     // in bytes
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1> gen;

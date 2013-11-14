@@ -19,9 +19,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-request::request(const completion_handler & on_compl,
-                 file * file__,
-                 void * buffer_,
+request::request(const completion_handler& on_compl,
+                 file* file__,
+                 void* buffer_,
                  offset_type offset_,
                  size_type bytes_,
                  request_type type_) :
@@ -32,13 +32,13 @@ request::request(const completion_handler & on_compl,
     bytes(bytes_),
     type(type_)
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::(...), ref_cnt=" << get_reference_count());
+    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request::(...), ref_cnt=" << get_reference_count());
     file_->add_request_ref();
 }
 
 request::~request()
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::~(), ref_cnt=" << get_reference_count());
+    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request::~(), ref_cnt=" << get_reference_count());
 }
 
 void request::completed()
@@ -80,10 +80,10 @@ void request::check_nref_failed(bool after)
                  );
 }
 
-std::ostream & request::print(std::ostream & out) const
+std::ostream& request::print(std::ostream& out) const
 {
-    out << "File object address: " << static_cast<void *>(get_file());
-    out << " Buffer address: " << static_cast<void *>(get_buffer());
+    out << "File object address: " << static_cast<void*>(get_file());
+    out << " Buffer address: " << static_cast<void*>(get_buffer());
     out << " File offset: " << get_offset();
     out << " Transfer size: " << get_size() << " bytes";
     out << " Type of transfer: " << ((get_type() == READ) ? "READ" : "WRITE");

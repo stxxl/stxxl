@@ -34,8 +34,8 @@ __STXXL_BEGIN_NAMESPACE
 struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
 {
     bool operator () (
-        const request_ptr & a,
-        const request_ptr & b) const
+        const request_ptr& a,
+        const request_ptr& b) const
     {
         // matching file and offset are enough to cause problems
         return (a->get_offset() == b->get_offset()) &&
@@ -47,10 +47,10 @@ request_queue_impl_1q::request_queue_impl_1q(int n)
     : m_thread_state(NOT_RUNNING), sem(0)
 {
     STXXL_UNUSED(n);
-    start_thread(worker, static_cast<void *>(this), thread, m_thread_state);
+    start_thread(worker, static_cast<void*>(this), thread, m_thread_state);
 }
 
-void request_queue_impl_1q::add_request(request_ptr & req)
+void request_queue_impl_1q::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
@@ -74,7 +74,7 @@ void request_queue_impl_1q::add_request(request_ptr & req)
     sem++;
 }
 
-bool request_queue_impl_1q::cancel_request(request_ptr & req)
+bool request_queue_impl_1q::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
@@ -101,9 +101,9 @@ request_queue_impl_1q::~request_queue_impl_1q()
     stop_thread(thread, m_thread_state, sem);
 }
 
-void * request_queue_impl_1q::worker(void * arg)
+void* request_queue_impl_1q::worker(void* arg)
 {
-    self * pthis = static_cast<self *>(arg);
+    self* pthis = static_cast<self*>(arg);
 
     for ( ; ; )
     {

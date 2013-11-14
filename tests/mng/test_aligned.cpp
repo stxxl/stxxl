@@ -31,11 +31,11 @@ template class stxxl::typed_block<BLOCK_SIZE, type>; // forced instantiation
 
 void test_typed_block()
 {
-    block_type * a = new block_type;
-    block_type * b = new block_type;
-    block_type * A = new block_type[4];
-    block_type * B = new block_type[1];
-    block_type * C = NULL;
+    block_type* a = new block_type;
+    block_type* b = new block_type;
+    block_type* A = new block_type[4];
+    block_type* B = new block_type[1];
+    block_type* C = NULL;
     C = new block_type[0];
     delete a;
     a = b;
@@ -50,9 +50,9 @@ void test_typed_block()
 
 void test_aligned_alloc()
 {
-    void * p = stxxl::aligned_alloc<1024>(4096);
-    void * q = NULL;
-    void * r = stxxl::aligned_alloc<1024>(4096, 42);
+    void* p = stxxl::aligned_alloc<1024>(4096);
+    void* q = NULL;
+    void* r = stxxl::aligned_alloc<1024>(4096, 42);
     stxxl::aligned_dealloc<1024>(p);
     stxxl::aligned_dealloc<1024>(q);
     stxxl::aligned_dealloc<1024>(r);

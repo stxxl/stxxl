@@ -46,12 +46,12 @@ struct my_type
 };
 
 
-inline bool operator < (const my_type & a, const my_type & b)
+inline bool operator < (const my_type& a, const my_type& b)
 {
     return a.key() < b.key();
 }
 
-inline bool operator == (const my_type & a, const my_type & b)
+inline bool operator == (const my_type& a, const my_type& b)
 {
     return a.key() == b.key();
 }
@@ -61,7 +61,7 @@ struct Cmp
     typedef my_type first_argument_type;
     typedef my_type second_argument_type;
     typedef bool result_type;
-    bool operator () (const my_type & a, const my_type & b) const
+    bool operator () (const my_type& a, const my_type& b) const
     {
         return a < b;
     }
@@ -75,14 +75,14 @@ struct Cmp
     }
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj._key;
     return o;
 }
 
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 3)
     {
@@ -104,7 +104,7 @@ int main(int argc, char ** argv)
 #if STXXL_MSVC
     typedef stxxl::stream::streamify_traits<vector_type::iterator>::stream_type input_stream_type;
 #else
-    typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+    typedef __typeof__ (stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 #endif
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 

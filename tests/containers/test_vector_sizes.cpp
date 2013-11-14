@@ -18,9 +18,9 @@ typedef int my_type;
 typedef stxxl::VECTOR_GENERATOR<my_type>::result vector_type;
 typedef vector_type::block_type block_type;
 
-void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+void test_write(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::file* f = stxxl::create_file(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         vector_type v(f);
         v.resize(sz);
@@ -32,9 +32,9 @@ void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_ty
 }
 
 template <typename Vector>
-void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+void test_rdwr(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::file* f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
@@ -46,9 +46,9 @@ void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_typ
 }
 
 template <typename Vector>
-void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+void test_rdonly(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
+    stxxl::file* f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
@@ -59,7 +59,7 @@ void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_t
     delete f;
 }
 
-void test(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+void test(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
 {
     test_write(fn, ft, sz, ofs);
     test_rdwr<const vector_type>(fn, ft, sz, ofs);
@@ -70,14 +70,14 @@ void test(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs
     // whereas a usual read() will just stop short at the end. The read-only
     // vector however will always read the last block in full, thus causing a
     // segfault with mmap files. FIXME
-    if (strcmp(ft,"mmap") == 0) return;
+    if (strcmp(ft, "mmap") == 0) return;
 
     test_rdonly<const vector_type>(fn, ft, sz, ofs);
     //-tb: vector always writes data! FIXME
     //test_rdonly<vector_type>(fn, ft, sz, ofs);
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 2)
     {
@@ -87,8 +87,8 @@ int main(int argc, char ** argv)
 
     stxxl::config::get_instance();
 
-    const char * fn = argv[1];
-    const char * ft = (argc >= 3) ? argv[2] : "syscall";
+    const char* fn = argv[1];
+    const char* ft = (argc >= 3) ? argv[2] : "syscall";
 
     stxxl::unsigned_type start_elements = 42 * block_type::size;
 

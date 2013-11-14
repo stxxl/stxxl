@@ -30,7 +30,8 @@ template <class KeyType,
           class PDAllocStrategy
           >
 class btree;
-}
+
+} // namespace btree
 
 //! \addtogroup stlcont
 //! \{
@@ -75,8 +76,8 @@ class btree;
 template <class KeyType,
           class DataType,
           class CompareType,
-          unsigned RawNodeSize = 16 * 1024,     // 16 KBytes default
-          unsigned RawLeafSize = 128 * 1024,    // 128 KBytes default
+          unsigned RawNodeSize = 16* 1024,      // 16 KBytes default
+          unsigned RawLeafSize = 128* 1024,     // 128 KBytes default
           class PDAllocStrategy = stxxl::SR
           >
 class map : private noncopyable
@@ -156,7 +157,7 @@ public:
     //! \param c_ comparator object
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
-    map(const key_compare & c_,
+    map(const key_compare& c_,
         unsigned_type node_cache_size_in_bytes,
         unsigned_type leaf_cache_size_in_bytes
         ) : Impl(c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes)
@@ -196,7 +197,7 @@ public:
     template <class InputIterator>
     map(InputIterator b,
         InputIterator e,
-        const key_compare & c_,
+        const key_compare& c_,
         unsigned_type node_cache_size_in_bytes,
         unsigned_type leaf_cache_size_in_bytes,
         bool range_sorted = false,
@@ -206,12 +207,12 @@ public:
                  range_sorted, node_fill_factor, leaf_fill_factor)
     { }
 
-    void swap(map & obj) { std::swap(Impl, obj.Impl); }
-    std::pair<iterator, bool> insert(const value_type & x)
+    void swap(map& obj) { std::swap(Impl, obj.Impl); }
+    std::pair<iterator, bool> insert(const value_type& x)
     {
         return Impl.insert(x);
     }
-    iterator insert(iterator pos, const value_type & x)
+    iterator insert(iterator pos, const value_type& x)
     {
         return Impl.insert(pos, x);
     }
@@ -224,7 +225,7 @@ public:
     {
         Impl.erase(pos);
     }
-    size_type erase(const key_type & k)
+    size_type erase(const key_type& k)
     {
         return Impl.erase(k);
     }
@@ -236,43 +237,43 @@ public:
     {
         Impl.clear();
     }
-    iterator find(const key_type & k)
+    iterator find(const key_type& k)
     {
         return Impl.find(k);
     }
-    const_iterator find(const key_type & k) const
+    const_iterator find(const key_type& k) const
     {
         return Impl.find(k);
     }
-    size_type count(const key_type & k)
+    size_type count(const key_type& k)
     {
         return Impl.count(k);
     }
-    iterator lower_bound(const key_type & k)
+    iterator lower_bound(const key_type& k)
     {
         return Impl.lower_bound(k);
     }
-    const_iterator lower_bound(const key_type & k) const
+    const_iterator lower_bound(const key_type& k) const
     {
         return Impl.lower_bound(k);
     }
-    iterator upper_bound(const key_type & k)
+    iterator upper_bound(const key_type& k)
     {
         return Impl.upper_bound(k);
     }
-    const_iterator upper_bound(const key_type & k) const
+    const_iterator upper_bound(const key_type& k) const
     {
         return Impl.upper_bound(k);
     }
-    std::pair<iterator, iterator> equal_range(const key_type & k)
+    std::pair<iterator, iterator> equal_range(const key_type& k)
     {
         return Impl.equal_range(k);
     }
-    std::pair<const_iterator, const_iterator> equal_range(const key_type & k) const
+    std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
     {
         return Impl.equal_range(k);
     }
-    data_type & operator [] (const key_type & k)
+    data_type& operator [] (const key_type& k)
     {
         return Impl[k];
     }
@@ -296,7 +297,7 @@ public:
     }
 
     //! Prints cache statistics
-    void print_statistics(std::ostream & o) const
+    void print_statistics(std::ostream& o) const
     {
         Impl.print_statistics(o);
     }
@@ -314,8 +315,8 @@ public:
               unsigned RawNodeSize_,
               unsigned RawLeafSize_,
               class PDAllocStrategy_>
-    friend bool operator == (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & a,
-                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & b);
+    friend bool operator == (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& a,
+                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& b);
     //////////////////////////////////////////////////
     template <class KeyType_,
               class DataType_,
@@ -323,8 +324,8 @@ public:
               unsigned RawNodeSize_,
               unsigned RawLeafSize_,
               class PDAllocStrategy_>
-    friend bool operator < (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & a,
-                            const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & b);
+    friend bool operator < (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& a,
+                            const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& b);
     //////////////////////////////////////////////////
     template <class KeyType_,
               class DataType_,
@@ -332,8 +333,8 @@ public:
               unsigned RawNodeSize_,
               unsigned RawLeafSize_,
               class PDAllocStrategy_>
-    friend bool operator > (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & a,
-                            const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & b);
+    friend bool operator > (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& a,
+                            const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& b);
     //////////////////////////////////////////////////
     template <class KeyType_,
               class DataType_,
@@ -341,8 +342,8 @@ public:
               unsigned RawNodeSize_,
               unsigned RawLeafSize_,
               class PDAllocStrategy_>
-    friend bool operator != (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & a,
-                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & b);
+    friend bool operator != (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& a,
+                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& b);
     //////////////////////////////////////////////////
     template <class KeyType_,
               class DataType_,
@@ -350,8 +351,8 @@ public:
               unsigned RawNodeSize_,
               unsigned RawLeafSize_,
               class PDAllocStrategy_>
-    friend bool operator <= (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & a,
-                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & b);
+    friend bool operator <= (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& a,
+                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& b);
     //////////////////////////////////////////////////
     template <class KeyType_,
               class DataType_,
@@ -359,8 +360,8 @@ public:
               unsigned RawNodeSize_,
               unsigned RawLeafSize_,
               class PDAllocStrategy_>
-    friend bool operator >= (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & a,
-                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_> & b);
+    friend bool operator >= (const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& a,
+                             const map<KeyType_, DataType_, CompareType_, RawNodeSize_, RawLeafSize_, PDAllocStrategy_>& b);
     //////////////////////////////////////////////////
 };
 
@@ -371,8 +372,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-inline bool operator == (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b)
+inline bool operator == (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b)
 {
     return a.Impl == b.Impl;
 }
@@ -384,8 +385,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-inline bool operator < (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-                        const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b)
+inline bool operator < (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+                        const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b)
 {
     return a.Impl < b.Impl;
 }
@@ -397,8 +398,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-inline bool operator > (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-                        const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b)
+inline bool operator > (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+                        const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b)
 {
     return a.Impl > b.Impl;
 }
@@ -410,8 +411,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-inline bool operator != (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b)
+inline bool operator != (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b)
 {
     return a.Impl != b.Impl;
 }
@@ -423,8 +424,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-inline bool operator <= (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b)
+inline bool operator <= (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b)
 {
     return a.Impl <= b.Impl;
 }
@@ -436,8 +437,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-inline bool operator >= (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b)
+inline bool operator >= (const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+                         const map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b)
 {
     return a.Impl >= b.Impl;
 }
@@ -455,8 +456,8 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-void swap(stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-          stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b
+void swap(stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& a,
+          stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>& b
           )
 {
     a.swap(b);

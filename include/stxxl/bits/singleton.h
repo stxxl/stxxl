@@ -27,7 +27,7 @@ template <typename INSTANCE, bool destroy_on_exit = true>
 class singleton : private noncopyable
 {
     typedef INSTANCE instance_type;
-    typedef instance_type * instance_pointer;
+    typedef instance_type* instance_pointer;
     typedef volatile instance_pointer volatile_instance_pointer;
 
     static volatile_instance_pointer instance;

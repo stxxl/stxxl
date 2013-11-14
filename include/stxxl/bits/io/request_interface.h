@@ -42,8 +42,8 @@ public:
     enum request_type { READ, WRITE };
 
 public:
-    virtual bool add_waiter(onoff_switch * sw) = 0;
-    virtual void delete_waiter(onoff_switch * sw) = 0;
+    virtual bool add_waiter(onoff_switch* sw) = 0;
+    virtual void delete_waiter(onoff_switch* sw) = 0;
 
 protected:
     virtual void notify_waiters() = 0;
@@ -77,7 +77,7 @@ public:
     virtual const char * io_type() const = 0;
 
     //! Dumps properties of a request.
-    virtual std::ostream & print(std::ostream & out) const = 0;
+    virtual std::ostream & print(std::ostream& out) const = 0;
 
     virtual ~request_interface()
     { }

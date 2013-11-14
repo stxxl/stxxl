@@ -27,13 +27,13 @@ int main()
 
     assert(my_queue.size() == 4);
 
-    std::cout << "back element " << my_queue.back() << std::endl;  // prints out 7 (last inserted element)
+    std::cout << "back element " << my_queue.back() << std::endl;   // prints out 7 (last inserted element)
     assert(my_queue.back() == 7);
-    std::cout << "front element " << my_queue.front() << std::endl;  // prints out 5 (first inserted element)
+    std::cout << "front element " << my_queue.front() << std::endl; // prints out 5 (first inserted element)
     assert(my_queue.front() == 5);
-    my_queue.pop();  // deletes element 5, queue now stores: |7|3|11|
+    my_queue.pop();                                                 // deletes element 5, queue now stores: |7|3|11|
 
-    std::cout << "front element " << my_queue.front() << std::endl;  // prints out 11
+    std::cout << "front element " << my_queue.front() << std::endl; // prints out 11
     assert(my_queue.front() == 11);
 
     return 0;

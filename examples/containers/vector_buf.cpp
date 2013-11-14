@@ -34,7 +34,7 @@ void test_vector_element(uint64 size)
 //! [element]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
+    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 void test_vector_iterator(uint64 size)
@@ -56,7 +56,7 @@ void test_vector_iterator(uint64 size)
 //! [iterator]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
+    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 void test_vector_buffered(uint64 size)
@@ -87,7 +87,7 @@ void test_vector_buffered(uint64 size)
 //! [buffered]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
+    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 #if STXXL_HAVE_CXX11_RANGE_FOR_LOOP
@@ -117,14 +117,14 @@ void test_vector_cxx11(uint64 size)
 //! [cxx11]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
+    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
 }
 #endif
 
 int main(int argc, char* argv[])
 {
     int multi = (argc >= 2 ? atoi(argv[1]) : 4);
-    const uint64 size = multi * 1024*1024 * uint64(1024) / sizeof(uint64);
+    const uint64 size = multi * 1024 * 1024 * uint64(1024) / sizeof(uint64);
 
     stxxl::block_manager::get_instance();
 

@@ -34,7 +34,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void *>(this) << "]::" << msg)
+#define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void*>(this) << "]::" << msg)
 
 //! \defgroup stlcont Containers
 //! \ingroup stllayer
@@ -91,14 +91,14 @@ public:
         pos = block2 * modulo12 + block1 * modulo1 + offset;
     }
 
-    double_blocked_index & operator = (size_type pos)
+    double_blocked_index& operator = (size_type pos)
     {
         set(pos);
         return *this;
     }
 
     //pre-increment operator
-    double_blocked_index & operator ++ ()
+    double_blocked_index& operator ++ ()
     {
         ++pos;
         ++offset;
@@ -129,7 +129,7 @@ public:
     }
 
     //pre-increment operator
-    double_blocked_index & operator -- ()
+    double_blocked_index& operator -- ()
     {
         --pos;
         if (offset == 0)
@@ -164,7 +164,7 @@ public:
         return double_blocked_index(pos + addend);
     }
 
-    double_blocked_index & operator += (size_type addend)
+    double_blocked_index& operator += (size_type addend)
     {
         set(pos + addend);
         return *this;
@@ -175,48 +175,48 @@ public:
         return double_blocked_index(pos - addend);
     }
 
-    size_type operator - (const double_blocked_index & dbi2) const
+    size_type operator - (const double_blocked_index& dbi2) const
     {
         return pos - dbi2.pos;
     }
 
-    double_blocked_index & operator -= (size_type subtrahend)
+    double_blocked_index& operator -= (size_type subtrahend)
     {
         set(pos - subtrahend);
         return *this;
     }
 
-    bool operator == (const double_blocked_index & dbi2) const
+    bool operator == (const double_blocked_index& dbi2) const
     {
         return pos == dbi2.pos;
     }
 
-    bool operator != (const double_blocked_index & dbi2) const
+    bool operator != (const double_blocked_index& dbi2) const
     {
         return pos != dbi2.pos;
     }
 
-    bool operator < (const double_blocked_index & dbi2) const
+    bool operator < (const double_blocked_index& dbi2) const
     {
         return pos < dbi2.pos;
     }
 
-    bool operator <= (const double_blocked_index & dbi2) const
+    bool operator <= (const double_blocked_index& dbi2) const
     {
         return pos <= dbi2.pos;
     }
 
-    bool operator > (const double_blocked_index & dbi2) const
+    bool operator > (const double_blocked_index& dbi2) const
     {
         return pos > dbi2.pos;
     }
 
-    bool operator >= (const double_blocked_index & dbi2) const
+    bool operator >= (const double_blocked_index& dbi2) const
     {
         return pos >= dbi2.pos;
     }
 
-    double_blocked_index & operator >>= (size_type shift)
+    double_blocked_index& operator >>= (size_type shift)
     {
         set(pos >> shift);
         return *this;
@@ -308,11 +308,11 @@ public:
 
 protected:
     blocked_index_type offset;
-    vector_type * p_vector;
+    vector_type* p_vector;
 
 private:
     //! private constructor for initializing other iterators
-    vector_iterator(vector_type * v, size_type o)
+    vector_iterator(vector_type* v, size_type o)
         : offset(o), p_vector(v)
     { }
 
@@ -322,7 +322,7 @@ public:
         : offset(0), p_vector(NULL)
     { }
     //! copy-constructor
-    vector_iterator(const self_type & a)
+    vector_iterator(const self_type& a)
         : offset(a.offset),
           p_vector(a.p_vector)
     { }
@@ -388,12 +388,12 @@ public:
     //! \{
 
     //! calculate different between two iterator
-    difference_type operator - (const self_type & a) const
+    difference_type operator - (const self_type& a) const
     {
         return offset - a.offset;
     }
     //! calculate different between two iterator
-    difference_type operator - (const const_self_type & a) const
+    difference_type operator - (const const_self_type& a) const
     {
         return offset - a.offset;
     }
@@ -408,19 +408,19 @@ public:
         return self_type(p_vector, offset.get_pos() + i);
     }
     //! advance this iterator -i positions in the vector
-    self_type & operator -= (size_type i)
+    self_type& operator -= (size_type i)
     {
         offset -= i;
         return *this;
     }
     //! advance this iterator +i positions in the vector
-    self_type & operator += (size_type i)
+    self_type& operator += (size_type i)
     {
         offset += i;
         return *this;
     }
     //! advance this iterator to next position in the vector
-    self_type & operator ++ ()
+    self_type& operator ++ ()
     {
         offset++;
         return *this;
@@ -433,7 +433,7 @@ public:
         return tmp;
     }
     //! advance this iterator to preceding position in the vector
-    self_type & operator -- ()
+    self_type& operator -- ()
     {
         offset--;
         return *this;
@@ -451,63 +451,63 @@ public:
     //! \name Comparison Operators
     //! \{
 
-    bool operator == (const self_type & a) const
+    bool operator == (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset == a.offset;
     }
-    bool operator != (const self_type & a) const
+    bool operator != (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset != a.offset;
     }
-    bool operator < (const self_type & a) const
+    bool operator < (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
-    bool operator <= (const self_type & a) const
+    bool operator <= (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset <= a.offset;
     }
-    bool operator > (const self_type & a) const
+    bool operator > (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset > a.offset;
     }
-    bool operator >= (const self_type & a) const
+    bool operator >= (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset >= a.offset;
     }
 
-    bool operator == (const const_self_type & a) const
+    bool operator == (const const_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset == a.offset;
     }
-    bool operator != (const const_self_type & a) const
+    bool operator != (const const_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset != a.offset;
     }
-    bool operator < (const const_self_type & a) const
+    bool operator < (const const_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
-    bool operator <= (const const_self_type & a) const
+    bool operator <= (const const_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset <= a.offset;
     }
-    bool operator > (const const_self_type & a) const
+    bool operator > (const const_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset > a.offset;
     }
-    bool operator >= (const const_self_type & a) const
+    bool operator >= (const const_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset >= a.offset;
@@ -572,11 +572,11 @@ public:
 
 protected:
     blocked_index_type offset;
-    const vector_type * p_vector;
+    const vector_type* p_vector;
 
 private:
     //! private constructor for initializing other iterators
-    const_vector_iterator(const vector_type * v, size_type o)
+    const_vector_iterator(const vector_type* v, size_type o)
         : offset(o), p_vector(v)
     { }
 
@@ -586,11 +586,11 @@ public:
         : offset(0), p_vector(NULL)
     { }
     //! copy-constructor
-    const_vector_iterator(const self_type & a)
+    const_vector_iterator(const self_type& a)
         : offset(a.offset), p_vector(a.p_vector)
     { }
     //! copy-constructor from mutable iterator
-    const_vector_iterator(const mutable_self_type & a)
+    const_vector_iterator(const mutable_self_type& a)
         : offset(a.offset), p_vector(a.p_vector)
     { }
 
@@ -610,7 +610,7 @@ public:
     //! return iterator to BID containg current element
     bids_container_iterator bid() const
     {
-        return ((vector_type *)p_vector)->bid(offset);
+        return ((vector_type*)p_vector)->bid(offset);
     }
 
     //! \}
@@ -640,12 +640,12 @@ public:
     //! \{
 
     //! calculate different between two iterator
-    difference_type operator - (const self_type & a) const
+    difference_type operator - (const self_type& a) const
     {
         return offset - a.offset;
     }
     //! calculate different between two iterator
-    difference_type operator - (const mutable_self_type & a) const
+    difference_type operator - (const mutable_self_type& a) const
     {
         return offset - a.offset;
     }
@@ -660,19 +660,19 @@ public:
         return self_type(p_vector, offset.get_pos() + i);
     }
     //! advance this iterator -i positions in the vector
-    self_type & operator -= (size_type i)
+    self_type& operator -= (size_type i)
     {
         offset -= i;
         return *this;
     }
     //! advance this iterator +i positions in the vector
-    self_type & operator += (size_type i)
+    self_type& operator += (size_type i)
     {
         offset += i;
         return *this;
     }
     //! advance this iterator to next position in the vector
-    self_type & operator ++ ()
+    self_type& operator ++ ()
     {
         offset++;
         return *this;
@@ -685,7 +685,7 @@ public:
         return tmp_;
     }
     //! advance this iterator to preceding position in the vector
-    self_type & operator -- ()
+    self_type& operator -- ()
     {
         offset--;
         return *this;
@@ -703,63 +703,63 @@ public:
     //! \name Comparison Operators
     //! \{
 
-    bool operator == (const self_type & a) const
+    bool operator == (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset == a.offset;
     }
-    bool operator != (const self_type & a) const
+    bool operator != (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset != a.offset;
     }
-    bool operator < (const self_type & a) const
+    bool operator < (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
-    bool operator <= (const self_type & a) const
+    bool operator <= (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset <= a.offset;
     }
-    bool operator > (const self_type & a) const
+    bool operator > (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset > a.offset;
     }
-    bool operator >= (const self_type & a) const
+    bool operator >= (const self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset >= a.offset;
     }
 
-    bool operator == (const mutable_self_type & a) const
+    bool operator == (const mutable_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset == a.offset;
     }
-    bool operator != (const mutable_self_type & a) const
+    bool operator != (const mutable_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset != a.offset;
     }
-    bool operator < (const mutable_self_type & a) const
+    bool operator < (const mutable_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
-    bool operator <= (const mutable_self_type & a) const
+    bool operator <= (const mutable_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset <= a.offset;
     }
-    bool operator > (const mutable_self_type & a) const
+    bool operator > (const mutable_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset > a.offset;
     }
-    bool operator >= (const mutable_self_type & a) const
+    bool operator >= (const mutable_self_type& a) const
     {
         assert(p_vector == a.p_vector);
         return offset >= a.offset;
@@ -818,13 +818,13 @@ public:
     //! The type of elements stored in the vector.
     typedef ValueType value_type;
     //! reference to value_type
-    typedef value_type & reference;
+    typedef value_type& reference;
     //! constant reference to value_type
-    typedef const value_type & const_reference;
+    typedef const value_type& const_reference;
     //! pointer to value_type
-    typedef value_type * pointer;
+    typedef value_type* pointer;
     //! constant pointer to value_type
-    typedef const value_type * const_pointer;
+    typedef const value_type* const_pointer;
     //! an unsigned 64-bit integral type
     typedef SizeType size_type;
     typedef stxxl::int64 difference_type;
@@ -900,9 +900,9 @@ private:
     mutable std::vector<int_type> m_page_to_slot;
     mutable simple_vector<int_type> m_slot_to_page;
     mutable std::queue<int_type> m_free_slots;
-    mutable simple_vector<block_type> * m_cache;
-    file * m_from;
-    block_manager * m_bm;
+    mutable simple_vector<block_type>* m_cache;
+    file* m_from;
+    block_manager* m_bm;
     bool m_exported;
 
     size_type size_from_file_length(stxxl::uint64 file_length) const
@@ -958,7 +958,7 @@ public:
         m_bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end(), 0);
     }
 
-    void swap(vector & obj)
+    void swap(vector& obj)
     {
         std::swap(m_alloc_strategy, obj.m_alloc_strategy);
         std::swap(m_size, obj.m_size);
@@ -1052,7 +1052,7 @@ public:
                 (*it).offset = offset;
             }
             STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " <<
-                                 ((void *)m_from) << " to " << offset);
+                                 ((void*)m_from) << " to " << offset);
             m_from->set_size(offset);
         }
     }
@@ -1200,7 +1200,7 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    vector(file * from, size_type size = size_type(-1), unsigned_type npages = pager_type().size())
+    vector(file* from, size_type size = size_type(-1), unsigned_type npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
           m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
@@ -1246,7 +1246,7 @@ public:
     }
 
     //! copy-constructor
-    vector(const vector & obj)
+    vector(const vector& obj)
         : m_size(obj.size()),
           m_bids((size_t)div_ceil(obj.size(), block_type::size)),
           m_pager(obj.numpages()),
@@ -1279,7 +1279,7 @@ public:
     }
 
     //! assignment operator
-    vector & operator = (const vector & obj)
+    vector& operator = (const vector& obj)
     {
         if (&obj != this)
         {
@@ -1444,7 +1444,7 @@ public:
             else // file must be truncated
             {
                 STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " <<
-                                     ((void *)m_from) << " to " << file_length());
+                                     ((void*)m_from) << " to " << file_length());
                 STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
                 try
                 {
@@ -1486,7 +1486,7 @@ public:
     //! Set the blocks and the size of this container explicitly.
     //! The vector must be completely empty before.
     template <typename ForwardIterator>
-    void set_content(const ForwardIterator & bid_begin, const ForwardIterator & bid_end, size_type n)
+    void set_content(const ForwardIterator& bid_begin, const ForwardIterator& bid_end, size_type n)
     {
         unsigned_type new_bids_size = div_ceil(n, block_type::size);
         m_bids.resize(new_bids_size);
@@ -1504,25 +1504,25 @@ public:
     }
 
 private:
-    bids_container_iterator bid(const size_type & offset)
+    bids_container_iterator bid(const size_type& offset)
     {
         return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    bids_container_iterator bid(const blocked_index_type & offset)
+    bids_container_iterator bid(const blocked_index_type& offset)
     {
         return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset.get_block2() * PageSize + offset.get_block1()));
     }
-    const_bids_container_iterator bid(const size_type & offset) const
+    const_bids_container_iterator bid(const size_type& offset) const
     {
         return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    const_bids_container_iterator bid(const blocked_index_type & offset) const
+    const_bids_container_iterator bid(const blocked_index_type& offset) const
     {
         return (m_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
@@ -1535,7 +1535,7 @@ private:
         if (m_page_status[page_no] == uninitialized)
             return;
         STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
-        request_ptr * reqs = new request_ptr[page_size];
+        request_ptr* reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(m_bids.size()));
         int_type i = cache_slot * page_size, j = 0;
@@ -1553,7 +1553,7 @@ private:
         if (!(m_page_status[page_no] & dirty))
             return;
         STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
-        request_ptr * reqs = new request_ptr[page_size];
+        request_ptr* reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(m_bids.size()));
         assert(block_no < last_block);
@@ -1576,7 +1576,7 @@ private:
         return element(blocked_index_type(offset));
     }
 
-    reference element(const blocked_index_type & offset)
+    reference element(const blocked_index_type& offset)
     {
 #ifdef STXXL_RANGE_CHECK
         assert(offset.get_pos() < size());
@@ -1649,7 +1649,7 @@ private:
         page_externally_updated(offset / (block_type::size * page_size));
     }
 
-    void block_externally_updated(const blocked_index_type & offset) const
+    void block_externally_updated(const blocked_index_type& offset) const
     {
         page_externally_updated(offset.get_block2());
     }
@@ -1659,7 +1659,7 @@ private:
         return const_element(blocked_index_type(offset));
     }
 
-    const_reference const_element(const blocked_index_type & offset) const
+    const_reference const_element(const blocked_index_type& offset) const
     {
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
@@ -1700,7 +1700,7 @@ private:
         }
     }
 
-    bool is_page_cached(const blocked_index_type & offset) const
+    bool is_page_cached(const blocked_index_type& offset) const
     {
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
@@ -1717,9 +1717,9 @@ template <
     typename AllocStr,
     typename SizeType>
 inline bool operator == (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & a,
+                                       AllocStr, SizeType>& a,
                          stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & b)
+                                       AllocStr, SizeType>& b)
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
@@ -1732,9 +1732,9 @@ template <
     typename AllocStr,
     typename SizeType>
 inline bool operator != (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & a,
+                                       AllocStr, SizeType>& a,
                          stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & b)
+                                       AllocStr, SizeType>& b)
 {
     return !(a == b);
 }
@@ -1747,9 +1747,9 @@ template <
     typename AllocStr,
     typename SizeType>
 inline bool operator < (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr, SizeType> & a,
+                                      AllocStr, SizeType>& a,
                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr, SizeType> & b)
+                                      AllocStr, SizeType>& b)
 {
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
 }
@@ -1762,9 +1762,9 @@ template <
     typename AllocStr,
     typename SizeType>
 inline bool operator > (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr, SizeType> & a,
+                                      AllocStr, SizeType>& a,
                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr, SizeType> & b)
+                                      AllocStr, SizeType>& b)
 {
     return b < a;
 }
@@ -1777,9 +1777,9 @@ template <
     typename AllocStr,
     typename SizeType>
 inline bool operator <= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & a,
+                                       AllocStr, SizeType>& a,
                          stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & b)
+                                       AllocStr, SizeType>& b)
 {
     return !(b < a);
 }
@@ -1792,9 +1792,9 @@ template <
     typename AllocStr,
     typename SizeType>
 inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & a,
+                                       AllocStr, SizeType>& a,
                          stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr, SizeType> & b)
+                                       AllocStr, SizeType>& b)
 {
     return !(a < b);
 }
@@ -1883,7 +1883,7 @@ protected:
     vector_iterator m_end;
 
     //! buffered input stream used to overlapped I/O.
-    buf_istream_type * m_bufin;
+    buf_istream_type* m_bufin;
 
     //! number of blocks to use as buffers.
     unsigned_type m_nbuffers;
@@ -1912,7 +1912,7 @@ public:
     //! Create overlapped reader for the whole vector's content.
     //! \param vec vector to read
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader(const vector_type & vec, unsigned_type nbuffers = 0)
+    vector_bufreader(const vector_type& vec, unsigned_type nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -1954,19 +1954,19 @@ public:
     }
 
     //! Return constant reference to current item
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         return *(*m_bufin);
     }
 
     //! Return constant pointer to current item
-    const value_type * operator -> () const
+    const value_type* operator -> () const
     {
         return &(*(*m_bufin));
     }
 
     //! Advance to next item (asserts if !empty()).
-    vector_bufreader & operator ++ ()
+    vector_bufreader& operator ++ ()
     {
         assert(!empty());
         ++m_iter;
@@ -1981,7 +1981,7 @@ public:
     }
 
     //! Read current item into variable and advance to next one.
-    vector_bufreader & operator >> (value_type & v)
+    vector_bufreader& operator >> (value_type& v)
     {
         v = operator * ();
         operator ++ ();
@@ -2045,26 +2045,26 @@ public:
 
 protected:
     //! Buffered reader used to access elements in vector
-    vector_bufreader_type & m_bufreader;
+    vector_bufreader_type& m_bufreader;
 
     //! Use vector_iterator to reference a point in the vector.
     vector_iterator m_iter;
 
 public:
     //! Construct iterator using vector_iterator
-    vector_bufreader_iterator(vector_bufreader_type & bufreader, const vector_iterator & iter)
+    vector_bufreader_iterator(vector_bufreader_type& bufreader, const vector_iterator& iter)
         : m_bufreader(bufreader), m_iter(iter)
     { }
 
     //! Return constant reference to current item
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         assert(m_bufreader.m_iter == m_iter);
         return m_bufreader.operator * ();
     }
 
     //! Return constant pointer to current item
-    const value_type * operator -> () const
+    const value_type* operator -> () const
     {
         assert(m_bufreader.m_iter == m_iter);
         return m_bufreader.operator -> ();
@@ -2072,7 +2072,7 @@ public:
 
     //! Make bufreader advance to next item (asserts if !empty() or if iterator
     //! does not point to current).
-    vector_bufreader_iterator & operator ++ ()
+    vector_bufreader_iterator& operator ++ ()
     {
         assert(m_bufreader.m_iter == m_iter);
         m_bufreader.operator ++ ();
@@ -2081,14 +2081,14 @@ public:
     }
 
     //! Equality comparison operator
-    bool operator == (const vector_bufreader_iterator & vbi) const
+    bool operator == (const vector_bufreader_iterator& vbi) const
     {
         assert(&m_bufreader == &vbi.m_bufreader);
         return (m_iter == vbi.m_iter);
     }
 
     //! Inequality comparison operator
-    bool operator != (const vector_bufreader_iterator & vbi) const
+    bool operator != (const vector_bufreader_iterator& vbi) const
     {
         assert(&m_bufreader == &vbi.m_bufreader);
         return (m_iter != vbi.m_iter);
@@ -2147,7 +2147,7 @@ protected:
     vector_iterator m_end;
 
     //! buffered input stream used to overlapped I/O.
-    buf_istream_type * m_bufin;
+    buf_istream_type* m_bufin;
 
     //! number of blocks to use as buffers.
     unsigned_type m_nbuffers;
@@ -2173,7 +2173,7 @@ public:
     //! Create overlapped reader for the whole vector's content.
     //! \param vec vector to read
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader_reverse(const vector_type & vec, unsigned_type nbuffers = 0)
+    vector_bufreader_reverse(const vector_type& vec, unsigned_type nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -2221,19 +2221,19 @@ public:
     }
 
     //! Return constant reference to current item
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         return *(*m_bufin);
     }
 
     //! Return constant pointer to current item
-    const value_type * operator -> () const
+    const value_type* operator -> () const
     {
         return &(*(*m_bufin));
     }
 
     //! Advance to next item (asserts if !empty()).
-    vector_bufreader_reverse & operator ++ ()
+    vector_bufreader_reverse& operator ++ ()
     {
         assert(!empty());
         --m_iter;
@@ -2248,7 +2248,7 @@ public:
     }
 
     //! Read current item into variable and advance to next one.
-    vector_bufreader_reverse & operator >> (value_type & v)
+    vector_bufreader_reverse& operator >> (value_type& v)
     {
         v = operator * ();
         operator ++ ();
@@ -2328,7 +2328,7 @@ protected:
     vector_const_iterator m_prevblk;
 
     //! buffered output stream used to overlapped I/O.
-    buf_ostream_type * m_bufout;
+    buf_ostream_type* m_bufout;
 
     //! number of blocks to use as buffers.
     unsigned_type m_nbuffers;
@@ -2354,7 +2354,7 @@ public:
     //! Create overlapped writer for the vector's beginning
     //! \param vec vector to write
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2D recommended)
-    vector_bufwriter(vector_type & vec,
+    vector_bufwriter(vector_type& vec,
                      unsigned_type nbuffers = 0)
         : m_iter(vec.begin()),
           m_end(m_iter.parent_vector()->end()),
@@ -2376,7 +2376,7 @@ public:
 
     //! Return mutable reference to item at the position of the internal
     //! iterator.
-    value_type & operator * ()
+    value_type& operator * ()
     {
         if (UNLIKELY(m_iter == m_end))
         {
@@ -2391,7 +2391,7 @@ public:
                     m_iter.block_externally_updated();
             }
 
-            vector_type & v = *m_iter.parent_vector();
+            vector_type& v = *m_iter.parent_vector();
             if (v.size() < 2 * block_type::size) {
                 v.resize(2 * block_type::size);
             }
@@ -2440,7 +2440,7 @@ public:
     }
 
     //! Advance internal iterator.
-    vector_bufwriter & operator ++ ()
+    vector_bufwriter& operator ++ ()
     {
         // always advance internal iterator
         ++m_iter;
@@ -2452,7 +2452,7 @@ public:
     }
 
     //! Write value to the current position and advance the internal iterator.
-    vector_bufwriter & operator << (const value_type & v)
+    vector_bufwriter& operator << (const value_type& v)
     {
         operator * () = v;
         operator ++ ();
@@ -2488,7 +2488,7 @@ public:
 
         if (m_grown)
         {
-            vector_type & v = *m_iter.parent_vector();
+            vector_type& v = *m_iter.parent_vector();
             v.resize(m_iter - v.begin());
 
             m_grown = false;
@@ -2538,8 +2538,8 @@ template <
     unsigned BlockSize,
     typename AllocStr,
     typename SizeType>
-void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> & a,
-          stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> & b)
+void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType>& a,
+          stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType>& b)
 {
     a.swap(b);
 }

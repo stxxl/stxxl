@@ -73,7 +73,7 @@ class simdisk_geometry : private noncopyable
     };
     struct ZoneCmp
     {
-        inline bool operator () (const Zone & a, const Zone & b) const
+        inline bool operator () (const Zone& a, const Zone& b) const
         {
             return a.first_sector < b.first_sector;
         }
@@ -91,8 +91,8 @@ protected:
     double interface_speed;             // in byte/s
     std::set<Zone, ZoneCmp> zones;
 
-    void add_zone(int & first_cyl, int last_cyl,
-                  int sec_per_track, int & first_sect);
+    void add_zone(int& first_cyl, int last_cyl,
+                  int sec_per_track, int& first_sect);
 
 public:
     inline simdisk_geometry()
@@ -121,13 +121,13 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param queue_id disk queue identifier
     //! \param allocator_id linked disk_allocator
-    inline sim_disk_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
+    inline sim_disk_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     {
         std::cout << "Please, make sure that '" << filename <<
-        "' is resided on swap memory partition!" <<
-        std::endl;
+            "' is resided on swap memory partition!" <<
+            std::endl;
     }
-    void serve(const request * req) throw (io_error);
+    void serve(const request* req) throw (io_error);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };
@@ -136,6 +136,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_SIMDISK_FILE
+#endif // #if STXXL_HAVE_SIMDISK_FILE
 
 #endif // !STXXL_IO_SIMDISK_FILE_HEADER

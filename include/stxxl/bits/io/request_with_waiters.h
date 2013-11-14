@@ -30,11 +30,11 @@ __STXXL_BEGIN_NAMESPACE
 class request_with_waiters : virtual public request_interface
 {
     mutex waiters_mutex;
-    std::set<onoff_switch *> waiters;
+    std::set<onoff_switch*> waiters;
 
 protected:
-    bool add_waiter(onoff_switch * sw);
-    void delete_waiter(onoff_switch * sw);
+    bool add_waiter(onoff_switch* sw);
+    void delete_waiter(onoff_switch* sw);
     void notify_waiters();
     /*
     int nwaiters();             // returns number of waiters

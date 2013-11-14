@@ -41,19 +41,19 @@ void print_malloc_stats()
     STXXL_MSG("================================================================");
 }
 
-int do_mallinfo(int argc, char * argv[])
+int do_mallinfo(int argc, char* argv[])
 {
     // parse command line
     stxxl::cmdline_parser cp;
 
     cp.set_description("Allocate some memory and mlock() it to consume physical memory. "
                        "Needs to run as root to block more than 64 KiB in default settings."
-        );
+                       );
 
     stxxl::uint64 M;
     cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 1GiB)", M);
 
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     sbrk(128 * 1024 * 1024);
@@ -61,7 +61,7 @@ int do_mallinfo(int argc, char * argv[])
     std::cout << "Nothing allocated" << std::endl;
     print_malloc_stats();
 
-    char * ptr = new char[M];
+    char* ptr = new char[M];
 
     std::cout << "Allocated " << M << " bytes" << std::endl;
     print_malloc_stats();
@@ -81,7 +81,7 @@ int do_mallinfo(int argc, char * argv[])
 
 #else // !STXXL_HAVE_MALLINFO_PROTO
 
-int do_mallinfo(int, char *[])
+int do_mallinfo(int, char*[])
 {
     STXXL_MSG("Sorry, mallinfo() statistics are not supported on this platform.");
     return -1;

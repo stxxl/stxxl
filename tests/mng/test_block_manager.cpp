@@ -30,7 +30,7 @@ struct MyType
 
 struct my_handler
 {
-    void operator () (stxxl::request * req)
+    void operator () (stxxl::request* req)
     {
         STXXL_MSG(req << " done, type=" << req->io_type());
     }
@@ -45,11 +45,11 @@ int main()
     const unsigned nblocks = 2;
     stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
     std::vector<int> disks(nblocks, 2);
-    stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::request_ptr* reqs = new stxxl::request_ptr[nblocks];
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
 
-    block_type * block = new block_type[2];
+    block_type* block = new block_type[2];
     STXXL_MSG(std::hex);
     STXXL_MSG("Allocated block address    : " << (stxxl::unsigned_type)(block));
     STXXL_MSG("Allocated block address + 1: " << (stxxl::unsigned_type)(block + 1));
@@ -75,7 +75,7 @@ int main()
         {
             STXXL_CHECK2(j == block->elem[j].integer,
                          "Error in block " << std::hex << i << " pos: " << j
-                         << " value read: " << block->elem[j].integer);
+                                           << " value read: " << block->elem[j].integer);
         }
     }
 

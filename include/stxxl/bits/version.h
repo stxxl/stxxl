@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 // STXXL_VERSION_{MAJOR,MINOR,PATCH} are defined in cmake generated config.h
 
 // construct an integer version number, like "10400" for "1.4.0".
-#define STXXL_VERSION_INTEGER (STXXL_VERSION_MAJOR * 10000 + STXXL_VERSION_MINOR * 100 + STXXL_VERSION_PATCH)
+#define STXXL_VERSION_INTEGER (STXXL_VERSION_MAJOR* 10000 + STXXL_VERSION_MINOR* 100 + STXXL_VERSION_PATCH)
 
 #define stringify_(x) #x
 #define stringify(x) stringify_(x)

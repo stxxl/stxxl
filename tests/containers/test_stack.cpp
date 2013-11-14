@@ -27,7 +27,7 @@ template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink2,
 
 
 template <typename stack_type>
-void test_lvalue_correctness(stack_type & stack, int a, int b)
+void test_lvalue_correctness(stack_type& stack, int a, int b)
 {
     int i;
     STXXL_CHECK(stack.empty());
@@ -52,7 +52,7 @@ void test_lvalue_correctness(stack_type & stack, int a, int b)
 
 
 template <typename stack_type>
-void simple_test(stack_type & my_stack, int test_size)
+void simple_test(stack_type& my_stack, int test_size)
 {
     int i;
 
@@ -112,7 +112,7 @@ void simple_test(stack_type & my_stack, int test_size)
     test_lvalue_correctness(my_stack, 4 * 4096 / 4 * 2, 4 * 4096 / 4 * 2 * 20);
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result ext_normal_stack_type;
     typedef stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096>::result ext_migrating_stack_type;

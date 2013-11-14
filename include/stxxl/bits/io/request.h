@@ -43,8 +43,8 @@ protected:
     compat_unique_ptr<stxxl::io_error>::result error;
 
 protected:
-    file * file_;
-    void * buffer;
+    file* file_;
+    void* buffer;
     offset_type offset;
     size_type bytes;
     request_type type;
@@ -52,10 +52,9 @@ protected:
     void completed();
 
 public:
-
-    request(const completion_handler & on_compl,
-            file * file__,
-            void * buffer_,
+    request(const completion_handler& on_compl,
+            file* file__,
+            void* buffer_,
             offset_type offset_,
             size_type bytes_,
             request_type type_);
@@ -70,18 +69,18 @@ public:
 
     void check_alignment() const;
 
-    std::ostream & print(std::ostream & out) const;
+    std::ostream & print(std::ostream& out) const;
 
     //! Inform the request object that an error occurred during the I/O
     //! execution.
-    void error_occured(const char * msg)
+    void error_occured(const char* msg)
     {
         error.reset(new stxxl::io_error(msg));
     }
 
     //! Inform the request object that an error occurred during the I/O
     //! execution.
-    void error_occured(const std::string & msg)
+    void error_occured(const std::string& msg)
     {
         error.reset(new stxxl::io_error(msg));
     }
@@ -104,7 +103,7 @@ private:
     void check_nref_failed(bool after);
 };
 
-inline std::ostream & operator << (std::ostream & out, const request & req)
+inline std::ostream& operator << (std::ostream& out, const request& req)
 {
     return req.print(out);
 }

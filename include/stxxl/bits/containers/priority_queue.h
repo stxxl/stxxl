@@ -43,7 +43,7 @@ template <
     unsigned N_ = 512,                             // length of group 1 sequences
     unsigned IntKMAX_ = 64,                        // maximal arity for internal mergers
     unsigned IntLevels_ = 4,                       // number of internal groups
-    unsigned BlockSize_ = (2 * 1024 * 1024),       // external block size
+    unsigned BlockSize_ = (2* 1024* 1024),         // external block size
     unsigned ExtKMAX_ = 64,                        // maximal arity for external mergers
     unsigned ExtLevels_ = 2,                       // number of external groups
     class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
@@ -68,24 +68,25 @@ struct priority_queue_config
 
 __STXXL_END_NAMESPACE
 
-namespace std
-{
+namespace std {
+
 template <class BlockType,
           class CompareType,
           unsigned Arity,
           class AllocStr>
-void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr> & a,
-          stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr> & b)
+void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr>& a,
+          stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr>& b)
 {
     a.swap(b);
 }
 template <class ValueType, class CompareType, unsigned KNKMAX>
-void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX> & a,
-          stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX> & b)
+void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX>& a,
+          stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX>& b)
 {
     a.swap(b);
 }
-}
+
+} // namespace std
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -122,33 +123,33 @@ public:
 
 protected:
     typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
-    insert_heap_type;
+        insert_heap_type;
 
     typedef priority_queue_local::loser_tree<
-        value_type,
-        comparator_type,
-        IntKMAX> int_merger_type;
+            value_type,
+            comparator_type,
+            IntKMAX> int_merger_type;
 
     typedef priority_queue_local::ext_merger<
-        block_type,
-        comparator_type,
-        ExtKMAX,
-        alloc_strategy_type> ext_merger_type;
+            block_type,
+            comparator_type,
+            ExtKMAX,
+            alloc_strategy_type> ext_merger_type;
 
 
     int_merger_type int_mergers[num_int_groups];
-    pool_type * pool;
+    pool_type* pool;
     bool pool_owned;
-    ext_merger_type ** ext_mergers;
+    ext_merger_type** ext_mergers;
 
     // one delete buffer for each tree => group buffer
     value_type group_buffers[total_num_groups][N + 1];          // tree->group_buffers->delete_buffer (extra space for sentinel)
-    value_type * group_buffer_current_mins[total_num_groups];   // group_buffer_current_mins[i] is current start of group_buffers[i], end is group_buffers[i] + N
+    value_type* group_buffer_current_mins[total_num_groups];    // group_buffer_current_mins[i] is current start of group_buffers[i], end is group_buffers[i] + N
 
     // overall delete buffer
     value_type delete_buffer[delete_buffer_size + 1];
-    value_type * delete_buffer_current_min;                     // current start of delete_buffer
-    value_type * delete_buffer_end;                             // end of delete_buffer
+    value_type* delete_buffer_current_min;                      // current start of delete_buffer
+    value_type* delete_buffer_end;                              // end of delete_buffer
 
     comparator_type cmp;
 
@@ -180,7 +181,7 @@ public:
     //! for data writing and prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    priority_queue(pool_type & pool_);
+    priority_queue(pool_type& pool_);
 
     //! Constructs external priority queue object.
     //! \param p_pool_ pool of blocks that will be used
@@ -191,7 +192,7 @@ public:
     //! for writing data for the memory<->disk transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    _STXXL_DEPRECATED(priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_));
+    _STXXL_DEPRECATED(priority_queue(prefetch_pool<block_type>& p_pool_, write_pool<block_type>& w_pool_));
 
     //! Constructs external priority queue object.
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
@@ -207,7 +208,7 @@ public:
 #if 0
     //! swap this priority queue with another one.
     //! Implementation correctness is questionable.
-    void swap(priority_queue & obj)
+    void swap(priority_queue& obj)
     {
         //swap_1D_arrays(int_mergers,obj.int_mergers,num_int_groups); // does not work in g++ 3.4.3 :( bug?
         for (unsigned_type i = 0; i < num_int_groups; ++i)
@@ -266,7 +267,7 @@ public:
     //!
     //! Inserts x into the priority_queue. Postcondition: \c size() will be
     //! incremented by 1.
-    void push(const value_type & obj);
+    void push(const value_type& obj);
 
     //! Number of bytes consumed by the \b priority_queue from the internal
     //! memory not including pools (see the constructor)
@@ -306,7 +307,7 @@ inline const typename priority_queue<ConfigType>::value_type & priority_queue<Co
 {
     assert(!insert_heap.empty());
 
-    const typename priority_queue<ConfigType>::value_type & t = insert_heap.top();
+    const typename priority_queue<ConfigType>::value_type& t = insert_heap.top();
     if (/*(!insert_heap.empty()) && */ cmp(*delete_buffer_current_min, t))
         return t;
     else
@@ -331,7 +332,7 @@ inline void priority_queue<ConfigType>::pop()
 }
 
 template <class ConfigType>
-inline void priority_queue<ConfigType>::push(const value_type & obj)
+inline void priority_queue<ConfigType>::push(const value_type& obj)
 {
     //STXXL_VERBOSE3("priority_queue::push("<< obj <<")");
     assert(int_mergers->not_sentinel(obj));
@@ -348,7 +349,7 @@ inline void priority_queue<ConfigType>::push(const value_type & obj)
 ////////////////////////////////////////////////////////////////
 
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(pool_type & pool_) :
+priority_queue<ConfigType>::priority_queue(pool_type& pool_) :
     pool(&pool_),
     pool_owned(false),
     delete_buffer_end(delete_buffer + delete_buffer_size),
@@ -361,7 +362,7 @@ priority_queue<ConfigType>::priority_queue(pool_type & pool_) :
 
 // DEPRECATED
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
+priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type>& p_pool_, write_pool<block_type>& w_pool_) :
     pool(new pool_type(p_pool_, w_pool_)),
     pool_owned(true),
     delete_buffer_end(delete_buffer + delete_buffer_size),
@@ -426,7 +427,7 @@ unsigned_type priority_queue<ConfigType>::refill_group_buffer(unsigned_type grou
 {
     STXXL_VERBOSE_PQ("refill_group_buffer(" << group << ")");
 
-    value_type * target;
+    value_type* target;
     unsigned_type length;
     size_type group_size = (group < num_int_groups) ?
                            int_mergers[group].size() :
@@ -465,7 +466,7 @@ unsigned_type priority_queue<ConfigType>::refill_group_buffer(unsigned_type grou
     if (!stxxl::is_sorted(group_buffer_current_mins[group], group_buffers[group] + N, inv_cmp))
     {
         STXXL_VERBOSE_PQ("refill_grp... length: " << length << " left_elements: " << left_elements);
-        for (value_type * v = group_buffer_current_mins[group] + 1; v < group_buffer_current_mins[group] + left_elements; ++v)
+        for (value_type* v = group_buffer_current_mins[group] + 1; v < group_buffer_current_mins[group] + left_elements; ++v)
         {
             if (inv_cmp(*v, *(v - 1)))
             {
@@ -532,7 +533,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
     case 2:
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
         {
-            std::pair<value_type *, value_type *> seqs[2] =
+            std::pair<value_type*, value_type*> seqs[2] =
             {
                 std::make_pair(group_buffer_current_mins[0], group_buffers[0] + N),
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N)
@@ -551,7 +552,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
     case 3:
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
         {
-            std::pair<value_type *, value_type *> seqs[3] =
+            std::pair<value_type*, value_type*> seqs[3] =
             {
                 std::make_pair(group_buffer_current_mins[0], group_buffers[0] + N),
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N),
@@ -573,7 +574,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
     case 4:
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
         {
-            std::pair<value_type *, value_type *> seqs[4] =
+            std::pair<value_type*, value_type*> seqs[4] =
             {
                 std::make_pair(group_buffer_current_mins[0], group_buffers[0] + N),
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N),
@@ -603,7 +604,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
 #if STXXL_CHECK_ORDER_IN_SORTS
     if (!stxxl::is_sorted(delete_buffer_current_min, delete_buffer_end, inv_cmp))
     {
-        for (value_type * v = delete_buffer_current_min + 1; v < delete_buffer_end; ++v)
+        for (value_type* v = delete_buffer_current_min + 1; v < delete_buffer_end; ++v)
         {
             if (inv_cmp(*v, *(v - 1)))
             {
@@ -654,7 +655,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
         unsigned_type extLevel = level - num_int_groups;
         const size_type segmentSize = ext_mergers[extLevel]->size();
         STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
-        ext_merger_type * overflow_merger = new ext_merger_type;
+        ext_merger_type* overflow_merger = new ext_merger_type;
         overflow_merger->set_pool(pool);
         overflow_merger->insert_segment(*ext_mergers[extLevel], segmentSize);
         std::swap(ext_mergers[extLevel], overflow_merger);
@@ -668,7 +669,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
         if (level < num_int_groups - 1)                                  // from internal to internal tree
         {
             unsigned_type segmentSize = int_mergers[level].size();
-            value_type * newSegment = new value_type[segmentSize + 1];
+            value_type* newSegment = new value_type[segmentSize + 1];
             int_mergers[level].multi_merge(newSegment, segmentSize);     // empty this level
 
             newSegment[segmentSize] = delete_buffer[delete_buffer_size]; // sentinel
@@ -707,12 +708,12 @@ void priority_queue<ConfigType>::empty_insert_heap()
     const value_type sup = get_supremum();
 
     // build new segment
-    value_type * newSegment = new value_type[N + 1];
-    value_type * newPos = newSegment;
+    value_type* newSegment = new value_type[N + 1];
+    value_type* newPos = newSegment;
 
     // put the new data there for now
     //insert_heap.sortTo(newSegment);
-    value_type * SortTo = newSegment;
+    value_type* SortTo = newSegment;
 
     insert_heap.sort_to(SortTo);
 
@@ -730,7 +731,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
     value_type temp[tempSize + 1];
     unsigned_type sz1 = current_delete_buffer_size();
     unsigned_type sz2 = current_group_buffer_size(0);
-    value_type * pos = temp + tempSize - sz1 - sz2;
+    value_type* pos = temp + tempSize - sz1 - sz2;
     std::copy(delete_buffer_current_min, delete_buffer_current_min + sz1, pos);
     std::copy(group_buffer_current_mins[0], group_buffer_current_mins[0] + sz2, pos + sz1);
     temp[tempSize] = sup; // sentinel
@@ -789,18 +790,18 @@ void priority_queue<ConfigType>::dump_sizes() const
     for (int i = 0; i < num_int_groups; ++i) {
         capacity *= IntKMAX;
         STXXL_MSG("  grp " << i << " int" <<
-                " grpbuf=" << current_group_buffer_size(i) <<
-                " size=" << int_mergers[i].size() << "/" << capacity <<
-                " (" << (int)(int_mergers[i].size() * 100.0 / capacity) << "%)" <<
-                " space=" << int_mergers[i].is_space_available());
+                  " grpbuf=" << current_group_buffer_size(i) <<
+                  " size=" << int_mergers[i].size() << "/" << capacity <<
+                  " (" << (int)(int_mergers[i].size() * 100.0 / capacity) << "%)" <<
+                  " space=" << int_mergers[i].is_space_available());
     }
     for (int i = 0; i < num_ext_groups; ++i) {
         capacity *= ExtKMAX;
         STXXL_MSG("  grp " << i + num_int_groups << " ext" <<
-                " grpbuf=" << current_group_buffer_size(i + num_int_groups) <<
-                " size=" << ext_mergers[i]->size() << "/" << capacity <<
-                " (" << (int)(ext_mergers[i]->size() * 100.0 / capacity) << "%)" <<
-                " space=" << ext_mergers[i]->is_space_available());
+                  " grpbuf=" << current_group_buffer_size(i + num_int_groups) <<
+                  " size=" << ext_mergers[i]->size() << "/" << capacity <<
+                  " (" << (int)(ext_mergers[i]->size() * 100.0 / capacity) << "%)" <<
+                  " space=" << ext_mergers[i]->is_space_available());
     }
     dump_params();
 }
@@ -811,90 +812,91 @@ void priority_queue<ConfigType>::dump_params() const
     STXXL_MSG("params: delete_buffer_size=" << delete_buffer_size << " N=" << N << " IntKMAX=" << IntKMAX << " num_int_groups=" << num_int_groups << " ExtKMAX=" << ExtKMAX << " num_ext_groups=" << num_ext_groups << " BlockSize=" << BlockSize);
 }
 
-namespace priority_queue_local
+namespace priority_queue_local {
+
+struct Parameters_for_priority_queue_not_found_Increase_IntMem
 {
-    struct Parameters_for_priority_queue_not_found_Increase_IntMem
-    {
-        enum { fits = false };
-        typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
-    };
+    enum { fits = false };
+    typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
+};
 
-    struct dummy
-    {
-        enum { fits = false };
-        typedef dummy result;
-    };
+struct dummy
+{
+    enum { fits = false };
+    typedef dummy result;
+};
 
-    template <unsigned_type E_, internal_size_type IntMem_, external_size_type MaxItems, unsigned_type B_, unsigned_type m_, bool stop = false>
-    struct find_B_m
-    {
-        typedef find_B_m<E_, IntMem_, MaxItems, B_, m_, stop> Self;
+template <unsigned_type E_, internal_size_type IntMem_, external_size_type MaxItems, unsigned_type B_, unsigned_type m_, bool stop = false>
+struct find_B_m
+{
+    typedef find_B_m<E_, IntMem_, MaxItems, B_, m_, stop> Self;
 
-        static const unsigned_type k = IntMem_ / B_;   // number of blocks that fit into M
-        static const unsigned_type element_size = E_;  // element size
-        static const internal_size_type IntMem = IntMem_;
-        static const unsigned_type B = B_;             // block size
-        static const external_size_type m = m_;             // number of blocks fitting into buffers
-        static const unsigned_type c = k - m_;
-        // memory occupied by block must be at least 10 times larger than size of ext sequence
-        // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
-        static const external_size_type fits = (c > 10) &&
-            (((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxItems) &&
-            ((MaxItems < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128);
-        static const unsigned_type step = 1;
+    static const unsigned_type k = IntMem_ / B_;       // number of blocks that fit into M
+    static const unsigned_type element_size = E_;      // element size
+    static const internal_size_type IntMem = IntMem_;
+    static const unsigned_type B = B_;                 // block size
+    static const external_size_type m = m_;            // number of blocks fitting into buffers
+    static const unsigned_type c = k - m_;
+    // memory occupied by block must be at least 10 times larger than size of ext sequence
+    // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
+    static const external_size_type fits = (c > 10) &&
+                                           (((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxItems) &&
+                                           ((MaxItems < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128);
+    static const unsigned_type step = 1;
 
-        typedef typename find_B_m<element_size, IntMem, MaxItems, B, m + step, fits || (m >= k - step)>::result candidate1;
-        typedef typename find_B_m<element_size, IntMem, MaxItems, B / 2, 1, fits || candidate1::fits>::result candidate2;
-        typedef typename IF<fits, Self, typename IF<candidate1::fits, candidate1, candidate2>::result>::result result;
-    };
+    typedef typename find_B_m<element_size, IntMem, MaxItems, B, m + step, fits || (m >= k - step)>::result candidate1;
+    typedef typename find_B_m<element_size, IntMem, MaxItems, B / 2, 1, fits || candidate1::fits>::result candidate2;
+    typedef typename IF<fits, Self, typename IF<candidate1::fits, candidate1, candidate2>::result>::result result;
+};
 
-    // specialization for the case when no valid parameters are found
-    template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems, bool stop>
-    struct find_B_m<E_, IntMem, MaxItems, 2048, 1, stop>
-    {
-        enum { fits = false };
-        typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
-    };
+// specialization for the case when no valid parameters are found
+template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems, bool stop>
+struct find_B_m<E_, IntMem, MaxItems, 2048, 1, stop>
+{
+    enum { fits = false };
+    typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
+};
 
-    // to speedup search
-    template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems, unsigned_type B_, unsigned_type m_>
-    struct find_B_m<E_, IntMem, MaxItems, B_, m_, true>
-    {
-        enum { fits = false };
-        typedef dummy result;
-    };
+// to speedup search
+template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems, unsigned_type B_, unsigned_type m_>
+struct find_B_m<E_, IntMem, MaxItems, B_, m_, true>
+{
+    enum { fits = false };
+    typedef dummy result;
+};
 
-    // E_ size of element in bytes
-    template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems>
-    struct find_settings
-    {
-        // start from block size (8*1024*1024) bytes
-        typedef typename find_B_m<E_, IntMem, MaxItems, (8 * 1024 * 1024), 1>::result result;
-    };
+// E_ size of element in bytes
+template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems>
+struct find_settings
+{
+    // start from block size (8*1024*1024) bytes
+    typedef typename find_B_m<E_, IntMem, MaxItems, (8* 1024* 1024), 1>::result result;
+};
 
-    struct Parameters_not_found_Try_to_change_the_Tune_parameter
-    {
-        typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
-    };
+struct Parameters_not_found_Try_to_change_the_Tune_parameter
+{
+    typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
+};
 
 
-    template <unsigned_type AI_, unsigned_type X_, unsigned_type CriticalSize>
-    struct compute_N
-    {
-        typedef compute_N<AI_, X_, CriticalSize> Self;
+template <unsigned_type AI_, unsigned_type X_, unsigned_type CriticalSize>
+struct compute_N
+{
+    typedef compute_N<AI_, X_, CriticalSize> Self;
 
-        static const unsigned_type X = X_;
-        static const unsigned_type AI = AI_;
-        static const unsigned_type N = X / (AI * AI); // two stage internal
+    static const unsigned_type X = X_;
+    static const unsigned_type AI = AI_;
+    static const unsigned_type N = X / (AI * AI);     // two stage internal
 
-        typedef typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result result;
-    };
+    typedef typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result result;
+};
 
-    template <unsigned_type X_, unsigned_type CriticalSize_>
-    struct compute_N<1, X_, CriticalSize_>
-    {
-        typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
-    };
+template <unsigned_type X_, unsigned_type CriticalSize_>
+struct compute_N<1, X_, CriticalSize_>
+{
+    typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
+};
+
 } // namespace priority_queue_local
 
 //! \}
@@ -940,7 +942,7 @@ public:
         Buffer1Size = 32                                     // fixed
     };
     // derivation of N, AI, AE
-    typedef typename priority_queue_local::compute_N<(1 << Tune), X, 4 * Buffer1Size>::result ComputeN;
+    typedef typename priority_queue_local::compute_N<(1 << Tune), X, 4* Buffer1Size>::result ComputeN;
     enum
     {
         N = ComputeN::N,
@@ -971,8 +973,8 @@ __STXXL_END_NAMESPACE
 namespace std {
 
 template <class ConfigType>
-void swap(stxxl::priority_queue<ConfigType> & a,
-          stxxl::priority_queue<ConfigType> & b)
+void swap(stxxl::priority_queue<ConfigType>& a,
+          stxxl::priority_queue<ConfigType>& b)
 {
     a.swap(b);
 }

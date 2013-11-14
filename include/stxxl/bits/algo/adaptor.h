@@ -21,7 +21,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 template <unsigned _blk_sz, typename _run_type, class __pos_type = int_type>
-struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type>
+struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type>
 {
     typedef runs2bid_array_adaptor<_blk_sz, _run_type, __pos_type> _Self;
     typedef BID<_blk_sz> data_type;
@@ -30,18 +30,18 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<_run_type 
 
     unsigned_type dim_size;
 
-    typedef two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type> _Parent;
+    typedef two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type> _Parent;
     using _Parent::array;
     using _Parent::pos;
 
-    runs2bid_array_adaptor(_run_type ** a, __pos_type p, unsigned_type d)
-        : two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type>(a, p), dim_size(d)
+    runs2bid_array_adaptor(_run_type** a, __pos_type p, unsigned_type d)
+        : two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type>(a, p), dim_size(d)
     { }
-    runs2bid_array_adaptor(const _Self & a)
-        : two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type>(a), dim_size(a.dim_size)
+    runs2bid_array_adaptor(const _Self& a)
+        : two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type>(a), dim_size(a.dim_size)
     { }
 
-    const _Self & operator = (const _Self & a)
+    const _Self& operator = (const _Self& a)
     {
         array = a.array;
         pos = a.pos;
@@ -49,20 +49,20 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<_run_type 
         return *this;
     }
 
-    data_type & operator * ()
+    data_type& operator * ()
     {
         CHECK_RUN_BOUNDS(pos);
         return (BID<_blk_sz>&)((*(array[(pos) % dim_size]))[(pos) / dim_size].bid);
     }
 
-    const data_type * operator -> () const
+    const data_type* operator -> () const
     {
         CHECK_RUN_BOUNDS(pos);
         return &((*(array[(pos) % dim_size])[(pos) / dim_size].bid));
     }
 
 
-    data_type & operator [] (__pos_type n) const
+    data_type& operator [] (__pos_type n) const
     {
         n += pos;
         CHECK_RUN_BOUNDS(n);
@@ -74,12 +74,12 @@ BLOCK_ADAPTOR_OPERATORS(runs2bid_array_adaptor)
 
 template <unsigned _blk_sz, typename _run_type, class __pos_type = int_type>
 struct runs2bid_array_adaptor2
-    : public two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type>
+    : public two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type>
 {
     typedef runs2bid_array_adaptor2<_blk_sz, _run_type, __pos_type> _Self;
     typedef BID<_blk_sz> data_type;
 
-    typedef two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type> ParentClass_;
+    typedef two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type> ParentClass_;
 
     using ParentClass_::pos;
     using ParentClass_::array;
@@ -89,17 +89,17 @@ struct runs2bid_array_adaptor2
 
     __pos_type w, h, K;
 
-    runs2bid_array_adaptor2(_run_type ** a, __pos_type p, int_type _w, int_type _h)
-        : two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type>(a, p),
+    runs2bid_array_adaptor2(_run_type** a, __pos_type p, int_type _w, int_type _h)
+        : two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type>(a, p),
           w(_w), h(_h), K(_w * _h)
     { }
 
-    runs2bid_array_adaptor2(const _Self & a)
-        : two2one_dim_array_adapter_base<_run_type *, BID<_blk_sz>, __pos_type>(a),
+    runs2bid_array_adaptor2(const _Self& a)
+        : two2one_dim_array_adapter_base<_run_type*, BID<_blk_sz>, __pos_type>(a),
           w(a.w), h(a.h), K(a.K)
     { }
 
-    const _Self & operator = (const _Self & a)
+    const _Self& operator = (const _Self& a)
     {
         array = a.array;
         pos = a.pos;
@@ -109,7 +109,7 @@ struct runs2bid_array_adaptor2
         return *this;
     }
 
-    data_type & operator * ()
+    data_type& operator * ()
     {
         register __pos_type i = pos - K;
         if (i < 0)
@@ -120,7 +120,7 @@ struct runs2bid_array_adaptor2
         return (BID<_blk_sz>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 
-    const data_type * operator -> () const
+    const data_type* operator -> () const
     {
         register __pos_type i = pos - K;
         if (i < 0)
@@ -133,7 +133,7 @@ struct runs2bid_array_adaptor2
     }
 
 
-    data_type & operator [] (__pos_type n) const
+    data_type& operator [] (__pos_type n) const
     {
         n += pos;
         register __pos_type i = n - K;
@@ -160,32 +160,32 @@ struct trigger_entry_iterator
     typedef bid_type value_type;
     typedef std::random_access_iterator_tag iterator_category;
     typedef int_type difference_type;
-    typedef value_type * pointer;
-    typedef value_type & reference;
+    typedef value_type* pointer;
+    typedef value_type& reference;
 
     trigger_iterator_type value;
 
-    trigger_entry_iterator(const _Self & a) : value(a.value) { }
+    trigger_entry_iterator(const _Self& a) : value(a.value) { }
     trigger_entry_iterator(trigger_iterator_type v) : value(v) { }
 
-    bid_type & operator * ()
+    bid_type& operator * ()
     {
         return value->bid;
     }
-    bid_type * operator -> () const
+    bid_type* operator -> () const
     {
         return &(value->bid);
     }
-    const bid_type & operator [] (int_type n) const
+    const bid_type& operator [] (int_type n) const
     {
         return (value + n)->bid;
     }
-    bid_type & operator [] (int_type n)
+    bid_type& operator [] (int_type n)
     {
         return (value + n)->bid;
     }
 
-    _Self & operator ++ ()
+    _Self& operator ++ ()
     {
         value++;
         return *this;
@@ -196,7 +196,7 @@ struct trigger_entry_iterator
         value++;
         return __tmp;
     }
-    _Self & operator -- ()
+    _Self& operator -- ()
     {
         value--;
         return *this;
@@ -207,11 +207,11 @@ struct trigger_entry_iterator
         value--;
         return __tmp;
     }
-    bool operator == (const _Self & a) const
+    bool operator == (const _Self& a) const
     {
         return value == a.value;
     }
-    bool operator != (const _Self & a) const
+    bool operator != (const _Self& a) const
     {
         return value != a.value;
     }
@@ -225,11 +225,11 @@ struct trigger_entry_iterator
         value -= n;
         return *this;
     }
-    int_type operator - (const _Self & a) const
+    int_type operator - (const _Self& a) const
     {
         return value - a.value;
     }
-    int_type operator + (const _Self & a) const
+    int_type operator + (const _Self& a) const
     {
         return value + a.value;
     }

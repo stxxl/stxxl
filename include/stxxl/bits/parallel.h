@@ -124,19 +124,20 @@ inline bool do_parallel_merge()
 }
 
 
-namespace potentially_parallel
-{
-#if STXXL_PARALLEL_MODE_EXPLICIT
-    using __gnu_parallel::sort;
-    using __gnu_parallel::random_shuffle;
-#else
-    using std::sort;
-    using std::random_shuffle;
-#endif
-}
+namespace potentially_parallel {
 
-namespace parallel
-{
+#if STXXL_PARALLEL_MODE_EXPLICIT
+using __gnu_parallel::sort;
+using __gnu_parallel::random_shuffle;
+#else
+using std::sort;
+using std::random_shuffle;
+#endif
+
+} // namespace potentially_parallel
+
+namespace parallel {
+
 #if STXXL_PARALLEL
 
 /*! Multi-way merging dispatcher.
@@ -147,23 +148,23 @@ namespace parallel
  * @param length Maximum length to merge.
  * @return End iterator of output sequence.
  */
-    template <typename RandomAccessIteratorPairIterator,
-              typename RandomAccessIterator3, typename DiffType, typename Comparator>
-    RandomAccessIterator3
-    multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
-                   RandomAccessIteratorPairIterator seqs_end,
-                   RandomAccessIterator3 target,
-                   Comparator comp,
-                   DiffType length)
-    {
+template <typename RandomAccessIteratorPairIterator,
+          typename RandomAccessIterator3, typename DiffType, typename Comparator>
+RandomAccessIterator3
+multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
+               RandomAccessIteratorPairIterator seqs_end,
+               RandomAccessIterator3 target,
+               Comparator comp,
+               DiffType length)
+{
 #if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
-        return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
+    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
 #elif defined(STXXL_PARALLEL_MODE)
-        return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
+    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #else
 #error "no implementation found for multiway_merge()"
 #endif
-    }
+}
 
 /*! Multi-way merging front-end.
  * @param seqs_begin Begin iterator of iterator pair input sequence.
@@ -174,26 +175,27 @@ namespace parallel
  * @return End iterator of output sequence.
  * @pre For each @c i, @c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element.
  */
-    template <typename RandomAccessIteratorPairIterator,
-              typename RandomAccessIterator3, typename DiffType, typename Comparator>
-    RandomAccessIterator3
-    multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
-                            RandomAccessIteratorPairIterator seqs_end,
-                            RandomAccessIterator3 target,
-                            Comparator comp,
-                            DiffType length)
-    {
+template <typename RandomAccessIteratorPairIterator,
+          typename RandomAccessIterator3, typename DiffType, typename Comparator>
+RandomAccessIterator3
+multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
+                        RandomAccessIteratorPairIterator seqs_end,
+                        RandomAccessIterator3 target,
+                        Comparator comp,
+                        DiffType length)
+{
 #if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
-        return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
+    return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
 #elif defined(STXXL_PARALLEL_MODE)
-        return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
+    return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
 #else
 #error "no implementation found for multiway_merge_sentinel()"
 #endif
-    }
+}
 
 #endif
-}
+
+} // namespace parallel
 
 __STXXL_END_NAMESPACE
 

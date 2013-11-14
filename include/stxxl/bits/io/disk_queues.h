@@ -39,7 +39,7 @@ class disk_queues : public singleton<disk_queues>
     typedef request_queue_impl_qwqr request_queue_type;
 
     typedef stxxl::int64 DISKID;
-    typedef std::map<DISKID, request_queue_type *> request_queue_map;
+    typedef std::map<DISKID, request_queue_type*> request_queue_map;
 
 protected:
     request_queue_map queues;
@@ -49,7 +49,7 @@ protected:
     }
 
 public:
-    void add_request(request_ptr & req, DISKID disk)
+    void add_request(request_ptr& req, DISKID disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;
@@ -70,7 +70,7 @@ public:
     //! \param req request to cancel
     //! \param disk disk number for disk that \c req was scheduled on
     //! \return \c true iff the request was canceled successfully
-    bool cancel_request(request_ptr & req, DISKID disk)
+    bool cancel_request(request_ptr& req, DISKID disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;

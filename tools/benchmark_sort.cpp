@@ -39,7 +39,7 @@ typedef stxxl::tuple<uint64, uint64> pair64_type;
 // larger struct of 64 bytes
 struct struct64_type : public pair64_type
 {
-    char junk[16+32];
+    char junk[16 + 32];
 
     struct64_type() { }
 
@@ -56,7 +56,7 @@ class BenchmarkSort
 
     struct value_less
     {
-        bool operator() (const value_type& a, const value_type& b) const
+        bool operator () (const value_type& a, const value_type& b) const
         {
             return a.first < b.first;
         }
@@ -71,8 +71,8 @@ class BenchmarkSort
     struct value_key_second
     {
         typedef typename value_type::second_type key_type;
-    
-        key_type operator() (const value_type & p) const
+
+        key_type operator () (const value_type& p) const
         { return p.second; }
 
         static value_type min_value()
@@ -108,7 +108,7 @@ class BenchmarkSort
         {
             assert(m_counter > 0);
             --m_counter;
-            
+
             m_value.first = m_rng();
             m_value.second = m_rng();
             return *this;
@@ -131,7 +131,7 @@ public:
     {
         // construct vector
         typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
-    
+
         uint64 vec_size = stxxl::div_ceil(length, sizeof(ValueType));
 
         vector_type vec(vec_size);
@@ -144,7 +144,7 @@ public:
             std::cout << "# materialize random_stream into vector of size " << vec.size() << std::endl;
             double ts1 = timestamp();
 
-            random_stream rs (vec_size);
+            random_stream rs(vec_size);
             stxxl::stream::materialize(rs, vec.begin(), vec.end());
 
             double elapsed = timestamp() - ts1;
@@ -177,7 +177,7 @@ public:
             typedef stxxl::stream::sort<random_stream, value_less>
                 random_stream_sort_type;
 
-            random_stream stream (vec_size);
+            random_stream stream(vec_size);
             random_stream_sort_type stream_sort(stream, value_less(), memsize);
 
             stxxl::stream::discard(stream_sort);
@@ -191,7 +191,7 @@ public:
 };
 
 // run sorting benchmark for the three types defined above.
-int benchmark_sort(int argc, char * argv[])
+int benchmark_sort(int argc, char* argv[])
 {
     // parse command line
     stxxl::cmdline_parser cp;
@@ -199,7 +199,7 @@ int benchmark_sort(int argc, char * argv[])
     cp.set_description("This program will benchmark the different sorting methods provided "
                        "by STXXL using three different data types: first a pair of 32-bit uints, "
                        "then a pair 64-bit uint and then a larger structure of 64 bytes."
-        );
+                       );
     cp.set_author("Timo Bingmann <tb@panthema.net>");
 
     uint64 length = 0;
@@ -208,7 +208,7 @@ int benchmark_sort(int argc, char * argv[])
     uint64 memsize = 256 * MB;
     cp.add_bytes('M', "ram", "Amount of RAM to use when sorting, default: 256 MiB", memsize);
 
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     BenchmarkSort<pair32_type, stxxl::random_number32>("pair of uint32", length, memsize);

@@ -43,7 +43,7 @@ typedef unsigned long long int uint64;
 
 
 // integer types declarations
-enum { my_pointer_size = sizeof(void *) };
+enum { my_pointer_size = sizeof(void*) };
 
 template <int PtrSize>
 struct choose_int_types

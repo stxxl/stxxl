@@ -30,7 +30,7 @@ struct TwoInteger
 
 struct TwoIntegerComparator
 {
-    bool operator () (const TwoInteger & a, const TwoInteger & b) const
+    bool operator () (const TwoInteger& a, const TwoInteger& b) const
     {
         return a.i < b.i;
     }
@@ -49,7 +49,7 @@ struct TwoIntegerComparator
 int main()
 {
     // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
-    typedef stxxl::sorter<TwoInteger, TwoIntegerComparator, 1 *1024 *1024> sorter_type;
+    typedef stxxl::sorter<TwoInteger, TwoIntegerComparator, 1*1024*1024> sorter_type;
 
     // create sorter object (CompareType(), MainMemoryLimit)
     sorter_type int_sorter(TwoIntegerComparator(), 64 * 1024 * 1024);

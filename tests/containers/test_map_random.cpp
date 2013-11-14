@@ -62,7 +62,7 @@ typedef stxxl::map<key_type, data_type, cmp2,
 #define NODE_MELEMENTS xxl_map_type::node_block_type::size
 #define LEAF_MELEMENTS xxl_map_type::leaf_block_type::size
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     typedef std::vector<std::pair<key_type, data_type> > vector_type;
 

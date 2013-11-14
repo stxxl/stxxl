@@ -22,7 +22,7 @@
 // forced instantiation
 template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>;
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result ext_stack_type;
 
@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    ext_stack_type * my_stacks = new ext_stack_type[atoi(argv[1])];
+    ext_stack_type* my_stacks = new ext_stack_type[atoi(argv[1])];
 
     delete[] my_stacks;
 

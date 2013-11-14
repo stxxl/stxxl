@@ -23,9 +23,9 @@ bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit)
 {
     char* endptr;
     size = strtoul(str.c_str(), &endptr, 10);
-    if (!endptr) return false; // parse failed, no number
+    if (!endptr) return false;          // parse failed, no number
 
-    while (endptr[0] == ' ') ++endptr; // skip over spaces
+    while (endptr[0] == ' ') ++endptr;  // skip over spaces
 
     // multiply with base ^ power
     unsigned int base = 1000;
@@ -43,29 +43,39 @@ bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit)
         power = 5, ++endptr;
 
     // switch to power of two (only if power was set above)
-    if ( (endptr[0] == 'i' || endptr[0] == 'I') && power != 0 )
+    if ((endptr[0] == 'i' || endptr[0] == 'I') && power != 0)
         base = 1024, ++endptr;
 
     // byte indicator
-    if ( endptr[0] == 'b' || endptr[0] == 'B' ) {
+    if (endptr[0] == 'b' || endptr[0] == 'B') {
         ++endptr;
     }
     else if (power == 0)
     {
         // no explicit power indicator, and no 'b' or 'B' -> apply default unit
-        switch(def_unit)
+        switch (def_unit)
         {
         default: break;
-        case 'k': power = 1, base = 1000, break;
-        case 'm': power = 2, base = 1000, break;
-        case 'g': power = 3, base = 1000, break;
-        case 't': power = 4, base = 1000, break;
-        case 'p': power = 5, base = 1000, break;
-        case 'K': power = 1, base = 1024, break;
-        case 'M': power = 2, base = 1024, break;
-        case 'G': power = 3, base = 1024, break;
-        case 'T': power = 4, base = 1024, break;
-        case 'P': power = 5, base = 1024, break;
+        case 'k': power = 1, base = 1000;
+            break;
+        case 'm': power = 2, base = 1000;
+            break;
+        case 'g': power = 3, base = 1000;
+            break;
+        case 't': power = 4, base = 1000;
+            break;
+        case 'p': power = 5, base = 1000;
+            break;
+        case 'K': power = 1, base = 1024;
+            break;
+        case 'M': power = 2, base = 1024;
+            break;
+        case 'G': power = 3, base = 1024;
+            break;
+        case 'T': power = 4, base = 1024;
+            break;
+        case 'P': power = 5, base = 1024;
+            break;
         }
     }
 
@@ -83,7 +93,7 @@ std::string format_SI_size(uint64 number)
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EiB
     double multiplier = 1000.0;
-    static const char * SIendings[] = { "", "k", "M", "G", "T", "P", "E" };
+    static const char* SIendings[] = { "", "k", "M", "G", "T", "P", "E" };
     unsigned int scale = 0;
     double number_d = (double)number;
     while (number_d >= multiplier) {
@@ -100,7 +110,7 @@ std::string format_IEC_size(uint64 number)
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EiB
     double multiplier = 1024.0;
-    static const char * IECendings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
+    static const char* IECendings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     unsigned int scale = 0;
     double number_d = (double)number;
     while (number_d >= multiplier) {

@@ -23,8 +23,8 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void simdisk_geometry::add_zone(int & first_cyl, int last_cyl,
-                                int sec_per_track, int & first_sect)
+void simdisk_geometry::add_zone(int& first_cyl, int last_cyl,
+                                int sec_per_track, int& first_sect)
 {
     double rate =
         nsurfaces * sec_per_track * bytes_per_sector /
@@ -86,7 +86,7 @@ double simdisk_geometry::get_delay(file::offset_type offset, file::size_type siz
 IC35L080AVVA07::IC35L080AVVA07()
 {
     std::cout << "Creating IBM 120GXP IC35L080AVVA07" <<
-    std::endl;
+        std::endl;
 
     nsurfaces = 4;
     bytes_per_sector = 512;
@@ -149,33 +149,33 @@ IC35L080AVVA07::IC35L080AVVA07()
 #endif
 
     std::cout << "Transfer 16 MiB from zone 0 : " <<
-    get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;
+        get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;
     std::cout << "Transfer 16 MiB from zone 30: " <<
-    get_delay(file::offset_type(158204036) * file::offset_type(bytes_per_sector), 16 * 1024 * 1024) << " s" << std::endl;
+        get_delay(file::offset_type(158204036) * file::offset_type(bytes_per_sector), 16 * 1024 * 1024) << " s" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::serve(const request * req) throw (io_error)
+void sim_disk_file::serve(const request* req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    void* buffer = req->get_buffer();
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
     double op_start = timestamp();
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-    void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
+    void* mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
     if (mem == MAP_FAILED)
     {
         STXXL_THROW_ERRNO
             (io_error,
-             " mmap() failed." <<
-             " Page size: " << sysconf(_SC_PAGESIZE) <<
-             " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+            " mmap() failed." <<
+            " Page size: " << sysconf(_SC_PAGESIZE) <<
+            " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
     }
     else if (mem == 0)
     {
@@ -208,7 +208,7 @@ void sim_disk_file::serve(const request * req) throw (io_error)
     usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
 }
 
-const char * sim_disk_file::io_type() const
+const char* sim_disk_file::io_type() const
 {
     return "simdisk";
 }
@@ -221,7 +221,7 @@ void sim_disk_file::set_size(offset_type newsize)
     if (newsize > _size())
     {
         STXXL_THROW_ERRNO_LT_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error,
-                               "lseek() fd=" << file_des << " pos=" << newsize-1);
+                               "lseek() fd=" << file_des << " pos=" << newsize - 1);
         STXXL_THROW_ERRNO_LT_0(::write(file_des, "", 1), io_error,
                                "write() fd=" << file_des << " size=1");
     }

@@ -36,7 +36,7 @@ void cmdline_parser::output_wrap(std::ostream& os, const std::string& text, size
 
         // go back to last space
         if (to != text.size() && text[to] != '\n' &&
-            lspace != t) to = lspace+1;
+            lspace != t) to = lspace + 1;
 
         // output line
         os << std::string(indent, ' ')
@@ -100,7 +100,7 @@ void cmdline_parser::print_usage(std::ostream& os)
 
             os << "  " << std::setw(m_param_maxlong) << std::left << arg->param_text();
             output_wrap(os, arg->m_desc, m_linewrap,
-                        0, m_param_maxlong+2, m_param_maxlong+2, 8);
+                        0, m_param_maxlong + 2, m_param_maxlong + 2, 8);
         }
     }
 
@@ -115,7 +115,7 @@ void cmdline_parser::print_usage(std::ostream& os)
 
             os << "  " << std::setw(m_opt_maxlong) << std::left << arg->option_text();
             output_wrap(os, arg->m_desc, m_linewrap,
-                        0, m_opt_maxlong+2, m_opt_maxlong+2, 8);
+                        0, m_opt_maxlong + 2, m_opt_maxlong + 2, 8);
         }
     }
 
@@ -187,7 +187,7 @@ bool cmdline_parser::process(int argc, const char* const* argv, std::ostream& os
                     arglist_type::const_iterator oi = m_optlist.begin();
                     for ( ; oi != m_optlist.end(); ++oi)
                     {
-                        if ((arg+2) == (*oi)->m_longkey)
+                        if ((arg + 2) == (*oi)->m_longkey)
                         {
                             if (!(*oi)->process(argc, argv))
                             {
@@ -315,7 +315,7 @@ void cmdline_parser::print_result(std::ostream& os)
             os << "  " << std::setw(maxlong) << std::left << arg->param_text();
 
             std::string typestr = "(" + std::string(arg->type_name()) + ")";
-            os << std::setw(m_maxtypename+4) << typestr;
+            os << std::setw(m_maxtypename + 4) << typestr;
 
             arg->print_value(os);
 
@@ -335,7 +335,7 @@ void cmdline_parser::print_result(std::ostream& os)
             os << "  " << std::setw(maxlong) << std::left << arg->option_text();
 
             std::string typestr = "(" + std::string(arg->type_name()) + ")";
-            os << std::setw(m_maxtypename+4) << std::left << typestr;
+            os << std::setw(m_maxtypename + 4) << std::left << typestr;
 
             arg->print_value(os);
 

@@ -43,14 +43,14 @@ public:
     //! param filename_prefix  filename prefix, numbering will be appended to it
     //! param mode open mode, see \c file::open_modes
     fileperblock_file(
-        const std::string & filename_prefix,
+        const std::string& filename_prefix,
         int mode,
         int queue_id = DEFAULT_QUEUE,
         int allocator_id = NO_ALLOCATOR);
 
     virtual ~fileperblock_file();
 
-    virtual void serve(const request * req) throw (io_error);
+    virtual void serve(const request* req) throw (io_error);
 
     //! Changes the size of the file.
     //! \param new_size value of the new file size

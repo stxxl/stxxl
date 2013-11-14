@@ -19,7 +19,7 @@
 // deprecated functions
 
 #if STXXL_NO_DEPRECATED
-  // dont issue deprecated warnings for forced instantiation tests -tb
+// dont issue deprecated warnings for forced instantiation tests -tb
   #define _STXXL_DEPRECATED(x) x
 #elif STXXL_MSVC
   #define _STXXL_DEPRECATED(x) __declspec(deprecated) x

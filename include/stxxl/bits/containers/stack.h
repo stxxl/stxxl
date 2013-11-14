@@ -81,7 +81,7 @@ public:
 private:
     size_type m_size;
     unsigned_type cache_offset;
-    value_type * current_element;
+    value_type* current_element;
     simple_vector<block_type> cache;
     typename simple_vector<block_type>::iterator front_page;
     typename simple_vector<block_type>::iterator back_page;
@@ -102,7 +102,7 @@ public:
         bids.reserve(blocks_per_page);
     }
 
-    void swap(normal_stack & obj)
+    void swap(normal_stack& obj)
     {
         std::swap(m_size, obj.m_size);
         std::swap(cache_offset, obj.cache_offset);
@@ -118,7 +118,7 @@ public:
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
-    normal_stack(const stack_type & stack_) :
+    normal_stack(const stack_type& stack_) :
         m_size(0),
         cache_offset(0),
         current_element(NULL),
@@ -180,7 +180,7 @@ public:
 
     //! Inserts an element at the top of the stack. Postconditions: size() is
     //! incremented by 1, and top() is the inserted element.
-    void push(const value_type & val)
+    void push(const value_type& val)
     {
         assert(cache_offset <= 2 * blocks_per_page * block_type::size);
         //assert(cache_offset >= 0);
@@ -303,7 +303,7 @@ public:
 private:
     size_type m_size;
     unsigned_type cache_offset;
-    value_type * current_element;
+    value_type* current_element;
     simple_vector<block_type> cache;
     typename simple_vector<block_type>::iterator cache_buffers;
     typename simple_vector<block_type>::iterator overlap_buffers;
@@ -326,7 +326,7 @@ public:
         bids.reserve(blocks_per_page);
     }
 
-    void swap(grow_shrink_stack & obj)
+    void swap(grow_shrink_stack& obj)
     {
         std::swap(m_size, obj.m_size);
         std::swap(cache_offset, obj.cache_offset);
@@ -343,7 +343,7 @@ public:
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
-    grow_shrink_stack(const stack_type & stack_) :
+    grow_shrink_stack(const stack_type& stack_) :
         m_size(0),
         cache_offset(0),
         current_element(NULL),
@@ -377,7 +377,7 @@ public:
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
         }
-        catch (const io_error &)
+        catch (const io_error&)
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
@@ -412,7 +412,7 @@ public:
 
     //! Inserts an element at the top of the stack. Postconditions: size() is
     //! incremented by 1, and top() is the inserted element.
-    void push(const value_type & val)
+    void push(const value_type& val)
     {
         assert(cache_offset <= blocks_per_page * block_type::size);
         //assert(cache_offset >= 0);
@@ -520,12 +520,12 @@ private:
 
     size_type m_size;
     unsigned_type cache_offset;
-    block_type * cache;
+    block_type* cache;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
-    pool_type * owned_pool;
-    pool_type * pool;
+    pool_type* owned_pool;
+    pool_type* pool;
 
 public:
     //! Default constructor: creates empty stack. The stack will use the
@@ -533,7 +533,7 @@ public:
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     grow_shrink_stack2(
-        pool_type & pool_,
+        pool_type& pool_,
         unsigned_type prefetch_aggressiveness = 0)
         : m_size(0),
           cache_offset(0),
@@ -554,8 +554,8 @@ public:
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     _STXXL_DEPRECATED(grow_shrink_stack2(
-                          prefetch_pool<block_type> & p_pool_,
-                          write_pool<block_type> & w_pool_,
+                          prefetch_pool<block_type>& p_pool_,
+                          write_pool<block_type>& w_pool_,
                           unsigned_type prefetch_aggressiveness = 0)) :
         m_size(0),
         cache_offset(0),
@@ -567,7 +567,7 @@ public:
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
 
-    void swap(grow_shrink_stack2 & obj)
+    void swap(grow_shrink_stack2& obj)
     {
         std::swap(m_size, obj.m_size);
         std::swap(cache_offset, obj.cache_offset);
@@ -597,7 +597,7 @@ public:
             for ( ; cur != end; ++cur)
             {
                 // FIXME: read_write_pool needs something like cancel_write(bid)
-                block_type * b = NULL;  // w_pool.steal(*cur);
+                block_type* b = NULL;   // w_pool.steal(*cur);
                 if (b)
                 {
                     pool->add(cache);   // return buffer
@@ -606,7 +606,7 @@ public:
             }
             delete cache;
         }
-        catch (const io_error &)
+        catch (const io_error&)
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
         delete owned_pool;
@@ -626,7 +626,7 @@ public:
 
     //! Inserts an element at the top of the stack. Postconditions: size() is
     //! incremented by 1, and top() is the inserted element.
-    void push(const value_type & val)
+    void push(const value_type& val)
     {
         STXXL_VERBOSE3("grow_shrink_stack2::push(" << val << ")");
         assert(cache_offset <= block_type::size);
@@ -763,13 +763,13 @@ public:
 private:
     enum { critical_size = CritSize };
 
-    int_stack_type * int_impl;
-    ext_stack_type * ext_impl;
+    int_stack_type* int_impl;
+    ext_stack_type* ext_impl;
 
     //! Copy-construction from a another stack of any type.
     //! \warning not implemented yet!
     template <class stack_type>
-    migrating_stack(const stack_type & stack_);
+    migrating_stack(const stack_type& stack_);
 
 public:
     //! Default constructor: creates empty stack.
@@ -777,7 +777,7 @@ public:
         : int_impl(new int_stack_type()), ext_impl(NULL)
     { }
 
-    void swap(migrating_stack & obj)
+    void swap(migrating_stack& obj)
     {
         std::swap(int_impl, obj.int_impl);
         std::swap(ext_impl, obj.ext_impl);
@@ -827,7 +827,7 @@ public:
 
     //! Inserts an element at the top of the stack. Postconditions: size() is
     //! incremented by 1, and top() is the inserted element.
-    void push(const value_type & val)
+    void push(const value_type& val)
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
 
@@ -910,7 +910,7 @@ template <
     unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
 
     class IntStackType = std::stack<ValueType>,
-    unsigned_type MigrCritSize = (2 * BlocksPerPage * BlockSize),
+    unsigned_type MigrCritSize = (2* BlocksPerPage* BlockSize),
 
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
     class SizeType = stxxl::int64
@@ -938,29 +938,29 @@ __STXXL_END_NAMESPACE
 namespace std {
 
 template <class StackConfig>
-void swap(stxxl::normal_stack<StackConfig> & a,
-          stxxl::normal_stack<StackConfig> & b)
+void swap(stxxl::normal_stack<StackConfig>& a,
+          stxxl::normal_stack<StackConfig>& b)
 {
     a.swap(b);
 }
 
 template <class StackConfig>
-void swap(stxxl::grow_shrink_stack<StackConfig> & a,
-          stxxl::grow_shrink_stack<StackConfig> & b)
+void swap(stxxl::grow_shrink_stack<StackConfig>& a,
+          stxxl::grow_shrink_stack<StackConfig>& b)
 {
     a.swap(b);
 }
 
 template <class StackConfig>
-void swap(stxxl::grow_shrink_stack2<StackConfig> & a,
-          stxxl::grow_shrink_stack2<StackConfig> & b)
+void swap(stxxl::grow_shrink_stack2<StackConfig>& a,
+          stxxl::grow_shrink_stack2<StackConfig>& b)
 {
     a.swap(b);
 }
 
 template <stxxl::unsigned_type CritSize, class ExternalStack, class InternalStack>
-void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & a,
-          stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & b)
+void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack>& a,
+          stxxl::migrating_stack<CritSize, ExternalStack, InternalStack>& b)
 {
     a.swap(b);
 }

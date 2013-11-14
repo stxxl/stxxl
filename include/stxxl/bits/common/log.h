@@ -29,7 +29,7 @@ class logger : public singleton<logger>
 
     std::ofstream log_stream_;
     std::ofstream errlog_stream_;
-    std::ofstream * waitlog_stream_;
+    std::ofstream* waitlog_stream_;
 
     logger();
     ~logger();

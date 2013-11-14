@@ -22,7 +22,7 @@
     #define NOMINMAX
   #endif
   #include <windows.h>
-  // this is not stxxl/bits/io/io.h !
+// this is not stxxl/bits/io/io.h !
   #include <io.h>
 #else
   #include <unistd.h>
@@ -56,7 +56,7 @@
   #if !defined(O_DIRECT)
     #error O_DIRECT is not defined while __linux__ is - PLEASE REPORT THIS BUG
   #endif
-  // FIXME: In which conditions is this not defined? Why only i386 and alpha? Why not amd64?
+// FIXME: In which conditions is this not defined? Why only i386 and alpha? Why not amd64?
   #if !defined (O_DIRECT) && (defined (__alpha__) || defined (__i386__))
     #define O_DIRECT 040000       /* direct disk access */
   #endif

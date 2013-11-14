@@ -49,9 +49,9 @@ using stxxl::timestamp;
 
 
 #ifdef WATCH_TIMES
-void watch_times(request_ptr reqs[], unsigned n, double * out)
+void watch_times(request_ptr reqs[], unsigned n, double* out)
 {
-    bool * finished = new bool[n];
+    bool* finished = new bool[n];
     unsigned count = 0;
     unsigned i = 0;
     for (i = 0; i < n; i++)
@@ -77,19 +77,19 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
 }
 
 
-void out_stat(double start, double end, double * times, unsigned n, const std::vector<std::string> & names)
+void out_stat(double start, double end, double* times, unsigned n, const std::vector<std::string>& names)
 {
     for (unsigned i = 0; i < n; i++)
     {
         std::cout << i << " " << names[i] << " took " <<
-        100. * (times[i] - start) / (end - start) << " %" << std::endl;
+            100. * (times[i] - start) / (end - start) << " %" << std::endl;
     }
 }
 #endif
 
 #define MB (1024 * 1024)
 
-int create_files(int argc, char * argv[])
+int create_files(int argc, char* argv[])
 {
     std::vector<std::string> disks_arr;
     stxxl::uint64 offset = 0, length;
@@ -98,7 +98,7 @@ int create_files(int argc, char * argv[])
     cp.add_param_bytes("filesize", "Number of bytes to write to files.", length);
     cp.add_param_stringlist("filename", "Paths to files to write.", disks_arr);
 
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     stxxl::uint64 endpos = offset + length;
@@ -124,12 +124,12 @@ int create_files(int argc, char * argv[])
 
     unsigned i = 0, j = 0;
 
-    int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
-    file ** disks = new file *[ndisks];
-    request_ptr * reqs = new request_ptr[ndisks * chunks];
+    int* buffer = (int*)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
+    file** disks = new file*[ndisks];
+    request_ptr* reqs = new request_ptr[ndisks * chunks];
 #ifdef WATCH_TIMES
-    double * r_finish_times = new double[ndisks];
-    double * w_finish_times = new double[ndisks];
+    double* r_finish_times = new double[ndisks];
+    double* w_finish_times = new double[ndisks];
 #endif
 
     for (i = 0; i < ndisks * buffer_size_int; i++)

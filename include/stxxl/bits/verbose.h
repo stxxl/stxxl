@@ -37,15 +37,15 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-void print_msg(const char * label, const std::string & msg, unsigned flags);
+void print_msg(const char* label, const std::string& msg, unsigned flags);
 
 __STXXL_END_NAMESPACE
 
 
-#define _STXXL_PRINT(label, message, flags) \
-    do { \
-        std::ostringstream str_; \
-        str_ << message; \
+#define _STXXL_PRINT(label, message, flags)                                  \
+    do {                                                                     \
+        std::ostringstream str_;                                             \
+        str_ << message;                                                     \
         stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
     } while (false)
 
@@ -118,15 +118,23 @@ __STXXL_END_NAMESPACE
 // assert() also works in release builds. These macros should ONLY be used in
 // UNIT TESTS, not in the library source. Use usual assert() there.
 
-#define STXXL_CHECK(condition) \
-    do { if (!(condition)) { _STXXL_PRINT("STXXL-CHECK", \
-       #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
-       _STXXL_PRINT_FLAGS_ERROR); abort(); } } while(0)
+#define STXXL_CHECK(condition)                                               \
+    do {                                                                     \
+        if (!(condition)) {                                                  \
+            _STXXL_PRINT("STXXL-CHECK",                                      \
+                         #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                         _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+        }                                                                    \
+    } while (0)
 
-#define STXXL_CHECK2(condition,text) \
-    do { if (!(condition)) { _STXXL_PRINT("STXXL-CHECK", \
-       text << " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
-       _STXXL_PRINT_FLAGS_ERROR); abort(); } } while(0)
+#define STXXL_CHECK2(condition, text)                                                      \
+    do {                                                                                   \
+        if (!(condition)) {                                                                \
+            _STXXL_PRINT("STXXL-CHECK",                                                    \
+                         text << " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                         _STXXL_PRINT_FLAGS_ERROR); abort();                               \
+        }                                                                                  \
+    } while (0)
 
 // STXXL_ASSERT is an assertion macro almost identical to assert(). The only
 // difference is that with NDEBUG defined, the _code_ itself still exists. This
@@ -134,32 +142,43 @@ __STXXL_END_NAMESPACE
 
 #ifdef NDEBUG
 
-#define STXXL_ASSERT(condition) \
-    do { if (0) { if (!(condition)) { _STXXL_PRINT("STXXL-ASSERT", \
-       #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
-       _STXXL_PRINT_FLAGS_ERROR); abort(); } } } while(0)
+#define STXXL_ASSERT(condition)                                                   \
+    do { if (0) {                                                                 \
+             if (!(condition)) {                                                  \
+                 _STXXL_PRINT("STXXL-ASSERT",                                     \
+                              #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                              _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+             }                                                                    \
+         }                                                                        \
+    } while (0)
 
 #else
 
-#define STXXL_ASSERT(condition) \
-    do { if (1) { if (!(condition)) { _STXXL_PRINT("STXXL-ASSERT", \
-       #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
-       _STXXL_PRINT_FLAGS_ERROR); abort(); } } } while(0)
+#define STXXL_ASSERT(condition)                                                   \
+    do { if (1) {                                                                 \
+             if (!(condition)) {                                                  \
+                 _STXXL_PRINT("STXXL-ASSERT",                                     \
+                              #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                              _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+             }                                                                    \
+         }                                                                        \
+    } while (0)
 
 #endif
 
 // STXXL_CHECK_THROW is an assertion macro for unit tests, which checks that
 // the enclosed code throws an exception.
 
-#define STXXL_CHECK_THROW(code,exception_type)                  \
-    do { bool t_ = false; try { code; }                         \
-        catch (const exception_type&) { t_ = true; }            \
-        if (t_) break;                                          \
-        _STXXL_PRINT("STXXL-CHECK-THROW",                       \
-                     #code " - NO EXCEPTION " #exception_type   \
-                     " @ " __FILE__ ":" << __LINE__,            \
-                     _STXXL_PRINT_FLAGS_ERROR);                 \
-        abort();                                                \
+#define STXXL_CHECK_THROW(code, exception_type)               \
+    do {                                                      \
+        bool t_ = false; try { code; }                        \
+        catch (const exception_type&) { t_ = true; }          \
+        if (t_) break;                                        \
+        _STXXL_PRINT("STXXL-CHECK-THROW",                     \
+                     #code " - NO EXCEPTION " #exception_type \
+                     " @ " __FILE__ ":" << __LINE__,          \
+                     _STXXL_PRINT_FLAGS_ERROR);               \
+        abort();                                              \
     } while (0)
 
 ////////////////////////////////////////////////////////////////////////////

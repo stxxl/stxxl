@@ -20,13 +20,13 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-const char * ufs_file_base::io_type() const
+const char* ufs_file_base::io_type() const
 {
     return "ufs_base";
 }
 
 ufs_file_base::ufs_file_base(
-    const std::string & filename,
+    const std::string& filename,
     int mode) : file_des(-1), m_mode(mode), filename(filename)
 {
     int flags = 0;
@@ -196,7 +196,7 @@ void ufs_file_base::_set_size(offset_type newsize)
     if (!(m_mode & RDONLY) && !m_is_device)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
-        HANDLE hfile = (HANDLE)::_get_osfhandle(file_des);
+        HANDLE hfile = (HANDLE) ::_get_osfhandle(file_des);
         STXXL_THROW_ERRNO_NE_0((hfile == INVALID_HANDLE_VALUE), io_error,
                                "_get_osfhandle() path=" << filename << " fd=" << file_des);
 
@@ -206,12 +206,12 @@ void ufs_file_base::_set_size(offset_type newsize)
         if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
             STXXL_THROW_WIN_LASTERROR(io_error,
                                       "SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
-                                     " newsize=" << newsize << " ");
+                                      " newsize=" << newsize << " ");
 
         if (!SetEndOfFile(hfile))
             STXXL_THROW_WIN_LASTERROR(io_error,
                                       "SetEndOfFile oldsize=" << cur_size <<
-                                     " newsize=" << newsize << " ");
+                                      " newsize=" << newsize << " ");
 #else
         STXXL_THROW_ERRNO_NE_0(::ftruncate(file_des, newsize), io_error,
                                "ftruncate() path=" << filename << " fd=" << file_des);

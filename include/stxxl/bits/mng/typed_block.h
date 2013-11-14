@@ -36,7 +36,7 @@ class filler_struct__
     byte_type filler_array_[bytes];
 
 public:
-    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] filler_struct__ is constructed"); }
+    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct__ is constructed"); }
 };
 
 template <>
@@ -45,7 +45,7 @@ class filler_struct__<0>
     typedef unsigned char byte_type;
 
 public:
-    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] filler_struct__<> is constructed"); }
+    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct__<> is constructed"); }
 };
 
 //! Contains data elements for \c stxxl::typed_block , not intended for direct use.
@@ -55,11 +55,11 @@ class element_block
 public:
     typedef T type;
     typedef T value_type;
-    typedef T & reference;
-    typedef const T & const_reference;
-    typedef type * pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef type* pointer;
     typedef pointer iterator;
-    typedef const type * const_iterator;
+    typedef const type* const_iterator;
 
     enum
     {
@@ -69,7 +69,7 @@ public:
     //! Array of elements of type T
     T elem[size];
 
-    element_block() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] element_block is constructed"); }
+    element_block() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] element_block is constructed"); }
 
     //! An operator to access elements in the block
     reference operator [] (size_t i)
@@ -131,12 +131,12 @@ public:
     bid_type ref[nbids];
 
     //! An operator to access bid references
-    bid_type & operator () (size_t i)
+    bid_type& operator () (size_t i)
     {
         return ref[i];
     }
 
-    block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_bids is constructed"); }
+    block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_bids is constructed"); }
 };
 
 template <class T, unsigned Size_, unsigned RawSize_>
@@ -151,13 +151,13 @@ public:
 
     typedef BID<raw_size> bid_type;
 
-    block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_bids<> is constructed"); }
+    block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_bids<> is constructed"); }
 };
 
 //! Contains per block information for \c stxxl::typed_block , not intended for direct use.
 template <class T_, unsigned RawSize_, unsigned NBids_, class InfoType_ = void>
 class block_w_info :
-    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_)), RawSize_, NBids_>
+    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>)* NBids_ - sizeof(InfoType_)) / sizeof(T_)), RawSize_, NBids_>
 {
 public:
     //! Type of per block information element.
@@ -166,17 +166,17 @@ public:
     //! Per block information element.
     info_type info;
 
-    block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info is constructed"); }
+    block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_info is constructed"); }
 };
 
 template <class T_, unsigned RawSize_, unsigned NBids_>
 class block_w_info<T_, RawSize_, NBids_, void>:
-    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_)), RawSize_, NBids_>
+    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>)* NBids_) / sizeof(T_)), RawSize_, NBids_>
 {
 public:
     typedef void info_type;
 
-    block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info<> is constructed"); }
+    block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_info<> is constructed"); }
 };
 
 //! Contains per block filler for \c stxxl::typed_block , not intended for direct use.
@@ -189,7 +189,7 @@ private:
     filler_struct__<FillSize_> filler;
 
 public:
-    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler is constructed"); }
+    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] add_filler is constructed"); }
 };
 
 template <typename BaseType_>
@@ -197,7 +197,7 @@ class add_filler<BaseType_, 0>:
     public BaseType_
 {
 public:
-    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler<> is constructed"); }
+    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] add_filler<> is constructed"); }
 };
 
 //! Helper to compute the size of the filler , not intended for direct use.
@@ -227,11 +227,11 @@ class typed_block :
 
 public:
     typedef T_ value_type;
-    typedef value_type & reference;
-    typedef const value_type & const_reference;
-    typedef value_type * pointer;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
     typedef pointer iterator;
-    typedef const value_type * const_pointer;
+    typedef const value_type* const_pointer;
     typedef const_pointer const_iterator;
 
     enum constants
@@ -246,17 +246,17 @@ public:
     typed_block()
     {
         STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
-        STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] typed_block is constructed");
+        STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] typed_block is constructed");
 #if 0
         assert(((long)this) % BLOCK_ALIGN == 0);
 #endif
     }
 
 #if 0
-    typed_block(const typed_block & tb)
+    typed_block(const typed_block& tb)
     {
         STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
-        STXXL_MSG("[" << (void *)this << "] typed_block is copy constructed from [" << (void *)&tb << "]");
+        STXXL_MSG("[" << (void*)this << "] typed_block is copy constructed from [" << (void*)&tb << "]");
         STXXL_UNUSED(tb);
     }
 #endif
@@ -266,7 +266,7 @@ public:
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
-    request_ptr write(const bid_type & bid,
+    request_ptr write(const bid_type& bid,
                       completion_handler on_cmpl = default_completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
@@ -278,65 +278,65 @@ public:
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
-    request_ptr read(const bid_type & bid,
+    request_ptr read(const bid_type& bid,
                      completion_handler on_cmpl = default_completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
     }
 
-    static void * operator new (size_t bytes)
+    static void* operator new (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
         STXXL_VERBOSE1("typed::block operator new: Meta info size: " << meta_info_size);
 
-        void * result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
+        void* result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
         #ifdef STXXL_VALGRIND_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
         #endif
-        char * tmp = (char *)result;
+        char* tmp = (char*)result;
         tmp += RawSize_;
-        while (tmp < ((char *)result) + bytes)
+        while (tmp < ((char*)result) + bytes)
         {
             tmp += RawSize_;
         }
         return result;
     }
 
-    static void * operator new[] (size_t bytes)
+    static void* operator new[] (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
         STXXL_VERBOSE1("typed::block operator new[]: Meta info size: " << meta_info_size);
 
-        void * result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
+        void* result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
         #ifdef STXXL_VALGRIND_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
         #endif
-        char * tmp = (char *)result;
+        char* tmp = (char*)result;
         tmp += RawSize_;
-        while (tmp < ((char *)result) + bytes)
+        while (tmp < ((char*)result) + bytes)
         {
             tmp += RawSize_;
         }
         return result;
     }
 
-    static void * operator new (size_t /*bytes*/, void * ptr)     // construct object in existing memory
+    static void* operator new (size_t /*bytes*/, void* ptr)       // construct object in existing memory
     {
         return ptr;
     }
 
-    static void operator delete (void * ptr)
+    static void operator delete (void* ptr)
     {
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
-    static void operator delete[] (void * ptr)
+    static void operator delete[] (void* ptr)
     {
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
-    static void operator delete (void *, void *)
+    static void operator delete (void*, void*)
     { }
 
 #if 1
@@ -351,7 +351,7 @@ public:
     //  be 8 bytes long in g++."
     ~typed_block()
     {
-        STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] typed_block is destructed");
+        STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] typed_block is destructed");
     }
 #endif
 };

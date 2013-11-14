@@ -52,12 +52,12 @@ protected:
     offset_type _size();
 
 public:
-    boostfd_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR);
+    boostfd_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR);
     ~boostfd_file();
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    void serve(const request * req) throw (io_error);
+    void serve(const request* req) throw (io_error);
     const char * io_type() const;
 };
 
@@ -65,6 +65,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_BOOSTFD_FILE
+#endif // #if STXXL_HAVE_BOOSTFD_FILE
 
 #endif // !STXXL_IO_BOOSTFD_FILE_HEADER

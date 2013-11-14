@@ -22,7 +22,7 @@ int main()
     unsigned int smaller_left = 0;
     unsigned int smaller_right = 0;
     stxxl::random_number32 rand32;
-    stxxl::uint64 number_of_elements = (long long int)(1*64) * (long long int)(1024 * 1024);
+    stxxl::uint64 number_of_elements = (long long int)(1 * 64) * (long long int)(1024 * 1024);
 
     // fill deque with random integer values
     for (stxxl::uint64 i = 0; i < number_of_elements; i++)
@@ -59,7 +59,7 @@ int main()
         ++deque_iterator;
     }
 
-    STXXL_MSG("smaller left: " << smaller_left << ", smaller right: " <<  smaller_right);
+    STXXL_MSG("smaller left: " << smaller_left << ", smaller right: " << smaller_right);
 
     return 0;
 }

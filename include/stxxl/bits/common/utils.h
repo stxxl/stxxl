@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
-#  define STXXL_ATTRIBUTE_UNUSED __attribute__((unused))
+#  define STXXL_ATTRIBUTE_UNUSED __attribute__ ((unused))
 #else
 #  define STXXL_ATTRIBUTE_UNUSED
 #endif
@@ -54,7 +54,7 @@ __STXXL_BEGIN_NAMESPACE
 //! Split a string by given separator string. Returns a vector of strings with
 //! at least min_fields and at most limit_fields
 static inline std::vector<std::string>
-split(const std::string & str, const std::string & sep,
+split(const std::string& str, const std::string& sep,
       unsigned int min_fields = 0,
       unsigned int limit_fields = std::numeric_limits<unsigned int>::max())
 {
@@ -67,7 +67,7 @@ split(const std::string & str, const std::string & sep,
     std::string::size_type CurPos(0), LastPos(0);
     while (1)
     {
-        if (result.size()+1 == limit_fields)
+        if (result.size() + 1 == limit_fields)
             break;
 
         CurPos = str.find(sep, LastPos);
@@ -120,7 +120,7 @@ std::string format_IEC_size(uint64 number);
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline stxxl::int64 atoi64(const char * s)
+inline stxxl::int64 atoi64(const char* s)
 {
 #if STXXL_MSVC
     return _atoi64(s);
@@ -131,7 +131,7 @@ inline stxxl::int64 atoi64(const char * s)
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline stxxl::uint64 atouint64(const char * s)
+inline stxxl::uint64 atouint64(const char* s)
 {
 #if STXXL_MSVC
     return _strtoui64(s, NULL, 10);
@@ -143,15 +143,15 @@ inline stxxl::uint64 atouint64(const char * s)
 ////////////////////////////////////////////////////////////////////////////
 
 template <typename Tp>
-inline const Tp &
-STXXL_MIN(const Tp & a, const Tp & b)
+inline const Tp&
+STXXL_MIN(const Tp& a, const Tp& b)
 {
     return std::min<Tp>(a, b);
 }
 
 template <typename Tp>
-inline const Tp &
-STXXL_MAX(const Tp & a, const Tp & b)
+inline const Tp&
+STXXL_MAX(const Tp& a, const Tp& b)
 {
     return std::max<Tp>(a, b);
 }
@@ -200,7 +200,7 @@ typename compat::remove_const<Integral>::type
 div_ceil(Integral __n, Integral2 __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
-    typedef __typeof__(std::div(__n, __d)) div_type;
+    typedef __typeof__ (std::div(__n, __d)) div_type;
     div_type result = std::div(__n, __d);
     return result.quot + (result.rem != 0);
 #else
@@ -244,7 +244,7 @@ inline uint64 longhash1(uint64 key_)
 ////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-inline void swap_1D_arrays(T * a, T * b, unsigned_type size)
+inline void swap_1D_arrays(T* a, T* b, unsigned_type size)
 {
     for (unsigned_type i = 0; i < size; ++i)
         std::swap(a[i], b[i]);
@@ -257,8 +257,8 @@ template <typename Integral>
 inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)
 {
     Integral pot = Integral(1) << power, // = 0..0 1 0^power
-             mask = pot - 1;   // = 0..0 0 1^power
-    if (n & mask)  // n not divisible by pot
+        mask = pot - 1;                  // = 0..0 0 1^power
+    if (n & mask)                        // n not divisible by pot
         return (n & ~mask) + pot;
     else
         return n;
@@ -267,7 +267,7 @@ inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)
 ////////////////////////////////////////////////////////////////////////////
 
 template <class Container>
-inline typename Container::value_type pop(Container & c)
+inline typename Container::value_type pop(Container& c)
 {
     typename Container::value_type r = c.top();
     c.pop();
@@ -275,7 +275,7 @@ inline typename Container::value_type pop(Container & c)
 }
 
 template <class Container>
-inline typename Container::value_type pop_front(Container & c)
+inline typename Container::value_type pop_front(Container& c)
 {
     typename Container::value_type r = c.front();
     c.pop_front();
@@ -283,7 +283,7 @@ inline typename Container::value_type pop_front(Container & c)
 }
 
 template <class Container>
-inline typename Container::value_type pop_back(Container & c)
+inline typename Container::value_type pop_back(Container& c)
 {
     typename Container::value_type r = c.back();
     c.pop_back();
@@ -291,7 +291,7 @@ inline typename Container::value_type pop_back(Container & c)
 }
 
 template <class Container>
-inline typename Container::value_type pop_begin(Container & c)
+inline typename Container::value_type pop_begin(Container& c)
 {
     typename Container::value_type r = *c.begin();
     c.erase(c.begin());

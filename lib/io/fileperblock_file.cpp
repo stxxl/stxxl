@@ -28,7 +28,7 @@ __STXXL_BEGIN_NAMESPACE
 
 template <class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
-    const std::string & filename_prefix,
+    const std::string& filename_prefix,
     int mode,
     int queue_id,
     int allocator_id)
@@ -60,7 +60,7 @@ std::string fileperblock_file<base_file_type>::filename_for_block(offset_type of
 }
 
 template <class base_file_type>
-void fileperblock_file<base_file_type>::serve(const request * req) throw (io_error)
+void fileperblock_file<base_file_type>::serve(const request* req) throw (io_error)
 {
     assert(req->get_file() == this);
 
@@ -79,7 +79,7 @@ void fileperblock_file<base_file_type>::lock()
     {
         //create lock file and fill it with one page, an empty file cannot be locked
         const int page_size = BLOCK_ALIGN;
-        void * one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
+        void* one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
         lock_file.set_size(page_size);
         request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
         r->wait();
@@ -126,7 +126,7 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
 }
 
 template <class base_file_type>
-const char * fileperblock_file<base_file_type>::io_type() const
+const char* fileperblock_file<base_file_type>::io_type() const
 {
     return "fileperblock";
 }

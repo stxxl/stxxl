@@ -39,8 +39,7 @@ class state : private noncopyable
 public:
     state(const value_type& s)
         : m_state(s)
-    {
-    }
+    { }
 
     void set_to(const value_type& new_state)
     {

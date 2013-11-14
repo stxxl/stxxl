@@ -29,23 +29,23 @@ void test1()
 
     // good command line
     const char* cmdline1[] =
-        { "test", "-i", "42", "-f", "somefile", NULL };
+    { "test", "-i", "42", "-f", "somefile", NULL };
 
     std::ostringstream os1;
-    STXXL_CHECK( cp.process(5, cmdline1, os1) );
+    STXXL_CHECK(cp.process(5, cmdline1, os1));
 
-    STXXL_CHECK( a_int == 42 );
-    STXXL_CHECK( a_str == "somefile" );
+    STXXL_CHECK(a_int == 42);
+    STXXL_CHECK(a_str == "somefile");
 
     // bad command line
     const char* cmdline2[] =
-        { "test", "-i", "dd", "-f", "somefile", NULL };
+    { "test", "-i", "dd", "-f", "somefile", NULL };
 
     std::ostringstream os2;
-    STXXL_CHECK( !cp.process(5, cmdline2, os2) );
+    STXXL_CHECK(!cp.process(5, cmdline2, os2));
 }
 
-int main(int, char **)
+int main(int, char**)
 {
     test1();
     return 0;

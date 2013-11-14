@@ -35,7 +35,7 @@ struct my_type
     }
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj.key;
     return o;
@@ -43,7 +43,7 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
 
 struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 {
-    bool operator () (const my_type & a, const my_type & b) const
+    bool operator () (const my_type& a, const my_type& b) const
     {
         return a.key > b.key;
     }
@@ -56,7 +56,7 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 
 // forced instantiation
 const unsigned volume = 1024 * 1024; // in KiB
-template class stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type)>;
+template class stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32* 1024* 1024, volume / sizeof(my_type)>;
 
 int main()
 {
@@ -71,7 +71,7 @@ int main()
  */
     //typedef priority_queue<priority_queue_config<my_type,my_cmp,
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type)> gen;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32* 1024* 1024, volume / sizeof(my_type)> gen;
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;
 
@@ -95,7 +95,7 @@ int main()
     {
         if ((i % (1024 * 1024)) == 0)
             STXXL_MSG("Inserting element " << i);
-        p.push(my_type( int(nelements - i) ));
+        p.push(my_type(int(nelements - i)));
     }
     Timer.stop();
     STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");

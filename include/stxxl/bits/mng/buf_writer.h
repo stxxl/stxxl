@@ -43,9 +43,9 @@ protected:
     typedef typename block_type::bid_type bid_type;
 
     const unsigned_type nwriteblocks;
-    block_type * write_buffers;
-    bid_type * write_bids;
-    request_ptr * write_reqs;
+    block_type* write_buffers;
+    bid_type* write_bids;
+    request_ptr* write_reqs;
     const unsigned_type writebatchsize;
 
     std::vector<int_type> free_write_blocks;            // contains free write blocks
@@ -60,7 +60,7 @@ protected:
     };
     struct batch_entry_cmp
     {
-        bool operator () (const batch_entry & a, const batch_entry & b) const
+        bool operator () (const batch_entry& a, const batch_entry& b) const
         {
             return (a.offset > b.offset);
         }
@@ -106,7 +106,7 @@ public:
         if (UNLIKELY(free_write_blocks.empty()))
         {
             int_type size = busy_write_blocks.size();
-            request_ptr * reqs = new request_ptr[size];
+            request_ptr* reqs = new request_ptr[size];
             int_type i = 0;
             for ( ; i < size; ++i)
             {
@@ -129,7 +129,7 @@ public:
     //! \remark parameter \c filled_block must be value returned by \c get_free_block() or \c write() methods
     //! \param bid block identifier, a place to write data of the \c filled_block
     //! \return pointer to the new free block from the pool
-    block_type * write(block_type * filled_block, const bid_type & bid)        // writes filled_block and returns a new block
+    block_type * write(block_type* filled_block, const bid_type& bid)          // writes filled_block and returns a new block
     {
         if (batch_write_blocks.size() >= writebatchsize)
         {

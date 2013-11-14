@@ -47,7 +47,7 @@ struct BID
         t_size = SIZE        //!< Blocks size, given by the parameter
     };
 
-    file * storage;          //!< pointer to the file of the block
+    file* storage;           //!< pointer to the file of the block
     stxxl::int64 offset;     //!< offset within the file of the block
 
     BID() : storage(NULL), offset(0)
@@ -58,18 +58,18 @@ struct BID
         return storage != NULL;
     }
 
-    BID(file * s, stxxl::int64 o) : storage(s), offset(o)
+    BID(file* s, stxxl::int64 o) : storage(s), offset(o)
     { }
 
-    BID(const BID & obj) : storage(obj.storage), offset(obj.offset)
-    { }
-
-    template <unsigned BlockSize>
-    explicit BID(const BID<BlockSize> & obj) : storage(obj.storage), offset(obj.offset)
+    BID(const BID& obj) : storage(obj.storage), offset(obj.offset)
     { }
 
     template <unsigned BlockSize>
-    BID & operator = (const BID<BlockSize> & obj)
+    explicit BID(const BID<BlockSize>& obj) : storage(obj.storage), offset(obj.offset)
+    { }
+
+    template <unsigned BlockSize>
+    BID& operator = (const BID<BlockSize>& obj)
     {
         storage = obj.storage;
         offset = obj.offset;
@@ -89,7 +89,7 @@ struct BID
 template <>
 struct BID<0>
 {
-    file * storage;          //!< pointer to the file of the block
+    file* storage;           //!< pointer to the file of the block
     stxxl::int64 offset;     //!< offset within the file of the block
     unsigned size;           //!< size of the block in bytes
 
@@ -101,7 +101,7 @@ struct BID<0>
     BID() : storage(NULL), offset(0), size(0)
     { }
 
-    BID(file * f, stxxl::int64 o, unsigned s) : storage(f), offset(o), size(s)
+    BID(file* f, stxxl::int64 o, unsigned s) : storage(f), offset(o), size(s)
     { }
 
     bool valid() const
@@ -111,19 +111,19 @@ struct BID<0>
 };
 
 template <unsigned blk_sz>
-bool operator == (const BID<blk_sz> & a, const BID<blk_sz> & b)
+bool operator == (const BID<blk_sz>& a, const BID<blk_sz>& b)
 {
     return (a.storage == b.storage) && (a.offset == b.offset) && (a.size == b.size);
 }
 
 template <unsigned blk_sz>
-bool operator != (const BID<blk_sz> & a, const BID<blk_sz> & b)
+bool operator != (const BID<blk_sz>& a, const BID<blk_sz>& b)
 {
     return (a.storage != b.storage) || (a.offset != b.offset) || (a.size != b.size);
 }
 
 template <unsigned blk_sz>
-std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
+std::ostream& operator << (std::ostream& s, const BID<blk_sz>& bid)
 {
     // [0x12345678|0]0x00100000/0x00010000
     // [file ptr|file id]offset/size
@@ -143,18 +143,16 @@ std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
 }
 
 template <unsigned BLK_SIZE>
-class BIDArray : public simple_vector< BID<BLK_SIZE> >
+class BIDArray : public simple_vector<BID<BLK_SIZE> >
 {
 public:
     BIDArray()
-        : simple_vector< BID<BLK_SIZE> >()
-    {
-    }
+        : simple_vector<BID<BLK_SIZE> >()
+    { }
 
     BIDArray(unsigned_type size)
-        : simple_vector< BID<BLK_SIZE> >(size)
-    {
-    }
+        : simple_vector<BID<BLK_SIZE> >(size)
+    { }
 };
 
 //! \}

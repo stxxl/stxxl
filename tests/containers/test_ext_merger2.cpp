@@ -32,7 +32,7 @@ struct dummy_merger
     {
         while (b != e)
         {
-            *b = current;
+            * b = current;
             ++b;
             current += delta;
         }
@@ -47,9 +47,9 @@ struct my_cmp : public std::greater<my_type>
     }
 };
 
-my_type * make_sequence(dummy_merger & dummy, int l)
+my_type * make_sequence(dummy_merger& dummy, int l)
 {
-    my_type * seq = new my_type[l + 1]; // + sentinel
+    my_type* seq = new my_type[l + 1];  // + sentinel
     dummy.multi_merge(seq, seq + l);
     seq[l] = my_cmp().min_value();      // sentinel
     return seq;
@@ -132,21 +132,21 @@ int main()
     if (1) { // loser_tree test
         stxxl::priority_queue_local::loser_tree<my_type, my_cmp, 8> loser;
         dummy(1, 0);
-        my_type * seq0 = make_sequence(dummy, 2 * B);
+        my_type* seq0 = make_sequence(dummy, 2 * B);
         dummy(2, 0);
-        my_type * seq1 = make_sequence(dummy, 2 * B);
+        my_type* seq1 = make_sequence(dummy, 2 * B);
         dummy(B, 1);
-        my_type * seq2 = make_sequence(dummy, 4 * B);
+        my_type* seq2 = make_sequence(dummy, 4 * B);
         dummy(B, 2);
-        my_type * seq3 = make_sequence(dummy, 4 * B);
+        my_type* seq3 = make_sequence(dummy, 4 * B);
         dummy(2 * B, 1);
-        my_type * seq4 = make_sequence(dummy, 4 * B);
+        my_type* seq4 = make_sequence(dummy, 4 * B);
         dummy(B, 4);
-        my_type * seq5 = make_sequence(dummy, 4 * B);
+        my_type* seq5 = make_sequence(dummy, 4 * B);
         dummy(B, 8);
-        my_type * seq6 = make_sequence(dummy, 4 * B);
+        my_type* seq6 = make_sequence(dummy, 4 * B);
         dummy(2 * B, 2);
-        my_type * seq7 = make_sequence(dummy, 4 * B);
+        my_type* seq7 = make_sequence(dummy, 4 * B);
 
         loser.init();
         loser.insert_segment(seq0, 2 * B);
@@ -164,7 +164,7 @@ int main()
             delete[] seq7;
         }
 
-        my_type * out = new my_type[2 * B];
+        my_type* out = new my_type[2 * B];
 
         // zero length merge
         loser.multi_merge(out, out);

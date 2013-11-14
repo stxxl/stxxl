@@ -25,9 +25,9 @@ int main()
     my_deque.push_back(8);
     // deque now stores: |11|2|5|8|
 
-    std::cout << "return 'first' element: " << my_deque.front() << std::endl;  // prints 11
-    std::cout << "return 'last' element: " << my_deque.back() << std::endl;  // prints 8
-    std::cout << "random access: " << my_deque[2] << std::endl;  // prints 5
+    std::cout << "return 'first' element: " << my_deque.front() << std::endl; // prints 11
+    std::cout << "return 'last' element: " << my_deque.back() << std::endl;   // prints 8
+    std::cout << "random access: " << my_deque[2] << std::endl;               // prints 5
 
     // generate forward iterator
     stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();

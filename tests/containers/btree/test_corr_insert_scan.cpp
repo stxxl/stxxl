@@ -33,7 +33,7 @@ struct comp_type : public std::less<int>
 typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
 //typedef stxxl::btree::btree<int,double,comp_type,10,11,stxxl::SR> btree_type;
 
-std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
+std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {
     o << obj.first << " " << obj.second;
     return o;
@@ -49,12 +49,12 @@ struct rnd_gen
     }
 };
 
-bool operator == (const std::pair<int, double> & a, const std::pair<int, double> & b)
+bool operator == (const std::pair<int, double>& a, const std::pair<int, double>& b)
 {
     return a.first == b.first;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 2)
     {

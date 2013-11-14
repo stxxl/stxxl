@@ -68,7 +68,7 @@
 #define STXXL_PQ_INTERNAL_LOSER_TREE 1
 #endif
 
-#define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] priority_queue::" << msg)
+#define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] priority_queue::" << msg)
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -79,8 +79,8 @@ __STXXL_BEGIN_NAMESPACE
 
 /*! \internal
  */
-namespace priority_queue_local
-{
+namespace priority_queue_local {
+
 /*!
  * Similar to std::priority_queue, with the following differences:
  * - Maximum size is fixed at construction time, so an array can be used.
@@ -143,7 +143,7 @@ public:
      * sequence.
      */
     void
-    push(const value_type & __x)
+    push(const value_type& __x)
     {
         heap[current_size] = __x;
         ++current_size;
@@ -169,11 +169,11 @@ public:
     }
 
     //! Sort all contained elements, write result to @c target.
-    void sort_to(value_type * target)
+    void sort_to(value_type* target)
     {
         check_sort_settings();
         potentially_parallel::
-            sort(heap.begin(), heap.begin() + current_size, comp);
+        sort(heap.begin(), heap.begin() + current_size, comp);
         std::reverse_copy(heap.begin(), heap.begin() + current_size, target);
     }
 
@@ -193,9 +193,9 @@ protected:
 
 public:
     explicit
-    invert_order(const Predicate & _pred) : pred(_pred) { }
+    invert_order(const Predicate& _pred) : pred(_pred) { }
 
-    bool operator () (const first_argument_type & x, const second_argument_type & y) const
+    bool operator () (const first_argument_type& x, const second_argument_type& y) const
     {
         return pred(y, x);
     }
@@ -219,7 +219,7 @@ class internal_bounded_stack
 public:
     internal_bounded_stack() : size_(0) { }
 
-    void push(const value_type & x)
+    void push(const value_type& x)
     {
         assert(size_ < max_size);
         array[size_++] = x;

@@ -37,9 +37,9 @@ using stxxl::uint64;
 
 // *** Integer Pair Types
 
-typedef stxxl::tuple<uint32,uint32> uint32_pair_type;
+typedef stxxl::tuple<uint32, uint32> uint32_pair_type;
 
-typedef stxxl::tuple<uint64,uint64> uint64_pair_type;
+typedef stxxl::tuple<uint64, uint64> uint64_pair_type;
 
 // *** Larger Structure Type
 
@@ -61,8 +61,8 @@ struct my_type : public uint32_pair_type
 
     static my_type max_value()
     {
-        return my_type( std::numeric_limits<key_type>::max(),
-                        std::numeric_limits<key_type>::max() );
+        return my_type(std::numeric_limits<key_type>::max(),
+                       std::numeric_limits<key_type>::max());
     }
 };
 
@@ -85,8 +85,8 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
 {
     if ((i % PRINTMOD) == 0)
         STXXL_MSG(text << " " << i << " ("
-                  << std::setprecision(5)
-                  << (i * 100.0 / nelements) << " %)");
+                       << std::setprecision(5)
+                       << (i * 100.0 / nelements) << " %)");
 }
 
 template <typename PQType>
@@ -113,7 +113,7 @@ void run_pqueue_insert_delete(uint64 nelements, uint64 mem_for_pools)
         }
     }
 
-    STXXL_CHECK( pq.size() == nelements );
+    STXXL_CHECK(pq.size() == nelements);
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
 
@@ -127,8 +127,8 @@ void run_pqueue_insert_delete(uint64 nelements, uint64 mem_for_pools)
 
         for (stxxl::uint64 i = 0; i < nelements; ++i)
         {
-            STXXL_CHECK( !pq.empty() );
-            STXXL_CHECK( pq.top().first == i + 1 );
+            STXXL_CHECK(!pq.empty());
+            STXXL_CHECK(pq.top().first == i + 1);
 
             pq.pop();
 
@@ -164,7 +164,7 @@ void run_pqueue_insert_intermixed(uint64 nelements, uint64 mem_for_pools)
         }
     }
 
-    STXXL_CHECK( pq.size() == nelements );
+    STXXL_CHECK(pq.size() == nelements);
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
 
@@ -183,11 +183,11 @@ void run_pqueue_insert_intermixed(uint64 nelements, uint64 mem_for_pools)
             int o = rand() % 3;
             if (o == 0)
             {
-                pq.push( ValueType((int)(nelements - i), 0) );
+                pq.push(ValueType((int)(nelements - i), 0));
             }
             else
             {
-                STXXL_CHECK( !pq.empty() );
+                STXXL_CHECK(!pq.empty());
                 pq.pop();
             }
 
@@ -209,20 +209,20 @@ int do_benchmark_pqueue(uint64 volume, int opseq)
     const uint64 mem_for_pools = mib_for_pools * MiB;
 
     typedef typename stxxl::PRIORITY_QUEUE_GENERATOR<
-        ValueType, my_cmp<ValueType>,
-        mem_for_queue,
-        maxvolume * MiB / sizeof(ValueType)> gen;
+            ValueType, my_cmp<ValueType>,
+            mem_for_queue,
+            maxvolume* MiB / sizeof(ValueType)> gen;
 
     typedef typename gen::result pq_type;
 
     STXXL_MSG("Given PQ parameters: " << mib_for_queue << " MiB for queue, "
-              << mib_for_pools << " MiB for pools, " << maxvolume << " GiB maximum volume.");
+                                      << mib_for_pools << " MiB for pools, " << maxvolume << " GiB maximum volume.");
 
     STXXL_MSG("Selected PQ parameters:");
     STXXL_MSG("element size: " << sizeof(ValueType));
     STXXL_MSG("block size: " << pq_type::BlockSize);
     STXXL_MSG("insertion buffer size (N): " << pq_type::N << " items ("
-              << pq_type::N * sizeof(ValueType) << " B)");
+                                            << pq_type::N * sizeof(ValueType) << " B)");
     STXXL_MSG("delete buffer size: " << pq_type::delete_buffer_size);
     STXXL_MSG("maximal arity for internal mergers (AI): " << pq_type::IntKMAX);
     STXXL_MSG("maximal arity for external mergers (AE): " << pq_type::ExtKMAX);
@@ -309,7 +309,7 @@ int benchmark_pqueue(int argc, char* argv[])
     unsigned opseq = 1;
     cp.add_uint('o', "opseq", "Operation sequence to perform:\n 1 = insert all, delete all (default)\n 2 = insert all, intermixed insert/delete\n 0 = all of the above", opseq);
 
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     stxxl::config::get_instance();

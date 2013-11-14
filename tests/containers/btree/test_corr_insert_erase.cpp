@@ -34,7 +34,7 @@ struct comp_type : public std::less<int>
 typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
 //typedef stxxl::btree::btree<int,double,comp_type,10,11,stxxl::SR> btree_type;
 
-std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
+std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {
     o << obj.first << " " << obj.second;
     return o;
@@ -50,12 +50,12 @@ struct rnd_gen
     }
 };
 
-bool operator == (const std::pair<int, double> & a, const std::pair<int, double> & b)
+bool operator == (const std::pair<int, double>& a, const std::pair<int, double>& b)
 {
     return a.first == b.first;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
@@ -106,13 +106,13 @@ int main(int argc, char * argv[])
         btree_type::iterator bIt = BTree.find(*vIt);
         STXXL_CHECK(bIt != BTree.end());
         // erasing non-existent element
-        STXXL_CHECK( BTree.erase((*vIt) + 1) == 0 );
+        STXXL_CHECK(BTree.erase((*vIt) + 1) == 0);
         // erasing existing element
-        STXXL_CHECK( BTree.erase(*vIt) == 1 );
+        STXXL_CHECK(BTree.erase(*vIt) == 1);
         // checking it is not there
-        STXXL_CHECK( BTree.find(*vIt) == BTree.end() );
+        STXXL_CHECK(BTree.find(*vIt) == BTree.end());
         // trying to erase it again
-        STXXL_CHECK( BTree.erase(*vIt) == 0 );
+        STXXL_CHECK(BTree.erase(*vIt) == 0);
     }
 
     STXXL_CHECK(BTree.empty());

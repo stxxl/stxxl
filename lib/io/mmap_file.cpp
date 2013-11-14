@@ -24,12 +24,12 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mmap_file::serve(const request * req) throw (io_error)
+void mmap_file::serve(const request* req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    void* buffer = req->get_buffer();
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
@@ -38,7 +38,7 @@ void mmap_file::serve(const request * req) throw (io_error)
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
     int prot = (type == request::READ) ? PROT_READ : PROT_WRITE;
-    void * mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des, offset);
+    void* mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des, offset);
     // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des, offset);
     // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
     if (mem == MAP_FAILED)
@@ -69,7 +69,7 @@ void mmap_file::serve(const request * req) throw (io_error)
     }
 }
 
-const char * mmap_file::io_type() const
+const char* mmap_file::io_type() const
 {
     return "mmap";
 }

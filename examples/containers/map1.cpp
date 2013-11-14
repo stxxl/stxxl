@@ -20,7 +20,7 @@
 //! [comparator]
 struct CompareGreater
 {
-    bool operator () (const int & a, const int & b) const
+    bool operator () (const int& a, const int& b) const
     { return a > b; }
 
     static int max_value()
@@ -34,7 +34,7 @@ int main()
     typedef stxxl::map<int, char, CompareGreater, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> map_type;
 
     // Constructor map(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
-    map_type my_map((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);
+    map_type my_map((map_type::node_block_type::raw_size)*3, (map_type::leaf_block_type::raw_size)*3);
 
     my_map.insert(std::pair<int, char>(1, 'a'));
     my_map.insert(std::pair<int, char>(2, 'b'));
@@ -53,7 +53,7 @@ int main()
 
     map_type::iterator iter_low, iter_up;
 
-    iter_low = my_map.lower_bound(1);  // iter_low points to (1,a) in this case
+    iter_low = my_map.lower_bound(1); // iter_low points to (1,a) in this case
     iter_up = my_map.upper_bound(3);  // iter_up points to (2,b) in this case
 
     std::cout << "lower bound " << iter_low->second << ", upper bound " << iter_up->second << std::endl;

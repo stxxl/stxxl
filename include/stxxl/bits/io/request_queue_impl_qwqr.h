@@ -44,7 +44,7 @@ private:
 
     static const priority_op _priority_op = WRITE;
 
-    static void * worker(void * arg);
+    static void * worker(void* arg);
 
 public:
     // \param n max number of requests simultaneously submitted to disk
@@ -59,8 +59,8 @@ public:
         //_priority_op = op;
         STXXL_UNUSED(op);
     }
-    void add_request(request_ptr & req);
-    bool cancel_request(request_ptr & req);
+    void add_request(request_ptr& req);
+    bool cancel_request(request_ptr& req);
     ~request_queue_impl_qwqr();
 };
 

@@ -47,15 +47,15 @@ using stxxl::timestamp;
 
 
 #if STXXL_WINDOWS
-const char * default_file_type = "wincall";
+const char* default_file_type = "wincall";
 #else
-const char * default_file_type = "syscall";
+const char* default_file_type = "syscall";
 #endif
 
 #ifdef WATCH_TIMES
-void watch_times(request_ptr reqs[], unsigned n, double * out)
+void watch_times(request_ptr reqs[], unsigned n, double* out)
 {
-    bool * finished = new bool[n];
+    bool* finished = new bool[n];
     unsigned count = 0;
     for (unsigned i = 0; i < n; i++)
         finished[i] = false;
@@ -79,12 +79,12 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
 }
 
 
-void out_stat(double start, double end, double * times, unsigned n, const std::vector<std::string> & names)
+void out_stat(double start, double end, double* times, unsigned n, const std::vector<std::string>& names)
 {
     for (unsigned i = 0; i < n; i++)
     {
         std::cout << i << " " << names[i] << " took " <<
-        100. * (times[i] - start) / (end - start) << " %" << std::endl;
+            100. * (times[i] - start) / (end - start) << " %" << std::endl;
     }
 }
 #endif
@@ -99,7 +99,7 @@ static inline double throughput(stxxl::int64 bytes, double seconds)
     return bytes / (1024 * 1024) / seconds;
 }
 
-int benchmark_files(int argc, char * argv[])
+int benchmark_files(int argc, char* argv[])
 {
     stxxl::uint64 offset = 0, length = 0;
 
@@ -142,7 +142,7 @@ int benchmark_files(int argc, char * argv[])
                        "If length == 0 , then operation will continue till end of space (please ignore the write error). "
                        "Memory consumption: block_size * batch_size * num_files");
 
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     stxxl::uint64 endpos = offset + length;
@@ -170,7 +170,7 @@ int benchmark_files(int argc, char * argv[])
         do_write = true;
     }
 
-    const char * myself = strrchr(argv[0], '/');
+    const char* myself = strrchr(argv[0], '/');
     if (!myself || !*(++myself))
         myself = argv[0];
     std::cout << "# " << myself << " " << stxxl::get_version_string_long();
@@ -191,13 +191,13 @@ int benchmark_files(int argc, char * argv[])
     const stxxl::uint64 block_size_int = block_size / sizeof(int);
     const stxxl::uint64 step_size_int = step_size / sizeof(int);
 
-    unsigned * buffer = (unsigned *)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);
-    file ** files = new file *[nfiles];
-    request_ptr * reqs = new request_ptr[nfiles * batch_size];
+    unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);
+    file** files = new file*[nfiles];
+    request_ptr* reqs = new request_ptr[nfiles * batch_size];
 
 #ifdef WATCH_TIMES
-    double * r_finish_times = new double[nfiles];
-    double * w_finish_times = new double[nfiles];
+    double* r_finish_times = new double[nfiles];
+    double* w_finish_times = new double[nfiles];
 #endif
 
     double totaltimeread = 0, totaltimewrite = 0;
@@ -381,7 +381,7 @@ int benchmark_files(int argc, char * argv[])
             offset += current_step_size;
         }
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());

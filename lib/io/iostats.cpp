@@ -294,7 +294,7 @@ void stats::wait_finished(wait_op_type wait_op)
             p_wait_write += (acc_wait_write--) ? diff : 0.0;
         }
 #ifdef STXXL_WAIT_LOG_ENABLED
-        std::ofstream * waitlog = stxxl::logger::get_instance()->waitlog_stream();
+        std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
         if (waitlog)
             *waitlog << (now - last_reset) << "\t"
                      << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
@@ -322,11 +322,11 @@ void stats::_reset_io_wait_time()
 #endif
 }
 
-std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit, int multiplier)
+std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char* unit, int multiplier)
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char * endings[] = { "", "k", "M", "G", "T", "P", "E" };
-    static const char * binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
+    static const char* endings[] = { "", "k", "M", "G", "T", "P", "E" };
+    static const char* binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;
@@ -346,7 +346,7 @@ std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit,
     return out.str();
 }
 
-std::ostream & operator << (std::ostream & o, const stats_data & s)
+std::ostream& operator << (std::ostream& o, const stats_data& s)
 {
 #define hr add_IEC_binary_multiplier
     o << "STXXL I/O statistics" << std::endl;
@@ -361,16 +361,16 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << " time spent in reading (parallel read time) : " << s.get_pread_time() << " s"
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MiB/s"
       << std::endl;
-   if (s.get_cached_reads()) {
-    o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
-    o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
-    o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
-   }
-   if (s.get_cached_writes()) {
-    o << " total number of cached writes              : " << hr(s.get_cached_writes()) << std::endl;
-    o << " average block size (cached write)          : " << hr(s.get_cached_written_volume() / s.get_cached_writes(), "B") << std::endl;
-    o << " number of bytes written to cache           : " << hr(s.get_cached_written_volume(), "B") << std::endl;
-   }
+    if (s.get_cached_reads()) {
+        o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
+        o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
+        o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
+    }
+    if (s.get_cached_writes()) {
+        o << " total number of cached writes              : " << hr(s.get_cached_writes()) << std::endl;
+        o << " average block size (cached write)          : " << hr(s.get_cached_written_volume() / s.get_cached_writes(), "B") << std::endl;
+        o << " number of bytes written to cache           : " << hr(s.get_cached_written_volume(), "B") << std::endl;
+    }
     o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
     o << " average block size (write)                 : "
       << hr(s.get_writes() ? s.get_written_volume() / s.get_writes() : 0, "B") << std::endl;
@@ -389,10 +389,10 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
 #endif
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     o << " I/O wait time                              : " << s.get_io_wait_time() << " s" << std::endl;
-   if (s.get_wait_read_time() != 0.0)
-    o << " I/O wait4read time                         : " << s.get_wait_read_time() << " s" << std::endl;
-   if (s.get_wait_write_time() != 0.0)
-    o << " I/O wait4write time                        : " << s.get_wait_write_time() << " s" << std::endl;
+    if (s.get_wait_read_time() != 0.0)
+        o << " I/O wait4read time                         : " << s.get_wait_read_time() << " s" << std::endl;
+    if (s.get_wait_write_time() != 0.0)
+        o << " I/O wait4write time                        : " << s.get_wait_write_time() << " s" << std::endl;
 #endif
     o << " Time since the last reset                  : " << s.get_elapsed_time() << " s" << std::endl;
     return o;

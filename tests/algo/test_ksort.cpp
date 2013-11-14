@@ -37,7 +37,7 @@ struct my_type
     my_type max_value() const { return my_type((std::numeric_limits<key_type1>::max)()); }
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj._key << " " << obj._key_copy;
     return o;
@@ -47,7 +47,7 @@ struct get_key
 {
     typedef my_type::key_type1 key_type;
     my_type dummy;
-    key_type operator () (const my_type & obj) const
+    key_type operator () (const my_type& obj) const
     {
         return obj._key;
     }
@@ -62,7 +62,7 @@ struct get_key
 };
 
 
-bool operator < (const my_type & a, const my_type & b)
+bool operator < (const my_type& a, const my_type& b)
 {
     return a.key() < b.key();
 }
@@ -73,7 +73,7 @@ int main()
     try {
         stxxl::block_manager::get_instance();
     }
-    catch (std::exception & e)
+    catch (std::exception& e)
     {
         STXXL_MSG("Exception: " << e.what());
         abort();

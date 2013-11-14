@@ -53,7 +53,7 @@ struct my_type
 };
 
 template <typename KEY, unsigned SIZE>
-std::ostream & operator << (std::ostream & o, const my_type<KEY, SIZE> obj)
+std::ostream& operator << (std::ostream& o, const my_type<KEY, SIZE> obj)
 {
 #ifndef KEY_COMPARE
     o << obj._key;
@@ -66,19 +66,19 @@ std::ostream & operator << (std::ostream & o, const my_type<KEY, SIZE> obj)
 #ifndef KEY_COMPARE
 
 template <typename KEY, unsigned SIZE>
-bool operator < (const my_type<KEY, SIZE> & a, const my_type<KEY, SIZE> & b)
+bool operator < (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
     return a._key < b._key;
 }
 
 template <typename KEY, unsigned SIZE>
-bool operator == (const my_type<KEY, SIZE> & a, const my_type<KEY, SIZE> & b)
+bool operator == (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
     return a._key == b._key;
 }
 
 template <typename KEY, unsigned SIZE>
-bool operator != (const my_type<KEY, SIZE> & a, const my_type<KEY, SIZE> & b)
+bool operator != (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
     return a._key != b._key;
 }
@@ -86,7 +86,7 @@ bool operator != (const my_type<KEY, SIZE> & a, const my_type<KEY, SIZE> & b)
 template <typename T>
 struct Cmp : public std::less<T>
 {
-    bool operator () (const T & a, const T & b) const
+    bool operator () (const T& a, const T& b) const
     {
         return a._key < b._key;
     }
@@ -104,7 +104,7 @@ struct Cmp : public std::less<T>
 #else
 
 template <typename KEY, unsigned SIZE>
-bool operator < (const my_type<KEY, SIZE> & a, const my_type<KEY, SIZE> & b)
+bool operator < (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
     return a.key() < b.key();
 }

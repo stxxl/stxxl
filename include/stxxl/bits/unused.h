@@ -20,7 +20,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 template <typename U>
-inline void STXXL_UNUSED(const U &)
+inline void STXXL_UNUSED(const U&)
 { }
 
 __STXXL_END_NAMESPACE

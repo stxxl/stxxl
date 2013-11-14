@@ -20,12 +20,12 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-void syscall_file::serve(const request * req) throw (io_error)
+void syscall_file::serve(const request* req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    char * buffer = static_cast<char *>(req->get_buffer());
+    char* buffer = static_cast<char*>(req->get_buffer());
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
@@ -38,15 +38,15 @@ void syscall_file::serve(const request * req) throw (io_error)
         {
             STXXL_THROW_ERRNO
                 (io_error,
-                 " this=" << this <<
-                 " call=::lseek(fd,offset,SEEK_SET)" <<
-                 " path=" << filename <<
-                 " fd=" << file_des <<
-                 " offset=" << offset <<
-                 " buffer=" << (void *)buffer <<
-                 " bytes=" << bytes <<
-                 " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                 " rc=" << rc);
+                " this=" << this <<
+                " call=::lseek(fd,offset,SEEK_SET)" <<
+                " path=" << filename <<
+                " fd=" << file_des <<
+                " offset=" << offset <<
+                " buffer=" << (void*)buffer <<
+                " bytes=" << bytes <<
+                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " rc=" << rc);
         }
 
         if (type == request::READ)
@@ -60,15 +60,15 @@ void syscall_file::serve(const request * req) throw (io_error)
             {
                 STXXL_THROW_ERRNO
                     (io_error,
-                     " this=" << this <<
-                     " call=::read(fd,buffer,bytes)" <<
-                     " path=" << filename <<
-                     " fd=" << file_des <<
-                     " offset=" << offset <<
-                     " buffer=" << (void *)buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << "READ" <<
-                     " rc=" << rc);
+                    " this=" << this <<
+                    " call=::read(fd,buffer,bytes)" <<
+                    " path=" << filename <<
+                    " fd=" << file_des <<
+                    " offset=" << offset <<
+                    " buffer=" << (void*)buffer <<
+                    " bytes=" << bytes <<
+                    " type=" << "READ" <<
+                    " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;
@@ -93,15 +93,15 @@ void syscall_file::serve(const request * req) throw (io_error)
             {
                 STXXL_THROW_ERRNO
                     (io_error,
-                     " this=" << this <<
-                     " call=::write(fd,buffer,bytes)" <<
-                     " path=" << filename <<
-                     " fd=" << file_des <<
-                     " offset=" << offset <<
-                     " buffer=" << (void *)buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << "WRITE" <<
-                     " rc=" << rc);
+                    " this=" << this <<
+                    " call=::write(fd,buffer,bytes)" <<
+                    " path=" << filename <<
+                    " fd=" << file_des <<
+                    " offset=" << offset <<
+                    " buffer=" << (void*)buffer <<
+                    " bytes=" << bytes <<
+                    " type=" << "WRITE" <<
+                    " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;
@@ -110,7 +110,7 @@ void syscall_file::serve(const request * req) throw (io_error)
     }
 }
 
-const char * syscall_file::io_type() const
+const char* syscall_file::io_type() const
 {
     return "syscall";
 }

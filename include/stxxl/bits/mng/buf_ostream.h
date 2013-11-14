@@ -38,7 +38,7 @@ protected:
     buffered_writer<block_type> writer;
     bid_iterator_type current_bid;
     int_type current_elem;
-    block_type * current_blk;
+    block_type* current_blk;
 
 public:
     typedef typename block_type::const_reference const_reference;
@@ -58,7 +58,7 @@ public:
     //! Output stream operator, writes out \c record.
     //! \param record const reference to block record type, containing a value of record to write to the stream
     //! \return reference to itself (stream object)
-    _Self & operator << (const_reference record)
+    _Self& operator << (const_reference record)
     {
         current_blk->elem[current_elem++] = record;
         if (UNLIKELY(current_elem >= block_type::size))
@@ -85,7 +85,7 @@ public:
 
     //! Moves to the next record in the stream.
     //! \return reference to itself after the advance
-    _Self & operator ++ ()
+    _Self& operator ++ ()
     {
         ++current_elem;
         if (UNLIKELY(current_elem >= block_type::size))
@@ -101,7 +101,7 @@ public:
     {
         while (current_elem != 0)
         {
-            operator<< (record);
+            operator << (record);
         }
         return *this;
     }

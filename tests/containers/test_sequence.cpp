@@ -14,7 +14,7 @@
 #include <stxxl/sequence>
 #include <stxxl/random>
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     stxxl::uint64 ops = (argc >= 2) ? stxxl::atouint64(argv[1]) : 32 * 1024 * 1024;
 

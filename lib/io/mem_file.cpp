@@ -22,13 +22,13 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mem_file::serve(const request * req) throw (io_error)
+void mem_file::serve(const request* req) throw (io_error)
 {
     scoped_mutex_lock lock(m_mutex);
 
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    void* buffer = req->get_buffer();
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
@@ -44,7 +44,7 @@ void mem_file::serve(const request * req) throw (io_error)
     }
 }
 
-const char * mem_file::io_type() const
+const char* mem_file::io_type() const
 {
     return "memory";
 }
@@ -80,7 +80,7 @@ void mem_file::discard(offset_type offset, offset_type size)
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY
     // overwrite the freed region with uninitialized memory
     STXXL_VERBOSE("discard at " << offset << " len " << size);
-    void * uninitialized = malloc(BLOCK_ALIGN);
+    void* uninitialized = malloc(BLOCK_ALIGN);
     while (size >= BLOCK_ALIGN) {
         memcpy(ptr + offset, uninitialized, BLOCK_ALIGN);
         offset += BLOCK_ALIGN;

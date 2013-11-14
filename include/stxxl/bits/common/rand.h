@@ -55,7 +55,7 @@ struct random_number32
     //! Returns a random number from [0, N)
     inline value_type operator () (const value_type& N) const
     {
-        return operator()() % N;
+        return operator () () % N;
     }
 };
 
@@ -126,14 +126,13 @@ struct random_uniform_slow
 
     random_uniform_slow(unsigned seed = 0)
         : gen(seed ? seed : get_next_seed()),
-          uni(0.0,1.0)
-    {
-    }
+          uni(0.0, 1.0)
+    { }
 #elif STXXL_BOOST_RANDOM
     typedef boost::minstd_rand base_generator_type;
     base_generator_type generator;
     boost::uniform_real<> uni_dist;
-    mutable boost::variate_generator<base_generator_type &, boost::uniform_real<> > uni;
+    mutable boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
 
     random_uniform_slow(unsigned seed = 0) : uni(generator, uni_dist)
     {
@@ -160,33 +159,33 @@ struct random_uniform_slow
     static void
     _dorand48(unsigned short xseed[3])
     {
-	unsigned long accu;
-	unsigned short temp[2];
+        unsigned long accu;
+        unsigned short temp[2];
 
         static const unsigned short _mult[3] = { 0xe66d, 0xdeec, 0x0005 };
         static const unsigned short _add = 0x000b;
 
-	accu = (unsigned long) _mult[0] * (unsigned long) xseed[0]
-            + (unsigned long) _add;
-	temp[0] = (unsigned short) accu;	/* lower 16 bits */
-	accu >>= sizeof(unsigned short) * 8;
-	accu += (unsigned long) _mult[0] * (unsigned long) xseed[1]
-            + (unsigned long) _mult[1] * (unsigned long) xseed[0];
-	temp[1] = (unsigned short) accu;	/* middle 16 bits */
-	accu >>= sizeof(unsigned short) * 8;
-	accu += _mult[0] * xseed[2] + _mult[1] * xseed[1] + _mult[2] * xseed[0];
-	xseed[0] = temp[0];
-	xseed[1] = temp[1];
-	xseed[2] = (unsigned short) accu;
+        accu = (unsigned long)_mult[0] * (unsigned long)xseed[0]
+               + (unsigned long)_add;
+        temp[0] = (unsigned short)accu;         /* lower 16 bits */
+        accu >>= sizeof(unsigned short) * 8;
+        accu += (unsigned long)_mult[0] * (unsigned long)xseed[1]
+                + (unsigned long)_mult[1] * (unsigned long)xseed[0];
+        temp[1] = (unsigned short)accu;         /* middle 16 bits */
+        accu >>= sizeof(unsigned short) * 8;
+        accu += _mult[0] * xseed[2] + _mult[1] * xseed[1] + _mult[2] * xseed[0];
+        xseed[0] = temp[0];
+        xseed[1] = temp[1];
+        xseed[2] = (unsigned short)accu;
     }
 
     static double
     _erand48(unsigned short xseed[3])
     {
-	_dorand48(xseed);
-	return ldexp((double) xseed[0], -48)
-            + ldexp((double) xseed[1], -32)
-            + ldexp((double) xseed[2], -16);
+        _dorand48(xseed);
+        return ldexp((double)xseed[0], -48)
+               + ldexp((double)xseed[1], -32)
+               + ldexp((double)xseed[2], -16);
     }
 /* end erand48.c */
 

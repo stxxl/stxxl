@@ -64,28 +64,28 @@ class block_manager : public singleton<block_manager>
 {
     friend class singleton<block_manager>;
 
-    disk_allocator ** disk_allocators;
-    file ** disk_files;
+    disk_allocator** disk_allocators;
+    file** disk_files;
 
     size_t ndisks;
     block_manager();
 
 #if STXXL_MNG_COUNT_ALLOCATION
     //! total requested allocation in bytes
-    uint64      m_total_allocation;
+    uint64 m_total_allocation;
 
     //! currently allocated bytes
-    uint64      m_current_allocation;
+    uint64 m_current_allocation;
 
     //! maximum number of bytes allocated during program run.
-    uint64      m_maximum_allocation;
+    uint64 m_maximum_allocation;
 #endif // STXXL_MNG_COUNT_ALLOCATION
 
 protected:
     template <class BIDType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks_int(
         const unsigned_type nblocks,
-        const DiskAssignFunctor & functor,
+        const DiskAssignFunctor& functor,
         unsigned_type offset,
         BIDIteratorClass out);
 
@@ -109,7 +109,7 @@ public:
     //! \param offset advance for \b functor to line up partial allocations
     template <class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
-        const DiskAssignFunctor & functor,
+        const DiskAssignFunctor& functor,
         BIDIteratorClass bidbegin,
         BIDIteratorClass bidend,
         unsigned_type offset = 0)
@@ -132,7 +132,7 @@ public:
     template <class BlockType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
         const unsigned_type nblocks,
-        const DiskAssignFunctor & functor,
+        const DiskAssignFunctor& functor,
         BIDIteratorClass out,
         unsigned_type offset = 0)
     {
@@ -149,7 +149,7 @@ public:
     //! \param bid BID to store the block identifier
     //! \param offset advance for \b functor to line up partial allocations
     template <typename DiskAssignFunctor, unsigned BLK_SIZE>
-    void new_block(const DiskAssignFunctor & functor, BID<BLK_SIZE> & bid, unsigned_type offset = 0)
+    void new_block(const DiskAssignFunctor& functor, BID<BLK_SIZE>& bid, unsigned_type offset = 0)
     {
         new_blocks_int<BID<BLK_SIZE> >(1, functor, offset, &bid);
     }
@@ -160,26 +160,26 @@ public:
     //! \param bidbegin iterator object of \b bid_iterator concept
     //! \param bidend iterator object of \b bid_iterator concept
     template <class BIDIteratorClass>
-    void delete_blocks(const BIDIteratorClass & bidbegin, const BIDIteratorClass & bidend);
+    void delete_blocks(const BIDIteratorClass& bidbegin, const BIDIteratorClass& bidend);
 
     //! Deallocates a block.
     //! \param bid block identifier
     template <unsigned BLK_SIZE>
-    void delete_block(const BID<BLK_SIZE> & bid);
+    void delete_block(const BID<BLK_SIZE>& bid);
 
     ~block_manager();
 
 #if STXXL_MNG_COUNT_ALLOCATION
     //! return total requested allocation in bytes
-    uint64      get_total_allocation() const
+    uint64 get_total_allocation() const
     { return m_total_allocation; }
 
     //! return currently allocated bytes
-    uint64      get_current_allocation() const
+    uint64 get_current_allocation() const
     { return m_current_allocation; }
 
     //! return maximum number of bytes allocated during program run.
-    uint64      get_maximum_allocation() const
+    uint64 get_maximum_allocation() const
     { return m_maximum_allocation; }
 #endif // STXXL_MNG_COUNT_ALLOCATION
 };
@@ -188,16 +188,16 @@ public:
 template <class BIDType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks_int(
     const unsigned_type nblocks,
-    const DiskAssignFunctor & functor,
+    const DiskAssignFunctor& functor,
     unsigned_type offset,
     OutputIterator out)
 {
     typedef BIDType bid_type;
     typedef BIDArray<bid_type::t_size> bid_array_type;
 
-    simple_vector<int_type> bl (ndisks);
-    simple_vector<bid_array_type> disk_bids (ndisks);
-    simple_vector<file*> disk_ptrs (nblocks);
+    simple_vector<int_type> bl(ndisks);
+    simple_vector<bid_array_type> disk_bids(ndisks);
+    simple_vector<file*> disk_ptrs(nblocks);
 
     bl.memzero();
 
@@ -223,7 +223,7 @@ void block_manager::new_blocks_int(
     for (unsigned_type i = 0; i != nblocks; ++it, ++i)
     {
         const int disk = disk_ptrs[i]->get_allocator_id();
-        bid_type bid(disk_ptrs[i], disk_bids[disk][ bl[disk]++ ].offset);
+        bid_type bid(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
         *it = bid;
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:new    " << FMT_BID(bid));
     }
@@ -237,7 +237,7 @@ void block_manager::new_blocks_int(
 
 
 template <unsigned BLK_SIZE>
-void block_manager::delete_block(const BID<BLK_SIZE> & bid)
+void block_manager::delete_block(const BID<BLK_SIZE>& bid)
 {
     // do not uncomment it
     //assert(bid.storage->get_allocator_id() < config::get_instance()->disks_number());
@@ -256,8 +256,8 @@ void block_manager::delete_block(const BID<BLK_SIZE> & bid)
 
 template <class BIDIteratorClass>
 void block_manager::delete_blocks(
-    const BIDIteratorClass & bidbegin,
-    const BIDIteratorClass & bidend)
+    const BIDIteratorClass& bidbegin,
+    const BIDIteratorClass& bidend)
 {
     for (BIDIteratorClass it = bidbegin; it != bidend; it++)
     {

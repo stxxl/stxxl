@@ -33,13 +33,13 @@ struct my_type
     char filler[24];
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << " " << obj.data;
     return o;
 }
 
-std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
+std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {
     o << obj.first << " " << obj.second;
     return o;
@@ -57,7 +57,7 @@ template class stxxl::btree::btree<int, my_type, comp_type,
 
 stxxl::uint64 checksum = 0;
 
-void NC(btree_type & BTree)
+void NC(btree_type& BTree)
 {
     stxxl::uint64 sum = 0;
     stxxl::timer Timer1;
@@ -71,7 +71,7 @@ void NC(btree_type & BTree)
     STXXL_CHECK(sum == checksum);
 }
 
-void C(btree_type & BTree)
+void C(btree_type& BTree)
 {
     stxxl::uint64 sum = 0;
     stxxl::timer Timer1;
@@ -85,7 +85,7 @@ void C(btree_type & BTree)
     STXXL_CHECK(sum == checksum);
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 2)
     {

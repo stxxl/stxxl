@@ -91,7 +91,7 @@ void test_all_strategies(
     }
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 6)
     {
@@ -116,49 +116,49 @@ int main(int argc, char * argv[])
     switch (block_size)
     {
     case 0:
-        test_all_strategies<my_default_type, 128 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 128* 1024>(data_mem, sort_mem, strategy);
         break;
     case 1:
-        test_all_strategies<my_default_type, 256 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 256* 1024>(data_mem, sort_mem, strategy);
         break;
     case 2:
-        test_all_strategies<my_default_type, 512 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 512* 1024>(data_mem, sort_mem, strategy);
         break;
     case 3:
-        test_all_strategies<my_default_type, 1024 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 1024* 1024>(data_mem, sort_mem, strategy);
         break;
     case 4:
-        test_all_strategies<my_default_type, 2 * 1024 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 2* 1024* 1024>(data_mem, sort_mem, strategy);
         break;
     case 5:
-        test_all_strategies<my_default_type, 4 * 1024 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 4* 1024* 1024>(data_mem, sort_mem, strategy);
         break;
     case 6:
-        test_all_strategies<my_default_type, 8 * 1024 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 8* 1024* 1024>(data_mem, sort_mem, strategy);
         break;
     case 7:
-        test_all_strategies<my_default_type, 16 * 1024 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 16* 1024* 1024>(data_mem, sort_mem, strategy);
         break;
     case 8:
-        test_all_strategies<my_default_type, 640 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 640* 1024>(data_mem, sort_mem, strategy);
         break;
     case 9:
-        test_all_strategies<my_default_type, 768 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 768* 1024>(data_mem, sort_mem, strategy);
         break;
     case 10:
-        test_all_strategies<my_default_type, 896 * 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 896* 1024>(data_mem, sort_mem, strategy);
         break;
     case 11:
-        test_all_strategies<my_type<unsigned, 12>, 2 * MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_type<unsigned, 12>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     case 12:
-        test_all_strategies<my_type<unsigned, 12>, 2 * MB + 4096>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_type<unsigned, 12>, 2* MB + 4096>(data_mem, sort_mem, strategy);
         break;
     case 13:
-        test_all_strategies<my_type<unsigned, 20>, 2 * MB + 4096>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_type<unsigned, 20>, 2* MB + 4096>(data_mem, sort_mem, strategy);
         break;
     case 14:
-        test_all_strategies<my_type<unsigned, 8>, 2 * MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_type<unsigned, 8>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");

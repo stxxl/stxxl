@@ -44,7 +44,7 @@ void test_strategy()
 
 int main()
 {
-    stxxl::config * cfg = stxxl::config::get_instance();
+    stxxl::config* cfg = stxxl::config::get_instance();
 
     // instantiate the allocation strategies
     STXXL_MSG("Number of disks: " << cfg->disks_number());

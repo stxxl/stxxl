@@ -117,7 +117,7 @@ public:
 };
 
 //! Prints current malloc statistics in a convenient way.
-inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
+inline std::ostream& operator << (std::ostream& s, const malloc_stats& st)
 {
 #if STXXL_HAVE_MALLINFO_PROTO
     s << "MALLOC statistics" << std::endl;
@@ -134,7 +134,7 @@ inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
     s << "Space allocated from system using mmap: " << st.from_system_mmap() << " bytes" << std::endl;
     s << "       number of chunks allocated via mmap(): " << st.mmap_chunks() << std::endl;
     s << "Total space allocated from system (mmap and not mmap): " <<
-    st.from_system_total() << " bytes" << std::endl;
+        st.from_system_total() << " bytes" << std::endl;
     s << "=================================================================" << std::endl;
 #else
     s << "MALLOC statistics are not supported on this platform";

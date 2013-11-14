@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     cp.add_param_string("filename", "A filename to process", a_filename);
 
     // process command line
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1; // some error occurred and help was always written to user.
 
     std::cout << "Command line parsed okay." << std::endl;

@@ -20,7 +20,7 @@ int main()
     int height = 3;
     int width = 3;
 
-    int internal_memory = 64*1024*1024;
+    int internal_memory = 64 * 1024 * 1024;
     const int small_block_order = 32;  // must be multiple of matrix valueType in bits
 
     typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<int, small_block_order> > block_schedular_type;

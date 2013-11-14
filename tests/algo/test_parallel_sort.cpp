@@ -54,27 +54,27 @@ struct my_type
     my_type(key_type __key) : _key(__key) { }
     my_type(key_type __key, key_type __load) : _key(__key), _load(__load) { }
 
-    void operator = (const key_type & __key) { _key = __key; }
-    void operator = (const my_type & mt)
+    void operator = (const key_type& __key) { _key = __key; }
+    void operator = (const my_type& mt)
     {
         _key = mt._key;
         _load = mt._load;
     }
 };
 
-bool operator < (const my_type & a, const my_type & b);
+bool operator < (const my_type& a, const my_type& b);
 
-inline bool operator < (const my_type & a, const my_type & b)
+inline bool operator < (const my_type& a, const my_type& b)
 {
     return a.key() < b.key();
 }
 
-inline bool operator == (const my_type & a, const my_type & b)
+inline bool operator == (const my_type& a, const my_type& b)
 {
     return a.key() == b.key();
 }
 
-inline std::ostream & operator << (std::ostream & o, const my_type & obj)
+inline std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj._key << "/" << obj._load;
     return o;
@@ -88,7 +88,7 @@ struct cmp_less_key : public std::less<my_type>
 
 typedef stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> vector_type;
 
-stxxl::unsigned_type checksum(vector_type & input)
+stxxl::unsigned_type checksum(vector_type& input)
 {
     stxxl::unsigned_type sum = 0;
     for (vector_type::const_iterator i = input.begin(); i != input.end(); ++i)
@@ -96,7 +96,7 @@ stxxl::unsigned_type checksum(vector_type & input)
     return sum;
 }
 
-void linear_sort_normal(vector_type & input)
+void linear_sort_normal(vector_type& input)
 {
     stxxl::unsigned_type sum1 = checksum(input);
 
@@ -117,14 +117,14 @@ void linear_sort_normal(vector_type & input)
     std::cout << "Linear sorting normal took " << (stop - start) << " seconds." << std::endl;
 }
 
-void linear_sort_streamed(vector_type & input, vector_type & output)
+void linear_sort_streamed(vector_type& input, vector_type& output)
 {
     stxxl::unsigned_type sum1 = checksum(input);
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
-    typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+    typedef __typeof__ (stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
@@ -154,7 +154,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
 }
 
 
-int main(int argc, const char ** argv)
+int main(int argc, const char** argv)
 {
     if (argc < 6) {
         std::cout << "Usage: " << argv[0] << " [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]" << std::endl;

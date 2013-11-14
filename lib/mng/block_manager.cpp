@@ -19,15 +19,15 @@ __STXXL_BEGIN_NAMESPACE
 
 block_manager::block_manager()
 {
-    config * config = config::get_instance();
+    config* config = config::get_instance();
 
     // initialize config (may read config files now)
     config->check_initialized();
 
     // allocate disk_allocators
     ndisks = config->disks_number();
-    disk_allocators = new disk_allocator* [ndisks];
-    disk_files = new file *[ndisks];
+    disk_allocators = new disk_allocator*[ndisks];
+    disk_files = new file*[ndisks];
 
     uint64 total_size = 0;
 

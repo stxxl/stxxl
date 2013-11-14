@@ -32,7 +32,7 @@ __STXXL_BEGIN_NAMESPACE
 
 static const double program_start_time_stamp = timestamp();
 
-void print_msg(const char * label, const std::string & msg, unsigned flags)
+void print_msg(const char* label, const std::string& msg, unsigned flags)
 {
     std::string s;
 #ifdef STXXL_PRINT_TIMESTAMP_ALWAYS
@@ -67,7 +67,7 @@ void print_msg(const char * label, const std::string & msg, unsigned flags)
         std::cout << s << std::flush;
     if (flags & _STXXL_PRNT_CERR)
         std::cerr << s << std::flush;
-    logger * logger_instance = logger::get_instance();
+    logger* logger_instance = logger::get_instance();
     if (flags & _STXXL_PRNT_LOG)
         logger_instance->log_stream() << s << std::flush;
     if (flags & _STXXL_PRNT_ERRLOG)

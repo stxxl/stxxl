@@ -31,15 +31,15 @@ public:
     disk_queued_file(int queue_id, int allocator_id) : queue_id(queue_id), allocator_id(allocator_id)
     { }
     request_ptr aread(
-        void * buffer,
+        void* buffer,
         offset_type pos,
         size_type bytes,
-        const completion_handler & on_cmpl);
+        const completion_handler& on_cmpl);
     request_ptr awrite(
-        void * buffer,
+        void* buffer,
         offset_type pos,
         size_type bytes,
-        const completion_handler & on_cmpl);
+        const completion_handler& on_cmpl);
 
     virtual int get_queue_id() const
     {

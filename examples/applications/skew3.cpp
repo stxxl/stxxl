@@ -60,7 +60,7 @@ typedef external_size_type size_type;
  * Note: ISA := The inverse of SA
  */
 template <typename InputT, typename InputSA>
-bool sacheck(InputT & inputT, InputSA & inputSA)
+bool sacheck(InputT& inputT, InputSA& inputSA)
 {
     typedef typename InputSA::value_type offset_type;
     typedef stxxl::tuple<offset_type, offset_type> pair_type;
@@ -134,7 +134,7 @@ bool sacheck(InputT & inputT, InputSA & inputSA)
 
         while (!triple_rm.empty())
         {
-            const triple_type & this_triple = *triple_rm;
+            const triple_type& this_triple = *triple_rm;
 
             if (prev_triple.second > this_triple.second)
             {
@@ -169,7 +169,7 @@ bool sacheck(InputT & inputT, InputSA & inputSA)
 }
 
 template <typename InputT, typename InputSA>
-bool sacheck_vectors(InputT & inputT, InputSA & inputSA)
+bool sacheck_vectors(InputT& inputT, InputSA& inputSA)
 {
     typename stream::streamify_traits<typename InputT::iterator>::stream_type streamT
         = stream::streamify(inputT.begin(), inputT.end());
@@ -217,7 +217,7 @@ public:
     {
         typedef skew_quint_type value_type;
 
-        bool operator () (const value_type & a, const value_type & b) const
+        bool operator () (const value_type& a, const value_type& b) const
         {
             if (a.second == b.second)
                 return a.fourth < b.fourth;
@@ -237,7 +237,7 @@ public:
     {
         typedef skew_pair_type value_type;
 
-        bool operator () (const value_type & a, const value_type & b) const
+        bool operator () (const value_type& a, const value_type& b) const
         {
             if ((a.first & 1) == (b.first & 1))
                 return a.first < b.first;
@@ -255,7 +255,7 @@ public:
     {
         typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
 
-        bool operator () (const value_type & a, const value_type & b) const
+        bool operator () (const value_type& a, const value_type& b) const
         {
             if (a.second == b.second) {
                 if (a.third == b.third)
@@ -274,7 +274,7 @@ public:
 
     /** Check, if last two components of tree quads are equal. */
     template <class quad_type>
-    static inline bool quad_eq(const quad_type & a, const quad_type & b)
+    static inline bool quad_eq(const quad_type& a, const quad_type& b)
     {
         return (a.second == b.second) && (a.third == b.third) && (a.fourth == b.fourth);
     }
@@ -289,15 +289,15 @@ public:
         typedef skew_pair_type value_type;
 
     private:
-        Input & A;
+        Input& A;
 
-        bool & unique;
+        bool& unique;
         offset_type lexname;
         quad_type prev;
         skew_pair_type result;
 
     public:
-        naming(Input & A_, bool & unique_) :
+        naming(Input& A_, bool& unique_) :
             A(A_), unique(unique_), lexname(0)
         {
             assert(!A.empty());
@@ -308,12 +308,12 @@ public:
             result.second = lexname;
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         {
             return result;
         }
 
-        naming & operator ++ ()
+        naming& operator ++ ()
         {
             assert(!A.empty());
 
@@ -351,12 +351,12 @@ public:
         typedef stxxl::tuple<typename InputA::value_type, offset_type> value_type;
 
     private:
-        InputA & A;
-        InputB & B;
+        InputA& A;
+        InputB& B;
         value_type result;
 
     public:
-        make_pairs(InputA & a, InputB & b)
+        make_pairs(InputA& a, InputB& b)
             : A(a), B(b)
         {
             assert(!A.empty());
@@ -366,10 +366,10 @@ public:
             }
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         { return result; }
 
-        make_pairs & operator ++ ()
+        make_pairs& operator ++ ()
         {
             assert(!A.empty());
             assert(!B.empty());
@@ -405,16 +405,16 @@ public:
         typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
 
     private:
-        Input & A;
+        Input& A;
         value_type current;
         offset_type counter;
         unsigned int z3z;  // = counter mod 3, ("+",Z/3Z) is cheaper than %
         bool finished;
 
-        offset_array_type & text;
+        offset_array_type& text;
 
     public:
-        make_quads(Input & data_in_, offset_array_type & text_)
+        make_quads(Input& data_in_, offset_array_type& text_)
             : A(data_in_),
               current(0, 0, 0, 0),
               counter(0),
@@ -445,10 +445,10 @@ public:
             }
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         { return current; }
 
-        make_quads & operator ++ ()
+        make_quads& operator ++ ()
         {
             assert(!A.empty() || !finished);
 
@@ -494,13 +494,13 @@ public:
         typedef typename Input::value_type value_type;
 
     private:
-        Input & A;
+        Input& A;
         offset_type counter;
         offset_type output_counter;
         value_type result;
 
     public:
-        extract_mod12(Input & A_)
+        extract_mod12(Input& A_)
             : A(A_),
               counter(0),
               output_counter(0)
@@ -513,10 +513,10 @@ public:
             }
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         { return result; }
 
-        extract_mod12 & operator ++ ()
+        extract_mod12& operator ++ ()
         {
             assert(!A.empty());
 
@@ -554,9 +554,9 @@ public:
         typedef offset_type value_type;
 
     private:
-        Mod0 & A;
-        Mod1 & B;
-        Mod2 & C;
+        Mod0& A;
+        Mod1& B;
+        Mod2& C;
 
         skew_quint_type s0;
         skew_quad_type s1;
@@ -652,7 +652,7 @@ public:
             return (A.empty() && B.empty() && C.empty());
         }
 
-        merge_sa(Mod0 & x1, Mod1 & x2, Mod2 & x3)
+        merge_sa(Mod0& x1, Mod1& x2, Mod2& x3)
             : A(x1), B(x2), C(x3), selected(-1), index(0)
         {
             assert(!A.empty());
@@ -668,12 +668,12 @@ public:
             merge();
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         {
             return merge_result;
         }
 
-        merge_sa & operator ++ ()
+        merge_sa& operator ++ ()
         {
             if (selected == 0) {
                 assert(!A.empty());
@@ -759,17 +759,17 @@ public:
         less_mod2 c2;
 
         // Runs merger
-        mod1_rm_type * mod1_result;
-        mod2_rm_type * mod2_result;
-        mod0_rm_type * mod0_result;
+        mod1_rm_type* mod1_result;
+        mod2_rm_type* mod2_result;
+        mod0_rm_type* mod0_result;
 
         // Merger
-        merge_sa_type * vmerge_sa;
+        merge_sa_type* vmerge_sa;
 
         // Input
-        S & source;
-        Mod1 & mod_1;
-        Mod2 & mod_2;
+        S& source;
+        Mod1& mod_1;
+        Mod2& mod_2;
 
         // Tmp variables
         offset_type t[3];
@@ -788,7 +788,7 @@ public:
         value_type result;
 
     public:
-        build_sa(S & source_, Mod1 & mod_1_, Mod2 & mod_2_, size_t a_size, size_t memsize)
+        build_sa(S& source_, Mod1& mod_1_, Mod2& mod_2_, size_t a_size, size_t memsize)
             : source(source_), mod_1(mod_1_), mod_2(mod_2_), index(0), ready(false)
         {
             assert(!source_.empty());
@@ -897,12 +897,12 @@ public:
             result = *(*vmerge_sa);
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         {
             return result;
         }
 
-        build_sa & operator ++ ()
+        build_sa& operator ++ ()
         {
             assert(vmerge_sa != 0 && !vmerge_sa->empty());
 
@@ -973,7 +973,7 @@ public:
         // Real recursive skew3 implementation
         // This part is the core of the skew algorithm and runs all class objects in their respective order
         template <typename RecInputType>
-        buildSA_type * skew3(RecInputType & p_Input)
+        buildSA_type * skew3(RecInputType& p_Input)
         {
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
             typedef make_quads<RecInputType, offset_type, 1> make_quads_input_type;
@@ -1010,7 +1010,7 @@ public:
             // create (i, s^12[i])
             size_type concat_length = 0; // holds length of current S_12
             while (!names_input.empty()) {
-                const skew_pair_type & tmp = *names_input;
+                const skew_pair_type& tmp = *names_input;
                 if (tmp.first & 1) {
                     m2_sorter.push(tmp); // sorter #2
                 }
@@ -1033,7 +1033,7 @@ public:
                 // compute s^12 := lexname[S[1 mod 3]] . lexname[S[2 mod 3]], (also known as reduced recursion string 'R')
                 concatenation concat_mod1mod2(m1_sorter, m2_sorter);
 
-                buildSA_type * recType = skew3(concat_mod1mod2); // recursion with recursion string T' = concat_mod1mod2 lexnames
+                buildSA_type* recType = skew3(concat_mod1mod2);  // recursion with recursion string T' = concat_mod1mod2 lexnames
 
                 std::cout << "exit recursion level = " << --rec_depth << std::endl;
 
@@ -1048,7 +1048,7 @@ public:
                 mod12_sorter_type isa2_pair(mod12cmp(), ram_use / 5);
 
                 while (!isa_pairs.empty()) {
-                    const skew_pair_type & tmp = *isa_pairs;
+                    const skew_pair_type& tmp = *isa_pairs;
                     if (tmp.first < mod2_pos) {
                         if (tmp.first + special < mod2_pos) // else: special sentinel tuple is dropped
                             isa1_pair.push(tmp);            // sorter #1
@@ -1095,10 +1095,10 @@ public:
         typedef make_pairs<counter_stream_type, Input> make_pairs_input_type;
 
         // points to final constructed suffix array generator
-        buildSA_type * out_sa;
+        buildSA_type* out_sa;
 
     public:
-        algorithm(Input & data_in)
+        algorithm(Input& data_in)
             : finished(false), rec_depth(0)
         {
             // (t_i) -> (i,t_i)
@@ -1108,12 +1108,12 @@ public:
             out_sa = skew3(pairs_input);
         }
 
-        const value_type & operator * () const
+        const value_type& operator * () const
         {
             return *(*out_sa);
         }
 
-        algorithm & operator ++ ()
+        algorithm& operator ++ ()
         {
             assert(out_sa);
             assert(!out_sa->empty());
@@ -1160,23 +1160,23 @@ public:
 
 protected:
     //! instance of input stream
-    InputType & m_input;
+    InputType& m_input;
 
     //! counter after which the stream ends
     size_type m_count;
 
 public:
-    cut_stream(InputType & input, size_type count)
+    cut_stream(InputType& input, size_type count)
         : m_input(input), m_count(count)
     { }
 
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         assert(m_count > 0);
         return *m_input;
     }
 
-    cut_stream & operator ++ ()
+    cut_stream& operator ++ ()
     {
         assert(!empty());
         --m_count;
@@ -1191,7 +1191,7 @@ public:
 };
 
 template <typename offset_type>
-int process(const std::string & input_filename, const std::string & output_filename,
+int process(const std::string& input_filename, const std::string& output_filename,
             size_type sizelimit,
             bool text_output_flag, bool check_flag, bool input_verbatim)
 {
@@ -1201,7 +1201,7 @@ int process(const std::string & input_filename, const std::string & output_filen
     typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
 
     // input and output files (if supplied via command line)
-    stxxl::syscall_file * input_file = NULL, * output_file = NULL;
+    stxxl::syscall_file* input_file = NULL, * output_file = NULL;
 
     // input and output vectors for suffix array construction
     alphabet_vector_type input_vector;
@@ -1232,7 +1232,7 @@ int process(const std::string & input_filename, const std::string & output_filen
     }
 
     // I/O measurement
-    stxxl::stats * Stats = stxxl::stats::get_instance();
+    stxxl::stats* Stats = stxxl::stats::get_instance();
     stxxl::stats_data stats_begin(*Stats);
 
     // construct skew class with bufreader input type
@@ -1271,7 +1271,7 @@ int process(const std::string & input_filename, const std::string & output_filen
             std::cout << i << " : " << output_vector[i] << " : ";
 
             // We need a const reference because operator[] would write data
-            const alphabet_vector_type & cinput = input_vector;
+            const alphabet_vector_type& cinput = input_vector;
 
             for (unsigned int j = 0; output_vector[i] + j < cinput.size(); j++) {
                 std::cout << dumpC(cinput[output_vector[i] + j]) << " ";
@@ -1305,7 +1305,7 @@ int process(const std::string & input_filename, const std::string & output_filen
     return 0;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     stxxl::cmdline_parser cp;
 

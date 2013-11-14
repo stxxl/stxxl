@@ -44,7 +44,7 @@ struct my_record_
 };
 
 template <unsigned RECORD_SIZE>
-inline std::ostream & operator << (std::ostream & o, const my_record_<RECORD_SIZE> &)
+inline std::ostream& operator << (std::ostream& o, const my_record_<RECORD_SIZE>&)
 {
     o << ".";
     return o;
@@ -52,7 +52,7 @@ inline std::ostream & operator << (std::ostream & o, const my_record_<RECORD_SIZ
 
 
 template <typename stack_type>
-void benchmark_insert(stack_type & Stack, stxxl::int64 volume)
+void benchmark_insert(stack_type& Stack, stxxl::int64 volume)
 {
     typedef typename stack_type::value_type value_type;
 
@@ -94,7 +94,7 @@ void benchmark_insert(stack_type & Stack, stxxl::int64 volume)
 }
 
 template <typename stack_type>
-void benchmark_delete(stack_type & Stack, stxxl::int64 volume)
+void benchmark_delete(stack_type& Stack, stxxl::int64 volume)
 {
     typedef typename stack_type::value_type value_type;
 
@@ -172,7 +172,7 @@ void run_stl_stack(stxxl::int64 volume)
 }
 
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     STXXL_MSG("stxxl::pq block size: " << BLOCK_SIZE << " bytes");
 
@@ -200,7 +200,7 @@ int main(int argc, char * argv[])
 
     STXXL_MSG("Allocating array with size " <<
               MEM_2_RESERVE << " bytes to prevent file buffering.");
-    int * array = new int[MEM_2_RESERVE / sizeof(int)];
+    int* array = new int[MEM_2_RESERVE / sizeof(int)];
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 
     STXXL_MSG("Running variant: " << variant);

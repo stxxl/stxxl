@@ -32,7 +32,7 @@ struct forty_two
         return counter;
     }
 
-    forty_two & operator ++ ()
+    forty_two& operator ++ ()
     {
         STXXL_CHECK(!empty());
         ++counter;
@@ -81,13 +81,13 @@ void check_42_fill(VectorType& v, unsigned length)
 
     for (unsigned i = 0; i < length; ++i)
     {
-        STXXL_CHECK( *ci == (int)i );
+        STXXL_CHECK(*ci == (int)i);
         ++ci;
     }
 
     for (unsigned i = length; i < v.size(); ++i)
     {
-        STXXL_CHECK( *ci == 0 );
+        STXXL_CHECK(*ci == 0);
         ++ci;
     }
 
@@ -99,7 +99,7 @@ int main()
     stxxl::config::get_instance();
 
     {
-        forty_two _42 (42);
+        forty_two _42(42);
 
         // materialize into std vector
         std::vector<int> v(1000);
@@ -112,7 +112,7 @@ int main()
         check_42_fill(v, _42.len());
     }
     {
-        forty_two _42 (42);
+        forty_two _42(42);
 
         // materialize into stxxl vector
         stxxl::VECTOR_GENERATOR<int>::result v(1000);
@@ -131,7 +131,7 @@ int main()
         check_42_fill(v, _42.len());
     }
     {
-        forty_two _42mill (42 * 1000000);
+        forty_two _42mill(42 * 1000000);
 
         // materialize into larger stxxl vector (to cross block boundaries)
         stxxl::VECTOR_GENERATOR<int>::result v(100 * 1000000);

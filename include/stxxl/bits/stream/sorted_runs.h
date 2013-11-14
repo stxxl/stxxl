@@ -24,104 +24,105 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-namespace stream
+namespace stream {
+
+//! \addtogroup streampack Stream Package
+//! \{
+
+
+////////////////////////////////////////////////////////////////////////
+//     SORTED RUNS                                                    //
+////////////////////////////////////////////////////////////////////////
+
+//! All sorted runs of a sort operation.
+template <typename TriggerEntryType, typename CompareType>
+struct sorted_runs : private noncopyable, public counted_object
 {
-    //! \addtogroup streampack Stream Package
-    //! \{
+    typedef TriggerEntryType trigger_entry_type;
+    typedef typename trigger_entry_type::block_type block_type;
+    typedef typename block_type::value_type value_type;      // may differ from trigger_entry_type::value_type
+    typedef std::vector<trigger_entry_type> run_type;
+    typedef std::vector<value_type> small_run_type;
+    typedef stxxl::external_size_type size_type;
+    typedef typename std::vector<run_type>::size_type run_index_type;
 
+    typedef CompareType cmp_type;
 
-    ////////////////////////////////////////////////////////////////////////
-    //     SORTED RUNS                                                    //
-    ////////////////////////////////////////////////////////////////////////
+    //! total number of elements in all runs
+    size_type elements;
 
-    //! All sorted runs of a sort operation.
-    template <typename TriggerEntryType, typename CompareType>
-    struct sorted_runs : private noncopyable, public counted_object
+    //! vector of runs (containing vectors of block ids)
+    std::vector<run_type> runs;
+
+    //! vector of the number of elements in each individual run
+    std::vector<size_type> runs_sizes;
+
+    //! Small sort optimization:
+    // if the input is small such that its total size is at most B
+    // (block_type::size) then input is sorted internally and kept in the
+    // array "small_run"
+    small_run_type small_run;
+
+public:
+    sorted_runs()
+        : elements(0)
+    { }
+
+    ~sorted_runs()
     {
-        typedef TriggerEntryType trigger_entry_type;
-        typedef typename trigger_entry_type::block_type block_type;
-        typedef typename block_type::value_type value_type;  // may differ from trigger_entry_type::value_type
-        typedef std::vector<trigger_entry_type> run_type;
-        typedef std::vector<value_type> small_run_type;
-        typedef stxxl::external_size_type size_type;
-        typedef typename std::vector<run_type>::size_type run_index_type;
+        deallocate_blocks();
+    }
 
-        typedef CompareType cmp_type;
+    //! Clear the internal state of the object: release all runs and reset.
+    void clear()
+    {
+        deallocate_blocks();
 
-        //! total number of elements in all runs
-        size_type elements;
+        elements = 0;
+        runs.clear();
+        runs_sizes.clear();
+        small_run.clear();
+    }
 
-        //! vector of runs (containing vectors of block ids)
-        std::vector<run_type> runs;
+    //! Add a new run with given number of elements
+    void add_run(const run_type& run, size_type run_size)
+    {
+        runs.push_back(run);
+        runs_sizes.push_back(run_size);
+        elements += run_size;
+    }
 
-        //! vector of the number of elements in each individual run
-        std::vector<size_type> runs_sizes;
+    //! Swap contents with another object. This is used by the recursive
+    //! merger to swap in a sorted_runs object with fewer runs.
+    void swap(sorted_runs& b)
+    {
+        std::swap(elements, b.elements);
+        std::swap(runs, b.runs);
+        std::swap(runs_sizes, b.runs_sizes);
+        std::swap(small_run, b.small_run);
+    }
 
-        //! Small sort optimization:
-        // if the input is small such that its total size is at most B
-        // (block_type::size) then input is sorted internally and kept in the
-        // array "small_run"
-        small_run_type  small_run;
-
-    public:
-        sorted_runs()
-            : elements(0)
-        { }
-
-        ~sorted_runs()
+private:
+    //! Deallocates the blocks which the runs occupy.
+    //!
+    //! \remark There is no need in calling this method, the blocks are
+    //! deallocated by the destructor. However, if you wish to reuse the
+    //! object, then this function can be used to clear its state.
+    void deallocate_blocks()
+    {
+        block_manager* bm = block_manager::get_instance();
+        for (unsigned_type i = 0; i < runs.size(); ++i)
         {
-            deallocate_blocks();
+            bm->delete_blocks(make_bid_iterator(runs[i].begin()),
+                              make_bid_iterator(runs[i].end()));
         }
-        
-        //! Clear the internal state of the object: release all runs and reset.
-        void clear()
-        {
-            deallocate_blocks();
-
-            elements = 0;
-            runs.clear();
-            runs_sizes.clear();
-            small_run.clear();
-        }
-
-        //! Add a new run with given number of elements
-        void add_run(const run_type& run, size_type run_size)
-        {
-            runs.push_back(run);
-            runs_sizes.push_back(run_size);
-            elements += run_size;
-        }
-
-        //! Swap contents with another object. This is used by the recursive
-        //! merger to swap in a sorted_runs object with fewer runs.
-        void swap(sorted_runs& b)
-        {
-            std::swap(elements, b.elements);
-            std::swap(runs, b.runs);
-            std::swap(runs_sizes, b.runs_sizes);
-            std::swap(small_run, b.small_run);
-        }
-
-    private:
-        //! Deallocates the blocks which the runs occupy.
-        //!
-        //! \remark There is no need in calling this method, the blocks are
-        //! deallocated by the destructor. However, if you wish to reuse the
-        //! object, then this function can be used to clear its state.
-        void deallocate_blocks()
-        {
-            block_manager * bm = block_manager::get_instance();
-            for (unsigned_type i = 0; i < runs.size(); ++i)
-            {
-                bm->delete_blocks(make_bid_iterator(runs[i].begin()),
-                                  make_bid_iterator(runs[i].end()));
-            }
-        }
-    };
+    }
+};
 
 
 //! \}
-}
+
+} // namespace stream
 
 __STXXL_END_NAMESPACE
 

@@ -32,7 +32,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-static inline bool exist_file(const std::string & path)
+static inline bool exist_file(const std::string& path)
 {
     //STXXL_MSG("Checking " << path << " for disk configuration.");
     std::ifstream in(path.c_str());
@@ -68,20 +68,20 @@ void config::find_config()
     // check several locations for disk configuration files
 
     // check STXXLCFG environment path
-    const char * stxxlcfg = getenv("STXXLCFG");
+    const char* stxxlcfg = getenv("STXXLCFG");
     if (stxxlcfg && exist_file(stxxlcfg))
         return load_config_file(stxxlcfg);
 
 #if !STXXL_WINDOWS
     // read environment, unix style
-    const char * hostname = getenv("HOSTNAME");
-    const char * home = getenv("HOME");
-    const char * suffix = "";
+    const char* hostname = getenv("HOSTNAME");
+    const char* home = getenv("HOME");
+    const char* suffix = "";
 #else
     // read environment, windows style
-    const char * hostname = getenv("COMPUTERNAME");
-    const char * home = getenv("APPDATA");
-    const char * suffix = ".txt";
+    const char* hostname = getenv("COMPUTERNAME");
+    const char* home = getenv("APPDATA");
+    const char* suffix = ".txt";
 #endif
 
     // check current directory
@@ -124,7 +124,7 @@ void config::load_default_config()
     entry1.delete_on_exit = true;
     entry1.autogrow = true;
 
-    char * tmpstr = new char[255];
+    char* tmpstr = new char[255];
     if (GetTempPath(255, tmpstr) == 0)
         STXXL_THROW_WIN_LASTERROR(resource_error, "GetTempPath()");
     entry1.path = tmpstr;
@@ -137,7 +137,7 @@ void config::load_default_config()
     first_flash = (unsigned int)disks_list.size();
 }
 
-void config::load_config_file(const std::string & config_path)
+void config::load_config_file(const std::string& config_path)
 {
     std::vector<disk_config> flash_list;
     std::ifstream cfg_file(config_path.c_str());
@@ -198,8 +198,8 @@ disk_config::disk_config()
       unlink_on_open(false)
 { }
 
-disk_config::disk_config(const std::string & _path, uint64 _size,
-                         const std::string & _io_impl)
+disk_config::disk_config(const std::string& _path, uint64 _size,
+                         const std::string& _io_impl)
     : path(_path),
       size(_size),
       io_impl(_io_impl),
@@ -214,7 +214,7 @@ disk_config::disk_config(const std::string & _path, uint64 _size,
     parse_fileio();
 }
 
-disk_config::disk_config(const std::string & line)
+disk_config::disk_config(const std::string& line)
     : size(0),
       autogrow(false),
       delete_on_exit(false),
@@ -227,7 +227,7 @@ disk_config::disk_config(const std::string & line)
     parse_line(line);
 }
 
-void disk_config::parse_line(const std::string & line)
+void disk_config::parse_line(const std::string& line)
 {
     // split off disk= or flash=
     std::vector<std::string> eqfield = split(line, "=", 2, 2);
@@ -347,7 +347,7 @@ void disk_config::parse_fileio()
         }
         else if (eq[0] == "queue")
         {
-            char * endp;
+            char* endp;
             queue = strtoul(eq[1].c_str(), &endp, 10);
             if (endp && *endp != 0) {
                 STXXL_THROW(std::runtime_error,

@@ -18,7 +18,7 @@
 //! This tests the maximum chunk size that a file type can handle with a single request.
 
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 4)
     {
@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
     using stxxl::uint64;
 
     uint64 max_size = stxxl::atouint64(argv[3]);
-    uint64 * buffer = (uint64 *)stxxl::aligned_alloc<4096>(max_size);
+    uint64* buffer = (uint64*)stxxl::aligned_alloc<4096>(max_size);
 
     try
     {

@@ -22,7 +22,7 @@ int main()
     simple_stack a_stack;
 
     stxxl::random_number<> random;
-    stxxl::uint64 number_of_elements = (long long int)(1*128) * (long long int)(1024 * 1024);
+    stxxl::uint64 number_of_elements = (long long int)(1 * 128) * (long long int)(1024 * 1024);
 
     // routine: 1) push random values on stack and 2) pop all except the lowest value and start again
     for (int k = 0; k < 5; k++) {

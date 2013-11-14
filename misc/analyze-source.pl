@@ -27,14 +27,12 @@ my $write_changes = 0;
 sub filter_uncrustify($) {
     my ($path) = @_;
 
-    return 1 if $path =~ m"^include/stxxl/bits/containers/(vector|sequence|sorter|queue|stack|deque|map|pager)";
+    return 0 if $path =~ m"^include/stxxl/bits/containers/matrix";
+    # misformats config.h.in!
+    return 0 if $path =~ m"^include/stxxl/bits/config.h.in";
+    return 0 if $path =~ m"^doc/";
 
-    return 1 if $path =~ m"^tests/";
-    return 1 if $path =~ m"^examples/";
-    return 1 if $path =~ m"^tools/";
-    return 1 if $path =~ m"^lib/";
-
-    return 0;
+    return 1;
 }
 
 use strict;
@@ -185,17 +183,25 @@ sub process_cpp {
         my @uncrust = filter_program($data, "uncrustify", "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
 
         # manually add blank line after "namespace xyz {" and before "} // namespace xyz"
+        my $namespace = 0;
         for(my $i = 0; $i < @uncrust-1; ++$i)
         {
-            if ($uncrust[$i] =~ m!namespace \S+ {!) {
+            if ($uncrust[$i] =~ m!^namespace \S+ {!) {
                 splice(@uncrust, $i+1, 0, "\n");
+                ++$namespace;
             }
-            if ($uncrust[$i] =~ m!// namespace \S+!) {
+            if ($uncrust[$i] =~ m!^} // namespace!) {
                 splice(@uncrust, $i, 0, "\n"); ++$i;
+                --$namespace;
             }
         }
+        if ($namespace != 0) {
+            print "$path\n";
+            print "    NAMESPACE MISMATCH!\n";
+            #system("emacsclient -n $path");
+        }
 
-        if (@data != @uncrust) {
+        if (!(@data ~~ @uncrust)) {
             print "$path\n";
             print diff(\@data, \@uncrust);
             @data = @uncrust;
@@ -298,7 +304,7 @@ foreach my $file (@filelist)
     }
     elsif ($file =~ m!^misc/!) {
     }
-    elsif ($file =~ m!^doc/images/.*\.(png|pdf|svg)$!) {
+    elsif ($file =~ m!^doc/images/.*\.(png|pdf|svg|xmi)$!) {
     }
     elsif ($file =~ m!^doc/[^/]*\.(xml|css|bib)$!) {
     }

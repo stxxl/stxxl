@@ -53,7 +53,7 @@ struct random_generator
     {
         return current;
     }
-    random_generator & operator ++ ()
+    random_generator& operator ++ ()
     {
         count--;
         if (verbose) {
@@ -72,7 +72,7 @@ struct random_generator
 template <typename value_type>
 struct Cmp : std::binary_function<value_type, value_type, bool>
 {
-    bool operator () (const value_type & a, const value_type & b) const
+    bool operator () (const value_type& a, const value_type& b) const
     {
         return a < b;
     }
@@ -91,9 +91,9 @@ struct filter
 {
     typedef typename Input::value_type value_type;
     typedef stxxl::uint64 size_type;
-    Input & input;
+    Input& input;
     value_type filter_value;
-    size_type & counter;
+    size_type& counter;
 
     void apply_filter()
     {
@@ -103,7 +103,7 @@ struct filter
         }
     }
 
-    filter(Input & _input, value_type _filter_value, size_type & _counter) : input(_input), filter_value(_filter_value), counter(_counter)
+    filter(Input& _input, value_type _filter_value, size_type& _counter) : input(_input), filter_value(_filter_value), counter(_counter)
     {
         apply_filter();
     }
@@ -113,7 +113,7 @@ struct filter
         return *input;
     }
 
-    filter & operator ++ ()
+    filter& operator ++ ()
     {
         ++input;
         apply_filter();
@@ -130,16 +130,16 @@ template <typename Input>
 struct output
 {
     typedef typename Input::value_type value_type;
-    Input & input;
+    Input& input;
 
-    output(Input & _input) : input(_input) { }
+    output(Input& _input) : input(_input) { }
 
     const value_type operator * () const
     {
         return *input;
     }
 
-    output & operator ++ ()
+    output& operator ++ ()
     {
         if (verbose) cout << *input << ", ";
         ++input;
@@ -158,7 +158,7 @@ template <typename Input>
 struct shuffle
 {
     typedef typename Input::value_type value_type;
-    Input & input;
+    Input& input;
     value_type current, next;
     bool even, is_empty;
 
@@ -189,7 +189,7 @@ struct shuffle
         }
     }
 
-    shuffle(Input & _input) : input(_input), current(0), next(0), even(true), is_empty(false)
+    shuffle(Input& _input) : input(_input), current(0), next(0), even(true), is_empty(false)
     {
         apply_shuffle();
     }
@@ -199,7 +199,7 @@ struct shuffle
         return current;
     }
 
-    shuffle & operator ++ ()
+    shuffle& operator ++ ()
     {
         even = !even;
         is_empty = input.empty();
@@ -232,7 +232,7 @@ typedef stxxl::stream::runs_creator<shuffle_type, cmp> runs_creator_type1;
 // force instantiation of whole chain
 template class stxxl::stream::runs_creator<shuffle_type, cmp>;
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 2) {
         cout << "Usage: " << argv[0] << " count [Options]\nOptions: -v \t prints elements of each iteration\n";

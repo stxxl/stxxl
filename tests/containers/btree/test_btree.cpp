@@ -32,7 +32,7 @@ typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree
 // forced instantiation
 template class stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR>;
 
-std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
+std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {
     o << obj.first << " " << obj.second;
     return o;
@@ -41,7 +41,7 @@ std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (25 * 1024 * 1024)
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
@@ -249,12 +249,12 @@ int main(int argc, char * argv[])
 
     btree_type::const_iterator cb = BTree3.begin();
     btree_type::const_iterator ce = BTree3.end();
-    const btree_type & CBTree3 = BTree3;
+    const btree_type& CBTree3 = BTree3;
     cb = CBTree3.begin();
-    STXXL_CHECK( !(b3 == cb) );
-    STXXL_CHECK(  (b3 != cb) );
-    STXXL_CHECK( !(cb == b3) );
-    STXXL_CHECK(  (cb != b3) );
+    STXXL_CHECK(!(b3 == cb));
+    STXXL_CHECK((b3 != cb));
+    STXXL_CHECK(!(cb == b3));
+    STXXL_CHECK((cb != b3));
     ce = CBTree3.end();
     btree_type::const_iterator cit = CBTree3.find(0);
     cit = CBTree3.lower_bound(0);

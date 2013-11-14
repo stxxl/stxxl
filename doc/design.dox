@@ -392,16 +392,16 @@ stxxl::prefetch_pool p_pool(10); // 10 read buffers
 stxxl::write_pool w_pool(6);     // 6 write buffers
 stack_type S(p_pool,w_pool,0);   // no read buffers used
 
-for(long long i=0;i < max_value;++i)
-     S.push(i);
+for(long long i = 0; i < max_value; ++i)
+    S.push(i);
 
 S.set_prefetch_aggressiveness(5);
 
 /* give a hint that we are going to shrink the stack from now on,
 always prefetch 5 buffers beforehand */
 
-for(long long i=0; i< max_value;++i)
-        S.pop();
+for(long long i = 0; i < max_value; ++i)
+    S.pop();
 
 S.set_prefetch_aggressiveness(0);
 // stop prefetching

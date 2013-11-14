@@ -42,7 +42,7 @@ protected:
     const std::string filename;
     offset_type bytes_per_sector;
     bool locked;
-    wfs_file_base(const std::string & filename, int mode);
+    wfs_file_base(const std::string& filename, int mode);
     offset_type _size();
     void close();
 

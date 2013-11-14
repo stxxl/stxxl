@@ -60,9 +60,9 @@ public:
 
 private:
     //! member containing lower significant integer value
-    low_type    low;
+    low_type low;
     //! member containing higher significant integer value
-    high_type   high;
+    high_type high;
 
     //! return highest value storable in lower part, also used as a mask.
     static low_type low_max()
@@ -93,31 +93,28 @@ public:
     inline uint_pair()
     {
         // compile-time assertions about size of low_type
-        STXXL_STATIC_ASSERT( 8 * sizeof(low_type) == 32 );
+        STXXL_STATIC_ASSERT(8 * sizeof(low_type) == 32);
         // compile-time assertions about size of our data structure, this tests
         // packing of structures by the compiler
-        STXXL_STATIC_ASSERT( sizeof(uint_pair) == bytes );
-        STXXL_STATIC_ASSERT( sizeof(uint_pair) == digits / 8 );
-        STXXL_STATIC_ASSERT( digits / 8 == bytes );
+        STXXL_STATIC_ASSERT(sizeof(uint_pair) == bytes);
+        STXXL_STATIC_ASSERT(sizeof(uint_pair) == digits / 8);
+        STXXL_STATIC_ASSERT(digits / 8 == bytes);
     }
 
     //! construct unit pair from lower and higher parts.
     inline uint_pair(const low_type& l, const high_type& h)
         : low(l), high(h)
-    {
-    }
+    { }
 
     //! copy constructor
     inline uint_pair(const uint_pair& a)
         : low(a.low), high(a.high)
-    {
-    }
+    { }
 
     //! const from a simple 32-bit unsigned integer
     inline uint_pair(const uint32& a)
         : low(a), high(0)
-    {
-    }
+    { }
 
     //! const from a simple 32-bit signed integer
     inline uint_pair(const int32& a)
@@ -135,7 +132,7 @@ public:
           high((a >> low_bits) & high_max())
     {
         // check for overflow
-        assert( (a >> (low_bits + high_bits)) == 0 );
+        assert((a >> (low_bits + high_bits)) == 0);
     }
 
     //! return the number as an uint64 (unsigned long long)
@@ -145,7 +142,7 @@ public:
     }
 
     //! implicit cast to an unsigned long long
-    inline operator uint64() const
+    inline operator uint64 () const
     {
         return ull();
     }
@@ -157,7 +154,7 @@ public:
     }
 
     //! prefix increment operator (directly manipulates the integer parts)
-    inline uint_pair& operator++ ()
+    inline uint_pair& operator ++ ()
     {
         if (UNLIKELY(low == low_max()))
             ++high, low = 0;
@@ -167,7 +164,7 @@ public:
     }
 
     //! prefix decrement operator (directly manipulates the integer parts)
-    inline uint_pair& operator-- ()
+    inline uint_pair& operator -- ()
     {
         if (UNLIKELY(low == 0))
             --high, low = low_max();
@@ -177,7 +174,7 @@ public:
     }
 
     //! addition operator (uses 64-bit arithmetic)
-    inline uint_pair& operator+= (const uint_pair& b)
+    inline uint_pair& operator += (const uint_pair& b)
     {
         uint64 add = low + b.low;
         low = add & low_max();
@@ -186,43 +183,43 @@ public:
     }
 
     //! equality checking operator
-    inline bool operator== (const uint_pair& b) const
+    inline bool operator == (const uint_pair& b) const
     {
         return (low == b.low) && (high == b.high);
     }
 
     //! inequality checking operator
-    inline bool operator!= (const uint_pair& b) const
+    inline bool operator != (const uint_pair& b) const
     {
         return (low != b.low) || (high != b.high);
     }
 
     //! less-than comparison operator
-    inline bool operator< (const uint_pair& b) const
+    inline bool operator < (const uint_pair& b) const
     {
         return (high < b.high) || (high == b.high && low < b.low);
     }
 
     //! less-or-equal comparison operator
-    inline bool operator<= (const uint_pair& b) const
+    inline bool operator <= (const uint_pair& b) const
     {
         return (high < b.high) || (high == b.high && low <= b.low);
     }
 
     //! greater comparison operator
-    inline bool operator> (const uint_pair& b) const
+    inline bool operator > (const uint_pair& b) const
     {
         return (high > b.high) || (high == b.high && low > b.low);
     }
 
     //! greater-or-equal comparison operator
-    inline bool operator>= (const uint_pair& b) const
+    inline bool operator >= (const uint_pair& b) const
     {
         return (high > b.high) || (high == b.high && low >= b.low);
     }
 
     //! make a uint_pair outputtable via iostreams, using unsigned long long.
-    friend std::ostream& operator<< (std::ostream& os, const uint_pair& a)
+    friend std::ostream& operator << (std::ostream& os, const uint_pair& a)
     {
         return os << a.ull();
     }
@@ -242,10 +239,10 @@ public:
     }
 }
 #if STXXL_MSVC
-    ;
+;
 #pragma pack(pop)
 #else
-__attribute__((packed));
+__attribute__ ((packed));
 #endif
 
 //! Construct a 40-bit unsigned integer stored in five bytes.
@@ -260,7 +257,7 @@ namespace std {
 
 //! template class providing some numeric_limits fields for uint_pair types.
 template <typename HighType>
-class numeric_limits< stxxl::uint_pair<HighType> >
+class numeric_limits<stxxl::uint_pair<HighType> >
 {
 public:
     //! yes we have information about uint_pair
@@ -295,11 +292,11 @@ public:
 
     //! epsilon is zero
     static const stxxl::uint_pair<HighType> epsilon()
-    { return stxxl::uint_pair<HighType>(0,0); }
+    { return stxxl::uint_pair<HighType>(0, 0); }
 
     //! rounding error is zero
     static const stxxl::uint_pair<HighType> round_error()
-    { return stxxl::uint_pair<HighType>(0,0); }
+    { return stxxl::uint_pair<HighType>(0, 0); }
 
     //! no exponent
     static const int min_exponent = 0;

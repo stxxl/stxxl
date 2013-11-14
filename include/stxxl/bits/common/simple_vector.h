@@ -59,8 +59,7 @@ public:
     //! allocate empty simple vector
     simple_vector()
         : m_size(0), m_array(NULL)
-    {
-    }
+    { }
     //! allocate vector's memory
     simple_vector(size_type sz)
         : m_size(sz), m_array(NULL)
@@ -69,7 +68,7 @@ public:
             m_array = new value_type[m_size];
     }
     //! swap vector with another one
-    void swap(simple_vector & obj)
+    void swap(simple_vector& obj)
     {
         std::swap(m_size, obj.m_size);
         std::swap(m_array, obj.m_array);
@@ -144,7 +143,7 @@ public:
             STXXL_MSG("Warning: resizing non-empty simple_vector");
             value_type* tmp = m_array;
             m_array = new value_type[newsize];
-            memcpy((void*)m_array, (void *)tmp,
+            memcpy((void*)m_array, (void*)tmp,
                    sizeof(value_type) * STXXL_MIN(m_size, newsize));
             delete[] tmp;
             m_size = newsize;
@@ -163,14 +162,15 @@ public:
 };
 __STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+
+template <class ValueType>
+void swap(stxxl::simple_vector<ValueType>& a,
+          stxxl::simple_vector<ValueType>& b)
 {
-    template <class ValueType>
-    void swap(stxxl::simple_vector<ValueType> & a,
-              stxxl::simple_vector<ValueType> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
 }
+
+} // namespace std
 
 #endif // !STXXL_COMMON_SIMPLE_VECTOR_HEADER

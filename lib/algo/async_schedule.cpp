@@ -42,7 +42,7 @@ struct sim_event
 
 struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
 {
-    inline bool operator () (const sim_event & a, const sim_event & b) const
+    inline bool operator () (const sim_event& a, const sim_event& b) const
     {
         return a.timestamp > b.timestamp;
     }
@@ -51,14 +51,14 @@ struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
 typedef std::pair<int_type, int_type> write_time_pair;
 struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
 {
-    inline bool operator () (const write_time_pair & a, const write_time_pair & b) const
+    inline bool operator () (const write_time_pair& a, const write_time_pair& b) const
     {
         return a.second > b.second;
     }
 };
 
 
-static inline int_type get_disk(int_type i, const int_type * disks, int_type D)
+static inline int_type get_disk(int_type i, const int_type* disks, int_type D)
 {
     int_type disk = disks[i];
     if (disk == file::NO_ALLOCATOR)
@@ -68,22 +68,22 @@ static inline int_type get_disk(int_type i, const int_type * disks, int_type D)
 }
 
 int_type simulate_async_write(
-    const int_type * disks,
+    const int_type* disks,
     const int_type L,
     const int_type m_init,
     const int_type D,
-    std::pair<int_type, int_type> * o_time)
+    std::pair<int_type, int_type>* o_time)
 {
     typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
     typedef std::queue<int_type> disk_queue_type;
     assert(L >= D);
-    disk_queue_type * disk_queues = new disk_queue_type[D + 1];      // + sentinel for remapping NO_ALLOCATOR
+    disk_queue_type* disk_queues = new disk_queue_type[D + 1];       // + sentinel for remapping NO_ALLOCATOR
     event_queue_type event_queue;
 
     int_type m = m_init;
     int_type i = L - 1;
     int_type oldtime = 0;
-    bool * disk_busy = new bool[D + 1];
+    bool* disk_busy = new bool[D + 1];
 
     while (m && (i >= 0))
     {
@@ -165,13 +165,13 @@ int_type simulate_async_write(
     return (oldtime - 1);
 }
 
-}  // namespace async_schedule_local
+} // namespace async_schedule_local
 
 
 void compute_prefetch_schedule(
-    const int_type * first,
-    const int_type * last,
-    int_type * out_first,
+    const int_type* first,
+    const int_type* last,
+    int_type* out_first,
     int_type m,
     int_type D)
 {
@@ -184,7 +184,7 @@ void compute_prefetch_schedule(
 
         return;
     }
-    pair_type * write_order = new pair_type[L];
+    pair_type* write_order = new pair_type[L];
 
     int_type w_steps = async_schedule_local::simulate_async_write(first, L, m, D, write_order);
 

@@ -43,28 +43,28 @@ struct my_record
     my_record(int k, int d) : key(k), data(d) { }
 };
 
-std::ostream & operator << (std::ostream & o, const my_record & obj)
+std::ostream& operator << (std::ostream& o, const my_record& obj)
 {
     o << obj.key << " " << obj.data;
     return o;
 }
 
-bool operator == (const my_record & a, const my_record & b)
+bool operator == (const my_record& a, const my_record& b)
 {
     return a.key == b.key;
 }
 
-bool operator != (const my_record & a, const my_record & b)
+bool operator != (const my_record& a, const my_record& b)
 {
     return a.key != b.key;
 }
 
-bool operator < (const my_record & a, const my_record & b)
+bool operator < (const my_record& a, const my_record& b)
 {
     return a.key < b.key;
 }
 
-bool operator > (const my_record & a, const my_record & b)
+bool operator > (const my_record& a, const my_record& b)
 {
     return a.key > b.key;
 }
@@ -72,7 +72,7 @@ bool operator > (const my_record & a, const my_record & b)
 
 struct comp_type : std::binary_function<my_record, my_record, bool>
 {
-    bool operator () (const my_record & a, const my_record & b) const
+    bool operator () (const my_record& a, const my_record& b) const
     {
         return a > b;
     }
@@ -230,7 +230,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     STXXL_MSG("stxxl::pq lock size: " << BLOCK_SIZE << " bytes");
 

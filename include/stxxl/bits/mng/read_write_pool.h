@@ -35,8 +35,8 @@ protected:
     typedef write_pool<block_type> write_pool_type;
     typedef prefetch_pool<block_type> prefetch_pool_type;
 
-    write_pool_type * w_pool;
-    prefetch_pool_type * p_pool;
+    write_pool_type* w_pool;
+    prefetch_pool_type* p_pool;
     bool delete_pools;
 
 public:
@@ -50,11 +50,11 @@ public:
         p_pool = new prefetch_pool_type(init_size_prefetch);
     }
 
-    _STXXL_DEPRECATED(read_write_pool(prefetch_pool_type & p_pool, write_pool_type & w_pool)) :
+    _STXXL_DEPRECATED(read_write_pool(prefetch_pool_type& p_pool, write_pool_type& w_pool)) :
         w_pool(&w_pool), p_pool(&p_pool), delete_pools(false)
     { }
 
-    void swap(read_write_pool & obj)
+    void swap(read_write_pool& obj)
     {
         std::swap(w_pool, obj.w_pool);
         std::swap(p_pool, obj.p_pool);
@@ -98,7 +98,7 @@ public:
     //! \param bid location, where to write
     //! \warning \c block must be allocated dynamically with using \c new .
     //! \return request object of the write operation
-    request_ptr write(block_type * & block, bid_type bid)
+    request_ptr write(block_type*& block, bid_type bid)
     {
         request_ptr result = w_pool->write(block, bid);
 
@@ -117,7 +117,7 @@ public:
         return w_pool->steal();
     }
 
-    void add(block_type * & block)
+    void add(block_type*& block)
     {
         w_pool->add(block);
     }
@@ -147,7 +147,7 @@ public:
     //! \param bid address of the block
     //! \warning \c block parameter must be allocated dynamically using \c new .
     //! \return request pointer object of read operation
-    request_ptr read(block_type * & block, bid_type bid)
+    request_ptr read(block_type*& block, bid_type bid)
     {
         return p_pool->read(block, bid, *w_pool);
     }
@@ -158,15 +158,16 @@ public:
 __STXXL_END_NAMESPACE
 
 
-namespace std
+namespace std {
+
+template <class BlockType>
+void swap(stxxl::read_write_pool<BlockType>& a,
+          stxxl::read_write_pool<BlockType>& b)
 {
-    template <class BlockType>
-    void swap(stxxl::read_write_pool<BlockType> & a,
-              stxxl::read_write_pool<BlockType> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
 }
+
+} // namespace std
 
 #endif // !STXXL_MNG_READ_WRITE_POOL_HEADER
 // vim: et:ts=4:sw=4

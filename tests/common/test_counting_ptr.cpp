@@ -22,7 +22,7 @@ struct my_int : public stxxl::counted_object
 {
     int i;
 
-    my_int(int _i) : i(_i) {}
+    my_int(int _i) : i(_i) { }
 
     // count number of destructor calls
     ~my_int()
@@ -37,29 +37,29 @@ int_cptr run_test()
     // create object and pointer to it
     int_ptr i1 = new my_int(42);
 
-    STXXL_CHECK( i1->i == 42 );
-    STXXL_CHECK( (*i1).i == 42 );
-    STXXL_CHECK( i1.get()->i == 42 );
-    STXXL_CHECK( i1->unique() );
+    STXXL_CHECK(i1->i == 42);
+    STXXL_CHECK((*i1).i == 42);
+    STXXL_CHECK(i1.get()->i == 42);
+    STXXL_CHECK(i1->unique());
 
     // make pointer sharing same object
     int_ptr i2 = i1;
 
-    STXXL_CHECK( i2->i == 42 );
-    STXXL_CHECK( !i1->unique() );
-    STXXL_CHECK( i1 == i2 );
-    STXXL_CHECK( i1->get_reference_count() == 2 );
+    STXXL_CHECK(i2->i == 42);
+    STXXL_CHECK(!i1->unique());
+    STXXL_CHECK(i1 == i2);
+    STXXL_CHECK(i1->get_reference_count() == 2);
 
     // make another pointer sharing the same object
     int_ptr i3 = i2;
 
-    STXXL_CHECK( i3->i == 42 );
-    STXXL_CHECK( i3->get_reference_count() == 3 );
+    STXXL_CHECK(i3->i == 42);
+    STXXL_CHECK(i3->get_reference_count() == 3);
 
     // replace object in i3 with new integer
     i3 = new my_int(5);
-    STXXL_CHECK( i1 != i3 );
-    STXXL_CHECK( i1->get_reference_count() == 2 );
+    STXXL_CHECK(i1 != i3);
+    STXXL_CHECK(i1->get_reference_count() == 2);
 
     // create a const pointer
     int_cptr i4 = i3;

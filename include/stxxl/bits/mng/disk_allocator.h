@@ -40,7 +40,7 @@ class disk_allocator : private noncopyable
     struct first_fit : public std::binary_function<place, stxxl::int64, bool>
     {
         bool operator () (
-            const place & entry,
+            const place& entry,
             const stxxl::int64 size) const
         {
             return (entry.second >= size);
@@ -54,14 +54,14 @@ class disk_allocator : private noncopyable
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
     stxxl::int64 cfg_bytes;
-    stxxl::file * storage;
+    stxxl::file* storage;
     bool autogrow;
 
     void dump() const;
 
     void deallocation_error(
         stxxl::int64 block_pos, stxxl::int64 block_size,
-        const sortseq::iterator & pred, const sortseq::iterator & succ) const;
+        const sortseq::iterator& pred, const sortseq::iterator& succ) const;
 
     // expects the mutex to be locked to prevent concurrent access
     void add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size);
@@ -78,7 +78,7 @@ class disk_allocator : private noncopyable
     }
 
 public:
-    disk_allocator(stxxl::file * storage, const disk_config& cfg)
+    disk_allocator(stxxl::file* storage, const disk_config& cfg)
         : free_bytes(0),
           disk_bytes(0),
           cfg_bytes(cfg.size),
@@ -112,17 +112,17 @@ public:
     }
 
     template <unsigned BLK_SIZE>
-    void new_blocks(BIDArray<BLK_SIZE> & bids)
+    void new_blocks(BIDArray<BLK_SIZE>& bids)
     {
         new_blocks(bids.begin(), bids.end());
     }
 
     template <unsigned BLK_SIZE>
-    void new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end);
+    void new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end);
 
 #if 0
     template <unsigned BLK_SIZE>
-    void delete_blocks(const BIDArray<BLK_SIZE> & bids)
+    void delete_blocks(const BIDArray<BLK_SIZE>& bids)
     {
         for (unsigned i = 0; i < bids.size(); ++i)
             delete_block(bids[i]);
@@ -130,7 +130,7 @@ public:
 #endif
 
     template <unsigned BLK_SIZE>
-    void delete_block(const BID<BLK_SIZE> & bid)
+    void delete_block(const BID<BLK_SIZE>& bid)
     {
         scoped_mutex_lock lock(mutex);
 
@@ -143,7 +143,7 @@ public:
 };
 
 template <unsigned BLK_SIZE>
-void disk_allocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
+void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
 {
     stxxl::int64 requested_size = 0;
 
@@ -158,8 +158,8 @@ void disk_allocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
     STXXL_VERBOSE2("disk_allocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
                    ", blocks: " << (end - begin) <<
-                   " begin: " << static_cast<void *>(begin) <<
-                   " end: " << static_cast<void *>(end) <<
+                   " begin: " << static_cast<void*>(begin) <<
+                   " end: " << static_cast<void*>(end) <<
                    ", requested_size=" << requested_size);
 
     if (free_bytes < requested_size)
@@ -226,7 +226,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
     lock.unlock();
 
-    BID<BLK_SIZE> * middle = begin + ((end - begin) / 2);
+    BID<BLK_SIZE>* middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
 }

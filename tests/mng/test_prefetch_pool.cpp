@@ -36,7 +36,7 @@ int main()
     pool.resize(10);
     pool.resize(5);
 
-    block_type * blk = new block_type;
+    block_type* blk = new block_type;
     (*blk)[0].integer = 42;
     block_type::bid_type bids[2];
     stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), bids, bids + 2);

@@ -76,8 +76,8 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 batch_size,
     stxxl::uint64 num_blocks_per_batch = stxxl::div_ceil(batch_size, raw_block_size);
     batch_size = num_blocks_per_batch * raw_block_size;
 
-    block_type * buffer = new block_type[num_blocks_per_batch];
-    stxxl::request_ptr * reqs = new stxxl::request_ptr[num_blocks_per_batch];
+    block_type* buffer = new block_type[num_blocks_per_batch];
+    stxxl::request_ptr* reqs = new stxxl::request_ptr[num_blocks_per_batch];
     std::vector<BID_type> blocks;
     double totaltimeread = 0, totaltimewrite = 0;
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
@@ -172,7 +172,7 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 batch_size,
             offset += current_batch_size;
         }
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());
@@ -189,7 +189,7 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 batch_size,
     return 0;
 }
 
-int benchmark_disks(int argc, char * argv[])
+int benchmark_disks(int argc, char* argv[])
 {
     // parse command line
 

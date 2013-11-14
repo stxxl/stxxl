@@ -18,14 +18,15 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-namespace btree
+namespace btree {
+
+template <class KeyType, class BIDType>
+class root_node
 {
-    template <class KeyType, class BIDType>
-    class root_node
-    {
-        // a place for a future custom root node tree implementation
-    };
-}
+    // a place for a future custom root node tree implementation
+};
+
+} // namespace btree
 
 __STXXL_END_NAMESPACE
 

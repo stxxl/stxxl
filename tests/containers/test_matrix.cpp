@@ -36,7 +36,7 @@ template struct stxxl::matrix_local::matrix_operations<int_type, 32>;
 
 struct constant_one
 {
-    const constant_one & operator ++ () const { return *this; }
+    const constant_one& operator ++ () const { return *this; }
     bool empty() const { return false; }
     int operator * () const { return 1; }
 };
@@ -53,7 +53,7 @@ public:
           modulus(modulus)
     { }
 
-    modulus_integers & operator ++ ()
+    modulus_integers& operator ++ ()
     {
         counter += step;
         if (modulus != 0 && counter >= modulus)
@@ -75,7 +75,7 @@ public:
     diagonal_matrix(unsigned_type order, unsigned_type value = 1)
         : order(order), counter(0), value(value) { }
 
-    diagonal_matrix & operator ++ ()
+    diagonal_matrix& operator ++ ()
     {
         ++counter;
         return *this;
@@ -96,7 +96,7 @@ public:
     inverse_diagonal_matrix(unsigned_type order, unsigned_type value = 1)
         : order(order), counter(0), value(value) { }
 
-    inverse_diagonal_matrix & operator ++ ()
+    inverse_diagonal_matrix& operator ++ ()
     {
         ++counter;
         return *this;
@@ -113,18 +113,18 @@ class iterator_compare
 {
     typedef std::pair<ValueType, ValueType> error_type;
 
-    CompareIterator & compiter;
+    CompareIterator& compiter;
     ValueType current_value;
     stxxl::vector<error_type> errors;
 
 public:
-    iterator_compare(CompareIterator & co)
+    iterator_compare(CompareIterator& co)
         : compiter(co),
           current_value(),
           errors()
     { }
 
-    iterator_compare & operator ++ ()
+    iterator_compare& operator ++ ()
     {
         if (current_value != *compiter)
             errors.push_back(error_type(current_value, *compiter));
@@ -133,14 +133,14 @@ public:
     }
 
     bool empty() const { return compiter.empty(); }
-    ValueType & operator * () { return current_value; }
+    ValueType& operator * () { return current_value; }
 
     unsigned_type get_num_errors() { return errors.size(); }
     stxxl::vector<error_type> & get_errors() { return errors; }
 };
 
 const int small_block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
-const int block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
+const int block_order = 32;       // must be a multiple of 32, assuming at least 4 bytes element size
 
 unsigned_type internal_memory = 256 * 1024 * 1024;
 
@@ -149,7 +149,7 @@ void test1(int rank)
     STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
     typedef int_type value_type;
 
-    typedef stxxl::block_scheduler< stxxl::matrix_swappable_block<value_type, small_block_order> > block_scheduler_type;
+    typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, small_block_order> > block_scheduler_type;
     typedef stxxl::matrix<value_type, small_block_order> matrix_type;
     typedef matrix_type::row_vector_type row_vector_type;
     typedef matrix_type::column_vector_type column_vector_type;
@@ -157,16 +157,16 @@ void test1(int rank)
     typedef matrix_type::const_row_major_iterator const_row_major_iterator;
 
     // the block_scheduler may use internal_memory byte for caching
-    block_scheduler_type * bs_ptr = new block_scheduler_type(internal_memory);
+    block_scheduler_type* bs_ptr = new block_scheduler_type(internal_memory);
     // the block_scheduler may use 16 blocks for caching
     //block_scheduler_type * bs_ptr = new block_scheduler_type(16 * sizeof(value_type) * small_block_order * small_block_order);
-    block_scheduler_type & bs = *bs_ptr;
+    block_scheduler_type& bs = *bs_ptr;
 
     // create three matrices
     matrix_type
-        * a = new matrix_type(bs, rank, rank),
-        * b = new matrix_type(bs, rank, rank),
-        * c = new matrix_type(bs, rank, rank);
+    * a = new matrix_type(bs, rank, rank),
+    * b = new matrix_type(bs, rank, rank),
+    * c = new matrix_type(bs, rank, rank);
 
     stxxl::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
@@ -210,7 +210,7 @@ void test1(int rank)
         matrix_type::iterator mit = b->begin();
         for (int_type i = 0; i < b->get_height(); ++i)
         {
-            mit.set_pos(i,i);
+            mit.set_pos(i, i);
             *mit = 1;
         }
     }
@@ -284,23 +284,23 @@ void test1(int rank)
 void test2(int rank, int mult_algo_num, int sched_algo_num)
 {
     STXXL_MSG("multiplying two full double matrices of rank " << rank << ", block order " << block_order
-              << " using " << internal_memory << " bytes internal memory, multiplication-algo "
-              << mult_algo_num << ", scheduling-algo " << sched_algo_num);
+                                                              << " using " << internal_memory << " bytes internal memory, multiplication-algo "
+                                                              << mult_algo_num << ", scheduling-algo " << sched_algo_num);
 
     typedef double value_type;
 
-    typedef stxxl::block_scheduler< stxxl::matrix_swappable_block<value_type, block_order> > block_scheduler_type;
+    typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> > block_scheduler_type;
     typedef stxxl::matrix<value_type, block_order> matrix_type;
     typedef matrix_type::row_major_iterator row_major_iterator;
     typedef matrix_type::const_row_major_iterator const_row_major_iterator;
 
     // the block_scheduler may use internal_memory byte for caching
-    block_scheduler_type * bs_ptr = new block_scheduler_type(internal_memory);
-    block_scheduler_type & bs = *bs_ptr;
+    block_scheduler_type* bs_ptr = new block_scheduler_type(internal_memory);
+    block_scheduler_type& bs = *bs_ptr;
     matrix_type
-        * a = new matrix_type(bs, rank, rank),
-        * b = new matrix_type(bs, rank, rank),
-        * c = new matrix_type(bs, rank, rank);
+    * a = new matrix_type(bs, rank, rank),
+    * b = new matrix_type(bs, rank, rank),
+    * c = new matrix_type(bs, rank, rank);
     stxxl::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
@@ -340,7 +340,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     delete bs_ptr;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     int test_case = -1;
     int rank = 500;
@@ -354,7 +354,7 @@ int main(int argc, char **argv)
 
     cp.add_opt_param_int("K", "number of the test case to run: 1 or 2, or by default: all", test_case);
 
-    cp.add_int('r', "rank", "<N>","rank of the matrices, default: 500", rank);
+    cp.add_int('r', "rank", "<N>", "rank of the matrices, default: 500", rank);
     cp.add_bytes('m', "memory", "<L>", "internal memory to, default: 256 MiB", internal_memory);
     cp.add_int('a', "mult-algo", "<N>", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n  default: 2", mult_algo_num);
     cp.add_int('s', "scheduling-algo", "<N>", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default: 1", sched_algo_num);

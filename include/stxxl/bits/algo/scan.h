@@ -261,7 +261,7 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
  *         such exists then \c end
  */
 template <typename ExtIterator, typename EqualityComparable>
-ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable & value, int_type nbuffers)
+ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& value, int_type nbuffers)
 {
     if (begin == end)
         return end;

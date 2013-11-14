@@ -19,10 +19,10 @@ __STXXL_BEGIN_NAMESPACE
 
 
 request_ptr disk_queued_file::aread(
-    void * buffer,
+    void* buffer,
     offset_type pos,
     size_type bytes,
-    const completion_handler & on_cmpl)
+    const completion_handler& on_cmpl)
 {
     request_ptr req(new serving_request(on_cmpl, this, buffer, pos, bytes,
                                         request::READ));
@@ -33,10 +33,10 @@ request_ptr disk_queued_file::aread(
 }
 
 request_ptr disk_queued_file::awrite(
-    void * buffer,
+    void* buffer,
     offset_type pos,
     size_type bytes,
-    const completion_handler & on_cmpl)
+    const completion_handler& on_cmpl)
 {
     request_ptr req(new serving_request(on_cmpl, this, buffer, pos, bytes,
                                         request::WRITE));

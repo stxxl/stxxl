@@ -54,7 +54,7 @@ public:
 };
 
 template <typename T>
-void matrix_multiply(const matrix2d<T> & a, const matrix2d<T> & b, matrix2d<T> & c)
+void matrix_multiply(const matrix2d<T>& a, const matrix2d<T>& b, matrix2d<T>& c)
 {
     assert(a.get_width() == b.get_height());
     assert(b.get_height() == c.get_height());
@@ -90,7 +90,7 @@ int main()
         std::cout << c.const_element(0, 0) << std::endl;
         std::cout << c.const_element(width - 1, height - 1) << std::endl;
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         STXXL_MSG("Caught exception: " << ex.what());
     }

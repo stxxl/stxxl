@@ -134,7 +134,6 @@ public:
 class scoped_print_timer
 {
 protected:
-
     //! message
     std::string m_message;
 
@@ -145,7 +144,6 @@ protected:
     class timer m_timer;
 
 public:
-
     //! save message and start timer
     scoped_print_timer(const std::string& message, const uint64 bytes = 0)
         : m_message(message),
@@ -160,12 +158,12 @@ public:
     {
         if (m_bytes == 0)
             STXXL_MSG("Finished " << m_message
-                      << " after " << m_timer.seconds() << " seconds");
+                                  << " after " << m_timer.seconds() << " seconds");
         else
             STXXL_MSG("Finished " << m_message
-                      << " after " << m_timer.seconds() << " seconds. "
-                      << "Processed " << format_IEC_size(m_bytes) << "B"
-                      << " @ " << format_IEC_size(uint64(m_bytes / m_timer.seconds())) << "B/s");
+                                  << " after " << m_timer.seconds() << " seconds. "
+                                  << "Processed " << format_IEC_size(m_bytes) << "B"
+                                  << " @ " << format_IEC_size(uint64(m_bytes / m_timer.seconds())) << "B/s");
     }
 };
 

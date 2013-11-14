@@ -36,7 +36,7 @@ protected:
     { }
 
 public:
-    interleaved_striping(int_type _nruns, const striping & strategy)
+    interleaved_striping(int_type _nruns, const striping& strategy)
         : nruns(_nruns), begindisk(strategy.begin), diff(strategy.diff)
     { }
 
@@ -51,7 +51,7 @@ struct interleaved_FR : public interleaved_striping
     typedef random_number<random_uniform_fast> rnd_type;
     rnd_type rnd;
 
-    interleaved_FR(int_type _nruns, const FR & strategy)
+    interleaved_FR(int_type _nruns, const FR& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     { }
 
@@ -66,12 +66,12 @@ struct interleaved_SR : public interleaved_striping
     typedef random_number<random_uniform_fast> rnd_type;
     std::vector<int> offsets;
 
-    interleaved_SR(int_type _nruns, const SR & strategy)
+    interleaved_SR(int_type _nruns, const SR& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     {
         rnd_type rnd;
         for (int_type i = 0; i < nruns; i++)
-            offsets.push_back( rnd(rnd_type::value_type(diff)) );
+            offsets.push_back(rnd(rnd_type::value_type(diff)));
     }
 
     unsigned_type operator () (unsigned_type i) const
@@ -83,9 +83,9 @@ struct interleaved_SR : public interleaved_striping
 
 struct interleaved_RC : public interleaved_striping
 {
-    std::vector< std::vector<unsigned_type> > perms;
+    std::vector<std::vector<unsigned_type> > perms;
 
-    interleaved_RC(int_type _nruns, const RC & strategy)
+    interleaved_RC(int_type _nruns, const RC& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff),
           perms(nruns, std::vector<unsigned_type>(diff))
     {
@@ -107,7 +107,7 @@ struct interleaved_RC : public interleaved_striping
 
 struct first_disk_only : public interleaved_striping
 {
-    first_disk_only(int_type _nruns, const single_disk & strategy)
+    first_disk_only(int_type _nruns, const single_disk& strategy)
         : interleaved_striping(_nruns, strategy.disk, 1)
     { }
 

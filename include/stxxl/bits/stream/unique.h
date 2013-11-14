@@ -20,114 +20,115 @@
 __STXXL_BEGIN_NAMESPACE
 
 //! Stream package subnamespace.
-namespace stream
+namespace stream {
+
+////////////////////////////////////////////////////////////////////////
+//     UNIQUE                                                         //
+////////////////////////////////////////////////////////////////////////
+
+struct dummy_cmp_unique_ { };
+
+//! Equivalent to std::unique algorithms.
+//!
+//! Removes consecutive duplicates from the stream.
+//! Uses BinaryPredicate to compare elements of the stream
+template <class Input, class BinaryPredicate = dummy_cmp_unique_>
+class unique
 {
-    ////////////////////////////////////////////////////////////////////////
-    //     UNIQUE                                                         //
-    ////////////////////////////////////////////////////////////////////////
+    Input& input;
+    BinaryPredicate binary_pred;
+    typename Input::value_type current;
 
-    struct dummy_cmp_unique_ { };
+public:
+    //! Standard stream typedef.
+    typedef typename Input::value_type value_type;
 
-    //! Equivalent to std::unique algorithms.
-    //!
-    //! Removes consecutive duplicates from the stream.
-    //! Uses BinaryPredicate to compare elements of the stream
-    template <class Input, class BinaryPredicate = dummy_cmp_unique_>
-    class unique
+    unique(Input& input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
     {
-        Input & input;
-        BinaryPredicate binary_pred;
-        typename Input::value_type current;
+        if (!input.empty())
+            current = *input;
+    }
 
-    public:
-        //! Standard stream typedef.
-        typedef typename Input::value_type value_type;
-
-        unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
-        {
-            if (!input.empty())
-                current = *input;
-        }
-
-        //! Standard stream method.
-        unique & operator ++ ()
-        {
-            value_type old_value = current;
-            ++input;
-            while (!input.empty() && (binary_pred(current = *input, old_value)))
-                ++input;
-            return *this;
-        }
-
-        //! Standard stream method.
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        //! Standard stream method.
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! Standard stream method.
-        bool empty() const
-        {
-            return input.empty();
-        }
-    };
-
-    //! Equivalent to std::unique algorithms.
-    //!
-    //! Removes consecutive duplicates from the stream.
-    template <class Input>
-    class unique<Input, dummy_cmp_unique_>
+    //! Standard stream method.
+    unique& operator ++ ()
     {
-        Input & input;
-        typename Input::value_type current;
-
-    public:
-        //! Standard stream typedef.
-        typedef typename Input::value_type value_type;
-
-        unique(Input & input_) : input(input_)
-        {
-            if (!input.empty())
-                current = *input;
-        }
-
-        //! Standard stream method.
-        unique & operator ++ ()
-        {
-            value_type old_value = current;
+        value_type old_value = current;
+        ++input;
+        while (!input.empty() && (binary_pred(current = *input, old_value)))
             ++input;
-            while (!input.empty() && ((current = *input) == old_value))
-                ++input;
-            return *this;
-        }
+        return *this;
+    }
 
-        //! Standard stream method.
-        const value_type & operator * () const
-        {
-            return current;
-        }
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
 
-        //! Standard stream method.
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
+    //! Standard stream method.
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
 
-        //! Standard stream method.
-        bool empty() const
-        {
-            return input.empty();
-        }
-    };
+    //! Standard stream method.
+    bool empty() const
+    {
+        return input.empty();
+    }
+};
+
+//! Equivalent to std::unique algorithms.
+//!
+//! Removes consecutive duplicates from the stream.
+template <class Input>
+class unique<Input, dummy_cmp_unique_>
+{
+    Input& input;
+    typename Input::value_type current;
+
+public:
+    //! Standard stream typedef.
+    typedef typename Input::value_type value_type;
+
+    unique(Input& input_) : input(input_)
+    {
+        if (!input.empty())
+            current = *input;
+    }
+
+    //! Standard stream method.
+    unique& operator ++ ()
+    {
+        value_type old_value = current;
+        ++input;
+        while (!input.empty() && ((current = *input) == old_value))
+            ++input;
+        return *this;
+    }
+
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
+
+    //! Standard stream method.
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
+
+    //! Standard stream method.
+    bool empty() const
+    {
+        return input.empty();
+    }
+};
 
 //! \}
-}
+
+} // namespace stream
 
 __STXXL_END_NAMESPACE
 

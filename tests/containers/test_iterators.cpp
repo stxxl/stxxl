@@ -23,7 +23,7 @@
 template <typename T>
 const char * _()
 {
-    const char * start = strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
+    const char* start = strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
     if (start == NULL)
         return "unknown";
     else
@@ -31,7 +31,7 @@ const char * _()
 }
 
 template <typename I>
-void dump_iterator_info(I &)
+void dump_iterator_info(I&)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  category:        " << _<typename std::iterator_traits<I>::iterator_category>());
@@ -42,7 +42,7 @@ void dump_iterator_info(I &)
 }
 
 template <typename C>
-void dump_container_info(C &)
+void dump_container_info(C&)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  value_type:      " << _<typename C::value_type>());
@@ -59,7 +59,7 @@ void dump_container_info(C &)
 template <typename T>
 struct modify
 {
-    void operator () (T & obj) const
+    void operator () (T& obj) const
     {
         ++obj;
     }
@@ -111,26 +111,26 @@ struct test_comparison_lt_gt<IteratorA, IteratorB, std::random_access_iterator_t
 {
     void operator () (IteratorA a, IteratorB b)
     {
-        STXXL_CHECK(! (a < b) );
-        STXXL_CHECK(  (a <= b) );
-        STXXL_CHECK(! (a > b) );
-        STXXL_CHECK(  (a >= b) );
+        STXXL_CHECK(! (a < b));
+        STXXL_CHECK((a <= b));
+        STXXL_CHECK(! (a > b));
+        STXXL_CHECK((a >= b));
 
-        STXXL_CHECK(! (b < a) );
-        STXXL_CHECK(  (b <= a) );
-        STXXL_CHECK(! (b > a) );
-        STXXL_CHECK(  (b >= a) );
+        STXXL_CHECK(! (b < a));
+        STXXL_CHECK((b <= a));
+        STXXL_CHECK(! (b > a));
+        STXXL_CHECK((b >= a));
     }
 };
 
 template <typename IteratorA, typename IteratorB>
 void test_comparison(IteratorA a, IteratorB b)
 {
-    STXXL_CHECK(  (a == b) );
-    STXXL_CHECK(! (a != b) );
+    STXXL_CHECK((a == b));
+    STXXL_CHECK(! (a != b));
 
-    STXXL_CHECK(  (b == a) );
-    STXXL_CHECK(! (b != a) );
+    STXXL_CHECK((b == a));
+    STXXL_CHECK(! (b != a));
 
     test_comparison_lt_gt<IteratorA, IteratorB, typename std::iterator_traits<IteratorA>::iterator_category>() (a, b);
 }
@@ -144,7 +144,7 @@ void test_operators(Iterator it)
 }
 
 template <typename svt>
-void test(svt & sv)
+void test(svt& sv)
 {
     dump_container_info(sv);
 
@@ -191,7 +191,7 @@ void test(svt & sv)
 
 ///////////////////////////////////////////////////////////////////////////
 
-    csvt & csv = sv;
+    csvt& csv = sv;
     //csv[0] = 108; // read-only
 
     //typename csvt::iterator csvi = csv.begin();    // read-only
@@ -219,7 +219,7 @@ void test(svt & sv)
 }
 
 template <typename svt>
-void test_reverse(svt & sv)
+void test_reverse(svt& sv)
 {
     dump_container_info(sv);
 
@@ -268,7 +268,7 @@ void test_reverse(svt & sv)
 
 ///////////////////////////////////////////////////////////////////////////
 
-    csvt & csv = sv;
+    csvt& csv = sv;
     //csv[0] = 108; // read-only
 
     //typename csvt::reverse_iterator csvi = csv.rbegin();    // read-only
@@ -300,7 +300,7 @@ void test_reverse(svt & sv)
 }
 
 template <typename svt>
-void test_random_access(svt & sv)
+void test_random_access(svt& sv)
 {
     typename svt::const_iterator svci = sv.begin();
     typename svt::iterator xsvi = sv.begin();
@@ -321,7 +321,7 @@ void test_random_access(svt & sv)
 }
 
 template <typename svt>
-void test_random_access_reverse(svt & sv)
+void test_random_access_reverse(svt& sv)
 {
     typename svt::const_reverse_iterator svcri = sv.rbegin();
     typename svt::reverse_iterator xsvri = sv.rbegin();
@@ -363,7 +363,7 @@ struct cmp : public std::less<key_type>
 template <>
 struct modify<std::pair<const key_type, data_type> >
 {
-    void operator () (std::pair<const key_type, data_type> & obj) const
+    void operator () (std::pair<const key_type, data_type>& obj) const
     {
         ++(obj.second);
     }

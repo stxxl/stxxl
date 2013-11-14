@@ -36,8 +36,7 @@ public:
     //! construct semaphore
     semaphore(int init_value = 1)
         : v(init_value)
-    {
-    }
+    { }
     //! function increments the semaphore and signals any threads that are
     //! blocked waiting a change in the semaphore
     int operator ++ (int)

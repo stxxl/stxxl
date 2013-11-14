@@ -21,7 +21,7 @@ template class stxxl::typed_block<BLOCK_SIZE, int>; // forced instantiation
 int main()
 {
     stxxl::int64 totalsize = 0;
-    stxxl::config * config = stxxl::config::get_instance();
+    stxxl::config* config = stxxl::config::get_instance();
 
     for (size_t i = 0; i < config->disks_number(); ++i)
         totalsize += config->disk_size(i);
@@ -35,7 +35,7 @@ int main()
     stxxl::BIDArray<BLOCK_SIZE> b5d(totalblocks / 5);
     stxxl::BIDArray<BLOCK_SIZE> b2(totalblocks / 2);
 
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
 
     STXXL_MSG("get 4 x " << totalblocks / 5);
     bm->new_blocks(stxxl::striping(), b5a.begin(), b5a.end());

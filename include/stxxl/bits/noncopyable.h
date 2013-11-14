@@ -30,14 +30,15 @@ typedef boost::noncopyable noncopyable;
 
 #else
 
-class noncopyable {
+class noncopyable
+{
 protected:
     noncopyable() { }
 
 private:
     // copying and assignment is not allowed
-    noncopyable(const noncopyable &);
-    const noncopyable & operator = (const noncopyable &);
+    noncopyable(const noncopyable&);
+    const noncopyable& operator = (const noncopyable&);
 };
 
 #endif

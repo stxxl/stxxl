@@ -18,7 +18,7 @@
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/parallel.h>
 
-int stxxl_info(int, char **)
+int stxxl_info(int, char**)
 {
     stxxl::config::get_instance();
     stxxl::block_manager::get_instance();
@@ -34,7 +34,7 @@ int stxxl_info(int, char **)
     STXXL_MSG("sizeof(long)           = " << sizeof(long));
     STXXL_MSG("sizeof(size_t)         = " << sizeof(size_t));
     STXXL_MSG("sizeof(off_t)          = " << sizeof(off_t));
-    STXXL_MSG("sizeof(void*)          = " << sizeof(void *));
+    STXXL_MSG("sizeof(void*)          = " << sizeof(void*));
 
 #if defined(STXXL_HAVE_AIO_FILE)
     STXXL_MSG("STXXL_HAVE_AIO_FILE    = " << STXXL_HAVE_AIO_FILE);
@@ -43,21 +43,21 @@ int stxxl_info(int, char **)
     return 0;
 }
 
-extern int create_files(int argc, char * argv[]);
-extern int benchmark_disks(int argc, char * argv[]);
-extern int benchmark_files(int argc, char * argv[]);
-extern int benchmark_sort(int argc, char * argv[]);
-extern int benchmark_disks_random(int argc, char * argv[]);
-extern int benchmark_pqueue(int argc, char * argv[]);
-extern int do_mlock(int argc, char * argv[]);
-extern int do_mallinfo(int argc, char * argv[]);
+extern int create_files(int argc, char* argv[]);
+extern int benchmark_disks(int argc, char* argv[]);
+extern int benchmark_files(int argc, char* argv[]);
+extern int benchmark_sort(int argc, char* argv[]);
+extern int benchmark_disks_random(int argc, char* argv[]);
+extern int benchmark_pqueue(int argc, char* argv[]);
+extern int do_mlock(int argc, char* argv[]);
+extern int do_mallinfo(int argc, char* argv[]);
 
 struct SubTool
 {
-    const char * name;
-    int (* func)(int argc, char * argv[]);
+    const char* name;
+    int (* func)(int argc, char* argv[]);
     bool shortline;
-    const char * description;
+    const char* description;
 };
 
 struct SubTool subtools[] = {
@@ -102,7 +102,7 @@ struct SubTool subtools[] = {
     { NULL, NULL, false, NULL }
 };
 
-int main_usage(const char * arg0)
+int main_usage(const char* arg0)
 {
     STXXL_MSG(stxxl::get_version_string_long());
 
@@ -136,7 +136,7 @@ int main_usage(const char * arg0)
     return 0;
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     char progsub[256];
 

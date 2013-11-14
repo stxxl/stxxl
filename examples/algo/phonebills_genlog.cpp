@@ -26,7 +26,7 @@ struct LogEntry
 
 struct cmp
 {
-    bool operator () (const LogEntry & a, const LogEntry & b) const
+    bool operator () (const LogEntry& a, const LogEntry& b) const
     {
         return a.timestamp < b.timestamp;
     }
@@ -46,7 +46,7 @@ struct cmp
 
 typedef stxxl::VECTOR_GENERATOR<LogEntry, 1, 1>::result vector_type;
 
-std::ostream & operator << (std::ostream & i, const LogEntry & entry)
+std::ostream& operator << (std::ostream& i, const LogEntry& entry)
 {
     i << entry.from << " ";
     i << entry.to << " ";
@@ -56,7 +56,7 @@ std::ostream & operator << (std::ostream & i, const LogEntry & entry)
 }
 
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 5)
     {

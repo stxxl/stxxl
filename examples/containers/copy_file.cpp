@@ -24,7 +24,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
 
     file::unlink(output_path); // delete output file
 
-    stxxl::timer tm(true); // start a timer
+    stxxl::timer tm(true);     // start a timer
 
     // input file object
     stxxl::syscall_file InputFile(input_path, file::RDONLY | file::DIRECT);
@@ -52,7 +52,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
         for (vector_type::const_iterator it = InputVector.begin(); // iterate through InputVector
              it != InputVector.end(); ++it)
         {
-            OutputVector.push_back(*it); // add the value pointed by 'it' to OutputVector
+            OutputVector.push_back(*it);                           // add the value pointed by 'it' to OutputVector
         }
     }
     else if (method == 2)
@@ -68,7 +68,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
 
         // construct prefetching input stream
         stxxl::stream::vector_iterator2stream<vector_type::const_iterator>
-            input(InputVector.begin(), InputVector.end());
+        input(InputVector.begin(), InputVector.end());
 
         // construct buffered output writer
         vector_type::bufwriter_type writer(OutputVector.begin());
@@ -92,7 +92,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
 
         // construct prefetching input stream
         stxxl::stream::vector_iterator2stream<vector_type::const_iterator>
-            input(InputVector.begin(), InputVector.end());
+        input(InputVector.begin(), InputVector.end());
 
         // materilize intput directly into output vector
         stxxl::stream::materialize(input, OutputVector.begin(), OutputVector.end());
@@ -102,7 +102,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
               << (double)InputVector.size() / tm.seconds() / 1024 / 1024 << " MiB/s" << std::endl;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 3)
     {

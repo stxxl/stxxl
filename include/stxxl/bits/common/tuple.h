@@ -117,7 +117,7 @@ struct tuple
           fourth_type _fourth,
           fifth_type _fifth,
           sixth_type _sixth
-        )
+          )
         : first(_first),
           second(_second),
           third(_third),
@@ -127,7 +127,7 @@ struct tuple
     { }
 
     //! Make tuple ostream-able
-    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
         return os << '(' << t.first << ',' << t.second << ',' << t.third
                   << ',' << t.fourth << ',' << t.fifth << ',' << t.sixth
@@ -182,7 +182,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     { }
 
     //! Make tuple ostream-able
-    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
         return os << '(' << t.first << ')';
     }
@@ -234,7 +234,7 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     { }
 
     //! Make tuple ostream-able
-    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
         return os << '(' << t.first << ',' << t.second << ')';
     }
@@ -299,7 +299,7 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     { }
 
     //! Make tuple ostream-able
-    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
         return os << '(' << t.first << ',' << t.second << ',' << t.third
                   << ')';
@@ -374,7 +374,7 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     { }
 
     //! Make tuple ostream-able
-    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
         return os << '(' << t.first << ',' << t.second << ',' << t.third
                   << ',' << t.fourth << ')';
@@ -460,7 +460,7 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     { }
 
     //! Make tuple ostream-able
-    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
         return os << '(' << t.first << ',' << t.second << ',' << t.third
                   << ',' << t.fourth << ',' << t.fifth << ')';
@@ -498,9 +498,10 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
 template <typename TupleType>
 struct tuple_less1st
 {
-    typedef TupleType       value_type;
+    typedef TupleType value_type;
 
-    bool operator()(const value_type& a, const value_type& b) const {
+    bool operator () (const value_type& a, const value_type& b) const
+    {
         return (a.first < b.first);
     }
 
@@ -511,9 +512,10 @@ struct tuple_less1st
 template <typename TupleType>
 struct tuple_greater1st
 {
-    typedef TupleType       value_type;
+    typedef TupleType value_type;
 
-    bool operator()(const value_type& a, const value_type& b) const {
+    bool operator () (const value_type& a, const value_type& b) const
+    {
         return (a.first > b.first);
     }
 
@@ -524,9 +526,10 @@ struct tuple_greater1st
 template <typename TupleType>
 struct tuple_less1st_less2nd
 {
-    typedef TupleType       value_type;
+    typedef TupleType value_type;
 
-    bool operator()(const value_type& a, const value_type& b) const {
+    bool operator () (const value_type& a, const value_type& b) const
+    {
         if (a.first == b.first)
             return (a.second < b.second);
         return (a.first < b.first);
@@ -539,9 +542,10 @@ struct tuple_less1st_less2nd
 template <typename TupleType>
 struct tuple_less2nd
 {
-    typedef TupleType       value_type;
+    typedef TupleType value_type;
 
-    bool operator()(const value_type& a, const value_type& b) const {
+    bool operator () (const value_type& a, const value_type& b) const
+    {
         return (a.second < b.second);
     }
 
@@ -550,8 +554,8 @@ struct tuple_less2nd
 };
 
 
-/** 
- * Counter for creating tuple indexes for example. 
+/**
+ * Counter for creating tuple indexes for example.
  */
 template <class valuetype>
 struct counter
@@ -565,26 +569,28 @@ protected:
 public:
     counter(const value_type& start = 0)
         : m_count(start)
-    {}
+    { }
 
-    const value_type & operator*() const { 
-      return m_count;
+    const value_type& operator * () const
+    {
+        return m_count;
     }
 
-    counter& operator++ ()
+    counter& operator ++ ()
     {
         ++m_count;
         return *this;
     }
 
-    bool empty() const { 
-      return false; 
+    bool empty() const
+    {
+        return false;
     }
 };
 
 
 /**
- * Concatenates two tuple streams as streamA . streamB 
+ * Concatenates two tuple streams as streamA . streamB
  */
 template <class StreamA, class StreamB>
 class concatenate
@@ -597,29 +603,29 @@ private:
     StreamB& B;
 
 public:
-
-    concatenate(StreamA& A_, StreamB& B_) : A(A_), B(B_) {
+    concatenate(StreamA& A_, StreamB& B_) : A(A_), B(B_)
+    {
         assert(!A.empty());
         assert(!B.empty());
     }
 
-    const value_type & operator*() const
+    const value_type& operator * () const
     {
         assert(!empty());
 
         if (!A.empty()) {
             return *A;
         }
-        else {  
+        else {
             return *B;
         }
     }
 
-    concatenate & operator++()
+    concatenate& operator ++ ()
     {
-        assert (!empty());
+        assert(!empty());
 
-        if(!A.empty()) {
+        if (!A.empty()) {
             ++A;
         }
         else if (!B.empty()) {
@@ -629,8 +635,9 @@ public:
         return *this;
     }
 
-    bool empty() const { 
-      return (A.empty() && B.empty()); 
+    bool empty() const
+    {
+        return (A.empty() && B.empty());
     }
 };
 

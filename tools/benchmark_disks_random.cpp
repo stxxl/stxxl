@@ -63,8 +63,8 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
 
     worksize = num_blocks * raw_block_size;
 
-    block_type * buffer = new block_type;
-    request_ptr * reqs = new request_ptr[num_blocks_in_span];
+    block_type* buffer = new block_type;
+    request_ptr* reqs = new request_ptr[num_blocks_in_span];
     std::vector<BID_type> blocks;
 
     //touch data, so it is actually allocated
@@ -139,7 +139,7 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
                       << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MiB / elapsed) << " MiB/s write " << std::endl;
         }
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());
@@ -152,14 +152,14 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
 }
 
 template <typename AllocStrategy>
-int benchmark_disks_random_alloc(stxxl::uint64 span, stxxl::uint64 block_size, stxxl::uint64 worksize,  
+int benchmark_disks_random_alloc(stxxl::uint64 span, stxxl::uint64 block_size, stxxl::uint64 worksize,
                                  const std::string& optirw)
 {
     bool do_init = (optirw.find('i') != std::string::npos);
     bool do_read = (optirw.find('r') != std::string::npos);
     bool do_write = (optirw.find('w') != std::string::npos);
 
-#define run(bs) run_test<bs,AllocStrategy>(span, worksize, do_init, do_read, do_write)
+#define run(bs) run_test<bs, AllocStrategy>(span, worksize, do_init, do_read, do_write)
     if (block_size == 4 * KiB)
         run(4 * KiB);
     else if (block_size == 8 * KiB)
@@ -200,7 +200,7 @@ int benchmark_disks_random_alloc(stxxl::uint64 span, stxxl::uint64 block_size, s
     return 0;
 }
 
-int benchmark_disks_random(int argc, char * argv[])
+int benchmark_disks_random(int argc, char* argv[])
 {
     // parse command line
 

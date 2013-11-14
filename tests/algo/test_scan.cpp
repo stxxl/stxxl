@@ -39,7 +39,7 @@ struct counter
 template <typename type>
 struct square
 {
-    void operator () (type & arg)
+    void operator () (type& arg)
     {
         arg = arg * arg;
     }
@@ -49,7 +49,7 @@ template <typename type>
 struct fill_value
 {
     type val;
-    fill_value(const type & v_) : val(v_) { }
+    fill_value(const type& v_) : val(v_) { }
 
     type operator () ()
     {
@@ -78,7 +78,7 @@ int main()
     STXXL_MSG("check");
     for (i = 0; i < v.size(); ++i)
     {
-        STXXL_CHECK2( v[i] == int64(i * i), "Error at position " << i);
+        STXXL_CHECK2(v[i] == int64(i * i), "Error at position " << i);
     }
 
     STXXL_MSG("Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin()));
@@ -94,10 +94,10 @@ int main()
 
 
     STXXL_MSG("check");
-    STXXL_CHECK2( v[0] == 0, "Error at position " << 0);
+    STXXL_CHECK2(v[0] == 0, "Error at position " << 0);
 
-    STXXL_CHECK2( v[v.size() - 1] == int64((v.size() - 1) * (v.size() - 1)),
-                  "Error at position " << v.size() - 1 );
+    STXXL_CHECK2(v[v.size() - 1] == int64((v.size() - 1) * (v.size() - 1)),
+                 "Error at position " << v.size() - 1);
 
     for (i = 1; i < v.size() - 1; ++i)
     {

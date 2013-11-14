@@ -72,7 +72,7 @@ u_int datasize = DATA_SIZE;
 u_int keysize = KEY_SIZE;
 u_int numitems = 0;
 
-const char * letters = "abcdefghijklmnopqrstuvwxuz";
+const char* letters = "abcdefghijklmnopqrstuvwxuz";
 
 struct my_key
 {
@@ -80,7 +80,7 @@ struct my_key
 };
 
 
-std::ostream & operator << (std::ostream & o, const my_key & obj)
+std::ostream& operator << (std::ostream& o, const my_key& obj)
 {
     for (int i = 0; i < KEY_SIZE; ++i)
         o << obj.keybuf[i];
@@ -88,32 +88,32 @@ std::ostream & operator << (std::ostream & o, const my_key & obj)
     return o;
 }
 
-bool operator == (const my_key & a, const my_key & b)
+bool operator == (const my_key& a, const my_key& b)
 {
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) == 0;
 }
 
-bool operator != (const my_key & a, const my_key & b)
+bool operator != (const my_key& a, const my_key& b)
 {
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) != 0;
 }
 
-bool operator < (const my_key & a, const my_key & b)
+bool operator < (const my_key& a, const my_key& b)
 {
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) < 0;
 }
 
-bool operator > (const my_key & a, const my_key & b)
+bool operator > (const my_key& a, const my_key& b)
 {
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) > 0;
 }
 
-bool operator <= (const my_key & a, const my_key & b)
+bool operator <= (const my_key& a, const my_key& b)
 {
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) <= 0;
 }
 
-bool operator >= (const my_key & a, const my_key & b)
+bool operator >= (const my_key& a, const my_key& b)
 {
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) >= 0;
 }
@@ -124,7 +124,7 @@ struct my_data
     char databuf[DATA_SIZE];
 };
 
-std::ostream & operator << (std::ostream & o, const my_data & obj)
+std::ostream& operator << (std::ostream& o, const my_data& obj)
 {
     o << "DATA(size=" << sizeof(obj) << ") ";
 
@@ -135,7 +135,7 @@ my_key min_key, max_key;
 
 struct comp_type : std::binary_function<my_key, my_key, bool>
 {
-    bool operator () (const my_key & a, const my_key & b) const
+    bool operator () (const my_key& a, const my_key& b) const
     {
         return strncmp(a.keybuf, b.keybuf, KEY_SIZE) < 0;
     }
@@ -162,7 +162,7 @@ struct el_t {
     el_t() { }
 };
 struct key_from_el {
-    bkey_t operator () (const el_t & v) const
+    bkey_t operator () (const el_t& v) const
     {
         return v.key_;
     }
@@ -205,7 +205,7 @@ inline unsigned myrand()
 {
     return (ran32State = 1664525 * ran32State + 1013904223);
 }
-inline void rand_key(stxxl::int64 pos, my_key & Key)
+inline void rand_key(stxxl::int64 pos, my_key& Key)
 {
     for (int i = 0; i < KEY_SIZE; ++i)
         Key.keybuf[i] = letters[myrand() % 26];
@@ -216,7 +216,7 @@ inline long long unsigned myrand()
 {
     return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL);
 }
-inline void rand_key(stxxl::int64 /*pos*/, my_key & Key)
+inline void rand_key(stxxl::int64 /*pos*/, my_key& Key)
 {
     long long unsigned r = myrand();
     for (int i = 0; i < KEY_SIZE; ++i)
@@ -229,7 +229,7 @@ inline void rand_key(stxxl::int64 /*pos*/, my_key & Key)
 
 void run_bdb_btree(stxxl::int64 ops)
 {
-    const char * filename = BDB_FILE;
+    const char* filename = BDB_FILE;
 
     my_key key1_storage;
     my_data data1_storage;
@@ -268,7 +268,7 @@ void run_bdb_btree(stxxl::int64 ops)
         ran32State = 0xdeadbeef;
 
 
-        DB_BTREE_STAT * dbstat;
+        DB_BTREE_STAT* dbstat;
 
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
@@ -297,7 +297,7 @@ void run_bdb_btree(stxxl::int64 ops)
         Timer.start();
 
 
-        Dbc * cursorp;
+        Dbc* cursorp;
         db.cursor(NULL, &cursorp, 0);
 
         for (i = 0; i < n_locates; ++i)
@@ -341,7 +341,7 @@ void run_bdb_btree(stxxl::int64 ops)
                 continue;
 
 
-            while (*((my_key *)keyx.get_data()) <= last_key)
+            while (*((my_key*)keyx.get_data()) <= last_key)
             {
                 ++n_scanned;
                 if (cursorp->get(&keyx, &datax, DB_NEXT) == DB_NOTFOUND)
@@ -394,11 +394,11 @@ void run_bdb_btree(stxxl::int64 ops)
 
         db.close(0);
     }
-    catch (DbException & e)
+    catch (DbException& e)
     {
         STXXL_ERRMSG("DbException happened");
     }
-    catch (std::exception & e)
+    catch (std::exception& e)
     {
         STXXL_ERRMSG("std::exception happened");
     }
@@ -410,7 +410,7 @@ void run_stxxl_map(stxxl::int64 ops)
 {
     map_type Map(NODE_CACHE_SIZE, LEAF_CACHE_SIZE);
     Map.enable_prefetching();
-    stxxl::stats * Stats = stxxl::stats::get_instance();
+    stxxl::stats* Stats = stxxl::stats::get_instance();
 
     std::pair<my_key, my_data> element;
 
@@ -449,7 +449,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
     ////////////////////////////////////////////////
 
-    const map_type & CMap(Map);     // const map reference
+    const map_type& CMap(Map);      // const map reference
 
     stats_begin = stxxl::stats_data(*Stats);
     Timer.reset();
@@ -538,24 +538,24 @@ void run_stxxl_map(stxxl::int64 ops)
 class rand_key_gen
 {
     stxxl::int64 counter;
-    my_key & current;
+    my_key& current;
     stxxl::random_number32 myrand;
     rand_key_gen();
 
 public:
     typedef my_key value_type;
 
-    rand_key_gen(stxxl::int64 el, my_key & cur) :
+    rand_key_gen(stxxl::int64 el, my_key& cur) :
         counter(el), current(cur)
     {
         //const stxxl::int64  & i = counter;
         //current.keybuf[KEYPOS] = letters[VALUE];
         rand_key(counter, current);
     }
-    const my_key & operator * () { return current; }
-    const my_key * operator -> () { return &current; }
+    const my_key& operator * () { return current; }
+    const my_key* operator -> () { return &current; }
 
-    rand_key_gen & operator ++ ()
+    rand_key_gen& operator ++ ()
     {
         --counter;
         //const stxxl::int64  & i = counter;
@@ -569,22 +569,22 @@ public:
 template <class InputType>
 class key2pair
 {
-    InputType & in;
+    InputType& in;
     std::pair<my_key, my_data> current;
     key2pair();
 
 public:
     typedef std::pair<my_key, my_data> value_type;
 
-    key2pair(InputType & in_) : in(in_)
+    key2pair(InputType& in_) : in(in_)
     {
         if (!in.empty())
             current.first = *in;
     }
-    const value_type & operator * () { return current; }
-    const value_type * operator -> () { return &current; }
+    const value_type& operator * () { return current; }
+    const value_type* operator -> () { return &current; }
 
-    key2pair & operator ++ ()
+    key2pair& operator ++ ()
     {
         ++in;
         if (!empty())
@@ -598,7 +598,7 @@ public:
 
 void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 {
-    stxxl::stats * Stats = stxxl::stats::get_instance();
+    stxxl::stats* Stats = stxxl::stats::get_instance();
 
     std::pair<my_key, my_data> element;
 
@@ -617,7 +617,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
     Timer.start();
 
     vector_type SortedSeq(n);
-    const vector_type & CSortedSeq(SortedSeq);
+    const vector_type& CSortedSeq(SortedSeq);
     {
         rand_key_gen Gen(n, element.first);
         typedef stxxl::stream::sort<rand_key_gen, comp_type> sorter_type;
@@ -680,7 +680,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     ////////////////////////////////////
 
-    const map_type & CMap(Map);     // const map reference
+    const map_type& CMap(Map);      // const map reference
 
     Timer.reset();
     Timer.start();
@@ -796,7 +796,7 @@ char dummy;
 class MyFilter
 {
 public:
-    bool operator () (const el_t & v) const
+    bool operator () (const el_t& v) const
     {
         dummy += v.key_.keybuf[0];         // touch element
         return true;
@@ -816,7 +816,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     MM_manager.set_memory_limit(TOTAL_CACHE_SIZE);
     MM_manager.enforce_memory_limit();
 
-    stream_t * is = new stream_t;
+    stream_t* is = new stream_t;
 
     stxxl::timer Timer;
     stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
@@ -854,7 +854,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     Timer.start();
 
     // bulk construction
-    u_btree_t * u_btree;
+    u_btree_t* u_btree;
     AMI_btree_params params;
     params.node_block_factor = NODE_BLOCK_SIZE / 4096;
     params.leaf_block_factor = LEAF_BLOCK_SIZE / 4096;
@@ -985,13 +985,13 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 {
-    const char * filename = BDB_FILE;
+    const char* filename = BDB_FILE;
 
     my_key key1_storage;
     my_data data1_storage;
 
 #ifdef BDB_BULK_SCAN
-    int * bulk_buffer = new int[logbufsize / sizeof(int)];
+    int* bulk_buffer = new int[logbufsize / sizeof(int)];
 #endif
 
     unlink(filename);
@@ -1062,7 +1062,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
         Timer.stop();
 
-        DB_BTREE_STAT * dbstat;
+        DB_BTREE_STAT* dbstat;
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
         STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
@@ -1097,7 +1097,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         Timer.start();
 
 
-        Dbc * cursorp;
+        Dbc* cursorp;
         db.cursor(NULL, &cursorp, 0);
 
         for (i = 0; i < n_locates; ++i)
@@ -1158,7 +1158,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
                 DbMultipleKeyDataIterator BulkIterator(datax);
                 Dbt key1, data1;
                 while (BulkIterator.next(key1, data1) &&
-                       *((my_key *)key1.get_data()) <= last_key)
+                       *((my_key*)key1.get_data()) <= last_key)
                 {
                     ++n_scanned;
                     //STXXL_MSG("Result      "<<*((my_key *)key1.get_data()));
@@ -1167,7 +1167,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
                     break;
 
 
-                if (*((my_key *)keyx.get_data()) > last_key)
+                if (*((my_key*)keyx.get_data()) > last_key)
                 {
                     break;
                 }
@@ -1177,7 +1177,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
             if (cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
                 continue;
 
-            while (*((my_key *)keyx.get_data()) <= last_key)
+            while (*((my_key*)keyx.get_data()) <= last_key)
             {
                 ++n_scanned;
                 if (cursorp->get(&keyx, &datax, DB_NEXT) == DB_NOTFOUND)
@@ -1234,11 +1234,11 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
         db.close(0);
     }
-    catch (DbException & e)
+    catch (DbException& e)
     {
         STXXL_ERRMSG("DbException happened");
     }
-    catch (std::exception & e)
+    catch (std::exception& e)
     {
         STXXL_ERRMSG("std::exception happened");
     }
@@ -1251,7 +1251,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 }
 
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     STXXL_MSG("stxxl::map Real Node block size: " << REAL_NODE_BLOCK_SIZE << " bytes");
     STXXL_MSG("stxxl::map Real Leaf block size: " << REAL_LEAF_BLOCK_SIZE << " bytes");

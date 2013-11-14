@@ -16,7 +16,7 @@
 // comparison struct for priority queue where top() returns the biggest contained value:
 struct Cmp
 {
-    bool operator () (const int & a, const int & b) const
+    bool operator () (const int& a, const int& b) const
     { return a < b; }
 
     int min_value() const
@@ -26,7 +26,7 @@ struct Cmp
 int main()
 {
     // use 64 GiB on main memory and 1 billion items at most
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64 *1024 *1024, 1024 *1024>::result pq_type;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64*1024*1024, 1024*1024>::result pq_type;
     typedef pq_type::block_type block_type;
 
     // block_type::raw_size = 262144 bytes

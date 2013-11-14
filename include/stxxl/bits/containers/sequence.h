@@ -85,19 +85,19 @@ private:
     bool m_owns_pool;
 
     /// read_write_pool of blocks
-    pool_type * m_pool;
+    pool_type* m_pool;
 
     /// current front block of sequence
-    block_type * m_front_block;
+    block_type* m_front_block;
 
     /// current back block of sequence
-    block_type * m_back_block;
+    block_type* m_back_block;
 
     /// pointer to current front element in m_front_block
-    value_type * m_front_element;
+    value_type* m_front_element;
 
     /// pointer to current back element in m_back_block
-    value_type * m_back_element;
+    value_type* m_back_element;
 
     /// block allocation strategy
     alloc_strategy_type m_alloc_strategy;
@@ -109,7 +109,7 @@ private:
     bid_deque_type m_bids;
 
     /// block manager used
-    block_manager * m_bm;
+    block_manager* m_bm;
 
     /// number of blocks to prefetch
     unsigned_type m_blocks2prefetch;
@@ -155,7 +155,7 @@ public:
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side), default is number of blocks in the prefetch pool
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    sequence(pool_type & pool, int blocks2prefetch = -1) :
+    sequence(pool_type& pool, int blocks2prefetch = -1) :
         m_size(0),
         m_owns_pool(false),
         m_pool(&pool),
@@ -166,7 +166,7 @@ public:
         init(blocks2prefetch);
     }
 
-    void swap(sequence & obj)
+    void swap(sequence& obj)
     {
         std::swap(m_size, obj.m_size);
         std::swap(m_owns_pool, obj.m_owns_pool);
@@ -226,7 +226,7 @@ public:
     }
 
     //! Adds an element to the front of the sequence
-    void push_front(const value_type & val)
+    void push_front(const value_type& val)
     {
         if (UNLIKELY(m_front_element == m_front_block->begin()))
         {
@@ -296,7 +296,7 @@ public:
     }
 
     //! Adds an element to the end of the sequence
-    void push_back(const value_type & val)
+    void push_back(const value_type& val)
     {
         if (UNLIKELY(m_back_element == m_back_block->begin() + (block_type::size - 1)))
         {
@@ -537,18 +537,18 @@ public:
         typedef typename bid_deque_type::const_iterator bid_iter_type;
 
     protected:
-        const sequence & m_sequence;
+        const sequence& m_sequence;
 
         size_type m_size;
 
-        value_type * m_current_element;
+        value_type* m_current_element;
 
-        block_type * m_current_block;
+        block_type* m_current_block;
 
         bid_iter_type m_next_bid;
 
     public:
-        stream(const sequence & sequence)
+        stream(const sequence& sequence)
             : m_sequence(sequence),
               m_size(sequence.size())
         {
@@ -577,14 +577,14 @@ public:
         }
 
         //! standard stream method
-        const value_type & operator * () const
+        const value_type& operator * () const
         {
             assert(!empty());
             return *m_current_element;
         }
 
         //! standard stream method
-        stream & operator ++ ()
+        stream& operator ++ ()
         {
             assert(!empty());
 
@@ -663,18 +663,18 @@ public:
         typedef typename bid_deque_type::const_reverse_iterator bid_iter_type;
 
     protected:
-        const sequence & m_sequence;
+        const sequence& m_sequence;
 
         size_type m_size;
 
-        value_type * m_current_element;
+        value_type* m_current_element;
 
-        block_type * m_current_block;
+        block_type* m_current_block;
 
         bid_iter_type m_next_bid;
 
     public:
-        reverse_stream(const sequence & sequence)
+        reverse_stream(const sequence& sequence)
             : m_sequence(sequence),
               m_size(sequence.size())
         {
@@ -703,14 +703,14 @@ public:
         }
 
         //! standard stream method
-        const value_type & operator * () const
+        const value_type& operator * () const
         {
             assert(!empty());
             return *m_current_element;
         }
 
         //! standard stream method
-        reverse_stream & operator ++ ()
+        reverse_stream& operator ++ ()
         {
             assert(!empty());
 

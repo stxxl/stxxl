@@ -21,17 +21,17 @@ using stxxl::int_type;
 using stxxl::unsigned_type;
 
 // forced instantiation
-template class stxxl::block_scheduler< stxxl::swappable_block<int_type, 1024> >;
+template class stxxl::block_scheduler<stxxl::swappable_block<int_type, 1024> >;
 
 template <class IBT>
-void set_pattern_A(IBT & ib)
+void set_pattern_A(IBT& ib)
 {
     for (int_type i = 0; i < ib.size; ++i)
         ib[i] = i;
 }
 
 template <class IBT>
-int_type test_pattern_A(IBT & ib)
+int_type test_pattern_A(IBT& ib)
 {
     int_type num_err = 0;
     for (int_type i = 0; i < ib.size; ++i)
@@ -40,14 +40,14 @@ int_type test_pattern_A(IBT & ib)
 }
 
 template <class IBT>
-void set_pattern_B(IBT & ib)
+void set_pattern_B(IBT& ib)
 {
     for (int_type i = 0; i < ib.size; ++i)
         ib[i] = ib.size - i;
 }
 
 template <class IBT>
-int_type test_pattern_B(IBT & ib)
+int_type test_pattern_B(IBT& ib)
 {
     int_type num_err = 0;
     for (int_type i = 0; i < ib.size; ++i)
@@ -60,7 +60,7 @@ typedef int_type value_type;
 
 unsigned_type internal_memory = 0;
 
-typedef stxxl::block_scheduler< stxxl::swappable_block<value_type, block_size> > block_scheduler_type;
+typedef stxxl::block_scheduler<stxxl::swappable_block<value_type, block_size> > block_scheduler_type;
 typedef stxxl::swappable_block<value_type, block_size> swappable_block_type;
 typedef block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
 typedef block_scheduler_type::internal_block_type internal_block_type;
@@ -74,13 +74,13 @@ void test1()
     // prepare an external_block with pattern A
     external_block_type ext_bl;
     stxxl::block_manager::get_instance()->new_block(stxxl::striping(), ext_bl);
-    internal_block_type * int_bl = new internal_block_type;
+    internal_block_type* int_bl = new internal_block_type;
     set_pattern_A(*int_bl);
     int_bl->write(ext_bl)->wait();
 
     // the block_scheduler may use internal_memory byte for caching
-    block_scheduler_type * bs_ptr = new block_scheduler_type(internal_memory);
-    block_scheduler_type & bs = *bs_ptr;
+    block_scheduler_type* bs_ptr = new block_scheduler_type(internal_memory);
+    block_scheduler_type& bs = *bs_ptr;
     // make sure is not just recording a prediction sequence
     STXXL_CHECK(! bs.is_simulating());
 
@@ -92,7 +92,7 @@ void test1()
     bs.initialize(sbi1, ext_bl);
     {
         // acquire the swappable_block to gain access
-        internal_block_type & ib = bs.acquire(sbi1);
+        internal_block_type& ib = bs.acquire(sbi1);
 
         // read from the swappable_block. it should contain pattern A
         int_type num_err = 0;
@@ -103,7 +103,7 @@ void test1()
     }
     {
         // get a new reference to the already allocated block (because we forgot the old one)
-        internal_block_type & ib = bs.get_internal_block(sbi1);
+        internal_block_type& ib = bs.get_internal_block(sbi1);
 
         // write pattern B
         for (int_type i = 0; i < block_size; ++i)
@@ -119,9 +119,9 @@ void test1()
 
     {
         // acquire the swappable_block to gain access
-        internal_block_type & ib1 = bs.acquire(sbi1);
+        internal_block_type& ib1 = bs.acquire(sbi1);
         // acquire the swappable_block to gain access because it was uninitialized, it now becomes initialized
-        internal_block_type & ib2 = bs.acquire(sbi2);
+        internal_block_type& ib2 = bs.acquire(sbi2);
 
         // copy pattern B
         for (int_type i = 0; i < block_size; ++i)
@@ -150,8 +150,8 @@ void test1()
     bs.explicit_timestep();
 
     // switch to simulation mode
-    stxxl::block_scheduler_algorithm_simulation< swappable_block_type > * asim =
-        new stxxl::block_scheduler_algorithm_simulation< swappable_block_type >(bs);
+    stxxl::block_scheduler_algorithm_simulation<swappable_block_type>* asim =
+        new stxxl::block_scheduler_algorithm_simulation<swappable_block_type>(bs);
     delete bs.switch_algorithm_to(asim);
 
     // allocate swappable block
@@ -160,9 +160,9 @@ void test1()
     // perform acquire and release sequence
     bs.acquire(sbi);
     bs.acquire(sbi);
-    bs.release(sbi,true);
+    bs.release(sbi, true);
     bs.explicit_timestep();
-    bs.release(sbi,false);
+    bs.release(sbi, false);
     bs.deinitialize(sbi);
     bs.initialize(sbi, external_block_type());
     if (bs.is_simulating())
@@ -181,14 +181,14 @@ void test1()
 
     // switch to LFD processing
     delete bs.switch_algorithm_to(
-        new stxxl::block_scheduler_algorithm_offline_lfd< swappable_block_type >(asim));
+        new stxxl::block_scheduler_algorithm_offline_lfd<swappable_block_type>(asim));
 
     sbi = bs.allocate_swappable_block();
     bs.acquire(sbi);
     bs.acquire(sbi);
-    bs.release(sbi,true);
+    bs.release(sbi, true);
     bs.explicit_timestep();
-    bs.release(sbi,false);
+    bs.release(sbi, false);
     bs.deinitialize(sbi);
     bs.initialize(sbi, external_block_type());
     if (bs.is_simulating())
@@ -200,13 +200,13 @@ void test1()
 #if 0
     // 2013-tb: segfaults due to missing prediction sequence? TODO
     delete bs.switch_algorithm_to(
-        new stxxl::block_scheduler_algorithm_offline_lru_prefetching< swappable_block_type >(asim));
+        new stxxl::block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(asim));
     sbi = bs.allocate_swappable_block();
     bs.acquire(sbi);
     bs.acquire(sbi);
-    bs.release(sbi,true);
+    bs.release(sbi, true);
     bs.explicit_timestep();
-    bs.release(sbi,false);
+    bs.release(sbi, false);
     bs.deinitialize(sbi);
     bs.initialize(sbi, external_block_type());
     if (bs.is_simulating())
@@ -231,8 +231,8 @@ void test2()
     const int_type num_sb = 5;
 
     // only 3 internal_blocks allowed
-    block_scheduler_type * bs_ptr = new block_scheduler_type(block_size * sizeof(value_type) * 3);
-    block_scheduler_type & bs = *bs_ptr;
+    block_scheduler_type* bs_ptr = new block_scheduler_type(block_size * sizeof(value_type) * 3);
+    block_scheduler_type& bs = *bs_ptr;
 
     // allocate blocks
     swappable_block_identifier_type sbi[num_sb];
@@ -240,7 +240,7 @@ void test2()
         sbi[i] = bs.allocate_swappable_block();
 
     // fill 3 blocks
-    internal_block_type * ib[num_sb];
+    internal_block_type* ib[num_sb];
     ib[0] = &bs.acquire(sbi[0]);
     ib[1] = &bs.acquire(sbi[1]);
     ib[2] = &bs.acquire(sbi[2]);
@@ -343,7 +343,7 @@ void test3()
     }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     int test_case = -1;
     int internal_memory_megabytes = 256;

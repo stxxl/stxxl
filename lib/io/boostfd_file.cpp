@@ -27,12 +27,12 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void boostfd_file::serve(const request * req) throw (io_error)
+void boostfd_file::serve(const request* req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    void* buffer = req->get_buffer();
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
@@ -40,17 +40,17 @@ void boostfd_file::serve(const request * req) throw (io_error)
     {
         file_des.seek(offset, BOOST_IOS::beg);
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         STXXL_THROW_ERRNO
             (io_error,
-             "Error doing seek() in boostfd_request::serve()" <<
-             " offset=" << offset <<
-             " this=" << this <<
-             " buffer=" << buffer <<
-             " bytes=" << bytes <<
-             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-             " : " << ex.what());
+            "Error doing seek() in boostfd_request::serve()" <<
+            " offset=" << offset <<
+            " this=" << this <<
+            " buffer=" << buffer <<
+            " bytes=" << bytes <<
+            " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+            " : " << ex.what());
     }
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
@@ -59,55 +59,55 @@ void boostfd_file::serve(const request * req) throw (io_error)
     {
         try
         {
-            std::streamsize rc = file_des.read((char *)buffer, bytes);
+            std::streamsize rc = file_des.read((char*)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
                 STXXL_THROW_ERRNO(io_error, " partial read: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
         }
-        catch (const std::exception & ex)
+        catch (const std::exception& ex)
         {
             STXXL_THROW_ERRNO
                 (io_error,
-                 "Error doing read() in boostfd_request::serve()" <<
-                 " offset=" << offset <<
-                 " this=" << this <<
-                 " buffer=" << buffer <<
-                 " bytes=" << bytes <<
-                 " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                 " : " << ex.what());
+                "Error doing read() in boostfd_request::serve()" <<
+                " offset=" << offset <<
+                " this=" << this <<
+                " buffer=" << buffer <<
+                " bytes=" << bytes <<
+                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " : " << ex.what());
         }
     }
     else
     {
         try
         {
-            std::streamsize rc = file_des.write((char *)buffer, bytes);
+            std::streamsize rc = file_des.write((char*)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
                 STXXL_THROW_ERRNO(io_error, " partial write: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
         }
-        catch (const std::exception & ex)
+        catch (const std::exception& ex)
         {
             STXXL_THROW_ERRNO
                 (io_error,
-                 "Error doing write() in boostfd_request::serve()" <<
-                 " offset=" << offset <<
-                 " this=" << this <<
-                 " buffer=" << buffer <<
-                 " bytes=" << bytes <<
-                 " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                 " : " << ex.what());
+                "Error doing write() in boostfd_request::serve()" <<
+                " offset=" << offset <<
+                " this=" << this <<
+                " buffer=" << buffer <<
+                " bytes=" << bytes <<
+                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " : " << ex.what());
         }
     }
 }
 
-const char * boostfd_file::io_type() const
+const char* boostfd_file::io_type() const
 {
     return "boostfd";
 }
 
 boostfd_file::boostfd_file(
-    const std::string & filename,
+    const std::string& filename,
     int mode,
     int queue_id, int allocator_id) : disk_queued_file(queue_id, allocator_id), mode_(mode)
 {

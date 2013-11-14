@@ -67,22 +67,22 @@ private:
 
     size_type m_size;
     bool delete_pool;
-    pool_type * pool;
-    block_type * front_block;
-    block_type * back_block;
-    value_type * front_element;
-    value_type * back_element;
+    pool_type* pool;
+    block_type* front_block;
+    block_type* back_block;
+    value_type* front_element;
+    value_type* back_element;
     alloc_strategy_type alloc_strategy;
     unsigned_type alloc_count;
     std::deque<bid_type> bids;
-    block_manager * bm;
+    block_manager* bm;
     unsigned_type blocks2prefetch;
 
 public:
     //! Constructs empty queue with own write and prefetch block pool.
     //!
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
-    //!           memory consumption will be 2 * D + 2 blocks 
+    //!           memory consumption will be 2 * D + 2 blocks
     //!           (first and last block, D blocks as write cache, D block for prefetching)
     explicit queue(int_type D = -1) :
         m_size(0),
@@ -123,7 +123,7 @@ public:
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
     _STXXL_DEPRECATED(
-    queue(write_pool<block_type> & w_pool, prefetch_pool<block_type> & p_pool, int blocks2prefetch_ = -1)) :
+        queue(write_pool<block_type>& w_pool, prefetch_pool<block_type>& p_pool, int blocks2prefetch_ = -1)) :
         m_size(0),
         delete_pool(true),
         alloc_count(0),
@@ -141,7 +141,7 @@ public:
     //!                          default is number of blocks in the prefetch pool
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    queue(pool_type & pool_, int blocks2prefetch_ = -1) :
+    queue(pool_type& pool_, int blocks2prefetch_ = -1) :
         m_size(0),
         delete_pool(false),
         pool(&pool_),
@@ -211,7 +211,7 @@ public:
     }
 
     //! Adds an element in the queue.
-    void push(const value_type & val)
+    void push(const value_type& val)
     {
         if (UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
         {

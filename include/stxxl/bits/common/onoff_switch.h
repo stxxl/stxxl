@@ -41,8 +41,7 @@ public:
     //! construct switch
     onoff_switch(bool flag = false)
         : m_on(flag)
-    {
-    }
+    { }
     //! turn switch ON and notify one waiter
     void on()
     {

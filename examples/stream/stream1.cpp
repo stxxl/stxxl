@@ -35,13 +35,13 @@ public:
     { }
 
     // The retrieve operator returning the current value.
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         return m_current_value;
     }
 
     // Increment operator advancing to the next integer.
-    counter_object & operator ++ ()
+    counter_object& operator ++ ()
     {
         ++m_current_value;
         return *this;
@@ -62,14 +62,14 @@ struct squaring_object
 
 private:
     // A reference to another stream of integers, which are our input.
-    InputStream & m_input_stream;
+    InputStream& m_input_stream;
 
     // A temporary value buffer to hold the current square in for retrieval.
     value_type m_current_value;
 
 public:
     // A constructor taking another stream of integers as input.
-    squaring_object(InputStream & input_stream)
+    squaring_object(InputStream& input_stream)
         : m_input_stream(input_stream)
     {
         if (!m_input_stream.empty())
@@ -80,13 +80,13 @@ public:
     }
 
     // The retrieve operator returning the square of the input stream.
-    const value_type & operator * () const
+    const value_type& operator * () const
     {
         return m_current_value;
     }
 
     // Increment operator: handled by incrementing the input stream.
-    squaring_object & operator ++ ()
+    squaring_object& operator ++ ()
     {
         ++m_input_stream;
         if (!m_input_stream.empty())

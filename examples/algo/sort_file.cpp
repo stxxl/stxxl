@@ -48,12 +48,12 @@ struct my_type
 };
 
 
-inline bool operator < (const my_type & a, const my_type & b)
+inline bool operator < (const my_type& a, const my_type& b)
 {
     return a.key() < b.key();
 }
 
-inline bool operator == (const my_type & a, const my_type & b)
+inline bool operator == (const my_type& a, const my_type& b)
 {
     return a.key() == b.key();
 }
@@ -63,7 +63,7 @@ struct Cmp
     typedef my_type first_argument_type;
     typedef my_type second_argument_type;
     typedef bool result_type;
-    bool operator () (const my_type & a, const my_type & b) const
+    bool operator () (const my_type& a, const my_type& b) const
     {
         return a < b;
     }
@@ -77,13 +77,13 @@ struct Cmp
     }
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj._key;
     return o;
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 3)
     {
@@ -97,7 +97,7 @@ int main(int argc, char ** argv)
         const my_type::key_type num_elements = 1 * 1024 * 1024;
         const unsigned int records_in_block = block_size / sizeof(my_type);
         stxxl::syscall_file f(argv[2], stxxl::file::CREAT | stxxl::file::RDWR);
-        my_type * array = (my_type *)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
+        my_type* array = (my_type*)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
         memset(array, 0, block_size);
 
         my_type::key_type cur_key = num_elements;
@@ -106,7 +106,7 @@ int main(int argc, char ** argv)
             for (unsigned j = 0; j < records_in_block; j++)
                 array[j]._key = cur_key--;
 
-            stxxl::request_ptr req = f.awrite((void *)array, stxxl::int64(i) * block_size, block_size, stxxl::default_completion_handler());
+            stxxl::request_ptr req = f.awrite((void*)array, stxxl::int64(i) * block_size, block_size, stxxl::default_completion_handler());
             req->wait();
         }
         stxxl::aligned_dealloc<BLOCK_ALIGN>(array);

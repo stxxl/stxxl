@@ -39,8 +39,8 @@ public:
     typedef meta_iter_t handle;
 
     //! Create an empty queue.
-    addressable_fifo_queue() {}
-    ~addressable_fifo_queue() {}
+    addressable_fifo_queue() { }
+    ~addressable_fifo_queue() { }
 
     //! Check if queue is empty.
     //! \return If queue is empty.
@@ -50,7 +50,7 @@ public:
     //! Insert new element. If the element is already in, it is moved to the back.
     //! \param e Element to insert.
     //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
-    std::pair<handle, bool> insert(const KeyType & e)
+    std::pair<handle, bool> insert(const KeyType& e)
     {
         container_iter_t ei = vals.insert(vals.end(), e);
         std::pair<handle, bool> r = meta.insert(std::make_pair(e, ei));
@@ -66,7 +66,7 @@ public:
     //! Erase element from the queue.
     //! \param e Element to remove.
     //! \return If element was in.
-    bool erase(const KeyType & e)
+    bool erase(const KeyType& e)
     {
         handle mi = meta.find(e);
         if (mi == meta.end())
@@ -104,18 +104,18 @@ public:
 //! An internal priority queue that allows removing elements addressed with (a copy of) themselves.
 //! \tparam KeyType Type of contained elements.
 //! \tparam PriorityType Type of Priority.
-template < typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >
+template <typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >
 class addressable_priority_queue
 {
     struct cmp // like < for pair, but uses Cmp for < on first
     {
-      bool operator()(const std::pair<PriorityType, KeyType> & left,
-              const std::pair<PriorityType, KeyType> & right) const
-      {
-          Cmp c;
-          return c(left.first, right.first) ||
-                  ((! c(right.first, left.first)) && left.second < right.second);
-      }
+        bool operator () (const std::pair<PriorityType, KeyType>& left,
+                          const std::pair<PriorityType, KeyType>& right) const
+        {
+            Cmp c;
+            return c(left.first, right.first) ||
+                   ((! c(right.first, left.first)) && left.second < right.second);
+        }
     };
 
     typedef std::set<std::pair<PriorityType, KeyType>, cmp> container_t;
@@ -131,8 +131,8 @@ public:
     typedef meta_iter_t handle;
 
     //! Create an empty queue.
-    addressable_priority_queue() {}
-    ~addressable_priority_queue() {}
+    addressable_priority_queue() { }
+    ~addressable_priority_queue() { }
 
     //! Check if queue is empty.
     //! \return If queue is empty.
@@ -143,9 +143,9 @@ public:
     //! \param e Element to insert.
     //! \param o Priority of element.
     //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
-    std::pair<handle, bool> insert(const KeyType & e, const PriorityType o)
+    std::pair<handle, bool> insert(const KeyType& e, const PriorityType o)
     {
-        std::pair<container_iter_t ,bool> s = vals.insert(std::make_pair(o, e));
+        std::pair<container_iter_t, bool> s = vals.insert(std::make_pair(o, e));
         std::pair<handle, bool> r = meta.insert(std::make_pair(e, s.first));
         if (! r.second && s.second)
         {
@@ -159,7 +159,7 @@ public:
     //! Erase element from the queue.
     //! \param e Element to remove.
     //! \return If element was in.
-    bool erase(const KeyType & e)
+    bool erase(const KeyType& e)
     {
         handle mi = meta.find(e);
         if (mi == meta.end())

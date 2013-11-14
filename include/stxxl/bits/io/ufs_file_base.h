@@ -36,7 +36,7 @@ protected:
     int m_mode;            // open mode
     const std::string filename;
     bool m_is_device;      //!< is special device node
-    ufs_file_base(const std::string & filename, int mode);
+    ufs_file_base(const std::string& filename, int mode);
     void _after_open();
     offset_type _size();
     void _set_size(offset_type newsize);

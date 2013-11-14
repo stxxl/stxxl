@@ -41,7 +41,7 @@ typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 // forced instantiation
 template class stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE>;
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     stxxl::stats_data stats_elapsed;
@@ -59,8 +59,8 @@ int main(int argc, char ** argv)
 
         // allocate map and insert elements
 
-        map_type * DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
-        map_type & Map = *DMap;
+        map_type* DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
+        map_type& Map = *DMap;
 
         for (unsigned i = 0; i < el; ++i)
         {
@@ -78,7 +78,7 @@ int main(int argc, char ** argv)
         stats_begin = *stxxl::stats::get_instance();
         STXXL_MSG("Doing search");
         unsigned queries = el / 16;
-        const map_type & ConstMap = Map;
+        const map_type& ConstMap = Map;
         stxxl::random_number32 myrandom;
         for (unsigned i = 0; i < queries; ++i)
         {

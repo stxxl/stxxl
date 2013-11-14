@@ -37,10 +37,10 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param queue_id disk queue identifier
     //! \param allocator_id linked disk_allocator
-    inline mmap_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
+    inline mmap_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
         ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
-    void serve(const request * req) throw (io_error);
+    void serve(const request* req) throw (io_error);
     const char * io_type() const;
 };
 
@@ -48,6 +48,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_MMAP_FILE
+#endif // #if STXXL_HAVE_MMAP_FILE
 
 #endif // !STXXL_IO_MMAP_FILE_HEADER

@@ -48,7 +48,7 @@ template <typename ExtIterator_,
           typename AllocStrategy_>
 void random_shuffle(ExtIterator_ first,
                     ExtIterator_ last,
-                    RandomNumberGenerator_ & rand,
+                    RandomNumberGenerator_& rand,
                     unsigned_type M,
                     AllocStrategy_ AS = STXXL_DEFAULT_ALLOC_STRATEGY())
 {
@@ -76,18 +76,18 @@ void random_shuffle(ExtIterator_ first,
 
     stxxl::int64 i, j, size = 0;
 
-    value_type * temp_array;
+    value_type* temp_array;
     typedef typename stxxl::VECTOR_GENERATOR<value_type,
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
-    temp_vector_type * temp_vector;
+    temp_vector_type* temp_vector;
 
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets");
     stxxl::read_write_pool<block_type> pool(0, M / BlockSize_ - k);  // no read buffers and M/B-k write buffers
 
-    stack_type ** buckets;
+    stack_type** buckets;
 
     // create and put buckets into container
-    buckets = new stack_type *[k];
+    buckets = new stack_type*[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 
@@ -195,7 +195,7 @@ template <typename Tp_, typename AllocStrategy_, typename SzTp_, typename DiffTp
           unsigned BlockSize_, typename PgTp_, unsigned PageSize_, typename RandomNumberGenerator_>
 void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> first,
                     stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> last,
-                    RandomNumberGenerator_ & rand,
+                    RandomNumberGenerator_& rand,
                     unsigned_type M)
 {
     typedef stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> ExtIterator_;
@@ -218,17 +218,17 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
 
     stxxl::int64 i, j, size = 0;
 
-    value_type * temp_array;
+    value_type* temp_array;
     typedef typename stxxl::VECTOR_GENERATOR<value_type,
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
-    temp_vector_type * temp_vector;
+    temp_vector_type* temp_vector;
 
     stxxl::read_write_pool<block_type> pool(0, M / BlockSize_ - k);  // no read buffers and M/B-k write buffers
 
-    stack_type ** buckets;
+    stack_type** buckets;
 
     // create and put buckets into container
-    buckets = new stack_type *[k];
+    buckets = new stack_type*[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 

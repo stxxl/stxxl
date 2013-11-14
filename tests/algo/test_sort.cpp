@@ -47,23 +47,23 @@ struct my_type
     ~my_type() { }
 };
 
-std::ostream & operator << (std::ostream & o, const my_type & obj)
+std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
     o << obj._key;
     return o;
 }
 
-bool operator < (const my_type & a, const my_type & b)
+bool operator < (const my_type& a, const my_type& b)
 {
     return a.key() < b.key();
 }
 
-bool operator == (const my_type & a, const my_type & b)
+bool operator == (const my_type& a, const my_type& b)
 {
     return a.key() == b.key();
 }
 
-bool operator != (const my_type & a, const my_type & b)
+bool operator != (const my_type& a, const my_type& b)
 {
     return a.key() != b.key();
 }

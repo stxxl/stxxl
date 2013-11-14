@@ -29,7 +29,7 @@ typedef stxxl::buf_ostream<block_type, bid_iterator_type> buf_ostream_type;
 typedef stxxl::buf_istream<block_type, bid_iterator_type> buf_istream_type;
 typedef stxxl::buf_istream_reverse<block_type, bid_iterator_type> buf_istream_reverse_type;
 
- // forced instantiations
+// forced instantiations
 template class stxxl::buf_ostream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
 template class stxxl::buf_istream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
 template class stxxl::buf_istream_reverse<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
@@ -40,7 +40,7 @@ int main()
     const unsigned nelements = nblocks * block_type::size;
     stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
 
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
     {
         buf_ostream_type out(bids.begin(), 2);
@@ -55,9 +55,9 @@ int main()
             unsigned value;
             in >> value;
 
-            STXXL_CHECK2( value == i,
-                          "Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size) );
-            STXXL_CHECK( prevalue == value );
+            STXXL_CHECK2(value == i,
+                         "Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size));
+            STXXL_CHECK(prevalue == value);
         }
     }
     {
@@ -68,9 +68,9 @@ int main()
             unsigned value;
             in >> value;
 
-            STXXL_CHECK2( value == nelements - i - 1,
-                          "Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size) );
-            STXXL_CHECK( prevalue == value );
+            STXXL_CHECK2(value == nelements - i - 1,
+                         "Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size));
+            STXXL_CHECK(prevalue == value);
         }
     }
     bm->delete_blocks(bids.begin(), bids.end());

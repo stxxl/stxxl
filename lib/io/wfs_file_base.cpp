@@ -25,12 +25,12 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-const char * wfs_file_base::io_type() const
+const char* wfs_file_base::io_type() const
 {
     return "wfs_base";
 }
 
-static HANDLE open_file_impl(const std::string & filename, int mode)
+static HANDLE open_file_impl(const std::string& filename, int mode)
 {
     DWORD dwDesiredAccess = 0;
     DWORD dwShareMode = 0;
@@ -96,7 +96,7 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
         return file_des;
 
 #if !STXXL_DIRECT_IO_OFF
-    if ((mode & file::DIRECT) && !(mode & file::REQUIRE_DIRECT))
+    if ((mode& file::DIRECT) && !(mode & file::REQUIRE_DIRECT))
     {
         STXXL_MSG("CreateFile() error on path=" << filename << " mode=" << mode << ", retrying without DIRECT mode.");
 
@@ -114,7 +114,7 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
 }
 
 wfs_file_base::wfs_file_base(
-    const std::string & filename,
+    const std::string& filename,
     int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename), locked(false)
 {
     file_des = open_file_impl(filename, mode);
@@ -200,11 +200,11 @@ void wfs_file_base::set_size(offset_type newsize)
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = newsize;
 
-        bool direct_with_bad_size = (mode_ & file::DIRECT) && (newsize % bytes_per_sector);
+        bool direct_with_bad_size = (mode_& file::DIRECT) && (newsize % bytes_per_sector);
         if (direct_with_bad_size)
         {
             if (!CloseHandle(file_des))
-                STXXL_THROW_WIN_LASTERROR(io_error,"closing file (call of ::CloseHandle() from set_size) ");
+                STXXL_THROW_WIN_LASTERROR(io_error, "closing file (call of ::CloseHandle() from set_size) ");
 
             file_des = INVALID_HANDLE_VALUE;
             file_des = open_file_impl(filename, WRONLY);
@@ -216,13 +216,13 @@ void wfs_file_base::set_size(offset_type newsize)
                                       " newsize=" << newsize << " ");
 
         if (!SetEndOfFile(file_des))
-            STXXL_THROW_WIN_LASTERROR(io_error,"SetEndOfFile() oldsize=" << cur_size <<
+            STXXL_THROW_WIN_LASTERROR(io_error, "SetEndOfFile() oldsize=" << cur_size <<
                                       " newsize=" << newsize << " ");
 
         if (direct_with_bad_size)
         {
             if (!CloseHandle(file_des))
-                STXXL_THROW_WIN_LASTERROR(io_error,"closing file (call of ::CloseHandle() from set_size) ");
+                STXXL_THROW_WIN_LASTERROR(io_error, "closing file (call of ::CloseHandle() from set_size) ");
 
             file_des = INVALID_HANDLE_VALUE;
             file_des = open_file_impl(filename, mode_ & ~TRUNC);

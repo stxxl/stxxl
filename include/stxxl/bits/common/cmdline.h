@@ -42,12 +42,11 @@ __STXXL_BEGIN_NAMESPACE
 class cmdline_parser : private noncopyable
 {
 protected:
-
     //! base class of all options and parameters
     struct argument
     {
         //! single letter short option, or 0 is none
-        char        m_key;
+        char m_key;
         //! long option key or name for parameters
         std::string m_longkey;
         //! option type description, e.g. "<#>" to indicate numbers
@@ -55,28 +54,27 @@ protected:
         //! longer description, which will be wrapped
         std::string m_desc;
         //! required, process() fails if the option/parameter is not found.
-        bool        m_required;
+        bool m_required;
         //! found during processing of command line
-        bool        m_found;
+        bool m_found;
         //! repeated argument, i.e. std::vector<std::string>
-        bool        m_repeated;
+        bool m_repeated;
 
         //! contructor filling most attributes
         argument(char key, const std::string& longkey, const std::string& keytype,
                  const std::string& desc, bool required)
             : m_key(key), m_longkey(longkey), m_keytype(keytype),
               m_desc(desc), m_required(required), m_found(false), m_repeated(false)
-        {
-        }
+        { }
 
         //! empty virtual destructor
         virtual ~argument() { }
 
         //! return formatted type name to user
-        virtual const char* type_name() const = 0;
+        virtual const char * type_name() const = 0;
 
         //! process one item from command line for this argument
-        virtual bool process(int& argc, const char* const* &argv) = 0;
+        virtual bool process(int& argc, const char* const*& argv) = 0;
 
         //! format value to ostream
         virtual void print_value(std::ostream& os) const = 0;
@@ -86,7 +84,7 @@ protected:
         {
             std::string s = m_longkey;
             if (m_keytype.size()) {
-                s += ' '; s += m_keytype;
+                s += ' ' + m_keytype;
             }
             return s;
         }
@@ -96,12 +94,12 @@ protected:
         {
             std::string s;
             if (m_key) {
-                s += '-'; s += m_key; s += ", ";
+                s += '-' + m_key + ", ";
             }
             s += "--";
             s += m_longkey;
             if (m_keytype.size()) {
-                s += ' '; s += m_keytype;
+                s += ' ' + m_keytype;
             }
             return s;
         }
@@ -111,21 +109,20 @@ protected:
     struct argument_flag : public argument
     {
         //! reference to boolean to set to true
-        bool&       m_dest;
+        bool& m_dest;
 
         //! contructor filling most attributes
         argument_flag(char key, const std::string& longkey, const std::string& keytype,
                       const std::string& desc, bool required, bool& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
-        {
-        }
+        { }
 
-        virtual const char* type_name() const
+        virtual const char * type_name() const
         { return "flag"; }
 
         //! "process" argument: just set to true, no argument is used.
-        virtual bool process(int&, const char* const* &)
+        virtual bool process(int&, const char* const*&)
         {
             m_dest = true;
             return true;
@@ -145,14 +142,13 @@ protected:
                      const std::string& desc, bool required, int& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
-        {
-        }
+        { }
 
-        virtual const char* type_name() const
+        virtual const char * type_name() const
         { return "integer"; }
 
         //! parse signed integer using sscanf.
-        virtual bool process(int& argc, const char* const* &argv)
+        virtual bool process(int& argc, const char* const*& argv)
         {
             if (argc == 0) return false;
             if (sscanf(argv[0], "%d", &m_dest) == 1) {
@@ -174,17 +170,16 @@ protected:
 
         //! contructor filling most attributes
         argument_uint(char key, const std::string& longkey, const std::string& keytype,
-                     const std::string& desc, bool required, unsigned int& dest)
+                      const std::string& desc, bool required, unsigned int& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
-        {
-        }
+        { }
 
-        virtual const char* type_name() const
+        virtual const char * type_name() const
         { return "unsigned integer"; }
 
         //! parse unsigned integer using sscanf.
-        virtual bool process(int& argc, const char* const* &argv)
+        virtual bool process(int& argc, const char* const*& argv)
         {
             if (argc == 0) return false;
             if (sscanf(argv[0], "%u", &m_dest) == 1) {
@@ -206,17 +201,16 @@ protected:
 
         //! contructor filling most attributes
         argument_bytes(char key, const std::string& longkey, const std::string& keytype,
-                     const std::string& desc, bool required, uint64& dest)
+                       const std::string& desc, bool required, uint64& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
-        {
-        }
+        { }
 
-        virtual const char* type_name() const
+        virtual const char * type_name() const
         { return "bytes"; }
 
         //! parse byte size using SI/IEC parser from stxxl.
-        virtual bool process(int& argc, const char* const* &argv)
+        virtual bool process(int& argc, const char* const*& argv)
         {
             if (argc == 0) return false;
             if (parse_SI_IEC_size(argv[0], m_dest)) {
@@ -241,14 +235,13 @@ protected:
                         const std::string& desc, bool required, std::string& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
-        {
-        }
+        { }
 
-        virtual const char* type_name() const
+        virtual const char * type_name() const
         { return "string"; }
 
         //! "process" string argument just by storing it.
-        virtual bool process(int& argc, const char* const* &argv)
+        virtual bool process(int& argc, const char* const*& argv)
         {
             if (argc == 0) return false;
             m_dest = argv[0];
@@ -274,11 +267,11 @@ protected:
             m_repeated = true;
         }
 
-        virtual const char* type_name() const
+        virtual const char * type_name() const
         { return "string list"; }
 
         //! "process" string argument just by storing it in vector.
-        virtual bool process(int& argc, const char* const* &argv)
+        virtual bool process(int& argc, const char* const*& argv)
         {
             if (argc == 0) return false;
             m_dest.push_back(argv[0]);
@@ -299,53 +292,50 @@ protected:
     };
 
 protected:
-
     //! option and parameter list type
     typedef std::vector<argument*> arglist_type;
 
     //! list of options available
-    arglist_type        m_optlist;
+    arglist_type m_optlist;
     //! list of parameters, both required and optional
-    arglist_type        m_paramlist;
+    arglist_type m_paramlist;
 
     //! formatting width for options, '-s, --switch <#>'
-    size_t              m_opt_maxlong;
+    size_t m_opt_maxlong;
     //! formatting width for parameters, 'param <#>'
-    size_t              m_param_maxlong;
+    size_t m_param_maxlong;
 
     //! argv[0] for usage.
-    const char*         m_progname;
+    const char* m_progname;
 
     //! verbose processing of arguments
-    bool                m_verbose_process;
+    bool m_verbose_process;
 
     //! user set description of program, will be wrapped
-    std::string         m_description;
+    std::string m_description;
     //! user set author of program, will be wrapped
-    std::string         m_author;
+    std::string m_author;
 
     //! set line wrap length
-    unsigned int        m_linewrap;
+    unsigned int m_linewrap;
 
     //! maximum length of a type_name() result
     static const int m_maxtypename = 16;
 
 private:
-
     //! update maximum formatting width for new option
     void calc_opt_max(const argument* arg)
     {
-        m_opt_maxlong = STXXL_MAX(arg->option_text().size()+2, m_opt_maxlong);
+        m_opt_maxlong = STXXL_MAX(arg->option_text().size() + 2, m_opt_maxlong);
     }
 
     //! update maximum formatting width for new parameter
     void calc_param_max(const argument* arg)
     {
-        m_param_maxlong = STXXL_MAX(arg->param_text().size()+2, m_param_maxlong);
+        m_param_maxlong = STXXL_MAX(arg->param_text().size() + 2, m_param_maxlong);
     }
 
 public:
-
     //! Wrap a long string at spaces into lines. Prefix is added
     //! unconditionally to each line. Lines are wrapped after wraplen
     //! characters if possible.
@@ -355,7 +345,6 @@ public:
                 size_t current = 0, size_t indent_newline = 0);
 
 public:
-
     //! Construct new command line parser
     cmdline_parser()
         : m_opt_maxlong(8),
@@ -363,8 +352,7 @@ public:
           m_progname(NULL),
           m_verbose_process(true),
           m_linewrap(80)
-    {
-    }
+    { }
 
     //! Delete all added arguments
     ~cmdline_parser()
@@ -579,7 +567,6 @@ public:
     void print_usage(std::ostream& os = std::cout);
 
 private:
-
     //! print error about option.
     void print_option_error(int argc, const char* const* argv, const argument* arg,
                             std::ostream& os);
@@ -589,7 +576,6 @@ private:
                            std::ostream& os);
 
 public:
-
     //! parse command line options as specified by the options and parameters added.
     //! \return true if command line is okay and all required parameters are present.
     bool process(int argc, const char* const* argv, std::ostream& os = std::cout);

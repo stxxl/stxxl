@@ -14,7 +14,7 @@
 #include <iterator>
 #include <stxxl/deque>
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc != 2) {
         STXXL_MSG("Usage: " << argv[0] << " #ops");

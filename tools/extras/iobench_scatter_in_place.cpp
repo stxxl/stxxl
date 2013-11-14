@@ -33,7 +33,7 @@ using stxxl::uint64;
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
 
-void usage(const char * argv0)
+void usage(const char* argv0)
 {
     std::cout << "Usage: " << argv0 << " num_blocks blocks_per_round block_size file" << std::endl;
     std::cout << "    'block_size' in bytes" << std::endl;
@@ -52,7 +52,7 @@ inline double throughput(stxxl::uint64 bytes, double seconds)
     return bytes / (1024 * 1024) / seconds;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 5)
         usage(argv[0]);
@@ -60,7 +60,7 @@ int main(int argc, char * argv[])
     uint64 num_blocks = stxxl::atoint64(argv[1]);
     uint64 blocks_per_round = stxxl::atoint64(argv[2]);
     uint64 block_size = stxxl::atoint64(argv[3]);
-    const char * filebase = argv[4];
+    const char* filebase = argv[4];
 
     uint64 num_rounds = stxxl::div_ceil(num_blocks, blocks_per_round);
 
@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
               << block_size << ", reading chunks of "
               << blocks_per_round << " blocks" << std::endl;
 
-    char * buffer = (char *)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size * blocks_per_round);
+    char* buffer = (char*)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size * blocks_per_round);
     double totaltimeread = 0, totaltimewrite = 0;
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
     double totaltimereadchunk = 0.0, totaltimewritechunk = 0.0;
@@ -144,7 +144,7 @@ int main(int argc, char * argv[])
             std::cout << std::endl;
         }
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());

@@ -25,7 +25,7 @@ struct MyType
 
 struct my_handler
 {
-    void operator () (stxxl::request * req)
+    void operator () (stxxl::request* req)
     {
         STXXL_MSG(req << " done, type=" << req->io_type());
     }
@@ -38,11 +38,11 @@ void testIO()
     const unsigned nblocks = 2;
     stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
     std::vector<int> disks(nblocks, 2);
-    stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::request_ptr* reqs = new stxxl::request_ptr[nblocks];
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
 
-    block_type * block = new block_type;
+    block_type* block = new block_type;
     STXXL_MSG(std::hex);
     STXXL_MSG("Allocated block address    : " << (stxxl::unsigned_type)(block));
     STXXL_MSG("Allocated block address + 1: " << (stxxl::unsigned_type)(block + 1));
@@ -78,12 +78,12 @@ void testIO()
 
 void testIO2()
 {
-    typedef stxxl::typed_block<128 * 1024, double> block_type;
+    typedef stxxl::typed_block<128* 1024, double> block_type;
     std::vector<block_type::bid_type> bids;
     std::vector<stxxl::request_ptr> requests;
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     bm->new_blocks<block_type>(32, stxxl::striping(), std::back_inserter(bids));
-    block_type * blocks = new block_type[32];
+    block_type* blocks = new block_type[32];
     int vIndex;
     for (vIndex = 0; vIndex < 32; ++vIndex) {
         for (int vIndex2 = 0; vIndex2 < block_type::size; ++vIndex2) {
@@ -104,7 +104,7 @@ void testPrefetchPool()
     stxxl::prefetch_pool<block_type> pool(2);
     pool.resize(10);
     pool.resize(5);
-    block_type * blk = new block_type;
+    block_type* blk = new block_type;
     block_type::bid_type bid;
     stxxl::block_manager::get_instance()->new_block(stxxl::single_disk(), bid);
     pool.hint(bid);
@@ -117,7 +117,7 @@ void testWritePool()
     stxxl::write_pool<block_type> pool(100);
     pool.resize(10);
     pool.resize(5);
-    block_type * blk = new block_type;
+    block_type* blk = new block_type;
     block_type::bid_type bid;
     stxxl::block_manager::get_instance()->new_block(stxxl::single_disk(), bid);
     pool.write(blk, bid);
@@ -133,7 +133,7 @@ void testStreams()
     const unsigned nelements = nblocks * block_type1::size;
     stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
 
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
     {
         buf_ostream_type out(bids.begin(), 2);
@@ -161,7 +161,7 @@ int main()
     testStreams();
 
 #if STXXL_MNG_COUNT_ALLOCATION
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     STXXL_MSG("block_manager total allocation: " << bm->get_total_allocation());
     STXXL_MSG("block_manager current allocation: " << bm->get_current_allocation());
     STXXL_MSG("block_manager maximum allocation: " << bm->get_maximum_allocation());

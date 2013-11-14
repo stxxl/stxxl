@@ -31,12 +31,12 @@ using stxxl::timestamp;
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
 
-void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
+void run(char* buffer, file** disks, stxxl::int64 offset, stxxl::int64 length,
          unsigned hdd_blocks, unsigned hdd_bytes, unsigned ssd_blocks, unsigned ssd_bytes, unsigned repeats)
 {
     unsigned i, j;
     double begin = timestamp(), end, elapsed;
-    request_ptr * reqs = new request_ptr[stxxl::STXXL_MAX(hdd_blocks + ssd_blocks, 1U)];
+    request_ptr* reqs = new request_ptr[stxxl::STXXL_MAX(hdd_blocks + ssd_blocks, 1U)];
 
     struct diskinfo {
         unsigned id;
@@ -61,7 +61,7 @@ void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
 
     for (unsigned repeat = 0; repeat < repeats; ++repeat) {
         int r = 0;
-        char * buf = buffer;
+        char* buf = buffer;
         for (i = 0; i < 2; i++)
         {
             for (j = 0; j < info[i].n; j++) {
@@ -85,7 +85,7 @@ void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
     delete[] reqs;
 }
 
-void usage(const char * argv0)
+void usage(const char* argv0)
 {
     std::cout << "Usage: " << argv0 << " offset length diskfile flashfile" << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB" << std::endl;
@@ -93,7 +93,7 @@ void usage(const char * argv0)
     exit(-1);
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 4)
         usage(argv[0]);
@@ -120,8 +120,8 @@ int main(int argc, char * argv[])
 
     unsigned i;
 
-    file ** disks = new file *[ndisks];
-    unsigned * buffer = (unsigned *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size);
+    file** disks = new file*[ndisks];
+    unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size);
 
     for (i = 0; i < buffer_size_int; i++)
         buffer[i] = i;
@@ -133,19 +133,19 @@ int main(int argc, char * argv[])
     }
 
     try {
-        run((char *)buffer, disks, offset, length, 1, 2 * MB, 23, 128 * 1024, 100);
-        run((char *)buffer, disks, offset, length, 1, 2 * MB, 42, 128 * 1024, 100);
+        run((char*)buffer, disks, offset, length, 1, 2 * MB, 23, 128 * 1024, 100);
+        run((char*)buffer, disks, offset, length, 1, 2 * MB, 42, 128 * 1024, 100);
         for (unsigned hdd_bytes = 4 * KB; hdd_bytes < 256 * MB; hdd_bytes <<= 1) {
             for (unsigned ssd_bytes = 128 * KB; ssd_bytes == 128 * KB; ssd_bytes <<= 1) {
                 for (unsigned hdd_blocks = 1; hdd_blocks == 1; ++hdd_blocks) {
                     for (unsigned ssd_blocks = 0; ssd_blocks <= (stxxl::STXXL_MAX(16U, 2 * hdd_bytes * hdd_blocks / ssd_bytes)); ++ssd_blocks) {
-                        run((char *)buffer, disks, offset, length, hdd_blocks, hdd_bytes, ssd_blocks, ssd_bytes, 100);
+                        run((char*)buffer, disks, offset, length, hdd_blocks, hdd_bytes, ssd_blocks, ssd_bytes, 100);
                     }
                 }
             }
         }
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());

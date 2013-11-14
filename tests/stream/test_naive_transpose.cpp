@@ -42,7 +42,7 @@ public:
         return (pos % cut) * repeat + pos / cut;
     }
 
-    streamop_matrix_transpose & operator ++ ()
+    streamop_matrix_transpose& operator ++ ()
     {
         ++pos;
         return *this;
@@ -60,7 +60,7 @@ struct cmp_tuple_first : std::binary_function<T, T, bool>
     typedef T value_type;
     typedef typename value_type::first_type first_value_type;
 
-    bool operator () (const value_type & a, const value_type & b) const
+    bool operator () (const value_type& a, const value_type& b) const
     {
         return a.first < b.first;
     }
@@ -77,7 +77,7 @@ struct cmp_tuple_first : std::binary_function<T, T, bool>
 };
 
 template <typename Vector>
-void dump_upper_left(const Vector & v, unsigned rows, unsigned cols, unsigned nx, unsigned ny)
+void dump_upper_left(const Vector& v, unsigned rows, unsigned cols, unsigned nx, unsigned ny)
 {
     int w = 5;
 
@@ -128,7 +128,7 @@ int main()
 #if STXXL_WINDOWS
     typedef stxxl::stream::streamify_traits<array_type::iterator>::stream_type input_stream_type;
 #else
-    typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+    typedef __typeof__ (stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 #endif
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end(), numbuffers);
 

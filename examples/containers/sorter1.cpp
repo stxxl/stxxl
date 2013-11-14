@@ -18,7 +18,7 @@
 
 struct my_comparator
 {
-    bool operator () (const int & a, const int & b) const
+    bool operator () (const int& a, const int& b) const
     {
         return a < b;
     }

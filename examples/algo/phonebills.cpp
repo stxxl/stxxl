@@ -21,7 +21,7 @@
 
 #define CT_PER_MIN 2    // subscribers pay 2 cent per minute
 
-struct LogEntry // the event log data structure
+struct LogEntry         // the event log data structure
 {
     long long int from; // callers number (64 bit integer)
     long long int to;   // destination number (64 bit int)
@@ -31,7 +31,7 @@ struct LogEntry // the event log data structure
 };
 
 // input operator used for reading from the file
-std::istream & operator >> (std::istream & i, LogEntry & entry)
+std::istream& operator >> (std::istream& i, LogEntry& entry)
 {
     i >> entry.from;
     i >> entry.to;
@@ -41,7 +41,7 @@ std::istream & operator >> (std::istream & i, LogEntry & entry)
 }
 
 // output operator used for writing to file
-std::ostream & operator << (std::ostream & i, const LogEntry & entry)
+std::ostream& operator << (std::ostream& i, const LogEntry& entry)
 {
     i << entry.from << " ";
     i << entry.to << " ";
@@ -53,14 +53,14 @@ std::ostream & operator << (std::ostream & i, const LogEntry & entry)
 // unary function used for producing the bills
 struct ProduceBill
 {
-    std::ostream & out; // stream for outputting
+    std::ostream& out;  // stream for outputting
     // the bills
     unsigned sum;       // current subscribers debit
     LogEntry last;      // the last record
 
-    ProduceBill(std::ostream & o_) : out(o_), sum(0) { last.from = -1; }
+    ProduceBill(std::ostream& o_) : out(o_), sum(0) { last.from = -1; }
 
-    void operator () (const LogEntry & e)
+    void operator () (const LogEntry& e)
     {
         if (last.from == e.from)
         {
@@ -80,7 +80,7 @@ struct ProduceBill
 
             // output the total sum
             out << last.from << "; " << (sum / 100) << " EUR " << (sum % 100) <<
-            " ct" << std::endl;
+                " ct" << std::endl;
 
             sum = 0;             // reset the sum
         }
@@ -92,7 +92,7 @@ struct ProduceBill
 struct SortByCaller
 {
     // comparison function
-    bool operator () (const LogEntry & a, const LogEntry & b) const
+    bool operator () (const LogEntry& a, const LogEntry& b) const
     {
         return a.from < b.from ||
                (a.from == b.from && a.timestamp < b.timestamp) ||
@@ -120,7 +120,7 @@ struct SortByCaller
 };
 
 
-void print_usage(const char * program)
+void print_usage(const char* program)
 {
     std::cout << "Usage: " << program << " logfile main billfile" << std::endl;
     std::cout << " logfile  - file name of the input" << std::endl;
@@ -135,7 +135,7 @@ typedef stxxl::vector<LogEntry> vector_type;
 typedef std::vector<LogEntry> vector_type;
 #endif
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if (argc < 4)
     {

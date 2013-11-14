@@ -28,7 +28,7 @@ struct element  // 24 bytes, not a power of 2 intentionally
     stxxl::int64 load0;
     stxxl::int64 load1;
 
-    element & operator = (stxxl::int64 i)
+    element& operator = (stxxl::int64 i)
     {
         key = i;
         load0 = i + 42;
@@ -36,7 +36,7 @@ struct element  // 24 bytes, not a power of 2 intentionally
         return *this;
     }
 
-    bool operator == (const element & e2) const
+    bool operator == (const element& e2) const
     {
         return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
     }
@@ -55,7 +55,7 @@ struct counter
 };
 
 template <class my_vec_type>
-void test_const_iterator(const my_vec_type & x)
+void test_const_iterator(const my_vec_type& x)
 {
     typename my_vec_type::const_iterator i = x.begin();
     i = x.end() - 1;
@@ -71,14 +71,14 @@ void test_const_iterator(const my_vec_type & x)
 void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (1024 * 1024), stxxl::striping>::result vector_type;
+    typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (1024* 1024), stxxl::striping>::result vector_type;
     vector_type v(32 * 1024 * 1024 / sizeof(element));
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
     STXXL_UNUSED(c_it);
 
-    unsigned int big_size = 2*32 * 1024 * 1024;
+    unsigned int big_size = 2 * 32 * 1024 * 1024;
     typedef stxxl::vector<double> vec_big;
     vec_big my_vec(big_size);
 
@@ -157,7 +157,7 @@ void test_resize_shrink()
     int n = 1 << 16;
     vector.resize(n);
 
-    for(int i = 0; i < n; i += 100)
+    for (int i = 0; i < n; i += 100)
         vector[i] = i;
 
     vector.resize(1, true);
@@ -173,7 +173,7 @@ int main()
 }
 
 // forced instantiation
-template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024 * 1024), stxxl::striping>;
+template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024* 1024), stxxl::striping>;
 template class stxxl::vector<double>;
 template class stxxl::vector_iterator<double, STXXL_DEFAULT_ALLOC_STRATEGY, stxxl::uint64, stxxl::int64, STXXL_DEFAULT_BLOCK_SIZE(double), stxxl::lru_pager<8>, 4>;
 template class stxxl::const_vector_iterator<double, STXXL_DEFAULT_ALLOC_STRATEGY, stxxl::uint64, stxxl::int64, STXXL_DEFAULT_BLOCK_SIZE(double), stxxl::lru_pager<8>, 4>;
@@ -182,7 +182,7 @@ template class stxxl::const_vector_iterator<double, STXXL_DEFAULT_ALLOC_STRATEGY
 typedef stxxl::vector<double>::const_iterator const_vector_iterator;
 template class stxxl::vector_bufreader<const_vector_iterator>;
 template class stxxl::vector_bufreader_reverse<const_vector_iterator>;
-template class stxxl::vector_bufreader_iterator< stxxl::vector_bufreader<const_vector_iterator> >;
+template class stxxl::vector_bufreader_iterator<stxxl::vector_bufreader<const_vector_iterator> >;
 
 typedef stxxl::vector<double>::iterator vector_iterator;
 template class stxxl::vector_bufwriter<vector_iterator>;

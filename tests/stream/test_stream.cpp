@@ -35,7 +35,7 @@ typedef stxxl::tuple<char, int> tuple_type;
 
 namespace std {
 
-std::ostream & operator << (std::ostream & os, const tuple_type & t)
+std::ostream& operator << (std::ostream& os, const tuple_type& t)
 {
     os << "<" << t.first << "," << t.second << ">";
     return os;
@@ -57,11 +57,11 @@ using stxxl::stream::make_tuple;
 using stxxl::tuple;
 
 
-const char * phrase = "Hasta la vista, baby";
+const char* phrase = "Hasta la vista, baby";
 
 
 template <class Container_, class It_>
-void fill_input_array(Container_ & container, It_ p)
+void fill_input_array(Container_& container, It_ p)
 {
     while (*p)
     {
@@ -91,7 +91,7 @@ typedef counter<int> counter_type;
 struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
 {
     typedef tuple_type value_type;
-    bool operator () (const value_type & a, const value_type & b) const
+    bool operator () (const value_type& a, const value_type& b) const
     {
         return a.first < b.first;
     }
@@ -109,7 +109,7 @@ struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
 struct cmp_int : std::binary_function<int, int, bool>
 {
     typedef int value_type;
-    bool operator () (const value_type & a, const value_type & b) const
+    bool operator () (const value_type& a, const value_type& b) const
     {
         return a > b;
     }
@@ -129,7 +129,7 @@ struct identity : std::unary_function<T, T>
 {
     typedef T value_type;
 
-    const T & operator () (const T & t)
+    const T& operator () (const T& t)
     {
         return t;
     }
@@ -140,7 +140,7 @@ int main()
     input_array_type input;
     output_array_type output;
 
-    stxxl::stats * s = stxxl::stats::get_instance();
+    stxxl::stats* s = stxxl::stats::get_instance();
 
     std::cout << *s;
 
@@ -213,8 +213,8 @@ int main()
     std::vector<int> InternalArray(1024 * 1024);
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
     //convenience function based on streaming
-    stxxl::sort<1024 * 1024>(InternalArray.begin(), InternalArray.end(),
-                             cmp_int(), 1024 * 1024 * 31, stxxl::RC());
+    stxxl::sort<1024* 1024>(InternalArray.begin(), InternalArray.end(),
+                            cmp_int(), 1024 * 1024 * 31, stxxl::RC());
 
     return 0;
 }

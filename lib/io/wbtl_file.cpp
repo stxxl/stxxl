@@ -33,7 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 
 
 wbtl_file::wbtl_file(
-    file * backend_file,
+    file* backend_file,
     size_type write_buffer_size,
     int write_buffers,
     int queue_id, int allocator_id) :
@@ -42,8 +42,8 @@ wbtl_file::wbtl_file(
 {
     STXXL_UNUSED(write_buffers);
     assert(write_buffers == 2); // currently hardcoded
-    write_buffer[0] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
-    write_buffer[1] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
+    write_buffer[0] = static_cast<char*>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
+    write_buffer[1] = static_cast<char*>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
     buffer_address[0] = offset_type(-1);
     buffer_address[1] = offset_type(-1);
 }
@@ -56,11 +56,11 @@ wbtl_file::~wbtl_file()
     storage = 0;
 }
 
-void wbtl_file::serve(const request * req) throw (io_error)
+void wbtl_file::serve(const request* req) throw (io_error)
 {
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    void* buffer = req->get_buffer();
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
@@ -99,8 +99,8 @@ void wbtl_file::set_size(offset_type newsize)
 }
 
 #define FMT_A_S(_addr_, _size_) "0x" << std::hex << std::setfill('0') << std::setw(8) << (_addr_) << "/0x" << std::setw(8) << (_size_)
-#define FMT_A_C(_addr_, _size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
-#define FMT_A(_addr_) "0x" << std::setw(8) << (_addr_)
+        #define FMT_A_C(_addr_, _size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
+        #define FMT_A(_addr_) "0x" << std::setw(8) << (_addr_)
 
 // logical address
 void wbtl_file::discard(offset_type offset, offset_type size)
@@ -198,7 +198,7 @@ void wbtl_file::_add_free_region(offset_type offset, offset_type size)
     STXXL_VERBOSE_WBTL("wbtl:free    p" << FMT_A_S(region_pos, region_size) << " F => f" << FMT_A_C(free_bytes, free_space.size()));
 }
 
-void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
+void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
 {
     scoped_mutex_lock buffer_lock(buffer_mutex);
     int cached = -1;
@@ -236,7 +236,7 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
     }
     else if (physical_offset == 0xffffffff) {
         // block was deleted or never written before
-        char * uninitialized = (char *)malloc(sizeof(char));
+        char* uninitialized = (char*)malloc(sizeof(char));
         memset(buffer, *uninitialized, bytes);
         free(uninitialized);
     }
@@ -250,7 +250,7 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
     STXXL_UNUSED(cached);
 }
 
-void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
+void wbtl_file::swrite(void* buffer, offset_type offset, size_type bytes)
 {
     scoped_mutex_lock buffer_lock(buffer_mutex);
     // is the block already mapped?
@@ -347,7 +347,7 @@ void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size
     }
 }
 
-const char * wbtl_file::io_type() const
+const char* wbtl_file::io_type() const
 {
     return "wbtl";
 }

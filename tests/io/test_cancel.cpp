@@ -22,13 +22,13 @@ using stxxl::file;
 
 struct print_completion
 {
-    void operator () (stxxl::request * ptr)
+    void operator () (stxxl::request* ptr)
     {
         std::cout << "Request completed: " << ptr << std::endl;
     }
 };
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     if (argc < 3)
     {
@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
     }
 
     const stxxl::uint64 size = 64 * 1024 * 1024, num_blocks = 16;
-    char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
+    char* buffer = (char*)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
     stxxl::compat_unique_ptr<stxxl::file>::result file(

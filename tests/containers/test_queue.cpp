@@ -20,7 +20,7 @@
 typedef unsigned my_type;
 
 template <class q1type, class q2type>
-void check(const q1type & q1, const q2type & q2)
+void check(const q1type& q1, const q2type& q2)
 {
     STXXL_CHECK(q1.empty() == q2.empty());
     STXXL_CHECK(q1.size() == q2.size());

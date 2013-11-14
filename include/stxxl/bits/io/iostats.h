@@ -461,7 +461,7 @@ public:
         elapsed(0.0)
     { }
 
-    stats_data(const stats & s) :
+    stats_data(const stats& s) :
         reads(s.get_reads()),
         writes(s.get_writes()),
         volume_read(s.get_read_volume()),
@@ -481,7 +481,7 @@ public:
         elapsed(timestamp() - s.get_last_reset_time())
     { }
 
-    stats_data operator + (const stats_data & a) const
+    stats_data operator + (const stats_data& a) const
     {
         stats_data s;
         s.reads = reads + a.reads;
@@ -504,7 +504,7 @@ public:
         return s;
     }
 
-    stats_data operator - (const stats_data & a) const
+    stats_data operator - (const stats_data& a) const
     {
         stats_data s;
         s.reads = reads - a.reads;
@@ -613,22 +613,22 @@ public:
     }
 };
 
-std::ostream & operator << (std::ostream & o, const stats_data & s);
+std::ostream& operator << (std::ostream& o, const stats_data& s);
 
-inline std::ostream & operator << (std::ostream & o, const stats & s)
+inline std::ostream& operator << (std::ostream& o, const stats& s)
 {
     o << stxxl::stats_data(s);
     return o;
 }
 
-std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit = "", int multiplier = 1000);
+std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char* unit = "", int multiplier = 1000);
 
-inline std::string add_IEC_binary_multiplier(uint64 number, const char * unit = "")
+inline std::string add_IEC_binary_multiplier(uint64 number, const char* unit = "")
 {
     return format_with_SI_IEC_unit_multiplier(number, unit, 1024);
 }
 
-inline std::string add_SI_multiplier(uint64 number, const char * unit = "")
+inline std::string add_SI_multiplier(uint64 number, const char* unit = "")
 {
     return format_with_SI_IEC_unit_multiplier(number, unit, 1000);
 }

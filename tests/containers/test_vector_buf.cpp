@@ -30,7 +30,7 @@ struct my_type  // 24 bytes, not a power of 2 intentionally
           load1(1 + 42)
     { }
 
-    bool operator == (const my_type & b) const
+    bool operator == (const my_type& b) const
     {
         return (key == b.key) && (load0 == b.load0) && (load1 == b.load1);
     }
@@ -38,7 +38,7 @@ struct my_type  // 24 bytes, not a power of 2 intentionally
 
 //! Verify contents of the vector
 template <typename VectorType>
-void check_vector(const VectorType & v)
+void check_vector(const VectorType& v)
 {
     typedef typename VectorType::value_type value_type;
 
@@ -66,7 +66,7 @@ public:
         return value_type(i);
     }
 
-    MyStream & operator ++ ()
+    MyStream& operator ++ ()
     {
         ++i;
         return *this;
@@ -135,7 +135,7 @@ void test_vector_buf(uint64 size)
     {   // read vector using vector_bufreader
         stxxl::scoped_print_timer tm("vector_bufreader");
 
-        const vector_type & cvec = vec;
+        const vector_type& cvec = vec;
 
         typename vector_type::bufreader_type reader(cvec.begin(), cvec.end());
 
@@ -179,7 +179,7 @@ void test_vector_buf(uint64 size)
     {   // read vector using vector_bufreader_reverse
         stxxl::scoped_print_timer tm("vector_bufreader_reverse");
 
-        const vector_type & cvec = vec;
+        const vector_type& cvec = vec;
 
         typename vector_type::bufreader_reverse_type reader(cvec.begin(), cvec.end());
 
@@ -251,7 +251,7 @@ void test_vector_buf(uint64 size)
 #endif
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     int size = (argc > 1) ? atoi(argv[1]) : 16;
 

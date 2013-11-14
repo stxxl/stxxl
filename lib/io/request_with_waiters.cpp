@@ -18,7 +18,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-bool request_with_waiters::add_waiter(onoff_switch * sw)
+bool request_with_waiters::add_waiter(onoff_switch* sw)
 {
     // this lock needs to be obtained before poll(), otherwise a race
     // condition might occur: the state might change and notify_waiters()
@@ -36,7 +36,7 @@ bool request_with_waiters::add_waiter(onoff_switch * sw)
     return false;
 }
 
-void request_with_waiters::delete_waiter(onoff_switch * sw)
+void request_with_waiters::delete_waiter(onoff_switch* sw)
 {
     scoped_mutex_lock lock(waiters_mutex);
     waiters.erase(sw);

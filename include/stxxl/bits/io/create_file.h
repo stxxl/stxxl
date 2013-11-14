@@ -20,8 +20,8 @@
 __STXXL_BEGIN_NAMESPACE
 
 //! create fileio object from io_impl string and a few parameters
-file * create_file(const std::string & io_impl,
-                   const std::string & filename,
+file * create_file(const std::string& io_impl,
+                   const std::string& filename,
                    int options,
                    int physical_device_id = file::DEFAULT_QUEUE,
                    int disk_allocator_id = file::NO_ALLOCATOR);

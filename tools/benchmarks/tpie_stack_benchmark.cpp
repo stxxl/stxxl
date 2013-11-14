@@ -94,7 +94,7 @@ void run_stack(stxxl::int64 volume)
     Timer.reset();
     Timer.start();
 
-    my_record * out;
+    my_record* out;
 
     for (i = 0; i < ops; ++i)
     {
@@ -116,7 +116,7 @@ void run_stack(stxxl::int64 volume)
 }
 
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     using std::cout;
     using std::endl;
@@ -155,7 +155,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
                                             << " bytes to prevent file buffering.");
     //int * array = new int[MEM_2_RESERVE/sizeof(int)];
-    int * array = (int *)malloc(MEM_2_RESERVE);
+    int* array = (int*)malloc(MEM_2_RESERVE);
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 
     STXXL_MSG("Running version: " << version);

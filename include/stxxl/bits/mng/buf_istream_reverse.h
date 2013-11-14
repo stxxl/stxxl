@@ -51,10 +51,10 @@ private:
 
 protected:
     typedef block_prefetcher<block_type, typename bid_vector_type::iterator> prefetcher_type;
-    prefetcher_type * prefetcher;
+    prefetcher_type* prefetcher;
     int_type current_elem;
-    block_type * current_blk;
-    int_type * prefetch_seq;
+    block_type* current_blk;
+    int_type* prefetch_seq;
 #ifdef BUF_ISTREAM_CHECK_END
     bool not_finished;
 #endif
@@ -76,7 +76,7 @@ public:
           bids_(end - begin)
     {
         // copy list of bids in reverse
-        std::reverse_copy( begin, end, bids_.begin() );
+        std::reverse_copy(begin, end, bids_.begin());
 
         // calculate prefetch sequence
         const unsigned_type ndisks = config::get_instance()->disks_number();
@@ -100,7 +100,7 @@ public:
     //! \param record reference to the block record type,
     //!        contains value of the next record in the stream after the call of the operator
     //! \return reference to itself (stream object)
-    _Self & operator >> (reference record)
+    _Self& operator >> (reference record)
     {
 #ifdef BUF_ISTREAM_CHECK_END
         assert(not_finished);
@@ -135,7 +135,7 @@ public:
 
     //! Moves to the _previous_ record in the stream.
     //! \return reference to itself after the advance
-    _Self & operator ++ ()
+    _Self& operator ++ ()
     {
 #ifdef BUF_ISTREAM_CHECK_END
         assert(not_finished);

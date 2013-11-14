@@ -32,13 +32,13 @@ template class stxxl::read_write_pool<block_type>;
 
 int main()
 {
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     STXXL_DEFAULT_ALLOC_STRATEGY alloc;
 
     {
         STXXL_MSG("Write-After-Write coherence test");
         stxxl::read_write_pool<block_type> pool(2, 10);
-        block_type * blk;
+        block_type* blk;
         block_type::bid_type bid;
 
         bm->new_block(alloc, bid);
@@ -75,7 +75,7 @@ int main()
     {
         STXXL_MSG("Write-After-Hint coherence test #1");
         stxxl::read_write_pool<block_type> pool(1, 1);
-        block_type * blk;
+        block_type* blk;
         block_type::bid_type bid;
 
         bm->new_block(alloc, bid);
@@ -105,7 +105,7 @@ int main()
     {
         STXXL_MSG("Write-After-Hint coherence test #2");
         stxxl::read_write_pool<block_type> pool(1, 1);
-        block_type * blk;
+        block_type* blk;
         block_type::bid_type bid;
 
         bm->new_block(alloc, bid);
