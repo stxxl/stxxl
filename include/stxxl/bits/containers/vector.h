@@ -933,7 +933,7 @@ public:
     //! \param npages Number of cached pages.
     vector(size_type n = 0, unsigned_type npages = pager_type().size())
         : m_size(n),
-          m_bids((size_t) div_ceil(n, block_type::size)),
+          m_bids((size_t)div_ceil(n, block_type::size)),
           m_pager(npages),
           m_page_status(div_ceil(m_bids.size(), page_size)),
           m_page_to_slot(div_ceil(m_bids.size(), page_size)),
@@ -1202,7 +1202,7 @@ public:
     //! \c sizeof(ValueType) and the page size (4096).
     vector(file * from, size_type size = size_type(-1), unsigned_type npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-          m_bids((size_t) div_ceil(m_size, size_type(block_type::size))),
+          m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
           m_page_status(div_ceil(m_bids.size(), page_size)),
           m_page_to_slot(div_ceil(m_bids.size(), page_size)),
@@ -1216,7 +1216,7 @@ public:
         {
             std::ostringstream str;
             str << "The block size for a vector that is mapped to a file must be a multiple of the element size (" <<
-            sizeof(value_type) << ") and the page size (4096).";
+                sizeof(value_type) << ") and the page size (4096).";
             throw std::runtime_error(str.str());
         }
 
@@ -1248,7 +1248,7 @@ public:
     //! copy-constructor
     vector(const vector & obj)
         : m_size(obj.size()),
-          m_bids((size_t) div_ceil(obj.size(), block_type::size)),
+          m_bids((size_t)div_ceil(obj.size(), block_type::size)),
           m_pager(obj.numpages()),
           m_page_status(div_ceil(m_bids.size(), page_size)),
           m_page_to_slot(div_ceil(m_bids.size(), page_size)),
@@ -1809,8 +1809,8 @@ bool is_sorted(
     stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last)
 {
     return is_sorted_helper(
-               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
-               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last));
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last));
 }
 
 template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
@@ -1821,9 +1821,9 @@ bool is_sorted(
     _StrictWeakOrdering __comp)
 {
     return is_sorted_helper(
-               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
-               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last),
-               __comp);
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last),
+        __comp);
 }
 
 ////////////////////////////////////////////////////////////////////////////

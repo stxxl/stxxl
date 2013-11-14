@@ -1220,8 +1220,9 @@ public:
         if (scheduling_algorithm > 0)
         {
             // all offline algos need a simulation-run
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs)
+                );
             switch (multiplication_algorithm)
             {
             case 0:
@@ -1253,16 +1254,19 @@ public:
         switch (scheduling_algorithm)
         {
         case 0:
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
+                );
             break;
         case 1:
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs)
+                );
             break;
         case 2:
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs)
+                );
             break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
@@ -1294,8 +1298,9 @@ public:
             STXXL_ERRMSG("invalid multiplication-algorithm number");
             break;
         }
-        delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+        delete data->bs.switch_algorithm_to(
+            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
+            );
         return res;
     }
 
@@ -1309,30 +1314,35 @@ public:
         if (scheduling_algorithm > 0)
         {
             // all offline algos need a simulation-run
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs)
+                );
             multiply_internal(right, res);
         }
         switch (scheduling_algorithm)
         {
         case 0:
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
+                );
             break;
         case 1:
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs)
+                );
             break;
         case 2:
-            delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
+            delete data->bs.switch_algorithm_to(
+                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs)
+                );
             break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
         }
         multiply_internal(right, res);
-        delete data->bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+        delete data->bs.switch_algorithm_to(
+            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
+            );
         return res;
     }
 
