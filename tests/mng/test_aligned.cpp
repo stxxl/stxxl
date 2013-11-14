@@ -18,7 +18,7 @@
 #include <vector>
 #include <stxxl/mng>
 
-#define BLOCK_SIZE (1024 * 1024)
+#define BLOCK_SIZE (512 * 1024)
 
 struct type
 {
