@@ -94,7 +94,9 @@ protected:
         {
             std::string s;
             if (m_key) {
-                s += '-' + m_key + ", ";
+                s += '-';
+                s += m_key;
+                s += ", ";
             }
             s += "--";
             s += m_longkey;

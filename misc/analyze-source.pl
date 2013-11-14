@@ -30,6 +30,7 @@ sub filter_uncrustify($) {
     return 0 if $path =~ m"^include/stxxl/bits/containers/matrix";
     # misformats config.h.in!
     return 0 if $path =~ m"^include/stxxl/bits/config.h.in";
+    # doesnt work with comments
     return 0 if $path =~ m"^doc/";
 
     return 1;
