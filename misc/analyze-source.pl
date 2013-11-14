@@ -184,9 +184,22 @@ sub process_cpp {
         my $data = join("", @data);
         my @uncrust = filter_program($data, "uncrustify", "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
 
+        # manually add blank line after "namespace xyz {" and before "} // namespace xyz"
+        for(my $i = 0; $i < @uncrust-1; ++$i)
+        {
+            if ($uncrust[$i] =~ m!namespace \S+ {!) {
+                splice(@uncrust, $i+1, 0, "\n");
+            }
+            if ($uncrust[$i] =~ m!// namespace \S+!) {
+                splice(@uncrust, $i, 0, "\n"); ++$i;
+            }
+        }
+
         if (@data != @uncrust) {
+            print "$path\n";
             print diff(\@data, \@uncrust);
             @data = @uncrust;
+            #system("emacsclient -n $path");
         }
     }
 

@@ -21,6 +21,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 namespace btree {
+
 template <class KeyType,
           class DataType,
           class CompareType,
@@ -446,6 +447,7 @@ inline bool operator >= (const map<KeyType, DataType, CompareType, RawNodeSize, 
 __STXXL_END_NAMESPACE
 
 namespace std {
+
 template <class KeyType,
           class DataType,
           class CompareType,
@@ -459,6 +461,7 @@ void swap(stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, P
 {
     a.swap(b);
 }
-}
+
+} // namespace std
 
 #endif // !STXXL_CONTAINERS_MAP_HEADER

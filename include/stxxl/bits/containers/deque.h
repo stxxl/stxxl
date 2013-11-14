@@ -661,12 +661,14 @@ bool operator < (const deque<ValueType, VectorType> & a, const deque<ValueType, 
 __STXXL_END_NAMESPACE
 
 namespace std {
+
 template <typename ValueType, typename VectorType>
 void swap(stxxl::deque<ValueType, VectorType> & a,
           stxxl::deque<ValueType, VectorType> & b)
 {
     a.swap(b);
 }
-}
+
+} // namespace std
 
 #endif // !STXXL_CONTAINERS_DEQUE_HEADER

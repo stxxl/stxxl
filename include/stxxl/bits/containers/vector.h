@@ -2530,6 +2530,7 @@ struct VECTOR_GENERATOR
 __STXXL_END_NAMESPACE
 
 namespace std {
+
 template <
     typename ValueType,
     unsigned PageSize,
@@ -2542,6 +2543,7 @@ void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, Siz
 {
     a.swap(b);
 }
+
 } // namespace std
 
 #endif // !STXXL_CONTAINERS_VECTOR_HEADER

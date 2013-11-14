@@ -31,6 +31,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 namespace async_schedule_local {
+
 // only one type of event: WRITE COMPLETED
 struct sim_event
 {
@@ -163,6 +164,7 @@ int_type simulate_async_write(
 
     return (oldtime - 1);
 }
+
 }  // namespace async_schedule_local
 
 
