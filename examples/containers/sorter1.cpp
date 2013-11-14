@@ -18,16 +18,18 @@
 
 struct my_comparator
 {
-    bool operator()(const int &a, const int &b) const
+    bool operator () (const int & a, const int & b) const
     {
         return a < b;
     }
 
-    int min_value() const {
+    int min_value() const
+    {
         return std::numeric_limits<int>::min();
     }
 
-    int max_value() const {
+    int max_value() const
+    {
         return std::numeric_limits<int>::max();
     }
 };
@@ -38,7 +40,7 @@ int main()
     typedef stxxl::sorter<int, my_comparator> sorter_type;
 
     // create sorter object (CompareType(), MainMemoryLimit)
-    sorter_type int_sorter(my_comparator(), 64*1024*1024);
+    sorter_type int_sorter(my_comparator(), 64 * 1024 * 1024);
 
     // fill sorter with elements order in descending order
     for (int i = 10000; i > 0; i--)

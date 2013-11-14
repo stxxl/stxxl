@@ -39,7 +39,7 @@ using stxxl::external_size_type;
 namespace stream = stxxl::stream;
 
 // 1 GiB ram used by external data structures / 1 MiB block size
-uint64 ram_use = 1024*1024*1024;
+uint64 ram_use = 1024 * 1024 * 1024;
 
 // alphabet data type
 typedef unsigned char alphabet_type;
@@ -60,7 +60,7 @@ typedef external_size_type size_type;
  * Note: ISA := The inverse of SA
  */
 template <typename InputT, typename InputSA>
-bool sacheck(InputT& inputT, InputSA& inputSA)
+bool sacheck(InputT & inputT, InputSA & inputSA)
 {
     typedef typename InputSA::value_type offset_type;
     typedef stxxl::tuple<offset_type, offset_type> pair_type;
@@ -82,9 +82,9 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
     // build (ISA[i], T[i], ISA[i+1]) and sort to (i, T[SA[i]], ISA[SA[i]+1])
-    typedef stxxl::tuple_less1st<triple_type> triple_less_type;  // comparison relation
+    typedef stxxl::tuple_less1st<triple_type> triple_less_type;      // comparison relation
 
-    typedef typename stream::use_push<triple_type> triple_push_type;  // indicator use push()
+    typedef typename stream::use_push<triple_type> triple_push_type; // indicator use push()
     typedef typename stream::runs_creator<triple_push_type, triple_less_type> triple_rc_type;
     typedef typename stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type> triple_rm_type;
 
@@ -109,7 +109,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
             ++build_isa; // ISA is one in front of T
 
             if (!build_isa.empty()) {
-                triple_rc.push( triple_type(prev_isa, *inputT, (*build_isa).first) );
+                triple_rc.push(triple_type(prev_isa, *inputT, (*build_isa).first));
                 prev_isa = (*build_isa).first;
             }
             ++inputT;
@@ -134,23 +134,23 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
 
         while (!triple_rm.empty())
         {
-            const triple_type& this_triple = *triple_rm;
+            const triple_type & this_triple = *triple_rm;
 
             if (prev_triple.second > this_triple.second)
             {
                 // simple check of first character of suffix
-                std::cout << "Error: suffix array position " << counter  << " ordered incorrectly." << std::endl;
+                std::cout << "Error: suffix array position " << counter << " ordered incorrectly." << std::endl;
                 return false;
             }
             else if (prev_triple.second == this_triple.second)
             {
-                if ( this_triple.third == (offset_type)totalSize ) {
+                if (this_triple.third == (offset_type)totalSize) {
                     // last suffix of string must be first among those with same
                     // first character
                     std::cout << "Error: suffix array position " << counter << " ordered incorrectly." << std::endl;
                     return false;
                 }
-                if ( prev_triple.third != (offset_type)totalSize && prev_triple.third > this_triple.third ) {
+                if (prev_triple.third != (offset_type)totalSize && prev_triple.third > this_triple.third) {
                     // positions SA[i] and SA[i-1] has same first character but
                     // their suffixes are ordered incorrectly: the suffix
                     // position of SA[i] is given by ISA[SA[i]]
@@ -169,7 +169,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
 }
 
 template <typename InputT, typename InputSA>
-bool sacheck_vectors(InputT& inputT, InputSA& inputSA)
+bool sacheck_vectors(InputT & inputT, InputSA & inputSA)
 {
     typename stream::streamify_traits<typename InputT::iterator>::stream_type streamT
         = stream::streamify(inputT.begin(), inputT.end());
@@ -177,7 +177,7 @@ bool sacheck_vectors(InputT& inputT, InputSA& inputSA)
     typename stream::streamify_traits<typename InputSA::iterator>::stream_type streamSA
         = stream::streamify(inputSA.begin(), inputSA.end());
 
-    return sacheck( streamT, streamSA );
+    return sacheck(streamT, streamSA);
 }
 
 /// DC3 aka skew algorithm
@@ -203,7 +203,6 @@ template <typename offset_type>
 class skew
 {
 public:
-
     // 2-tuple, 3-tuple, 4-tuple (=quads), 5-tuple(=quints) definition
     typedef stxxl::tuple<offset_type, offset_type> skew_pair_type;
     typedef stxxl::tuple<offset_type, offset_type, offset_type> skew_triple_type;
@@ -218,7 +217,7 @@ public:
     {
         typedef skew_quint_type value_type;
 
-        bool operator() (const value_type& a, const value_type& b) const
+        bool operator () (const value_type & a, const value_type & b) const
         {
             if (a.second == b.second)
                 return a.fourth < b.fourth;
@@ -238,7 +237,7 @@ public:
     {
         typedef skew_pair_type value_type;
 
-        bool operator() (const value_type& a, const value_type& b) const
+        bool operator () (const value_type & a, const value_type & b) const
         {
             if ((a.first & 1) == (b.first & 1))
                 return a.first < b.first;
@@ -256,7 +255,7 @@ public:
     {
         typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
 
-        bool operator() (const value_type& a, const value_type& b) const
+        bool operator () (const value_type & a, const value_type & b) const
         {
             if (a.second == b.second) {
                 if (a.third == b.third)
@@ -275,21 +274,22 @@ public:
 
     /** Check, if last two components of tree quads are equal. */
     template <class quad_type>
-    static inline bool quad_eq(const quad_type& a, const quad_type& b)
+    static inline bool quad_eq(const quad_type & a, const quad_type & b)
     {
         return (a.second == b.second) && (a.third == b.third) && (a.fourth == b.fourth);
     }
 
     /** Naming pipe for the conventional skew algorithm without discarding. */
-    template<class Input>
-    class naming {
+    template <class Input>
+    class naming
+    {
     public:
         typedef typename Input::value_type quad_type;
 
         typedef skew_pair_type value_type;
 
     private:
-        Input& A;
+        Input & A;
 
         bool & unique;
         offset_type lexname;
@@ -297,9 +297,9 @@ public:
         skew_pair_type result;
 
     public:
-
-        naming(Input& A_, bool & unique_) :
-            A(A_), unique(unique_), lexname(0) {
+        naming(Input & A_, bool & unique_) :
+            A(A_), unique(unique_), lexname(0)
+        {
             assert(!A.empty());
             unique = true;
 
@@ -308,11 +308,13 @@ public:
             result.second = lexname;
         }
 
-        const value_type& operator*() const {
+        const value_type & operator * () const
+        {
             return result;
         }
 
-        naming& operator++() {
+        naming & operator ++ ()
+        {
             assert(!A.empty());
 
             ++A;
@@ -335,42 +337,45 @@ public:
             return *this;
         }
 
-        bool empty() const {
+        bool empty() const
+        {
             return A.empty();
         }
     };
 
     /** Create tuples of 2 components until one of the input streams are empty. */
-    template<class InputA, class InputB, const int add_alphabet = 0>
+    template <class InputA, class InputB, const int add_alphabet = 0>
     class make_pairs
     {
     public:
         typedef stxxl::tuple<typename InputA::value_type, offset_type> value_type;
 
     private:
-        InputA& A;
-        InputB& B;
+        InputA & A;
+        InputB & B;
         value_type result;
 
     public:
-
-        make_pairs(InputA& a, InputB& b)
+        make_pairs(InputA & a, InputB & b)
             : A(a), B(b)
         {
-            assert(!A.empty()); assert(!B.empty());
+            assert(!A.empty());
+            assert(!B.empty());
             if (!empty()) {
                 result = value_type(*A, *B + add_alphabet);
             }
         }
 
-        const value_type & operator*() const
+        const value_type & operator * () const
         { return result; }
 
-        make_pairs & operator++()
+        make_pairs & operator ++ ()
         {
-            assert(!A.empty()); assert(!B.empty());
+            assert(!A.empty());
+            assert(!B.empty());
 
-            ++A; ++B;
+            ++A;
+            ++B;
 
             if (!A.empty() && !B.empty()) {
                 result = value_type(*A, *B + add_alphabet);
@@ -411,7 +416,7 @@ public:
     public:
         make_quads(Input & data_in_, offset_array_type & text_)
             : A(data_in_),
-              current(0,0,0,0),
+              current(0, 0, 0, 0),
               counter(0),
               z3z(0),
               finished(false),
@@ -440,10 +445,10 @@ public:
             }
         }
 
-        const value_type & operator*() const
+        const value_type & operator * () const
         { return current; }
 
-        make_quads & operator++()
+        make_quads & operator ++ ()
         {
             assert(!A.empty() || !finished);
 
@@ -495,7 +500,6 @@ public:
         value_type result;
 
     public:
-
         extract_mod12(Input & A_)
             : A(A_),
               counter(0),
@@ -509,10 +513,10 @@ public:
             }
         }
 
-        const value_type & operator*() const
+        const value_type & operator * () const
         { return result; }
 
-        extract_mod12 & operator++()
+        extract_mod12 & operator ++ ()
         {
             assert(!A.empty());
 
@@ -597,7 +601,7 @@ public:
 
         void merge()
         {
-            assert( !done[0] || !done[1] || !done[2] );
+            assert(!done[0] || !done[1] || !done[2]);
 
             if (done[0])
             {
@@ -639,11 +643,10 @@ public:
                 }
             }
 
-            assert( !done[selected] );
+            assert(!done[selected]);
         }
 
     public:
-
         bool empty() const
         {
             return (A.empty() && B.empty() && C.empty());
@@ -665,12 +668,12 @@ public:
             merge();
         }
 
-        const value_type & operator* () const
+        const value_type & operator * () const
         {
             return merge_result;
         }
 
-        merge_sa & operator++ ()
+        merge_sa & operator ++ ()
         {
             if (selected == 0) {
                 assert(!A.empty());
@@ -730,25 +733,25 @@ public:
 
     private:
         // mod1 types
-        typedef typename stream::use_push < skew_quad_type > mod1_push_type;
-        typedef typename stream::runs_creator < mod1_push_type, less_mod1> mod1_runs_type;
+        typedef typename stream::use_push<skew_quad_type> mod1_push_type;
+        typedef typename stream::runs_creator<mod1_push_type, less_mod1> mod1_runs_type;
         typedef typename mod1_runs_type::sorted_runs_type sorted_mod1_runs_type;
-        typedef typename stream::runs_merger < sorted_mod1_runs_type, less_mod1 > mod1_rm_type;
+        typedef typename stream::runs_merger<sorted_mod1_runs_type, less_mod1> mod1_rm_type;
 
         // mod2 types
-        typedef typename stream::use_push < skew_quint_type > mod2_push_type;
-        typedef typename stream::runs_creator < mod2_push_type, less_mod2> mod2_runs_type;
+        typedef typename stream::use_push<skew_quint_type> mod2_push_type;
+        typedef typename stream::runs_creator<mod2_push_type, less_mod2> mod2_runs_type;
         typedef typename mod2_runs_type::sorted_runs_type sorted_mod2_runs_type;
-        typedef typename stream::runs_merger < sorted_mod2_runs_type, less_mod2 > mod2_rm_type;
+        typedef typename stream::runs_merger<sorted_mod2_runs_type, less_mod2> mod2_rm_type;
 
         // mod0 types
-        typedef typename stream::use_push < skew_quint_type > mod0_push_type;
-        typedef typename stream::runs_creator < mod0_push_type, less_mod0> mod0_runs_type;
+        typedef typename stream::use_push<skew_quint_type> mod0_push_type;
+        typedef typename stream::runs_creator<mod0_push_type, less_mod0> mod0_runs_type;
         typedef typename mod0_runs_type::sorted_runs_type sorted_mod0_runs_type;
-        typedef typename stream::runs_merger < sorted_mod0_runs_type, less_mod0 > mod0_rm_type;
+        typedef typename stream::runs_merger<sorted_mod0_runs_type, less_mod0> mod0_rm_type;
 
         // Merge type
-        typedef merge_sa < mod0_rm_type, mod1_rm_type, mod2_rm_type > merge_sa_type;
+        typedef merge_sa<mod0_rm_type, mod1_rm_type, mod2_rm_type> merge_sa_type;
 
         // Functions
         less_mod0 c0;
@@ -756,12 +759,12 @@ public:
         less_mod2 c2;
 
         // Runs merger
-        mod1_rm_type *mod1_result;
-        mod2_rm_type *mod2_result;
-        mod0_rm_type *mod0_result;
+        mod1_rm_type * mod1_result;
+        mod2_rm_type * mod2_result;
+        mod0_rm_type * mod0_result;
 
         // Merger
-        merge_sa_type *vmerge_sa;
+        merge_sa_type * vmerge_sa;
 
         // Input
         S & source;
@@ -785,7 +788,6 @@ public:
         value_type result;
 
     public:
-
         build_sa(S & source_, Mod1 & mod_1_, Mod2 & mod_2_, size_t a_size, size_t memsize)
             : source(source_), mod_1(mod_1_), mod_2(mod_2_), index(0), ready(false)
         {
@@ -895,12 +897,12 @@ public:
             result = *(*vmerge_sa);
         }
 
-        const value_type & operator*() const
+        const value_type & operator * () const
         {
             return result;
         }
 
-        build_sa & operator++()
+        build_sa & operator ++ ()
         {
             assert(vmerge_sa != 0 && !vmerge_sa->empty());
 
@@ -913,12 +915,12 @@ public:
                 ready = true;
 
                 assert(vmerge_sa != NULL);
-                delete vmerge_sa; vmerge_sa = NULL;
+                delete vmerge_sa, vmerge_sa = NULL;
 
                 assert(mod0_result != NULL && mod1_result != NULL && mod2_result != NULL);
-                delete mod0_result; mod0_result = NULL;
-                delete mod1_result; mod1_result = NULL;
-                delete mod2_result; mod2_result = NULL;
+                delete mod0_result, mod0_result = NULL;
+                delete mod1_result, mod1_result = NULL;
+                delete mod2_result, mod2_result = NULL;
             }
 
             return *this;
@@ -933,7 +935,8 @@ public:
             if (mod2_result) delete mod2_result;
         }
 
-        bool empty() const {
+        bool empty() const
+        {
             return ready;
         }
     };
@@ -948,7 +951,6 @@ public:
         typedef typename Input::value_type alphabet_type;
 
     protected:
-
         // finished reading final suffix array
         bool finished;
 
@@ -956,7 +958,6 @@ public:
         unsigned int rec_depth;
 
     protected:
-
         // generate (i) sequence
         typedef stxxl::counter<offset_type> counter_stream_type;
 
@@ -967,30 +968,30 @@ public:
         // Additional streaming items
         typedef stream::choose<mod12_sorter_type, 2> isa_second_type;
         typedef build_sa<offset_array_it_rg, isa_second_type, isa_second_type> buildSA_type;
-        typedef make_pairs< buildSA_type , counter_stream_type> precompute_isa_type;
+        typedef make_pairs<buildSA_type, counter_stream_type> precompute_isa_type;
 
         // Real recursive skew3 implementation
         // This part is the core of the skew algorithm and runs all class objects in their respective order
         template <typename RecInputType>
-        buildSA_type* skew3(RecInputType& p_Input)
+        buildSA_type * skew3(RecInputType & p_Input)
         {
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
-            typedef make_quads <RecInputType, offset_type, 1> make_quads_input_type;
+            typedef make_quads<RecInputType, offset_type, 1> make_quads_input_type;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2}) with i = 1,2 mod 3
-            typedef extract_mod12 <make_quads_input_type> mod12_quads_input_type;
+            typedef extract_mod12<make_quads_input_type> mod12_quads_input_type;
 
             // sort (i,t_i,t_{i+1},t_{i+2}) by (t_i,t_{i+1},t_{i+2})
             typedef typename stream::sort<mod12_quads_input_type, less_quad<offset_type> > sort_mod12_input_type;
 
             // name (i,t_i,t_{i+1},t_{i+2}) -> (i,n_i)
-            typedef naming <sort_mod12_input_type> naming_input_type;
+            typedef naming<sort_mod12_input_type> naming_input_type;
 
             mod12_sorter_type m1_sorter(mod12cmp(), ram_use / 5);
             mod12_sorter_type m2_sorter(mod12cmp(), ram_use / 5);
 
             // sorted mod1 runs -concatenate- sorted mod2 runs
-            typedef stxxl::concatenate <mod12_sorter_type, mod12_sorter_type> concatenation;
+            typedef stxxl::concatenate<mod12_sorter_type, mod12_sorter_type> concatenation;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
             offset_array_type text;
@@ -1003,13 +1004,13 @@ public:
             sort_mod12_input_type sort_mod12_input(mod12_quads_input, less_quad<offset_type>(), ram_use / 5);
 
             // name (i,t_i,t_{i+1},t_{i+2}) -> (i,"n_i")
-            bool unique = false; // is the current quad array unique?
+            bool unique = false;         // is the current quad array unique?
             naming_input_type names_input(sort_mod12_input, unique);
 
             // create (i, s^12[i])
             size_type concat_length = 0; // holds length of current S_12
             while (!names_input.empty()) {
-                const skew_pair_type& tmp = *names_input;
+                const skew_pair_type & tmp = *names_input;
                 if (tmp.first & 1) {
                     m2_sorter.push(tmp); // sorter #2
                 }
@@ -1032,7 +1033,7 @@ public:
                 // compute s^12 := lexname[S[1 mod 3]] . lexname[S[2 mod 3]], (also known as reduced recursion string 'R')
                 concatenation concat_mod1mod2(m1_sorter, m2_sorter);
 
-                buildSA_type* recType = skew3(concat_mod1mod2); // recursion with recursion string T' = concat_mod1mod2 lexnames
+                buildSA_type * recType = skew3(concat_mod1mod2); // recursion with recursion string T' = concat_mod1mod2 lexnames
 
                 std::cout << "exit recursion level = " << --rec_depth << std::endl;
 
@@ -1041,18 +1042,18 @@ public:
 
                 // store beginning of mod2-tuples of s^12 in mod2_pos
                 offset_type special = (concat_length != subp_size(text.size()));
-                offset_type mod2_pos = offset_type( (subp_size(text.size()) >> 1) + (subp_size(text.size()) & 1) + special );
+                offset_type mod2_pos = offset_type((subp_size(text.size()) >> 1) + (subp_size(text.size()) & 1) + special);
 
                 mod12_sorter_type isa1_pair(mod12cmp(), ram_use / 5);
                 mod12_sorter_type isa2_pair(mod12cmp(), ram_use / 5);
 
                 while (!isa_pairs.empty()) {
-                    const skew_pair_type& tmp = *isa_pairs;
+                    const skew_pair_type & tmp = *isa_pairs;
                     if (tmp.first < mod2_pos) {
                         if (tmp.first + special < mod2_pos) // else: special sentinel tuple is dropped
-                            isa1_pair.push(tmp); // sorter #1
+                            isa1_pair.push(tmp);            // sorter #1
                     } else {
-                        isa2_pair.push(tmp); // sorter #2
+                        isa2_pair.push(tmp);                // sorter #2
                     }
                     ++isa_pairs;
                 }
@@ -1090,15 +1091,13 @@ public:
         } // end of skew3()
 
     protected:
-
         // Adapt (t_i) -> (i,t_i) for input to fit to recursive call
         typedef make_pairs<counter_stream_type, Input> make_pairs_input_type;
 
         // points to final constructed suffix array generator
-        buildSA_type *out_sa;
+        buildSA_type * out_sa;
 
     public:
-
         algorithm(Input & data_in)
             : finished(false), rec_depth(0)
         {
@@ -1109,12 +1108,12 @@ public:
             out_sa = skew3(pairs_input);
         }
 
-        const value_type & operator*() const
+        const value_type & operator * () const
         {
             return *(*out_sa);
         }
 
-        algorithm & operator++()
+        algorithm & operator ++ ()
         {
             assert(out_sa);
             assert(!out_sa->empty());
@@ -1123,7 +1122,8 @@ public:
 
             if (out_sa->empty()) {
                 finished = true;
-                delete out_sa; out_sa = NULL;
+                delete out_sa;
+                out_sa = NULL;
             }
             return *this;
         }
@@ -1138,7 +1138,7 @@ public:
             return finished;
         }
     }; // algorithm class
-}; // skew class
+};     // skew class
 
 //! helper to print out readable characters.
 template <typename alphabet_type>
@@ -1160,25 +1160,23 @@ public:
 
 protected:
     //! instance of input stream
-    InputType& m_input;
+    InputType & m_input;
 
     //! counter after which the stream ends
     size_type m_count;
 
 public:
-
-    cut_stream(InputType& input, size_type count)
+    cut_stream(InputType & input, size_type count)
         : m_input(input), m_count(count)
-    {
-    }
+    { }
 
-    const value_type& operator* () const
+    const value_type & operator * () const
     {
         assert(m_count > 0);
         return *m_input;
     }
 
-    cut_stream& operator++ ()
+    cut_stream & operator ++ ()
     {
         assert(!empty());
         --m_count;
@@ -1193,7 +1191,7 @@ public:
 };
 
 template <typename offset_type>
-int process(const std::string& input_filename, const std::string& output_filename,
+int process(const std::string & input_filename, const std::string & output_filename,
             size_type sizelimit,
             bool text_output_flag, bool check_flag, bool input_verbatim)
 {
@@ -1203,7 +1201,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
 
     // input and output files (if supplied via command line)
-    stxxl::syscall_file *input_file = NULL, *output_file = NULL;
+    stxxl::syscall_file * input_file = NULL, * output_file = NULL;
 
     // input and output vectors for suffix array construction
     alphabet_vector_type input_vector;
@@ -1222,7 +1220,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
         // define input file object and map input_vector to input_file (no copying)
         input_file = new stxxl::syscall_file(input_filename, file::RDONLY | file::DIRECT);
         alphabet_vector_type file_input_vector(input_file);
-        input_vector.swap( file_input_vector );
+        input_vector.swap(file_input_vector);
     }
 
     if (output_filename.size())
@@ -1230,7 +1228,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
         // define output file object and map output_vector to output_file
         output_file = new stxxl::syscall_file(output_filename, file::RDWR | file::CREAT | file::DIRECT);
         offset_vector_type file_output_vector(output_file);
-        output_vector.swap( file_output_vector );
+        output_vector.swap(file_output_vector);
     }
 
     // I/O measurement
@@ -1273,10 +1271,10 @@ int process(const std::string& input_filename, const std::string& output_filenam
             std::cout << i << " : " << output_vector[i] << " : ";
 
             // We need a const reference because operator[] would write data
-            const alphabet_vector_type& cinput = input_vector;
+            const alphabet_vector_type & cinput = input_vector;
 
-            for (unsigned int j = 0; output_vector[i]+j < cinput.size(); j++) {
-                std::cout << dumpC(cinput[ output_vector[i]+j ]) << " ";
+            for (unsigned int j = 0; output_vector[i] + j < cinput.size(); j++) {
+                std::cout << dumpC(cinput[output_vector[i] + j]) << " ";
             }
 
             std::cout << std::endl;
@@ -1307,7 +1305,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     return 0;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char * argv[])
 {
     stxxl::cmdline_parser cp;
 
@@ -1331,7 +1329,7 @@ int main(int argc, char* argv[])
     cp.add_uint('w', "wordsize", "Set word size of suffix array to 32, 40 or 64 bit, default: 32-bit.", wordsize);
 
     // process command line
-    if (!cp.process(argc,argv))
+    if (!cp.process(argc, argv))
         return -1;
 
     if (wordsize == 32)

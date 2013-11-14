@@ -16,8 +16,8 @@
 
 int main(int argc, char * argv[])
 {
-    stxxl::uint64 ops = (argc >= 2) ? stxxl::atouint64(argv[1]) : 32*1024*1024;
- 
+    stxxl::uint64 ops = (argc >= 2) ? stxxl::atouint64(argv[1]) : 32 * 1024 * 1024;
+
     stxxl::random_number32 random;
     stxxl::sequence<int> XXLDeque;
     std::deque<int> STDDeque;
@@ -69,14 +69,15 @@ int main(int argc, char * argv[])
             stxxl::sequence<int>::stream stream = XXLDeque.get_stream();
             std::deque<int>::const_iterator b = STDDeque.begin();
 
-            while ( !stream.empty() )
+            while (!stream.empty())
             {
-                STXXL_CHECK( b != STDDeque.end() );
-                STXXL_CHECK( *stream == *b );
-                ++stream; ++b;
+                STXXL_CHECK(b != STDDeque.end());
+                STXXL_CHECK(*stream == *b);
+                ++stream;
+                ++b;
             }
 
-            STXXL_CHECK( b == STDDeque.end() );
+            STXXL_CHECK(b == STDDeque.end());
         }
 
         if (!(i % 1000000))
@@ -85,14 +86,15 @@ int main(int argc, char * argv[])
             stxxl::sequence<int>::reverse_stream stream = XXLDeque.get_reverse_stream();
             std::deque<int>::reverse_iterator b = STDDeque.rbegin();
 
-            while ( !stream.empty() )
+            while (!stream.empty())
             {
-                STXXL_CHECK( b != STDDeque.rend() );
-                STXXL_CHECK( *stream == *b );
-                ++stream; ++b;
+                STXXL_CHECK(b != STDDeque.rend());
+                STXXL_CHECK(*stream == *b);
+                ++stream;
+                ++b;
             }
 
-            STXXL_CHECK( b == STDDeque.rend() );
+            STXXL_CHECK(b == STDDeque.rend());
         }
     }
 

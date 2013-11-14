@@ -18,20 +18,19 @@
 // comparison struct for priority queue where top() returns the smallest contained value:
 struct ComparatorGreater
 {
-    bool operator () (const int &a, const int &b) const
+    bool operator () (const int & a, const int & b) const
     { return (a > b); }
 
     int min_value() const
-    { return (std::numeric_limits<int>::max) (); }
-
+    { return std::numeric_limits<int>::max(); }
 };
 
 int main()
 {
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128 *1024 *1024, 1024 *1024>::result pqueue_type;
     typedef pqueue_type::block_type block_type;
-    
-    // block_type::raw_size = 262144 bytes  
+
+    // block_type::raw_size = 262144 bytes
     // use 64 block read and write pools each to enable overlapping between I/O and computation
     const unsigned int mem_for_pools = 32 * 1024 * 1024;
     stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);

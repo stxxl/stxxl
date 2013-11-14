@@ -62,7 +62,7 @@ bool operator <= (const my_type & a, const my_type & b)
 
 struct Comparator : public std::less<my_type>
 {
-    inline bool operator()(const my_type & a, const my_type & b) const
+    inline bool operator () (const my_type & a, const my_type & b) const
     {
         return a.key() < b.key();
     }
@@ -96,7 +96,7 @@ int main()
     {
         // test small number of items that can be sorted internally
 
-        sorter_type s (cmp, memory_to_use);
+        sorter_type s(cmp, memory_to_use);
 
         // put in some items
         s.push(42);
@@ -106,10 +106,13 @@ int main()
         // finish input, switch to sorting stage.
         s.sort();
 
-        STXXL_CHECK( *s == 0 );      ++s;
-        STXXL_CHECK( *s == 23 );     ++s;
-        STXXL_CHECK( *s == 42 );     ++s;
-        STXXL_CHECK( s.empty() );
+        STXXL_CHECK(*s == 0);
+        ++s;
+        STXXL_CHECK(*s == 23);
+        ++s;
+        STXXL_CHECK(*s == 42);
+        ++s;
+        STXXL_CHECK(s.empty());
     }
 
     {
@@ -117,7 +120,7 @@ int main()
 
         const stxxl::uint64 n_records = stxxl::int64(384) * stxxl::int64(1024 * 1024) / sizeof(my_type);
 
-        sorter_type s (cmp, memory_to_use);
+        sorter_type s(cmp, memory_to_use);
 
         stxxl::random_number32 rnd;
 
@@ -125,9 +128,9 @@ int main()
 
         for (stxxl::uint64 i = 0; i < n_records; i++)
         {
-            STXXL_CHECK( s.size() == i );
+            STXXL_CHECK(s.size() == i);
 
-            s.push( 1 + (rnd() % 0xfffffff) );
+            s.push(1 + (rnd() % 0xfffffff));
         }
 
         // finish input, switch to sorting stage.
@@ -135,22 +138,23 @@ int main()
 
         STXXL_MSG("Checking order...");
 
-        STXXL_CHECK( !s.empty() );
-        STXXL_CHECK( s.size() == n_records );
+        STXXL_CHECK(!s.empty());
+        STXXL_CHECK(s.size() == n_records);
 
         my_type prev = *s;      // get first item
         ++s;
 
         stxxl::uint64 count = n_records - 1;
 
-        while ( !s.empty() )
+        while (!s.empty())
         {
-            STXXL_CHECK( s.size() == count );
+            STXXL_CHECK(s.size() == count);
 
-            if ( !(prev <= *s) ) STXXL_MSG("WRONG");
-            STXXL_CHECK( prev <= *s );
+            if (!(prev <= *s)) STXXL_MSG("WRONG");
+            STXXL_CHECK(prev <= *s);
 
-            ++s; --count;
+            ++s;
+            --count;
         }
         STXXL_MSG("OK");
 
@@ -158,23 +162,23 @@ int main()
         s.rewind();
 
         STXXL_MSG("Checking order again...");
-        
-        STXXL_CHECK( !s.empty() );
-        STXXL_CHECK( s.size() == n_records );
+
+        STXXL_CHECK(!s.empty());
+        STXXL_CHECK(s.size() == n_records);
 
         prev = *s;      // get first item
         ++s;
 
-        while ( !s.empty() )
+        while (!s.empty())
         {
-            if ( !(prev <= *s) ) STXXL_MSG("WRONG");
-            STXXL_CHECK( prev <= *s );
+            if (!(prev <= *s)) STXXL_MSG("WRONG");
+            STXXL_CHECK(prev <= *s);
 
             ++s;
         }
         STXXL_MSG("OK");
 
-        STXXL_CHECK( s.size() == 0 );
+        STXXL_CHECK(s.size() == 0);
 
         STXXL_MSG("Done");
     }
