@@ -380,11 +380,11 @@ public:
 
 #ifndef STXXL_IO_STATS_RESET_FORBIDDEN
     //! Resets I/O time counters (including I/O wait counter).
-    _STXXL_DEPRECATED(void reset());
+    STXXL_DEPRECATED(void reset());
 #endif
 
     //! Resets I/O wait time counter.
-    _STXXL_DEPRECATED(void _reset_io_wait_time());
+    STXXL_DEPRECATED(void _reset_io_wait_time());
 
     // for library use
     void write_started(unsigned_type size_, double now = 0.0);

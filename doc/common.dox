@@ -430,7 +430,7 @@ if (UNLIKELY(x > 8)) { ... }
 
 \section deprecated Deprecated Functions
 
-Some compilers can warn the user about deprecated function by tagging them in the source. In STXXL we use the macro _STXXL_DEPRECATED(...) to enclose deprecated functions.
+Some compilers can warn the user about deprecated function by tagging them in the source. In STXXL we use the macro STXXL_DEPRECATED(...) to enclose deprecated functions.
 
 */
 

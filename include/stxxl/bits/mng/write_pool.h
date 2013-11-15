@@ -160,7 +160,7 @@ public:
     }
 
     // deprecated name for the steal()
-    _STXXL_DEPRECATED(block_type * get())
+    STXXL_DEPRECATED(block_type * get())
     {
         return steal();
     }
@@ -185,7 +185,7 @@ public:
             delete steal();
     }
 
-    _STXXL_DEPRECATED(request_ptr get_request(bid_type bid))
+    STXXL_DEPRECATED(request_ptr get_request(bid_type bid))
     {
         busy_blocks_iterator i2 = busy_blocks.begin();
         for ( ; i2 != busy_blocks.end(); ++i2)
@@ -206,7 +206,7 @@ public:
         return false;
     }
 
-    _STXXL_DEPRECATED(block_type * steal(bid_type bid))
+    STXXL_DEPRECATED(block_type * steal(bid_type bid))
     {
         busy_blocks_iterator i2 = busy_blocks.begin();
         for ( ; i2 != busy_blocks.end(); ++i2)

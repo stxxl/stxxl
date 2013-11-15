@@ -50,7 +50,7 @@ public:
         p_pool = new prefetch_pool_type(init_size_prefetch);
     }
 
-    _STXXL_DEPRECATED(read_write_pool(prefetch_pool_type& p_pool, write_pool_type& w_pool)) :
+    STXXL_DEPRECATED(read_write_pool(prefetch_pool_type& p_pool, write_pool_type& w_pool)) :
         w_pool(&w_pool), p_pool(&p_pool), delete_pools(false)
     { }
 
