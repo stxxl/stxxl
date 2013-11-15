@@ -20,7 +20,7 @@
 #include <stxxl/bits/mng/buf_ostream.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
 //! \{
@@ -293,7 +293,7 @@ ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& v
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_SCAN_HEADER
 // vim: et:ts=4:sw=4

@@ -30,7 +30,7 @@
  #include <ext/hash_map>
 #endif
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <class _Tp>
 struct compat_hash {
@@ -60,6 +60,6 @@ struct compat_hash_map {
 #endif
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMPAT_HASH_MAP_HEADER

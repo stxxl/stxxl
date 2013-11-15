@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/error_handling.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 // TODO:  speedup BID2node_ access using search result iterator in the methods
 
@@ -624,7 +624,7 @@ public:
 
 } // namespace btree
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std {

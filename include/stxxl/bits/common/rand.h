@@ -35,7 +35,7 @@
 // 4. create all the other prngs used.
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 extern unsigned ran32State;
 
@@ -256,6 +256,6 @@ struct random_number64
 #pragma warning(pop) // assignment operator could not be generated
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_RAND_HEADER

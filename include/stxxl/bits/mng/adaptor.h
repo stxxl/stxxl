@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer
 //!
@@ -636,7 +636,7 @@ make_element_iterator(BlockType* blocks, unsigned_type offset)
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_ADAPTOR_HEADER
 // vim: et:ts=4:sw=4

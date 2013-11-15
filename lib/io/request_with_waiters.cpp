@@ -16,7 +16,7 @@
 #include <stxxl/bits/parallel.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 bool request_with_waiters::add_waiter(onoff_switch* sw)
 {
@@ -59,5 +59,5 @@ int request_with_waiters::nwaiters()
 }
 */
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

@@ -18,7 +18,7 @@
 #include <stxxl/bits/mng/block_scheduler.h>
 #include <stxxl/bits/containers/matrix_arithmetic.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \defgroup matrix matrix
 //! Efficient external memory matrix operations
@@ -1393,7 +1393,7 @@ protected:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_MATRIX_HEADER
 // vim: et:ts=4:sw=4

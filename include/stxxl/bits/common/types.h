@@ -18,7 +18,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 #if STXXL_MSVC
@@ -69,6 +69,6 @@ typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
 typedef unsigned_type internal_size_type;  // fits in internal memory
 typedef uint64 external_size_type;         // may require external memory
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_TYPES_HEADER

@@ -20,7 +20,7 @@
 #include "ufs_platform.h"
 #include <sys/mman.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 void simdisk_geometry::add_zone(int& first_cyl, int last_cyl,
@@ -227,7 +227,7 @@ void sim_disk_file::set_size(offset_type newsize)
     }
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_SIMDISK_FILE
 // vim: et:ts=4:sw=4

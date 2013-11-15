@@ -20,7 +20,7 @@
 #include <stxxl/bits/verbose.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \internal
 namespace sort_helper {
@@ -138,7 +138,7 @@ void refill_or_remove_empty_sequences(SequenceVector& seqs,
 
 } // namespace sort_helper
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_SORT_HELPER_HEADER
 // vim: et:ts=4:sw=4

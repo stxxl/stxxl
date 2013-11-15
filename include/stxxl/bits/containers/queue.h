@@ -28,7 +28,7 @@
 #include <stxxl/bits/mng/prefetch_pool.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 #ifndef STXXL_VERBOSE_QUEUE
 #define STXXL_VERBOSE_QUEUE STXXL_VERBOSE2
@@ -383,7 +383,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_QUEUE_HEADER
 // vim: et:ts=4:sw=4

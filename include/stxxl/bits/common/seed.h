@@ -16,7 +16,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! set the global stxxl seed value
 void set_seed(unsigned seed);
@@ -25,6 +25,6 @@ void set_seed(unsigned seed);
 //! sequence of different values
 unsigned get_next_seed();
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_SEED_HEADER

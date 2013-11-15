@@ -18,7 +18,7 @@
 #include <stxxl/bits/verbose.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 namespace btree {
@@ -373,6 +373,6 @@ inline bool operator != (const btree_iterator<BTreeType>& a,
 
 } // namespace btree
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_BTREE_ITERATOR_HEADER

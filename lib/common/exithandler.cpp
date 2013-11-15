@@ -22,7 +22,7 @@
 
 #include <cstdlib>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 // default exit handler
 int register_exit_handler(void (* function)(void))
@@ -36,14 +36,14 @@ void run_exit_handlers()
     // nothing to do
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #else // STXXL_NON_DEFAULT_EXIT_HANDLER
 
 #include <vector>
 #include <stxxl/bits/common/mutex.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 mutex exit_handler_mutex;
 std::vector<void (*)(void)> exit_handlers;
@@ -65,7 +65,7 @@ void run_exit_handlers()
     }
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // STXXL_NON_DEFAULT_EXIT_HANDLER
 #endif // STXXL_EXTERNAL_EXIT_HANDLER

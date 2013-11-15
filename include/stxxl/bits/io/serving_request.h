@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/request_with_state.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -47,7 +47,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_SERVING_REQUEST_HEADER
 // vim: et:ts=4:sw=4

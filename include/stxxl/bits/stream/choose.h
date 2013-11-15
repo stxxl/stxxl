@@ -17,7 +17,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! Stream package subnamespace.
 namespace stream {
@@ -304,7 +304,7 @@ public:
 
 } // namespace stream
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 #include <stxxl/bits/stream/unique.h>

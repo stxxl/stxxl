@@ -35,7 +35,7 @@
 #include <boost/iostreams/device/file_descriptor.hpp>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
@@ -63,7 +63,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // #if STXXL_HAVE_BOOSTFD_FILE
 

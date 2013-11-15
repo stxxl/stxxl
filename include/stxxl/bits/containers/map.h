@@ -18,7 +18,7 @@
 #include <stxxl/bits/containers/btree/btree.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace btree {
 
@@ -445,7 +445,7 @@ inline bool operator >= (const map<KeyType, DataType, CompareType, RawNodeSize, 
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

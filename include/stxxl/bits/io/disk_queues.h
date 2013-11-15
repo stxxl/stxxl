@@ -24,7 +24,7 @@
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -102,7 +102,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_DISK_QUEUES_HEADER
 // vim: et:ts=4:sw=4

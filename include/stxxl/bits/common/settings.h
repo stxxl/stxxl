@@ -21,7 +21,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename must_be_int = int>
 class settings
@@ -35,6 +35,6 @@ bool settings<must_be_int>::native_merge = true;
 
 typedef settings<> SETTINGS;
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_SETTINGS_HEADER

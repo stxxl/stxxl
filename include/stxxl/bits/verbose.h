@@ -35,11 +35,11 @@
 #define _STXXL_PRINT_FLAGS_VERBOSE  (_STXXL_PRINT_FLAGS_DEFAULT | _STXXL_PRNT_TIMESTAMP | _STXXL_PRNT_THREAD_ID)
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 void print_msg(const char* label, const std::string& msg, unsigned flags);
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 #define _STXXL_PRINT(label, message, flags)                                  \

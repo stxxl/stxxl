@@ -23,7 +23,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer
 //! \{
@@ -358,7 +358,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_TYPED_BLOCK_HEADER
 // vim: et:ts=4:sw=4

@@ -25,7 +25,7 @@
 #include <stxxl/stack>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 //! \addtogroup stlalgo
@@ -374,7 +374,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_RANDOM_SHUFFLE_HEADER
 // vim: et:ts=4:sw=4

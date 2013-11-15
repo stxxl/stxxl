@@ -18,7 +18,7 @@
 #include "ufs_platform.h"
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 void syscall_file::serve(const request* req) throw (io_error)
 {
@@ -115,5 +115,5 @@ const char* syscall_file::io_type() const
     return "syscall";
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

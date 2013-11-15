@@ -22,7 +22,7 @@
   #include <boost/noncopyable.hpp>
 #endif
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 #if STXXL_BOOST_CONFIG
 
@@ -43,6 +43,6 @@ private:
 
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_NONCOPYABLE_HEADER

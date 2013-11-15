@@ -19,7 +19,7 @@
 #include <stxxl/bits/common/condition_variable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 class semaphore : private noncopyable
 {
@@ -79,6 +79,6 @@ public:
 #endif
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_SEMAPHORE_HEADER

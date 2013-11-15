@@ -20,7 +20,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <class _Tp>
 struct compat_unique_ptr {
@@ -32,7 +32,7 @@ struct compat_unique_ptr {
 #endif
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #if defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) == 30400)
 

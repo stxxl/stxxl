@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 void compute_prefetch_schedule(
     const int_type* first,
@@ -73,7 +73,7 @@ void compute_prefetch_schedule(
     delete[] disks;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_ASYNC_SCHEDULE_HEADER
 // vim: et:ts=4:sw=4

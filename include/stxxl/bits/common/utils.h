@@ -31,7 +31,7 @@
 #include <stxxl/bits/msvc_compatibility.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -300,7 +300,7 @@ inline typename Container::value_type pop_begin(Container& c)
 
 ////////////////////////////////////////////////////////////////////////////
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_UTILS_HEADER
 // vim: et:ts=4:sw=4

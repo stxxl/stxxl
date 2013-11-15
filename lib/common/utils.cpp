@@ -15,7 +15,7 @@
 #include <sstream>
 #include <iomanip>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! Parse a string like "343KB" or "  44 GiB  " into the corresponding size in
 //! bytes.
@@ -123,4 +123,4 @@ std::string format_IEC_size(uint64 number)
     return out.str();
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

@@ -24,7 +24,7 @@
 #include <boost/version.hpp>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 void boostfd_file::serve(const request* req) throw (io_error)
@@ -204,7 +204,7 @@ void boostfd_file::lock()
     // FIXME: is there no locking possible/needed/... for boostfd?
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_BOOSTFD_FILE
 // vim: et:ts=4:sw=4

@@ -27,7 +27,7 @@
 #include <stxxl/bits/config.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 #if STXXL_MSVC
  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
@@ -155,6 +155,6 @@ __STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_ERROR_HANDLING_HEADER

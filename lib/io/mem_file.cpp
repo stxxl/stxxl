@@ -19,7 +19,7 @@
 #include <stxxl/bits/io/iostats.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 void mem_file::serve(const request* req) throw (io_error)
@@ -96,4 +96,4 @@ void mem_file::discard(offset_type offset, offset_type size)
 #endif
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

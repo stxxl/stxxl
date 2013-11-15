@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/simple_vector.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcont_vector
 //! \{
@@ -106,7 +106,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

@@ -28,7 +28,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 static const double program_start_time_stamp = timestamp();
 
@@ -74,6 +74,6 @@ void print_msg(const char* label, const std::string& msg, unsigned flags)
         logger_instance->errlog_stream() << s << std::flush;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 // vim: et:ts=4:sw=4

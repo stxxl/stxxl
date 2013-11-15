@@ -15,7 +15,7 @@
 #include <stxxl/bits/common/log.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 logger::logger() : waitlog_stream_(NULL)
 {
@@ -37,4 +37,4 @@ logger::~logger()
     delete waitlog_stream_;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

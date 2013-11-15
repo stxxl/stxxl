@@ -21,7 +21,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 class io_error : public std::ios_base::failure
 {
@@ -83,7 +83,7 @@ public:
     { }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_EXCEPTIONS_HEADER
 // vim: et:ts=4:sw=4

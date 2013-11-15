@@ -18,7 +18,7 @@
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename block_type>
 struct run_cursor
@@ -125,7 +125,7 @@ struct run_cursor_cmp
 };
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 #endif // !STXXL_ALGO_RUN_CURSOR_HEADER

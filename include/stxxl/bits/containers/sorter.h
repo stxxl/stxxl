@@ -16,7 +16,7 @@
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/stream/sort_stream.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 #ifndef STXXL_VERBOSE_SORTER
 #define STXXL_VERBOSE_SORTER STXXL_VERBOSE2
@@ -237,7 +237,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_SORTER_HEADER
 // vim: et:ts=4:sw=4

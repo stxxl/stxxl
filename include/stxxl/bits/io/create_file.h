@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! create fileio object from io_impl string and a few parameters
 file * create_file(const std::string& io_impl,
@@ -33,7 +33,7 @@ class disk_config;
 file * create_file(disk_config& config, int mode,
                    int disk_allocator_id = file::NO_ALLOCATOR);
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_CREATE_FILE_HEADER
 // vim: et:ts=4:sw=4

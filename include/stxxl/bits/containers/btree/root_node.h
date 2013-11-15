@@ -16,7 +16,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace btree {
 
@@ -28,6 +28,6 @@ class root_node
 
 } // namespace btree
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER

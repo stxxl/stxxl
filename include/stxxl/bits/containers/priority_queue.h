@@ -24,7 +24,7 @@
 #include <stxxl/bits/containers/pq_ext_merger.h>
 #include <stxxl/bits/containers/pq_losertree.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 /*
    KNBufferSize1 = 32;
@@ -66,7 +66,7 @@ struct priority_queue_config
     };
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 
@@ -88,7 +88,7 @@ void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX
 
 } // namespace std
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! External priority queue data structure \n
 //! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
@@ -967,7 +967,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std {

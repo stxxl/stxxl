@@ -21,7 +21,7 @@
 #include <stxxl/bits/noncopyable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \defgroup schedlayer Block Scheduling Sublayer
 //! \ingroup mnglayer
@@ -219,6 +219,6 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_BUF_WRITER_HEADER

@@ -24,7 +24,7 @@
 #include <stxxl/bits/noncopyable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
@@ -224,6 +224,6 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_BLOCK_PREFETCHER_HEADER

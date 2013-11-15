@@ -23,7 +23,7 @@
 #include <stxxl/bits/common/utils.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 /*!
  * Simpler non-growing vector without initialization.
@@ -160,7 +160,7 @@ public:
         memset(m_array, 0, m_size * sizeof(value_type));
     }
 };
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

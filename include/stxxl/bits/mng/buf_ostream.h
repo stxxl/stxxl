@@ -17,7 +17,7 @@
 #include <stxxl/bits/mng/buf_writer.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
@@ -124,6 +124,6 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_BUF_OSTREAM_HEADER

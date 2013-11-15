@@ -31,7 +31,7 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \weakgroup fileimpl
 //! \{
@@ -134,7 +134,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // #if STXXL_HAVE_SIMDISK_FILE
 

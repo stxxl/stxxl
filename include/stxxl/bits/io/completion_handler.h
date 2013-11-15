@@ -20,7 +20,7 @@
 #include <stxxl/bits/compat/unique_ptr.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 class request;
 
@@ -96,7 +96,7 @@ struct default_completion_handler
     void operator () (request*) { }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_COMPLETION_HANDLER_HEADER
 // vim: et:ts=4:sw=4

@@ -18,7 +18,7 @@
 #include <stxxl/bits/common/error_handling.h>
 #include "ufs_platform.h"
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 const char* ufs_file_base::io_type() const
 {
@@ -254,5 +254,5 @@ bool ufs_file_base::is_device() const
     return m_is_device;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

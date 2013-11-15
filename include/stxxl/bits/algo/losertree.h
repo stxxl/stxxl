@@ -21,7 +21,7 @@
 #include <stxxl/bits/verbose.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename run_cursor_type,
           typename run_cursor_cmp_type>
@@ -241,7 +241,7 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

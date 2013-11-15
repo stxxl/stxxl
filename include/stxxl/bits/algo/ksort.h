@@ -38,7 +38,7 @@
 
 #define OPT_MERGING
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \defgroup stllayer STL-User Layer
 //! Layer which groups STL compatible algorithms and containers
@@ -1091,7 +1091,7 @@ void ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_KSORT_HEADER
 // vim: et:ts=4:sw=4

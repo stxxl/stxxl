@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/rand.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 #define CHECK_RUN_BOUNDS(pos)
 
@@ -165,7 +165,7 @@ struct interleaved_alloc_traits<single_disk>
     typedef first_disk_only strategy;
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
 // vim: et:ts=4:sw=4

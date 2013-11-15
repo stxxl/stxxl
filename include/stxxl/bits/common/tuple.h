@@ -18,7 +18,7 @@
 #include <limits>
 #include <ostream>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 struct Plug { };
 
@@ -642,6 +642,6 @@ public:
 };
 
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_TUPLE_HEADER

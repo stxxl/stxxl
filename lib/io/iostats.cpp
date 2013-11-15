@@ -20,7 +20,7 @@
 #include <stxxl/bits/verbose.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 stats::stats() :
     reads(0),
@@ -399,5 +399,5 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
 #undef hr
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

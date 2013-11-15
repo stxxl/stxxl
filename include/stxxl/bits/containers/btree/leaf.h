@@ -17,7 +17,7 @@
 #include <stxxl/bits/containers/btree/node_cache.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace btree {
 
@@ -700,6 +700,6 @@ public:
 } // namespace btree
 
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_BTREE_LEAF_HEADER

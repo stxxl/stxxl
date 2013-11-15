@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/mutex.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -66,7 +66,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 // vim: et:ts=4:sw=4

@@ -19,7 +19,7 @@
 #include <stxxl/bits/common/error_handling.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 file * create_file(const std::string& io_impl,
                    const std::string& filename,
@@ -177,5 +177,5 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
                 "Unsupported disk I/O implementation '" << cfg.io_impl << "'.");
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

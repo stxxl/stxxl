@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
@@ -54,7 +54,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_DISK_QUEUED_FILE_HEADER
 // vim: et:ts=4:sw=4

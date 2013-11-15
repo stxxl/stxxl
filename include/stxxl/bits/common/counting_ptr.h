@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/mutex.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 /*!
  * High-performance smart pointer used as a wrapping reference counting
@@ -516,6 +516,6 @@ public:
 
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_COUNTING_PTR_HEADER

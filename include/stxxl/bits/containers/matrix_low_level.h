@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/parallel.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup matrix
 //! \{
@@ -750,6 +750,6 @@ struct low_level_matrix_multiply_and_add<blas_double_complex, BlockSideLength>
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_MATRIX_LOW_LEVEL_HEADER

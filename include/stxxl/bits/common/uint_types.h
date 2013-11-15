@@ -25,7 +25,7 @@
 #include <ostream>
 #include <cassert>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 /*!
  * \brief Construct an 40-bit or 48-bit unsigned integer stored in five or six
@@ -251,7 +251,7 @@ typedef uint_pair<uint8> uint40;
 //! Construct a 48-bit unsigned integer stored in six bytes.
 typedef uint_pair<uint16> uint48;
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

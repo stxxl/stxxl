@@ -20,7 +20,7 @@
 
 #include <stxxl/bits/namespace.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 // ***********************************************
 // THERE
@@ -112,6 +112,6 @@ bool is_size(const MAPTYPE& map_, const typename MAPTYPE::size_type size)
     return map_.size() == size;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_

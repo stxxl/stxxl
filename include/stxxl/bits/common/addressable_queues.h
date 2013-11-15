@@ -19,7 +19,7 @@
 
 #include <stxxl/bits/namespace.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! An internal fifo queue that allows removing elements addressed with (a copy of) themselves.
 //! \tparam KeyType Type of contained elements.
@@ -194,6 +194,6 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER

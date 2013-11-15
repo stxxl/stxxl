@@ -20,7 +20,7 @@
 #include <stxxl/bits/mng/config.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \defgroup alloc Allocation Functors
 //! \ingroup mnglayer
@@ -261,7 +261,7 @@ struct offset_allocator
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_BLOCK_ALLOC_HEADER
 // vim: et:ts=4:sw=4

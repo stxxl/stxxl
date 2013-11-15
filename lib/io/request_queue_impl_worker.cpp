@@ -25,7 +25,7 @@
 #endif
 
 #include <iostream>
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 void request_queue_impl_worker::start_thread(void* (* worker)(void*), void* arg, thread_type& t, state<thread_state>& s)
 {
@@ -75,5 +75,5 @@ void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>&
     s.set_to(NOT_RUNNING);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

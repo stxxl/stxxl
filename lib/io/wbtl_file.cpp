@@ -29,7 +29,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 wbtl_file::wbtl_file(
@@ -352,7 +352,7 @@ const char* wbtl_file::io_type() const
     return "wbtl";
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_WBTL_FILE
 // vim: et:ts=4:sw=4

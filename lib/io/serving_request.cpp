@@ -16,7 +16,7 @@
 #include <stxxl/bits/io/file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 serving_request::serving_request(
@@ -74,5 +74,5 @@ const char* serving_request::io_type() const
     return file_->io_type();
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

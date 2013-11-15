@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/counting_ptr.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace stream {
 
@@ -124,7 +124,7 @@ private:
 
 } // namespace stream
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_STREAM_SORTED_RUNS_HEADER
 // vim: et:ts=4:sw=4

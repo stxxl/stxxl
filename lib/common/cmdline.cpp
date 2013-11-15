@@ -13,7 +13,7 @@
 #include <stxxl/bits/common/cmdline.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 void cmdline_parser::output_wrap(std::ostream& os, const std::string& text, size_t wraplen,
                                  size_t indent_first, size_t indent_rest,
@@ -346,4 +346,4 @@ void cmdline_parser::print_result(std::ostream& os)
     os.copyfmt(state);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

@@ -20,7 +20,7 @@
 #include <stxxl/bits/compat/hash_map.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
@@ -282,7 +282,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

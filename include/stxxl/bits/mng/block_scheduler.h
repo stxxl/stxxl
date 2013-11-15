@@ -21,7 +21,7 @@
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/addressable_queues.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! Virtualization of a block of data.
 //! Holds information for allocating and swapping. To use in cooperation with block_scheduler.
@@ -1839,6 +1839,6 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_BLOCK_SCHEDULER_HEADER

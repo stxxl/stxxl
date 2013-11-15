@@ -28,7 +28,7 @@
 #include <cassert>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace async_schedule_local {
 
@@ -206,6 +206,6 @@ void compute_prefetch_schedule(
     STXXL_UNUSED(w_steps);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 // vim: et:ts=4:sw=4

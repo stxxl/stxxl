@@ -24,7 +24,7 @@
 #include <stxxl/bits/common/condition_variable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 class onoff_switch : private noncopyable
 {
@@ -80,6 +80,6 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_ONOFF_SWITCH_HEADER

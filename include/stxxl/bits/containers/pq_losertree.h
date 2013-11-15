@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/containers/pq_helpers.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals
 //!
@@ -741,7 +741,7 @@ multi_merge_k(Element* target, unsigned_type length)
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_PQ_LOSERTREE_HEADER
 // vim: et:ts=4:sw=4

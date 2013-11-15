@@ -19,7 +19,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <class T>
 class new_alloc;
@@ -139,7 +139,7 @@ inline bool operator != (const new_alloc<T1>&,
     return false;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_NEW_ALLOC_HEADER
 // vim: et:ts=4:sw=4

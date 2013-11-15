@@ -32,7 +32,7 @@
 #include <stxxl/bits/singleton.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //!
@@ -635,7 +635,7 @@ inline std::string add_SI_multiplier(uint64 number, const char* unit = "")
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_IOSTATS_HEADER
 // vim: et:ts=4:sw=4

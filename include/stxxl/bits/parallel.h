@@ -84,7 +84,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 inline unsigned sort_memory_usage_factor()
 {
@@ -197,7 +197,7 @@ multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
 
 } // namespace parallel
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_PARALLEL_HEADER
 // vim: et:ts=4:sw=4

@@ -40,7 +40,7 @@
 #include <stxxl/bits/common/is_sorted.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
 //! \{
@@ -1003,7 +1003,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_SORT_HEADER
 // vim: et:ts=4:sw=4

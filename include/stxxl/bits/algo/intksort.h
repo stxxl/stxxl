@@ -20,7 +20,7 @@
 #include <stxxl/bits/parallel.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename type_key>
 static void
@@ -367,6 +367,6 @@ void classify_block(type* begin, type* end, type_key*& out, int_type* bucket, ty
     STXXL_UNUSED(K);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_INTKSORT_HEADER

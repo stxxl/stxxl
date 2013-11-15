@@ -24,7 +24,7 @@
 #include <stxxl/bits/common/error_handling.h>
 #include "ufs_platform.h"
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
@@ -147,4 +147,4 @@ template class fileperblock_file<wincall_file>;
 template class fileperblock_file<boostfd_file>;
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

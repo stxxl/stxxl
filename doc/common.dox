@@ -404,9 +404,9 @@ See the file common/uint_types.h
 
 /** \page common_misc_macros Miscellaneous Macros
 
-\section namespaces __STXXL_BEGIN_NAMESPACE
+\section namespaces STXXL_BEGIN_NAMESPACE
 
-A long, long time ago, not all compilers supported C++ namespaces, thus STXXL uses the macros __STXXL_BEGIN_NAMESPACE and __STXXL_END_NAMESPACE, which open and close the \c "namespace stxxl".
+A long, long time ago, not all compilers supported C++ namespaces, thus STXXL uses the macros STXXL_BEGIN_NAMESPACE and STXXL_END_NAMESPACE, which open and close the \c "namespace stxxl".
 
 \section unused STXXL_UNUSED
 

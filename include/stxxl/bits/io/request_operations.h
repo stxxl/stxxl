@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/onoff_switch.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -157,7 +157,7 @@ inline size_t wait_any(request_ptr req_array[], size_t count)
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_REQUEST_OPERATIONS_HEADER
 // vim: et:ts=4:sw=4

@@ -16,7 +16,7 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/disk_queues.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 request_with_state::~request_with_state()
@@ -72,5 +72,5 @@ bool request_with_state::poll()
     return s == DONE || s == READY2DIE;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

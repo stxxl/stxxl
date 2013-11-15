@@ -14,7 +14,7 @@
 #include <stxxl/bits/version.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 int version_major()
 {
@@ -46,6 +46,6 @@ const char * get_library_version_string_long()
     return get_version_string_long();
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 // vim: et:ts=4:sw=4

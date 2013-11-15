@@ -32,7 +32,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
 //! \{
@@ -465,6 +465,6 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_STABLE_KSORT_HEADER

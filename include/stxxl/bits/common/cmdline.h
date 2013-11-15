@@ -24,7 +24,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 /**
  * \brief Command line parser which automatically fills variables and prints
@@ -586,6 +586,6 @@ public:
     void print_result(std::ostream& os = std::cout);
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_CMDLINE_HEADER

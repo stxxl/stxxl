@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/condition_variable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename ValueType = int>
 class state : private noncopyable
@@ -63,6 +63,6 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_STATE_HEADER

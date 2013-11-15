@@ -29,7 +29,7 @@
 #define STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION 1
 #endif
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
 {
@@ -149,5 +149,5 @@ void* request_queue_impl_1q::worker(void* arg)
 #endif
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

@@ -70,7 +70,7 @@
 
 #define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] priority_queue::" << msg)
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \defgroup stlcontinternals internals
 //! \ingroup stlcont
@@ -257,7 +257,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_CONTAINERS_PQ_HELPERS_HEADER
 // vim: et:ts=4:sw=4

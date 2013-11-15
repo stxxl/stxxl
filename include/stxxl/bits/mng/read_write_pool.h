@@ -17,7 +17,7 @@
 #include <stxxl/bits/mng/prefetch_pool.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
@@ -155,7 +155,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std {

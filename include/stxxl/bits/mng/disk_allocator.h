@@ -28,7 +28,7 @@
 #include <stxxl/bits/mng/config.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \ingroup mnglayer
 //! \{
@@ -233,7 +233,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_DISK_ALLOCATOR_HEADER
 // vim: et:ts=4:sw=4

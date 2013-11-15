@@ -25,7 +25,7 @@
 #include <stxxl/bits/unused.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 //! Access to some useful malloc statistics.
@@ -146,6 +146,6 @@ inline std::ostream& operator << (std::ostream& s, const malloc_stats& st)
 class malloc_setup
 { };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_UTILS_MALLOC_HEADER

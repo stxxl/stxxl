@@ -25,7 +25,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace compat {
 
@@ -105,6 +105,6 @@ struct make_signed
 
 } // namespace compat
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMPAT_TYPE_TRAITS_HEADER

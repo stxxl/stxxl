@@ -15,7 +15,7 @@
 #include <stxxl/bits/common/error_handling.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 void disk_allocator::dump() const
 {
@@ -151,5 +151,5 @@ void disk_allocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_
     //dump();
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

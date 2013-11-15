@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! IF template metaprogramming statement.
 //!
@@ -160,6 +160,6 @@ public:
     };
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_TMETA_HEADER

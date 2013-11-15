@@ -1572,8 +1572,8 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator
 # instead of the = operator.
 
-PREDEFINED             = "__STXXL_BEGIN_NAMESPACE=namespace stxxl {" \
-                         "__STXXL_END_NAMESPACE=}" \
+PREDEFINED             = "STXXL_BEGIN_NAMESPACE=namespace stxxl {" \
+                         "STXXL_END_NAMESPACE=}" \
                          "_STXXL_DEPRECATED(x)=x" \
                          "STXXL_HAVE_MMAP_FILE=1" \
                          "STXXL_WINDOWS=1" \

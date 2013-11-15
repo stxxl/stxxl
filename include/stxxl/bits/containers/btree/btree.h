@@ -24,7 +24,7 @@
 #include <stxxl/vector>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace btree {
 
@@ -1137,7 +1137,7 @@ inline bool operator >= (const btree<KeyType, DataType, CompareType, LogNodeSize
 
 } // namespace btree
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std {

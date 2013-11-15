@@ -15,7 +15,7 @@
 #include <stxxl/bits/io/disk_queues.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 request_ptr disk_queued_file::aread(
@@ -46,5 +46,5 @@ request_ptr disk_queued_file::awrite(
     return req;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

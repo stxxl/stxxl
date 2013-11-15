@@ -33,7 +33,7 @@
 #include <stxxl/bits/common/state.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -58,7 +58,7 @@ protected:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 // vim: et:ts=4:sw=4

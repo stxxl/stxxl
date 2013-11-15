@@ -30,7 +30,7 @@
   #include <unistd.h>
 #endif
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 static inline bool exist_file(const std::string& path)
 {
@@ -415,5 +415,5 @@ std::string disk_config::fileio_string() const
     return oss.str();
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

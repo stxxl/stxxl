@@ -18,7 +18,7 @@
 #include <stxxl/vector>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <class T, class VectorType>
 class deque;
@@ -658,7 +658,7 @@ bool operator < (const deque<ValueType, VectorType>& a, const deque<ValueType, V
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std {
 

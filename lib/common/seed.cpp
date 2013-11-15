@@ -29,7 +29,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 inline unsigned initial_seed();
 
@@ -78,4 +78,4 @@ unsigned get_next_seed()
     return seed_generator().seed++;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

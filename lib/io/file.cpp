@@ -14,11 +14,11 @@
 #include <stxxl/bits/common/error_handling.h>
 #include "ufs_platform.h"
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 int file::unlink(const char* path)
 {
     return ::unlink(path);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE

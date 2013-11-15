@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 request::request(const completion_handler& on_compl,
                  file* file__,
@@ -90,5 +90,5 @@ std::ostream& request::print(std::ostream& out) const
     return out;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

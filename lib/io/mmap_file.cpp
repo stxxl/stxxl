@@ -21,7 +21,7 @@
 #include <sys/mman.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 void mmap_file::serve(const request* req) throw (io_error)
@@ -74,7 +74,7 @@ const char* mmap_file::io_type() const
     return "mmap";
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_MMAP_FILE
 // vim: et:ts=4:sw=4

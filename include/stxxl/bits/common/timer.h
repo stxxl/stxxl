@@ -35,7 +35,7 @@
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! Returns number of seconds since the epoch, high resolution.
 inline double
@@ -167,7 +167,7 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_TIMER_HEADER
 // vim: et:ts=4:sw=4

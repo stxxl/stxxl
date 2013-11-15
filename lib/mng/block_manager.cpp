@@ -15,7 +15,7 @@
 #include <stxxl/bits/mng/block_manager.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 block_manager::block_manager()
 {
@@ -107,5 +107,5 @@ uint64 block_manager::get_free_bytes() const
     return total;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

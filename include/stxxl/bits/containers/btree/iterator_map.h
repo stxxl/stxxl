@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/error_handling.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace btree {
 
@@ -151,7 +151,7 @@ public:
 
 } // namespace btree
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std {

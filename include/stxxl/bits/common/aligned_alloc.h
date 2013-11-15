@@ -24,7 +24,7 @@
 #define STXXL_VERBOSE_ALIGNED_ALLOC STXXL_VERBOSE2
 #endif
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename must_be_int>
 struct aligned_alloc_settings {
@@ -121,7 +121,7 @@ aligned_dealloc(void* ptr)
     std::free(buffer);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_ALIGNED_ALLOC_HEADER
 // vim: et:ts=4:sw=4
