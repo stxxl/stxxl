@@ -12,12 +12,20 @@
  **************************************************************************/
 
 #include <limits>
+#include <stxxl/bits/config.h>
 #include <stxxl/types>
 
 template <unsigned n>
 struct bulk
 {
     char _data[n];
+
+    bulk()
+    {
+#if STXXL_WITH_VALGRIND
+        memset(_data, 0, n);
+#endif
+    }
 };
 
 template <>

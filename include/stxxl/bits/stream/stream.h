@@ -1239,9 +1239,7 @@ public:
         i1(i1_), i2(i2_)
     {
         if (!empty())
-        {
             current = value_type(*i1, *i2);
-        }
     }
 
     //! Standard stream method.

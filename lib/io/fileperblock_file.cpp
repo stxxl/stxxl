@@ -80,6 +80,9 @@ void fileperblock_file<base_file_type>::lock()
         //create lock file and fill it with one page, an empty file cannot be locked
         const int page_size = BLOCK_ALIGN;
         void* one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
+#if STXXL_WITH_VALGRIND
+        memset(one_page, 0, page_size);
+#endif
         lock_file.set_size(page_size);
         request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
         r->wait();

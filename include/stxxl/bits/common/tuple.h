@@ -130,7 +130,7 @@ struct tuple
     bool operator == (const tuple& t) const
     {
         return first == t.first && second == t.second && third == t.third
-            && fourth == t.fourth && fifth == t.fifth && sixth == t.sixth;
+               && fourth == t.fourth && fifth == t.fifth && sixth == t.sixth;
     }
 
     //! Inequality comparison
@@ -195,7 +195,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
         : first(first_)
     { }
 
-     //! Equality comparison
+    //! Equality comparison
     bool operator == (const tuple& t) const
     {
         return first == t.first;
@@ -427,7 +427,7 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     bool operator == (const tuple& t) const
     {
         return first == t.first && second == t.second && third == t.third
-            && fourth == t.fourth;
+               && fourth == t.fourth;
     }
 
     //! Inequality comparison
@@ -527,7 +527,7 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     bool operator == (const tuple& t) const
     {
         return first == t.first && second == t.second && third == t.third
-            && fourth == t.fourth && fifth == t.fifth;
+               && fourth == t.fourth && fifth == t.fifth;
     }
 
     //! Inequality comparison

@@ -29,9 +29,9 @@ struct my_type
     my_type() { }
     explicit my_type(key_type k) : key(k)
     {
-        #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
+#if STXXL_WITH_VALGRIND
         memset(data, 0, sizeof(data));
-        #endif
+#endif
     }
 };
 

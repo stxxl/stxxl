@@ -93,6 +93,9 @@ struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
     typedef tuple_type value_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
+        if (a.first == b.first)
+            return a.second < b.second;
+
         return a.first < b.first;
     }
 
@@ -207,6 +210,28 @@ int main()
     {
         STXXL_MSG("('" << output[i].first << "'," << output[i].second << ")");
     }
+
+    STXXL_CHECK(output[0] == tuple_type(' ', 5));
+    STXXL_CHECK(output[1] == tuple_type(' ', 8));
+    STXXL_CHECK(output[2] == tuple_type(' ', 15));
+    STXXL_CHECK(output[3] == tuple_type(',', 14));
+    STXXL_CHECK(output[4] == tuple_type('H', 0));
+    STXXL_CHECK(output[5] == tuple_type('a', 1));
+    STXXL_CHECK(output[6] == tuple_type('a', 4));
+    STXXL_CHECK(output[7] == tuple_type('a', 7));
+    STXXL_CHECK(output[8] == tuple_type('a', 13));
+    STXXL_CHECK(output[9] == tuple_type('a', 17));
+    STXXL_CHECK(output[10] == tuple_type('b', 16));
+    STXXL_CHECK(output[11] == tuple_type('b', 18));
+    STXXL_CHECK(output[12] == tuple_type('i', 10));
+    STXXL_CHECK(output[13] == tuple_type('l', 6));
+    STXXL_CHECK(output[14] == tuple_type('s', 2));
+    STXXL_CHECK(output[15] == tuple_type('s', 11));
+    STXXL_CHECK(output[16] == tuple_type('t', 3));
+    STXXL_CHECK(output[17] == tuple_type('t', 12));
+    STXXL_CHECK(output[18] == tuple_type('v', 9));
+    STXXL_CHECK(output[19] == tuple_type('y', 19));
+    STXXL_CHECK(output.size() == 20);
 
     std::cout << *s;
 

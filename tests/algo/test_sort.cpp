@@ -33,7 +33,12 @@ struct my_type
     }
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
+    my_type(key_type __key) : _key(__key)
+    {
+#if STXXL_WITH_VALGRIND
+        memset(_data, 0, sizeof(_data));
+#endif
+    }
 
     static my_type min_value()
     {

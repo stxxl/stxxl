@@ -54,7 +54,7 @@ struct my_type : public uint32_pair_type
     my_type(const key_type& k1, const key_type& k2)
         : uint32_pair_type(k1, k2)
     {
-#ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
+#if STXXL_WITH_VALGRIND
         memset(data, 0, sizeof(data));
 #endif
     }

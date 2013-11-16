@@ -79,6 +79,8 @@ endif()
 
 option(NO_CXX11 "Build without C++11 flags" OFF)
 
+option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." ON)
+
 ### building shared and/or static libraries
 
 if(MSVC OR CYGWIN OR MINGW)
@@ -120,8 +122,10 @@ enable_testing()
 include(CTest)
 set(CTEST_PROJECT_NAME "STXXL")
 
-find_program(CTEST_MEMORYCHECK_COMMAND NAMES "valgrind")
-#set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE ${CTEST_SOURCE_DIRECTORY}/tests/valgrind.supp)
+if(USE_VALGRIND)
+  set(STXXL_WITH_VALGRIND 1)
+  set(VALGRIND_OPTS --leak-check=full --error-exitcode=1 --suppressions=${PROJECT_SOURCE_DIR}/misc/valgrind.supp)
+endif()
 
 ###############################################################################
 # enable use of "make package"
@@ -473,8 +477,16 @@ macro(stxxl_test TESTNAME)
   if(BUILD_TESTS)
     set(TESTFULLNAME ${TESTNAME} ${ARGN})
     string(REPLACE ";" "-" TESTFULLNAME "${TESTFULLNAME}") # stringify list
-    add_test(${TESTFULLNAME} ${TESTNAME} ${ARGN})
-    set_tests_properties(${TESTFULLNAME} PROPERTIES TIMEOUT 3600)
+
+    if(USE_VALGRIND)
+      # prepend valgrind call
+      add_test(${TESTFULLNAME} /usr/bin/valgrind ${VALGRIND_OPTS} ./${TESTNAME} ${ARGN})
+      set_tests_properties(${TESTFULLNAME} PROPERTIES TIMEOUT 7200)
+    else()
+      add_test(${TESTFULLNAME} ${TESTNAME} ${ARGN})
+      set_tests_properties(${TESTFULLNAME} PROPERTIES TIMEOUT 3600)
+    endif()
+
   endif(BUILD_TESTS)
 
 endmacro(stxxl_test)

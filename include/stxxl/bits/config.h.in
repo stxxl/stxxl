@@ -101,4 +101,9 @@
 // cmake:   detection of mlock() function in <sys/mman.h>
 // effect:  used by stxxl_tool/mlock for locking physical pages
 
+#cmakedefine STXXL_WITH_VALGRIND ${STXXL_WITH_VALGRIND}
+// default: off
+// cmake:   option USE_VALGRIND=ON
+// effect:  run all tests with valgrind and pre-initialize some memory buffers
+
 #endif // !STXXL_CONFIG_HEADER
