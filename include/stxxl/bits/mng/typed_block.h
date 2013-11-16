@@ -295,12 +295,6 @@ public:
 #if STXXL_WITH_VALGRIND || STXXL_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
 #endif
-        char* tmp = (char*)result;
-        tmp += RawSize_;
-        while (tmp < ((char*)result) + bytes)
-        {
-            tmp += RawSize_;
-        }
         return result;
     }
 
@@ -313,12 +307,6 @@ public:
 #if STXXL_WITH_VALGRIND || STXXL_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
 #endif
-        char* tmp = (char*)result;
-        tmp += RawSize_;
-        while (tmp < ((char*)result) + bytes)
-        {
-            tmp += RawSize_;
-        }
         return result;
     }
 
