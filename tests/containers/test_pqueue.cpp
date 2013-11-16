@@ -50,7 +50,7 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 
     my_type min_value() const
     {
-        return my_type((std::numeric_limits<my_type::key_type>::max)());
+        return my_type(std::numeric_limits<my_type::key_type>::max());
     }
 };
 

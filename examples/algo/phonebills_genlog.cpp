@@ -33,13 +33,13 @@ struct cmp
     static LogEntry min_value()
     {
         LogEntry e;
-        e.timestamp = (std::numeric_limits<time_t>::min)();
+        e.timestamp = std::numeric_limits<time_t>::min();
         return e;
     }
     static LogEntry max_value()
     {
         LogEntry e;
-        e.timestamp = (std::numeric_limits<time_t>::max)();
+        e.timestamp = std::numeric_limits<time_t>::max();
         return e;
     }
 };

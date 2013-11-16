@@ -97,17 +97,17 @@ struct my_cmp /*: public std::binary_function<my_type, my_type, bool>*/ // great
     my_type min_value() const
     {
 #if LOAD
-        return my_type((std::numeric_limits<my_type::key_type>::max)(), MAGIC);
+        return my_type(std::numeric_limits<my_type::key_type>::max(), MAGIC);
 #else
-        return my_type((std::numeric_limits<my_type::key_type>::max)());
+        return my_type(std::numeric_limits<my_type::key_type>::max());
 #endif
     }
     my_type max_value() const
     {
 #if LOAD
-        return my_type((std::numeric_limits<my_type::key_type>::min)(), MAGIC);
+        return my_type(std::numeric_limits<my_type::key_type>::min(), MAGIC);
 #else
-        return my_type((std::numeric_limits<my_type::key_type>::min)());
+        return my_type(std::numeric_limits<my_type::key_type>::min());
 #endif
     }
 };

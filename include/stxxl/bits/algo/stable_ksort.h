@@ -219,11 +219,11 @@ void distribute(
 //! \param M amount of memory for internal use (in bytes)
 //! \remark Elements must provide a method key() which returns the integer key.
 //! \remark Not yet fully implemented, it assumes that the keys are uniformly
-//! distributed between [0,(std::numeric_limits<key_type>::max)().
+//! distributed between [0,std::numeric_limits<key_type>::max().
 template <typename ExtIterator_>
 void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 {
-    STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,(std::numeric_limits<key_type>::max)()]");
+    STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename value_type::key_type key_type;
     typedef typename ExtIterator_::block_type block_type;

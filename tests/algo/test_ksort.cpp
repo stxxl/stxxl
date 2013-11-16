@@ -33,8 +33,8 @@ struct my_type
     my_type() : _key(0), _key_copy(0) { }
     my_type(key_type1 __key) : _key(__key), _key_copy(__key) { }
 
-    my_type min_value() const { return my_type((std::numeric_limits<key_type1>::min)()); }
-    my_type max_value() const { return my_type((std::numeric_limits<key_type1>::max)()); }
+    my_type min_value() const { return my_type(std::numeric_limits<key_type1>::min()); }
+    my_type max_value() const { return my_type(std::numeric_limits<key_type1>::max()); }
 };
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)

@@ -43,7 +43,7 @@ struct my_cmp : public std::greater<my_type>
 {
     my_type min_value() const
     {
-        return (std::numeric_limits<my_type>::max)();
+        return std::numeric_limits<my_type>::max();
     }
 };
 

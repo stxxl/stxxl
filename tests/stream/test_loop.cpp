@@ -78,11 +78,11 @@ struct Cmp : std::binary_function<value_type, value_type, bool>
     }
     static value_type min_value()
     {
-        return value_type((std::numeric_limits<value_type>::min)());
+        return value_type(std::numeric_limits<value_type>::min());
     }
     static value_type max_value()
     {
-        return value_type((std::numeric_limits<value_type>::max)());
+        return value_type(std::numeric_limits<value_type>::max());
     }
 };
 

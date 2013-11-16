@@ -78,7 +78,7 @@ struct comp_type : std::binary_function<my_record, my_record, bool>
     }
     static my_record min_value()
     {
-        return my_record((std::numeric_limits<int>::max)(), 0);
+        return my_record(std::numeric_limits<int>::max(), 0);
     }
 };
 

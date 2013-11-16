@@ -67,12 +67,12 @@ struct cmp_tuple_first : std::binary_function<T, T, bool>
 
     value_type min_value() const
     {
-        return value_type((std::numeric_limits<first_value_type>::min)(), 0);
+        return value_type(std::numeric_limits<first_value_type>::min(), 0);
     }
 
     value_type max_value() const
     {
-        return value_type((std::numeric_limits<first_value_type>::max)(), 0);
+        return value_type(std::numeric_limits<first_value_type>::max(), 0);
     }
 };
 

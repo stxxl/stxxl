@@ -514,7 +514,7 @@ public:
 
     size_type max_size() const
     {
-        return (std::numeric_limits<size_type>::max)() / 2 - 1;
+        return std::numeric_limits<size_type>::max() / 2 - 1;
     }
 
     bool empty() const

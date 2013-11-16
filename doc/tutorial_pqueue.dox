@@ -43,7 +43,7 @@ struct ComparatorGreater
     { return (a > b); }
 
     int min_value() const
-    { return (std::numeric_limits<int>::max) (); }
+    { return std::numeric_limits<int>::max(); }
 };
 \endcode
 

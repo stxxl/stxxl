@@ -79,12 +79,12 @@ int main(int argc, char** argv)
         STXXL_MSG(">>>" << stxxl::add_SI_multiplier(sz) << "<<<");
     for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
         STXXL_MSG(">>>" << stxxl::add_SI_multiplier(sz, "B") << "<<<");
-    STXXL_MSG(">>>" << stxxl::add_SI_multiplier((std::numeric_limits<stxxl::uint64>::max)(), "B") << "<<<");
+    STXXL_MSG(">>>" << stxxl::add_SI_multiplier(std::numeric_limits<stxxl::uint64>::max(), "B") << "<<<");
     for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
         STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier(sz) << "<<<");
     for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
         STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier(sz, "B") << "<<<");
-    STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier((std::numeric_limits<stxxl::uint64>::max)(), "B") << "<<<");
+    STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier(std::numeric_limits<stxxl::uint64>::max(), "B") << "<<<");
 
 #if STXXL_HAVE_MMAP_FILE
     file1.close_remove();

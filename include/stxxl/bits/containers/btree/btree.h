@@ -451,7 +451,7 @@ public:
 
     size_type max_size() const
     {
-        return (std::numeric_limits<size_type>::max)();
+        return std::numeric_limits<size_type>::max();
     }
 
     bool empty() const
