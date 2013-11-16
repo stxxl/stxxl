@@ -32,6 +32,7 @@
 #include <stxxl/stats>
 #include <stxxl/stream>
 #include <stxxl/vector>
+#include <stxxl/algorithm>
 #include <stxxl/bits/common/uint_types.h>
 
 using stxxl::uint64;
@@ -1190,6 +1191,11 @@ public:
     }
 };
 
+alphabet_type unary_generator()
+{
+    return 'a';
+}
+
 template <typename offset_type>
 int process(const std::string& input_filename, const std::string& output_filename,
             size_type sizelimit,
@@ -1214,6 +1220,29 @@ int process(const std::string& input_filename, const std::string& output_filenam
         // copy input verbatim into vector
         input_vector.resize(input_filename.size());
         std::copy(input_filename.begin(), input_filename.end(), input_vector.begin());
+    }
+    else if (input_filename == "random")
+    {
+        if (sizelimit == std::numeric_limits<size_type>::max()) {
+            std::cout << "You must provide -s <size> for generated inputs." << std::endl;
+            return 1;
+        }
+
+        // fill input vector with random bytes
+        input_vector.resize(sizelimit);
+        stxxl::random_number32 rand32;
+        stxxl::generate(input_vector.begin(), input_vector.end(), rand32);
+    }
+    else if (input_filename == "unary")
+    {
+        if (sizelimit == std::numeric_limits<size_type>::max()) {
+            std::cout << "You must provide -s <size> for generated inputs." << std::endl;
+            return 1;
+        }
+
+        // fill input vector with random bytes
+        input_vector.resize(sizelimit);
+        stxxl::generate(input_vector.begin(), input_vector.end(), unary_generator);
     }
     else
     {
@@ -1281,12 +1310,16 @@ int process(const std::string& input_filename, const std::string& output_filenam
         }
     }
 
+    int ret = 0;
+
     if (check_flag)
     {
         (std::cout << "checking suffix array... ").flush();
 
-        if (!sacheck_vectors(input_vector, output_vector))
+        if (!sacheck_vectors(input_vector, output_vector)) {
             std::cout << "failed!" << std::endl;
+            ret = -1;
+        }
         else
             std::cout << "ok." << std::endl;
     }
@@ -1302,7 +1335,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
         delete output_file;
     }
 
-    return 0;
+    return ret;
 }
 
 int main(int argc, char* argv[])
@@ -1319,7 +1352,7 @@ int main(int argc, char* argv[])
     bool input_verbatim = false;
     unsigned wordsize = 32;
 
-    cp.add_param_string("input", "path to input file (or verbatim text)", input_filename);
+    cp.add_param_string("input", "Path to input file (or verbatim text).\n  The special inputs 'random' and 'unary' generate such text on-the-fly.", input_filename);
     cp.add_flag('c', "check", "Check suffix array for correctness.", check_flag);
     cp.add_flag('t', "text", "Print out suffix array in readable text.", text_output_flag);
     cp.add_string('o', "output", "Output suffix array to given path.", output_filename);

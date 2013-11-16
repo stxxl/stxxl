@@ -19,4 +19,6 @@ if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
     set_target_properties(skew3 PROPERTIES COMPILE_FLAGS /bigobj)
   endif()
 
+  stxxl_test(skew3 --size 1mib random --check)
+
 endif()

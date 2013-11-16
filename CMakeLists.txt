@@ -476,7 +476,7 @@ macro(stxxl_test TESTNAME)
 
   if(BUILD_TESTS)
     set(TESTFULLNAME ${TESTNAME} ${ARGN})
-    string(REPLACE ";" "-" TESTFULLNAME "${TESTFULLNAME}") # stringify list
+    string(REPLACE ";" "_" TESTFULLNAME "${TESTFULLNAME}") # stringify list
 
     if(USE_VALGRIND)
       # prepend valgrind call
