@@ -1,10 +1,14 @@
 /***************************************************************************
  *  include/stxxl/bits/mng/typed_block.h
  *
+ *  Constructs a typed_block object containing as many elements elements plus
+ *  some metadata as fits into the given block size.
+ *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -29,46 +33,53 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup mnglayer
 //! \{
 
+//! Block Manager Internals \internal
+namespace mng_local {
 
-template <unsigned bytes>
-class filler_struct__
+//! \defgroup mnglayer_internals Internals
+//! \ingroup mnglayer
+//! Internals and support classes
+//! \{
+
+template <unsigned Bytes>
+class filler_struct
 {
     typedef unsigned char byte_type;
-    byte_type filler_array_[bytes];
+    byte_type filler_array[Bytes];
 
 public:
-    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct__ is constructed"); }
+    filler_struct() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct is constructed"); }
 };
 
 template <>
-class filler_struct__<0>
+class filler_struct<0>
 {
     typedef unsigned char byte_type;
 
 public:
-    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct__<> is constructed"); }
+    filler_struct() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct<> is constructed"); }
 };
 
 //! Contains data elements for \c stxxl::typed_block , not intended for direct use.
-template <class T, unsigned Size_>
+template <typename Type, unsigned Size>
 class element_block
 {
 public:
-    typedef T type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
+    typedef Type type;
+    typedef Type value_type;
+    typedef Type& reference;
+    typedef const Type& const_reference;
     typedef type* pointer;
     typedef pointer iterator;
     typedef const type* const_iterator;
 
     enum
     {
-        size = Size_ //!< number of elements in the block
+        size = Size //!< number of elements in the block
     };
 
-    //! Array of elements of type T
-    T elem[size];
+    //! Array of elements of type Type
+    value_type elem[size];
 
     element_block() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] element_block is constructed"); }
 
@@ -116,14 +127,14 @@ public:
 };
 
 //! Contains BID references for \c stxxl::typed_block , not intended for direct use.
-template <class T, unsigned Size_, unsigned RawSize_, unsigned NBids_ = 0>
-class block_w_bids : public element_block<T, Size_>
+template <typename Type, unsigned Size, unsigned RawSize, unsigned NBids = 0>
+class block_w_bids : public element_block<Type, Size>
 {
 public:
     enum
     {
-        raw_size = RawSize_,
-        nbids = NBids_
+        raw_size = RawSize,
+        nbids = NBids
     };
 
     typedef BID<raw_size> bid_type;
@@ -140,13 +151,14 @@ public:
     block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_bids is constructed"); }
 };
 
-template <class T, unsigned Size_, unsigned RawSize_>
-class block_w_bids<T, Size_, RawSize_, 0>: public element_block<T, Size_>
+template <typename Type, unsigned Size, unsigned RawSize>
+class block_w_bids<Type, Size, RawSize, 0>
+    : public element_block<Type, Size>
 {
 public:
     enum
     {
-        raw_size = RawSize_,
+        raw_size = RawSize,
         nbids = 0
     };
 
@@ -156,13 +168,13 @@ public:
 };
 
 //! Contains per block information for \c stxxl::typed_block , not intended for direct use.
-template <class T_, unsigned RawSize_, unsigned NBids_, class InfoType_ = void>
+template <typename Type, unsigned RawSize, unsigned NBids, typename MetaInfoType = void>
 class block_w_info :
-    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>)* NBids_ - sizeof(InfoType_)) / sizeof(T_)), RawSize_, NBids_>
+    public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids - sizeof(MetaInfoType)) / sizeof(Type)), RawSize, NBids>
 {
 public:
     //! Type of per block information element.
-    typedef InfoType_ info_type;
+    typedef MetaInfoType info_type;
 
     //! Per block information element.
     info_type info;
@@ -170,9 +182,9 @@ public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_info is constructed"); }
 };
 
-template <class T_, unsigned RawSize_, unsigned NBids_>
-class block_w_info<T_, RawSize_, NBids_, void>:
-    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>)* NBids_) / sizeof(T_)), RawSize_, NBids_>
+template <typename Type, unsigned RawSize, unsigned NBids>
+class block_w_info<Type, RawSize, NBids, void>:
+    public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids) / sizeof(Type)), RawSize, NBids>
 {
 public:
     typedef void info_type;
@@ -181,53 +193,55 @@ public:
 };
 
 //! Contains per block filler for \c stxxl::typed_block , not intended for direct use.
-template <typename BaseType_, unsigned FillSize_ = 0>
-class add_filler :
-    public BaseType_
+template <typename BaseType, unsigned FillSize = 0>
+class add_filler : public BaseType
 {
 private:
     //! Per block filler element.
-    filler_struct__<FillSize_> filler;
+    filler_struct<FillSize> filler;
 
 public:
     add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] add_filler is constructed"); }
 };
 
-template <typename BaseType_>
-class add_filler<BaseType_, 0>:
-    public BaseType_
+template <typename BaseType>
+class add_filler<BaseType, 0>
+    : public BaseType
 {
 public:
     add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] add_filler<> is constructed"); }
 };
 
 //! Helper to compute the size of the filler , not intended for direct use.
-template <typename Tp_, unsigned RawSize_>
-class expand_struct :
-    public add_filler<Tp_, RawSize_ - sizeof(Tp_)>
+template <typename Type, unsigned RawSize>
+class expand_struct : public add_filler<Type, RawSize - sizeof(Type)>
 { };
+
+//! \}
+
+} // namespace mng_local
 
 //! Block containing elements of fixed length.
 //!
-//! \tparam RawSize_ size of block in bytes
-//! \tparam T_ type of block's records
-//! \tparam NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
-//! \tparam InfoType_ type of per block information (default is no information - void)
+//! \tparam RawSize size of block in bytes
+//! \tparam Type type of block's records
+//! \tparam NRef number of block references (BIDs) that can be stored in the block (default is 0)
+//! \tparam MetaInfoType type of per block information (default is no information - void)
 //!
-//! The data array of type T_ is contained in the parent class \c stxxl::element_block, see related information there.
+//! The data array of type Type is contained in the parent class \c stxxl::element_block, see related information there.
 //! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see related information there.
 //! The "per block information" is contained in the parent class \c stxxl::block_w_info, see related information there.
-//!  \warning If \c RawSize_ > 2MB object(s) of this type can not be allocated on the stack (as a
+//!  \warning If \c RawSize > 2MB object(s) of this type can not be allocated on the stack (as a
 //! function variable for example), because Linux POSIX library limits the stack size for the
 //! main thread to (2MB - system page size)
-template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = void>
+template <unsigned RawSize, typename Type, unsigned NRef = 0, typename MetaInfoType = void>
 class typed_block :
-    public expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_>
+    public mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>
 {
-    typedef expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_> Base;
+    typedef mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize> Base;
 
 public:
-    typedef T_ value_type;
+    typedef Type value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
     typedef value_type* pointer;
@@ -237,9 +251,9 @@ public:
 
     enum constants
     {
-        raw_size = RawSize_,                                        //!< size of block in bytes
-        size = Base::size,                                          //!< number of elements in block
-        has_only_data = (raw_size == (size * sizeof(value_type)))   //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
+        raw_size = RawSize,                                        //!< size of block in bytes
+        size = Base::size,                                         //!< number of elements in block
+        has_only_data = (raw_size == (size * sizeof(value_type)))  //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
     };
 
     typedef BID<raw_size> bid_type;
