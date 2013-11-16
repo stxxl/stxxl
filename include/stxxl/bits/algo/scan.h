@@ -16,6 +16,7 @@
 #define STXXL_ALGO_SCAN_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
@@ -47,7 +48,7 @@ STXXL_BEGIN_NAMESPACE
  * \warning nested stxxl::for_each are not supported
  */
 template <typename ExtIterator, typename UnaryFunction>
-UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers)
+UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers = 0)
 {
     if (begin == end)
         return functor;
@@ -55,6 +56,9 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
 
     begin.flush();     // flush container
+
+    if (nbuffers == 0)
+        nbuffers = 2 * config::get_instance()->disks_number();
 
     // create prefetching stream,
     buf_istream_type in(begin.bid(), end.bid() + ((end.block_offset()) ? 1 : 0), nbuffers);
@@ -114,7 +118,7 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
  * \warning nested stxxl::for_each_m are not supported
  */
 template <typename ExtIterator, typename UnaryFunction>
-UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers)
+UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers = 0)
 {
     if (begin == end)
         return functor;
@@ -123,6 +127,9 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     begin.flush();     // flush container
+
+    if (nbuffers == 0)
+        nbuffers = 2 * config::get_instance()->disks_number();
 
     // create prefetching stream,
     buf_istream_type in(begin.bid(), end.bid() + ((end.block_offset()) ? 1 : 0), nbuffers / 2);
@@ -181,10 +188,10 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
  * \param begin object of model of \c ext_random_access_iterator concept
  * \param end object of model of \c ext_random_access_iterator concept
  * \param generator function object of model of \c std::generator concept
- * \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
+ * \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D, or zero for automaticl 2*D)
  */
 template <typename ExtIterator, typename Generator>
-void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type nbuffers)
+void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type nbuffers = 0)
 {
     typedef typename ExtIterator::block_type block_type;
     typedef buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
@@ -201,6 +208,9 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
     }
 
     begin.flush();     // flush container
+
+    if (nbuffers == 0)
+        nbuffers = 2 * config::get_instance()->disks_number();
 
     // create buffered write stream for blocks
     buf_ostream_type outstream(begin.bid(), nbuffers);
@@ -261,7 +271,7 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
  *         such exists then \c end
  */
 template <typename ExtIterator, typename EqualityComparable>
-ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& value, int_type nbuffers)
+ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& value, int_type nbuffers = 0)
 {
     if (begin == end)
         return end;
@@ -269,6 +279,9 @@ ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& v
     typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
 
     begin.flush();     // flush container
+
+    if (nbuffers == 0)
+        nbuffers = 2 * config::get_instance()->disks_number();
 
     // create prefetching stream,
     buf_istream_type in(begin.bid(), end.bid() + ((end.block_offset()) ? 1 : 0), nbuffers);
