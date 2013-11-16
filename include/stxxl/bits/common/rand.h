@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002, 2003, 2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -86,6 +87,32 @@ struct random_number32_r
     inline value_type operator () () const
     {
         return (state = 1664525 * state + 1013904223);
+    }
+};
+
+//! Fast uniform [0, 255] pseudo-random generator with period 2^8, random bits:
+//! 8 (one byte).
+class random_number8_r
+{
+    random_number32_r m_rnd32;
+    uint32 m_value;
+    unsigned int m_pos;
+
+public:
+    typedef uint8 value_type;
+
+    random_number8_r(unsigned seed = 0)
+        : m_rnd32(seed), m_pos(4)
+    { }
+
+    //! Returns a random byte from [0, 255]
+    inline value_type operator () ()
+    {
+        if (++m_pos >= 4) {
+            m_value = m_rnd32();
+            m_pos = 0;
+        }
+        return ((uint8*)&m_value)[m_pos];
     }
 };
 

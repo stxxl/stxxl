@@ -26,13 +26,14 @@
 #include <iomanip>
 #include <sstream>
 
+#include <stxxl/algorithm>
 #include <stxxl/cmdline>
 #include <stxxl/io>
+#include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/stats>
 #include <stxxl/stream>
 #include <stxxl/vector>
-#include <stxxl/algorithm>
 #include <stxxl/bits/common/uint_types.h>
 
 using stxxl::uint64;
@@ -1230,8 +1231,8 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
         // fill input vector with random bytes
         input_vector.resize(sizelimit);
-        stxxl::random_number32 rand32;
-        stxxl::generate(input_vector.begin(), input_vector.end(), rand32);
+        stxxl::random_number8_r rand8;
+        stxxl::generate(input_vector.begin(), input_vector.end(), rand8);
     }
     else if (input_filename == "unary")
     {
