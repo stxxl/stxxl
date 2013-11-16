@@ -69,7 +69,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     // *** Pipeline Declaration ***
 
     // Build tuples with index: (SA[i]) -> (i, SA[i])
-    typedef stxxl::counter<offset_type> index_counter_type;
+    typedef stxxl::stream::counter<offset_type> index_counter_type;
     index_counter_type index_counter;
 
     typedef stream::make_tuple<index_counter_type, InputSA> tuple_index_sa_type;
@@ -959,7 +959,7 @@ public:
 
     protected:
         // generate (i) sequence
-        typedef stxxl::counter<offset_type> counter_stream_type;
+        typedef stxxl::stream::counter<offset_type> counter_stream_type;
 
         // Sorter
         typedef stxxl::tuple_less1st<skew_pair_type> mod12cmp;
@@ -991,7 +991,7 @@ public:
             mod12_sorter_type m2_sorter(mod12cmp(), ram_use / 5);
 
             // sorted mod1 runs -concatenate- sorted mod2 runs
-            typedef stxxl::concatenate<mod12_sorter_type, mod12_sorter_type> concatenation;
+            typedef stxxl::stream::concatenate<mod12_sorter_type, mod12_sorter_type> concatenation_type;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
             offset_array_type text;
@@ -1031,7 +1031,7 @@ public:
                 std::cout << "not unique -> next recursion level = " << ++rec_depth << std::endl;
 
                 // compute s^12 := lexname[S[1 mod 3]] . lexname[S[2 mod 3]], (also known as reduced recursion string 'R')
-                concatenation concat_mod1mod2(m1_sorter, m2_sorter);
+                concatenation_type concat_mod1mod2(m1_sorter, m2_sorter);
 
                 buildSA_type* recType = skew3(concat_mod1mod2);  // recursion with recursion string T' = concat_mod1mod2 lexnames
 

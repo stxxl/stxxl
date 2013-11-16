@@ -126,6 +126,20 @@ struct tuple
           sixth(_sixth)
     { }
 
+    //! Equality comparison
+    bool operator == (const tuple& t) const
+    {
+        return first == t.first && second == t.second && third == t.third
+            && fourth == t.fourth && fifth == t.fifth && sixth == t.sixth;
+    }
+
+    //! Inequality comparison
+    bool operator != (const tuple& t) const
+    {
+        return !(first == t.first && second == t.second && third == t.third
+                 && fourth == t.fourth && fifth == t.fifth && sixth == t.sixth);
+    }
+
     //! Make tuple ostream-able
     friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
@@ -181,6 +195,18 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
         : first(first_)
     { }
 
+     //! Equality comparison
+    bool operator == (const tuple& t) const
+    {
+        return first == t.first;
+    }
+
+    //! Inequality comparison
+    bool operator != (const tuple& t) const
+    {
+        return !(first == t.first);
+    }
+
     //! Make tuple ostream-able
     friend std::ostream& operator << (std::ostream& os, const tuple& t)
     {
@@ -232,6 +258,18 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
         : first(first_),
           second(second_)
     { }
+
+    //! Equality comparison
+    bool operator == (const tuple& t) const
+    {
+        return first == t.first && second == t.second;
+    }
+
+    //! Inequality comparison
+    bool operator != (const tuple& t) const
+    {
+        return !(first == t.first && second == t.second);
+    }
 
     //! Make tuple ostream-able
     friend std::ostream& operator << (std::ostream& os, const tuple& t)
@@ -297,6 +335,18 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
           second(_second),
           third(_third)
     { }
+
+    //! Equality comparison
+    bool operator == (const tuple& t) const
+    {
+        return first == t.first && second == t.second && third == t.third;
+    }
+
+    //! Inequality comparison
+    bool operator != (const tuple& t) const
+    {
+        return !(first == t.first && second == t.second && third == t.third);
+    }
 
     //! Make tuple ostream-able
     friend std::ostream& operator << (std::ostream& os, const tuple& t)
@@ -372,6 +422,20 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
           third(_third),
           fourth(_fourth)
     { }
+
+    //! Equality comparison
+    bool operator == (const tuple& t) const
+    {
+        return first == t.first && second == t.second && third == t.third
+            && fourth == t.fourth;
+    }
+
+    //! Inequality comparison
+    bool operator != (const tuple& t) const
+    {
+        return !(first == t.first && second == t.second && third == t.third
+                 && fourth == t.fourth);
+    }
 
     //! Make tuple ostream-able
     friend std::ostream& operator << (std::ostream& os, const tuple& t)
@@ -458,6 +522,20 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
           fourth(_fourth),
           fifth(_fifth)
     { }
+
+    //! Equality comparison
+    bool operator == (const tuple& t) const
+    {
+        return first == t.first && second == t.second && third == t.third
+            && fourth == t.fourth && fifth == t.fifth;
+    }
+
+    //! Inequality comparison
+    bool operator != (const tuple& t) const
+    {
+        return !(first == t.first && second == t.second && third == t.third
+                 && fourth == t.fourth && fifth == t.fifth);
+    }
 
     //! Make tuple ostream-able
     friend std::ostream& operator << (std::ostream& os, const tuple& t)
@@ -553,15 +631,16 @@ struct tuple_less2nd
     static value_type max_value() { return value_type::max_value(); }
 };
 
+namespace stream {
 
 /**
  * Counter for creating tuple indexes for example.
  */
-template <class valuetype>
+template <class ValueType>
 struct counter
 {
 public:
-    typedef valuetype value_type;
+    typedef ValueType value_type;
 
 protected:
     value_type m_count;
@@ -641,6 +720,7 @@ public:
     }
 };
 
+} // namespace stream
 
 STXXL_END_NAMESPACE
 
