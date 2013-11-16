@@ -22,7 +22,7 @@ int main()
     unsigned int counter = 0;
     unsigned int tmp;
     stxxl::random_number<> rand;
-    stxxl::uint64 number_of_elements = (long long int)(1 * 128) * (long long int)(1024 * 1024);
+    stxxl::uint64 number_of_elements = 32 * 1024 * 1024;
 
     // fill vector with random integers
     for (stxxl::uint64 i = 0; i < number_of_elements; ++i)

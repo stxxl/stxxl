@@ -11,3 +11,5 @@
 ############################################################################
 
 stxxl_build_example(cmdline)
+
+stxxl_test(cmdline test)

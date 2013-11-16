@@ -12,3 +12,4 @@
 
 stxxl_build_example(stream1)
 
+stxxl_test(stream1)

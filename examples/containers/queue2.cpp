@@ -23,7 +23,7 @@ int main()
 
     unsigned int random;
     stxxl::random_number32 rand32;  // define random number generator
-    stxxl::uint64 number_of_elements = (long long int)(1 * 64) * (long long int)(1024 * 1024);
+    stxxl::uint64 number_of_elements = 64 * 1024 * 1024;
 
     // push random values in the queue
     for (stxxl::uint64 i = 0; i < number_of_elements; i++)

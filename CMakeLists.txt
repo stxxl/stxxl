@@ -79,7 +79,7 @@ endif()
 
 option(NO_CXX11 "Build without C++11 flags" OFF)
 
-option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." ON)
+option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
 
 ### building shared and/or static libraries
 
