@@ -376,12 +376,20 @@ public:
     {
         return p_vector->element(offset.get_pos() + i);
     }
+
+#ifdef _LIBCPP_VERSION
+    //-tb 2013-11: libc++ defines std::reverse_iterator::operator[] in such a
+    // way that it expects vector_iterator::operator[] to return a (mutable)
+    // reference. Thus to remove confusion about the compiler error, we remove
+    // the operator[] const for libc++. The const_reference actually violates
+    // some version of the STL standard, but works well in gcc's libstdc++.
+#else
     //! return const reference to element +i after the current element
     const_reference operator [] (size_type i) const
     {
         return p_vector->const_element(offset.get_pos() + i);
     }
-
+#endif
     //! \}
 
     //! \name Relative Calculation of Iterators

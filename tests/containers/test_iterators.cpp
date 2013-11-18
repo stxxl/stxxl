@@ -334,9 +334,14 @@ void test_random_access_reverse(svt& sv)
 
     // bracket operators
     svcri[0];
-    xsvri[0];
     //svcri[0] = 1; // read-only
+#ifndef _LIBCPP_VERSION
+    // see note about problem with std::reverse_iterator::operator[] in
+    // vector_iterator::operator [], in effect:
+    // vector_reverse_iterator::operator[] does not work with libc++.
+    xsvri[0];
     xsvri[0] = 1;
+#endif
 
     // test +, -, +=, -=
     test_inc_dec_random(svcri);
