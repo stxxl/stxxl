@@ -1,7 +1,7 @@
 Version 1.4.0 (unreleased)
 
 * Reorganized Directory Hierarchy
-  - separating old componented based directories into lib/ (libstxxl source
+  - separating old component based directories into lib/ (libstxxl source
     files), tests/ (for tests cases), examples/ (for tutorial and example code)
     and tools/ (for stxxl_tool and more benchmarks).
 
@@ -64,7 +64,7 @@ Version 1.4.0 (unreleased)
   - VS 2012 and 2013 support STL threads, mutexes, condition_variables and
     more, which are basically modeled after the Boost libraries. Thus we can
     simply uses these included libraries instead of Boost.
-  - Fixed bad runtime deadlock bug occuring when joining std::threads after
+  - Fixed bad runtime deadlock bug occurring when joining std::threads after
     main() exits. The bug persists in VS 2012 and 2013.
 
 * Implementing counting_ptr reference counted objects
@@ -114,6 +114,26 @@ Version 1.3.2 (unreleased)
     information and an inline function check_library_version() to check at
     runtime for mismatching header and library versions.  (Bz:#6)
     Available via <stxxl/version.h>
+* Merged matrix branch which allows external memory matrix operations.
+  - merged dsr::argument_helper for command line processing
+  - also required an internal memory addressable_priority_queue, a
+    shared_object_pointer (instrusive pointer)
+  - adds block_scheduler as submodule to prefetch matrix blocks in a
+    pre-recorded order
+  - contains a test and benchmark.
+* Fixed bug in stxxl::priority_queue
+  - added dump_sizes()
+  - The priority queue may become fragmented after a significant number of
+    insertions and deletes so that all slots in all groups are being used, but
+    the last external group is nearly empty (counting elements).  In that case
+    we merge the whole last external group into a temporary ext_merger and swap
+    this overflow merger and the (now empty) last external merger
+    afterwards. Increasing the number of groups beyond 4 is not possible
+    without significant changes elsewhere.
+* Fixed bug in stxxl::queue
+  - added special case when first block has space at the beginning
+  - added another test N * (push,pop,push), N * (pop, push, pop)
+* Using LIKELY and UNLIKEY to prioritize branchs in gcc.
 * Platform Support
   - add GCC 4.6
   - add clang++ 2.9
@@ -468,3 +488,9 @@ Version 0.2 (Summer 2003)
 * The first public release
 
 * Vectors, stacks, sorting, scanning are available
+
+------------------------------------------
+# Local Variables:
+# mode: text
+# mode: flyspell
+# End:
