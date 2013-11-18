@@ -58,7 +58,9 @@ ufs_file_base::ufs_file_base(
 
     if ((mode & DIRECT) || (mode & REQUIRE_DIRECT))
     {
-#if !STXXL_DIRECT_IO_OFF
+#ifdef __APPLE__
+        // no additional open flags are required for Mac OS X
+#elif !STXXL_DIRECT_IO_OFF
         flags |= O_DIRECT;
 #else
         if (mode & REQUIRE_DIRECT) {
@@ -132,7 +134,15 @@ void ufs_file_base::_after_open()
                            "fstat() path=" << filename << " fd=" << file_des);
 #endif
     m_is_device = S_ISBLK(st.st_mode) ? true : false;
+#ifdef __APPLE__
+    if (m_mode & DIRECT) {
+        STXXL_THROW_ERRNO_NE_0(fcntl(file_des, F_NOCACHE, 1), io_error,
+                           "fcntl() path=" << filename << " fd=" << file_des);
+        STXXL_THROW_ERRNO_NE_0(fcntl(file_des, F_RDAHEAD, 0), io_error,
+                           "fcntl() path=" << filename << " fd=" << file_des);
+    }
 
+#endif
     // successfully opened file descriptor
     if (!(m_mode & NO_LOCK))
         lock();
