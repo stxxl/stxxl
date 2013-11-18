@@ -169,11 +169,15 @@ void ufs_file_base::lock()
 
 file::offset_type ufs_file_base::_size()
 {
+    // We use lseek SEEK_END to find the file size. This works for raw devices
+    // (where stat() returns zero), and we need not reset the position because
+    // serve() always lseek()s before read/write.
+
     off_t rc = ::lseek(file_des, 0, SEEK_END);
     if (rc < 0)
         STXXL_THROW_ERRNO(io_error, "lseek(fd,0,SEEK_END) path=" << filename << " fd=" << file_des);
 
-    // retrun value is already the total size
+    // return value is already the total size
     return rc;
 }
 
