@@ -284,6 +284,9 @@ if(CYGWIN)
 elseif(MSVC)
   # have FILE_FLAG_NO_BUFFERING on Windows
   set(STXXL_DIRECT_IO_OFF 0)
+elseif(APPLE)
+  # we do not have to test anything, all is well.
+  set(STXXL_DIRECT_IO_OFF 0)
 else()
 
   include(CheckCXXSourceCompiles)
