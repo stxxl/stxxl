@@ -14,14 +14,15 @@
 #ifndef STXXL_UTILS_MALLOC_HEADER
 #define STXXL_UTILS_MALLOC_HEADER
 
+#include <stxxl/bits/config.h>
+
 #include <ostream>
-#ifndef __FreeBSD__
-    #include <malloc.h>
+#if STXXL_HAVE_MALLINFO_PROTO
+  #include <malloc.h>
 #endif
 #include <cstdlib>
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/config.h>
 #include <stxxl/bits/unused.h>
 
 
