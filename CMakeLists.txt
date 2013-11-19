@@ -39,7 +39,7 @@ set(STXXL_VERSION_MAJOR "1")
 set(STXXL_VERSION_MINOR "4")
 set(STXXL_VERSION_PATCH "0")
 set(STXXL_VERSION_STRING "${STXXL_VERSION_MAJOR}.${STXXL_VERSION_MINOR}.${STXXL_VERSION_PATCH}")
-set(STXXL_VERSION_PHASE "prerelease")
+set(STXXL_VERSION_PHASE "prerelease/${CMAKE_BUILD_TYPE}")
 
 # read .git directory (if it exists) and find git sha
 include(GetGitRevisionDescription)
