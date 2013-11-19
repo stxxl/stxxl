@@ -98,6 +98,10 @@ if(BUILD_SHARED_LIBS)
 
 else()
 
+  if(NOT BUILD_STATIC_LIBS)
+    message(FATAL_ERROR "You must build either a static or shared STXXL library")
+  endif()
+
   # build stxxl STATIC library and link all programs again it
   add_library(stxxl STATIC ${LIBSTXXL_SOURCES})
   set_target_properties(stxxl PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")

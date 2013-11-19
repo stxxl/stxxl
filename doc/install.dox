@@ -126,7 +126,7 @@ $ ./project
 
 \section install_unix_library Including STXXL as a Library
 
-STXXL compiles into both a shared and static library plus template include files, which may be included in binary distributions.
+STXXL compiles into a static (and optionally shared) library plus template include files, which may be included in binary distributions.
 
 If a binary STXXL package is installed, the following few CMake lines will automatically detect it and configure a program to build with the appropriate CXXFLAGS, include directories and libraries:
 \verbatim
@@ -166,17 +166,17 @@ Please see \ref install_config for further available options.
 
 # Notes for Linux Distribution Package Maintainers
 
-Package maintainers should make sure that both Debug and Release, and both shared and static libraries are available via the distribution package system.
+Package maintainers should make sure that \b both Debug and Release static libraries are available via the distribution package system. We currently cannot keep a stable binary interface for the library, thus providing versioned shared libraries is not a good idea.
 
-- The CMake build scripts will generate shared and static libraries when run with <tt>"-DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON"</tt>.
+- The CMake build scripts will generate static and exclude shared libraries when run with <tt>"-DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF"</tt>.
 
-- Debug libraries are suffixed with "_debug". Due to CMake's system, the library must be compiled once in Debug mode and once in Release mode!
+- Debug libraries are suffixed with "_debug". Due to CMake's system, the library must be compiled once in Debug mode and once in Release mode! (see below)
 
 - Running "make install" will correctly install the tree into \c CMAKE_INSTALL_PREFIX.
 
-- The library package should contain only the shared library \c libstxxl.so in it's current version. Additionally, the \c stxxl_tool should be included in the library package or packaged in an additional \c tools package. The \c test1 binary must not be included.
+- The binary package should only contain the \c stxxl_tool (since we do not provide shared libraries). Alternatively, the tool can packaged in an additional \c tools package, thus leaving the binary package empty. The \c test1 binary must not be included.
 
-- The development package must contain all installed headers, "libstxxl_debug.so" and two static libraries. \n
+- The development package must contain all installed headers, and both "libstxxl.a" and "libstxxl_debug.a". \n
   The CMake script will also install CMake project files in \c lib/cmake/stxxl , which must be included in the development package. \n
   We also provide a \c pkg-config file, which installs by default into \c lib/pkgconfig/ as \c stxxl.pc and \c stxxl_debug.pc
 
@@ -185,13 +185,14 @@ Package maintainers should make sure that both Debug and Release, and both share
 A typical build sequence would be
 \verbatim
 mkdir debug; cd debug
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON $SRCDIR
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_STATIC_LIBS=ON $SRCDIR
 make -j4 && make install
 cd ..
 mkdir release; cd release
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON $SRCDIR
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_STATIC_LIBS=ON $SRCDIR
 make -j4 && make install
 \endverbatim
+When building in this order the \b stxxl_tool will be built twice, and the Debug binary will be overwritten with the Release binary.
 
 */
 
@@ -211,7 +212,7 @@ The mode mostly changes CXXFLAGS.
 \verbatim
 $ cmake -DUSE_GNU_PARALLEL=ON ...
 \endverbatim
-when building. <b>Parallel is now on by default</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
+when building. <b>Parallel is now on by default for gcc</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
 
 - Use Boost for file I/O, multi-threading support and more. Boost is required on Windows for older MSVC versions and is CMake tries to automatically find it. On Linux/Unix it is optional <b>and not recommended</b>, but can be activated using
 \verbatim
@@ -243,7 +244,7 @@ $ cmake -DCMAKE_INSTALL_PREFIX=/some/dir ...
 $ make install
 \endverbatim
 
-- The CMake script by default only builds a shared library. Shared libraries in Linux incur a <b>small overhead</b> for each library call, which should be insignificant for STXXL. Nevertheless, you can build static and/or shared library via the following switches:
+- The CMake script by default only builds a static library. Shared libraries in Linux incur a <b>small overhead</b> for each library call, which should be insignificant for STXXL. However, keeping a stable binary interface for shared libraries is currently not planned. Nevertheless, you can build static and/or shared library via the following switches:
 \verbatim
 $ cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ..
 \endverbatim
