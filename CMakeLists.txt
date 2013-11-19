@@ -67,7 +67,7 @@ else()
   option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and date_time" OFF)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   option(USE_GNU_PARALLEL "Use GNU parallel extensions for multi-core parallelism" ON)
 endif()
 
