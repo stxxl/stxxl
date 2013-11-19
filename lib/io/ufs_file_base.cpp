@@ -136,11 +136,21 @@ void ufs_file_base::_after_open()
     m_is_device = S_ISBLK(st.st_mode) ? true : false;
 
 #ifdef __APPLE__
-    if (m_mode & DIRECT) {
+    if (m_mode & REQUIRE_DIRECT) {
         STXXL_THROW_ERRNO_NE_0(fcntl(file_des, F_NOCACHE, 1), io_error,
                                "fcntl() path=" << filename << " fd=" << file_des);
         STXXL_THROW_ERRNO_NE_0(fcntl(file_des, F_RDAHEAD, 0), io_error,
                                "fcntl() path=" << filename << " fd=" << file_des);
+    }
+    else if (m_mode & DIRECT) {
+        if (fcntl(file_des, F_NOCACHE, 1) != 0) {
+            STXXL_MSG("fcntl(fd,F_NOCACHE,1) failed on path=" << filename <<
+                      " fd=" << file_des << " : " << strerror(errno));
+        }
+        if (fcntl(file_des, F_RDAHEAD, 0) != 0) {
+            STXXL_MSG("fcntl(fd,F_RDAHEAD,0) failed on path=" << filename <<
+                      " fd=" << file_des << " : " << strerror(errno));
+        }
     }
 #endif
 
