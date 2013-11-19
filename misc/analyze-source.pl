@@ -39,6 +39,7 @@ sub filter_uncrustify($) {
 use strict;
 use warnings;
 use Text::Diff;
+use File::stat;
 
 my %includemap;
 my %authormap;
@@ -99,6 +100,15 @@ sub process_cpp {
 
     # special files
     return if $path eq "tools/benchmarks/app_config.h";
+
+    # check permissions
+    my $st = stat($path) or die("Cannot stat() file $path: $!");
+    if ($st->mode & 0133) {
+        print("Wrong mode ".sprintf("%o", $st->mode)." on $path\n");
+        if ($write_changes) {
+            chmod(0644, $path) or die("Cannot chmod() file $path: $!");
+        }
+    }
 
     # read file
     open(F, $path) or die("Cannot read file $path: $!");
@@ -221,6 +231,18 @@ sub process_cpp {
 sub process_pl_cmake {
     my ($path) = @_;
 
+    # check permissions
+    if ($path !~ /\.pl$/) {
+        my $st = stat($path) or die("Cannot stat() file $path: $!");
+        if ($st->mode & 0133) {
+            print("Wrong mode ".sprintf("%o", $st->mode)." on $path\n");
+            if ($write_changes) {
+                chmod(0644, $path) or die("Cannot chmod() file $path: $!");
+            }
+        }
+    }
+
+    # read file
     open(F, $path) or die("Cannot read file $path: $!");
     my @data = <F>;
     close(F);

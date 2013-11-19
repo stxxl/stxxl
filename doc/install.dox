@@ -493,7 +493,7 @@ $ stxxl_tool create_files 1GiB /data01/stxxl
 
 \section install_config_user User-Supplied disk_config Structures
 
-With STXXL 1.4.0, the library can also be configured via the user application.
+With STXXL >= 1.4.0, the library can also be configured via the user application.
 
 All disk configuration is managed by the stxxl::config class, which contains a list of stxxl::disk_config objects. Each stxxl::disk_config object encapsulates one disk= lines from a config file, or one allocated disk.
 
