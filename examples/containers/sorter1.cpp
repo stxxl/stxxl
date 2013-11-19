@@ -43,7 +43,7 @@ int main()
     sorter_type int_sorter(my_comparator(), 64 * 1024 * 1024);
 
     // fill sorter with elements order in descending order
-    for (int i = 10000; i > 0; i--)
+    for (int i = 1000; i > 0; i--)
     {
         int_sorter.push(i);
     }
