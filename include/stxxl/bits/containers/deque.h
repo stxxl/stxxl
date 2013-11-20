@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
  *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -20,7 +21,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <class T, class VectorType>
+template <class ValueType, class VectorType>
 class deque;
 
 template <class DequeType>
@@ -29,172 +30,178 @@ class const_deque_iterator;
 template <class DequeType>
 class deque_iterator
 {
-    typedef typename DequeType::size_type size_type;
-    typedef typename DequeType::vector_type vector_type;
-    typedef deque_iterator<DequeType> _Self;
-    DequeType* Deque;
-    size_type Offset;
+public:
+    typedef DequeType deque_type;
+    typedef typename deque_type::vector_type vector_type;
 
-    deque_iterator(DequeType* Deque_, size_type Offset_) :
-        Deque(Deque_), Offset(Offset_)
+    typedef typename deque_type::value_type value_type;
+    typedef typename deque_type::pointer pointer;
+    typedef typename deque_type::const_pointer const_pointer;
+    typedef typename deque_type::reference reference;
+    typedef typename deque_type::const_reference const_reference;
+    typedef typename deque_type::size_type size_type;
+    typedef typename deque_type::difference_type difference_type;
+    typedef deque_iterator<deque_type> iterator;
+    typedef const_deque_iterator<deque_type> const_iterator;
+
+    typedef std::random_access_iterator_tag iterator_category;
+
+    friend class const_deque_iterator<deque_type>;
+    friend class deque<value_type, vector_type>;
+
+protected:
+    typedef deque_iterator<deque_type> self_type;
+
+    deque_type* m_deque;
+    size_type m_offset;
+
+    deque_iterator(deque_type* deque, size_type offset)
+        : m_deque(deque), m_offset(offset)
     { }
 
-    friend class const_deque_iterator<DequeType>;
-
 public:
-    typedef typename DequeType::value_type value_type;
-    typedef typename DequeType::pointer pointer;
-    typedef typename DequeType::const_pointer const_pointer;
-    typedef typename DequeType::reference reference;
-    typedef typename DequeType::const_reference const_reference;
-    typedef deque_iterator<DequeType> iterator;
-    typedef const_deque_iterator<DequeType> const_iterator;
-    friend class deque<value_type, vector_type>;
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef typename DequeType::difference_type difference_type;
+    deque_iterator() : m_deque(NULL), m_offset(0) { }
 
-    deque_iterator() : Deque(NULL), Offset(0) { }
-
-    difference_type operator - (const _Self& a) const
+    difference_type operator - (const self_type& a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
-                                  Offset : (Deque->m_vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
-                               a.Offset : (Deque->m_vector.size() + a.Offset);
+        size_type SelfAbsOffset = (m_offset >= m_deque->m_begin) ?
+                                  m_offset : (m_deque->m_vector.size() + m_offset);
+        size_type aAbsOffset = (a.m_offset >= m_deque->m_begin) ?
+                               a.m_offset : (m_deque->m_vector.size() + a.m_offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
     difference_type operator - (const const_iterator& a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
-                                  Offset : (Deque->m_vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
-                               a.Offset : (Deque->m_vector.size() + a.Offset);
+        size_type SelfAbsOffset = (m_offset >= m_deque->m_begin) ?
+                                  m_offset : (m_deque->m_vector.size() + m_offset);
+        size_type aAbsOffset = (a.m_offset >= m_deque->m_begin) ?
+                               a.m_offset : (m_deque->m_vector.size() + a.m_offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
-    _Self operator - (size_type op) const
+    self_type operator - (size_type op) const
     {
-        return _Self(Deque, (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size());
+        return self_type(m_deque, (m_offset + m_deque->m_vector.size() - op) % m_deque->m_vector.size());
     }
 
-    _Self operator + (size_type op) const
+    self_type operator + (size_type op) const
     {
-        return _Self(Deque, (Offset + op) % Deque->m_vector.size());
+        return self_type(m_deque, (m_offset + op) % m_deque->m_vector.size());
     }
 
-    _Self& operator -= (size_type op)
+    self_type& operator -= (size_type op)
     {
-        Offset = (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size();
+        m_offset = (m_offset + m_deque->m_vector.size() - op) % m_deque->m_vector.size();
         return *this;
     }
 
-    _Self& operator += (size_type op)
+    self_type& operator += (size_type op)
     {
-        Offset = (Offset + op) % Deque->m_vector.size();
+        m_offset = (m_offset + op) % m_deque->m_vector.size();
         return *this;
     }
 
     reference operator * ()
     {
-        return Deque->m_vector[Offset];
+        return m_deque->m_vector[m_offset];
     }
 
     pointer operator -> ()
     {
-        return &(Deque->m_vector[Offset]);
+        return &(m_deque->m_vector[m_offset]);
     }
 
     const_reference operator * () const
     {
-        return Deque->m_vector[Offset];
+        return m_deque->m_vector[m_offset];
     }
 
     const_pointer operator -> () const
     {
-        return &(Deque->m_vector[Offset]);
+        return &(m_deque->m_vector[m_offset]);
     }
 
     reference operator [] (size_type op)
     {
-        return Deque->m_vector[(Offset + op) % Deque->m_vector.size()];
+        return m_deque->m_vector[(m_offset + op) % m_deque->m_vector.size()];
     }
 
     const_reference operator [] (size_type op) const
     {
-        return Deque->m_vector[(Offset + op) % Deque->m_vector.size()];
+        return m_deque->m_vector[(m_offset + op) % m_deque->m_vector.size()];
     }
 
-    _Self& operator ++ ()
+    self_type& operator ++ ()
     {
-        Offset = (Offset + 1) % Deque->m_vector.size();
+        m_offset = (m_offset + 1) % m_deque->m_vector.size();
         return *this;
     }
-    _Self operator ++ (int)
+    self_type operator ++ (int)
     {
-        _Self __tmp = *this;
-        Offset = (Offset + 1) % Deque->m_vector.size();
-        return __tmp;
+        self_type tmp = *this;
+        m_offset = (m_offset + 1) % m_deque->m_vector.size();
+        return tmp;
     }
-    _Self& operator -- ()
+    self_type& operator -- ()
     {
-        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
+        m_offset = (m_offset + m_deque->m_vector.size() - 1) % m_deque->m_vector.size();
         return *this;
     }
-    _Self operator -- (int)
+    self_type operator -- (int)
     {
-        _Self __tmp = *this;
-        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
-        return __tmp;
+        self_type tmp = *this;
+        m_offset = (m_offset + m_deque->m_vector.size() - 1) % m_deque->m_vector.size();
+        return tmp;
     }
-    bool operator == (const _Self& a) const
+    bool operator == (const self_type& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset == a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset == a.m_offset;
     }
-    bool operator != (const _Self& a) const
+    bool operator != (const self_type& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset != a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset != a.m_offset;
     }
 
-    bool operator < (const _Self& a) const
+    bool operator < (const self_type& a) const
     {
-        assert(Deque == a.Deque);
+        assert(m_deque == a.m_deque);
         return (a - (*this)) > 0;
     }
 
-    bool operator > (const _Self& a) const
+    bool operator > (const self_type& a) const
     {
         return a < (*this);
     }
 
-    bool operator <= (const _Self& a) const
+    bool operator <= (const self_type& a) const
     {
         return !((*this) > a);
     }
 
-    bool operator >= (const _Self& a) const
+    bool operator >= (const self_type& a) const
     {
         return !((*this) < a);
     }
 
     bool operator == (const const_iterator& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset == a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset == a.m_offset;
     }
     bool operator != (const const_iterator& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset != a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset != a.m_offset;
     }
 
     bool operator < (const const_iterator& a) const
     {
-        assert(Deque == a.Deque);
+        assert(m_deque == a.m_deque);
         return (a - (*this)) > 0;
     }
 
@@ -217,160 +224,168 @@ public:
 template <class DequeType>
 class const_deque_iterator
 {
-    typedef const_deque_iterator<DequeType> _Self;
-    typedef typename DequeType::size_type size_type;
-    typedef typename DequeType::vector_type vector_type;
-    const DequeType* Deque;
-    size_type Offset;
+public:
+    typedef DequeType deque_type;
+    typedef typename deque_type::vector_type vector_type;
 
-    const_deque_iterator(const DequeType* Deque_, size_type Offset_) :
-        Deque(Deque_), Offset(Offset_)
+    typedef typename deque_type::value_type value_type;
+    typedef typename deque_type::const_pointer pointer;
+    typedef typename deque_type::const_pointer const_pointer;
+    typedef typename deque_type::const_reference reference;
+    typedef typename deque_type::const_reference const_reference;
+    typedef typename deque_type::size_type size_type;
+    typedef typename deque_type::difference_type difference_type;
+
+    typedef deque_iterator<deque_type> iterator;
+    typedef const_deque_iterator<deque_type> const_iterator;
+
+    typedef std::random_access_iterator_tag iterator_category;
+
+    friend class deque_iterator<deque_type>;
+    friend class deque<value_type, vector_type>;
+
+protected:
+    typedef const_deque_iterator<deque_type> self_type;
+
+    const deque_type* m_deque;
+    size_type m_offset;
+
+    const_deque_iterator(const deque_type* deque, size_type offset)
+        : m_deque(deque), m_offset(offset)
     { }
 
 public:
-    typedef typename DequeType::value_type value_type;
-    typedef typename DequeType::const_pointer pointer;
-    typedef typename DequeType::const_pointer const_pointer;
-    typedef typename DequeType::const_reference reference;
-    typedef typename DequeType::const_reference const_reference;
-    typedef deque_iterator<DequeType> iterator;
-    typedef const_deque_iterator<DequeType> const_iterator;
-    friend class deque<value_type, vector_type>;
-    friend class deque_iterator<DequeType>;
+    const_deque_iterator() : m_deque(NULL), m_offset(0) { }
 
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef typename DequeType::difference_type difference_type;
-
-    const_deque_iterator() : Deque(NULL), Offset(0) { }
-    const_deque_iterator(const deque_iterator<DequeType>& it) :
-        Deque(it.Deque), Offset(it.Offset)
+    const_deque_iterator(const deque_iterator<deque_type>& it) :
+        m_deque(it.m_deque), m_offset(it.m_offset)
     { }
 
-    difference_type operator - (const _Self& a) const
+    difference_type operator - (const self_type& a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
-                                  Offset : (Deque->m_vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
-                               a.Offset : (Deque->m_vector.size() + a.Offset);
+        size_type SelfAbsOffset = (m_offset >= m_deque->m_begin) ?
+                                  m_offset : (m_deque->m_vector.size() + m_offset);
+        size_type aAbsOffset = (a.m_offset >= m_deque->m_begin) ?
+                               a.m_offset : (m_deque->m_vector.size() + a.m_offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
     difference_type operator - (const iterator& a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
-                                  Offset : (Deque->m_vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
-                               a.Offset : (Deque->m_vector.size() + a.Offset);
+        size_type SelfAbsOffset = (m_offset >= m_deque->m_begin) ?
+                                  m_offset : (m_deque->m_vector.size() + m_offset);
+        size_type aAbsOffset = (a.m_offset >= m_deque->m_begin) ?
+                               a.m_offset : (m_deque->m_vector.size() + a.m_offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
-    _Self operator - (size_type op) const
+    self_type operator - (size_type op) const
     {
-        return _Self(Deque, (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size());
+        return self_type(m_deque, (m_offset + m_deque->m_vector.size() - op) % m_deque->m_vector.size());
     }
 
-    _Self operator + (size_type op) const
+    self_type operator + (size_type op) const
     {
-        return _Self(Deque, (Offset + op) % Deque->m_vector.size());
+        return self_type(m_deque, (m_offset + op) % m_deque->m_vector.size());
     }
 
-    _Self& operator -= (size_type op)
+    self_type& operator -= (size_type op)
     {
-        Offset = (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size();
+        m_offset = (m_offset + m_deque->m_vector.size() - op) % m_deque->m_vector.size();
         return *this;
     }
 
-    _Self& operator += (size_type op)
+    self_type& operator += (size_type op)
     {
-        Offset = (Offset + op) % Deque->m_vector.size();
+        m_offset = (m_offset + op) % m_deque->m_vector.size();
         return *this;
     }
 
     const_reference operator * () const
     {
-        return Deque->m_vector[Offset];
+        return m_deque->m_vector[m_offset];
     }
 
     const_pointer operator -> () const
     {
-        return &(Deque->m_vector[Offset]);
+        return &(m_deque->m_vector[m_offset]);
     }
 
     const_reference operator [] (size_type op) const
     {
-        return Deque->m_vector[(Offset + op) % Deque->m_vector.size()];
+        return m_deque->m_vector[(m_offset + op) % m_deque->m_vector.size()];
     }
 
-    _Self& operator ++ ()
+    self_type& operator ++ ()
     {
-        Offset = (Offset + 1) % Deque->m_vector.size();
+        m_offset = (m_offset + 1) % m_deque->m_vector.size();
         return *this;
     }
-    _Self operator ++ (int)
+    self_type operator ++ (int)
     {
-        _Self __tmp = *this;
-        Offset = (Offset + 1) % Deque->m_vector.size();
-        return __tmp;
+        self_type tmp = *this;
+        m_offset = (m_offset + 1) % m_deque->m_vector.size();
+        return tmp;
     }
-    _Self& operator -- ()
+    self_type& operator -- ()
     {
-        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
+        m_offset = (m_offset + m_deque->m_vector.size() - 1) % m_deque->m_vector.size();
         return *this;
     }
-    _Self operator -- (int)
+    self_type operator -- (int)
     {
-        _Self __tmp = *this;
-        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
-        return __tmp;
+        self_type tmp = *this;
+        m_offset = (m_offset + m_deque->m_vector.size() - 1) % m_deque->m_vector.size();
+        return tmp;
     }
-    bool operator == (const _Self& a) const
+    bool operator == (const self_type& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset == a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset == a.m_offset;
     }
-    bool operator != (const _Self& a) const
+    bool operator != (const self_type& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset != a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset != a.m_offset;
     }
 
-    bool operator < (const _Self& a) const
+    bool operator < (const self_type& a) const
     {
-        assert(Deque == a.Deque);
+        assert(m_deque == a.m_deque);
         return (a - (*this)) > 0;
     }
 
-    bool operator > (const _Self& a) const
+    bool operator > (const self_type& a) const
     {
         return a < (*this);
     }
 
-    bool operator <= (const _Self& a) const
+    bool operator <= (const self_type& a) const
     {
         return !((*this) > a);
     }
 
-    bool operator >= (const _Self& a) const
+    bool operator >= (const self_type& a) const
     {
         return !((*this) < a);
     }
 
     bool operator == (const iterator& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset == a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset == a.m_offset;
     }
     bool operator != (const iterator& a) const
     {
-        assert(Deque == a.Deque);
-        return Offset != a.Offset;
+        assert(m_deque == a.m_deque);
+        return m_offset != a.m_offset;
     }
 
     bool operator < (const iterator& a) const
     {
-        assert(Deque == a.Deque);
+        assert(m_deque == a.m_deque);
         return (a - (*this)) > 0;
     }
 
@@ -406,7 +421,7 @@ public:
 template <class ValueType, class VectorType = stxxl::vector<ValueType> >
 class deque : private noncopyable
 {
-    typedef deque<ValueType, VectorType> Self_;
+    typedef deque<ValueType, VectorType> self_type;
 
 public:
     typedef typename VectorType::size_type size_type;
@@ -417,13 +432,13 @@ public:
     typedef const value_type* const_pointer;
     typedef ValueType& reference;
     typedef const ValueType& const_reference;
-    typedef deque_iterator<Self_> iterator;
-    typedef const_deque_iterator<Self_> const_iterator;
+    typedef deque_iterator<self_type> iterator;
+    typedef const_deque_iterator<self_type> const_iterator;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    friend class deque_iterator<Self_>;
-    friend class const_deque_iterator<Self_>;
+    friend class deque_iterator<self_type>;
+    friend class const_deque_iterator<self_type>;
 
 private:
     vector_type m_vector;
@@ -538,7 +553,7 @@ public:
     //! \}
 
     //! \name Operators
-    //!{
+    //! \{
 
     reference operator [] (size_type n)
     {
