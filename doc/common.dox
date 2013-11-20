@@ -20,6 +20,7 @@ namespace stxxl {
 
 A lots of basic utility classes and helper functions have accumulated in STXXL. Try are usually fundamental enough to be also used in an application program.  Before implementing a common software utility, please check the list below; it might already exist in STXXL:
 
+- \subpage common_io_counter "I/O statistics and performance counter"
 - \subpage common_random "random number generators"
 - \subpage common_timer "timestamp and timer function"
 - \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
@@ -33,7 +34,6 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_log2 "calculating log_2(x)"
 - \subpage common_misc_macros "miscellaneous macros"
 - \subpage common_misc_funcs "miscellaneous functions"
-- \subpage common_io_counter "i/o performance counter"
 
 */
 
@@ -113,7 +113,7 @@ STXXL_MSG("measured time: " << (stop - start) << " seconds.");
 
 /** \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
 
-For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the simple_vector is a good method.
+For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the \ref simple_vector is a good method.
 
 */
 
@@ -121,11 +121,11 @@ For applications where a std::vector is overkill, or one wishes to allocate an u
 
 /** \page common_counting_ptr Reference Counted (Shared) Objects
 
-Some objects in STXXL are reference counted. This is usually done for large objects, which should not be copied deeply in assignments. Instead, a reference counting pointer is used, which holds a handle while the pointer exists and deletes the object once all pointers go out of scope. Examples are matrices and sorted_runs.
+Some objects in STXXL are reference counted. This is usually done for large objects, which should not be copied deeply in assignments. Instead, a reference counting pointer is used, which holds a handle while the pointer exists and deletes the object once all pointers go out of scope. Examples are matrices and \ref stream::sorted_runs.
 
-The method used is called counting_ptr or intrusive reference counting.  This is similar, but not identical to boost or TR1's shared_ptr.
+The method used is called \ref counting_ptr or intrusive reference counting.  This is similar, but not identical to boost or TR1's \c shared_ptr.
 
-The counting_ptr is accompanied by counted_object, which contains the actual reference counter (a single integer). A reference counted object must derive from counted_object:
+The \ref counting_ptr is accompanied by \ref counted_object, which contains the actual reference counter (a single integer). A reference counted object must derive from \ref counted_object :
 
 \code
 struct something : public stxxl::counted_object
@@ -133,7 +133,7 @@ struct something : public stxxl::counted_object
 };
 \endcode
 
-Code that now wishes to use pointers referencing this object, will typedef an counting_ptr, which is used to increment and decrement the included reference counter automatically.
+Code that now wishes to use pointers referencing this object, will typedef an \ref counting_ptr, which is used to increment and decrement the included reference counter automatically.
 
 \code
 typedef stxxl::counting_ptr<something> something_ptr
@@ -149,9 +149,9 @@ typedef stxxl::counting_ptr<something> something_ptr
 }
 \endcode
 
-The counting_ptr can generally be used like a usual pointer or shared_ptr (see the docs for more).
+The \ref counting_ptr can generally be used like a usual pointer or \c shared_ptr (see the docs for more).
 
-There is also const_counting_ptr to return const objects (note that a const counting_ptr will only render the pointer const, not the enclosed object).
+There is also \ref const_counting_ptr to return const objects (note that a const \ref counting_ptr will only render the pointer const, not the enclosed object).
 
 */
 
@@ -159,7 +159,7 @@ There is also const_counting_ptr to return const objects (note that a const coun
 
 /** \page common_cmdline Command Line Parser
 
-STXXL now contains a rather sophisticated command line parser for C++, cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
+STXXL now contains a rather sophisticated command line parser for C++, \ref cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
 
 \snippet examples/common/cmdline.cpp example
 
@@ -199,7 +199,7 @@ Options:
 \endverbatim
 The output shows pretty much what happens. The command line parser is by default in a verbose mode outputting all arguments and values parsed. The debug summary shows to have values the corresponding variables were set.
 
-One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via cmdline_parser::add_param_stringlist() and similar.
+One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via \ref cmdline_parser::add_param_stringlist() and similar.
 
 \example examples/common/cmdline.cpp
 This example is documented in \ref common_cmdline tutorial.
@@ -281,7 +281,7 @@ There are quite a bunch of macros for testing assertions. You must be careful to
 
 # Compile-time Assertions: STXXL_STATIC_ASSERT
 
-To check specific conditions at compile time use STXXL_STATIC_ASSERT.
+To check specific conditions at compile time use \ref STXXL_STATIC_ASSERT.
 
 \code
 struct item { int a,b,c,d; }
@@ -299,13 +299,13 @@ STXXL_CHECK( 2+2 == 4 );
 STXXL_CHECK2( 2+2 == 4, "We cannot count!");
 \endcode
 
-Sometimes one also wants to check that a specific expression \b throws an exception. This checking can be done automatically using a <tt>try { } catch {}</tt> by using STXXL_CHECK_THROW.
+Sometimes one also wants to check that a specific expression \b throws an exception. This checking can be done automatically using a <tt>try { } catch {}</tt> by using \ref STXXL_CHECK_THROW.
 
 # Plain Assertions: assert
 
 For the usual assertions, that should be removed in production code for performance, we use the standard \c "assert()" function.
 
-However, there is also \c STXXL_ASSERT(), which can be used as a replacement for \c assert(), when compiler warnings about unused variables or typedefs occur. The issue is that assert() completely removes the code, whereas STXXL_ASSERT() keeps the code encloses it inside \c if(0).
+However, there is also \ref STXXL_ASSERT(), which can be used as a replacement for \c assert(), when compiler warnings about unused variables or typedefs occur. The issue is that assert() completely removes the code, whereas \ref STXXL_ASSERT() keeps the code encloses it inside \c if(0).
 
 */
 
@@ -384,7 +384,7 @@ std::cout << stxxl::log2_ceil(10000) << std::endl;
 
 /** \page common_types Signed and Unsigned Integer Types
 
-STXXL provides two very important types: stxxl::int_type and stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
+STXXL provides two very important types: \ref stxxl::int_type and \ref stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
 
 The previous types are for general purpose counting. For real 64-bit integers, also on 32-bit machines, STXXL also provides a stxx::uint64 type (independent of other headers).
 
@@ -406,11 +406,11 @@ See the file common/uint_types.h
 
 \section namespaces STXXL_BEGIN_NAMESPACE
 
-A long, long time ago, not all compilers supported C++ namespaces, thus STXXL uses the macros STXXL_BEGIN_NAMESPACE and STXXL_END_NAMESPACE, which open and close the \c "namespace stxxl".
+A long, long time ago, not all compilers supported C++ namespaces, thus STXXL uses the macros \ref STXXL_BEGIN_NAMESPACE and \ref STXXL_END_NAMESPACE, which open and close the \c "namespace stxxl".
 
 \section unused STXXL_UNUSED
 
-STXXL_UNUSED is not actually a macro. It is a remedy against "unused variable" warnings, for whatever reason. Usage:
+\ref STXXL_UNUSED is not actually a macro. It is a remedy against "unused variable" warnings, for whatever reason. Usage:
 
 \code
 void function(int x)
@@ -430,7 +430,7 @@ if (UNLIKELY(x > 8)) { ... }
 
 \section deprecated Deprecated Functions
 
-Some compilers can warn the user about deprecated function by tagging them in the source. In STXXL we use the macro STXXL_DEPRECATED(...) to enclose deprecated functions.
+Some compilers can warn the user about deprecated function by tagging them in the source. In STXXL we use the macro \ref STXXL_DEPRECATED(...) to enclose deprecated functions.
 
 */
 
@@ -440,7 +440,7 @@ Some compilers can warn the user about deprecated function by tagging them in th
 
 \section parse_filesize Parsing Filesizes with K, M, G suffixes
 
-Since with STXXL one often has to parse large file or disk sizes, there is a function called parse_filesize(), which accepts strings like "1 GiB" or "20 TB" as input.
+Since with STXXL one often has to parse large file or disk sizes, there is a function called \ref parse_SI_IEC_size(), which accepts strings like "1 GiB" or "20 TB" as input.
 
 See the \ref install_config documentation page on the format of accepted file size strings.
 
@@ -500,7 +500,7 @@ stxxl::block_manager * bm = stxxl::block_manager::get_instance();
 std::cout << "max: " << bm->get_maximum_allocation() << std::endl;  // max. number of bytes allocated until now
 \endcode
 
-See stxxl::stats and stxxl::stats_data class reference for all provided individual functions.
+See \ref stxxl::stats and \ref stxxl::stats_data class reference for all provided individual functions.
 
 */
 

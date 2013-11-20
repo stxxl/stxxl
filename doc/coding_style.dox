@@ -19,7 +19,7 @@ namespace stxxl {
 
 \author Timo Bingmann (2013)
 
-STXXL coding style follows the current style of STL and Boost, as STXXL strives to provide STL compatible interfaces. Following these guidelines greatly shortens the maintainers' response time and increases their willingness to incorporate your code.
+STXXL coding style follows the current style of STL and Boost, as STXXL strives to provide STL compatible interfaces. Following these guidelines greatly shortens the maintainers' response time and increases their willingness to incorporate your code into STXXL.
 
 We cannot provide a full coding style document here, the source code itself must serve as a large example. As the STXXL has grown historically, not all parts of the STXXL library following this coding style. But we do put down the following list of rules:
 
@@ -39,11 +39,18 @@ class some_class
 protected:
     //! a class attribute, prefixed with m_
     int m_used;
+
 public:
+    //! types are almost always suffixes with _type,
+    //! with _iterator being an exception.
     typedef ValueType value_type;
 
-    //! Return state of page
-    void get_state(int page)
+    //! \name Group of Functions
+    //! \{
+
+    //! Return current state of page in cache.
+    //! \param page please only document parameters when needed.
+    void get_state(int page) const
     {
         int ret = 0;
         for (size_t i = 0; i < list.size(); ++i) {
@@ -52,6 +59,8 @@ public:
         }
         return ret;
     }
+
+    //! \}
 };
 \endcode
 
@@ -62,6 +71,8 @@ public:
 - All containers and extensions must provide a simple tutorial and example. Design documentation is greatly recommended.
 
 - All extensions and subsystems must provide tests which sufficiently cover the functions.
+
+- All preprocessor macros should begin with \c STXXL_ .
 
 */
 
