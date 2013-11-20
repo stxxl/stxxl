@@ -107,6 +107,9 @@ public:
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+    //! \name Iterators
+    //! \{
+
     iterator begin() { return Impl.begin(); }
     iterator end() { return Impl.end(); }
     const_iterator begin() const { return Impl.begin(); }
@@ -139,11 +142,27 @@ public:
         return const_reverse_iterator(begin());
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     size_type size() const { return Impl.size(); }
     size_type max_size() const { return Impl.max_size(); }
     bool empty() const { return Impl.empty(); }
+
+    //! \}
+
+    //! \name Observers
+    //! \{
+
     key_compare key_comp() const { return Impl.key_comp(); }
     value_compare value_comp() const { return Impl.value_comp(); }
+
+    //! \}
+
+    //! \name Constructors/Destructors
+    //! \{
 
     //! A constructor
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
@@ -207,6 +226,11 @@ public:
                  range_sorted, node_fill_factor, leaf_fill_factor)
     { }
 
+    //! \}
+
+    //! \name Modifiers
+    //! \{
+
     void swap(map& obj) { std::swap(Impl, obj.Impl); }
     std::pair<iterator, bool> insert(const value_type& x)
     {
@@ -237,6 +261,12 @@ public:
     {
         Impl.clear();
     }
+
+    //! \}
+
+    //! \name Operations
+    //! \{
+
     iterator find(const key_type& k)
     {
         return Impl.find(k);
@@ -273,10 +303,21 @@ public:
     {
         return Impl.equal_range(k);
     }
+
+    //! \}
+
+    //! \name Operators
+    //! \{
+
     data_type& operator [] (const key_type& k)
     {
         return Impl[k];
     }
+
+    //! \}
+
+    //! \name Miscellaneous
+    //! \{
 
     //! Enables leaf prefetching during scanning
     void enable_prefetching()
@@ -307,6 +348,8 @@ public:
     {
         Impl.reset_statistics();
     }
+
+    //! \}
 
     //////////////////////////////////////////////////
     template <class KeyType_,

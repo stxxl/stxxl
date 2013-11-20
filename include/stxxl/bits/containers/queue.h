@@ -79,6 +79,9 @@ private:
     unsigned_type blocks2prefetch;
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Constructs empty queue with own write and prefetch block pool.
     //!
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
@@ -152,6 +155,11 @@ public:
         init(blocks2prefetch_);
     }
 
+    //! \}
+
+    //! \name Modifiers
+    //! \{
+
     void swap(queue& obj)
     {
         std::swap(m_size, obj.m_size);
@@ -167,6 +175,8 @@ public:
         std::swap(bm, obj.bm);
         std::swap(blocks2prefetch, obj.blocks2prefetch);
     }
+
+    //! \}
 
 private:
     void init(int blocks2prefetch_ = -1)
@@ -192,6 +202,9 @@ private:
     }
 
 public:
+    //! \name Miscellaneous
+    //! \{
+
     //! Defines the number of blocks to prefetch (\c front side).
     //! This method should be called whenever the prefetch pool is resized
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
@@ -209,6 +222,10 @@ public:
     {
         return blocks2prefetch;
     }
+    //! \}
+
+    //! \name Modifiers
+    //! \{
 
     //! Adds an element in the queue.
     void push(const value_type& val)
@@ -324,18 +341,10 @@ public:
         ++front_element;
         --m_size;
     }
+    //! \}
 
-    //! Returns the size of the queue.
-    size_type size() const
-    {
-        return m_size;
-    }
-
-    //! Returns \c true if queue is empty.
-    bool empty() const
-    {
-        return (m_size == 0);
-    }
+    //! \name Operators
+    //! \{
 
     //! Returns a mutable reference at the back of the queue.
     value_type & back()
@@ -365,6 +374,11 @@ public:
         return *front_element;
     }
 
+    //! \}
+
+    //! \name Constructors/Destructors
+    //! \{
+
     ~queue()
     {
         if (front_block != back_block)
@@ -379,6 +393,25 @@ public:
         if (!bids.empty())
             bm->delete_blocks(bids.begin(), bids.end());
     }
+
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
+    //! Returns the size of the queue.
+    size_type size() const
+    {
+        return m_size;
+    }
+
+    //! Returns \c true if queue is empty.
+    bool empty() const
+    {
+        return (m_size == 0);
+    }
+
+    //! \}
 };
 
 //! \}

@@ -1069,6 +1069,9 @@ protected:
     swappable_block_matrix_pointer_type data;
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Creates a new matrix of given dimensions. Elements' values are set to zero.
     //! \param bs block scheduler used
     //! \param height height of the created matrix
@@ -1088,13 +1091,19 @@ public:
     { Ops::recursive_matrix_from_vectors(*data, left, right); }
 
     ~matrix() { }
+    //! \}
 
+    //! \name Capacity
+    //! \{
     const elem_size_type & get_height() const
     { return height; }
 
     const elem_size_type & get_width() const
     { return width; }
+    //! \}
 
+    //! \name Iterators
+    //! \{
     iterator begin()
     {
         data.unify();
@@ -1104,7 +1113,6 @@ public:
     { return const_iterator(*this, 0, 0); }
     const_iterator cbegin() const
     { return const_iterator(*this, 0, 0); }
-
     iterator end()
     {
         data.unify();
@@ -1114,7 +1122,6 @@ public:
     { return const_iterator(*this); }
     const_iterator cend() const
     { return const_iterator(*this); }
-
     const_iterator operator () (const elem_size_type row, const elem_size_type col) const
     { return const_iterator(*this, row, col); }
 
@@ -1123,7 +1130,10 @@ public:
         data.unify();
         return iterator(*this, row, col);
     }
+    //! \}
 
+    //! \name Modifiers
+    //! \{
     void transpose()
     {
         data.unify();
@@ -1139,7 +1149,10 @@ public:
             data = new swappable_block_matrix_type
                        (data->bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength));
     }
+    //! \}
 
+    //! \name Operations
+    //! \{
     matrix_type operator + (const matrix_type& right) const
     {
         assert(height == right.height && width == right.width);
@@ -1357,6 +1370,7 @@ public:
             );
         return res;
     }
+    //! \}
 
 protected:
     void multiply_internal(const matrix_type& right, matrix_type& res) const

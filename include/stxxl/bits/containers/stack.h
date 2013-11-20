@@ -89,6 +89,9 @@ private:
     alloc_strategy_type alloc_strategy;
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Default constructor: creates empty stack.
     normal_stack() :
         m_size(0),
@@ -102,6 +105,9 @@ public:
         bids.reserve(blocks_per_page);
     }
 
+    //! \name Accessor Functions
+    //! \{
+
     void swap(normal_stack& obj)
     {
         std::swap(m_size, obj.m_size);
@@ -113,6 +119,11 @@ public:
         std::swap(bids, obj.bids);
         std::swap(alloc_strategy, obj.alloc_strategy);
     }
+
+    //! \}
+
+    //! \name Constructors/Destructors
+    //! \{
 
     //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
@@ -150,6 +161,11 @@ public:
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     //! Returns the number of elements contained in the stack
     size_type size() const
     {
@@ -161,6 +177,11 @@ public:
     {
         return (!m_size);
     }
+
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
 
     //! Return mutable reference to the element at the top of the
     //! stack. Precondition: stack is not empty().
@@ -263,6 +284,8 @@ public:
         current_element = element((--cache_offset) - 1);
     }
 
+    //! \}
+
 private:
     value_type * element(unsigned_type offset)
     {
@@ -312,6 +335,9 @@ private:
     alloc_strategy_type alloc_strategy;
 
 public:
+    //! \name Constructors/Destructor
+    //! \{
+
     //! Default constructor: creates empty stack.
     grow_shrink_stack() :
         m_size(0),
@@ -326,6 +352,11 @@ public:
         bids.reserve(blocks_per_page);
     }
 
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
+
     void swap(grow_shrink_stack& obj)
     {
         std::swap(m_size, obj.m_size);
@@ -338,6 +369,11 @@ public:
         std::swap(bids, obj.bids);
         std::swap(alloc_strategy, obj.alloc_strategy);
     }
+
+    //! \}
+
+    //! \name Constructors/Destructors
+    //! \{
 
     //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
@@ -382,17 +418,26 @@ public:
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     //! Returns the number of elements contained in the stack
     size_type size() const
     {
         return m_size;
     }
-
     //! Returns true if the stack is empty.
     bool empty() const
     {
         return (!m_size);
     }
+
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
 
     //! Return mutable reference to the element at the top of the
     //! stack. Precondition: stack is not empty().
@@ -492,6 +537,8 @@ public:
         unsigned_type cur_offset = (--cache_offset) - 1;
         current_element = &((*(cache_buffers + cur_offset / block_type::size))[cur_offset % block_type::size]);
     }
+
+    //! \}
 };
 
 //! Efficient implementation that uses prefetching and overlapping using (shared) buffers pools.
@@ -528,6 +575,9 @@ private:
     pool_type* pool;
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Default constructor: creates empty stack. The stack will use the
     //! read_write_pool for prefetching and buffered writing.
     //! \param pool_ block write/prefetch pool
@@ -569,6 +619,11 @@ public:
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
 
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
+
     void swap(grow_shrink_stack2& obj)
     {
         std::swap(m_size, obj.m_size);
@@ -580,6 +635,11 @@ public:
         std::swap(owned_pool, obj.owned_pool);
         std::swap(pool, obj.pool);
     }
+
+    //! \}
+
+    //! \name Constructors/Destructors
+    //! \{
 
     virtual ~grow_shrink_stack2()
     {
@@ -614,17 +674,26 @@ public:
         delete owned_pool;
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     //! Returns the number of elements contained in the stack
     size_type size() const
     {
         return m_size;
     }
-
     //! Returns true if the stack is empty.
     bool empty() const
     {
         return (!m_size);
     }
+
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
 
     //! Inserts an element at the top of the stack. Postconditions: size() is
     //! incremented by 1, and top() is the inserted element.
@@ -703,6 +772,11 @@ public:
         --m_size;
     }
 
+    //! \}
+
+    //! \name Miscellaneous
+    //! \{
+
     //! Sets level of prefetch aggressiveness (number of blocks from the
     //! prefetch pool used for prefetching).
     //! \param new_p new value for the prefetch aggressiveness
@@ -727,6 +801,8 @@ public:
     {
         return pref_aggr;
     }
+
+    //! \}
 
 private:
     //! hint the last pref_aggr external blocks.
@@ -774,16 +850,35 @@ private:
     migrating_stack(const stack_type& stack_);
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Default constructor: creates empty stack.
     migrating_stack()
         : int_impl(new int_stack_type()), ext_impl(NULL)
     { }
+
+    virtual ~migrating_stack()
+    {
+        delete int_impl;
+        delete ext_impl;
+    }
+
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
 
     void swap(migrating_stack& obj)
     {
         std::swap(int_impl, obj.int_impl);
         std::swap(ext_impl, obj.ext_impl);
     }
+
+    //! \}
+
+    //! \name Miscellaneous
+    //! \{
 
     //! Returns true if current implementation is internal, otherwise false.
     bool internal() const
@@ -798,6 +893,11 @@ public:
         return (ext_impl != NULL);
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     //! Returns true if the stack is empty.
     bool empty() const
     {
@@ -810,6 +910,11 @@ public:
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
         return (int_impl) ? size_type(int_impl->size()) : ext_impl->size();
     }
+
+    //! \}
+
+    //! \name Accessor Functions
+    //! \{
 
     //! Return mutable reference to the element at the top of the
     //! stack. Precondition: stack is not empty().
@@ -860,11 +965,7 @@ public:
             ext_impl->pop();
     }
 
-    virtual ~migrating_stack()
-    {
-        delete int_impl;
-        delete ext_impl;
-    }
+    //! \}
 };
 
 enum stack_externality { external, migrating, internal };

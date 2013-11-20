@@ -444,6 +444,9 @@ private:
     }
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     deque()
         : m_vector((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(value_type)),
           m_begin(0), m_end(0), m_size(0)
@@ -456,6 +459,11 @@ public:
 
     ~deque()      // empty so far
     { }
+
+    //! \}
+
+    //! \name Iterators
+    //! \{
 
     iterator begin()
     {
@@ -507,6 +515,11 @@ public:
         return const_reverse_iterator(begin());
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     size_type size() const
     {
         return m_size;
@@ -521,6 +534,11 @@ public:
     {
         return m_size == 0;
     }
+
+    //! \}
+
+    //! \name Operators
+    //!{
 
     reference operator [] (size_type n)
     {
@@ -557,6 +575,11 @@ public:
         assert(!empty());
         return m_vector[(m_end + m_vector.size() - 1) % m_vector.size()];
     }
+
+    //! \}
+
+    //! \name Modifiers
+    //! \{
 
     void push_front(const value_type& el)
     {
@@ -597,6 +620,11 @@ public:
         --m_size;
     }
 
+    //! \}
+
+    //! \name Modifiers
+    //! \{
+
     void swap(deque& obj)
     {
         std::swap(m_vector, obj.m_vector);
@@ -613,6 +641,11 @@ public:
         m_end = 0;
         m_size = 0;
     }
+
+    //! \}
+
+    //! \name Capacity
+    //! \{
 
     void resize(size_type n)
     {
@@ -642,6 +675,8 @@ public:
             m_size = n;
         }
     }
+
+    //! \}
 };
 
 template <class ValueType, class VectorType>

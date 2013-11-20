@@ -21,7 +21,7 @@ int main()
 
     for (int i = 0; i < 100; ++i)
     {
-        my_sequence.push_back(i*i);
+        my_sequence.push_back(i * i);
     }
 
     sequence_type::stream forward_stream = my_sequence.get_stream();

@@ -176,6 +176,9 @@ private:
     unsigned_type current_group_buffer_size(unsigned_type i) const { return &(group_buffers[i][N]) - group_buffer_current_mins[i]; }
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Constructs external priority queue object.
     //! \param pool_ pool of blocks that will be used
     //! for data writing and prefetching for the disk<->memory transfers
@@ -207,7 +210,12 @@ public:
     //! helps to speed up operations.
     priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
 
+    virtual ~priority_queue();
+
+    //! \}
+
 #if 0
+
     //! swap this priority queue with another one.
     //! Implementation correctness is questionable.
     void swap(priority_queue& obj)
@@ -237,7 +245,8 @@ public:
     }
 #endif
 
-    virtual ~priority_queue();
+    //! \name Capacity
+    //! \{
 
     //! Returns number of elements contained.
     //! \return number of elements contained
@@ -246,6 +255,11 @@ public:
     //! Returns true if queue has no elements.
     //! \return \b true if queue has no elements, \b false otherwise
     bool empty() const { return (size() == 0); }
+
+    //! \}
+
+    //! \name Operators
+    //! \{
 
     //! Returns "largest" element.
     //!
@@ -257,6 +271,11 @@ public:
     //! element \b x in the priority_queue, \b comparator_type(Q.top(), x) is
     //! false. Precondition: \c empty() is false.
     const value_type & top() const;
+
+    //! \}
+
+    //! \name Modifiers
+    //! \{
 
     //! Removes the element at the top.
     //!
@@ -270,6 +289,11 @@ public:
     //! Inserts x into the priority_queue. Postcondition: \c size() will be
     //! incremented by 1.
     void push(const value_type& obj);
+
+    //! \}
+
+    //! \name Miscellaneous
+    //! \{
 
     //! Number of bytes consumed by the \b priority_queue from the internal
     //! memory not including pools (see the constructor)
@@ -292,6 +316,8 @@ public:
 
     void dump_sizes() const;
     void dump_params() const;
+
+    //! \}
 };
 
 

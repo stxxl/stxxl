@@ -280,7 +280,7 @@ class vector_iterator
     friend class const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
 
 public:
-    //! @name Types
+    //! \name Types
     //! \{
 
     typedef self_type iterator;
@@ -552,7 +552,7 @@ class const_vector_iterator
     friend class vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
 
 public:
-    //! @name Types
+    //! \name Types
     //! \{
 
     typedef self_type const_iterator;
@@ -935,6 +935,9 @@ private:
     }
 
 public:
+    //! \name Constructors/Destructors
+    //! \{
+
     //! Constructs external vector with n elements.
     //!
     //! \param n Number of elements.
@@ -966,6 +969,12 @@ public:
         m_bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end(), 0);
     }
 
+    //! \}
+
+    //! \name Modifier
+    //! \{
+
+    //! swap content
     void swap(vector& obj)
     {
         std::swap(m_alloc_strategy, obj.m_alloc_strategy);
@@ -980,6 +989,11 @@ public:
         std::swap(m_from, obj.m_from);
         std::swap(m_exported, obj.m_exported);
     }
+
+    //! \}
+
+    //! \name Miscellaneous
+    //! \{
 
     //! Allocate page cache, must be called to allow access to elements.
     void allocate_page_cache() const
@@ -1144,6 +1158,9 @@ private:
     }
 
 public:
+    //! \name Modifiers
+    //! \{
+
     //! Erases all of the elements and deallocates all external memory that is
     //! occupied.
     void clear()
@@ -1178,6 +1195,11 @@ public:
         resize(m_size - 1);
     }
 
+    //! \}
+
+    //! \name Operators
+    //! \{
+
     //! Returns a reference to the last element, see \ref design_vector_notes.
     reference back()
     {
@@ -1201,7 +1223,10 @@ public:
 
     //! \}
 
-    //! \brief Construct vector from a file.
+    //! \name Constructors/Destructors
+    //! \{
+
+    //! Construct vector from a file.
     //! \param from file to be constructed from
     //! \param size Number of elements.
     //! \param npages Number of cached pages.
@@ -1286,6 +1311,11 @@ public:
         std::copy(inbegin, inend, begin());
     }
 
+    //! \}
+
+    //! \name Operators
+    //! \{
+
     //! assignment operator
     vector& operator = (const vector& obj)
     {
@@ -1296,6 +1326,8 @@ public:
         }
         return *this;
     }
+
+    //! \}
 
     //! \name Iterator Construction
     //! \{
@@ -1399,6 +1431,9 @@ public:
 
     //! \}
 
+    //! \name Modifiers
+    //! \{
+
     //! Flushes the cache pages to the external memory.
     void flush() const
     {
@@ -1427,6 +1462,11 @@ public:
             }
         }
     }
+
+    //! \}
+
+    //! \name Constructors/Destructors
+    //! \{
 
     ~vector()
     {
@@ -1467,6 +1507,11 @@ public:
         delete m_cache;
     }
 
+    //! \}
+
+    //! \name Miscellaneous
+    //! \{
+
     //! Export data such that it is persistent on the file system. Resulting
     //! files will be numbered ascending.
     void export_files(std::string filename_prefix)
@@ -1491,6 +1536,11 @@ public:
         return m_from;
     }
 
+    //! \}
+
+    //! \name Capacity
+    //! \{
+
     //! Set the blocks and the size of this container explicitly.
     //! The vector must be completely empty before.
     template <typename ForwardIterator>
@@ -1510,6 +1560,8 @@ public:
     {
         return m_pager.size();
     }
+
+    //! \}
 
 private:
     bids_container_iterator bid(const size_type& offset)
