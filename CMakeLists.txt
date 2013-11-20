@@ -51,6 +51,8 @@ endif()
 ###############################################################################
 # compilation options
 
+# please document all build options in doc/install.doc:install_build_options
+
 option(BUILD_EXAMPLES "Build all stxxl examples" OFF)
 
 option(BUILD_TESTS "Build all stxxl test programs" OFF)

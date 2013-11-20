@@ -212,7 +212,7 @@ The mode mostly changes CXXFLAGS.
 \verbatim
 $ cmake -DUSE_GNU_PARALLEL=ON ...
 \endverbatim
-when building. <b>Parallel is now on by default for gcc</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
+when building. <b>Parallel is now ON by default for gcc</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
 
 - Use Boost for file I/O, multi-threading support and more. Boost is required on Windows for older MSVC versions and is CMake tries to automatically find it. On Linux/Unix it is optional <b>and not recommended</b>, but can be activated using
 \verbatim
@@ -243,11 +243,25 @@ $ cmake -DCMAKE_INSTALL_PREFIX=/some/dir ...
 <compile>
 $ make install
 \endverbatim
+Additionally, the installation subdirectories can be specified using the following options:
+\verbatim
+INSTALL_BIN_DIR=bin
+INSTALL_LIB_DIR=lib
+INSTALL_INCLUDE_DIR=include
+INSTALL_PKGCONFIG_DIR=lib/pkgconfig
+INSTALL_CMAKE_DIR=lib/cmake/stxxl
+\endverbatim
 
 - The CMake script by default only builds a static library. Shared libraries in Linux incur a <b>small overhead</b> for each library call, which should be insignificant for STXXL. However, keeping a stable binary interface for shared libraries is currently not planned. Nevertheless, you can build static and/or shared library via the following switches:
 \verbatim
 $ cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ..
 \endverbatim
+
+- On Unix the pthreads library is used for threading, on Windows the Boost or STL thread library is used. For testing compilation, the STL thread library can optionally also be used on Unix/Linux by setting the \c -DUSE_STD_THREADS=ON switch.
+
+- For build testing, the CMake script can check that all header files in \c include/ compile by themselves. This is required since each header must be self-sufficient and include other headers appropriately. These test compiles are trigged with \c -DTRY_COMPILE_HEADERS=ON.
+
+- Again for testing, the CMake script can be instructed to run all tests and examples with \c valgrind by setting \c -DUSE_VALGRIND=ON. This option also enables a few additional lines of code that clear memory areas that are intentionally uninitialized.
 
 */
 
@@ -373,7 +387,7 @@ These are the locations STXXL will look for a disk configuration file on <b>Linu
   - first for <b><tt>$HOME/.stxxl.$HOSTNAME</tt></b> (for host specific configuration),
   - then for <b><tt>$HOME/.stxxl</tt></b> (for general configuration).
 
-\note On many Linux distributions the \c $HOSTNAME variable is not exported. For the host specific configuration to work, you must add <tt>"export HOSTNAME"</tt> to your shell configuration (<tt>.bashrc</tt>).
+\warning On many Linux distributions the \c $HOSTNAME variable is not exported. For the host specific configuration to work, you must add <tt>"export HOSTNAME"</tt> to your shell configuration (<tt>.bashrc</tt>).
 
 On <b>Windows systems</b>, STXXL looks for a disk configuration file in the following directories:
 - If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
@@ -383,8 +397,9 @@ On <b>Windows systems</b>, STXXL looks for a disk configuration file in the foll
 - Then the \c \%APPDATA\% directory of the current user is checked (<b>usual method</b>):
   - first for <b><tt>\%APPDATA\%/.stxxl.\%COMPUTERNAME\%.txt</tt></b> (for host specific configuration),
   - then for <b><tt>\%APPDATA\%/.stxxl.txt</tt></b> (for general configuration).
-  - in a default Windows 7 installation, \%APPDATA\% is <b><tt>C:\\Users\\<i>\<username\></i>\\AppData\\Roaming</tt></b> \n
-    You can visit your <tt>%APPDATA%</tt> directory by simply entering <b><tt>"%APPDATA%"</tt></b> in the Windows Explorer address/location line.
+
+\note In a default Windows 7 installation, \%APPDATA\% is <b><tt>C:\\Users\\<i>\<username\></i>\\AppData\\Roaming</tt></b> \n
+You can visit your <tt>\%APPDATA%</tt> directory by simply entering <b><tt>"%APPDATA%"</tt></b> in the Windows Explorer address/location line.
 
 \section install_config_format Disk Configuration File Format
 
