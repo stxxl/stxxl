@@ -16,7 +16,6 @@
 #ifndef STXXL_MNG_DISK_ALLOCATOR_HEADER
 #define STXXL_MNG_DISK_ALLOCATOR_HEADER
 
-#include <vector>
 #include <map>
 #include <algorithm>
 
