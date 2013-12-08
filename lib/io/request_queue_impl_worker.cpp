@@ -13,9 +13,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/semaphore.h>
+#include <stxxl/bits/common/state.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_queue_impl_worker.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/namespace.h>
+
+#include <cassert>
+#include <cstddef>
 
 #if STXXL_BOOST_THREADS
  #include <boost/bind.hpp>
@@ -24,7 +30,7 @@
  #include <windows.h>
 #endif
 
-#include <iostream>
+
 STXXL_BEGIN_NAMESPACE
 
 void request_queue_impl_worker::start_thread(void* (* worker)(void*), void* arg, thread_type& t, state<thread_state>& s)

@@ -12,13 +12,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <string>
-#include <sstream>
-#include <iomanip>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/timer.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/namespace.h>
 
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 STXXL_BEGIN_NAMESPACE
 

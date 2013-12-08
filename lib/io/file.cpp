@@ -11,7 +11,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/common/error_handling.h>
 #include "ufs_platform.h"
 
 STXXL_BEGIN_NAMESPACE

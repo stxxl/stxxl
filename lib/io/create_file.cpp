@@ -13,10 +13,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/common/error_handling.h>
+
+#include <ostream>
+#include <stdexcept>
 
 
 STXXL_BEGIN_NAMESPACE

@@ -10,7 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/namespace.h>
 
 #include <sstream>
 #include <iomanip>

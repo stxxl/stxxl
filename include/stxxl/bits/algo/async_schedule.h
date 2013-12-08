@@ -20,7 +20,7 @@
 // DOI: 10.1137/S0097539703431573
 
 #include <stxxl/bits/common/types.h>
-
+#include <stxxl/bits/namespace.h>
 
 STXXL_BEGIN_NAMESPACE
 

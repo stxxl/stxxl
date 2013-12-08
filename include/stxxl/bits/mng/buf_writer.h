@@ -37,8 +37,6 @@ STXXL_BEGIN_NAMESPACE
 template <typename block_type>
 class buffered_writer : private noncopyable
 {
-    buffered_writer() { }
-
 protected:
     typedef typename block_type::bid_type bid_type;
 

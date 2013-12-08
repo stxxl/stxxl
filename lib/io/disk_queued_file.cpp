@@ -11,8 +11,13 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/disk_queued_file.h>
-#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/disk_queues.h>
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_interface.h>
+#include <stxxl/bits/io/serving_request.h>
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/singleton.h>
 
 
 STXXL_BEGIN_NAMESPACE

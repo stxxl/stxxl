@@ -23,19 +23,27 @@
 #endif
 
 #include <cassert>
+#include <ostream>
+#include <string>
 
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/libstxxl.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/unused.h>
+#include <stxxl/bits/verbose.h>
 
 
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
+
+class completion_handler;
 
 //! Defines interface of file.
 //!

@@ -14,7 +14,6 @@
 #ifndef STXXL_COMMON_LOG_HEADER
 #define STXXL_COMMON_LOG_HEADER
 
-#include <iostream>
 #include <fstream>
 
 #include <stxxl/bits/namespace.h>

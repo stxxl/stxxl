@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/version.h>
 
 

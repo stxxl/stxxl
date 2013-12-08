@@ -11,13 +11,19 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iomanip>
-#include <stxxl/bits/io/serving_request.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/request_interface.h>
+#include <stxxl/bits/io/request_with_state.h>
+#include <stxxl/bits/io/serving_request.h>
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/verbose.h>
+
+#include <iomanip>
 
 
 STXXL_BEGIN_NAMESPACE
-
 
 serving_request::serving_request(
     const completion_handler& on_cmpl,

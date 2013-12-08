@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/exithandler.h>
+#include <stxxl/bits/namespace.h>
 
 // 1. do nothing for default handler
 // 2. #define STXXL_NON_DEFAULT_EXIT_HANDLER for a handler that does not use atexit()

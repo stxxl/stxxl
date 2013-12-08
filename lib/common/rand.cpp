@@ -12,6 +12,8 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/namespace.h>
 
 
 STXXL_BEGIN_NAMESPACE

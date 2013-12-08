@@ -18,14 +18,19 @@
 
 
 #include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/bits/unused.h>
+#include <stxxl/bits/verbose.h>
 
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <queue>
-#include <cassert>
+#include <utility>
+#include <vector>
 
 
 STXXL_BEGIN_NAMESPACE

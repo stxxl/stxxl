@@ -11,8 +11,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/mng/disk_allocator.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/mng/disk_allocator.h>
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/verbose.h>
+
+#include <cassert>
+#include <map>
+#include <ostream>
+#include <utility>
 
 
 STXXL_BEGIN_NAMESPACE

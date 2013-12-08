@@ -12,12 +12,19 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/request_with_state.h>
-#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/disk_queues.h>
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_with_state.h>
+#include <stxxl/bits/singleton.h>
+#include <stxxl/bits/verbose.h>
+
+#include <cassert>
+
 
 STXXL_BEGIN_NAMESPACE
-
 
 request_with_state::~request_with_state()
 {

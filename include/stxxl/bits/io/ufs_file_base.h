@@ -18,8 +18,11 @@
 #ifndef STXXL_IO_UFS_FILE_BASE_HEADER
 #define STXXL_IO_UFS_FILE_BASE_HEADER
 
+#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/namespace.h>
+
+#include <string>
 
 
 STXXL_BEGIN_NAMESPACE

@@ -13,16 +13,16 @@
 #ifndef STXXL_COMMON_CMDLINE_HEADER
 #define STXXL_COMMON_CMDLINE_HEADER
 
-#include <string>
-#include <iostream>
-#include <vector>
-#include <iomanip>
-#include <cstring>
+#include <cstddef>
 #include <cstdio>
+#include <iostream>
+#include <string>
+#include <vector>
 
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
 
 STXXL_BEGIN_NAMESPACE
 

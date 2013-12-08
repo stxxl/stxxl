@@ -17,9 +17,10 @@
 
 #if STXXL_HAVE_MALLINFO_PROTO
 
-#include <malloc.h>
-#include <iostream>
 #include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <malloc.h>
 #include <unistd.h>
 #include <stxxl/cmdline>
 

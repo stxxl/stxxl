@@ -14,8 +14,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/verbose.h>
 #include "ufs_platform.h"
 
 STXXL_BEGIN_NAMESPACE

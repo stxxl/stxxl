@@ -17,14 +17,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <algorithm>
 #include <cassert>
+#include <cctype>
+#include <cstddef>
 #include <cstdlib>
-#include <cstring>
-#include <climits>
-#include <cmath>
 #include <iostream>
-#include <iomanip>
-#include <sstream>
+#include <limits>
+#include <string>
+#include <vector>
 
 #include <stxxl/algorithm>
 #include <stxxl/cmdline>

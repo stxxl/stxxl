@@ -12,9 +12,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/syscall_file.h>
-#include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_interface.h>
+#include <stxxl/bits/io/syscall_file.h>
 #include "ufs_platform.h"
 
 

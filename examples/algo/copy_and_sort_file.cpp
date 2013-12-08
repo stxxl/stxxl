@@ -15,7 +15,10 @@
 //! content and then sorts it using \c stxxl::stream::sort while writing the
 //! sorted output to a different file.
 
+#include <algorithm>
+#include <iostream>
 #include <limits>
+#include <vector>
 #include <stxxl/io>
 #include <stxxl/vector>
 #include <stxxl/stream>

@@ -15,7 +15,9 @@
 #define STXXL_IO_CREATE_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/namespace.h>
 
+#include <string>
 
 STXXL_BEGIN_NAMESPACE
 

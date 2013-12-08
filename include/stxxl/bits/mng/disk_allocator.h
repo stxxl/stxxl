@@ -16,15 +16,22 @@
 #ifndef STXXL_MNG_DISK_ALLOCATOR_HEADER
 #define STXXL_MNG_DISK_ALLOCATOR_HEADER
 
-#include <map>
-#include <algorithm>
-
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/mng/bid.h>
+#include <stxxl/bits/mng/config.h>
+#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/io/file.h>
-#include <stxxl/bits/mng/config.h>
+
+#include <algorithm>
+#include <cassert>
+#include <functional>
+#include <map>
+#include <ostream>
+#include <utility>
 
 
 STXXL_BEGIN_NAMESPACE

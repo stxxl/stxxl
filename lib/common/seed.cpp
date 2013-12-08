@@ -12,10 +12,9 @@
  **************************************************************************/
 
 #include <cassert>
-#include <ctime>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/namespace.h>
 
 #if STXXL_WINDOWS
   #ifndef NOMINMAX

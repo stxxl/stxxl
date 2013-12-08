@@ -54,7 +54,6 @@ public:
 template <typename block_type, typename bid_iterator_type>
 class block_prefetcher : private noncopyable
 {
-    block_prefetcher() { }
     typedef typename block_type::bid_type bid_type;
 
 protected:

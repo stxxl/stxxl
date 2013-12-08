@@ -12,10 +12,22 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/io/create_file.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/mng/config.h>
+#include <stxxl/bits/mng/disk_allocator.h>
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/verbose.h>
 
+#include <cstddef>
+#include <fstream>
+#include <string>
 
 STXXL_BEGIN_NAMESPACE
+
+class io_error;
 
 block_manager::block_manager()
 {

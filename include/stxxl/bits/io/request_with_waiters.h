@@ -19,6 +19,7 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request_interface.h>
+#include <stxxl/bits/namespace.h>
 
 
 STXXL_BEGIN_NAMESPACE

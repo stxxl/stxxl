@@ -13,7 +13,9 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/log.h>
+#include <stxxl/bits/namespace.h>
 
+#include <cstdlib>
 
 STXXL_BEGIN_NAMESPACE
 

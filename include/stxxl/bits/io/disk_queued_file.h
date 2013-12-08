@@ -15,12 +15,16 @@
 #define STXXL_IO_DISK_QUEUED_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/namespace.h>
 
 
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
+
+class completion_handler;
 
 //! Implementation of some file methods based on serving_request.
 class disk_queued_file : public virtual file

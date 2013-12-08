@@ -11,7 +11,11 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/namespace.h>
 
+#include <iomanip>
+#include <cstring>
 
 STXXL_BEGIN_NAMESPACE
 

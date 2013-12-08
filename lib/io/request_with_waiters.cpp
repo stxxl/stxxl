@@ -11,9 +11,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request_with_waiters.h>
-#include <algorithm>
 #include <stxxl/bits/parallel.h>
+
+#include <algorithm>
+#include <functional>
 
 
 STXXL_BEGIN_NAMESPACE
