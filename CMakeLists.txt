@@ -233,7 +233,7 @@ if(USE_GCOV)
   find_program(GENHTML genhtml)
   find_program(LCOV lcov)
 
-  if(NOT(LCOV AND GENHTML))
+  if(NOT LCOV OR NOT GENHTML)
     message(SEND_ERROR "Coverage analysis requires lcov and genhtml programs.")
   endif()
 
