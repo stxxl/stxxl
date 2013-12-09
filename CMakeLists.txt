@@ -83,6 +83,8 @@ option(NO_CXX11 "Build without C++11 flags" OFF)
 
 option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
 
+option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
+
 ### building shared and/or static libraries
 
 # by default we currently only build a static library, since we do not aim to
@@ -222,6 +224,55 @@ check_cxx_source_compiles(
   "#include <vector>
    int main() { std::vector<int> v(42); for (auto i : v) { ++i; } return 0; }"
   STXXL_HAVE_CXX11_RANGE_FOR_LOOP)
+
+###############################################################################
+# enable gcov coverage analysis with gcc
+
+if(USE_GCOV)
+  # find programs
+  find_program(GENHTML genhtml)
+  find_program(LCOV lcov)
+
+  if(NOT(LCOV AND GENHTML))
+    message(SEND_ERROR "Coverage analysis requires lcov and genhtml programs.")
+  endif()
+
+  # add coverage anaylsis compile and link flags
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov")
+
+  # custom target to run before tests
+  add_custom_target(lcov-reset
+    COMMAND ${LCOV} -q --directory ${CMAKE_BINARY_DIR} --zerocounters
+    COMMENT "Resetting code coverage counters")
+
+  # custom lcov target to run tests
+  add_custom_target(lcov-runtests
+    COMMAND ${CMAKE_CTEST_COMMAND} \${ARGS}
+    DEPENDS ${ALL_TESTS} lcov-reset
+    COMMENT "Running all unit tests")
+
+  # get git version description
+  execute_process(COMMAND git describe --tags
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE GITDESC
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  # command sequence to gather, clean and generate HTML coverage report
+  add_custom_target(lcov-html
+    COMMAND ${LCOV} -q --directory . --capture --output-file lcov.info
+    COMMAND ${LCOV} -q --remove lcov.info 'tests/*' 'examples/*' '/usr/*' --output-file lcov-clean.info
+    COMMAND ${GENHTML} -q -o coverage --title "STXXL ${GITDESC}" --prefix ${PROJECT_SOURCE_DIR} --legend lcov-clean.info
+    COMMENT "Capturing code coverage counters and create HTML coverage report"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+  # top-level target to run tests and generate coverage report
+  add_custom_target(test-coverage
+    COMMENT "Generate HTML coverage report "
+    DEPENDS lcov-runtests lcov-html)
+
+endif(USE_GCOV)
 
 ###############################################################################
 # find thread and random library

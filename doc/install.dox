@@ -261,7 +261,15 @@ $ cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ..
 
 - For build testing, the CMake script can check that all header files in \c include/ compile by themselves. This is required since each header must be self-sufficient and include other headers appropriately. These test compiles are trigged with \c -DTRY_COMPILE_HEADERS=ON.
 
-- Again for testing, the CMake script can be instructed to run all tests and examples with \c valgrind by setting \c -DUSE_VALGRIND=ON. This option also enables a few additional lines of code that clear memory areas that are intentionally uninitialized.
+- Again for testing, the CMake script can be instructed to run all tests and examples
+\verbatim
+# with valgrind by setting
+$ cmake -DUSE_VALGRIND=ON ...
+# with gcov for test coverage analysis by setting
+$ cmake -DUSE_GCOV=ON ...
+\endverbatim
+The valgrind option also enables a few additional lines of code that clear memory areas that are intentionally uninitialized.
+The gcov coverage report can be automatically created using the additional targets \c test-coverage (runs everything) or \c lcov-html to generate the HTML report after running the test suite.
 
 */
 
