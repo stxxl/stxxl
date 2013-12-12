@@ -100,6 +100,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
 # include the STXXL library in my-project
 add_subdirectory(stxxl)
 
+# apply STXXL CXXFLAGS to our configuration
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STXXL_CXX_FLAGS}")
+
 # add STXXL includes path
 include_directories(${STXXL_INCLUDE_DIRS})
 
