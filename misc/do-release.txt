@@ -26,14 +26,15 @@
 * Release Procedure
 
 ** Update CHANGELOG -> change from (unreleased) to (release date)
+   [file:../CHANGELOG]
 
 ** Update the following files with the correct version number:
    [file:../CMakeLists.txt] -> STXXL_VERSION_*
    [file:../Doxyfile] -> PROJECT_NUMBER
 
 ** Git commit and add signed tag
-   git commit -am "Finalizing release 1.4.x"
-   git tag -s -a 1.4.x
+   git commit -am "stxxl-1.4.x"
+   git tag -s -a 1.4.x -m "Final release 1.4.x"
    git push
    git push --tags
 
@@ -48,12 +49,16 @@
    # move stxxl-1.4.x.tar.gz out of build
 
 ** Generate stand-alone doxygen tarball:
-   # check doxygen version!
+   # check doxygen version! -> 1.8.5
+   doxygen --version
    git reset --hard master
    git clean -d -f -x
    mv include/stxxl/bits/config.h.in include/stxxl/bits/config.h
    doxygen
+   # optimize pngs
    optipng -o7 doxygen-html/*.png
+   # tag HTML with version and link
+   sed -i "s@<li class=\"footer\">Generated@<li class=\"footer\"><a href=\"http://stxxl.sourceforge.net\">STXXL 1.4.x</a> - Generated@" doxygen-html/*.html
    tar czf stxxl-1.4.x-doxygen.tar.gz doxygen-html
    # check tarball
    tar tvvzf stxxl-1.4.x-doxygen.tar.gz
@@ -65,17 +70,19 @@
 
 ** Let website generator create tag/master for current git repository.
    - copy tag/master into git website repository
+   - optipng -o7 tag/1.4.x/*.png
 
 * Post-Release Procedure
 
 ** Update CHANGELOG -> change to next version 1.4.99 (unreleased)
+   [file:../CHANGELOG]
 
 ** Update the following files with the new prerelease version number:
    [file:../CMakeLists.txt] -> STXXL_VERSION_*
    [file:../Doxyfile] -> PROJECT_NUMBER
 
 ** Git commit and add signed tag
-   git commit -am "Tagging trunk with prerelease 1.4.99"
+   git commit -am "Tagging trunk with unreleased 1.4-dev"
 
 * Announcements
 
