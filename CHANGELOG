@@ -1,4 +1,4 @@
-Version 1.4.0 (unreleased)
+Version 1.4.0 (12 December 2013)
 
 * Reorganized Directory Hierarchy
   - separating old component based directories into lib/ (libstxxl source
