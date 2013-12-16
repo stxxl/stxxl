@@ -16,7 +16,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if __cplusplus >= 201103L
 #include <type_traits>
 #elif defined(__GNUG__) && (__GNUC__ >= 4)
 #include <tr1/type_traits>
@@ -29,7 +29,7 @@ STXXL_BEGIN_NAMESPACE
 
 namespace compat {
 
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if __cplusplus >= 201103L
 using std::remove_const;
 #elif defined(__GNUG__) && (__GNUC__ >= 4)
 using std::tr1::remove_const;

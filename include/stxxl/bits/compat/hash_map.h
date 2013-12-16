@@ -19,7 +19,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if __cplusplus >= 201103L
  #include <unordered_map>
 #elif STXXL_MSVC
  #include <hash_map>
@@ -34,7 +34,7 @@ STXXL_BEGIN_NAMESPACE
 
 template <class _Tp>
 struct compat_hash {
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if __cplusplus >= 201103L
     typedef std::hash<_Tp> result;
 #elif STXXL_MSVC
     typedef stdext::hash_compare<_Tp> result;
@@ -48,7 +48,7 @@ struct compat_hash {
 
 template <class _Key, class _Tp, class _Hash = typename compat_hash<_Key>::result>
 struct compat_hash_map {
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if __cplusplus >= 201103L
     typedef std::unordered_map<_Key, _Tp, _Hash> result;
 #elif STXXL_MSVC
     typedef stdext::hash_map<_Key, _Tp, _Hash> result;
