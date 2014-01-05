@@ -270,7 +270,7 @@ if(USE_GCOV)
   # top-level target to run tests and generate coverage report
   add_custom_target(test-coverage
     COMMENT "Generate HTML coverage report "
-    DEPENDS lcov-runtests lcov-html)
+    DEPENDS lcov-html lcov-runtests)
 
 endif(USE_GCOV)
 

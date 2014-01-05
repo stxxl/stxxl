@@ -26,6 +26,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
 - \subpage common_counting_ptr "reference counted (shared) objects via counting_ptr"
 - \subpage common_cmdline "command line parser"
+- \subpage common_binary_buffer "serialization of variable data structures into blobs"
 - \subpage common_thread_sync "synchronization primitives for multi-threading"
 - \subpage common_logging "logging macros"
 - \subpage common_assert "macros for checking assertions"
@@ -203,6 +204,26 @@ One feature worth naming is that the parser also supports lists of strings, i.e.
 
 \example examples/common/cmdline.cpp
 This example is documented in \ref common_cmdline tutorial.
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_binary_buffer Serializing Variable Data Structures with binary_buffer
+
+Some applications of STXXL will require variable data structures. Currently there is not much support for this in STXXL.
+
+For serializing information into in-memory data blocks, the STXXL provides the helper classes \ref binary_buffer and \ref binary_reader. These provide functions \ref binary_buffer::put<>() to append arbitrary integral data types and \ref binary_reader::get<>() to read these again. Serialization and deserialization of variable data structures are then composed of identical sequences of put()/get().
+
+Additionally, the classes already provide methods to serialize variable length strings (together with their lengths), and thereby also sub-block serialization. These functions are called \ref binary_buffer::put_string() and \ref binary_reader::get_string().
+
+Furthermore, to squeeze small integers into fewer bytes, they classes also contain "varint" encoding, where each byte contains 7 data bits and one continuation bit. These functions are called \ref binary_buffer::put_varint() and \ref binary_reader::get_varint().
+
+The following example fills a binary_buffer with some data elements:
+\snippet tests/common/test_binary_buffer.cpp serialize
+
+And the following binary_reader example deserializes the data elements and check's their content.
+\snippet tests/common/test_binary_buffer.cpp deserialize
 
 */
 
