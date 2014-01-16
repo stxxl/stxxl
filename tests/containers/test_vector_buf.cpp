@@ -121,6 +121,20 @@ void test_vector_buf(uint64 size)
 
         check_vector(vec);
     }
+    {   // fill empty vector using vector_bufwriter
+        stxxl::scoped_print_timer tm("empty vector_bufwriter");
+
+        vector_type vec;
+
+        typename vector_type::bufwriter_type writer(vec);
+
+        for (uint64 i = 0; i < size; ++i)
+            writer << ValueType(i);
+
+        writer.finish();
+
+        check_vector(vec);
+    }
 
     vector_type vec(size);
 

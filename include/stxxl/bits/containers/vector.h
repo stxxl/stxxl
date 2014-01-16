@@ -2443,7 +2443,12 @@ public:
             // iterator points to end of vector -> double vector's size
 
             if (m_bufout) {
-                m_bufout->flush(); // flush overlap buffers
+                // fixes issue with buf_ostream writing invalid blocks: when
+                // buf_ostream::current_elem advances to next block, flush()
+                // will write to block beyond bid().end.
+                if (m_iter.block_offset() != 0)
+                    m_bufout->flush(); // flushes overlap buffers
+
                 delete m_bufout;
                 m_bufout = NULL;
 
