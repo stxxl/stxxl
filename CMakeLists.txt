@@ -5,7 +5,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -222,7 +222,7 @@ endif()
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles(
   "#include <vector>
-   int main() { std::vector<int> v(42); for (auto i : v) { ++i; } return 0; }"
+  int main() { std::vector<int> v(42); for (auto i : v) { ++i; } return 0; }"
   STXXL_HAVE_CXX11_RANGE_FOR_LOOP)
 
 ###############################################################################
@@ -310,11 +310,11 @@ endif()
 include(TestLargeFiles)
 test_large_files(HAVE_LARGEFILES)
 
-if (HAVE_LARGEFILES)
+if(HAVE_LARGEFILES)
   add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
-else (NOT HAVE_LARGEFILES)
+else()
   message(FATAL_ERROR "Large file support was not detectable.")
-endif (HAVE_LARGEFILES)
+endif()
 
 ###############################################################################
 # check for O_DIRECT flag
@@ -337,7 +337,7 @@ else()
 int main(int argc, char * argv[]) { argc = O_DIRECT; }
 " STXXL_HAVE_O_DIRECT)
 
-  if (STXXL_HAVE_O_DIRECT)
+  if(STXXL_HAVE_O_DIRECT)
     set(STXXL_DIRECT_IO_OFF 0)
   else()
     set(STXXL_DIRECT_IO_OFF 1)
@@ -374,7 +374,7 @@ if(USE_BOOST)
 
   if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
-  endif(WIN32)
+  endif()
 
   # first try to find the version
   find_package(Boost 1.34.1 REQUIRED)
@@ -421,7 +421,7 @@ if(USE_GNU_PARALLEL)
   else()
     check_include_file_cxx(parallel/algorithm HAVE_PARALLEL_ALGORITHM_H)
 
-    if (NOT HAVE_PARALLEL_ALGORITHM_H)
+    if(NOT HAVE_PARALLEL_ALGORITHM_H)
       message(FATAL_ERROR "GNU parallel mode header not found. Try compilation without parallel mode.")
     else()
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -564,7 +564,7 @@ macro(add_define PROGNAME)
     endif(BUILD_TESTS)
   endif()
 
-endmacro (add_define TESTNAME)
+endmacro(add_define TESTNAME)
 
 ###############################################################################
 # cmake script TRY_COMPILE all stxxl header files
