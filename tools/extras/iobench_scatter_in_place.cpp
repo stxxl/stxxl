@@ -57,9 +57,9 @@ int main(int argc, char* argv[])
     if (argc < 5)
         usage(argv[0]);
 
-    uint64 num_blocks = stxxl::atoint64(argv[1]);
-    uint64 blocks_per_round = stxxl::atoint64(argv[2]);
-    uint64 block_size = stxxl::atoint64(argv[3]);
+    uint64 num_blocks = stxxl::atouint64(argv[1]);
+    uint64 blocks_per_round = stxxl::atouint64(argv[2]);
+    uint64 block_size = stxxl::atouint64(argv[3]);
     const char* filebase = argv[4];
 
     uint64 num_rounds = stxxl::div_ceil(num_blocks, blocks_per_round);
