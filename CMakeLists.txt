@@ -215,6 +215,17 @@ elseif(NOT NO_CXX11)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
     endif()
   endif()
+  # on MacOSX with clang we need to use libc++ for C++11 headers
+  if(APPLE AND
+      (CMAKE_CXX_COMPILER MATCHES ".*clang[+][+]"
+        OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+      check_cxx_compiler_flag(-stdlib=libc++ CXX_HAS_STDLIB_LIBCXX)
+      if(CXX_HAS_STDLIB_LIBCXX)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+      else()
+        message(SEND_ERROR "Compilation on MacOSX with clang requires libc++.")
+      endif()
+  endif()
 endif()
 
 # check C++ compiler for C++11 features
