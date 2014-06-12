@@ -291,13 +291,26 @@ endif(USE_GCOV)
 # for testing for c++ system include files
 include(CheckIncludeFileCXX)
 
-if(MSVC OR USE_STD_THREADS)
+check_include_file_cxx(pthread.h HAVE_PTHREAD_H)
 
-  check_include_file_cxx(thread HAVE_STD_THREAD_H)
-  check_include_file_cxx(mutex HAVE_STD_MUTEX_H)
+if(MSVC OR USE_STD_THREADS OR (MINGW AND NOT HAVE_PTHREAD_H))
 
-  if(HAVE_STD_THREAD_H AND HAVE_STD_MUTEX_H)
+  # check for std::mutex and std::threads avalability
+  check_cxx_source_compiles(
+    "#include <mutex>
+    int main() { std::mutex mutex; mutex.lock(); return 0; }"
+    HAVE_STD_MUTEX)
+
+  check_cxx_source_compiles(
+    "#include <thread>
+    int main() { std::thread t; return 0; }"
+    HAVE_STD_THREAD)
+
+  if(HAVE_STD_THREAD AND HAVE_STD_MUTEX)
     set(STXXL_STD_THREADS "1")
+  else()
+    set(USE_BOOST ON)
+    message("No std::thread and std::mutex found, trying to use Boost classes instead")
   endif()
 
   # using <thread> also requires -pthread on gcc
