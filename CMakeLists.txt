@@ -333,7 +333,7 @@ endif()
 if(CYGWIN)
   #-tb O_DIRECT messes up cygwin
   set(STXXL_DIRECT_IO_OFF 1)
-elseif(MSVC)
+elseif(MSVC OR MINGW)
   # have FILE_FLAG_NO_BUFFERING on Windows
   set(STXXL_DIRECT_IO_OFF 0)
 elseif(APPLE)

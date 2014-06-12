@@ -75,8 +75,7 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
 #else
         if (mode & file::REQUIRE_DIRECT) {
             STXXL_ERRMSG("Error: open()ing " << filename << " with DIRECT mode required, but the system does not support it.");
-            file_des = INVALID_HANDLE_VALUE;
-            return;
+            return INVALID_HANDLE_VALUE;
         }
         else {
             STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, as the system does not support it.");
