@@ -14,17 +14,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_META_TEMPLATE_PROGRAMMING
-#define STXXL_META_TEMPLATE_PROGRAMMING
+#ifndef STXXL_COMMON_TMETA_HEADER
+#define STXXL_COMMON_TMETA_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-//! \brief IF template metaprogramming statement
-
+//! IF template metaprogramming statement.
+//!
 //! If \c Flag is \c true then \c IF<>::result is of type Type1
 //! otherwise of \c IF<>::result is of type Type2
 template <bool Flag, class Type1, class Type2>
@@ -160,6 +160,6 @@ public:
     };
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_META_TEMPLATE_PROGRAMMING
+#endif // !STXXL_COMMON_TMETA_HEADER

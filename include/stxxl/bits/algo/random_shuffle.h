@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Manuel Krings
- *  Copyright (C) 2007 Markus Westphal
+ *  Copyright (C) 2007 Markus Westphal <mail@markuswestphal.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_RANDOM_SHUFFLE_HEADER
-#define STXXL_RANDOM_SHUFFLE_HEADER
+#ifndef STXXL_ALGO_RANDOM_SHUFFLE_HEADER
+#define STXXL_ALGO_RANDOM_SHUFFLE_HEADER
 
 // TODO: improve main memory consumption in recursion
 //        (free stacks buffers)
@@ -25,14 +25,14 @@
 #include <stxxl/stack>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 //! \addtogroup stlalgo
 //! \{
 
 
-//! \brief External equivalent of std::random_shuffle
+//! External equivalent of std::random_shuffle
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
@@ -48,7 +48,7 @@ template <typename ExtIterator_,
           typename AllocStrategy_>
 void random_shuffle(ExtIterator_ first,
                     ExtIterator_ last,
-                    RandomNumberGenerator_ & rand,
+                    RandomNumberGenerator_& rand,
                     unsigned_type M,
                     AllocStrategy_ AS = STXXL_DEFAULT_ALLOC_STRATEGY())
 {
@@ -76,18 +76,18 @@ void random_shuffle(ExtIterator_ first,
 
     stxxl::int64 i, j, size = 0;
 
-    value_type * temp_array;
+    value_type* temp_array;
     typedef typename stxxl::VECTOR_GENERATOR<value_type,
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
-    temp_vector_type * temp_vector;
+    temp_vector_type* temp_vector;
 
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets");
     stxxl::read_write_pool<block_type> pool(0, M / BlockSize_ - k);  // no read buffers and M/B-k write buffers
 
-    stack_type ** buckets;
+    stack_type** buckets;
 
     // create and put buckets into container
-    buckets = new stack_type *[k];
+    buckets = new stack_type*[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 
@@ -186,7 +186,7 @@ void random_shuffle(ExtIterator_ first,
     delete[] buckets;
 }
 
-//! \brief External equivalent of std::random_shuffle (specialization for stxxl::vector)
+//! External equivalent of std::random_shuffle (specialization for stxxl::vector)
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
@@ -195,7 +195,7 @@ template <typename Tp_, typename AllocStrategy_, typename SzTp_, typename DiffTp
           unsigned BlockSize_, typename PgTp_, unsigned PageSize_, typename RandomNumberGenerator_>
 void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> first,
                     stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> last,
-                    RandomNumberGenerator_ & rand,
+                    RandomNumberGenerator_& rand,
                     unsigned_type M)
 {
     typedef stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> ExtIterator_;
@@ -218,17 +218,17 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
 
     stxxl::int64 i, j, size = 0;
 
-    value_type * temp_array;
+    value_type* temp_array;
     typedef typename stxxl::VECTOR_GENERATOR<value_type,
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
-    temp_vector_type * temp_vector;
+    temp_vector_type* temp_vector;
 
     stxxl::read_write_pool<block_type> pool(0, M / BlockSize_ - k);  // no read buffers and M/B-k write buffers
 
-    stack_type ** buckets;
+    stack_type** buckets;
 
     // create and put buckets into container
-    buckets = new stack_type *[k];
+    buckets = new stack_type*[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 
@@ -258,7 +258,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     // distribute input into random buckets
     int_type random_bucket = 0;
     for (i = 0; i < n; ++i, ++_cur) {
-        random_bucket = rand(k);
+        random_bucket = rand((unsigned)k);
         typename ExtIterator_::value_type tmp;
         in >> tmp;
         buckets[random_bucket]->push(tmp); // reading the current input element
@@ -357,7 +357,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     }
 }
 
-//! \brief External equivalent of std::random_shuffle (specialization for stxxl::vector)
+//! External equivalent of std::random_shuffle (specialization for stxxl::vector)
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param M number of bytes for internal use
@@ -374,7 +374,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_RANDOM_SHUFFLE_HEADER
+#endif // !STXXL_ALGO_RANDOM_SHUFFLE_HEADER
 // vim: et:ts=4:sw=4

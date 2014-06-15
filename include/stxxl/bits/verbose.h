@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2005-2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,6 +15,7 @@
 #ifndef STXXL_VERBOSE_HEADER
 #define STXXL_VERBOSE_HEADER
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -33,17 +35,17 @@
 #define _STXXL_PRINT_FLAGS_VERBOSE  (_STXXL_PRINT_FLAGS_DEFAULT | _STXXL_PRNT_TIMESTAMP | _STXXL_PRNT_THREAD_ID)
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-void print_msg(const char * label, const std::string & msg, unsigned flags);
+void print_msg(const char* label, const std::string& msg, unsigned flags);
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
-#define _STXXL_PRINT(label, message, flags) \
-    do { \
-        std::ostringstream str_; \
-        str_ << message; \
+#define _STXXL_PRINT(label, message, flags)                                  \
+    do {                                                                     \
+        std::ostringstream str_;                                             \
+        str_ << message;                                                     \
         stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
     } while (false)
 
@@ -111,30 +113,75 @@ __STXXL_END_NAMESPACE
  #define STXXL_VERBOSE3(x) _STXXL_NOT_VERBOSE
 #endif
 
-////////////////////////////////////////////////////////////////////////////
 
-#ifdef BOOST_MSVC
+// STXXL_CHECK is an assertion macro for unit tests, which contrarily to
+// assert() also works in release builds. These macros should ONLY be used in
+// UNIT TESTS, not in the library source. Use usual assert() there.
 
-#define stxxl_win_lasterror_exit(errmsg, exception_type) \
-    do { \
-        LPVOID lpMsgBuf; \
-        DWORD dw = GetLastError(); \
-        FormatMessage( \
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | \
-            FORMAT_MESSAGE_FROM_SYSTEM, \
-            NULL, \
-            dw, \
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), \
-            (LPTSTR)&lpMsgBuf, \
-            0, NULL); \
-        std::ostringstream str_; \
-        str_ << "Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf); \
-        LocalFree(lpMsgBuf); \
-        throw exception_type(str_.str()); \
-    } while (false)
+#define STXXL_CHECK(condition)                                               \
+    do {                                                                     \
+        if (!(condition)) {                                                  \
+            _STXXL_PRINT("STXXL-CHECK",                                      \
+                         #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                         _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+        }                                                                    \
+    } while (0)
+
+#define STXXL_CHECK2(condition, text)                                                      \
+    do {                                                                                   \
+        if (!(condition)) {                                                                \
+            _STXXL_PRINT("STXXL-CHECK",                                                    \
+                         text << " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                         _STXXL_PRINT_FLAGS_ERROR); abort();                               \
+        }                                                                                  \
+    } while (0)
+
+// STXXL_ASSERT is an assertion macro almost identical to assert(). The only
+// difference is that with NDEBUG defined, the _code_ itself still exists. This
+// silences warnings about unused variables and typedefs in release builds.
+
+#ifdef NDEBUG
+
+#define STXXL_ASSERT(condition)                                                   \
+    do { if (0) {                                                                 \
+             if (!(condition)) {                                                  \
+                 _STXXL_PRINT("STXXL-ASSERT",                                     \
+                              #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                              _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+             }                                                                    \
+         }                                                                        \
+    } while (0)
+
+#else
+
+#define STXXL_ASSERT(condition)                                                   \
+    do { if (1) {                                                                 \
+             if (!(condition)) {                                                  \
+                 _STXXL_PRINT("STXXL-ASSERT",                                     \
+                              #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                              _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+             }                                                                    \
+         }                                                                        \
+    } while (0)
 
 #endif
 
+// STXXL_CHECK_THROW is an assertion macro for unit tests, which checks that
+// the enclosed code throws an exception.
+
+#define STXXL_CHECK_THROW(code, exception_type)               \
+    do {                                                      \
+        bool t_ = false; try { code; }                        \
+        catch (const exception_type&) { t_ = true; }          \
+        if (t_) break;                                        \
+        _STXXL_PRINT("STXXL-CHECK-THROW",                     \
+                     #code " - NO EXCEPTION " #exception_type \
+                     " @ " __FILE__ ":" << __LINE__,          \
+                     _STXXL_PRINT_FLAGS_ERROR);               \
+        abort();                                              \
+    } while (0)
+
+////////////////////////////////////////////////////////////////////////////
 
 #endif // !STXXL_VERBOSE_HEADER
 // vim: et:ts=4:sw=4

@@ -20,7 +20,7 @@
 #include <stxxl/bits/containers/hash_map/iterator.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
@@ -247,7 +247,7 @@ namespace hash_map
 } // end namespace hash_map
 
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std

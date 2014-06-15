@@ -16,7 +16,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 /*
@@ -104,6 +104,6 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_EXTERNAL_SHARED_PTR_H

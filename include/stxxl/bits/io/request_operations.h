@@ -12,24 +12,24 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_OPERATIONS_H_
-#define STXXL_IO__REQUEST_OPERATIONS_H_
+#ifndef STXXL_IO_REQUEST_OPERATIONS_HEADER
+#define STXXL_IO_REQUEST_OPERATIONS_HEADER
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/io/request_ptr.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/common/switch.h>
+#include <stxxl/bits/common/onoff_switch.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
 
-//! \brief Collection of functions to track statuses of a number of requests
+//! Collection of functions to track statuses of a number of requests.
 
 
-//! \brief Suspends calling thread until \b all given requests are completed
+//! Suspends calling thread until \b all given requests are completed.
 //! \param reqs_begin begin of request sequence to wait for
 //! \param reqs_end end of request sequence to wait for
 template <class request_iterator_>
@@ -39,15 +39,15 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
         (request_ptr(*reqs_begin))->wait();
 }
 
-//! \brief Suspends calling thread until \b all given requests are completed
+//! Suspends calling thread until \b all given requests are completed.
 //! \param req_array array of request_ptr objects
 //! \param count size of req_array
-inline void wait_all(request_ptr req_array[], int count)
+inline void wait_all(request_ptr req_array[], size_t count)
 {
     wait_all(req_array, req_array + count);
 }
 
-//! \brief Cancel requests
+//! Cancel requests.
 //! The specified requests are canceled unless already being processed.
 //! However, cancelation cannot be guaranteed.
 //! Cancelled requests must still be waited for in order to ensure correct
@@ -68,10 +68,9 @@ typename std::iterator_traits<request_iterator_>::difference_type cancel_all(req
     return num_canceled;
 }
 
-//! \brief Polls requests
+//! Polls requests.
 //! \param reqs_begin begin of request sequence to poll
 //! \param reqs_end end of request sequence to poll
-//! \param index contains index of the \b first completed request if any
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
 template <class request_iterator_>
 request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
@@ -87,20 +86,20 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 }
 
 
-//! \brief Polls requests
+//! Polls requests.
 //! \param req_array array of request_ptr objects
 //! \param count size of req_array
 //! \param index contains index of the \b first completed request if any
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
-inline bool poll_any(request_ptr req_array[], int count, int & index)
+inline bool poll_any(request_ptr req_array[], size_t count, size_t& index)
 {
-    request_ptr * res = poll_any(req_array, req_array + count);
+    request_ptr* res = poll_any(req_array, req_array + count);
     index = res - req_array;
     return res != (req_array + count);
 }
 
 
-//! \brief Suspends calling thread until \b any of requests is completed
+//! Suspends calling thread until \b any of requests is completed.
 //! \param reqs_begin begin of request sequence to wait for
 //! \param reqs_end end of request sequence to wait for
 //! \return index in req_array pointing to the \b first completed request
@@ -147,18 +146,18 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 }
 
 
-//! \brief Suspends calling thread until \b any of requests is completed
+//! Suspends calling thread until \b any of requests is completed.
 //! \param req_array array of \c request_ptr objects
 //! \param count size of req_array
 //! \return index in req_array pointing to the \b first completed request
-inline int wait_any(request_ptr req_array[], int count)
+inline size_t wait_any(request_ptr req_array[], size_t count)
 {
     return wait_any(req_array, req_array + count) - req_array;
 }
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_OPERATIONS_H_
+#endif // !STXXL_IO_REQUEST_OPERATIONS_HEADER
 // vim: et:ts=4:sw=4

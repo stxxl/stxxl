@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_INTKSORT_HEADER
-#define STXXL_INTKSORT_HEADER
+#ifndef STXXL_ALGO_INTKSORT_HEADER
+#define STXXL_ALGO_INTKSORT_HEADER
 
 #include <algorithm>
 #include <cassert>
@@ -20,18 +20,18 @@
 #include <stxxl/bits/parallel.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename type_key>
 static void
-count(type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename type_key::key_type offset,
+count(type_key* a, type_key* aEnd, int_type* bucket, int_type K, typename type_key::key_type offset,
       unsigned shift)
 {
     // reset buckets
     std::fill(bucket, bucket + K, 0);
 
     // count occupancies
-    for (type_key * p = a; p < aEnd; p++)
+    for (type_key* p = a; p < aEnd; p++)
     {
         int_type i = (p->key - offset) >> shift;
         /*
@@ -46,8 +46,8 @@ count(type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename typ
 }
 
 
-static void
-exclusive_prefix_sum(int_type * bucket, int_type K)
+static inline void
+exclusive_prefix_sum(int_type* bucket, int_type K)
 {
     int_type sum = 0;
     for (int_type i = 0; i < K; i++)
@@ -62,9 +62,9 @@ exclusive_prefix_sum(int_type * bucket, int_type K)
 // distribute input a to output b using bucket for the starting indices
 template <typename type_key>
 static void
-classify(type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typename type_key::key_type offset, unsigned shift)
+classify(type_key* a, type_key* aEnd, type_key* b, int_type* bucket, typename type_key::key_type offset, unsigned shift)
 {
-    for (type_key * p = a; p < aEnd; p++)
+    for (type_key* p = a; p < aEnd; p++)
     {
         int_type i = (p->key - offset) >> shift;
         int_type bi = bucket[i];
@@ -76,7 +76,7 @@ classify(type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typenam
 
 template <class T>
 inline void
-sort2(T & a, T & b)
+sort2(T& a, T& b)
 {
     if (b < a)
         std::swap(a, b);
@@ -84,7 +84,7 @@ sort2(T & a, T & b)
 
 template <class T>
 inline void
-sort3(T & a, T & b, T & c)
+sort3(T& a, T& b, T& c)
 {
     T temp;
     if (b < a)
@@ -131,7 +131,7 @@ sort3(T & a, T & b, T & c)
 
 template <class T>
 inline void
-sort4(T & a, T & b, T & c, T & d)
+sort4(T& a, T& b, T& c, T& d)
 {
     sort2(a, b);
     sort2(c, d);                // a < b ; c < d
@@ -184,7 +184,7 @@ sort4(T & a, T & b, T & c, T & d)
 
 template <class T>
 inline void
-sort5(T & a, T & b, T & c, T & d, T & e)
+sort5(T& a, T& b, T& c, T& d, T& e)
 {
     sort2(a, b);
     sort2(d, e);
@@ -231,10 +231,10 @@ sort5(T & a, T & b, T & c, T & d, T & e)
 
 template <class T>
 inline void
-insertion_sort(T * a, T * aEnd)
+insertion_sort(T* a, T* aEnd)
 {
-    T * pp;
-    for (T * p = a + 1; p < aEnd; p++)
+    T* pp;
+    for (T* p = a + 1; p < aEnd; p++)
     {
         // Invariant a..p-1 is sorted;
         T t = *p;
@@ -264,12 +264,12 @@ insertion_sort(T * a, T * aEnd)
 // the end of the i-th bucket
 template <class T>
 static void
-cleanup(T * b, int_type * bucket, int_type K)
+cleanup(T* b, int_type* bucket, int_type K)
 {
-    T * c = b;
+    T* c = b;
     for (int_type i = 0; i < K; i++)
     {
-        T * cEnd = b + bucket[i];
+        T* cEnd = b + bucket[i];
         switch (cEnd - c)
         {
         case 0:
@@ -304,6 +304,7 @@ cleanup(T * b, int_type * bucket, int_type K)
             insertion_sort(c, cEnd);
             break;
         default:
+            check_sort_settings();
             potentially_parallel::
             sort(c, cEnd);
         }
@@ -319,9 +320,9 @@ cleanup(T * b, int_type * bucket, int_type K)
 // the output goes to b
 template <typename type_key>
 void
-l1sort(type_key * a,
-       type_key * aEnd,
-       type_key * b, int_type * bucket, int_type K, typename type_key::key_type offset, int shift)
+l1sort(type_key* a,
+       type_key* aEnd,
+       type_key* b, int_type* bucket, int_type K, typename type_key::key_type offset, int shift)
 {
     count(a, aEnd, bucket, K, offset, shift);
     exclusive_prefix_sum(bucket, K);
@@ -330,11 +331,11 @@ l1sort(type_key * a,
 }
 
 template <typename type, typename type_key, typename key_extractor>
-void classify_block(type * begin, type * end, type_key * & out,
-                    int_type * bucket, typename key_extractor::key_type offset, unsigned shift, key_extractor keyobj)
+void classify_block(type* begin, type* end, type_key*& out,
+                    int_type* bucket, typename key_extractor::key_type offset, unsigned shift, key_extractor keyobj)
 {
     assert(shift < (sizeof(typename key_extractor::key_type) * 8 + 1));
-    for (type * p = begin; p < end; p++, out++) // count & create references
+    for (type* p = begin; p < end; p++, out++)  // count & create references
     {
         out->ptr = p;
         typename key_extractor::key_type key = keyobj(*p);
@@ -344,11 +345,11 @@ void classify_block(type * begin, type * end, type_key * & out,
     }
 }
 template <typename type, typename type_key, typename key_extractor>
-void classify_block(type * begin, type * end, type_key * & out, int_type * bucket, typename type::key_type offset, unsigned shift,
+void classify_block(type* begin, type* end, type_key*& out, int_type* bucket, typename type::key_type offset, unsigned shift,
                     const int_type K, key_extractor keyobj)
 {
     assert(shift < (sizeof(typename type::key_type) * 8 + 1));
-    for (type * p = begin; p < end; p++, out++) // count & create references
+    for (type* p = begin; p < end; p++, out++)  // count & create references
     {
         out->ptr = p;
         typename type::key_type key = keyobj(*p);
@@ -366,6 +367,6 @@ void classify_block(type * begin, type * end, type_key * & out, int_type * bucke
     STXXL_UNUSED(K);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_INTKSORT_HEADER
+#endif // !STXXL_ALGO_INTKSORT_HEADER

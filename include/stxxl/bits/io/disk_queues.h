@@ -20,17 +20,16 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
 
-class request_ptr;
-
-//! \brief Encapsulates disk queues
+//! Encapsulates disk queues.
 //! \remark is a singleton
 class disk_queues : public singleton<disk_queues>
 {
@@ -40,7 +39,7 @@ class disk_queues : public singleton<disk_queues>
     typedef request_queue_impl_qwqr request_queue_type;
 
     typedef stxxl::int64 DISKID;
-    typedef std::map<DISKID, request_queue_type *> request_queue_map;
+    typedef std::map<DISKID, request_queue_type*> request_queue_map;
 
 protected:
     request_queue_map queues;
@@ -50,7 +49,7 @@ protected:
     }
 
 public:
-    void add_request(request_ptr & req, DISKID disk)
+    void add_request(request_ptr& req, DISKID disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;
@@ -63,7 +62,7 @@ public:
         queues[disk]->add_request(req);
     }
 
-    //! \brief Cancel a request
+    //! Cancel a request.
     //! The specified request is canceled unless already being processed.
     //! However, cancelation cannot be guaranteed.
     //! Cancelled requests must still be waited for in order to ensure correct
@@ -71,7 +70,7 @@ public:
     //! \param req request to cancel
     //! \param disk disk number for disk that \c req was scheduled on
     //! \return \c true iff the request was canceled successfully
-    bool cancel_request(request_ptr & req, DISKID disk)
+    bool cancel_request(request_ptr& req, DISKID disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;
@@ -89,7 +88,7 @@ public:
             delete (*i).second;
     }
 
-    //! \brief Changes requests priorities
+    //! Changes requests priorities.
     //! \param op one of:
     //!                 - READ, read requests are served before write requests within a disk queue
     //!                 - WRITE, write requests are served before read requests within a disk queue
@@ -103,7 +102,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_DISK_QUEUES_HEADER
 // vim: et:ts=4:sw=4

@@ -12,18 +12,19 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BLOCK_PREFETCHER_HEADER
-#define STXXL_BLOCK_PREFETCHER_HEADER
+#ifndef STXXL_MNG_BLOCK_PREFETCHER_HEADER
+#define STXXL_MNG_BLOCK_PREFETCHER_HEADER
 
 #include <vector>
 #include <queue>
 
-#include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/request_ptr.h>
+#include <stxxl/bits/common/onoff_switch.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/noncopyable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
@@ -31,29 +32,28 @@ __STXXL_BEGIN_NAMESPACE
 
 class set_switch_handler
 {
-    onoff_switch & switch_;
+    onoff_switch& switch_;
     completion_handler on_compl;
 
 public:
-    set_switch_handler(onoff_switch & switch__, const completion_handler & on_compl)
+    set_switch_handler(onoff_switch& switch__, const completion_handler& on_compl)
         : switch_(switch__), on_compl(on_compl)
     { }
 
-    void operator () (request * req)
+    void operator () (request* req)
     {
         on_compl(req);  //call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
         switch_.on();
     }
 };
 
-//! \brief Encapsulates asynchronous prefetching engine
+//! Encapsulates asynchronous prefetching engine.
 //!
 //! \c block_prefetcher overlaps I/Os with consumption of read data.
 //! Utilizes optimal asynchronous prefetch scheduling (by Peter Sanders et.al.)
 template <typename block_type, typename bid_iterator_type>
-class block_prefetcher
+class block_prefetcher : private noncopyable
 {
-    block_prefetcher() { }
     typedef typename block_type::bid_type bid_type;
 
 protected:
@@ -61,19 +61,19 @@ protected:
     bid_iterator_type consume_seq_end;
     unsigned_type seq_length;
 
-    int_type * prefetch_seq;
+    int_type* prefetch_seq;
 
     unsigned_type nextread;
     unsigned_type nextconsume;
 
     const int_type nreadblocks;
 
-    block_type * read_buffers;
-    request_ptr * read_reqs;
-    bid_type * read_bids;
+    block_type* read_buffers;
+    request_ptr* read_reqs;
+    bid_type* read_bids;
 
-    onoff_switch * completed;
-    int_type * pref_buffer;
+    onoff_switch* completed;
+    int_type* pref_buffer;
 
     completion_handler do_after_fetch;
 
@@ -93,16 +93,17 @@ protected:
     }
 
 public:
-    //! \brief Constructs an object and immediately starts prefetching
+    //! Constructs an object and immediately starts prefetching.
     //! \param _cons_begin \c bid_iterator pointing to the \c bid of the first block to be consumed
     //! \param _cons_end \c bid_iterator pointing to the \c bid of the ( \b last + 1 ) block of consumption sequence
     //! \param _pref_seq gives the prefetch order, is a pointer to the integer array that contains
     //!        the indices of the blocks in the consumption sequence
     //! \param _prefetch_buf_size amount of prefetch buffers to use
+    //! \param do_after_fetch unknown
     block_prefetcher(
         bid_iterator_type _cons_begin,
         bid_iterator_type _cons_end,
-        int_type * _pref_seq,
+        int_type* _pref_seq,
         int_type _prefetch_buf_size,
         completion_handler do_after_fetch = default_completion_handler()
         ) :
@@ -144,19 +145,19 @@ public:
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
-    //! \brief Pulls next unconsumed block from the consumption sequence
+    //! Pulls next unconsumed block from the consumption sequence.
     //! \return Pointer to the already prefetched block from the internal buffer pool
     block_type * pull_block()
     {
         STXXL_VERBOSE1("block_prefetcher: pulling a block");
         return wait(nextconsume++);
     }
-    //! \brief Exchanges buffers between prefetcher and application
+    //! Exchanges buffers between prefetcher and application.
     //! \param buffer pointer to the consumed buffer. After call if return value is true \c buffer
     //!        contains valid pointer to the next unconsumed prefetched buffer.
     //! \remark parameter \c buffer must be value returned by \c pull_block() or \c block_consumed() methods
     //! \return \c false if there are no blocks to prefetch left, \c true if consumption sequence is not emptied
-    bool block_consumed(block_type * & buffer)
+    bool block_consumed(block_type*& buffer)
     {
         int_type ibuffer = buffer - read_buffers;
         STXXL_VERBOSE1("block_prefetcher: buffer " << ibuffer << " consumed");
@@ -191,20 +192,20 @@ public:
         return true;
     }
 
-    // no more consumable blocks available, but can't delete the prefetcher,
-    // because not all blocks may have been returned, yet
+    //! No more consumable blocks available, but can't delete the prefetcher,
+    //! because not all blocks may have been returned, yet.
     bool empty() const
     {
         return nextconsume >= seq_length;
     }
 
-    // index of the next element in the consume sequence
+    //! Index of the next element in the consume sequence.
     unsigned_type pos() const
     {
         return nextconsume;
     }
 
-    //! \brief Frees used memory
+    //! Frees used memory.
     ~block_prefetcher()
     {
         for (int_type i = 0; i < nreadblocks; ++i)
@@ -222,6 +223,6 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_BLOCK_PREFETCHER_HEADER
+#endif // !STXXL_MNG_BLOCK_PREFETCHER_HEADER

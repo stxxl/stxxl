@@ -5,115 +5,141 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MUTEX_HEADER
-#define STXXL_MUTEX_HEADER
+#ifndef STXXL_COMMON_MUTEX_HEADER
+#define STXXL_COMMON_MUTEX_HEADER
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-#ifdef STXXL_BOOST_THREADS
-
+#if STXXL_STD_THREADS
+ #include <mutex>
+#elif STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
-
-#else
-
+#elif STXXL_POSIX_THREADS
  #include <pthread.h>
- #include <cerrno>
 
  #include <stxxl/bits/noncopyable.h>
  #include <stxxl/bits/common/error_handling.h>
-
+#else
+ #error "Thread implementation not detected."
 #endif
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+
+typedef std::mutex mutex;
+
+#elif STXXL_BOOST_THREADS
 
 typedef boost::mutex mutex;
 
-#else
+#elif STXXL_POSIX_THREADS
 
 class mutex : private noncopyable
 {
-    pthread_mutex_t _mutex;
+    //! mutex handle
+    pthread_mutex_t m_mutex;
 
 public:
+    //! construct unlocked mutex
     mutex()
     {
-        check_pthread_call(pthread_mutex_init(&_mutex, NULL));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
-
+    //! destroy mutex handle
     ~mutex()
     {
-        int res = pthread_mutex_trylock(&_mutex);
+        // try simple delete first
+        int res = pthread_mutex_destroy(&m_mutex);
+        if (res == 0) return;
+
+        // try to lock and unlock mutex
+        res = pthread_mutex_trylock(&m_mutex);
 
         if (res == 0 || res == EBUSY) {
-            check_pthread_call(pthread_mutex_unlock(&_mutex));
-        } else
-            stxxl_function_error(resource_error);
+            STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
+        } else {
+            STXXL_THROW_ERRNO2(resource_error, "pthread_mutex_trylock() failed", res);
+        }
 
-        check_pthread_call(pthread_mutex_destroy(&_mutex));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_destroy(&m_mutex));
     }
+    //! lock mutex, may block
     void lock()
     {
-        check_pthread_call(pthread_mutex_lock(&_mutex));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_lock(&m_mutex));
     }
+    //! unlock mutex
     void unlock()
     {
-        check_pthread_call(pthread_mutex_unlock(&_mutex));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
+    }
+    //! return platform specific handle
+    pthread_mutex_t & native_handle()
+    {
+        return m_mutex;
     }
 };
 
 #endif
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+
+typedef std::unique_lock<std::mutex> scoped_mutex_lock;
+
+#elif STXXL_BOOST_THREADS
 
 typedef boost::mutex::scoped_lock scoped_mutex_lock;
 
 #else
 
-//! \brief Aquire a lock that's valid until the end of scope
+//! Aquire a lock that's valid until the end of scope.
 class scoped_mutex_lock
 {
-    mutex & mtx;
+    //! mutex reference
+    mutex& m_mutex;
+
+    //! marker if already unlocked by this thread (needs no synchronization)
     bool is_locked;
 
 public:
-    scoped_mutex_lock(mutex & mtx_) : mtx(mtx_), is_locked(false)
+    //! lock mutex
+    scoped_mutex_lock(mutex& m)
+        : m_mutex(m), is_locked(true)
     {
-        lock();
+        m_mutex.lock();
     }
-
+    //! unlock mutex hold when object goes out of scope.
     ~scoped_mutex_lock()
     {
         unlock();
     }
-
-    void lock()
-    {
-        if (!is_locked) {
-            mtx.lock();
-            is_locked = true;
-        }
-    }
-
+    //! unlock mutex hold prematurely
     void unlock()
     {
         if (is_locked) {
-            mtx.unlock();
             is_locked = false;
+            m_mutex.unlock();
         }
+    }
+    //! return platform specific handle
+    pthread_mutex_t & native_handle()
+    {
+        return m_mutex.native_handle();
     }
 };
 
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_MUTEX_HEADER
+#endif // !STXXL_COMMON_MUTEX_HEADER

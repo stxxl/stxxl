@@ -11,20 +11,20 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_RUN_CURSOR_HEADER
-#define STXXL_RUN_CURSOR_HEADER
+#ifndef STXXL_ALGO_RUN_CURSOR_HEADER
+#define STXXL_ALGO_RUN_CURSOR_HEADER
 
 #include <cstdlib>
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename block_type>
 struct run_cursor
 {
     unsigned_type pos;
-    block_type * buffer;
+    block_type* buffer;
 
     run_cursor() : pos(0), buffer(NULL) { }
 
@@ -43,7 +43,7 @@ struct run_cursor
 template <typename must_be_void = void>
 struct have_prefetcher
 {
-    static void * untyped_prefetcher;
+    static void* untyped_prefetcher;
 };
 
 #endif
@@ -63,24 +63,23 @@ struct run_cursor2 : public run_cursor<block_type>
     using run_cursor<block_type>::buffer;
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-    static prefetcher_type * const prefetcher()    // sorry, a hack
+    static prefetcher_type* const prefetcher()     // sorry, a hack
     {
-        return reinterpret_cast<prefetcher_type *>(untyped_prefetcher);
+        return reinterpret_cast<prefetcher_type*>(untyped_prefetcher);
     }
-    static void set_prefetcher(prefetcher_type * pfptr)
+    static void set_prefetcher(prefetcher_type* pfptr)
     {
         untyped_prefetcher = pfptr;
     }
     run_cursor2() { }
 #else
-    prefetcher_type * prefetcher_;
-    prefetcher_type * & prefetcher() // sorry, a hack
+    prefetcher_type* prefetcher_;
+    prefetcher_type* & prefetcher()  // sorry, a hack
     {
         return prefetcher_;
     }
 
-    run_cursor2() { }
-    run_cursor2(prefetcher_type * p) : prefetcher_(p) { }
+    run_cursor2(prefetcher_type* p = NULL) : prefetcher_(p) { }
 #endif
 
     inline bool empty() const
@@ -96,7 +95,7 @@ struct run_cursor2 : public run_cursor<block_type>
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
 template <typename must_be_void>
-void * have_prefetcher<must_be_void>::untyped_prefetcher = NULL;
+void* have_prefetcher<must_be_void>::untyped_prefetcher = NULL;
 #endif
 
 template <typename block_type,
@@ -119,15 +118,15 @@ struct run_cursor_cmp
 {
     typedef run_cursor<block_type> cursor_type;
 
-    inline bool operator () (const cursor_type & a, const cursor_type & b)      // greater or equal
+    inline bool operator () (const cursor_type& a, const cursor_type& b)        // greater or equal
     {
         return !((*a.buffer)[a.pos] < (*b.buffer)[b.pos]);
     }
 };
 #endif
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
-#endif // !STXXL_RUN_CURSOR_HEADER
+#endif // !STXXL_ALGO_RUN_CURSOR_HEADER
 // vim: et:ts=4:sw=4

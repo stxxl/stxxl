@@ -1,5 +1,0 @@
-TESTS			 = test_scan test_sort test_ksort test_stable_ksort sort_file copy_and_sort_file test_random_shuffle test_asch test_bad_cmp
-TESTS_LONG_COMPILE	 = test_sort_all_parameters test_ksort_all_parameters test_stable_ksort_all_parameters
-TESTS_NON_MSVC		 = test_parallel_sort
-
-LIB_SRC			 = async_schedule.cpp

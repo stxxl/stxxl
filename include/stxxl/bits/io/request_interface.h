@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_INTERFACE_H_
-#define STXXL_IO__REQUEST_INTERFACE_H_
+#ifndef STXXL_IO_REQUEST_INTERFACE_HEADER
+#define STXXL_IO_REQUEST_INTERFACE_HEADER
 
 #include <ostream>
 
@@ -22,15 +22,15 @@
 #include <stxxl/bits/common/types.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
 
 class onoff_switch;
 
-//! \brief Functional interface of a request
-
+//! Functional interface of a request.
+//!
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status:
 //! e.g. whether an I/O operation completed or not.
@@ -42,8 +42,8 @@ public:
     enum request_type { READ, WRITE };
 
 public:
-    virtual bool add_waiter(onoff_switch * sw) = 0;
-    virtual void delete_waiter(onoff_switch * sw) = 0;
+    virtual bool add_waiter(onoff_switch* sw) = 0;
+    virtual void delete_waiter(onoff_switch* sw) = 0;
 
 protected:
     virtual void notify_waiters() = 0;
@@ -56,10 +56,10 @@ protected:
     virtual void completed() = 0;
 
 public:
-    //! \brief Suspends calling thread until completion of the request
+    //! Suspends calling thread until completion of the request.
     virtual void wait(bool measure_time = true) = 0;
 
-    //! \brief Cancel a request.
+    //! Cancel a request.
     //!
     //! The request is canceled unless already being processed.
     //! However, cancelation cannot be guaranteed.
@@ -68,16 +68,16 @@ public:
     //! \return \c true iff the request was canceled successfully
     virtual bool cancel() = 0;
 
-    //! \brief Polls the status of the request
+    //! Polls the status of the request.
     //! \return \c true if request is completed, otherwise \c false
     virtual bool poll() = 0;
 
-    //! \brief Identifies the type of I/O implementation
+    //! Identifies the type of I/O implementation.
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const = 0;
 
-    //! \brief Dumps properties of a request
-    virtual std::ostream & print(std::ostream & out) const = 0;
+    //! Dumps properties of a request.
+    virtual std::ostream & print(std::ostream& out) const = 0;
 
     virtual ~request_interface()
     { }
@@ -85,7 +85,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_INTERFACE_H_
+#endif // !STXXL_IO_REQUEST_INTERFACE_HEADER
 // vim: et:ts=4:sw=4

@@ -14,14 +14,14 @@
 #ifndef STXXL_CONTAINERS_HASHMAP__UTIL_H
 #define STXXL_CONTAINERS_HASHMAP__UTIL_H
 
-#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/block_manager.h"
 #include "stxxl/bits/mng/buf_writer.h"
 
 #include "stxxl/bits/containers/hash_map/tuning.h"
 #include "stxxl/bits/containers/hash_map/block_cache.h"
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
@@ -528,6 +528,6 @@ namespace hash_map
     };
 } // end namespace hash_map
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif

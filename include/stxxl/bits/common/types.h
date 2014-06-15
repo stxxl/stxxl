@@ -11,35 +11,39 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_TYPES_HEADER
-#define STXXL_TYPES_HEADER
+#ifndef STXXL_COMMON_TYPES_HEADER
+#define STXXL_COMMON_TYPES_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
-#ifdef STXXL_BOOST_CONFIG
- #ifdef BOOST_MSVC
+#if STXXL_MSVC
+typedef __int8 int8;
+typedef unsigned __int8 uint8;
+typedef __int16 int16;
+typedef unsigned __int16 uint16;
+typedef __int32 int32;
+typedef unsigned __int32 uint32;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
- #else
-typedef long long int int64;
-typedef unsigned long long int uint64;
- #endif
 #else
+typedef char int8;
+typedef unsigned char uint8;
+typedef short int16;
+typedef unsigned short uint16;
+typedef int int32;
+typedef unsigned int uint32;
 typedef long long int int64;
 typedef unsigned long long int uint64;
 #endif
 
 
 // integer types declarations
-enum { my_pointer_size = sizeof(void *) };
+enum { my_pointer_size = sizeof(void*) };
 
 template <int PtrSize>
 struct choose_int_types
@@ -48,8 +52,8 @@ struct choose_int_types
 template <>
 struct choose_int_types<4>  // for 32-bit processors/compilers
 {
-    typedef int int_type;
-    typedef unsigned unsigned_type;
+    typedef int32 int_type;
+    typedef uint32 unsigned_type;
 };
 
 template <>
@@ -65,6 +69,6 @@ typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
 typedef unsigned_type internal_size_type;  // fits in internal memory
 typedef uint64 external_size_type;         // may require external memory
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_TYPES_HEADER
+#endif // !STXXL_COMMON_TYPES_HEADER

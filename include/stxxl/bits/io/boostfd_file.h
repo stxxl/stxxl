@@ -14,11 +14,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BOOSTFD_FILE_H_
-#define STXXL_BOOSTFD_FILE_H_
+#ifndef STXXL_IO_BOOSTFD_FILE_HEADER
+#define STXXL_IO_BOOSTFD_FILE_HEADER
+
+#include <stxxl/bits/config.h>
 
 #ifndef STXXL_HAVE_BOOSTFD_FILE
-#ifdef STXXL_BOOST_CONFIG // if boost is available
+#if STXXL_BOOST_CONFIG // if boost is available
  #define STXXL_HAVE_BOOSTFD_FILE 1
 #else
  #define STXXL_HAVE_BOOSTFD_FILE 0
@@ -33,12 +35,12 @@
 #include <boost/iostreams/device/file_descriptor.hpp>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation based on boost::iostreams::file_decriptor
+//! Implementation based on boost::iostreams::file_decriptor.
 class boostfd_file : public disk_queued_file
 {
     typedef boost::iostreams::file_descriptor fd_type;
@@ -50,19 +52,19 @@ protected:
     offset_type _size();
 
 public:
-    boostfd_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR);
+    boostfd_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR);
     ~boostfd_file();
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    void serve(const request * req) throw (io_error);
+    void serve(const request* req) throw (io_error);
     const char * io_type() const;
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_BOOSTFD_FILE
+#endif // #if STXXL_HAVE_BOOSTFD_FILE
 
-#endif  // !STXXL_BOOSTFD_FILE_H_
+#endif // !STXXL_IO_BOOSTFD_FILE_HEADER

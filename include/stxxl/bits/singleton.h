@@ -21,13 +21,13 @@
 #include <stxxl/bits/common/exithandler.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename INSTANCE, bool destroy_on_exit = true>
 class singleton : private noncopyable
 {
     typedef INSTANCE instance_type;
-    typedef instance_type * instance_pointer;
+    typedef instance_type* instance_pointer;
     typedef volatile instance_pointer volatile_instance_pointer;
 
     static volatile_instance_pointer instance;
@@ -72,6 +72,6 @@ template <typename INSTANCE, bool destroy_on_exit>
 typename singleton<INSTANCE, destroy_on_exit>::volatile_instance_pointer
 singleton<INSTANCE, destroy_on_exit>::instance = NULL;
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_SINGLETON_HEADER

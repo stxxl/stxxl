@@ -11,18 +11,22 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_DISK_QUEUED_FILE
-#define STXXL_HEADER_IO_DISK_QUEUED_FILE
+#ifndef STXXL_IO_DISK_QUEUED_FILE_HEADER
+#define STXXL_IO_DISK_QUEUED_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of some file methods based on serving_request
+class completion_handler;
+
+//! Implementation of some file methods based on serving_request.
 class disk_queued_file : public virtual file
 {
     int queue_id, allocator_id;
@@ -31,15 +35,15 @@ public:
     disk_queued_file(int queue_id, int allocator_id) : queue_id(queue_id), allocator_id(allocator_id)
     { }
     request_ptr aread(
-        void * buffer,
+        void* buffer,
         offset_type pos,
         size_type bytes,
-        const completion_handler & on_cmpl);
+        const completion_handler& on_cmpl);
     request_ptr awrite(
-        void * buffer,
+        void* buffer,
         offset_type pos,
         size_type bytes,
-        const completion_handler & on_cmpl);
+        const completion_handler& on_cmpl);
 
     virtual int get_queue_id() const
     {
@@ -54,7 +58,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_DISK_QUEUED_FILE
+#endif // !STXXL_IO_DISK_QUEUED_FILE_HEADER
 // vim: et:ts=4:sw=4

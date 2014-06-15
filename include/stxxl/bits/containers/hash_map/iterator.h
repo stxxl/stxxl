@@ -14,11 +14,11 @@
 #define STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 
 #include <stxxl/bits/containers/hash_map/util.h>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
@@ -541,7 +541,6 @@ end_search:
 } // end namespace hash_map
 
 
-__STXXL_END_NAMESPACE
-
+STXXL_END_NAMESPACE
 
 #endif /* STXXL_CONTAINERS_HASH_MAP__ITERATOR_H */

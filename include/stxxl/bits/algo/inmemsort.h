@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IN_MEMORY_SORT_HEADER
-#define STXXL_IN_MEMORY_SORT_HEADER
+#ifndef STXXL_ALGO_INMEMSORT_HEADER
+#define STXXL_ALGO_INMEMSORT_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/simple_vector.h>
@@ -24,12 +24,11 @@
 #include <algorithm>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename ExtIterator_, typename StrictWeakOrdering_>
 void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp)
 {
-    typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
 
     STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
@@ -46,6 +45,7 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     wait_all(reqs.begin(), nblocks);
 
     unsigned_type last_block_correction = last.block_offset() ? (block_type::size - last.block_offset()) : 0;
+    check_sort_settings();
     potentially_parallel::
     sort(make_element_iterator(blocks.begin(), first.block_offset()),
          make_element_iterator(blocks.begin(), nblocks * block_type::size - last_block_correction),
@@ -58,6 +58,6 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 }
 
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_IN_MEMORY_SORT_HEADER
+#endif // !STXXL_ALGO_INMEMSORT_HEADER

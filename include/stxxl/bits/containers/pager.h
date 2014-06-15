@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PAGER_HEADER
-#define STXXL_PAGER_HEADER
+#ifndef STXXL_CONTAINERS_PAGER_HEADER
+#define STXXL_CONTAINERS_PAGER_HEADER
 
 #include <list>
 #include <cassert>
@@ -22,9 +22,9 @@
 #include <stxxl/bits/common/simple_vector.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup stlcontinternals
+//! \addtogroup stlcont_vector
 //! \{
 
 enum pager_type
@@ -33,78 +33,51 @@ enum pager_type
     lru
 };
 
-//! \brief Pager with \b random replacement strategy
+//! Pager with \b random replacement strategy
 template <unsigned npages_>
 class random_pager
 {
+    enum { n_pages = npages_ };
+
+    typedef unsigned_type size_type;
+
+    size_type num_pages;
     random_number<random_uniform_fast> rnd;
 
 public:
-    enum { n_pages = npages_ };
-    random_pager() { }
-    int_type kick()
+    random_pager(size_type num_pages = n_pages) : num_pages(num_pages) { }
+    size_type kick()
     {
-        return rnd(npages_);
+        return rnd(size());
     }
-    void hit(int_type ipage)
+
+    void hit(size_type ipage)
     {
-        assert(ipage < int_type(npages_));
-        assert(ipage >= 0);
+        STXXL_ASSERT(ipage < size());
+    }
+
+    size_type size() const
+    {
+        return num_pages;
     }
 };
 
-//! \brief Pager with \b LRU replacement strategy
+//! Pager with \b LRU replacement strategy
 template <unsigned npages_ = 0>
 class lru_pager : private noncopyable
 {
-    typedef unsigned_type size_type;
-    typedef std::list<size_type> list_type;
-
-    list_type history;
-    simple_vector<list_type::iterator> history_entry;
-
-public:
     enum { n_pages = npages_ };
 
-    lru_pager() : history_entry(n_pages)
-    {
-        for (size_type i = 0; i < n_pages; ++i)
-            history_entry[i] = history.insert(history.end(), i);
-    }
-
-    size_type kick()
-    {
-        return history.back();
-    }
-
-    void hit(size_type ipage)
-    {
-        assert(ipage < n_pages);
-        history.splice(history.begin(), history, history_entry[ipage]);
-    }
-
-    void swap(lru_pager & obj)
-    {
-        history.swap(obj.history);
-        history_entry.swap(obj.history_entry);
-    }
-};
-
-// specialization, size is specified at runtime
-template <>
-class lru_pager<0> : private noncopyable
-{
     typedef unsigned_type size_type;
     typedef std::list<size_type> list_type;
 
-    size_type n_pages;
     list_type history;
     simple_vector<list_type::iterator> history_entry;
 
 public:
-    lru_pager(size_type npages_ = 0) : n_pages(npages_), history_entry(n_pages)
+    lru_pager(size_type num_pages = n_pages) : history_entry(num_pages)
     {
-        for (size_type i = 0; i < n_pages; ++i)
+        for (size_type i = 0; i < size(); ++i)
             history_entry[i] = history.insert(history.end(), i);
     }
 
@@ -115,31 +88,36 @@ public:
 
     void hit(size_type ipage)
     {
-        assert(ipage < n_pages);
+        assert(ipage < size());
         history.splice(history.begin(), history, history_entry[ipage]);
     }
 
-    void swap(lru_pager & obj)
+    void swap(lru_pager& obj)
     {
-        std::swap(n_pages, obj.n_pages);
         history.swap(obj.history);
         history_entry.swap(obj.history_entry);
+    }
+
+    size_type size() const
+    {
+        return history_entry.size();
     }
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+
+template <unsigned npages_>
+void swap(stxxl::lru_pager<npages_>& a,
+          stxxl::lru_pager<npages_>& b)
 {
-    template <unsigned npages_>
-    void swap(stxxl::lru_pager<npages_> & a,
-              stxxl::lru_pager<npages_> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
 }
 
-#endif // !STXXL_PAGER_HEADER
+} // namespace std
+
+#endif // !STXXL_CONTAINERS_PAGER_HEADER
 // vim: et:ts=4:sw=4

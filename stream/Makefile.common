@@ -1,4 +1,0 @@
-TESTS			 = test_stream test_stream1 test_sorted_runs test_push_sort test_materialize test_naive_transpose test_loop
-TESTS_NON_MSVC		 =
-
-LIB_SRC			 =

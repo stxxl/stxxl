@@ -10,18 +10,18 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-/**
- * @file settings.h
- * @brief Provides a static class to store runtime tuning parameters.
- */
+#ifndef STXXL_COMMON_SETTINGS_HEADER
+#define STXXL_COMMON_SETTINGS_HEADER
 
-#ifndef STXXL_SETTINGS_HEADER
-#define STXXL_SETTINGS_HEADER
+/*!
+ * @file settings.h
+ * Provides a static class to store runtime tuning parameters.
+ */
 
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename must_be_int = int>
 class settings
@@ -35,6 +35,6 @@ bool settings<must_be_int>::native_merge = true;
 
 typedef settings<> SETTINGS;
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_SETTINGS_HEADER
+#endif // !STXXL_COMMON_SETTINGS_HEADER

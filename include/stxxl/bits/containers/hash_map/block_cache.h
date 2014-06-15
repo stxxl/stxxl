@@ -18,14 +18,14 @@
 #endif
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/compat_hash_map.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/compat/hash_map.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
 
 #include <vector>
 #include <list>
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 
 namespace hash_map
@@ -533,7 +533,7 @@ namespace hash_map
     };
 } /* namespace hash_map */
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std
 {

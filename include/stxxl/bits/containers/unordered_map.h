@@ -11,7 +11,7 @@
 #include "stxxl/bits/containers/hash_map/hash_map.h"
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
@@ -270,7 +270,7 @@ public:
 };
 
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 namespace std
 {

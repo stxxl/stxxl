@@ -11,125 +11,126 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STREAM__UNIQUE_H
-#define STXXL_STREAM__UNIQUE_H
+#ifndef STXXL_STREAM_UNIQUE_HEADER
+#define STXXL_STREAM_UNIQUE_HEADER
 
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-//! \brief Stream package subnamespace
-namespace stream
+//! Stream package subnamespace.
+namespace stream {
+
+////////////////////////////////////////////////////////////////////////
+//     UNIQUE                                                         //
+////////////////////////////////////////////////////////////////////////
+
+struct dummy_cmp_unique_ { };
+
+//! Equivalent to std::unique algorithms.
+//!
+//! Removes consecutive duplicates from the stream.
+//! Uses BinaryPredicate to compare elements of the stream
+template <class Input, class BinaryPredicate = dummy_cmp_unique_>
+class unique
 {
-    ////////////////////////////////////////////////////////////////////////
-    //     UNIQUE                                                         //
-    ////////////////////////////////////////////////////////////////////////
+    Input& input;
+    BinaryPredicate binary_pred;
+    typename Input::value_type current;
 
-    struct dummy_cmp_unique_ { };
+public:
+    //! Standard stream typedef.
+    typedef typename Input::value_type value_type;
 
-    //! \brief Equivalent to std::unique algorithms
-    //!
-    //! Removes consecutive duplicates from the stream.
-    //! Uses BinaryPredicate to compare elements of the stream
-    template <class Input, class BinaryPredicate = dummy_cmp_unique_>
-    class unique
+    unique(Input& input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
     {
-        Input & input;
-        BinaryPredicate binary_pred;
-        typename Input::value_type current;
+        if (!input.empty())
+            current = *input;
+    }
 
-    public:
-        //! \brief Standard stream typedef
-        typedef typename Input::value_type value_type;
-
-        unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
-        {
-            if (!input.empty())
-                current = *input;
-        }
-
-        //! \brief Standard stream method
-        unique & operator ++ ()
-        {
-            value_type old_value = current;
-            ++input;
-            while (!input.empty() && (binary_pred(current = *input, old_value)))
-                ++input;
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        //! \brief Standard stream method
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return input.empty();
-        }
-    };
-
-    //! \brief Equivalent to std::unique algorithms
-    //!
-    //! Removes consecutive duplicates from the stream.
-    template <class Input>
-    class unique<Input, dummy_cmp_unique_>
+    //! Standard stream method.
+    unique& operator ++ ()
     {
-        Input & input;
-        typename Input::value_type current;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename Input::value_type value_type;
-
-        unique(Input & input_) : input(input_)
-        {
-            if (!input.empty())
-                current = *input;
-        }
-
-        //! \brief Standard stream method
-        unique & operator ++ ()
-        {
-            value_type old_value = current;
+        value_type old_value = current;
+        ++input;
+        while (!input.empty() && (binary_pred(current = *input, old_value)))
             ++input;
-            while (!input.empty() && ((current = *input) == old_value))
-                ++input;
-            return *this;
-        }
+        return *this;
+    }
 
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
 
-        //! \brief Standard stream method
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
+    //! Standard stream method.
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
 
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return input.empty();
-        }
-    };
+    //! Standard stream method.
+    bool empty() const
+    {
+        return input.empty();
+    }
+};
+
+//! Equivalent to std::unique algorithms.
+//!
+//! Removes consecutive duplicates from the stream.
+template <class Input>
+class unique<Input, dummy_cmp_unique_>
+{
+    Input& input;
+    typename Input::value_type current;
+
+public:
+    //! Standard stream typedef.
+    typedef typename Input::value_type value_type;
+
+    unique(Input& input_) : input(input_)
+    {
+        if (!input.empty())
+            current = *input;
+    }
+
+    //! Standard stream method.
+    unique& operator ++ ()
+    {
+        value_type old_value = current;
+        ++input;
+        while (!input.empty() && ((current = *input) == old_value))
+            ++input;
+        return *this;
+    }
+
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
+
+    //! Standard stream method.
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
+
+    //! Standard stream method.
+    bool empty() const
+    {
+        return input.empty();
+    }
+};
 
 //! \}
-}
 
-__STXXL_END_NAMESPACE
+} // namespace stream
 
-#endif // !STXXL_STREAM__UNIQUE_H
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_STREAM_UNIQUE_HEADER
 // vim: et:ts=4:sw=4

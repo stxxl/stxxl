@@ -10,18 +10,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_LIBSTXXL_H
-#define STXXL_LIBSTXXL_H
+#ifndef STXXL_LIBSTXXL_HEADER
+#define STXXL_LIBSTXXL_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
-#ifdef BOOST_MSVC
+#if STXXL_MSVC
  #ifndef STXXL_LIBNAME
   #define STXXL_LIBNAME "stxxl"
  #endif
- #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
+//-tb #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
 #endif
 
-#endif // !STXXL_IO_HEADER
+#endif // !STXXL_LIBSTXXL_HEADER

@@ -5,111 +5,64 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STATE_HEADER
-#define STXXL_STATE_HEADER
-
-#ifdef STXXL_BOOST_THREADS
- #include <boost/thread/mutex.hpp>
- #include <boost/thread/condition.hpp>
-#else
- #include <pthread.h>
-#endif
+#ifndef STXXL_COMMON_STATE_HEADER
+#define STXXL_COMMON_STATE_HEADER
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/condition_variable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-template <typename Tp = int>
+template <typename ValueType = int>
 class state : private noncopyable
 {
-    typedef Tp value_type;
+    typedef ValueType value_type;
 
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex mutex;
-    boost::condition cond;
-#else
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-#endif
-    value_type _state;
+    //! mutex for condition variable
+    mutex m_mutex;
+
+    //! condition variable
+    condition_variable m_cond;
+
+    //! current state
+    value_type m_state;
 
 public:
-    state(value_type s) : _state(s)
+    state(const value_type& s)
+        : m_state(s)
+    { }
+
+    void set_to(const value_type& new_state)
     {
-#ifndef STXXL_BOOST_THREADS
-        check_pthread_call(pthread_mutex_init(&mutex, NULL));
-        check_pthread_call(pthread_cond_init(&cond, NULL));
-#endif
+        scoped_mutex_lock lock(m_mutex);
+        m_state = new_state;
+        lock.unlock();
+        m_cond.notify_all();
     }
 
-    ~state()
+    void wait_for(const value_type& needed_state)
     {
-#ifndef STXXL_BOOST_THREADS
-        int res = pthread_mutex_trylock(&mutex);
-
-        if (res == 0 || res == EBUSY) {
-            check_pthread_call(pthread_mutex_unlock(&mutex));
-        } else
-            stxxl_function_error(resource_error);
-        check_pthread_call(pthread_mutex_destroy(&mutex));
-        check_pthread_call(pthread_cond_destroy(&cond));
-#endif
-    }
-
-    void set_to(value_type new_state)
-    {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(mutex);
-        _state = new_state;
-        Lock.unlock();
-        cond.notify_all();
-#else
-        check_pthread_call(pthread_mutex_lock(&mutex));
-        _state = new_state;
-        check_pthread_call(pthread_mutex_unlock(&mutex));
-        check_pthread_call(pthread_cond_broadcast(&cond));
-#endif
-    }
-
-    void wait_for(value_type needed_state)
-    {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(mutex);
-        while (needed_state != _state)
-            cond.wait(Lock);
-
-#else
-        check_pthread_call(pthread_mutex_lock(&mutex));
-        while (needed_state != _state)
-            check_pthread_call(pthread_cond_wait(&cond, &mutex));
-
-        check_pthread_call(pthread_mutex_unlock(&mutex));
-#endif
+        scoped_mutex_lock lock(m_mutex);
+        while (needed_state != m_state)
+            m_cond.wait(lock);
     }
 
     value_type operator () ()
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(mutex);
-        return _state;
-#else
-        value_type res;
-        check_pthread_call(pthread_mutex_lock(&mutex));
-        res = _state;
-        check_pthread_call(pthread_mutex_unlock(&mutex));
-        return res;
-#endif
+        scoped_mutex_lock lock(m_mutex);
+        return m_state;
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_STATE_HEADER
+#endif // !STXXL_COMMON_STATE_HEADER

@@ -11,18 +11,18 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__SERVING_REQUEST_H_
-#define STXXL_IO__SERVING_REQUEST_H_
+#ifndef STXXL_IO_SERVING_REQUEST_HEADER
+#define STXXL_IO_SERVING_REQUEST_HEADER
 
 #include <stxxl/bits/io/request_with_state.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
 
-//! \brief Request which serves an I/O by calling the synchronous routine of the file.
+//! Request which serves an I/O by calling the synchronous routine of the file.
 class serving_request : public request_with_state
 {
     template <class base_file_type>
@@ -30,9 +30,9 @@ class serving_request : public request_with_state
 
 public:
     serving_request(
-        const completion_handler & on_cmpl,
-        file * f,
-        void * buf,
+        const completion_handler& on_cmpl,
+        file* f,
+        void* buf,
         offset_type off,
         size_type b,
         request_type t);
@@ -47,7 +47,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__SERVING_REQUEST_H_
+#endif // !STXXL_IO_SERVING_REQUEST_HEADER
 // vim: et:ts=4:sw=4

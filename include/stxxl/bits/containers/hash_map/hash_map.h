@@ -17,7 +17,7 @@
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/bits/stream/sort_stream.h>
@@ -28,7 +28,7 @@
 #include <stxxl/bits/containers/hash_map/util.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
@@ -1336,7 +1336,7 @@ namespace hash_map
     }; /* end of class hash_map */
 } /* end of namespace hash_map */
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 
 namespace std

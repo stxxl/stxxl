@@ -41,17 +41,10 @@ IOSTAT_PLOT_LINE_IGNORE_PATTERN	?=
 IOSTAT_PLOT_CPU_LINE_IDENTIFIER	?= ^$(space)$(space)$(space)
 IOSTAT_PLOT_DISKS		?= 8
 IOSTAT_PLOT_CPUS		?= 8
-IOSTAT_PLOT_STRIDE		?= 12
 IOSTAT_PLOT_AVERAGE		?= 1
 IOSTAT_PLOT_AVERAGE.io		?= $(IOSTAT_PLOT_AVERAGE)
 IOSTAT_PLOT_AVERAGE.cpu		?= $(IOSTAT_PLOT_AVERAGE)
 IOSTAT_PLOT_LOAD_REDUCE		?= 0
-IOSTAT_PLOT_OFFSET_read_12	?= 6
-IOSTAT_PLOT_OFFSET_write_12	?= 7
-IOSTAT_PLOT_OFFSET_utilize_12	?= 12
-IOSTAT_PLOT_OFFSET_read_14	?= 8
-IOSTAT_PLOT_OFFSET_write_14	?= 9
-IOSTAT_PLOT_OFFSET_utilize_14	?= ???
 IOSTAT_PLOT_DISK_LIST		?= sda sdb sdc sdd sde sdf sdg sdh sdi sdj
 IOSTAT_PLOT_IO_WITH_UTILIZATION	?= no
 
@@ -64,12 +57,22 @@ GNUPLOTFILEINFO			?= set label "$(call GNUPLOT_PS_STRING_ESCAPE,$(HOST):$(patsub
 
 ECHO				?= echo
 
+# $1 = iostat file
+# (12)     Device:         rrqm/s   wrqm/s     r/s     w/s    rMB/s    wMB/s avgrq-sz avgqu-sz   await  svctm  %util
+# with -p: Device:         rrqm/s   wrqm/s     r/s     w/s    rMB/s    wMB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+define get-deviceline
+__deviceline	:= $(shell grep ^Device $1 | head -n 1)
+endef
+offset_read	 = $(if $(filter rMB/s,$(word 6,$(__deviceline))),6,8)
+offset_write	 = $(if $(filter wMB/s,$(word 7,$(__deviceline))),7,9)
+offset_util	 = $(if $(filter %util,$(word 12,$(__deviceline))),12,14)
+
 # $1 = first, $2 = increment, $3 = last
 define gnuplot-column-sequence-sum
 $(subst $(space),+,$(patsubst %,$$%,$(shell seq $1 $2 $3)))
 endef
 
-# $1 = io | cpu, $2 = numdisks (io) | numcpus (cpu), $3 = stride
+# $1 = io | cpu, $2 = numdisks (io) | numcpus (cpu)
 define template-iostat-gnuplot
 	$(RM) $@
 	$(ECHO) 'set title "$(subst _, ,$*) (avg=$(IOSTAT_PLOT_AVERAGE.$(strip $1)))"' >> $@
@@ -93,9 +96,9 @@ $(if $(and $(filter io,$1),$(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION))),
 	$(ECHO) 'set yrange [0:]' >> $@
 	$(ECHO) '' >> $@
 $(if $(filter io,$1),
-	$(ECHO) 'read = "$(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_read_$3), $3, $(shell expr $2 '*' $3))"' >> $@
-	$(ECHO) 'write = "$(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_write_$3), $3, $(shell expr $2 '*' $3))"' >> $@
-	$(ECHO) 'utilize = "($(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_utilize_$3), $3, $(shell expr $2 '*' $3))) / $2"' >> $@
+	$(ECHO) 'read = "$(call gnuplot-column-sequence-sum,2,4,$(shell expr $2 '*' 4))"' >> $@
+	$(ECHO) 'write = "$(call gnuplot-column-sequence-sum,3,4,$(shell expr $2 '*' 4))"' >> $@
+	$(ECHO) 'utilize = "($(call gnuplot-column-sequence-sum,4,4,$(shell expr $2 '*' 4))) / $2"' >> $@
 	$(ECHO) '' >> $@
 	$(ECHO) 'plot \' >> $@
 	$(ECHO) '	"$<" using 0:(@read + @write) title "Read + Write" ls 3$(comma) \' >> $@
@@ -130,14 +133,21 @@ $(if $(filter cpu,$1),
 	$(ECHO) '' >> $@
 endef
 
-%.io-$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $(MAKEFILE_LIST)
+define iostat-to-dat
+	$(eval $(call get-deviceline,$<))
 	$(pipefail) \
 	cat $< | \
 	$(if $(IOSTAT_PLOT_LINE_IGNORE_PATTERN),grep -v '$(IOSTAT_PLOT_LINE_IGNORE_PATTERN)' |) \
+	awk '{ print $$1 " " $$$(offset_read) " " $$$(offset_write) " " $$$(offset_util) }' | \
 	$(IOSTAT_PLOT_CONCAT_LINES) '$(IOSTAT_PLOT_LINE_IDENTIFIER)' | \
 	grep '$(IOSTAT_PLOT_LINE_IDENTIFIER)' | \
 	tail -n +2 | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.io) > $@
+
+endef
+
+%.io-$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $(MAKEFILE_LIST)
+	$(iostat-to-dat)
 
 define per-disk-plot-template
 %.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).dat: IOSTAT_PLOT_LINE_IDENTIFIER=^$(disk)
@@ -145,13 +155,7 @@ define per-disk-plot-template
 %.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).plot: IOSTAT_PLOT_IO_WITH_UTILIZATION=yes
 
 %.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $$(MAKEFILE_LIST)
-	$$(pipefail) \
-	cat $$< | \
-	$$(if $$(IOSTAT_PLOT_LINE_IGNORE_PATTERN),grep -v '$$(IOSTAT_PLOT_LINE_IGNORE_PATTERN)' |) \
-	$$(IOSTAT_PLOT_CONCAT_LINES) $$(IOSTAT_PLOT_LINE_IDENTIFIER) | \
-	grep "$$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
-	tail -n +2 | \
-	$$(IOSTAT_PLOT_FLOATING_AVERAGE) $$(IOSTAT_PLOT_AVERAGE.io) > $$@
+	$$(iostat-to-dat)
 endef
 $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
 
@@ -162,13 +166,13 @@ $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.cpu) > $@
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).dat $(MAKEFILE_LIST)
-	$(call template-iostat-gnuplot,io,$(IOSTAT_PLOT_DISKS),$(IOSTAT_PLOT_STRIDE))
+	$(call template-iostat-gnuplot,io,$(IOSTAT_PLOT_DISKS))
 
 %.io.plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).plot
 	@$(ECHO) Your plot file is: $<
 
 %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat %.loadavg $(MAKEFILE_LIST)
-	$(call template-iostat-gnuplot,cpu,$(IOSTAT_PLOT_CPUS),$(IOSTAT_PLOT_STRIDE))
+	$(call template-iostat-gnuplot,cpu,$(IOSTAT_PLOT_CPUS))
 
 %.cpu.plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot
 	@$(ECHO) Your plot file is: $<
