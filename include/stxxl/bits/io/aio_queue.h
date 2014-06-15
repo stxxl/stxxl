@@ -36,6 +36,8 @@ class aio_queue : public request_queue_impl_worker
 {
     friend class aio_request;
 
+    typedef aio_queue self_type;
+
 private:
     aio_context_t context;                     // OS context
     typedef std::list<request_ptr> queue_type; //storing aio_request* would drop ownership

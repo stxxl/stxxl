@@ -223,14 +223,36 @@ void aio_queue::wait_requests()
 
 void* aio_queue::post_async(void* arg)
 {
+    self_type* pthis = static_cast<self_type*>(arg);
+
     (static_cast<aio_queue*>(arg))->post_requests();
+
+    pthis->post_thread_state.set_to(TERMINATED);
+
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+    // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
+    // request_queue_impl_worker.cpp. -tb
+    ExitThread(NULL);
+#else
     return NULL;
+#endif
 }
 
 void* aio_queue::wait_async(void* arg)
 {
+    self_type* pthis = static_cast<self_type*>(arg);
+
     (static_cast<aio_queue*>(arg))->wait_requests();
+
+    pthis->wait_thread_state.set_to(TERMINATED);
+
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+    // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
+    // request_queue_impl_worker.cpp. -tb
+    ExitThread(NULL);
+#else
     return NULL;
+#endif
 }
 
 STXXL_END_NAMESPACE
