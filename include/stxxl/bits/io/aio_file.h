@@ -13,17 +13,7 @@
 #ifndef STXXL_IO_AIO_FILE_HEADER
 #define STXXL_IO_AIO_FILE_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
-#ifndef BOOST_MSVC
-// kernel aio interface does not exist on Windows
- #define STXXL_HAVE_AIO_FILE 1
-#else
- #define STXXL_HAVE_AIO_FILE 0
-#endif
-
+#include <stxxl/bits/config.h>
 
 #if STXXL_HAVE_AIO_FILE
 

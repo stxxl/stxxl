@@ -19,7 +19,7 @@
 #include <sys/syscall.h>
 
 #include <stxxl/bits/io/aio_request.h>
-#include <stxxl/bits/parallel.h>
+#include <stxxl/bits/io/aio_queue.h>
 
 #include <algorithm>
 
@@ -34,16 +34,22 @@ aio_queue::aio_queue(int desired_queue_length)
     : num_waiting_requests(0), num_free_events(0), num_posted_requests(0),
       post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
-    if (desired_queue_length == 0)
-        max_events = 64; // default value, 64 entries per queue (i.e. usually per disk) should be enough
+    if (desired_queue_length == 0) {
+        // default value, 64 entries per queue (i.e. usually per disk) should
+        // be enough
+        max_events = 64;
+    }
     else
         max_events = desired_queue_length;
 
     // negotiate maximum number of simultaneous events with the OS
     context = 0;
     int result;
-    while ((result = syscall(SYS_io_setup, max_events, &context)) == -1 && errno == EAGAIN && max_events > 1)
+    while ((result = syscall(SYS_io_setup, max_events, &context)) == -1 &&
+           errno == EAGAIN && max_events > 1)
+    {
         max_events <<= 1;               // try with half as many events
+    }
     if (result != 0) {
         STXXL_THROW2(io_error, "aio_queue::aio_queue",
                      "io_setup() nr_events=" << max_events);
@@ -223,10 +229,9 @@ void aio_queue::wait_requests()
 
 void* aio_queue::post_async(void* arg)
 {
-    self_type* pthis = static_cast<self_type*>(arg);
-
     (static_cast<aio_queue*>(arg))->post_requests();
 
+    self_type* pthis = static_cast<self_type*>(arg);
     pthis->post_thread_state.set_to(TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
@@ -240,10 +245,9 @@ void* aio_queue::post_async(void* arg)
 
 void* aio_queue::wait_async(void* arg)
 {
-    self_type* pthis = static_cast<self_type*>(arg);
-
     (static_cast<aio_queue*>(arg))->wait_requests();
 
+    self_type* pthis = static_cast<self_type*>(arg);
     pthis->wait_thread_state.set_to(TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700

@@ -38,6 +38,11 @@
 // used in: io/mmap_file.h/cpp
 // effect:  enables/disables memory mapped file implementation
 
+#cmakedefine STXXL_HAVE_AIO_FILE ${STXXL_HAVE_AIO_FILE}
+// default: 0/1 (platform dependent)
+// used in: io/aio_file.h/cpp
+// effect:  enables/disables Linux AIO file implementation
+
 #cmakedefine STXXL_POSIX_THREADS ${STXXL_POSIX_THREADS}
 // default: off
 // cmake:   detection of pthreads by cmake

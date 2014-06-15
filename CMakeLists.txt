@@ -382,6 +382,21 @@ include(CheckSymbolExists)
 check_symbol_exists(mmap "sys/mman.h" STXXL_HAVE_MMAP_FILE)
 
 ###############################################################################
+# check for Linux aio syscalls
+
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+  "#include <unistd.h>
+   #include <sys/syscall.h>
+   #include <linux/aio_abi.h>
+   int main() {
+       aio_context_t context;
+       int r = syscall(SYS_io_setup, 5, &context);
+       return (r == 0) ? 0 : -1;
+   }"
+   STXXL_HAVE_AIO_FILE)
+
+###############################################################################
 # check for an atomic add-and-fetch intrinsic for counting_ptr
 
 include(CheckCXXSourceCompiles)
