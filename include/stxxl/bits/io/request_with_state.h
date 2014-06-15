@@ -11,20 +11,22 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_WITH_STATE_H_
-#define STXXL_IO__REQUEST_WITH_STATE_H_
+#ifndef STXXL_IO_REQUEST_WITH_STATE_HEADER
+#define STXXL_IO_REQUEST_WITH_STATE_HEADER
 
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_with_waiters.h>
+#include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Request with completion state.
-class request_with_state : public request
+//! Request with completion state.
+class request_with_state : public request_with_waiters
 {
 protected:
     //! states of request
@@ -35,13 +37,13 @@ protected:
 
 protected:
     request_with_state(
-        const completion_handler & on_cmpl,
-        file * f,
-        void * buf,
+        const completion_handler& on_cmpl,
+        file* f,
+        void* buf,
         offset_type off,
         size_type b,
         request_type t) :
-        request(on_cmpl, f, buf, off, b, t),
+        request_with_waiters(on_cmpl, f, buf, off, b, t),
         _state(OP)
     { }
 
@@ -57,7 +59,7 @@ protected:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_WITH_STATE_H_
+#endif // !STXXL_IO_REQUEST_WITH_STATE_HEADER
 // vim: et:ts=4:sw=4

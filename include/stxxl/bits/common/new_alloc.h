@@ -11,15 +11,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_NEW_ALLOC_HEADER
-#define STXXL_NEW_ALLOC_HEADER
+#ifndef STXXL_COMMON_NEW_ALLOC_HEADER
+#define STXXL_COMMON_NEW_ALLOC_HEADER
 
 #include <memory>
 #include <limits>
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <class T>
 class new_alloc;
@@ -40,14 +40,15 @@ struct new_alloc_rebind {
 
 // designed for typed_block (to use with std::vector)
 template <class T>
-class new_alloc {
+class new_alloc
+{
 public:
     // type definitions
     typedef T value_type;
-    typedef T * pointer;
-    typedef const T * const_pointer;
-    typedef T & reference;
-    typedef const T & const_reference;
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
@@ -68,9 +69,9 @@ public:
     }
 
     new_alloc() throw () { }
-    new_alloc(const new_alloc &) throw () { }
+    new_alloc(const new_alloc&) throw () { }
     template <class U>
-    new_alloc(const new_alloc<U> &) throw () { }
+    new_alloc(const new_alloc<U>&) throw () { }
     ~new_alloc() throw () { }
 
     template <class U>
@@ -83,29 +84,29 @@ public:
     // return maximum number of elements that can be allocated
     size_type max_size() const throw ()
     {
-        return (std::numeric_limits<size_type>::max)() / sizeof(T);
+        return std::numeric_limits<size_type>::max() / sizeof(T);
     }
 
     // allocate but don't initialize num elements of type T
-    pointer allocate(size_type num, const void * = 0)
+    pointer allocate(size_type num, const void* = 0)
     {
-        return static_cast<T *>(T::operator new (num * sizeof(T)));
+        return static_cast<T*>(T::operator new (num * sizeof(T)));
     }
 
     // _GLIBCXX_RESOLVE_LIB_DEFECTS
     // 402. wrong new expression in [some_] allocator::construct
     // initialize elements of allocated storage p with value value
-    void construct(pointer p, const T & value)
+    void construct(pointer p, const T& value)
     {
         // initialize memory with placement new
-        ::new ((void *)p)T(value);
+        ::new ((void*)p)T(value);
     }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
     template <typename ... Args>
-    void construct(pointer p, Args && ... args)
+    void construct(pointer p, Args&& ... args)
     {
-        ::new ((void *)p)T(std::forward<Args>(args) ...);
+        ::new ((void*)p)T(std::forward<Args>(args) ...);
     }
 #endif
 
@@ -125,20 +126,20 @@ public:
 
 // return that all specializations of this allocator are interchangeable
 template <class T1, class T2>
-inline bool operator == (const new_alloc<T1> &,
-                         const new_alloc<T2> &) throw ()
+inline bool operator == (const new_alloc<T1>&,
+                         const new_alloc<T2>&) throw ()
 {
     return true;
 }
 
 template <class T1, class T2>
-inline bool operator != (const new_alloc<T1> &,
-                         const new_alloc<T2> &) throw ()
+inline bool operator != (const new_alloc<T1>&,
+                         const new_alloc<T2>&) throw ()
 {
     return false;
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_NEW_ALLOC_HEADER
+#endif // !STXXL_COMMON_NEW_ALLOC_HEADER
 // vim: et:ts=4:sw=4

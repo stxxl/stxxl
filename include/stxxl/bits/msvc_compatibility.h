@@ -10,14 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MSVC_COMPATIBILITY_H
-#define STXXL_MSVC_COMPATIBILITY_H
+#ifndef STXXL_MSVC_COMPATIBILITY_HEADER
+#define STXXL_MSVC_COMPATIBILITY_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
-#ifdef BOOST_MSVC
+#if STXXL_MSVC
 
 #include <cmath>
 
@@ -35,7 +33,7 @@ inline double log2(double x)
 // http://msdn.microsoft.com/en-us/library/85zk715d.aspx
 #define strtoull _strtoui64
 
-#endif
+#endif // STXXL_MSVC
 
-#endif // !STXXL_MSVC_COMPATIBILITY_H
+#endif // !STXXL_MSVC_COMPATIBILITY_HEADER
 // vim: et:ts=4:sw=4

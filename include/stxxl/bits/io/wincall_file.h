@@ -12,15 +12,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_WINCALL_FILE_HEADER
-#define STXXL_WINCALL_FILE_HEADER
+#ifndef STXXL_IO_WINCALL_FILE_HEADER
+#define STXXL_IO_WINCALL_FILE_HEADER
+
+#include <stxxl/bits/config.h>
 
 #ifndef STXXL_HAVE_WINCALL_FILE
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
-#ifdef BOOST_MSVC
+#if STXXL_WINDOWS
  #define STXXL_HAVE_WINCALL_FILE 1
 #else
  #define STXXL_HAVE_WINCALL_FILE 0
@@ -33,34 +31,34 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on Windows native I/O calls
+//! Implementation of file based on Windows native I/O calls.
 class wincall_file : public wfs_file_base, public disk_queued_file
 {
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! \param filename path of file
-    //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) identifier
+    //! \param queue_id disk queue identifier
+    //! \param allocator_id linked disk_allocator
     wincall_file(
-        const std::string & filename,
+        const std::string& filename,
         int mode,
         int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR)
         : wfs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
-    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     const char * io_type() const;
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_WINCALL_FILE
+#endif // #if STXXL_HAVE_WINCALL_FILE
 
-#endif  // !STXXL_WINCALL_FILE_HEADER
+#endif // !STXXL_IO_WINCALL_FILE_HEADER

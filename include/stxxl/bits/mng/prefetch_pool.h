@@ -11,25 +11,21 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PREFETCH_POOL_HEADER
-#define STXXL_PREFETCH_POOL_HEADER
+#ifndef STXXL_MNG_PREFETCH_POOL_HEADER
+#define STXXL_MNG_PREFETCH_POOL_HEADER
 
 #include <list>
-
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/mng/write_pool.h>
-#include <stxxl/bits/compat_hash_map.h>
+#include <stxxl/bits/compat/hash_map.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
 
-//! \brief Implements dynamically resizable prefetching pool
+//! Implements dynamically resizable prefetching pool.
 template <class BlockType>
 class prefetch_pool : private noncopyable
 {
@@ -40,14 +36,14 @@ public:
 protected:
     struct bid_hash
     {
-        size_t operator () (const bid_type & bid) const
+        size_t operator () (const bid_type& bid) const
         {
             size_t result = size_t(bid.storage) +
                             size_t(bid.offset & 0xffffffff) + size_t(bid.offset >> 32);
             return result;
         }
-#ifdef BOOST_MSVC
-        bool operator () (const bid_type & a, const bid_type & b) const
+#if STXXL_MSVC
+        bool operator () (const bid_type& a, const bid_type& b) const
         {
             return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
         }
@@ -58,20 +54,20 @@ protected:
         };
 #endif
     };
-    typedef std::pair<block_type *, request_ptr> busy_entry;
+    typedef std::pair<block_type*, request_ptr> busy_entry;
     typedef typename compat_hash_map<bid_type, busy_entry, bid_hash>::result hash_map_type;
-    typedef typename std::list<block_type *>::iterator free_blocks_iterator;
+    typedef typename std::list<block_type*>::iterator free_blocks_iterator;
     typedef typename hash_map_type::iterator busy_blocks_iterator;
 
     // contains free prefetch blocks
-    std::list<block_type *> free_blocks;
+    std::list<block_type*> free_blocks;
     // blocks that are in reading or already read but not retrieved by user
     hash_map_type busy_blocks;
 
     unsigned_type free_blocks_size;
 
 public:
-    //! \brief Constructs pool
+    //! Constructs pool.
     //! \param init_size initial number of blocks in the pool
     explicit prefetch_pool(unsigned_type init_size = 1) : free_blocks_size(init_size)
     {
@@ -80,14 +76,14 @@ public:
             free_blocks.push_back(new block_type);
     }
 
-    void swap(prefetch_pool & obj)
+    void swap(prefetch_pool& obj)
     {
         std::swap(free_blocks, obj.free_blocks);
         std::swap(busy_blocks, obj.busy_blocks);
         std::swap(free_blocks_size, obj.free_blocks_size);
     }
 
-    //! \brief Waits for completion of all ongoing read requests and frees memory
+    //! Waits for completion of all ongoing read requests and frees memory.
     virtual ~prefetch_pool()
     {
         while (!free_blocks.empty())
@@ -108,10 +104,12 @@ public:
         catch (...)
         { }
     }
-    //! \brief Returns number of owned blocks
-    unsigned_type size() const { return free_blocks_size + busy_blocks.size(); }
 
-    //! \brief Gives a hint for prefetching a block
+    //! Returns number of owned blocks.
+    unsigned_type size() const
+    { return free_blocks_size + busy_blocks.size(); }
+
+    //! Gives a hint for prefetching a block.
     //! \param bid address of a block to be prefetched
     //! \return \c true if there was a free block to do prefetch and prefetching
     //! was scheduled, \c false otherwise
@@ -129,7 +127,7 @@ public:
         if (free_blocks_size) //  only if we have a free block
         {
             --free_blocks_size;
-            block_type * block = free_blocks.back();
+            block_type* block = free_blocks.back();
             free_blocks.pop_back();
             STXXL_VERBOSE2("prefetch_pool::hint bid=" << bid << " => prefetching");
             request_ptr req = block->read(bid);
@@ -140,7 +138,7 @@ public:
         return false;
     }
 
-    bool hint(bid_type bid, write_pool<block_type> & w_pool)
+    bool hint(bid_type bid, write_pool<block_type>& w_pool)
     {
         // if block is already hinted, no need to hint it again
         if (in_prefetching(bid)) {
@@ -151,7 +149,7 @@ public:
         if (free_blocks_size) //  only if we have a free block
         {
             --free_blocks_size;
-            block_type * block = free_blocks.back();
+            block_type* block = free_blocks.back();
             free_blocks.pop_back();
             if (w_pool.has_request(bid))
             {
@@ -194,13 +192,13 @@ public:
         return (busy_blocks.find(bid) != busy_blocks.end());
     }
 
-    //! \brief Reads block. If this block is cached block is not read but passed from the cache
+    //! Reads block. If this block is cached block is not read but passed from the cache.
     //! \param block block object, where data to be read to. If block was cached \c block 's
     //! ownership goes to the pool and block from cache is returned in \c block value.
     //! \param bid address of the block
     //! \warning \c block parameter must be allocated dynamically using \c new .
     //! \return request pointer object of read operation
-    request_ptr read(block_type * & block, bid_type bid)
+    request_ptr read(block_type*& block, bid_type bid)
     {
         busy_blocks_iterator cache_el = busy_blocks.find(bid);
         if (cache_el == busy_blocks.end())
@@ -220,7 +218,7 @@ public:
         return result;
     }
 
-    request_ptr read(block_type * & block, bid_type bid, write_pool<block_type> & w_pool)
+    request_ptr read(block_type*& block, bid_type bid, write_pool<block_type>& w_pool)
     {
         // try cache
         busy_blocks_iterator cache_el = busy_blocks.find(bid);
@@ -252,7 +250,7 @@ public:
         return block->read(bid);
     }
 
-    //! \brief Resizes size of the pool
+    //! Resizes size of the pool.
     //! \param new_size desired size of the pool. If some
     //! blocks are used for prefetching, these blocks can't be freed.
     //! Only free blocks (not in prefetching) can be freed by reducing
@@ -284,17 +282,18 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+
+template <class BlockType>
+void swap(stxxl::prefetch_pool<BlockType>& a,
+          stxxl::prefetch_pool<BlockType>& b)
 {
-    template <class BlockType>
-    void swap(stxxl::prefetch_pool<BlockType> & a,
-              stxxl::prefetch_pool<BlockType> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
 }
 
-#endif // !STXXL_PREFETCH_POOL_HEADER
+} // namespace std
+
+#endif // !STXXL_MNG_PREFETCH_POOL_HEADER
 // vim: et:ts=4:sw=4

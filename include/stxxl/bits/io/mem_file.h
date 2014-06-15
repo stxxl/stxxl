@@ -11,31 +11,32 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MEM_FILE_HEADER
-#define STXXL_MEM_FILE_HEADER
+#ifndef STXXL_IO_MEM_FILE_HEADER
+#define STXXL_IO_MEM_FILE_HEADER
 
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on new[] and memcpy
+//! Implementation of file based on new[] and memcpy.
 class mem_file : public disk_queued_file
 {
-    char * ptr;
+    char* ptr;
     offset_type sz;
 
+    mutex m_mutex;      // sequentialize function calls
+
 public:
-    //! \brief constructs file object
-    //! \param disk disk(file) identifier
+    //! constructs file object.
     mem_file(
         int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : disk_queued_file(queue_id, allocator_id), ptr(NULL), sz(0)
     { }
-    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     ~mem_file();
     offset_type size();
     void set_size(offset_type newsize);
@@ -46,6 +47,6 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_MEM_FILE_HEADER
+#endif // !STXXL_IO_MEM_FILE_HEADER

@@ -10,19 +10,20 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BUFFERED_WRITER_HEADER
-#define STXXL_BUFFERED_WRITER_HEADER
+#ifndef STXXL_MNG_BUF_WRITER_HEADER
+#define STXXL_MNG_BUF_WRITER_HEADER
 
 #include <vector>
 #include <queue>
 
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/disk_queues.h>
+#include <stxxl/bits/noncopyable.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-//! \weakgroup schedlayer Block scheduling sublayer
+//! \defgroup schedlayer Block Scheduling Sublayer
 //! \ingroup mnglayer
 //! Group of classes which help in scheduling
 //! sequences of read and write requests
@@ -30,21 +31,19 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief Encapsulates asynchronous buffered block writing engine
+//! Encapsulates asynchronous buffered block writing engine.
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
 template <typename block_type>
-class buffered_writer
+class buffered_writer : private noncopyable
 {
-    buffered_writer() { }
-
 protected:
     typedef typename block_type::bid_type bid_type;
 
     const unsigned_type nwriteblocks;
-    block_type * write_buffers;
-    bid_type * write_bids;
-    request_ptr * write_reqs;
+    block_type* write_buffers;
+    bid_type* write_bids;
+    request_ptr* write_reqs;
     const unsigned_type writebatchsize;
 
     std::vector<int_type> free_write_blocks;            // contains free write blocks
@@ -55,11 +54,11 @@ protected:
     {
         stxxl::int64 offset;
         int_type ibuffer;
-        batch_entry(stxxl::int64 o, int b) : offset(o), ibuffer(b) { }
+        batch_entry(stxxl::int64 o, int_type b) : offset(o), ibuffer(b) { }
     };
     struct batch_entry_cmp
     {
-        bool operator () (const batch_entry & a, const batch_entry & b) const
+        bool operator () (const batch_entry& a, const batch_entry& b) const
         {
             return (a.offset > b.offset);
         }
@@ -69,7 +68,7 @@ protected:
     batch_type batch_write_blocks;      // sorted sequence of blocks to write
 
 public:
-    //! \brief Constructs an object
+    //! Constructs an object.
     //! \param write_buf_size number of write buffers to use
     //! \param write_batch_size number of blocks to accumulate in
     //!        order to flush write requests (bulk buffered writing)
@@ -86,7 +85,7 @@ public:
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
     }
-    //! \brief Returns free block from the internal buffer pool
+    //! Returns free block from the internal buffer pool.
     //! \return pointer to the block from the internal buffer pool
     block_type * get_free_block()
     {
@@ -105,7 +104,7 @@ public:
         if (UNLIKELY(free_write_blocks.empty()))
         {
             int_type size = busy_write_blocks.size();
-            request_ptr * reqs = new request_ptr[size];
+            request_ptr* reqs = new request_ptr[size];
             int_type i = 0;
             for ( ; i < size; ++i)
             {
@@ -123,12 +122,12 @@ public:
 
         return (write_buffers + ibuffer);
     }
-    //! \brief Submits block for writing
+    //! Submits block for writing.
     //! \param filled_block pointer to the block
     //! \remark parameter \c filled_block must be value returned by \c get_free_block() or \c write() methods
     //! \param bid block identifier, a place to write data of the \c filled_block
     //! \return pointer to the new free block from the pool
-    block_type * write(block_type * filled_block, const bid_type & bid)        // writes filled_block and returns a new block
+    block_type * write(block_type* filled_block, const bid_type& bid)          // writes filled_block and returns a new block
     {
         if (batch_write_blocks.size() >= writebatchsize)
         {
@@ -154,7 +153,7 @@ public:
 
         return get_free_block();
     }
-    //! \brief Flushes not yet written buffers
+    //! Flushes not yet written buffers.
     void flush()
     {
         int_type ibuffer;
@@ -186,7 +185,7 @@ public:
             free_write_blocks.push_back(i);
     }
 
-    //! \brief Flushes not yet written buffers and frees used memory
+    //! Flushes not yet written buffers and frees used memory.
     virtual ~buffered_writer()
     {
         int_type ibuffer;
@@ -218,6 +217,6 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_BUFFERED_WRITER_HEADER
+#endif // !STXXL_MNG_BUF_WRITER_HEADER

@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_EXCEPTIONS_H_
-#define STXXL_EXCEPTIONS_H_
+#ifndef STXXL_COMMON_EXCEPTIONS_HEADER
+#define STXXL_COMMON_EXCEPTIONS_HEADER
 
 #include <iostream>
 #include <string>
@@ -21,7 +21,7 @@
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 class io_error : public std::ios_base::failure
 {
@@ -30,7 +30,7 @@ public:
         std::ios_base::failure("")
     { }
 
-    io_error(const std::string & msg_) throw () :
+    io_error(const std::string& msg_) throw () :
         std::ios_base::failure(msg_)
     { }
 };
@@ -42,7 +42,7 @@ public:
         std::runtime_error("")
     { }
 
-    resource_error(const std::string & msg_) throw () :
+    resource_error(const std::string& msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
@@ -54,7 +54,7 @@ public:
         std::runtime_error("")
     { }
 
-    bad_ext_alloc(const std::string & msg_) throw () :
+    bad_ext_alloc(const std::string& msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
@@ -66,7 +66,7 @@ public:
         std::runtime_error("")
     { }
 
-    bad_parameter(const std::string & msg_) throw () :
+    bad_parameter(const std::string& msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
@@ -78,12 +78,12 @@ public:
         std::runtime_error("")
     { }
 
-    unreachable(const std::string & msg_) throw () :
+    unreachable(const std::string& msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_EXCEPTIONS_H_
+#endif // !STXXL_COMMON_EXCEPTIONS_HEADER
 // vim: et:ts=4:sw=4

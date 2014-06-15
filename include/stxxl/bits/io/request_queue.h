@@ -15,10 +15,10 @@
 #define STXXL_IO_REQUEST_QUEUE_HEADER
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/io/request_ptr.h>
+#include <stxxl/bits/io/request.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -29,15 +29,15 @@ public:
     enum priority_op { READ, WRITE, NONE };
 
 public:
-    virtual void add_request(request_ptr & req) = 0;
-    virtual bool cancel_request(request_ptr & req) = 0;
+    virtual void add_request(request_ptr& req) = 0;
+    virtual bool cancel_request(request_ptr& req) = 0;
     virtual ~request_queue() { }
     virtual void set_priority_op(priority_op p) { STXXL_UNUSED(p); }
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_REQUEST_QUEUE_HEADER
 // vim: et:ts=4:sw=4

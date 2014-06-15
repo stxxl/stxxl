@@ -1,13 +1,17 @@
 #!/usr/bin/perl -w
+############################################################################
+#  misc/analyze-include-dependencies.pl
 #
-# A tool to analyze #include dependencies and find unwanted cycles.
+#  A tool to analyze #include dependencies and find unwanted cycles.
 #
-# Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-# Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
+#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
 
 use File::Basename;
 

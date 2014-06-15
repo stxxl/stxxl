@@ -14,36 +14,35 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_WFSFILEBASE_HEADER
-#define STXXL_WFSFILEBASE_HEADER
+#ifndef STXXL_IO_WFS_FILE_BASE_HEADER
+#define STXXL_IO_WFS_FILE_BASE_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
-#ifdef BOOST_MSVC
+#if STXXL_WINDOWS
 
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
-#include <windows.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Base for Windows file system implementations
+//! Base for Windows file system implementations.
 class wfs_file_base : public virtual file
 {
 protected:
+    typedef void* HANDLE;
+
     mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
     const std::string filename;
     offset_type bytes_per_sector;
     bool locked;
-    wfs_file_base(const std::string & filename, int mode);
+    wfs_file_base(const std::string& filename, int mode);
     offset_type _size();
     void close();
 
@@ -53,13 +52,13 @@ public:
     void set_size(offset_type newsize);
     void lock();
     const char * io_type() const;
-    void remove();
+    void close_remove();
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // #ifdef BOOST_MSVC
+#endif // STXXL_WINDOWS
 
-#endif // !STXXL_WFSFILEBASE_HEADER
+#endif // !STXXL_IO_WFS_FILE_BASE_HEADER

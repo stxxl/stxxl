@@ -1,9 +1,152 @@
-Version x.y.z (unreleased)
+Version 1.4-dev (unreleased)
 
   - support kernel based asynchronous I/O on Linux (new file type "aio"),
     which exploits Native Command Queuing (NCQ) if available
     canceling requests apparently not yet supported by the kernel
     disable/enable with the define USE_LIBAIO 0/1
+
+Version 1.4.0 (12 December 2013)
+
+* Reorganized Directory Hierarchy
+  - separating old component based directories into lib/ (libstxxl source
+    files), tests/ (for tests cases), examples/ (for tutorial and example code)
+    and tools/ (for stxxl_tool and more benchmarks).
+
+* CMake build system for cross-platform compilation
+  - replaced adhoc Makefiles with CMake build system
+  - CMake scripts can also output MSVC project files and more.
+  - all component tests must register with CMake's test system -> run make test
+  - generates pkg-config and CMake's project config files
+
+* Greatly Improved Doxygen Documentation
+  - integrated old LaTeX tutorial
+  - newly written tutorials for almost all STXXL containers and algorithms
+  - embedded design documentation from Roman Dementiev's PhD thesis
+  - new compilation instructions for CMake build system
+
+* Improved .stxxl Config Options for File I/O Implementations
+  - looking for .stxxl in more places than just the current directory (see the
+    docs for which places exactly).
+  - parse file size with SI and IEC units, like "10GiB" in disk= config lines.
+  - parse additional file I/O implementation options.
+  - support for "unlink_on_open" (keep file descriptor but unlink file) and
+    "delete_at_exit" options.
+  - support for "direct=off/try/on" to turn off O_DIRECT for tmpfs and similar.
+  - the default open mode is now direct=try -> prints a warning if O_DIRECT is
+    unavailable on the system.
+
+* .stxxl Config Options Represented as disk_config Class
+  - all disk= config lines are parsed into disk_config objects.
+  - allow API calls to configure disks via stxxl::config::add_disk()
+  - delay config file load till config::initialize() is called by block_manager
+
+* Command line parser stxxl::cmdline_parser
+  - stand-alone command line parser with ability to parse SI and IEC units for
+    "bytes sizes".
+  - automatically output nicely formatted help for all options and flags.
+  - using the cmdline_parser for all stxxl_tool subtools.
+
+* Created stxxl_tool from multiple small tools and benchmarks
+  - stxxl_tool is a collection of subtools, previous scattered around in the
+    directory hierarchy.
+  - goal is to have one tool installed in binary distribution together with
+    libstxxl library and includes.
+  - primary tool for standardized platform speed tests.
+  - provide good command line help on these subtools via cmdline_parser.
+
+* Adding skew3 as "real-world" STXXL application to examples subdirectory.
+  - enhanced integrated stxxl::tuple construction for this application.
+
+* Enable use of raw block devices on Linux
+  - these do provide more stable I/O throughput than even XFS.
+  - disable growing of these devices
+
+* Most platform configuration is now done by CMake and saved into the
+  <stxxl/bits/config.h> header file
+
+* Enhanced stxxl::block_manager to count maximum, current and total number of
+  bytes allocated in external memory.
+
+* Support Visual Studio 2012 and 2013 _without_ Boost by using std::thread
+  - VS 2012 and 2013 support STL threads, mutexes, condition_variables and
+    more, which are basically modeled after the Boost libraries. Thus we can
+    simply uses these included libraries instead of Boost.
+  - Fixed bad runtime deadlock bug occurring when joining std::threads after
+    main() exits. The bug persists in VS 2012 and 2013.
+
+* Implementing counting_ptr reference counted objects
+  - used like boost::intrusive_ptr with a base class.
+  - reimplementing request_ptr using just counting_ptr<request>.
+  - (optionally) use atomic operations for thread-safe reference counting
+  - applying counting_ptr to stream::sorted_runs to avoid extra copying
+
+* New STXXL container "stxxl::sequence"
+  - basically a deque container without random access to blocks.
+  - efficient {push/pop}_{front/back} at both ends.
+  - access to block sequence via stream and reverse_stream constructions
+
+* New STXXL container "stxxl::sorter"
+  - combination of stream::runs_creator and stream::runs_merger into a
+    convenient sorting container.
+
+* Added vector_bufreader and vector_bufwriter to overlapping I/O and
+  computation when accessing a stxxl::vector in scanning mode.
+  - documented problems of scanning in a vector
+  - C++11 range loop access support to stxxl::vector via vector_bufreader.
+
+* Added uint40 and uint48 types for integers with five and six bytes.
+
+* Adding STXXL_CHECK macros to always check outcomes in tests.
+
+* Renaming mng/mng.{h,cpp} -> mng/block_manager.{h,cpp}.
+
+* Reworking version.h
+  - add integer version like 10400 for 1.4.0
+  - add get_version_string() for longer version string with features
+  - check_library_version() for mismatch between headers and libraries
+
+* Reworking error_handling.h to throw much more useful exceptions with
+  errno information and more.
+
+* Various file renames (which are only possible at major version changes).
+
+* Fixing bug in shrinking vector with vector::resize(n,true).
+
+------------------------------------------
+Version 1.3.2 (unreleased)
+
+* New Features
+  - Add defines STXXL_VERSION_{MAJOR,MINOR,PATCHLEVEL} and library routines
+    stxxl::version_{major,minor,patchlevel}() for getting STXXL version
+    information and an inline function check_library_version() to check at
+    runtime for mismatching header and library versions.  (Bz:#6)
+    Available via <stxxl/version.h>
+* Merged matrix branch which allows external memory matrix operations.
+  - merged dsr::argument_helper for command line processing
+  - also required an internal memory addressable_priority_queue, a
+    shared_object_pointer (instrusive pointer)
+  - adds block_scheduler as submodule to prefetch matrix blocks in a
+    pre-recorded order
+  - contains a test and benchmark.
+* Fixed bug in stxxl::priority_queue
+  - added dump_sizes()
+  - The priority queue may become fragmented after a significant number of
+    insertions and deletes so that all slots in all groups are being used, but
+    the last external group is nearly empty (counting elements).  In that case
+    we merge the whole last external group into a temporary ext_merger and swap
+    this overflow merger and the (now empty) last external merger
+    afterwards. Increasing the number of groups beyond 4 is not possible
+    without significant changes elsewhere.
+* Fixed bug in stxxl::queue
+  - added special case when first block has space at the beginning
+  - added another test N * (push,pop,push), N * (pop, push, pop)
+* Using LIKELY and UNLIKEY to prioritize branchs in gcc.
+* Platform Support
+  - add GCC 4.6
+  - add clang++ 2.9
+  - update ICPC 12.0 (Intel C++ Composer XE 2011 Update 4): drop workarounds
+    for bugs fixed in Update 4
+  - Boost 1.46: Boost Filesystem Version 3
 
 ------------------------------------------
 Version 1.3.1 (10 March 2011)
@@ -179,8 +322,8 @@ Version 1.2.0 (05 July 2008)
 * stxxl::noncopyable, inspired by boost::noncopyable: inheriting from this
   class forbids copying of objects when this is undesirable
   - used in all classes that had implemented their own variants previously
-* stxxl::vector, all sorting functions: replaced TwoToOneDimArrayRowAdaptor
-  with ArrayOfSequencesIterator which is much faster, especially
+* stxxl::vector, all sorting functions: replaced two2one_dim_array_row_adapter
+  with array_of_sequences_iterator which is much faster, especially
   if blocks have padding
 * if required, verify that the sentinels satisfy a strict weak ordering
 * stxxl::vector: several operations sped up, several more implemented
@@ -353,8 +496,8 @@ Version 0.2 (Summer 2003)
 
 * Vectors, stacks, sorting, scanning are available
 
-
-
-
-
-
+------------------------------------------
+# Local Variables:
+# mode: text
+# mode: flyspell
+# End:

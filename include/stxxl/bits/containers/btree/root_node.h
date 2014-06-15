@@ -10,23 +10,24 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_BTREE__ROOT_NODE_H
-#define STXXL_CONTAINERS_BTREE__ROOT_NODE_H
+#ifndef STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER
+#define STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER
 
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-namespace btree
+namespace btree {
+
+template <class KeyType, class BIDType>
+class root_node
 {
-    template <class KeyType, class BIDType>
-    class root_node
-    {
-        // a place for a future custom root node tree implementation
-    };
-}
+    // a place for a future custom root node tree implementation
+};
 
-__STXXL_END_NAMESPACE
+} // namespace btree
 
-#endif /* STXXL_CONTAINERS_BTREE__ROOT_NODE_H */
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER

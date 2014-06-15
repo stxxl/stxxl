@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_WBTL_FILE_HEADER
-#define STXXL_WBTL_FILE_HEADER
+#ifndef STXXL_IO_WBTL_FILE_HEADER
+#define STXXL_IO_WBTL_FILE_HEADER
 
 #ifndef STXXL_HAVE_WBTL_FILE
 #define STXXL_HAVE_WBTL_FILE 1
@@ -27,13 +27,13 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on buffered writes and
-//!        block remapping via a translation layer.
+//! Implementation of file based on buffered writes and block remapping via a
+//! translation layer.
 class wbtl_file : public disk_queued_file
 {
     typedef std::pair<offset_type, offset_type> place;
@@ -41,7 +41,7 @@ class wbtl_file : public disk_queued_file
     typedef std::map<offset_type, place> place_map;
 
     // the physical disk used as backend
-    file * storage;
+    file* storage;
     offset_type sz;
     size_type write_block_size;
 
@@ -60,7 +60,7 @@ class wbtl_file : public disk_queued_file
     // buffer_address if the start offset on the backend file
     // curpos is the next writing position in write_buffer[curbuf]
     mutex buffer_mutex;
-    char * write_buffer[2];
+    char* write_buffer[2];
     offset_type buffer_address[2];
     int curbuf;
     size_type curpos;
@@ -69,7 +69,7 @@ class wbtl_file : public disk_queued_file
     struct FirstFit : public std::binary_function<place, offset_type, bool>
     {
         bool operator () (
-            const place & entry,
+            const place& entry,
             const offset_type size) const
         {
             return (entry.second >= size);
@@ -77,11 +77,10 @@ class wbtl_file : public disk_queued_file
     };
 
 public:
-    //! \brief constructs file object
-    //! \param backend_file file object used as storage backend, will be deleted in ~wbtl_file()
-    //! \param disk disk(file) identifier
+    //! Constructs file object.
+    //! param backend_file file object used as storage backend, will be deleted in ~wbtl_file()
     wbtl_file(
-        file * backend_file,
+        file* backend_file,
         size_type write_buffer_size,
         int write_buffers = 2,
         int queue_id = DEFAULT_QUEUE,
@@ -90,7 +89,7 @@ public:
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     void discard(offset_type offset, offset_type size);
     const char * io_type() const;
 
@@ -98,8 +97,8 @@ private:
     void _add_free_region(offset_type offset, offset_type size);
 
 protected:
-    void sread(void * buffer, offset_type offset, size_type bytes);
-    void swrite(void * buffer, offset_type offset, size_type bytes);
+    void sread(void* buffer, offset_type offset, size_type bytes);
+    void swrite(void* buffer, offset_type offset, size_type bytes);
     offset_type get_next_write_block();
     void check_corruption(offset_type region_pos, offset_type region_size,
                           sortseq::iterator pred, sortseq::iterator succ);
@@ -107,8 +106,8 @@ protected:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_WBTL_FILE
+#endif // #if STXXL_HAVE_WBTL_FILE
 
-#endif  // !STXXL_WBTL_FILE_HEADER
+#endif // !STXXL_IO_WBTL_FILE_HEADER

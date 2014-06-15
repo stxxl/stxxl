@@ -11,17 +11,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_LOG_HEADER
-#define STXXL_LOG_HEADER
+#ifndef STXXL_COMMON_LOG_HEADER
+#define STXXL_COMMON_LOG_HEADER
 
-#include <iostream>
 #include <fstream>
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 class logger : public singleton<logger>
 {
@@ -29,7 +28,7 @@ class logger : public singleton<logger>
 
     std::ofstream log_stream_;
     std::ofstream errlog_stream_;
-    std::ofstream * waitlog_stream_;
+    std::ofstream* waitlog_stream_;
 
     logger();
     ~logger();
@@ -51,6 +50,6 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_LOG_HEADER
+#endif // !STXXL_COMMON_LOG_HEADER

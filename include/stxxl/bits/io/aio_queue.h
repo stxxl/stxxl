@@ -24,7 +24,7 @@
 #include <stxxl/bits/common/mutex.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -37,14 +37,14 @@ class aio_queue : public request_queue_impl_worker
     friend class aio_request;
 
 private:
-    aio_context_t context;  // OS context
-    typedef std::list<request_ptr> queue_type;  //storing aio_request* would drop ownership
+    aio_context_t context;                     // OS context
+    typedef std::list<request_ptr> queue_type; //storing aio_request* would drop ownership
 
     // "waiting" request have submitted to this queue, but not yet to the OS, those are "posted"
     mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
 
-    int max_events;   // max number of OS requests
+    int max_events;                                                       // max number of OS requests
     semaphore num_waiting_requests, num_free_events, num_posted_requests; //number of requests in waitings_requests
 
     // two threads, one for posting, one for waiting
@@ -59,10 +59,10 @@ private:
 
     static const priority_op _priority_op = WRITE;
 
-    static void * post_async(void * arg);  // thread start callback
-    static void * wait_async(void * arg);  // thread start callback
+    static void * post_async(void* arg);   // thread start callback
+    static void * wait_async(void* arg);   // thread start callback
     void post_requests();
-    void handle_events(io_event * events, int num_events, bool canceled);
+    void handle_events(io_event* events, int num_events, bool canceled);
     void wait_requests();
     void suspend();
 
@@ -73,15 +73,15 @@ public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
     aio_queue(int desired_queue_length = 0);
 
-    void add_request(request_ptr & req);
-    bool cancel_request(request_ptr & req);
-    void complete_request(request_ptr & req);
+    void add_request(request_ptr& req);
+    bool cancel_request(request_ptr& req);
+    void complete_request(request_ptr& req);
     ~aio_queue();
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // #if STXXL_HAVE_AIO_FILE
 

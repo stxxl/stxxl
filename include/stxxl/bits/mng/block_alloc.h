@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG__BLOCK_ALLOC_H
-#define STXXL_MNG__BLOCK_ALLOC_H
+#ifndef STXXL_MNG_BLOCK_ALLOC_HEADER
+#define STXXL_MNG_BLOCK_ALLOC_HEADER
 
 #include <algorithm>
 #include <stxxl/bits/parallel.h>
@@ -20,15 +20,14 @@
 #include <stxxl/bits/mng/config.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
+//! \defgroup alloc Allocation Functors
 //! \ingroup mnglayer
-
-//! \weakgroup alloc Allocation functors
-//! Standard allocation strategies encapsulated in functors
+//! Standard allocation strategies encapsulated in functors.
 //! \{
 
-//! \brief example disk allocation scheme functor
+//! Example disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct basic_allocation_strategy
 {
@@ -38,14 +37,14 @@ struct basic_allocation_strategy
     static const char * name();
 };
 
-//! \brief striping disk allocation scheme functor
+//! Striping disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct striping
 {
-    int begin, diff;
+    unsigned_type begin, diff;
 
 public:
-    striping(int b, int e) : begin(b), diff(e - b)
+    striping(unsigned_type b, unsigned_type e) : begin(b), diff(e - b)
     { }
 
     striping() : begin(0)
@@ -53,7 +52,7 @@ public:
         diff = config::get_instance()->disks_number();
     }
 
-    int operator () (int i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return begin + i % diff;
     }
@@ -64,23 +63,24 @@ public:
     }
 };
 
-//! \brief fully randomized disk allocation scheme functor
+//! Fully randomized disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct FR : public striping
 {
 private:
-    random_number<random_uniform_fast> rnd;
+    typedef random_number<random_uniform_fast> rnd_type;
+    rnd_type rnd;
 
 public:
-    FR(int b, int e) : striping(b, e)
+    FR(unsigned_type b, unsigned_type e) : striping(b, e)
     { }
 
     FR() : striping()
     { }
 
-    int operator () (int /*i*/) const
+    unsigned_type operator () (unsigned_type /*i*/) const
     {
-        return begin + rnd(diff);
+        return begin + rnd(rnd_type::value_type(diff));
     }
 
     static const char * name()
@@ -89,21 +89,23 @@ public:
     }
 };
 
-//! \brief simple randomized disk allocation scheme functor
+//! Simple randomized disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct SR : public striping
 {
 private:
-    int offset;
+    unsigned_type offset;
+
+    typedef random_number<random_uniform_fast> rnd_type;
 
     void init()
     {
-        random_number<random_uniform_fast> rnd;
-        offset = rnd(diff);
+        rnd_type rnd;
+        offset = rnd(rnd_type::value_type(diff));
     }
 
 public:
-    SR(int b, int e) : striping(b, e)
+    SR(unsigned_type b, unsigned_type e) : striping(b, e)
     {
         init();
     }
@@ -113,7 +115,7 @@ public:
         init();
     }
 
-    int operator () (int i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return begin + (i + offset) % diff;
     }
@@ -124,16 +126,16 @@ public:
     }
 };
 
-//! \brief randomized cycling disk allocation scheme functor
+//! Randomized cycling disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct RC : public striping
 {
 private:
-    std::vector<int> perm;
+    std::vector<unsigned_type> perm;
 
     void init()
     {
-        for (int i = 0; i < diff; i++)
+        for (unsigned_type i = 0; i < diff; i++)
             perm[i] = i;
 
         stxxl::random_number<random_uniform_fast> rnd;
@@ -141,7 +143,7 @@ private:
     }
 
 public:
-    RC(int b, int e) : striping(b, e), perm(diff)
+    RC(unsigned_type b, unsigned_type e) : striping(b, e), perm(diff)
     {
         init();
     }
@@ -151,7 +153,7 @@ public:
         init();
     }
 
-    int operator () (int i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return begin + perm[i % diff];
     }
@@ -164,7 +166,7 @@ public:
 
 struct RC_disk : public RC
 {
-    RC_disk(int b, int e) : RC(b, e)
+    RC_disk(unsigned_type b, unsigned_type e) : RC(b, e)
     { }
 
     RC_disk() : RC(config::get_instance()->regular_disk_range().first, config::get_instance()->regular_disk_range().second)
@@ -178,7 +180,7 @@ struct RC_disk : public RC
 
 struct RC_flash : public RC
 {
-    RC_flash(int b, int e) : RC(b, e)
+    RC_flash(unsigned_type b, unsigned_type e) : RC(b, e)
     { }
 
     RC_flash() : RC(config::get_instance()->flash_range().first, config::get_instance()->flash_range().second)
@@ -190,18 +192,18 @@ struct RC_flash : public RC
     }
 };
 
-//! \brief 'single disk' disk allocation scheme functor
+//! 'Single disk' disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct single_disk
 {
-    const int disk;
-    single_disk(int d, int = 0) : disk(d)
+    unsigned_type disk;
+    single_disk(unsigned_type d, unsigned_type = 0) : disk(d)
     { }
 
     single_disk() : disk(0)
     { }
 
-    int operator () (int /*i*/) const
+    unsigned_type operator () (unsigned_type /*i*/) const
     {
         return disk;
     }
@@ -212,8 +214,8 @@ struct single_disk
     }
 };
 
-//! \brief Allocator functor adaptor
-
+//! Allocator functor adaptor.
+//!
 //! Gives offset to disk number sequence defined in constructor
 template <class BaseAllocator_>
 struct offset_allocator
@@ -221,23 +223,23 @@ struct offset_allocator
     BaseAllocator_ base;
     int_type offset;
 
-    //! \brief Creates functor based on instance of \c BaseAllocator_ functor
-    //! with offset \c offset_
+    //! Creates functor based on instance of \c BaseAllocator_ functor
+    //! with offset \c offset_.
     //! \param offset_ offset
     //! \param base_ used to create a copy
-    offset_allocator(int_type offset_, const BaseAllocator_ & base_) : base(base_), offset(offset_)
+    offset_allocator(int_type offset_, const BaseAllocator_& base_) : base(base_), offset(offset_)
     { }
 
-    //! \brief Creates functor based on instance of \c BaseAllocator_ functor
+    //! Creates functor based on instance of \c BaseAllocator_ functor.
     //! \param base_ used to create a copy
-    offset_allocator(const BaseAllocator_ & base_) : base(base_), offset(0)
+    offset_allocator(const BaseAllocator_& base_) : base(base_), offset(0)
     { }
 
-    //! \brief Creates functor based on default \c BaseAllocator_ functor
+    //! Creates functor based on default \c BaseAllocator_ functor.
     offset_allocator() : offset(0)
     { }
 
-    int operator () (int_type i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return base(offset + i);
     }
@@ -259,7 +261,7 @@ struct offset_allocator
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_MNG__BLOCK_ALLOC_H
+#endif // !STXXL_MNG_BLOCK_ALLOC_HEADER
 // vim: et:ts=4:sw=4

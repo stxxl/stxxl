@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/mutex.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
@@ -35,13 +35,13 @@ private:
     mutex queue_mutex;
     queue_type queue;
 
-    state<thread_state> _thread_state;
+    state<thread_state> m_thread_state;
     thread_type thread;
     semaphore sem;
 
     static const priority_op _priority_op = WRITE;
 
-    static void * worker(void * arg);
+    static void * worker(void* arg);
 
 public:
     // \param n max number of requests simultaneously submitted to disk
@@ -56,14 +56,14 @@ public:
         //_priority_op = op;
         STXXL_UNUSED(op);
     }
-    void add_request(request_ptr & req);
-    bool cancel_request(request_ptr & req);
+    void add_request(request_ptr& req);
+    bool cancel_request(request_ptr& req);
     ~request_queue_impl_1q();
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_REQUEST_QUEUE_IMPL_1Q_HEADER
 // vim: et:ts=4:sw=4

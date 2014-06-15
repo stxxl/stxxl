@@ -12,40 +12,33 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SIMDISK_FILE_HEADER
-#define STXXL_SIMDISK_FILE_HEADER
+#ifndef STXXL_IO_SIMDISK_FILE_HEADER
+#define STXXL_IO_SIMDISK_FILE_HEADER
+
+#include <stxxl/bits/config.h>
 
 #ifndef STXXL_HAVE_SIMDISK_FILE
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
-#ifndef BOOST_MSVC
-// mmap call does not exist in Windows
- #define STXXL_HAVE_SIMDISK_FILE 1
-#else
- #define STXXL_HAVE_SIMDISK_FILE 0
-#endif
+// use mmap call
+#define STXXL_HAVE_SIMDISK_FILE STXXL_HAVE_MMAP_FILE
 #endif
 
 #if STXXL_HAVE_SIMDISK_FILE
 
 #include <set>
 #include <cmath>
-#include <sys/mman.h>
 
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup fileimpl
+//! \weakgroup fileimpl
 //! \{
 
  #define AVERAGE_SPEED (15 * 1024 * 1024)
 
-class DiskGeometry : private noncopyable
+class simdisk_geometry : private noncopyable
 {
     struct Zone
     {
@@ -80,7 +73,7 @@ class DiskGeometry : private noncopyable
     };
     struct ZoneCmp
     {
-        inline bool operator () (const Zone & a, const Zone & b) const
+        inline bool operator () (const Zone& a, const Zone& b) const
         {
             return a.first_sector < b.first_sector;
         }
@@ -98,50 +91,51 @@ protected:
     double interface_speed;             // in byte/s
     std::set<Zone, ZoneCmp> zones;
 
-    void add_zone(int & first_cyl, int last_cyl,
-                  int sec_per_track, int & first_sect);
+    void add_zone(int& first_cyl, int last_cyl,
+                  int sec_per_track, int& first_sect);
 
 public:
-    inline DiskGeometry()
+    inline simdisk_geometry()
     { }
     double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
 
-    inline ~DiskGeometry()
+    inline ~simdisk_geometry()
     { }
 };
 
 
-class IC35L080AVVA07 : public DiskGeometry              // IBM series 120GXP
+class IC35L080AVVA07 : public simdisk_geometry              // IBM series 120GXP
 {
 public:
     IC35L080AVVA07();
 };
 
-//! \brief Implementation of disk emulation
+//! Implementation of disk emulation.
 //! \remark It is emulation of IBM IC35L080AVVA07 disk's timings
 class sim_disk_file : public ufs_file_base, public disk_queued_file, public IC35L080AVVA07
 {
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! \param filename path of file
     //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) identifier
-    inline sim_disk_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
+    //! \param queue_id disk queue identifier
+    //! \param allocator_id linked disk_allocator
+    inline sim_disk_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     {
         std::cout << "Please, make sure that '" << filename <<
-        "' is resided on swap memory partition!" <<
-        std::endl;
+            "' is resided on swap memory partition!" <<
+            std::endl;
     }
-    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif  // #if STXXL_HAVE_SIMDISK_FILE
+#endif // #if STXXL_HAVE_SIMDISK_FILE
 
-#endif  // !STXXL_SIMDISK_FILE_HEADER
+#endif // !STXXL_IO_SIMDISK_FILE_HEADER

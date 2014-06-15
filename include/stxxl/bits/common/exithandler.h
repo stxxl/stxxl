@@ -10,13 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_EXITHANDLER_HEADER
-#define STXXL_EXITHANDLER_HEADER
+#ifndef STXXL_COMMON_EXITHANDLER_HEADER
+#define STXXL_COMMON_EXITHANDLER_HEADER
 
 #include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 // There are several possibilities for the exit handlers.
 // To use the default implementation (which uses atexit()), nothing special has to be done.
@@ -30,7 +30,7 @@ __STXXL_BEGIN_NAMESPACE
 int register_exit_handler(void (* function)(void));
 void run_exit_handlers();
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_EXITHANDLER_HEADER
+#endif // !STXXL_COMMON_EXITHANDLER_HEADER
 // vim: et:ts=4:sw=4

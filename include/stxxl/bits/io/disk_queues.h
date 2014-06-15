@@ -20,28 +20,26 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/aio_queue.h>
 #include <stxxl/bits/io/aio_request.h>
 #include <stxxl/bits/io/serving_request.h>
 
 
-
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
 
-class request_ptr;
-
-//! \brief Encapsulates disk queues
+//! Encapsulates disk queues.
 //! \remark is a singleton
 class disk_queues : public singleton<disk_queues>
 {
     friend class singleton<disk_queues>;
 
     typedef stxxl::int64 DISKID;
-    typedef std::map<DISKID, request_queue *> request_queue_map;
+    typedef std::map<DISKID, request_queue*> request_queue_map;
 
 protected:
     request_queue_map queues;
@@ -51,38 +49,39 @@ protected:
     }
 
 public:
-    void add_request(request_ptr & req, DISKID disk)
+    void add_request(request_ptr& req, DISKID disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;
 #endif
         request_queue_map::iterator qi = queues.find(disk);
-        request_queue * q;
+        request_queue* q;
         if (qi == queues.end())
         {
             // create new request queue
 #if STXXL_HAVE_AIO_FILE
             if (dynamic_cast<aio_request*>(req.get()))
-	            q = queues[disk] = new aio_queue(dynamic_cast<aio_file*>(req->get_file())->get_desired_queue_length());
+                q = queues[disk] = new aio_queue(dynamic_cast<aio_file*>(req->get_file())->get_desired_queue_length());
             else
 #endif
-	            q = queues[disk] = new request_queue_impl_qwqr();
+            q = queues[disk] = new request_queue_impl_qwqr();
         }
         else
             q = qi->second;
 
 #if STXXL_HAVE_AIO_FILE
         if (!(
-            (dynamic_cast<aio_request*>(req.get()) && dynamic_cast<aio_queue*>(q)) ||
-            (dynamic_cast<serving_request*>(req.get()) && dynamic_cast<request_queue*>(q))))
+                (dynamic_cast<aio_request*>(req.get()) && dynamic_cast<aio_queue*>(q)) ||
+                (dynamic_cast<serving_request*>(req.get()) && dynamic_cast<request_queue*>(q))))
         {
-            STXXL_THROW2(io_error, "Tried to add request to incompatible queue.");
+            STXXL_THROW2(io_error, "disk_queues::add_request",
+                         "Tried to add request to incompatible queue.");
         }
 #endif
         q->add_request(req);
     }
 
-    //! \brief Cancel a request
+    //! Cancel a request.
     //! The specified request is canceled unless already being processed.
     //! However, cancelation cannot be guaranteed.
     //! Cancelled requests must still be waited for in order to ensure correct
@@ -90,7 +89,7 @@ public:
     //! \param req request to cancel
     //! \param disk disk number for disk that \c req was scheduled on
     //! \return \c true iff the request was canceled successfully
-    bool cancel_request(request_ptr & req, DISKID disk)
+    bool cancel_request(request_ptr& req, DISKID disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;
@@ -116,7 +115,7 @@ public:
             delete (*i).second;
     }
 
-    //! \brief Changes requests priorities
+    //! Changes requests priorities.
     //! \param op one of:
     //!                 - READ, read requests are served before write requests within a disk queue
     //!                 - WRITE, write requests are served before read requests within a disk queue
@@ -130,7 +129,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_DISK_QUEUES_HEADER
 // vim: et:ts=4:sw=4

@@ -18,16 +18,16 @@
 #if STXXL_HAVE_AIO_FILE
 
 #include <linux/aio_abi.h>
-#include <stxxl/bits/io/request_with_waiters.h>
+#include <stxxl/bits/io/request_with_state.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
 
 //! \brief Request for an aio_file.
-class aio_request : public request_with_waiters
+class aio_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;
@@ -39,15 +39,15 @@ class aio_request : public request_with_waiters
 
 public:
     aio_request(
-        const completion_handler & on_cmpl,
-        file * f,
-        void * buf,
+        const completion_handler& on_cmpl,
+        file* f,
+        void* buf,
         offset_type off,
         size_type b,
         request_type t) :
-        request_with_waiters(on_cmpl, f, buf, off, b, t)
+        request_with_state(on_cmpl, f, buf, off, b, t)
     {
-        assert(dynamic_cast<aio_file *>(f));
+        assert(dynamic_cast<aio_file*>(f));
     }
 
     bool post();
@@ -59,7 +59,7 @@ public:
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
 #endif // #if STXXL_HAVE_AIO_FILE
 

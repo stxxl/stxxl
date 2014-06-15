@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_ALIGNED_ALLOC
-#define STXXL_ALIGNED_ALLOC
+#ifndef STXXL_COMMON_ALIGNED_ALLOC_HEADER
+#define STXXL_COMMON_ALIGNED_ALLOC_HEADER
 
 #include <cstdlib>
 #include <cassert>
@@ -24,7 +24,7 @@
 #define STXXL_VERBOSE_ALIGNED_ALLOC STXXL_VERBOSE2
 #endif
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 template <typename must_be_int>
 struct aligned_alloc_settings {
@@ -55,8 +55,8 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     // preserve the old memory area when shrinking, so out-of-bounds
     // accesses can't be detected easily.
     // Overhead: about ALIGNMENT bytes.
-    size_t alloc_size = ALIGNMENT + sizeof(char *) + meta_info_size + size;
-    char * buffer = (char *)std::malloc(alloc_size);
+    size_t alloc_size = ALIGNMENT + sizeof(char*) + meta_info_size + size;
+    char* buffer = (char*)std::malloc(alloc_size);
 #else
     // More space consuming and memory fragmenting variant using
     // posix_memalign() instead of malloc()/realloc(). Ensures that the end
@@ -66,9 +66,9 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     // valgrind. Usually produces an extra memory fragment of about
     // ALIGNMENT bytes.
     // Overhead: about 2 * ALIGNMENT bytes.
-    size_t alloc_size = ALIGNMENT * div_ceil(sizeof(char *) + meta_info_size, ALIGNMENT) + size;
-    char * buffer;
-    if (posix_memalign((void **)&buffer, ALIGNMENT, alloc_size) != 0)
+    size_t alloc_size = ALIGNMENT * div_ceil(sizeof(char*) + meta_info_size, ALIGNMENT) + size;
+    char* buffer;
+    if (posix_memalign((void**)&buffer, ALIGNMENT, alloc_size) != 0)
         throw std::bad_alloc();
 #endif
     if (buffer == NULL)
@@ -76,17 +76,20 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     #ifdef STXXL_ALIGNED_CALLOC
     memset(buffer, 0, alloc_size);
     #endif
-    char * reserve_buffer = buffer + sizeof(char *) + meta_info_size;
-    char * result = reserve_buffer + ALIGNMENT -
-                    (((unsigned long)reserve_buffer) % (ALIGNMENT)) - meta_info_size;
-    STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">() address " << (void *)result << " lost " << (result - buffer) << " bytes");
-    assert(long(result - buffer) >= long(sizeof(char *)));
+    char* reserve_buffer = buffer + sizeof(char*) + meta_info_size;
+    char* result = reserve_buffer + ALIGNMENT -
+                   (((unsigned_type)reserve_buffer) % (ALIGNMENT)) - meta_info_size;
+    STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">() address " << (void*)result << " lost " << (result - buffer) << " bytes");
+    //-tb: check that there is space for one char* before the "result" pointer
+    // delivered to the user. this char* is set below to the beginning of the
+    // allocated area.
+    assert(long(result - buffer) >= long(sizeof(char*)));
 
     // free unused memory behind the data area
     // so access behind the requested size can be recognized
     size_t realloc_size = (result - buffer) + meta_info_size + size;
     if (realloc_size < alloc_size && aligned_alloc_settings<int>::may_use_realloc) {
-        char * realloced = (char *)std::realloc(buffer, realloc_size);
+        char* realloced = (char*)std::realloc(buffer, realloc_size);
         if (buffer != realloced) {
             // hmm, realloc does move the memory block around while shrinking,
             // might run under valgrind, so disable realloc and retry
@@ -98,27 +101,27 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
         assert(result + size <= buffer + realloc_size);
     }
 
-    *(((char **)result) - 1) = buffer;
-    STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), allocated at " << (void *)buffer << " returning " << (void *)result);
+    *(((char**)result) - 1) = buffer;
+    STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), allocated at " << (void*)buffer << " returning " << (void*)result);
     STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_alloc<" << ALIGNMENT <<
                                 ">(size = " << size << ", meta info size = " << meta_info_size <<
-                                ") => buffer = " << (void *)buffer << ", ptr = " << (void *)result);
+                                ") => buffer = " << (void*)buffer << ", ptr = " << (void*)result);
 
     return result;
 }
 
 template <size_t ALIGNMENT>
 inline void
-aligned_dealloc(void * ptr)
+aligned_dealloc(void* ptr)
 {
     if (!ptr)
         return;
-    char * buffer = *(((char **)ptr) - 1);
-    STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_dealloc<" << ALIGNMENT << ">(), ptr = " << ptr << ", buffer = " << (void *)buffer);
+    char* buffer = *(((char**)ptr) - 1);
+    STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_dealloc<" << ALIGNMENT << ">(), ptr = " << ptr << ", buffer = " << (void*)buffer);
     std::free(buffer);
 }
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_ALIGNED_ALLOC
+#endif // !STXXL_COMMON_ALIGNED_ALLOC_HEADER
 // vim: et:ts=4:sw=4

@@ -11,30 +11,31 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_WITH_WAITERS_H_
-#define STXXL_IO__REQUEST_WITH_WAITERS_H_
+#ifndef STXXL_IO_REQUEST_WITH_WAITERS_HEADER
+#define STXXL_IO_REQUEST_WITH_WAITERS_HEADER
 
 #include <set>
 
 #include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/request_with_state.h>
+#include <stxxl/bits/common/onoff_switch.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/namespace.h>
 
 
-__STXXL_BEGIN_NAMESPACE
+STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Request that is aware of threads waiting for it to complete.
-class request_with_waiters : public request_with_state
+//! Request that is aware of threads waiting for it to complete.
+class request_with_waiters : public request
 {
     mutex waiters_mutex;
-    std::set<onoff_switch *> waiters;
+    std::set<onoff_switch*> waiters;
 
 protected:
-    bool add_waiter(onoff_switch * sw);
-    void delete_waiter(onoff_switch * sw);
+    bool add_waiter(onoff_switch* sw);
+    void delete_waiter(onoff_switch* sw);
     void notify_waiters();
     /*
     int nwaiters();             // returns number of waiters
@@ -42,20 +43,19 @@ protected:
 
 public:
     request_with_waiters(
-        const completion_handler & on_cmpl,
-        file * f,
-        void * buf,
+        const completion_handler& on_cmpl,
+        file* f,
+        void* buf,
         offset_type off,
         size_type b,
-        request_type t) :
-        request_with_state(on_cmpl, f, buf, off, b, t)
+        request_type t)
+        : request(on_cmpl, f, buf, off, b, t)
     { }
-
 };
 
 //! \}
 
-__STXXL_END_NAMESPACE
+STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_WITH_WAITERS_H_
+#endif // !STXXL_IO_REQUEST_WITH_WAITERS_HEADER
 // vim: et:ts=4:sw=4
