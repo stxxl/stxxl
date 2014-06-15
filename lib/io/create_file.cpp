@@ -99,24 +99,43 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         result->lock();
         return result;
     }
-#if STXXL_HAVE_AIO_FILE && TODO
-    //aio can have the desired queue length immediately appended to "aio", e.g. "aio(5)"
-    else if (cfg.io_impl.find("aio") == 0)
+#if STXXL_HAVE_AIO_FILE
+    // aio can have the desired queue length immediately appended to "aio", e.g. "aio(5)"
+    else if (cfg.io_impl == "aio")
     {
-        int desired_queue_length = 0;
+        ufs_file_base* result =
+            new aio_file(cfg.path, mode, cfg.queue, disk_allocator_id, cfg.queue_length);
 
-        size_t opening = io_impl[3] == '(' ? 3 : std::string::npos, closing = io_impl.find_first_of(')');
-        if (opening != std::string::npos && closing != std::string::npos && opening + 1 < closing)
+        result->lock();
+
+        // if marked as device but file is not -> throw!
+        if (cfg.raw_device && !result->is_device())
         {
-            std::istringstream input(io_impl.substr(opening + 1, closing - opening - 1));
-            input >> desired_queue_length;
+            delete result;
+            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be raw block device, but it is a normal file!");
         }
 
-        result = new aio_file(filename, options, physical_device_id, allocator_id, desired_queue_length);
+        // if is raw_device -> get size and remove some flags.
+        if (result->is_device())
+        {
+            // if device
+            cfg.raw_device = true;
+            cfg.size = result->size();
+            cfg.autogrow = cfg.delete_on_exit = cfg.unlink_on_open = false;
+        }
+
+        if (cfg.unlink_on_open)
+            result->unlink();
+
+        return result;
     }
-    else if (io_impl.find("fileperblock_aio") == 0)
+    else if (cfg.io_impl == "fileperblock_aio")
     {
-        result = new fileperblock_file<aio_file>(filename, options, physical_device_id, allocator_id); //default queue length, does not matter anyway
+        // default queue length, does not matter anyway
+        fileperblock_file<aio_file>* result =
+            new fileperblock_file<aio_file>(cfg.path, mode, cfg.queue, disk_allocator_id);
+        result->lock();
+        return result;
     }
 #endif
 #if STXXL_HAVE_MMAP_FILE

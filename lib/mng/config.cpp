@@ -195,7 +195,8 @@ disk_config::disk_config()
       flash(false),
       queue(file::DEFAULT_QUEUE),
       raw_device(false),
-      unlink_on_open(false)
+      unlink_on_open(false),
+      queue_length(0)
 { }
 
 disk_config::disk_config(const std::string& _path, uint64 _size,
@@ -209,7 +210,8 @@ disk_config::disk_config(const std::string& _path, uint64 _size,
       flash(false),
       queue(file::DEFAULT_QUEUE),
       raw_device(false),
-      unlink_on_open(false)
+      unlink_on_open(false),
+      queue_length(0)
 {
     parse_fileio();
 }
@@ -222,7 +224,8 @@ disk_config::disk_config(const std::string& line)
       flash(false),
       queue(file::DEFAULT_QUEUE),
       raw_device(false),
-      unlink_on_open(false)
+      unlink_on_open(false),
+      queue_length(0)
 {
     parse_line(line);
 }
@@ -364,7 +367,9 @@ void disk_config::parse_fileio()
         }
         else if (*p == "unlink" || *p == "unlink_on_open")
         {
-            if (!(io_impl == "syscall" || io_impl == "mmap") || io_impl == "wbtl") {
+            if (!(io_impl == "syscall" || io_impl == "aio" ||
+                  io_impl == "mmap" || io_impl == "wbtl"))
+            {
                 STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
             }
 
@@ -411,6 +416,9 @@ std::string disk_config::fileio_string() const
 
     if (unlink_on_open)
         oss << " unlink_on_open";
+
+    if (queue_length != 0)
+        oss << " queue_length=" << queue_length;
 
     return oss.str();
 }
