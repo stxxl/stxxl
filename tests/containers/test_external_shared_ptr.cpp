@@ -79,117 +79,106 @@ void test_const_iterator(const my_vec_type& x)
 
 void test_vector()
 {
-    try
+    // use non-randomized striping to avoid side effects on random generator
+    typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2* 1024* 1024), stxxl::striping>::result vector_type;
+    vector_type v(64 * 1024 * 1024 / sizeof(element));
+
+    // test assignment const_iterator = iterator
+    vector_type::const_iterator c_it = v.begin();
+    STXXL_UNUSED(c_it);
+
+    test_const_iterator(v);
+
+    stxxl::random_number32 rnd;
+    int offset = rnd();
+
+    STXXL_MSG("write " << v.size() << " elements");
+
+    stxxl::ran32State = 0xdeadbeef;
+    vector_type::size_type i;
+
+    // fill the vector with increasing sequence of integer numbers
+    for (i = 0; i < v.size(); ++i)
     {
-        // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2* 1024* 1024), stxxl::striping>::result vector_type;
-        vector_type v(64 * 1024 * 1024 / sizeof(element));
+        actual_element_ptr aep(boost::make_shared<actual_element>());
+        aep->key = i + offset;
+        element e(aep);
 
-        // test assignment const_iterator = iterator
-        vector_type::const_iterator c_it = v.begin();
-        STXXL_UNUSED(c_it);
+        v[i] = e;
 
-        test_const_iterator(v);
-
-        stxxl::random_number32 rnd;
-        int offset = rnd();
-
-        STXXL_MSG("write " << v.size() << " elements");
-
-        stxxl::ran32State = 0xdeadbeef;
-        vector_type::size_type i;
-
-        // fill the vector with increasing sequence of integer numbers
-        for (i = 0; i < v.size(); ++i)
-        {
-            actual_element_ptr aep(boost::make_shared<actual_element>());
-            aep->key = i + offset;
-            element e(aep);
-
-            v[i] = e;
-
-            STXXL_CHECK(v[i].get()->key == stxxl::int64(i + offset));
-        }
-
-        // fill the vector with random numbers
-        for (i = 0; i < v.size(); ++i)
-        {
-            actual_element_ptr aep(boost::make_shared<actual_element>());
-            aep->key = rnd();
-            element e(aep);
-
-            v[i].unwrap();
-            v[i] = e;
-
-            STXXL_CHECK(v[i].get()->key == aep->key);
-        }
-        v.flush();
-
-        STXXL_MSG("seq read of " << v.size() << " elements");
-
-        stxxl::ran32State = 0xdeadbeef;
-
-        // testing swap
-        vector_type a;
-        std::swap(v, a);
-        std::swap(v, a);
-
-        for (i = 0; i < v.size(); i++)
-            STXXL_CHECK(v[i].get()->key == rnd());
-
-        // check again
-        STXXL_MSG("clear");
-
-        for (vector_type::iterator it = v.begin(); it != v.end(); ++it)
-            it->unwrap();
-
-        v.clear();
-
-        stxxl::ran32State = 0xdeadbeef + 10;
-
-        v.resize(64 * 1024 * 1024 / sizeof(element));
-
-        STXXL_MSG("write " << v.size() << " elements");
-        for (i = 0; i < v.size(); ++i)
-        {
-            actual_element_ptr aep(boost::make_shared<actual_element>());
-            aep->key = rnd();
-            element e(aep);
-
-            v[i] = e;
-
-            STXXL_CHECK(v[i].get()->key == aep->key);
-        }
-
-        stxxl::ran32State = 0xdeadbeef + 10;
-
-        STXXL_MSG("seq read of " << v.size() << " elements");
-
-        for (i = 0; i < v.size(); i++)
-            STXXL_CHECK(v[i].get()->key == rnd());
-
-        STXXL_MSG("copy vector of " << v.size() << " elements");
-
-        vector_type v_copy0(v);
-        STXXL_CHECK(v == v_copy0);
-
-        vector_type v_copy1;
-        v_copy1 = v;
-        STXXL_CHECK(v == v_copy1);
-
-        while (v.size() != 0) {
-            element e = v.back();
-            v.pop_back();
-            e.unwrap();
-        }
+        STXXL_CHECK(v[i].get()->key == stxxl::int64(i + offset));
     }
-    catch (const std::exception& ex)
+
+    // fill the vector with random numbers
+    for (i = 0; i < v.size(); ++i)
     {
-        STXXL_MSG("Caught exception: " << ex.what());
+        actual_element_ptr aep(boost::make_shared<actual_element>());
+        aep->key = rnd();
+        element e(aep);
+
+        v[i].unwrap();
+        v[i] = e;
+
+        STXXL_CHECK(v[i].get()->key == aep->key);
     }
-    catch (...)
+    v.flush();
+
+    STXXL_MSG("seq read of " << v.size() << " elements");
+
+    stxxl::ran32State = 0xdeadbeef;
+
+    // testing swap
+    vector_type a;
+    std::swap(v, a);
+    std::swap(v, a);
+
+    for (i = 0; i < v.size(); i++)
+        STXXL_CHECK(v[i].get()->key == rnd());
+
+    // check again
+    STXXL_MSG("clear");
+
+    for (vector_type::iterator it = v.begin(); it != v.end(); ++it)
+        it->unwrap();
+
+    v.clear();
+
+    stxxl::ran32State = 0xdeadbeef + 10;
+
+    v.resize(64 * 1024 * 1024 / sizeof(element));
+
+    STXXL_MSG("write " << v.size() << " elements");
+    for (i = 0; i < v.size(); ++i)
     {
-        STXXL_MSG("Caught unknown exception.");
+        actual_element_ptr aep(boost::make_shared<actual_element>());
+        aep->key = rnd();
+        element e(aep);
+
+        v[i] = e;
+
+        STXXL_CHECK(v[i].get()->key == aep->key);
+    }
+
+    stxxl::ran32State = 0xdeadbeef + 10;
+
+    STXXL_MSG("seq read of " << v.size() << " elements");
+
+    for (i = 0; i < v.size(); i++)
+        STXXL_CHECK(v[i].get()->key == rnd());
+
+    STXXL_MSG("copy vector of " << v.size() << " elements");
+
+    vector_type v_copy0(v);
+    STXXL_CHECK(v == v_copy0);
+
+    vector_type v_copy1;
+    v_copy1 = v;
+    STXXL_CHECK(v == v_copy1);
+
+    while (v.size() != 0) {
+        element e = v.back();
+        v.pop_back();
+        e.unwrap();
     }
 }
 
