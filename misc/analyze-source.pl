@@ -201,7 +201,7 @@ sub process_cpp {
                 splice(@uncrust, $i+1, 0, "\n");
                 ++$namespace;
             }
-            if ($uncrust[$i] =~ m!^} // namespace!) {
+            if ($uncrust[$i] =~ m!^} +// namespace!) {
                 splice(@uncrust, $i, 0, "\n"); ++$i;
                 --$namespace;
             }

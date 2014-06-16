@@ -1,39 +1,44 @@
-#ifndef _STXXL_UNORDERED_MAP_H_
-#define _STXXL_UNORDERED_MAP_H_
-
 /***************************************************************************
- *            unordered_map.h
+ *  include/stxxl/bits/containers/unordered_map.h
  *
- *  Copyright  2008  Markus Westphal
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2008 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+#ifndef STXXL_CONTAINERS_UNORDERED_MAP_HEADER
+#define STXXL_CONTAINERS_UNORDERED_MAP_HEADER
 
 #include "stxxl/bits/noncopyable.h"
 #include "stxxl/bits/containers/hash_map/hash_map.h"
 
-
 STXXL_BEGIN_NAMESPACE
 
-namespace hash_map
-{
-    template <
-        class KeyType,
-        class DataType,
-        class HashType,
-        class CompareType,
-        unsigned SubBlkSize,
-        unsigned BlkSize,
-        class Alloc
-        >
-    class hash_map;
-}
-
+namespace hash_map {
 
 template <
     class KeyType,
     class DataType,
     class HashType,
     class CompareType,
-    unsigned SubBlkSize = 8 *1024,                                              // subblock raw size; 8k default
+    unsigned SubBlkSize,
+    unsigned BlkSize,
+    class Alloc
+    >
+class hash_map;
+
+} // namespace hash_map
+
+template <
+    class KeyType,
+    class DataType,
+    class HashType,
+    class CompareType,
+    unsigned SubBlkSize = 8*1024,                                               // subblock raw size; 8k default
     unsigned BlkSize = 256,                                                     // block size as number of subblocks; default 256*8KB = 2MB
     class Alloc = std::allocator<std::pair<const KeyType, DataType> >           // allocator for internal-memory buffer
     >
@@ -74,10 +79,10 @@ public:
     //! \param buffer_size size of internal-memory buffer in bytes
     //! \param a allocation-strategory for internal-memory buffer
     unordered_map(size_type n = 10000,
-                  const hasher & hf = hasher(),
-                  const key_compare & cmp = key_compare(),
-                  size_type buffer_size = 100 *1024 *1024,
-                  const Alloc & a = Alloc()
+                  const hasher& hf = hasher(),
+                  const key_compare& cmp = key_compare(),
+                  size_type buffer_size = 100*1024*1024,
+                  const Alloc& a = Alloc()
                   ) : Impl(n, hf, cmp, buffer_size, a)
     { }
 
@@ -93,15 +98,15 @@ public:
     template <class InputIterator>
     unordered_map(InputIterator f,
                   InputIterator l,
-                  size_type mem = 256 *1024 *1024,
-                  const hasher & hf = hasher(),
-                  const key_compare & cmp = key_compare(),
-                  size_type buffer_size = 100 *1024 *1024,
-                  const Alloc & a = Alloc()
+                  size_type mem = 256*1024*1024,
+                  const hasher& hf = hasher(),
+                  const key_compare& cmp = key_compare(),
+                  size_type buffer_size = 100*1024*1024,
+                  const Alloc& a = Alloc()
                   ) : Impl(f, l, mem, hf, cmp, buffer_size, a)
     { }
 
-    void swap(unordered_map & obj)
+    void swap(unordered_map& obj)
     {
         std::swap(Impl, obj.Impl);
     }
@@ -140,11 +145,11 @@ public:
     }
 
     // modifiers (insert)
-    std::pair<iterator, bool> insert(const value_type & obj)
+    std::pair<iterator, bool> insert(const value_type& obj)
     {
         return Impl.insert(obj);
     }
-    iterator insert_oblivious(const value_type & obj)
+    iterator insert_oblivious(const value_type& obj)
     {
         return Impl.insert_oblivious(obj);
     }
@@ -159,11 +164,11 @@ public:
     {
         Impl.erase(position);
     }
-    size_type erase(const key_type & key)
+    size_type erase(const key_type& key)
     {
         return Impl.erase(key);
     }
-    void erase_oblivious(const key_type & key)
+    void erase_oblivious(const key_type& key)
     {
         Impl.erase_oblivious(key);
     }
@@ -173,27 +178,27 @@ public:
     }
 
     // lookup (check)
-    iterator find(const key_type & key)
+    iterator find(const key_type& key)
     {
         return Impl.find(key);
     }
-    const_iterator find(const key_type & key) const
+    const_iterator find(const key_type& key) const
     {
         return Impl.find(key);
     }
-    size_type count(const key_type & key) const
+    size_type count(const key_type& key) const
     {
         return Impl.count(key);
     }
-    std::pair<iterator, iterator> equal_range(const key_type & key)
+    std::pair<iterator, iterator> equal_range(const key_type& key)
     {
         return Impl.equal_range(key);
     }
-    std::pair<const_iterator, const_iterator> equal_range(const key_type & key) const
+    std::pair<const_iterator, const_iterator> equal_range(const key_type& key) const
     {
         return Impl.equal_range(key);
     }
-    mapped_type & operator [] (const key_type & key)
+    mapped_type& operator [] (const key_type& key)
     {
         return Impl[key];
     }
@@ -217,7 +222,7 @@ public:
     {
         return Impl.max_bucket_count();
     }
-    size_type bucket(const key_type & k) const
+    size_type bucket(const key_type& k) const
     {
         return Impl.bucket(k);
     }
@@ -259,11 +264,11 @@ public:
     {
         Impl.reset_statistics();
     }
-    void print_statistics(std::ostream & o = std::cout) const
+    void print_statistics(std::ostream& o = std::cout) const
     {
         Impl.print_statistics(o);
     }
-    void print_load_statistics(std::ostream & o = std::cout) const
+    void print_load_statistics(std::ostream& o = std::cout) const
     {
         Impl.print_load_statistics(o);
     }
@@ -272,23 +277,24 @@ public:
 
 STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+
+template <
+    class KeyType,
+    class DataType,
+    class HashType,
+    class CompareType,
+    unsigned SubBlkSize,
+    unsigned BlkSize,
+    class Alloc
+    >
+void swap(stxxl::unordered_map<KeyType, DataType, HashType, CompareType, SubBlkSize, BlkSize, Alloc>& a,
+          stxxl::unordered_map<KeyType, DataType, HashType, CompareType, SubBlkSize, BlkSize, Alloc>& b
+          )
 {
-    template <
-        class KeyType,
-        class DataType,
-        class HashType,
-        class CompareType,
-        unsigned SubBlkSize,
-        unsigned BlkSize,
-        class Alloc
-        >
-    void swap(stxxl::unordered_map<KeyType, DataType, HashType, CompareType, SubBlkSize, BlkSize, Alloc> & a,
-              stxxl::unordered_map<KeyType, DataType, HashType, CompareType, SubBlkSize, BlkSize, Alloc> & b
-              )
-    {
-        a.swap(b);
-    }
+    a.swap(b);
 }
 
-#endif
+} // namespace std
+
+#endif // !STXXL_CONTAINERS_UNORDERED_MAP_HEADER

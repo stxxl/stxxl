@@ -1,3 +1,15 @@
+/***************************************************************************
+ *  tests/containers/hash_map/test_hash_map.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #include <iostream>
 
 #include <stxxl.h>
@@ -6,9 +18,9 @@
 
 
 struct rand_pairs {
-    stxxl::random_number32 & rand_;
+    stxxl::random_number32& rand_;
 
-    rand_pairs(stxxl::random_number32 & rand) : rand_(rand)
+    rand_pairs(stxxl::random_number32& rand) : rand_(rand)
     { }
 
     std::pair<int, int> operator () ()
@@ -31,7 +43,7 @@ struct hash_int {
         return key;
     }
 
-    stxxl::uint64 hash(stxxl::uint64 key) const { return (*this)(key); }
+    stxxl::uint64 hash(stxxl::uint64 key) const { return (* this)(key); }
 };
 
 struct cmp : public std::less<int>{
@@ -49,7 +61,7 @@ void basic_test()
     const unsigned n_values = 50000;
     const unsigned n_tests = 1000;
 
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int *));   // make sure all changes will be buffered (*)
+    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));    // make sure all changes will be buffered (*)
 
     const unsigned mem_to_sort = 10 * 1024 * 1024;
 
@@ -63,7 +75,7 @@ void basic_test()
 
     unordered_map map;
     map.max_buffer_size(buffer_size);
-    const unordered_map & cmap = map;
+    const unordered_map& cmap = map;
 
 
     // generate random values
@@ -79,10 +91,10 @@ void basic_test()
 
     // --- initial import
     std::cout << "Initial import...";
-    assert(map.begin() == map.end());
+    STXXL_CHECK(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
-    assert(map.begin() != map.end());
-    assert(map.size() == n_values);
+    STXXL_CHECK(map.begin() != map.end());
+    STXXL_CHECK(map.size() == n_values);
     std::cout << "passed" << std::endl;
     // (*) all these values are stored in external memory; the remaining changes will be buffered in internal memory
 
@@ -94,14 +106,14 @@ void basic_test()
         map.insert_oblivious(values2[2 * i]);
         // new with checking
         std::pair<iterator, bool> res = map.insert(values2[2 * i + 1]);
-        assert(res.second && (*(res.first)).first == values2[2 * i + 1].first);
+        STXXL_CHECK(res.second && (*(res.first)).first == values2[2 * i + 1].first);
         // existing without checking
         map.insert_oblivious(values1[2 * i]);
         // exiting with checking
         res = map.insert(values1[2 * i + 1]);
-        assert(!res.second && (*(res.first)).first == values1[2 * i + 1].first);
+        STXXL_CHECK(!res.second && (*(res.first)).first == values1[2 * i + 1].first);
     }
-    assert(map.size() == 2 * n_values);
+    STXXL_CHECK(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
     // "old" values are stored in external memory, "new" values are stored in internal memory
 
@@ -111,9 +123,9 @@ void basic_test()
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
     for (unsigned i = 0; i < n_tests; i++) {
-        assert(cmap.find(values1[i].first) != cmap.end());
-        assert(cmap.find(values2[i].first) != cmap.end());
-        assert(cmap.find(values3[i].first) == cmap.end());
+        STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
+        STXXL_CHECK(cmap.find(values2[i].first) != cmap.end());
+        STXXL_CHECK(cmap.find(values3[i].first) == cmap.end());
     }
     std::cout << "passed" << std::endl;
 
@@ -131,13 +143,13 @@ void basic_test()
         map.insert_oblivious(value2);
     }
     // now check
-    assert(map.size() == 2 * n_values);         // nothing added, nothing removed
+    STXXL_CHECK(map.size() == 2 * n_values);         // nothing added, nothing removed
     for (unsigned i = 0; i < n_tests; i++) {
         const_iterator it1 = cmap.find(values1[i].first);
         const_iterator it2 = cmap.find(values2[i].first);
 
-        assert((*it1).second == values1[i].second + 1);
-        assert((*it2).second == values2[i].second + 1);
+        STXXL_CHECK((*it1).second == values1[i].second + 1);
+        STXXL_CHECK((*it2).second == values2[i].second + 1);
     }
     std::cout << "passed" << std::endl;
 
@@ -151,22 +163,22 @@ void basic_test()
         // existing without checking
         map.erase_oblivious(values1[2 * i].first);
         // existing with checking
-        assert(map.erase(values1[2 * i + 1].first) == 1);
+        STXXL_CHECK(map.erase(values1[2 * i + 1].first) == 1);
     }
     for (unsigned i = 0; i < n_tests / 2; i++) {        // internal
         // existing without checking
         map.erase_oblivious(values2[2 * i].first);
         // existing with checking
-        assert(map.erase(values2[2 * i + 1].first) == 1);
+        STXXL_CHECK(map.erase(values2[2 * i + 1].first) == 1);
         // non-existing without chekcing
         map.erase_oblivious(values3[i].first);
         // non-existing with checking
     }
-    assert(map.size() == 2 * n_values - 2 * n_tests);
+    STXXL_CHECK(map.size() == 2 * n_values - 2 * n_tests);
     std::cout << "passed" << std::endl;
 
     map.clear();
-    assert(map.size() == 0);
+    STXXL_CHECK(map.size() == 0);
 
 
     // --- find and manipulate values by []-operator
@@ -177,42 +189,42 @@ void basic_test()
         map.insert_oblivious(values1[i]);
     }
     // lookup of exsisting values
-    assert(map[values1[5].first] == values1[5].second);                               // external
-    assert(map[values1[n_values / 2 + 5].first] == values1[n_values / 2 + 5].second); // internal
+    STXXL_CHECK(map[values1[5].first] == values1[5].second);                               // external
+    STXXL_CHECK(map[values1[n_values / 2 + 5].first] == values1[n_values / 2 + 5].second); // internal
     // manipulate existing values
     ++(map[values1[7].first]);
     ++(map[values1[n_values / 2 + 7].first]);
     {
         const_iterator cit1 = cmap.find(values1[7].first);
-        assert((*cit1).second == (*cit1).first + 1);
+        STXXL_CHECK((*cit1).second == (*cit1).first + 1);
         const_iterator cit2 = cmap.find(values1[n_values / 2 + 7].first);
-        assert((*cit2).second == (*cit2).first + 1);
+        STXXL_CHECK((*cit2).second == (*cit2).first + 1);
     }
     // lookup of non-existing values
-    assert(map[values2[5].first] == unordered_map::mapped_type());
+    STXXL_CHECK(map[values2[5].first] == unordered_map::mapped_type());
     // assignment of non-existing values
     map[values2[7].first] = values2[7].second;
     {
         const_iterator cit = cmap.find(values2[7].first);
-        assert((*cit).first == values2[7].second);
+        STXXL_CHECK((*cit).first == values2[7].second);
     }
-    assert(map.size() == n_values + 2);
+    STXXL_CHECK(map.size() == n_values + 2);
     std::cout << "passed" << std::endl;
 
 
     map.clear();
-    assert(map.size() == 0);
+    STXXL_CHECK(map.size() == 0);
 
 
     // --- additional bulk insert test
     std::cout << "additional bulk-insert...";
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     map.insert(values1.begin() + n_values / 2, values1.end(), mem_to_sort);
-    assert(map.size() == n_values);
+    STXXL_CHECK(map.size() == n_values);
     // lookup some random values
     std::random_shuffle(values1.begin(), values1.end());
     for (unsigned i = 0; i < n_tests; i++)
-        assert(cmap.find(values1[i].first) != cmap.end());
+        STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
 
 

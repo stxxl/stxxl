@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_EXTERNAL_SHARED_PTR_H
-#define STXXL_EXTERNAL_SHARED_PTR_H
+#ifndef STXXL_UTILS_EXTERNAL_SHARED_PTR_HEADER
+#define STXXL_UTILS_EXTERNAL_SHARED_PTR_HEADER
 
 #include <stxxl/bits/namespace.h>
 
@@ -73,7 +73,7 @@ public:
          * Copy the pointer to internal storage and increment
          * the refcount (the destructor never gets called).
          */
-        new(data) P(ptr);
+        new (data)P(ptr);
     }
 
     void unwrap()
@@ -82,7 +82,7 @@ public:
          * Call the destructor to decrement the refcount. If this is
          * called more than once the results are undefined.
          */
-        P * p = reinterpret_cast<P *>((void *)data);
+        P* p = reinterpret_cast<P*>((void*)data);
         p->~P();
     }
 
@@ -91,14 +91,14 @@ public:
         /*
          * If this is called after unwrap() the behaviour is undefined
          */
-        P * p = reinterpret_cast<P *>((void *)data);
+        P* p = reinterpret_cast<P*>((void*)data);
         return *p;
     }
 
-    bool operator == (const external_shared_ptr & x) const
+    bool operator == (const external_shared_ptr& x) const
     {
-        P * p1 = reinterpret_cast<P *>((void *)data);
-        P * p2 = reinterpret_cast<P *>((void *)x.data);
+        P* p1 = reinterpret_cast<P*>((void*)data);
+        P* p2 = reinterpret_cast<P*>((void*)x.data);
 
         return *p1 == *p2;
     }
@@ -106,4 +106,4 @@ public:
 
 STXXL_END_NAMESPACE
 
-#endif // !STXXL_EXTERNAL_SHARED_PTR_H
+#endif // !STXXL_UTILS_EXTERNAL_SHARED_PTR_HEADER

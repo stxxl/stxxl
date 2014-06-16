@@ -1,14 +1,14 @@
 /***************************************************************************
- *  containers/test_external_shared_ptr.cpp
- *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
- *
- *  Copyright (C) 2011 Daniel Godas-Lopez <dgodas@gmail.com>
+ *  tests/containers/test_external_shared_ptr.cpp
  *
  *  This file has been derived from the following tests written
  *  by Roman Dementiev:
  *     - test_vector.cpp
  *     - test_map.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2011 Daniel Godas-Lopez <dgodas@gmail.com>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -27,13 +27,13 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 
-struct actual_element  // 24 bytes, not a power of 2 intentionally
+struct actual_element   // 24 bytes, not a power of 2 intentionally
 {
     stxxl::int64 key;
     stxxl::int64 load0;
     stxxl::int64 load1;
 
-    actual_element & operator = (stxxl::int64 i)
+    actual_element& operator = (stxxl::int64 i)
     {
         key = i;
         load0 = i + 42;
@@ -41,7 +41,7 @@ struct actual_element  // 24 bytes, not a power of 2 intentionally
         return *this;
     }
 
-    bool operator == (const actual_element & e2) const
+    bool operator == (const actual_element& e2) const
     {
         return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
     }
@@ -63,7 +63,7 @@ struct counter
 };
 
 template <class my_vec_type>
-void test_const_iterator(const my_vec_type & x)
+void test_const_iterator(const my_vec_type& x)
 {
     typename my_vec_type::const_iterator i = x.begin();
     i = x.end() - 1;
@@ -82,7 +82,7 @@ void test_vector()
     try
     {
         // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
+        typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2* 1024* 1024), stxxl::striping>::result vector_type;
         vector_type v(64 * 1024 * 1024 / sizeof(element));
 
         // test assignment const_iterator = iterator
@@ -108,7 +108,7 @@ void test_vector()
 
             v[i] = e;
 
-            assert(v[i].get()->key == stxxl::int64(i + offset));
+            STXXL_CHECK(v[i].get()->key == stxxl::int64(i + offset));
         }
 
         // fill the vector with random numbers
@@ -121,7 +121,7 @@ void test_vector()
             v[i].unwrap();
             v[i] = e;
 
-            assert(v[i].get()->key == aep->key);
+            STXXL_CHECK(v[i].get()->key == aep->key);
         }
         v.flush();
 
@@ -135,7 +135,7 @@ void test_vector()
         std::swap(v, a);
 
         for (i = 0; i < v.size(); i++)
-            assert(v[i].get()->key == rnd());
+            STXXL_CHECK(v[i].get()->key == rnd());
 
         // check again
         STXXL_MSG("clear");
@@ -158,7 +158,7 @@ void test_vector()
 
             v[i] = e;
 
-            assert(v[i].get()->key == aep->key);
+            STXXL_CHECK(v[i].get()->key == aep->key);
         }
 
         stxxl::ran32State = 0xdeadbeef + 10;
@@ -166,16 +166,16 @@ void test_vector()
         STXXL_MSG("seq read of " << v.size() << " elements");
 
         for (i = 0; i < v.size(); i++)
-            assert(v[i].get()->key == rnd());
+            STXXL_CHECK(v[i].get()->key == rnd());
 
         STXXL_MSG("copy vector of " << v.size() << " elements");
 
         vector_type v_copy0(v);
-        assert(v == v_copy0);
+        STXXL_CHECK(v == v_copy0);
 
         vector_type v_copy1;
         v_copy1 = v;
-        assert(v == v_copy1);
+        STXXL_CHECK(v == v_copy1);
 
         while (v.size() != 0) {
             element e = v.back();
@@ -183,7 +183,7 @@ void test_vector()
             e.unwrap();
         }
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         STXXL_MSG("Caught exception: " << ex.what());
     }
@@ -238,8 +238,8 @@ void test_map()
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
-        map_type * DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
-        map_type & Map = *DMap;
+        map_type* DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
+        map_type& Map = *DMap;
 
         for (unsigned i = 0; i < el; ++i)
         {
@@ -271,10 +271,10 @@ void test_map()
             data_type data = (*result).second;
             test_data_ptr tmp = data.get();
 
-            assert(tmp->a == (key + 1) % 256);
+            STXXL_CHECK(tmp->a == (key + 1) % 256);
             for (unsigned j = 0; j < 3; ++j)
-                assert(tmp->b[j] == (key + 2));
-            assert(tmp->c == (key + 3));
+                STXXL_CHECK(tmp->b[j] == (key + 2));
+            STXXL_CHECK(tmp->c == (key + 3));
         }
         stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_reads()) / logel;
