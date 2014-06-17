@@ -28,7 +28,7 @@ STXXL_BEGIN_NAMESPACE
 
 request_with_state::~request_with_state()
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request_with_state::~(), ref_cnt: " << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request_with_state::~(), ref_cnt: " << get_reference_count());
 
     assert(_state() == DONE || _state() == READY2DIE);
 

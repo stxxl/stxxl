@@ -150,7 +150,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
                 WriteLock.unlock();
 
-                //assert(req->nref() > 1);
+                //assert(req->get_reference_count()) > 1);
                 req->serve();
             }
             else
@@ -178,10 +178,10 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
                 ReadLock.unlock();
 
-                STXXL_VERBOSE2("queue: before serve request has " << req->nref() << " references ");
-                //assert(req->nref() > 1);
+                STXXL_VERBOSE2("queue: before serve request has " << req->get_reference_count() << " references ");
+                //assert(req->get_reference_count() > 1);
                 req->serve();
-                STXXL_VERBOSE2("queue: after serve request has " << req->nref() << " references ");
+                STXXL_VERBOSE2("queue: after serve request has " << req->get_reference_count() << " references ");
             }
             else
             {
