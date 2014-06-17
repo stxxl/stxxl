@@ -32,13 +32,13 @@ request::request(const completion_handler& on_compl,
     bytes(bytes_),
     type(type_)
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request::(...), ref_cnt=" << get_reference_count());
+    STXXL_VERBOSE3_THIS("request::(...), ref_cnt=" << get_reference_count());
     file_->add_request_ref();
 }
 
 request::~request()
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request::~(), ref_cnt=" << get_reference_count());
+    STXXL_VERBOSE3_THIS("request::~request(), ref_cnt=" << get_reference_count());
 }
 
 void request::check_alignment() const

@@ -28,7 +28,7 @@ STXXL_BEGIN_NAMESPACE
 
 request_with_state::~request_with_state()
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request_with_state::~(), ref_cnt: " << ref_cnt);
+    STXXL_VERBOSE3_THIS("request_with_state::~(), ref_cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 
@@ -41,7 +41,7 @@ request_with_state::~request_with_state()
 
 void request_with_state::wait(bool measure_time)
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request_with_state::wait()");
+    STXXL_VERBOSE3_THIS("request_with_state::wait()");
 
     stats::scoped_wait_timer wait_timer(get_type() == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
 
@@ -52,7 +52,7 @@ void request_with_state::wait(bool measure_time)
 
 bool request_with_state::cancel()
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request_with_state::cancel() " << file_ << " " << buffer << " " << offset);
+    STXXL_VERBOSE3_THIS("request_with_state::cancel() " << file_ << " " << buffer << " " << offset);
 
     if (file_)
     {
@@ -81,7 +81,7 @@ bool request_with_state::poll()
 
 void request_with_state::completed(bool canceled)
 {
-    STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] serving_request::completed()");
+    STXXL_VERBOSE3_THIS("request_with_state::completed()");
     _state.set_to(DONE);
     if (!canceled)
         on_complete(this);

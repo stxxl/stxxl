@@ -45,8 +45,8 @@ serving_request::serving_request(
 void serving_request::serve()
 {
     check_nref();
-    STXXL_VERBOSE2(
-        "[" << static_cast<void*>(this) << "] serving_request::serve(): " <<
+    STXXL_VERBOSE2_THIS(
+        "serving_request::serve(): " <<
         buffer << " @ [" <<
         file_ << "|" << file_->get_allocator_id() << "]0x" <<
         std::hex << std::setfill('0') << std::setw(8) <<
