@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2011 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -56,7 +57,7 @@ aio_queue::aio_queue(int desired_queue_length)
     }
 
     for (int e = 0; e < max_events; ++e)
-        num_free_events++;  //cannot set semaphore to value directly
+        num_free_events++;  // cannot set semaphore to value directly
 
     STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
 
@@ -96,33 +97,42 @@ bool aio_queue::cancel_request(request_ptr& req)
     queue_type::iterator pos;
     {
         scoped_mutex_lock lock(waiting_mtx);
-        if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req _STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
+
+        pos = std::find(waiting_requests.begin(), waiting_requests.end(),
+                        req _STXXL_FORCE_SEQUENTIAL);
+        if (pos != waiting_requests.end())
         {
             waiting_requests.erase(pos);
 
-            //polymorphic_downcast
-            dynamic_cast<aio_request*>(pos->get())->completed(false, true); //canceled, not yet posted
+            // polymorphic_downcast to aio_request,
+            // request is canceled, but was not yet posted.
+            dynamic_cast<aio_request*>(pos->get())->completed(false, true);
 
-            num_waiting_requests--;                                         // will never block
+            num_waiting_requests--; // will never block
             return true;
         }
     }
 
     scoped_mutex_lock lock(posted_mtx);
-    if ((pos = std::find(posted_requests.begin(), posted_requests.end(), req _STXXL_FORCE_SEQUENTIAL)) != posted_requests.end())
+
+    pos = std::find(posted_requests.begin(), posted_requests.end(),
+                    req _STXXL_FORCE_SEQUENTIAL);
+    if (pos != posted_requests.end())
     {
-        //polymorphic_downcast
+        // polymorphic_downcast to aio_request,
         bool canceled_io_operation = (dynamic_cast<aio_request*>(req.get()))->cancel_aio();
 
         if (canceled_io_operation)
         {
             posted_requests.erase(pos);
 
-            //polymorphic_downcast
-            dynamic_cast<aio_request*>(pos->get())->completed(true, true); //canceled, already posted
+            // polymorphic_downcast to aio_request,
+
+            // request is canceled, already posted
+            dynamic_cast<aio_request*>(pos->get())->completed(true, true);
 
             num_free_events++;
-            num_posted_requests--;                                         // will never block
+            num_posted_requests--; // will never block
             return true;
         }
     }
@@ -136,9 +146,10 @@ void aio_queue::post_requests()
     request_ptr req;
     io_event* events = new io_event[max_events];
 
-    for ( ; ; )
-    {                                                                // as long as thread is running
-        int num_currently_waiting_requests = num_waiting_requests--; // might block until next request or message comes in
+    for ( ; ; ) // as long as thread is running
+    {
+        // might block until next request or message comes in
+        int num_currently_waiting_requests = num_waiting_requests--;
 
         // terminate if termination has been requested
         if (post_thread_state() == TERMINATING && num_currently_waiting_requests == 0)
@@ -151,11 +162,14 @@ void aio_queue::post_requests()
             waiting_requests.pop_front();
             lock.unlock();
 
-            num_free_events--; //might block because too many requests are posted
+            num_free_events--; // might block because too many requests are posted
 
-            //polymorphic_downcast
+            // polymorphic_downcast
             while (!dynamic_cast<aio_request*>(req.get())->post())
-            {                  // post failed, so first handle events to make queues (more) empty, then try again
+            {
+                // post failed, so first handle events to make queues (more)
+                // empty, then try again.
+
                 // wait for at least one event to complete, no time limit
                 int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
                 if (num_events < 0) {
@@ -178,7 +192,8 @@ void aio_queue::post_requests()
         {
             lock.unlock();
 
-            num_waiting_requests++;  // num_waiting_requests-- was premature, compensate for that
+            // num_waiting_requests-- was premature, compensate for that
+            num_waiting_requests++;
         }
     }
 
@@ -194,7 +209,7 @@ void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
         r->get()->completed(canceled);
         delete r;              // release auto_ptr reference
         num_free_events++;
-        num_posted_requests--; //will never block
+        num_posted_requests--; // will never block
     }
 }
 
@@ -204,9 +219,10 @@ void aio_queue::wait_requests()
     request_ptr req;
     io_event* events = new io_event[max_events];
 
-    for ( ; ; )
-    {                                                              // as long as thread is running
-        int num_currently_posted_requests = num_posted_requests--; // might block until next request is posted or message comes in
+    for ( ; ; ) // as long as thread is running
+    {
+        // might block until next request is posted or message comes in
+        int num_currently_posted_requests = num_posted_requests--;
 
         // terminate if termination has been requested
         if (wait_thread_state() == TERMINATING && num_currently_posted_requests == 0)
@@ -219,7 +235,7 @@ void aio_queue::wait_requests()
                          "io_getevents() nr_events=" << max_events);
         }
 
-        num_posted_requests++;  // compensate for the one eaten prematurely above
+        num_posted_requests++; // compensate for the one eaten prematurely above
 
         handle_events(events, num_events, false);
     }

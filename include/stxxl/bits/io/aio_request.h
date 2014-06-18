@@ -20,6 +20,7 @@
 #include <linux/aio_abi.h>
 #include <stxxl/bits/io/request_with_state.h>
 
+#define STXXL_VERBOSE_AIO(msg) STXXL_VERBOSE2(msg)
 
 STXXL_BEGIN_NAMESPACE
 
@@ -32,22 +33,26 @@ class aio_request : public request_with_state
     template <class base_file_type>
     friend class fileperblock_file;
 
-    iocb cb;                             // control block
-    iocb * get_cb() { return &cb; }      // must be initialized by post
+    //! control block of async request
+    iocb cb;
 
     void fill_control_block();
 
 public:
     aio_request(
         const completion_handler& on_cmpl,
-        file* f,
-        void* buf,
-        offset_type off,
-        size_type b,
-        request_type t) :
-        request_with_state(on_cmpl, f, buf, off, b, t)
+        file* file,
+        void* buffer,
+        offset_type offset,
+        size_type bytes,
+        request_type type)
+        : request_with_state(on_cmpl, file, buffer, offset, bytes, type)
     {
-        assert(dynamic_cast<aio_file*>(f));
+        assert(dynamic_cast<aio_file*>(file));
+        STXXL_VERBOSE_AIO("aio_request[" << this << "] aio_request(" <<
+                          "file=" << file << " buffer=" << buffer <<
+                          " offset=" << offset << " bytes=" << bytes <<
+                          " type=" << type << ")");
     }
 
     bool post();
