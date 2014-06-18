@@ -19,7 +19,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 //! Request which serves an I/O by calling the synchronous routine of the file.

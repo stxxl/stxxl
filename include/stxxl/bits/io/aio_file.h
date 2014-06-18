@@ -41,14 +41,19 @@ private:
     aio_queue * get_queue() { return queue; }
 
 public:
-    //! \brief constructs file object
+    //! Constructs file object
     //! \param filename path of file
     //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) identifier
+    //! \param queue_id disk queue identifier
+    //! \param allocator_id linked disk_allocator
+    //! \param desired_queue_length queue length requested from kernel
     aio_file(
-        const std::string& filename,
-        int mode, int physical_device_id = DEFAULT_AIO_QUEUE, int allocator_id = NO_ALLOCATOR, int desired_queue_length = 0) :
-        ufs_file_base(filename, mode), disk_queued_file(physical_device_id, allocator_id), desired_queue_length(desired_queue_length)
+        const std::string& filename, int mode,
+        int queue_id = DEFAULT_AIO_QUEUE, int allocator_id = NO_ALLOCATOR,
+        int desired_queue_length = 0)
+        : ufs_file_base(filename, mode),
+          disk_queued_file(queue_id, allocator_id),
+          desired_queue_length(desired_queue_length)
     { }
 
     void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);

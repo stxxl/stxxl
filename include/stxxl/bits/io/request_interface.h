@@ -24,7 +24,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 class onoff_switch;

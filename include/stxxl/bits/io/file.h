@@ -43,6 +43,11 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
+//! \defgroup fileimpl File I/O Implementations
+//! Implementations of \c stxxl::file for various file access methods and
+//! operating systems.
+//! \{
+
 class completion_handler;
 
 //! Defines interface of file.
@@ -197,9 +202,11 @@ public:
     //! \}
 };
 
-//! \defgroup fileimpl File I/O Implementations
-//! Implementations of \c stxxl::file and \c stxxl::request
-//! for various file access methods
+//! \}
+
+//! \defgroup reqlayer I/O Requests and Queues
+//! Encapsulation of an I/O request, queues for requests and threads to process
+//! them.
 //! \{
 //! \}
 

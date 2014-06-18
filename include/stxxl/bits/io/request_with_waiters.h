@@ -24,7 +24,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup fileimpl
+//! \addtogroup reqlayer
 //! \{
 
 //! Request that is aware of threads waiting for it to complete.

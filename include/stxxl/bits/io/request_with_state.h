@@ -22,7 +22,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup fileimpl
+//! \addtogroup reqlayer
 //! \{
 
 //! Request with completion state.

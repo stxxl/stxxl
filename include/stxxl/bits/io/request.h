@@ -28,14 +28,14 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 #define BLOCK_ALIGN 4096
 
 class file;
 
-//! Request with basic properties like file and offset.
+//! Request object encapsulating basic properties like file and offset.
 class request : virtual public request_interface, public atomic_counted_object
 {
     friend class aio_queue;

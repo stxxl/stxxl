@@ -23,7 +23,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 //! \brief Request for an aio_file.

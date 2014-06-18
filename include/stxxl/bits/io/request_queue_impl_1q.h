@@ -23,7 +23,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 class request_queue_impl_1q : public request_queue_impl_worker
