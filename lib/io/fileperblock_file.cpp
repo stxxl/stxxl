@@ -162,8 +162,4 @@ template class fileperblock_file<wincall_file>;
 template class fileperblock_file<boostfd_file>;
 #endif
 
-#if STXXL_HAVE_AIO_FILE
-template class fileperblock_file<aio_file>;
-#endif
-
 STXXL_END_NAMESPACE

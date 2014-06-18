@@ -129,14 +129,6 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 
         return result;
     }
-    else if (cfg.io_impl == "fileperblock_aio")
-    {
-        // default queue length, does not matter anyway
-        fileperblock_file<aio_file>* result =
-            new fileperblock_file<aio_file>(cfg.path, mode, cfg.queue, disk_allocator_id);
-        result->lock();
-        return result;
-    }
 #endif
 #if STXXL_HAVE_MMAP_FILE
     else if (cfg.io_impl == "mmap")
