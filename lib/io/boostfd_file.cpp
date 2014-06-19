@@ -6,6 +6,7 @@
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
  *  Copyright (C) 2009, 2010 Johannes Singler <singler@kit.edu>
  *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -27,13 +28,14 @@
 STXXL_BEGIN_NAMESPACE
 
 
-void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
+                         request::request_type type) throw (io_error)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    scoped_mutex_lock fd_lock(m_fd_mutex);
 
     try
     {
-        file_des.seek(offset, BOOST_IOS::beg);
+        m_file_des.seek(offset, BOOST_IOS::beg);
     }
     catch (const std::exception& ex)
     {
@@ -54,7 +56,7 @@ void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes, requ
     {
         try
         {
-            std::streamsize rc = file_des.read((char*)buffer, bytes);
+            std::streamsize rc = m_file_des.read((char*)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
                 STXXL_THROW_ERRNO(io_error, " partial read: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
@@ -76,7 +78,7 @@ void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes, requ
     {
         try
         {
-            std::streamsize rc = file_des.write((char*)buffer, bytes);
+            std::streamsize rc = m_file_des.write((char*)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
                 STXXL_THROW_ERRNO(io_error, " partial write: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
@@ -160,37 +162,37 @@ boostfd_file::boostfd_file(
     }
 
 #if (BOOST_VERSION >= 104100)
-    file_des.open(filename, boostfd_mode);      // also compiles with earlier Boost versions, but differs semantically
+    m_file_des.open(filename, boostfd_mode);      // also compiles with earlier Boost versions, but differs semantically
 #else
-    file_des.open(filename, boostfd_mode, boostfd_mode);
+    m_file_des.open(filename, boostfd_mode, boostfd_mode);
 #endif
 }
 
 boostfd_file::~boostfd_file()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
-    file_des.close();
+    scoped_mutex_lock fd_lock(m_fd_mutex);
+    m_file_des.close();
 }
 
 inline file::offset_type boostfd_file::_size()
 {
-    return file_des.seek(0, BOOST_IOS::end);
+    return m_file_des.seek(0, BOOST_IOS::end);
 }
 
 file::offset_type boostfd_file::size()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    scoped_mutex_lock fd_lock(m_fd_mutex);
     return _size();
 }
 
 void boostfd_file::set_size(offset_type newsize)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    scoped_mutex_lock fd_lock(m_fd_mutex);
 #ifndef NDEBUG
     offset_type oldsize = _size();
 #endif // NDEBUG
-    file_des.seek(newsize, BOOST_IOS::beg);
-    file_des.seek(0, BOOST_IOS::beg); // not important ?
+    m_file_des.seek(newsize, BOOST_IOS::beg);
+    m_file_des.seek(0, BOOST_IOS::beg); // not important ?
     assert(_size() >= oldsize);
 }
 

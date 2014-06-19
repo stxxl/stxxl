@@ -305,8 +305,9 @@ public:
         unsigned_type meta_info_size = bytes % raw_size;
         STXXL_VERBOSE1("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
 
-        void* result = aligned_alloc<STXXL_BLOCK_ALIGN>
-            (bytes - meta_info_size, meta_info_size);
+        void* result = aligned_alloc<STXXL_BLOCK_ALIGN>(
+            bytes - meta_info_size, meta_info_size);
+
 #if STXXL_WITH_VALGRIND || STXXL_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
 #endif
@@ -318,8 +319,9 @@ public:
         unsigned_type meta_info_size = bytes % raw_size;
         STXXL_VERBOSE1("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
 
-        void* result = aligned_alloc<STXXL_BLOCK_ALIGN>
-            (bytes - meta_info_size, meta_info_size);
+        void* result = aligned_alloc<STXXL_BLOCK_ALIGN>(
+            bytes - meta_info_size, meta_info_size);
+
 #if STXXL_WITH_VALGRIND || STXXL_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
 #endif

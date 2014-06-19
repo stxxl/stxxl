@@ -69,13 +69,13 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         if (cfg.raw_device && !result->is_device())
         {
             delete result;
-            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be raw block device, but it is a normal file!");
+            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be "
+                        "a raw block device, but it is a normal file!");
         }
 
         // if is raw_device -> get size and remove some flags.
         if (result->is_device())
         {
-            // if device
             cfg.raw_device = true;
             cfg.size = result->size();
             cfg.autogrow = cfg.delete_on_exit = cfg.unlink_on_open = false;
@@ -112,13 +112,13 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         if (cfg.raw_device && !result->is_device())
         {
             delete result;
-            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be raw block device, but it is a normal file!");
+            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be "
+                        "a raw block device, but it is a normal file!");
         }
 
         // if is raw_device -> get size and remove some flags.
         if (result->is_device())
         {
-            // if device
             cfg.raw_device = true;
             cfg.size = result->size();
             cfg.autogrow = cfg.delete_on_exit = cfg.unlink_on_open = false;

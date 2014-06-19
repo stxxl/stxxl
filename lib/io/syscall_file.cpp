@@ -24,7 +24,8 @@
 
 STXXL_BEGIN_NAMESPACE
 
-void syscall_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
+                         request::request_type type) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
 

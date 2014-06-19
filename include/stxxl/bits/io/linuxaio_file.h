@@ -57,7 +57,8 @@ public:
           desired_queue_length(desired_queue_length)
     { }
 
-    void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes,
+               request::request_type type) throw (io_error);
     request_ptr aread(void* buffer, offset_type pos, size_type bytes,
                       const completion_handler& on_cmpl);
     request_ptr awrite(void* buffer, offset_type pos, size_type bytes,

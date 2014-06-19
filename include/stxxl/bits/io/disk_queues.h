@@ -66,7 +66,7 @@ public:
                         );
             else
 #endif
-                q = queues[disk] = new request_queue_impl_qwqr();
+            q = queues[disk] = new request_queue_impl_qwqr();
         }
         else
             q = qi->second;

@@ -50,7 +50,8 @@ public:
 
     virtual ~fileperblock_file();
 
-    virtual void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    virtual void serve(void* buffer, offset_type offset, size_type bytes,
+                       request::request_type type) throw (io_error);
 
     //! Changes the size of the file.
     //! \param new_size value of the new file size

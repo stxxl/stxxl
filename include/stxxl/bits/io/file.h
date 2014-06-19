@@ -6,7 +6,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2008, 2009 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -56,8 +56,6 @@ class completion_handler;
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
 {
-    atomic_counted_object m_request_ref_cnt;
-
 public:
     //! the offset of a request, also the size of the file
     typedef request::offset_type offset_type;
@@ -109,21 +107,6 @@ public:
 
     virtual void serve(void* buffer, offset_type offset, size_type bytes,
                        request::request_type type) throw (io_error) = 0;
-
-    void add_request_ref()
-    {
-        m_request_ref_cnt.inc_reference();
-    }
-
-    void delete_request_ref()
-    {
-        m_request_ref_cnt.dec_reference();
-    }
-
-    unsigned_type get_request_nref()
-    {
-        return m_request_ref_cnt.get_reference_count();
-    }
 
     //! Changes the size of the file.
     //! \param newsize new file size
@@ -182,9 +165,29 @@ public:
     //! Identifies the type of I/O implementation.
     //! \return pointer to null terminated string of characters, containing the
     //! name of I/O implementation
-    virtual const char * io_type() const
+    virtual const char * io_type() const = 0;
+
+protected:
+    //! count the number of requests referencing this file
+    atomic_counted_object m_request_ref;
+
+public:
+    //! increment referenced requests
+    void add_request_ref()
     {
-        return "none";
+        m_request_ref.inc_reference();
+    }
+
+    //! decrement referenced requests
+    void delete_request_ref()
+    {
+        m_request_ref.dec_reference();
+    }
+
+    //! return number of referenced requests
+    unsigned_type get_request_nref()
+    {
+        return m_request_ref.get_reference_count();
     }
 
 public:

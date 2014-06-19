@@ -6,6 +6,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -40,7 +41,8 @@ public:
         int allocator_id = NO_ALLOCATOR)
         : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
-    void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes,
+               request::request_type type) throw (io_error);
     const char * io_type() const;
 };
 
