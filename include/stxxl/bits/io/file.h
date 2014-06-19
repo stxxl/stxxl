@@ -27,7 +27,7 @@
 #include <string>
 
 #include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_interface.h>
@@ -56,13 +56,7 @@ class completion_handler;
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
 {
-    mutex request_ref_cnt_mutex;
-    int request_ref_cnt;
-
-protected:
-    //! Initializes file object.
-    //! \remark Called in implementations of file
-    file() : request_ref_cnt(0) { }
+    atomic_counted_object m_request_ref_cnt;
 
 public:
     //! the offset of a request, also the size of the file
@@ -97,7 +91,9 @@ public:
     //! \param pos file position to start read from
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
-    //! \return \c request_ptr request object, which can be used to track the status of the operation
+    //! \return \c request_ptr request object, which can be used to track the
+    //! status of the operation
+
     virtual request_ptr aread(void* buffer, offset_type pos, size_type bytes,
                               const completion_handler& on_cmpl) = 0;
 
@@ -106,29 +102,27 @@ public:
     //! \param pos starting file position to write
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
-    //! \return \c request_ptr request object, which can be used to track the status of the operation
+    //! \return \c request_ptr request object, which can be used to track the
+    //! status of the operation
     virtual request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
                                const completion_handler& on_cmpl) = 0;
 
-    virtual void serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error) = 0;
+    virtual void serve(void* buffer, offset_type offset, size_type bytes,
+                       request::request_type type) throw (io_error) = 0;
 
     void add_request_ref()
     {
-        scoped_mutex_lock Lock(request_ref_cnt_mutex);
-        ++request_ref_cnt;
+        m_request_ref_cnt.inc_reference();
     }
 
     void delete_request_ref()
     {
-        scoped_mutex_lock Lock(request_ref_cnt_mutex);
-        assert(request_ref_cnt > 0);
-        --request_ref_cnt;
+        m_request_ref_cnt.dec_reference();
     }
 
-    int get_request_nref()
+    unsigned_type get_request_nref()
     {
-        scoped_mutex_lock Lock(request_ref_cnt_mutex);
-        return request_ref_cnt;
+        return m_request_ref_cnt.get_reference_count();
     }
 
     //! Changes the size of the file.
@@ -140,7 +134,8 @@ public:
     virtual offset_type size() = 0;
 
     //! Returns the identifier of the file's queue.
-    //! \remark Files allocated on the same physical device usually share the same queue
+    //! \remark Files allocated on the same physical device usually share the
+    //! same queue
     //! \return queue number
     virtual int get_queue_id() const = 0;
 
@@ -164,7 +159,8 @@ public:
         STXXL_UNUSED(size);
     }
 
-    virtual void export_files(offset_type offset, offset_type length, std::string prefix)
+    virtual void export_files(offset_type offset, offset_type length,
+                              std::string prefix)
     {
         STXXL_UNUSED(offset);
         STXXL_UNUSED(length);
@@ -178,11 +174,14 @@ public:
     {
         int nr = get_request_nref();
         if (nr != 0)
-            STXXL_ERRMSG("stxxl::file is being deleted while there are still " << nr << " (unfinished) requests referencing it");
+            STXXL_ERRMSG("stxxl::file is being deleted while there are "
+                         "still " << nr << " (unfinished) requests "
+                         "referencing it");
     }
 
     //! Identifies the type of I/O implementation.
-    //! \return pointer to null terminated string of characters, containing the name of I/O implementation
+    //! \return pointer to null terminated string of characters, containing the
+    //! name of I/O implementation
     virtual const char * io_type() const
     {
         return "none";
