@@ -74,11 +74,11 @@ void mem_file::discard(offset_type offset, offset_type size)
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY
     // overwrite the freed region with uninitialized memory
     STXXL_VERBOSE("discard at " << offset << " len " << size);
-    void* uninitialized = malloc(BLOCK_ALIGN);
-    while (size >= BLOCK_ALIGN) {
-        memcpy(ptr + offset, uninitialized, BLOCK_ALIGN);
-        offset += BLOCK_ALIGN;
-        size -= BLOCK_ALIGN;
+    void* uninitialized = malloc(STXXL_BLOCK_ALIGN);
+    while (size >= STXXL_BLOCK_ALIGN) {
+        memcpy(ptr + offset, uninitialized, STXXL_BLOCK_ALIGN);
+        offset += STXXL_BLOCK_ALIGN;
+        size -= STXXL_BLOCK_ALIGN;
     }
     assert(size <= std::numeric_limits<offset_type>::max());
     if (size > 0)

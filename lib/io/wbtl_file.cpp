@@ -42,16 +42,16 @@ wbtl_file::wbtl_file(
 {
     STXXL_UNUSED(write_buffers);
     assert(write_buffers == 2); // currently hardcoded
-    write_buffer[0] = static_cast<char*>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
-    write_buffer[1] = static_cast<char*>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
+    write_buffer[0] = static_cast<char*>(stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(write_block_size));
+    write_buffer[1] = static_cast<char*>(stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(write_block_size));
     buffer_address[0] = offset_type(-1);
     buffer_address[1] = offset_type(-1);
 }
 
 wbtl_file::~wbtl_file()
 {
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(write_buffer[1]);
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(write_buffer[0]);
+    stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(write_buffer[1]);
+    stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(write_buffer[0]);
     delete storage;
     storage = 0;
 }
