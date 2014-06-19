@@ -121,7 +121,16 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param queue_id disk queue identifier
     //! \param allocator_id linked disk_allocator
-    inline sim_disk_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
+    //! \param device_id physical device identifier
+    inline sim_disk_file(
+        const std::string& filename,
+        int mode,
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR,
+        unsigned int device_id = DEFAULT_DEVICE_ID)
+        : file(device_id),
+          ufs_file_base(filename, mode),
+          disk_queued_file(queue_id, allocator_id)
     {
         std::cout << "Please, make sure that '" << filename <<
             "' is resided on swap memory partition!" <<

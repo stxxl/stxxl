@@ -80,13 +80,14 @@ public:
 
         // calculate prefetch sequence
         const unsigned_type ndisks = config::get_instance()->disks_number();
+        const unsigned_type mdevid = config::get_instance()->get_max_device_id();
 
         prefetch_seq = new int_type[bids_.size()];
 
         // optimal schedule
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
         compute_prefetch_schedule(bids_.begin(), bids_.end(), prefetch_seq,
-                                  nbuffers, ndisks);
+                                  nbuffers, mdevid);
 
         // create stream prefetcher
         prefetcher = new prefetcher_type(bids_.begin(), bids_.end(), prefetch_seq, nbuffers);

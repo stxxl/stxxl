@@ -19,18 +19,19 @@
 
 STXXL_BEGIN_NAMESPACE
 
-request::request(const completion_handler& on_compl,
-                 file* file,
-                 void* buffer,
-                 offset_type offset,
-                 size_type bytes,
-                 request_type type) :
-    m_on_complete(on_compl),
-    m_file(file),
-    m_buffer(buffer),
-    m_offset(offset),
-    m_bytes(bytes),
-    m_type(type)
+request::request(
+    const completion_handler& on_compl,
+    file* file,
+    void* buffer,
+    offset_type offset,
+    size_type bytes,
+    request_type type)
+    : m_on_complete(on_compl),
+      m_file(file),
+      m_buffer(buffer),
+      m_offset(offset),
+      m_bytes(bytes),
+      m_type(type)
 {
     STXXL_VERBOSE3_THIS("request::(...), ref_cnt=" << get_reference_count());
     m_file->add_request_ref();

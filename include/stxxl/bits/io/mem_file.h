@@ -39,7 +39,12 @@ class mem_file : public disk_queued_file
 public:
     //! constructs file object.
     mem_file(
-        int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : disk_queued_file(queue_id, allocator_id), m_ptr(NULL), m_size(0)
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR,
+        unsigned_type device_id = DEFAULT_DEVICE_ID)
+        : file(device_id),
+          disk_queued_file(queue_id, allocator_id),
+          m_ptr(NULL), m_size(0)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
                request::request_type type) throw (io_error);

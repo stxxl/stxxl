@@ -106,7 +106,10 @@ const char* boostfd_file::io_type() const
 boostfd_file::boostfd_file(
     const std::string& filename,
     int mode,
-    int queue_id, int allocator_id) : disk_queued_file(queue_id, allocator_id), mode_(mode)
+    int queue_id, int allocator_id, unsigned int device_id)
+    : file(device_id),
+      disk_queued_file(queue_id, allocator_id),
+      m_mode(mode)
 {
     BOOST_IOS::openmode boostfd_mode =
         (mode & RDWR) ? (BOOST_IOS::out | BOOST_IOS::in) :

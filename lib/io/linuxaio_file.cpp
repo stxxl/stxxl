@@ -45,9 +45,10 @@ request_ptr linuxaio_file::awrite(
     return req;
 }
 
-void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes,
+                          request::request_type type) throw (io_error)
 {
-    //req need not be an linuxaio_request
+    // req need not be an linuxaio_request
     if (type == request::READ)
         aread(buffer, offset, bytes, default_completion_handler())->wait();
     else

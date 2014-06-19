@@ -1,8 +1,7 @@
 Version 1.4-dev (unreleased)
 
   - support kernel based asynchronous I/O on Linux (new file type "linuxaio"),
-    which exploits Native Command Queuing (NCQ) if available canceling requests
-    apparently not yet supported by the kernel
+    which exploits Native Command Queuing (NCQ) if available
     disable/enable with the define STXXL_FILE_LINUXAIO 0/1 via cmake
 
 Version 1.4.0 (12 December 2013)

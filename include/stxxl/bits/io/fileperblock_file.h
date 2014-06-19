@@ -46,7 +46,8 @@ public:
         const std::string& filename_prefix,
         int mode,
         int queue_id = DEFAULT_QUEUE,
-        int allocator_id = NO_ALLOCATOR);
+        int allocator_id = NO_ALLOCATOR,
+        unsigned int device_id = DEFAULT_DEVICE_ID);
 
     virtual ~fileperblock_file();
 

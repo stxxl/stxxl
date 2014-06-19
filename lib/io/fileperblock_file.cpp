@@ -47,8 +47,10 @@ fileperblock_file<base_file_type>::fileperblock_file(
     const std::string& filename_prefix,
     int mode,
     int queue_id,
-    int allocator_id)
-    : disk_queued_file(queue_id, allocator_id),
+    int allocator_id,
+    unsigned int device_id)
+    : file(device_id),
+      disk_queued_file(queue_id, allocator_id),
       filename_prefix(filename_prefix),
       mode(mode),
       current_size(0),

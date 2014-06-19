@@ -348,7 +348,7 @@ void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        disks_number);
+        config::get_instance()->get_max_device_id());
 #else
     for (unsigned_type i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;

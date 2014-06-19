@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2011 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -37,9 +38,6 @@ class linuxaio_file : public ufs_file_base, public disk_queued_file
 
 private:
     int desired_queue_length;
-    linuxaio_queue* queue;
-
-    linuxaio_queue * get_queue() { return queue; }
 
 public:
     //! Constructs file object
@@ -47,12 +45,16 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param queue_id disk queue identifier
     //! \param allocator_id linked disk_allocator
+    //! \param device_id physical device identifier
     //! \param desired_queue_length queue length requested from kernel
     linuxaio_file(
         const std::string& filename, int mode,
-        int queue_id = DEFAULT_LINUXAIO_QUEUE, int allocator_id = NO_ALLOCATOR,
+        int queue_id = DEFAULT_LINUXAIO_QUEUE,
+        int allocator_id = NO_ALLOCATOR,
+        unsigned int device_id = DEFAULT_DEVICE_ID,
         int desired_queue_length = 0)
-        : ufs_file_base(filename, mode),
+        : file(device_id),
+          ufs_file_base(filename, mode),
           disk_queued_file(queue_id, allocator_id),
           desired_queue_length(desired_queue_length)
     { }

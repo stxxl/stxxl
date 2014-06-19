@@ -52,7 +52,7 @@ void compute_prefetch_schedule(
     const int_type L = input.size();
     simple_vector<int_type> disks(L);
     for (int_type i = 0; i < L; ++i)
-        disks[i] = input[i].bid.storage->get_physical_device_id();
+        disks[i] = input[i].bid.storage->get_device_id();
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
 
@@ -68,7 +68,7 @@ void compute_prefetch_schedule(
     simple_vector<int_type> disks(L);
     int_type i = 0;
     for (bid_iterator_type it = input_begin; it != input_end; ++it, ++i)
-        disks[i] = it->storage->get_physical_device_id();
+        disks[i] = it->storage->get_device_id();
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
 

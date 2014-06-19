@@ -83,6 +83,12 @@ public:
     static const int DEFAULT_QUEUE = -1;
     static const int DEFAULT_LINUXAIO_QUEUE = -2;
     static const int NO_ALLOCATOR = -1;
+    static const unsigned int DEFAULT_DEVICE_ID = (unsigned int)(-1);
+
+    //! Construct a new file, usually called by a subclass.
+    file(unsigned int device_id = DEFAULT_DEVICE_ID)
+        : m_device_id(device_id)
+    { }
 
     //! Schedules an asynchronous read request to the file.
     //! \param buffer pointer to memory buffer to read into
@@ -116,20 +122,13 @@ public:
     //! \return file size in bytes
     virtual offset_type size() = 0;
 
-    //! Returns the identifier of the file's queue.
+    //! Returns the identifier of the file's queue number.
     //! \remark Files allocated on the same physical device usually share the
-    //! same queue
-    //! \return queue number
+    //! same queue, unless there is a common queue (e.g. with linuxaio).
     virtual int get_queue_id() const = 0;
 
-    //! Returns the file's allocator.
-    //! \return allocator number
+    //! Returns the file's disk allocator number
     virtual int get_allocator_id() const = 0;
-
-    virtual int get_physical_device_id() const
-    {
-        return get_queue_id();
-    }
 
     //! Locks file for reading and writing (acquires a lock in the file system).
     virtual void lock() = 0;
@@ -166,6 +165,18 @@ public:
     //! \return pointer to null terminated string of characters, containing the
     //! name of I/O implementation
     virtual const char * io_type() const = 0;
+
+protected:
+    //! The file's physical device id (e.g. used for prefetching sequence
+    //! calculation)
+    unsigned int m_device_id;
+
+public:
+    //! Returns the file's physical device id
+    unsigned int get_device_id() const
+    {
+        return m_device_id;
+    }
 
 protected:
     //! count the number of requests referencing this file
