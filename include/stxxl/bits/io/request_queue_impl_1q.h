@@ -26,6 +26,8 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup reqlayer
 //! \{
 
+//! Implementation of a local request queue having only one queue for both read
+//! and write requests, thus having only one thread.
 class request_queue_impl_1q : public request_queue_impl_worker
 {
 private:

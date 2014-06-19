@@ -27,6 +27,9 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup reqlayer
 //! \{
 
+//! Implementation of a local request queue having two queues, one for read and
+//! one for write requests, thus having two threads. This is the default
+//! implementation.
 class request_queue_impl_qwqr : public request_queue_impl_worker
 {
 private:
