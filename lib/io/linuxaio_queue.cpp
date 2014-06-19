@@ -11,7 +11,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
 
 #if STXXL_HAVE_LINUXAIO_FILE
@@ -19,6 +18,9 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
 
