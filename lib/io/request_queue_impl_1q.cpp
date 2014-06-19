@@ -44,10 +44,10 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
 };
 
 request_queue_impl_1q::request_queue_impl_1q(int n)
-    : m_thread_state(NOT_RUNNING), sem(0)
+    : m_thread_state(NOT_RUNNING), m_sem(0)
 {
     STXXL_UNUSED(n);
-    start_thread(worker, static_cast<void*>(this), thread, m_thread_state);
+    start_thread(worker, static_cast<void*>(this), m_thread, m_thread_state);
 }
 
 void request_queue_impl_1q::add_request(request_ptr& req)
@@ -59,19 +59,19 @@ void request_queue_impl_1q::add_request(request_ptr& req)
 
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
     {
-        scoped_mutex_lock Lock(queue_mutex);
-        if (std::find_if(queue.begin(), queue.end(),
+        scoped_mutex_lock Lock(m_queue_mutex);
+        if (std::find_if(m_queue.begin(), m_queue.end(),
                          bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
-            != queue.end())
+            != m_queue.end())
         {
             STXXL_ERRMSG("request submitted for a BID with a pending request");
         }
     }
 #endif
-    scoped_mutex_lock Lock(queue_mutex);
-    queue.push_back(req);
+    scoped_mutex_lock Lock(m_queue_mutex);
+    m_queue.push_back(req);
 
-    sem++;
+    m_sem++;
 }
 
 bool request_queue_impl_1q::cancel_request(request_ptr& req)
@@ -83,13 +83,16 @@ bool request_queue_impl_1q::cancel_request(request_ptr& req)
 
     bool was_still_in_queue = false;
     {
-        scoped_mutex_lock Lock(queue_mutex);
-        queue_type::iterator pos;
-        if ((pos = std::find(queue.begin(), queue.end(), req _STXXL_FORCE_SEQUENTIAL)) != queue.end())
+        scoped_mutex_lock Lock(m_queue_mutex);
+        queue_type::iterator pos
+            = std::find(m_queue.begin(), m_queue.end(),
+                        req _STXXL_FORCE_SEQUENTIAL);
+
+        if (pos != m_queue.end())
         {
-            queue.erase(pos);
+            m_queue.erase(pos);
             was_still_in_queue = true;
-            sem--;
+            m_sem--;
         }
     }
 
@@ -98,7 +101,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr& req)
 
 request_queue_impl_1q::~request_queue_impl_1q()
 {
-    stop_thread(thread, m_thread_state, sem);
+    stop_thread(m_thread, m_thread_state, m_sem);
 }
 
 void* request_queue_impl_1q::worker(void* arg)
@@ -107,14 +110,14 @@ void* request_queue_impl_1q::worker(void* arg)
 
     for ( ; ; )
     {
-        pthis->sem--;
+        pthis->m_sem--;
 
         {
-            scoped_mutex_lock Lock(pthis->queue_mutex);
-            if (!pthis->queue.empty())
+            scoped_mutex_lock Lock(pthis->m_queue_mutex);
+            if (!pthis->m_queue.empty())
             {
-                request_ptr req = pthis->queue.front();
-                pthis->queue.pop_front();
+                request_ptr req = pthis->m_queue.front();
+                pthis->m_queue.pop_front();
 
                 Lock.unlock();
 
@@ -125,16 +128,16 @@ void* request_queue_impl_1q::worker(void* arg)
             {
                 Lock.unlock();
 
-                pthis->sem++;
+                pthis->m_sem++;
             }
         }
 
         // terminate if it has been requested and queues are empty
         if (pthis->m_thread_state() == TERMINATING) {
-            if ((pthis->sem--) == 0)
+            if ((pthis->m_sem--) == 0)
                 break;
             else
-                pthis->sem++;
+                pthis->m_sem++;
         }
     }
 

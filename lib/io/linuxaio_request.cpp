@@ -29,34 +29,34 @@ void linuxaio_request::completed(bool posted, bool canceled)
 
     if (!canceled)
     {
-        if (type == READ)
+        if (m_type == READ)
             stats::get_instance()->read_finished();
         else
             stats::get_instance()->write_finished();
     }
     else if (posted)
     {
-        if (type == READ)
-            stats::get_instance()->read_canceled(bytes);
+        if (m_type == READ)
+            stats::get_instance()->read_canceled(m_bytes);
         else
-            stats::get_instance()->write_canceled(bytes);
+            stats::get_instance()->write_canceled(m_bytes);
     }
     request_with_state::completed(canceled);
 }
 
 void linuxaio_request::fill_control_block()
 {
-    linuxaio_file* af = dynamic_cast<linuxaio_file*>(file_);
+    linuxaio_file* af = dynamic_cast<linuxaio_file*>(m_file);
 
     memset(&cb, 0, sizeof(cb));
     // indirection, so the I/O system retains an auto_ptr reference
     cb.aio_data = reinterpret_cast<__u64>(new request_ptr(this));
     cb.aio_fildes = af->file_des;
-    cb.aio_lio_opcode = (type == READ) ? IOCB_CMD_PREAD : IOCB_CMD_PWRITE;
+    cb.aio_lio_opcode = (m_type == READ) ? IOCB_CMD_PREAD : IOCB_CMD_PWRITE;
     cb.aio_reqprio = 0;
-    cb.aio_buf = reinterpret_cast<__u64>(buffer);
-    cb.aio_nbytes = bytes;
-    cb.aio_offset = offset;
+    cb.aio_buf = reinterpret_cast<__u64>(m_buffer);
+    cb.aio_nbytes = m_bytes;
+    cb.aio_offset = m_offset;
 }
 
 //! \brief Submits an I/O request to the OS
@@ -71,15 +71,15 @@ bool linuxaio_request::post()
     // time before the call.
     double now = timestamp();
     linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
-        disk_queues::get_instance()->get_queue(get_file()->get_queue_id())
+        disk_queues::get_instance()->get_queue(m_file->get_queue_id())
         );
     int success = syscall(SYS_io_submit, queue->get_io_context(), 1, &cb_pointer);
     if (success == 1)
     {
-        if (type == READ)
-            stats::get_instance()->read_started(bytes, now);
+        if (m_type == READ)
+            stats::get_instance()->read_started(m_bytes, now);
         else
-            stats::get_instance()->write_started(bytes, now);
+            stats::get_instance()->write_started(m_bytes, now);
     }
     else if (success == -1 && errno != EAGAIN)
         STXXL_THROW2(io_error, "linuxaio_request::post", "io_submit()");
@@ -94,11 +94,11 @@ bool linuxaio_request::cancel()
 {
     STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] cancel()");
 
-    if (!get_file()) return false;
+    if (!m_file) return false;
 
     request_ptr req(this);
     linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
-        disk_queues::get_instance()->get_queue(get_file()->get_queue_id())
+        disk_queues::get_instance()->get_queue(m_file->get_queue_id())
         );
     return queue->cancel_request(req);
 }
@@ -108,11 +108,11 @@ bool linuxaio_request::cancel_aio()
 {
     STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] cancel_aio()");
 
-    if (!get_file()) return false;
+    if (!m_file) return false;
 
     io_event event;
     linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
-        disk_queues::get_instance()->get_queue(get_file()->get_queue_id())
+        disk_queues::get_instance()->get_queue(m_file->get_queue_id())
         );
     int result = syscall(SYS_io_cancel, queue->get_io_context(), &cb, &event);
     if (result == 0)    //successfully canceled

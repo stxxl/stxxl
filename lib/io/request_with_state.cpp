@@ -30,40 +30,40 @@ request_with_state::~request_with_state()
 {
     STXXL_VERBOSE3_THIS("request_with_state::~(), ref_cnt: " << ref_cnt);
 
-    assert(_state() == DONE || _state() == READY2DIE);
+    assert(m_state() == DONE || m_state() == READY2DIE);
 
-    // if(_state() != DONE && _state()!= READY2DIE )
+    // if(m_state() != DONE && m_state()!= READY2DIE )
     // STXXL_ERRMSG("WARNING: serious stxxl inconsistency: Request is being deleted while I/O not finished. "<<
     //              "Please submit a bug report.");
 
-    // _state.wait_for (READY2DIE); // does not make sense ?
+    // m_state.wait_for (READY2DIE); // does not make sense ?
 }
 
 void request_with_state::wait(bool measure_time)
 {
     STXXL_VERBOSE3_THIS("request_with_state::wait()");
 
-    stats::scoped_wait_timer wait_timer(get_type() == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
+    stats::scoped_wait_timer wait_timer(m_type == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
 
-    _state.wait_for(READY2DIE);
+    m_state.wait_for(READY2DIE);
 
     check_errors();
 }
 
 bool request_with_state::cancel()
 {
-    STXXL_VERBOSE3_THIS("request_with_state::cancel() " << file_ << " " << buffer << " " << offset);
+    STXXL_VERBOSE3_THIS("request_with_state::cancel() " << m_file << " " << m_buffer << " " << m_offset);
 
-    if (file_)
+    if (m_file)
     {
         request_ptr rp(this);
-        if (disk_queues::get_instance()->cancel_request(rp, file_->get_queue_id()))
+        if (disk_queues::get_instance()->cancel_request(rp, m_file->get_queue_id()))
         {
-            _state.set_to(DONE);
+            m_state.set_to(DONE);
             notify_waiters();
-            file_->delete_request_ref();
-            file_ = 0;
-            _state.set_to(READY2DIE);
+            m_file->delete_request_ref();
+            m_file = 0;
+            m_state.set_to(READY2DIE);
             return true;
         }
     }
@@ -72,7 +72,7 @@ bool request_with_state::cancel()
 
 bool request_with_state::poll()
 {
-    const request_state s = _state();
+    const request_state s = m_state();
 
     check_errors();
 
@@ -82,13 +82,13 @@ bool request_with_state::poll()
 void request_with_state::completed(bool canceled)
 {
     STXXL_VERBOSE3_THIS("request_with_state::completed()");
-    _state.set_to(DONE);
+    m_state.set_to(DONE);
     if (!canceled)
-        on_complete(this);
+        m_on_complete(this);
     notify_waiters();
-    file_->delete_request_ref();
-    file_ = 0;
-    _state.set_to(READY2DIE);
+    m_file->delete_request_ref();
+    m_file = 0;
+    m_state.set_to(READY2DIE);
 }
 
 STXXL_END_NAMESPACE

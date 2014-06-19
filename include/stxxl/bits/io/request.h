@@ -41,31 +41,31 @@ class request : virtual public request_interface, public atomic_counted_object
     friend class linuxaio_queue;
 
 protected:
-    completion_handler on_complete;
-    compat_unique_ptr<stxxl::io_error>::result error;
+    completion_handler m_on_complete;
+    compat_unique_ptr<stxxl::io_error>::result m_error;
 
 protected:
-    file* file_;
-    void* buffer;
-    offset_type offset;
-    size_type bytes;
-    request_type type;
+    file* m_file;
+    void* m_buffer;
+    offset_type m_offset;
+    size_type m_bytes;
+    request_type m_type;
 
 public:
     request(const completion_handler& on_compl,
-            file* file__,
-            void* buffer_,
-            offset_type offset_,
-            size_type bytes_,
-            request_type type_);
+            file* file,
+            void* buffer,
+            offset_type offset,
+            size_type bytes,
+            request_type type);
 
     virtual ~request();
 
-    file * get_file() const { return file_; }
-    void * get_buffer() const { return buffer; }
-    offset_type get_offset() const { return offset; }
-    size_type get_size() const { return bytes; }
-    request_type get_type() const { return type; }
+    file * get_file() const { return m_file; }
+    void * get_buffer() const { return m_buffer; }
+    offset_type get_offset() const { return m_offset; }
+    size_type get_size() const { return m_bytes; }
+    request_type get_type() const { return m_type; }
 
     void check_alignment() const;
 
@@ -75,21 +75,21 @@ public:
     //! execution.
     void error_occured(const char* msg)
     {
-        error.reset(new stxxl::io_error(msg));
+        m_error.reset(new stxxl::io_error(msg));
     }
 
     //! Inform the request object that an error occurred during the I/O
     //! execution.
     void error_occured(const std::string& msg)
     {
-        error.reset(new stxxl::io_error(msg));
+        m_error.reset(new stxxl::io_error(msg));
     }
 
     //! Rises an exception if there were error with the I/O.
     void check_errors() throw (stxxl::io_error)
     {
-        if (error.get())
-            throw *(error.get());
+        if (m_error.get())
+            throw *(m_error.get());
     }
 
     virtual const char * io_type() const;

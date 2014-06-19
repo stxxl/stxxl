@@ -30,16 +30,16 @@ STXXL_BEGIN_NAMESPACE
 //! Request that is aware of threads waiting for it to complete.
 class request_with_waiters : public request
 {
-    mutex waiters_mutex;
-    std::set<onoff_switch*> waiters;
+    mutex m_waiters_mutex;
+    std::set<onoff_switch*> m_waiters;
 
 protected:
     bool add_waiter(onoff_switch* sw);
     void delete_waiter(onoff_switch* sw);
     void notify_waiters();
-    /*
-    int nwaiters();             // returns number of waiters
-    */
+
+    //! returns number of waiters
+    size_t num_waiters();
 
 public:
     request_with_waiters(

@@ -32,14 +32,14 @@ private:
     typedef request_queue_impl_1q self;
     typedef std::list<request_ptr> queue_type;
 
-    mutex queue_mutex;
-    queue_type queue;
+    mutex m_queue_mutex;
+    queue_type m_queue;
 
     state<thread_state> m_thread_state;
-    thread_type thread;
-    semaphore sem;
+    thread_type m_thread;
+    semaphore m_sem;
 
-    static const priority_op _priority_op = WRITE;
+    static const priority_op m_priority_op = WRITE;
 
     static void * worker(void* arg);
 
