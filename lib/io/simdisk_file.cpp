@@ -22,6 +22,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
+const double simdisk_geometry::s_average_speed = (15 * 1024 * 1024);
 
 void simdisk_geometry::add_zone(int& first_cyl, int last_cyl,
                                 int sec_per_track, int& first_sect)
@@ -78,7 +79,7 @@ double simdisk_geometry::get_delay(file::offset_type offset, file::size_type siz
     return delay;
 #else
     STXXL_UNUSED(offset);
-    return double(size) / double(AVERAGE_SPEED);
+    return double(size) / s_average_speed;
 #endif
 }
 

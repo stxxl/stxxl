@@ -42,7 +42,7 @@ int main()
 
     stxxl::request_ptr req;
 
-    STXXL_MSG("Estimated time:" << block_size / double(AVERAGE_SPEED));
+    STXXL_MSG("Estimated time:" << block_size / stxxl::simdisk_geometry::s_average_speed);
     STXXL_MSG("Sequential write");
 
     for (i = 0; i < 40; i++)

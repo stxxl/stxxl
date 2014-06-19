@@ -36,8 +36,6 @@ STXXL_BEGIN_NAMESPACE
 //! \weakgroup fileimpl
 //! \{
 
- #define AVERAGE_SPEED (15 * 1024 * 1024)
-
 class simdisk_geometry : private noncopyable
 {
     struct Zone
@@ -101,6 +99,8 @@ public:
 
     inline ~simdisk_geometry()
     { }
+
+    static const double s_average_speed;
 };
 
 
