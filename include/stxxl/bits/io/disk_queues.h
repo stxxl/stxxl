@@ -66,20 +66,11 @@ public:
                         );
             else
 #endif
-            q = queues[disk] = new request_queue_impl_qwqr();
+                q = queues[disk] = new request_queue_impl_qwqr();
         }
         else
             q = qi->second;
 
-#if STXXL_HAVE_LINUXAIO_FILE
-        if (!(
-                (dynamic_cast<linuxaio_request*>(req.get()) && dynamic_cast<linuxaio_queue*>(q)) ||
-                (dynamic_cast<serving_request*>(req.get()) && dynamic_cast<request_queue*>(q))))
-        {
-            STXXL_THROW2(io_error, "disk_queues::add_request",
-                         "Tried to add request to incompatible queue.");
-        }
-#endif
         q->add_request(req);
     }
 

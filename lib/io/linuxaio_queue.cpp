@@ -93,6 +93,8 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
     if (post_thread_state() != RUNNING)
         STXXL_ERRMSG("Request canceled in stopped queue.");
+    if (!dynamic_cast<linuxaio_request*>(req.get()))
+        STXXL_ERRMSG("Non-LinuxAIO request submitted to LinuxAIO queue.");
 
     queue_type::iterator pos;
     {

@@ -55,6 +55,8 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
     if (m_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
+    if (!dynamic_cast<serving_request*>(req.get()))
+        STXXL_ERRMSG("Incompatible request submitted to running queue.");
 
     if (req.get()->get_type() == request::READ)
     {
@@ -98,6 +100,8 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
     if (m_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
+    if (!dynamic_cast<serving_request*>(req.get()))
+        STXXL_ERRMSG("Incompatible request submitted to running queue.");
 
     bool was_still_in_queue = false;
     if (req.get()->get_type() == request::READ)
