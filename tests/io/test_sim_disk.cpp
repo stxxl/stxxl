@@ -27,7 +27,7 @@ int main()
     const stxxl::int64 disk_size = stxxl::int64(1024 * 1024) * 1024 * 40;
     std::cout << sizeof(void*) << std::endl;
     const int block_size = 4 * 1024 * 1024;
-    char* buffer = static_cast<char*>(stxxl::aligned_alloc<BLOCK_ALIGN>(block_size));
+    char* buffer = static_cast<char*>(stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size));
     memset(buffer, 0, block_size);
     const char* paths[2] = { "/tmp/data1", "/tmp/data2" };
     stxxl::sim_disk_file file1(paths[0], file::CREAT | file::RDWR | file::DIRECT, 0);
@@ -81,7 +81,7 @@ int main()
     double err = sqrt(sum2 - sum * sum);
     STXXL_MSG("Standard Deviation: " << err << " s, " << 100. * (err / sum) << " %");
 
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
+    stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(buffer);
 
     file1.close_remove();
     file2.close_remove();

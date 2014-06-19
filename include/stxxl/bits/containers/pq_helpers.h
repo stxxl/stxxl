@@ -68,7 +68,7 @@
 #define STXXL_PQ_INTERNAL_LOSER_TREE 1
 #endif
 
-#define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] priority_queue::" << msg)
+#define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2_THIS("priority_queue::" << msg)
 
 STXXL_BEGIN_NAMESPACE
 

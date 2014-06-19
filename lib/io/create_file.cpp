@@ -57,25 +57,37 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         break;
     }
 
+    // automatically enumerate disks as separate device ids
+
+    if (cfg.device_id == file::DEFAULT_DEVICE_ID)
+    {
+        cfg.device_id = config::get_instance()->get_next_device_id();
+    }
+    else
+    {
+        config::get_instance()->update_max_device_id(cfg.device_id);
+    }
+
     // *** Select fileio Implementation
 
     if (cfg.io_impl == "syscall")
     {
         ufs_file_base* result =
-            new syscall_file(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new syscall_file(cfg.path, mode, cfg.queue, disk_allocator_id,
+                             cfg.device_id);
         result->lock();
 
         // if marked as device but file is not -> throw!
         if (cfg.raw_device && !result->is_device())
         {
             delete result;
-            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be raw block device, but it is a normal file!");
+            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be "
+                        "a raw block device, but it is a normal file!");
         }
 
         // if is raw_device -> get size and remove some flags.
         if (result->is_device())
         {
-            // if device
             cfg.raw_device = true;
             cfg.size = result->size();
             cfg.autogrow = cfg.delete_on_exit = cfg.unlink_on_open = false;
@@ -89,21 +101,58 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     else if (cfg.io_impl == "fileperblock_syscall")
     {
         fileperblock_file<syscall_file>* result =
-            new fileperblock_file<syscall_file>(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new fileperblock_file<syscall_file>(cfg.path, mode, cfg.queue,
+                                                disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
     else if (cfg.io_impl == "memory")
     {
-        mem_file* result = new mem_file(cfg.queue, disk_allocator_id);
+        mem_file* result = new mem_file(cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
+#if STXXL_HAVE_LINUXAIO_FILE
+    // linuxaio can have the desired queue length, specified as queue_length=?
+    else if (cfg.io_impl == "linuxaio")
+    {
+        // linuxaio_queue is a singleton.
+        cfg.queue = file::DEFAULT_LINUXAIO_QUEUE;
+
+        ufs_file_base* result =
+            new linuxaio_file(cfg.path, mode, cfg.queue, disk_allocator_id,
+                              cfg.device_id, cfg.queue_length);
+
+        result->lock();
+
+        // if marked as device but file is not -> throw!
+        if (cfg.raw_device && !result->is_device())
+        {
+            delete result;
+            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be "
+                        "a raw block device, but it is a normal file!");
+        }
+
+        // if is raw_device -> get size and remove some flags.
+        if (result->is_device())
+        {
+            cfg.raw_device = true;
+            cfg.size = result->size();
+            cfg.autogrow = cfg.delete_on_exit = cfg.unlink_on_open = false;
+        }
+
+        if (cfg.unlink_on_open)
+            result->unlink();
+
+        return result;
+    }
+#endif
 #if STXXL_HAVE_MMAP_FILE
     else if (cfg.io_impl == "mmap")
     {
         ufs_file_base* result =
-            new mmap_file(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new mmap_file(cfg.path, mode, cfg.queue, disk_allocator_id,
+                          cfg.device_id);
         result->lock();
 
         if (cfg.unlink_on_open)
@@ -114,7 +163,8 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     else if (cfg.io_impl == "fileperblock_mmap")
     {
         fileperblock_file<mmap_file>* result =
-            new fileperblock_file<mmap_file>(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new fileperblock_file<mmap_file>(cfg.path, mode, cfg.queue,
+                                             disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
@@ -124,7 +174,8 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     {
         mode &= ~(file::DIRECT | file::REQUIRE_DIRECT);  // clear the DIRECT flag, this file is supposed to be on tmpfs
         ufs_file_base* result =
-            new sim_disk_file(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new sim_disk_file(cfg.path, mode, cfg.queue, disk_allocator_id,
+                              cfg.device_id);
         result->lock();
         return result;
     }
@@ -133,14 +184,16 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     else if (cfg.io_impl == "wincall")
     {
         wfs_file_base* result =
-            new wincall_file(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new wincall_file(cfg.path, mode, cfg.queue, disk_allocator_id,
+                             cfg.device_id);
         result->lock();
         return result;
     }
     else if (cfg.io_impl == "fileperblock_wincall")
     {
         fileperblock_file<wincall_file>* result =
-            new fileperblock_file<wincall_file>(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new fileperblock_file<wincall_file>(cfg.path, mode, cfg.queue,
+                                                disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
@@ -149,14 +202,16 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     else if (cfg.io_impl == "boostfd")
     {
         boostfd_file* result =
-            new boostfd_file(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new boostfd_file(cfg.path, mode, cfg.queue, disk_allocator_id,
+                             cfg.device_id);
         result->lock();
         return result;
     }
     else if (cfg.io_impl == "fileperblock_boostfd")
     {
         fileperblock_file<boostfd_file>* result =
-            new fileperblock_file<boostfd_file>(cfg.path, mode, cfg.queue, disk_allocator_id);
+            new fileperblock_file<boostfd_file>(cfg.path, mode, cfg.queue,
+                                                disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
@@ -167,7 +222,8 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         ufs_file_base* backend =
             new syscall_file(cfg.path, mode, -1, -1); // FIXME: ID
         wbtl_file* result =
-            new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, cfg.queue, disk_allocator_id);
+            new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, cfg.queue,
+                                 disk_allocator_id);
         result->lock();
 
         if (cfg.unlink_on_open)

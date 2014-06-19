@@ -67,19 +67,19 @@ public:
         , not_finished(true)
 #endif
     {
-        //int_type i;
         const unsigned_type ndisks = config::get_instance()->disks_number();
+        const unsigned_type mdevid = config::get_instance()->get_max_device_id();
         const int_type seq_length = _end - _begin;
         prefetch_seq = new int_type[seq_length];
 
         // obvious schedule
-        //for(int_type i = 0; i< seq_length; ++i)
+        //for(int_type i = 0; i < seq_length; ++i)
         //	prefetch_seq[i] = i;
 
         // optimal schedule
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
         compute_prefetch_schedule(_begin, _end, prefetch_seq,
-                                  nbuffers, ndisks);
+                                  nbuffers, mdevid);
 
 
         prefetcher = new prefetcher_type(_begin, _end, prefetch_seq, nbuffers);

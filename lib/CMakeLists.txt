@@ -29,6 +29,9 @@ set(LIBSTXXL_SOURCES
   io/file.cpp
   io/fileperblock_file.cpp
   io/iostats.cpp
+  io/linuxaio_file.cpp
+  io/linuxaio_queue.cpp
+  io/linuxaio_request.cpp
   io/mem_file.cpp
   io/request.cpp
   io/request_queue_impl_1q.cpp

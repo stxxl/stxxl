@@ -17,7 +17,7 @@
 
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
-#include <stxxl/bits/io/request_with_state.h>
+#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/parallel.h>
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
@@ -43,10 +43,10 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
 };
 
 request_queue_impl_qwqr::request_queue_impl_qwqr(int n)
-    : m_thread_state(NOT_RUNNING), sem(0)
+    : m_thread_state(NOT_RUNNING), m_sem(0)
 {
     STXXL_UNUSED(n);
-    start_thread(worker, static_cast<void*>(this), thread, m_thread_state);
+    start_thread(worker, static_cast<void*>(this), m_thread, m_thread_state);
 }
 
 void request_queue_impl_qwqr::add_request(request_ptr& req)
@@ -55,41 +55,43 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
     if (m_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
+    if (!dynamic_cast<serving_request*>(req.get()))
+        STXXL_ERRMSG("Incompatible request submitted to running queue.");
 
     if (req.get()->get_type() == request::READ)
     {
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
-            scoped_mutex_lock Lock(write_mutex);
-            if (std::find_if(write_queue.begin(), write_queue.end(),
+            scoped_mutex_lock Lock(m_write_mutex);
+            if (std::find_if(m_write_queue.begin(), m_write_queue.end(),
                              bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
-                != write_queue.end())
+                != m_write_queue.end())
             {
                 STXXL_ERRMSG("READ request submitted for a BID with a pending WRITE request");
             }
         }
 #endif
-        scoped_mutex_lock Lock(read_mutex);
-        read_queue.push_back(req);
+        scoped_mutex_lock Lock(m_read_mutex);
+        m_read_queue.push_back(req);
     }
     else
     {
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
-            scoped_mutex_lock Lock(read_mutex);
-            if (std::find_if(read_queue.begin(), read_queue.end(),
+            scoped_mutex_lock Lock(m_read_mutex);
+            if (std::find_if(m_read_queue.begin(), m_read_queue.end(),
                              bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
-                != read_queue.end())
+                != m_read_queue.end())
             {
                 STXXL_ERRMSG("WRITE request submitted for a BID with a pending READ request");
             }
         }
 #endif
-        scoped_mutex_lock Lock(write_mutex);
-        write_queue.push_back(req);
+        scoped_mutex_lock Lock(m_write_mutex);
+        m_write_queue.push_back(req);
     }
 
-    sem++;
+    m_sem++;
 }
 
 bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
@@ -98,28 +100,34 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
     if (m_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
+    if (!dynamic_cast<serving_request*>(req.get()))
+        STXXL_ERRMSG("Incompatible request submitted to running queue.");
 
     bool was_still_in_queue = false;
     if (req.get()->get_type() == request::READ)
     {
-        scoped_mutex_lock Lock(read_mutex);
-        queue_type::iterator pos;
-        if ((pos = std::find(read_queue.begin(), read_queue.end(), req _STXXL_FORCE_SEQUENTIAL)) != read_queue.end())
+        scoped_mutex_lock Lock(m_read_mutex);
+        queue_type::iterator pos
+            = std::find(m_read_queue.begin(), m_read_queue.end(),
+                        req _STXXL_FORCE_SEQUENTIAL);
+        if (pos != m_read_queue.end())
         {
-            read_queue.erase(pos);
+            m_read_queue.erase(pos);
             was_still_in_queue = true;
-            sem--;
+            m_sem--;
         }
     }
     else
     {
-        scoped_mutex_lock Lock(write_mutex);
-        queue_type::iterator pos;
-        if ((pos = std::find(write_queue.begin(), write_queue.end(), req _STXXL_FORCE_SEQUENTIAL)) != write_queue.end())
+        scoped_mutex_lock Lock(m_write_mutex);
+        queue_type::iterator pos
+            = std::find(m_write_queue.begin(), m_write_queue.end(),
+                        req _STXXL_FORCE_SEQUENTIAL);
+        if (pos != m_write_queue.end())
         {
-            write_queue.erase(pos);
+            m_write_queue.erase(pos);
             was_still_in_queue = true;
-            sem--;
+            m_sem--;
         }
     }
 
@@ -128,7 +136,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
 
 request_queue_impl_qwqr::~request_queue_impl_qwqr()
 {
-    stop_thread(thread, m_thread_state, sem);
+    stop_thread(m_thread, m_thread_state, m_sem);
 }
 
 void* request_queue_impl_qwqr::worker(void* arg)
@@ -138,72 +146,70 @@ void* request_queue_impl_qwqr::worker(void* arg)
     bool write_phase = true;
     for ( ; ; )
     {
-        pthis->sem--;
+        pthis->m_sem--;
 
         if (write_phase)
         {
-            scoped_mutex_lock WriteLock(pthis->write_mutex);
-            if (!pthis->write_queue.empty())
+            scoped_mutex_lock WriteLock(pthis->m_write_mutex);
+            if (!pthis->m_write_queue.empty())
             {
-                request_ptr req = pthis->write_queue.front();
-                pthis->write_queue.pop_front();
+                request_ptr req = pthis->m_write_queue.front();
+                pthis->m_write_queue.pop_front();
 
                 WriteLock.unlock();
 
                 //assert(req->get_reference_count()) > 1);
-                req->serve();
+                dynamic_cast<serving_request*>(req.get())->serve();
             }
             else
             {
                 WriteLock.unlock();
 
-                pthis->sem++;
+                pthis->m_sem++;
 
-                if (pthis->_priority_op == WRITE)
+                if (pthis->m_priority_op == WRITE)
                     write_phase = false;
             }
 
-            if (pthis->_priority_op == NONE
-                || pthis->_priority_op == READ)
+            if (pthis->m_priority_op == NONE || pthis->m_priority_op == READ)
                 write_phase = false;
         }
         else
         {
-            scoped_mutex_lock ReadLock(pthis->read_mutex);
+            scoped_mutex_lock ReadLock(pthis->m_read_mutex);
 
-            if (!pthis->read_queue.empty())
+            if (!pthis->m_read_queue.empty())
             {
-                request_ptr req = pthis->read_queue.front();
-                pthis->read_queue.pop_front();
+                request_ptr req = pthis->m_read_queue.front();
+                pthis->m_read_queue.pop_front();
 
                 ReadLock.unlock();
 
                 STXXL_VERBOSE2("queue: before serve request has " << req->get_reference_count() << " references ");
                 //assert(req->get_reference_count() > 1);
-                req->serve();
+                dynamic_cast<serving_request*>(req.get())->serve();
                 STXXL_VERBOSE2("queue: after serve request has " << req->get_reference_count() << " references ");
             }
             else
             {
                 ReadLock.unlock();
 
-                pthis->sem++;
+                pthis->m_sem++;
 
-                if (pthis->_priority_op == READ)
+                if (pthis->m_priority_op == READ)
                     write_phase = true;
             }
 
-            if (pthis->_priority_op == NONE
-                || pthis->_priority_op == WRITE)
+            if (pthis->m_priority_op == NONE || pthis->m_priority_op == WRITE)
                 write_phase = true;
         }
 
         // terminate if it has been requested and queues are empty
         if (pthis->m_thread_state() == TERMINATING) {
-            if ((pthis->sem--) == 0)
+            if ((pthis->m_sem--) == 0)
                 break;
             else
-                pthis->sem++;
+                pthis->m_sem++;
         }
     }
 

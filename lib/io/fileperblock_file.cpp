@@ -28,6 +28,8 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/mmap_file.h>
+#include <stxxl/bits/io/boostfd_file.h>
+#include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/syscall_file.h>
@@ -45,8 +47,10 @@ fileperblock_file<base_file_type>::fileperblock_file(
     const std::string& filename_prefix,
     int mode,
     int queue_id,
-    int allocator_id)
-    : disk_queued_file(queue_id, allocator_id),
+    int allocator_id,
+    unsigned int device_id)
+    : file(device_id),
+      disk_queued_file(queue_id, allocator_id),
       filename_prefix(filename_prefix),
       mode(mode),
       current_size(0),
@@ -74,16 +78,11 @@ std::string fileperblock_file<base_file_type>::filename_for_block(offset_type of
 }
 
 template <class base_file_type>
-void fileperblock_file<base_file_type>::serve(const request* req) throw (io_error)
+void fileperblock_file<base_file_type>::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
-    assert(req->get_file() == this);
-
-    base_file_type base_file(filename_for_block(req->get_offset()), mode, get_queue_id());
-    base_file.set_size(req->get_size());
-
-    request_ptr derived(new serving_request(default_completion_handler(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type()));
-    request_ptr dummy = derived;
-    derived->serve();
+    base_file_type base_file(filename_for_block(offset), mode, get_queue_id());
+    base_file.set_size(bytes);
+    base_file.serve(buffer, 0, bytes, type);
 }
 
 template <class base_file_type>
@@ -92,15 +91,15 @@ void fileperblock_file<base_file_type>::lock()
     if (!lock_file_created)
     {
         //create lock file and fill it with one page, an empty file cannot be locked
-        const int page_size = BLOCK_ALIGN;
-        void* one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
+        const int page_size = STXXL_BLOCK_ALIGN;
+        void* one_page = aligned_alloc<STXXL_BLOCK_ALIGN>(page_size);
 #if STXXL_WITH_VALGRIND
         memset(one_page, 0, page_size);
 #endif
         lock_file.set_size(page_size);
         request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
         r->wait();
-        aligned_dealloc<BLOCK_ALIGN>(one_page);
+        aligned_dealloc<STXXL_BLOCK_ALIGN>(one_page);
         lock_file_created = true;
     }
     lock_file.lock();

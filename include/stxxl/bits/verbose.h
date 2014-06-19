@@ -118,6 +118,20 @@ STXXL_END_NAMESPACE
  #define STXXL_VERBOSE3(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
+// STXXL_VERBOSE[0123]_THIS prefixes "[0xaddress]" and then calls the version
+// without _THIS.
+
+#define STXXL_VERBOSE0_THIS(x) \
+    STXXL_VERBOSE0("[" << static_cast<void*>(this) << "] " << x)
+
+#define STXXL_VERBOSE1_THIS(x) \
+    STXXL_VERBOSE1("[" << static_cast<void*>(this) << "] " << x)
+
+#define STXXL_VERBOSE2_THIS(x) \
+    STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] " << x)
+
+#define STXXL_VERBOSE3_THIS(x) \
+    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] " << x)
 
 // STXXL_CHECK is an assertion macro for unit tests, which contrarily to
 // assert() also works in release builds. These macros should ONLY be used in

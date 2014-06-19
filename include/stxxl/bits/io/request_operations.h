@@ -23,7 +23,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 //! Collection of functions to track statuses of a number of requests.
