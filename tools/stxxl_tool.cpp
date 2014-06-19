@@ -36,8 +36,8 @@ int stxxl_info(int, char**)
     STXXL_MSG("sizeof(off_t)          = " << sizeof(off_t));
     STXXL_MSG("sizeof(void*)          = " << sizeof(void*));
 
-#if defined(STXXL_HAVE_AIO_FILE)
-    STXXL_MSG("STXXL_HAVE_AIO_FILE    = " << STXXL_HAVE_AIO_FILE);
+#if defined(STXXL_HAVE_LINUXAIO_FILE)
+    STXXL_MSG("STXXL_HAVE_LINUXAIO_FILE = " << STXXL_HAVE_LINUXAIO_FILE);
 #endif
 
     return 0;

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/aio_queue.h
+ *  include/stxxl/bits/io/linuxaio_queue.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,12 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_AIO_QUEUE_HEADER
-#define STXXL_IO_AIO_QUEUE_HEADER
+#ifndef STXXL_IO_LINUXAIO_QUEUE_HEADER
+#define STXXL_IO_LINUXAIO_QUEUE_HEADER
 
-#include <stxxl/bits/io/aio_file.h>
+#include <stxxl/bits/io/linuxaio_file.h>
 
-#if STXXL_HAVE_AIO_FILE
+#if STXXL_HAVE_LINUXAIO_FILE
 
 #include <linux/aio_abi.h>
 #include <list>
@@ -29,20 +29,20 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup reqlayer
 //! \{
 
-//! \brief Queue for aio_file(s)
+//! \brief Queue for linuxaio_file(s)
 //!
 //! Only one queue exists in a program, i.e. it is a singleton.
-class aio_queue : public request_queue_impl_worker
+class linuxaio_queue : public request_queue_impl_worker
 {
-    friend class aio_request;
+    friend class linuxaio_request;
 
-    typedef aio_queue self_type;
+    typedef linuxaio_queue self_type;
 
 private:
     //! OS context
     aio_context_t context;
 
-    //! storing aio_request* would drop ownership
+    //! storing linuxaio_request* would drop ownership
     typedef std::list<request_ptr> queue_type;
 
     // "waiting" request have submitted to this queue, but not yet to the OS,
@@ -77,25 +77,25 @@ private:
     void wait_requests();
     void suspend();
 
-    // needed by aio_request
+    // needed by linuxaio_request
     aio_context_t get_io_context() { return context; }
 
 public:
     //! Construct queue. Requests max number of requests simultaneously
     //! submitted to disk, 0 means as many as possible
-    aio_queue(int desired_queue_length = 0);
+    linuxaio_queue(int desired_queue_length = 0);
 
     void add_request(request_ptr& req);
     bool cancel_request(request_ptr& req);
     void complete_request(request_ptr& req);
-    ~aio_queue();
+    ~linuxaio_queue();
 };
 
 //! \}
 
 STXXL_END_NAMESPACE
 
-#endif // #if STXXL_HAVE_AIO_FILE
+#endif // #if STXXL_HAVE_LINUXAIO_FILE
 
-#endif // !STXXL_IO_AIO_QUEUE_HEADER
+#endif // !STXXL_IO_LINUXAIO_QUEUE_HEADER
 // vim: et:ts=4:sw=4

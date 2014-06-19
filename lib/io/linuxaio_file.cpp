@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/io/aio_file.cpp
+ *  lib/io/linuxaio_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,56 +10,56 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/aio_file.h>
+#include <stxxl/bits/io/linuxaio_file.h>
 
-#if STXXL_HAVE_AIO_FILE
+#if STXXL_HAVE_LINUXAIO_FILE
 
-#include <stxxl/bits/io/aio_request.h>
+#include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/disk_queues.h>
 
 STXXL_BEGIN_NAMESPACE
 
-request_ptr aio_file::aread(
+request_ptr linuxaio_file::aread(
     void* buffer,
     offset_type pos,
     size_type bytes,
     const completion_handler& on_cmpl)
 {
-    request_ptr req(new aio_request(on_cmpl, this, buffer, pos, bytes, request::READ));
+    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::READ));
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
     return req;
 }
 
-request_ptr aio_file::awrite(
+request_ptr linuxaio_file::awrite(
     void* buffer,
     offset_type pos,
     size_type bytes,
     const completion_handler& on_cmpl)
 {
-    request_ptr req(new aio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE));
+    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE));
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
     return req;
 }
 
-void aio_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
-    //req need not be an aio_request
+    //req need not be an linuxaio_request
     if (type == request::READ)
         aread(buffer, offset, bytes, default_completion_handler())->wait();
     else
         awrite(buffer, offset, bytes, default_completion_handler())->wait();
 }
 
-const char* aio_file::io_type() const
+const char* linuxaio_file::io_type() const
 {
-    return "aio";
+    return "linuxaio";
 }
 
 STXXL_END_NAMESPACE
 
-#endif // #if STXXL_HAVE_AIO_FILE
+#endif // #if STXXL_HAVE_LINUXAIO_FILE
 // vim: et:ts=4:sw=4

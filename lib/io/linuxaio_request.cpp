@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/io/aio_request.cpp
+ *  lib/io/linuxaio_request.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,10 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/aio_request.h>
+#include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/disk_queues.h>
 
-#if STXXL_HAVE_AIO_FILE
+#if STXXL_HAVE_LINUXAIO_FILE
 
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -22,10 +22,10 @@
 
 STXXL_BEGIN_NAMESPACE
 
-void aio_request::completed(bool posted, bool canceled)
+void linuxaio_request::completed(bool posted, bool canceled)
 {
-    STXXL_VERBOSE_AIO("aio_request[" << this << "] completed(" <<
-                      posted << "," << canceled << ")");
+    STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] completed(" <<
+                           posted << "," << canceled << ")");
 
     if (!canceled)
     {
@@ -44,9 +44,9 @@ void aio_request::completed(bool posted, bool canceled)
     request_with_state::completed(canceled);
 }
 
-void aio_request::fill_control_block()
+void linuxaio_request::fill_control_block()
 {
-    aio_file* af = dynamic_cast<aio_file*>(file_);
+    linuxaio_file* af = dynamic_cast<linuxaio_file*>(file_);
 
     memset(&cb, 0, sizeof(cb));
     // indirection, so the I/O system retains an auto_ptr reference
@@ -61,16 +61,16 @@ void aio_request::fill_control_block()
 
 //! \brief Submits an I/O request to the OS
 //! \returns false if submission fails
-bool aio_request::post()
+bool linuxaio_request::post()
 {
-    STXXL_VERBOSE_AIO("aio_request[" << this << "] post()");
+    STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] post()");
 
     fill_control_block();
     iocb* cb_pointer = &cb;
     // io_submit might considerable time, so we have to remember the current
     // time before the call.
     double now = timestamp();
-    aio_queue* queue = dynamic_cast<aio_queue*>(
+    linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
         disk_queues::get_instance()->get_queue(get_file()->get_queue_id())
         );
     int success = syscall(SYS_io_submit, queue->get_io_context(), 1, &cb_pointer);
@@ -82,7 +82,7 @@ bool aio_request::post()
             stats::get_instance()->write_started(bytes, now);
     }
     else if (success == -1 && errno != EAGAIN)
-        STXXL_THROW2(io_error, "aio_request::post", "io_submit()");
+        STXXL_THROW2(io_error, "linuxaio_request::post", "io_submit()");
 
     return success == 1;
 }
@@ -90,28 +90,28 @@ bool aio_request::post()
 //! \brief Cancel the request
 //!
 //! Routine is called by user, as part of the request interface.
-bool aio_request::cancel()
+bool linuxaio_request::cancel()
 {
-    STXXL_VERBOSE_AIO("aio_request[" << this << "] cancel()");
+    STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] cancel()");
 
     if (!get_file()) return false;
 
     request_ptr req(this);
-    aio_queue* queue = dynamic_cast<aio_queue*>(
+    linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
         disk_queues::get_instance()->get_queue(get_file()->get_queue_id())
         );
     return queue->cancel_request(req);
 }
 
 //! \brief Cancel already posted request
-bool aio_request::cancel_aio()
+bool linuxaio_request::cancel_aio()
 {
-    STXXL_VERBOSE_AIO("aio_request[" << this << "] cancel_aio()");
+    STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] cancel_aio()");
 
     if (!get_file()) return false;
 
     io_event event;
-    aio_queue* queue = dynamic_cast<aio_queue*>(
+    linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
         disk_queues::get_instance()->get_queue(get_file()->get_queue_id())
         );
     int result = syscall(SYS_io_cancel, queue->get_io_context(), &cb, &event);
@@ -122,5 +122,5 @@ bool aio_request::cancel_aio()
 
 STXXL_END_NAMESPACE
 
-#endif // #if STXXL_HAVE_AIO_FILE
+#endif // #if STXXL_HAVE_LINUXAIO_FILE
 // vim: et:ts=4:sw=4

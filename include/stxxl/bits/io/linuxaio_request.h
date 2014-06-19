@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/aio_request.h
+ *  include/stxxl/bits/io/linuxaio_request.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,25 +10,25 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_AIO_REQUEST_HEADER
-#define STXXL_IO_AIO_REQUEST_HEADER
+#ifndef STXXL_IO_LINUXAIO_REQUEST_HEADER
+#define STXXL_IO_LINUXAIO_REQUEST_HEADER
 
-#include <stxxl/bits/io/aio_file.h>
+#include <stxxl/bits/io/linuxaio_file.h>
 
-#if STXXL_HAVE_AIO_FILE
+#if STXXL_HAVE_LINUXAIO_FILE
 
 #include <linux/aio_abi.h>
 #include <stxxl/bits/io/request_with_state.h>
 
-#define STXXL_VERBOSE_AIO(msg) STXXL_VERBOSE2(msg)
+#define STXXL_VERBOSE_LINUXAIO(msg) STXXL_VERBOSE2(msg)
 
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer
 //! \{
 
-//! \brief Request for an aio_file.
-class aio_request : public request_with_state
+//! \brief Request for an linuxaio_file.
+class linuxaio_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;
@@ -39,7 +39,7 @@ class aio_request : public request_with_state
     void fill_control_block();
 
 public:
-    aio_request(
+    linuxaio_request(
         const completion_handler& on_cmpl,
         file* file,
         void* buffer,
@@ -48,11 +48,12 @@ public:
         request_type type)
         : request_with_state(on_cmpl, file, buffer, offset, bytes, type)
     {
-        assert(dynamic_cast<aio_file*>(file));
-        STXXL_VERBOSE_AIO("aio_request[" << this << "] aio_request(" <<
-                          "file=" << file << " buffer=" << buffer <<
-                          " offset=" << offset << " bytes=" << bytes <<
-                          " type=" << type << ")");
+        assert(dynamic_cast<linuxaio_file*>(file));
+        STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "]" <<
+                               " linuxaio_request" <<
+                               "(file=" << file << " buffer=" << buffer <<
+                               " offset=" << offset << " bytes=" << bytes <<
+                               " type=" << type << ")");
     }
 
     bool post();
@@ -66,7 +67,7 @@ public:
 
 STXXL_END_NAMESPACE
 
-#endif // #if STXXL_HAVE_AIO_FILE
+#endif // #if STXXL_HAVE_LINUXAIO_FILE
 
-#endif // !STXXL_IO_AIO_REQUEST_HEADER
+#endif // !STXXL_IO_LINUXAIO_REQUEST_HEADER
 // vim: et:ts=4:sw=4

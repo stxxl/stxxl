@@ -99,12 +99,12 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         result->lock();
         return result;
     }
-#if STXXL_HAVE_AIO_FILE
-    // aio can have the desired queue length immediately appended to "aio", e.g. "aio(5)"
-    else if (cfg.io_impl == "aio")
+#if STXXL_HAVE_LINUXAIO_FILE
+    // linuxaio can have the desired queue length, specified as queue_length=?
+    else if (cfg.io_impl == "linuxaio")
     {
         ufs_file_base* result =
-            new aio_file(cfg.path, mode, cfg.queue, disk_allocator_id, cfg.queue_length);
+            new linuxaio_file(cfg.path, mode, cfg.queue, disk_allocator_id, cfg.queue_length);
 
         result->lock();
 

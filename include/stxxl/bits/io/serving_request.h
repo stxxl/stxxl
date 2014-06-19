@@ -29,7 +29,6 @@ class serving_request : public request_with_state
     friend class fileperblock_file;
     friend class request_queue_impl_qwqr;
     friend class request_queue_impl_1q;
-    friend class aio_queue;
 
 public:
     serving_request(

@@ -394,7 +394,7 @@ check_cxx_source_compiles(
        int r = syscall(SYS_io_setup, 5, &context);
        return (r == 0) ? 0 : -1;
    }"
-   STXXL_HAVE_AIO_FILE)
+   STXXL_HAVE_LINUXAIO_FILE)
 
 ###############################################################################
 # check for an atomic add-and-fetch intrinsic for counting_ptr

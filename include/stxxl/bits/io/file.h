@@ -89,7 +89,7 @@ public:
     };
 
     static const int DEFAULT_QUEUE = -1;
-    static const int DEFAULT_AIO_QUEUE = -2;
+    static const int DEFAULT_LINUXAIO_QUEUE = -2;
     static const int NO_ALLOCATOR = -1;
 
     //! Schedules an asynchronous read request to the file.

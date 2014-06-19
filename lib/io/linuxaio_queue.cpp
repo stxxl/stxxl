@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/io/aio_queue.cpp
+ *  lib/io/linuxaio_queue.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,15 +12,15 @@
  **************************************************************************/
 
 #include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/io/aio_queue.h>
+#include <stxxl/bits/io/linuxaio_queue.h>
 
-#if STXXL_HAVE_AIO_FILE
+#if STXXL_HAVE_LINUXAIO_FILE
 
 #include <unistd.h>
 #include <sys/syscall.h>
 
-#include <stxxl/bits/io/aio_request.h>
-#include <stxxl/bits/io/aio_queue.h>
+#include <stxxl/bits/io/linuxaio_request.h>
+#include <stxxl/bits/io/linuxaio_queue.h>
 
 #include <algorithm>
 
@@ -31,7 +31,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-aio_queue::aio_queue(int desired_queue_length)
+linuxaio_queue::linuxaio_queue(int desired_queue_length)
     : num_waiting_requests(0), num_free_events(0), num_posted_requests(0),
       post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
@@ -52,34 +52,34 @@ aio_queue::aio_queue(int desired_queue_length)
         max_events <<= 1;               // try with half as many events
     }
     if (result != 0) {
-        STXXL_THROW2(io_error, "aio_queue::aio_queue",
+        STXXL_THROW2(io_error, "linuxaio_queue::linuxaio_queue",
                      "io_setup() nr_events=" << max_events);
     }
 
     for (int e = 0; e < max_events; ++e)
         num_free_events++;  // cannot set semaphore to value directly
 
-    STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
+    STXXL_MSG("Set up an linuxaio queue with " << max_events << " entries.");
 
     start_thread(post_async, static_cast<void*>(this), post_thread, post_thread_state);
     start_thread(wait_async, static_cast<void*>(this), wait_thread, wait_thread_state);
 }
 
-aio_queue::~aio_queue()
+linuxaio_queue::~linuxaio_queue()
 {
     stop_thread(post_thread, post_thread_state, num_waiting_requests);
     stop_thread(wait_thread, wait_thread_state, num_posted_requests);
     syscall(SYS_io_destroy, context);
 }
 
-void aio_queue::add_request(request_ptr& req)
+void linuxaio_queue::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
     if (post_thread_state() != RUNNING)
         STXXL_ERRMSG("Request submitted to stopped queue.");
-    if (!dynamic_cast<aio_request*>(req.get()))
-        STXXL_ERRMSG("Non-AIO request submitted to AIO queue.");
+    if (!dynamic_cast<linuxaio_request*>(req.get()))
+        STXXL_ERRMSG("Non-LinuxAIO request submitted to LinuxAIO queue.");
 
     scoped_mutex_lock lock(waiting_mtx);
 
@@ -87,7 +87,7 @@ void aio_queue::add_request(request_ptr& req)
     num_waiting_requests++;
 }
 
-bool aio_queue::cancel_request(request_ptr& req)
+bool linuxaio_queue::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
@@ -104,9 +104,9 @@ bool aio_queue::cancel_request(request_ptr& req)
         {
             waiting_requests.erase(pos);
 
-            // polymorphic_downcast to aio_request,
+            // polymorphic_downcast to linuxaio_request,
             // request is canceled, but was not yet posted.
-            dynamic_cast<aio_request*>(pos->get())->completed(false, true);
+            dynamic_cast<linuxaio_request*>(pos->get())->completed(false, true);
 
             num_waiting_requests--; // will never block
             return true;
@@ -119,17 +119,17 @@ bool aio_queue::cancel_request(request_ptr& req)
                     req _STXXL_FORCE_SEQUENTIAL);
     if (pos != posted_requests.end())
     {
-        // polymorphic_downcast to aio_request,
-        bool canceled_io_operation = (dynamic_cast<aio_request*>(req.get()))->cancel_aio();
+        // polymorphic_downcast to linuxaio_request,
+        bool canceled_io_operation = (dynamic_cast<linuxaio_request*>(req.get()))->cancel_aio();
 
         if (canceled_io_operation)
         {
             posted_requests.erase(pos);
 
-            // polymorphic_downcast to aio_request,
+            // polymorphic_downcast to linuxaio_request,
 
             // request is canceled, already posted
-            dynamic_cast<aio_request*>(pos->get())->completed(true, true);
+            dynamic_cast<linuxaio_request*>(pos->get())->completed(true, true);
 
             num_free_events++;
             num_posted_requests--; // will never block
@@ -141,7 +141,7 @@ bool aio_queue::cancel_request(request_ptr& req)
 }
 
 // internal routines, run by the posting thread
-void aio_queue::post_requests()
+void linuxaio_queue::post_requests()
 {
     request_ptr req;
     io_event* events = new io_event[max_events];
@@ -165,7 +165,7 @@ void aio_queue::post_requests()
             num_free_events--; // might block because too many requests are posted
 
             // polymorphic_downcast
-            while (!dynamic_cast<aio_request*>(req.get())->post())
+            while (!dynamic_cast<linuxaio_request*>(req.get())->post())
             {
                 // post failed, so first handle events to make queues (more)
                 // empty, then try again.
@@ -173,7 +173,7 @@ void aio_queue::post_requests()
                 // wait for at least one event to complete, no time limit
                 int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
                 if (num_events < 0) {
-                    STXXL_THROW2(io_error, "aio_queue::post_requests",
+                    STXXL_THROW2(io_error, "linuxaio_queue::post_requests",
                                  "io_getevents() nr_events=" << num_events);
                 }
 
@@ -200,7 +200,7 @@ void aio_queue::post_requests()
     delete[] events;
 }
 
-void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
+void linuxaio_queue::handle_events(io_event* events, int num_events, bool canceled)
 {
     for (int e = 0; e < num_events; ++e)
     {
@@ -214,7 +214,7 @@ void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
 }
 
 // internal routines, run by the waiting thread
-void aio_queue::wait_requests()
+void linuxaio_queue::wait_requests()
 {
     request_ptr req;
     io_event* events = new io_event[max_events];
@@ -231,7 +231,7 @@ void aio_queue::wait_requests()
         // wait for at least one of them to finish
         int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
         if (num_events < 0) {
-            STXXL_THROW2(io_error, "aio_queue::wait_requests",
+            STXXL_THROW2(io_error, "linuxaio_queue::wait_requests",
                          "io_getevents() nr_events=" << max_events);
         }
 
@@ -243,9 +243,9 @@ void aio_queue::wait_requests()
     delete[] events;
 }
 
-void* aio_queue::post_async(void* arg)
+void* linuxaio_queue::post_async(void* arg)
 {
-    (static_cast<aio_queue*>(arg))->post_requests();
+    (static_cast<linuxaio_queue*>(arg))->post_requests();
 
     self_type* pthis = static_cast<self_type*>(arg);
     pthis->post_thread_state.set_to(TERMINATED);
@@ -259,9 +259,9 @@ void* aio_queue::post_async(void* arg)
 #endif
 }
 
-void* aio_queue::wait_async(void* arg)
+void* linuxaio_queue::wait_async(void* arg)
 {
-    (static_cast<aio_queue*>(arg))->wait_requests();
+    (static_cast<linuxaio_queue*>(arg))->wait_requests();
 
     self_type* pthis = static_cast<self_type*>(arg);
     pthis->wait_thread_state.set_to(TERMINATED);
@@ -277,5 +277,5 @@ void* aio_queue::wait_async(void* arg)
 
 STXXL_END_NAMESPACE
 
-#endif // #if STXXL_HAVE_AIO_FILE
+#endif // #if STXXL_HAVE_LINUXAIO_FILE
 // vim: et:ts=4:sw=4

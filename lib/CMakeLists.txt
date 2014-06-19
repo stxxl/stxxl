@@ -23,15 +23,15 @@ set(LIBSTXXL_SOURCES
   common/verbose.cpp
   common/version.cpp
 
-  io/aio_file.cpp
-  io/aio_queue.cpp
-  io/aio_request.cpp
   io/boostfd_file.cpp
   io/create_file.cpp
   io/disk_queued_file.cpp
   io/file.cpp
   io/fileperblock_file.cpp
   io/iostats.cpp
+  io/linuxaio_file.cpp
+  io/linuxaio_queue.cpp
+  io/linuxaio_request.cpp
   io/mem_file.cpp
   io/request.cpp
   io/request_queue_impl_1q.cpp

@@ -97,7 +97,7 @@ public:
     //! unlink file immediately after opening (available on most Unix)
     bool unlink_on_open;
 
-    //! desired queue length for aio_file and aio_queue
+    //! desired queue length for linuxaio_file and linuxaio_queue
     int queue_length;
 
     //! \}

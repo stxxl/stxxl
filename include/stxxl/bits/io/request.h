@@ -38,7 +38,7 @@ class file;
 //! Request object encapsulating basic properties like file and offset.
 class request : virtual public request_interface, public atomic_counted_object
 {
-    friend class aio_queue;
+    friend class linuxaio_queue;
 
 protected:
     completion_handler on_complete;

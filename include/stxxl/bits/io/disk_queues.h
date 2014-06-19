@@ -22,8 +22,8 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
-#include <stxxl/bits/io/aio_queue.h>
-#include <stxxl/bits/io/aio_request.h>
+#include <stxxl/bits/io/linuxaio_queue.h>
+#include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/serving_request.h>
 
 
@@ -59,9 +59,11 @@ public:
         if (qi == queues.end())
         {
             // create new request queue
-#if STXXL_HAVE_AIO_FILE
-            if (dynamic_cast<aio_request*>(req.get()))
-                q = queues[disk] = new aio_queue(dynamic_cast<aio_file*>(req->get_file())->get_desired_queue_length());
+#if STXXL_HAVE_LINUXAIO_FILE
+            if (dynamic_cast<linuxaio_request*>(req.get()))
+                q = queues[disk] = new linuxaio_queue(
+                    dynamic_cast<linuxaio_file*>(req->get_file())->get_desired_queue_length()
+                    );
             else
 #endif
             q = queues[disk] = new request_queue_impl_qwqr();
@@ -69,9 +71,9 @@ public:
         else
             q = qi->second;
 
-#if STXXL_HAVE_AIO_FILE
+#if STXXL_HAVE_LINUXAIO_FILE
         if (!(
-                (dynamic_cast<aio_request*>(req.get()) && dynamic_cast<aio_queue*>(q)) ||
+                (dynamic_cast<linuxaio_request*>(req.get()) && dynamic_cast<linuxaio_queue*>(q)) ||
                 (dynamic_cast<serving_request*>(req.get()) && dynamic_cast<request_queue*>(q))))
         {
             STXXL_THROW2(io_error, "disk_queues::add_request",
