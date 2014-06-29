@@ -43,6 +43,7 @@ if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
     # requires /bigobj flag to build
     set_target_properties(test_ksort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
     set_target_properties(test_sort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
+    set_target_properties(test_stable_ksort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
   endif()
 
   ### extra sort tests:
