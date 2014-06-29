@@ -33,14 +33,24 @@ int main()
     stxxl::VECTOR_GENERATOR<int>::result vector;
 
     // fill vector with random integers
-    stxxl::random_number32 random;
+    {
+        stxxl::scoped_print_timer
+            timer("write random numbers", 100 * 1024 * 1024 * sizeof(int));
 
-    for (size_t i = 0; i < 100 * 1024 * 1024; ++i) {
-        vector.push_back(random());
+        stxxl::random_number32 random;
+
+        for (size_t i = 0; i < 100 * 1024 * 1024; ++i) {
+            vector.push_back(random());
+        }
     }
 
     // sort vector using 16 MiB RAM
-    stxxl::sort(vector.begin(), vector.end(), my_less_int(), 16 * 1024 * 1024);
+    {
+        stxxl::scoped_print_timer
+            timer("sorting random numbers", 100 * 1024 * 1024 * sizeof(int));
+
+        stxxl::sort(vector.begin(), vector.end(), my_less_int(), 16 * 1024 * 1024);
+    }
 
     // output first and last items:
     std::cout << vector.size() << " items sorted ranging from "
