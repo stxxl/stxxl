@@ -49,12 +49,12 @@ STXXL_END_NAMESPACE
         stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
     } while (false)
 
-#define _STXXL_NOT_VERBOSE(message)                                          \
-    do {                                                                     \
-        if (0) {                                                             \
-            std::ostringstream str_;                                         \
-            str_ << message;                                                 \
-        }                                                                    \
+#define _STXXL_NOT_VERBOSE(message)  \
+    do {                             \
+        if (0) {                     \
+            std::ostringstream str_; \
+            str_ << message;         \
+        }                            \
     } while (false)
 
 #ifdef STXXL_FORCE_VERBOSE_LEVEL
