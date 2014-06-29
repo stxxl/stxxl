@@ -278,7 +278,7 @@ public:
     inline binary_buffer & put_varint(uint32 v)
     {
         if (v < 128) {
-            put<uint8>(v);
+            put<uint8>(uint8(v));
         }
         else if (v < 128 * 128) {
             put<uint8>(((v >> 0) & 0x7F) | 0x80);
@@ -316,7 +316,7 @@ public:
     inline binary_buffer & put_varint(uint64 v)
     {
         if (v < 128) {
-            put<uint8>(v);
+            put<uint8>(uint8(v));
         }
         else if (v < 128 * 128) {
             put<uint8>(((v >> 00) & 0x7F) | 0x80);

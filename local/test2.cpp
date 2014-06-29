@@ -53,7 +53,7 @@ int main()
         stxxl::scoped_print_timer
             timer("read+merge random numbers", 600 * 1024 * 1024 * sizeof(int64_t));
 
-        int64_t first = *sorter, last, count = 1;
+        int64_t first = *sorter, last = first, count = 1;
         ++sorter;
 
         while (!sorter.empty())
