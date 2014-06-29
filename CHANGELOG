@@ -10,6 +10,9 @@ Version 1.4-dev (unreleased)
     queue; thus the distinction had to be made. In a default config, no changes
     are necessary, as the device_id parameter is automatically enumerated.
 
+  - adding stxxl::binary_buffer which can be used for compact serialization and
+    reading via a stxxl::binary_reader cursor interface.
+
 Version 1.4.0 (12 December 2013)
 
 * Reorganized Directory Hierarchy
