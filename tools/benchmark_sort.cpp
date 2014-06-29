@@ -213,9 +213,9 @@ int benchmark_sort(int argc, char* argv[])
 
     BenchmarkSort<pair32_type, stxxl::random_number32>("pair of uint32", length, memsize);
 
-    BenchmarkSort<pair64_type, stxxl::random_number64>("pair of uint64", length, memsize);
+    BenchmarkSort<pair64_type, stxxl::random_number32>("pair of uint64", length, memsize);
 
-    BenchmarkSort<struct64_type, stxxl::random_number64>("struct of 64 bytes", length, memsize);
+    BenchmarkSort<struct64_type, stxxl::random_number32>("struct of 64 bytes", length, memsize);
 
     return 0;
 }
