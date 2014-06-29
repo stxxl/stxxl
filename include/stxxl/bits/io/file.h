@@ -154,7 +154,7 @@ public:
 
     virtual ~file()
     {
-        int nr = get_request_nref();
+        unsigned_type nr = get_request_nref();
         if (nr != 0)
             STXXL_ERRMSG("stxxl::file is being deleted while there are "
                          "still " << nr << " (unfinished) requests "
