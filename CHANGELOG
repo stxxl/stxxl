@@ -4,6 +4,12 @@ Version 1.4-dev (unreleased)
     which exploits Native Command Queuing (NCQ) if available
     disable/enable with the define STXXL_FILE_LINUXAIO 0/1 via cmake
 
+  - adding new disk_config entry device_id, which specifies the physical device
+    id of the "disk" used during prefetching sequence calculations. This used
+    to be identical with the queue id, however, for linuxaio there is only one
+    queue; thus the distinction had to be made. In a default config, no changes
+    are necessary, as the device_id parameter is automatically enumerated.
+
 Version 1.4.0 (12 December 2013)
 
 * Reorganized Directory Hierarchy
