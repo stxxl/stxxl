@@ -46,11 +46,13 @@ public:
         const std::string& filename_prefix,
         int mode,
         int queue_id = DEFAULT_QUEUE,
-        int allocator_id = NO_ALLOCATOR);
+        int allocator_id = NO_ALLOCATOR,
+        unsigned int device_id = DEFAULT_DEVICE_ID);
 
     virtual ~fileperblock_file();
 
-    virtual void serve(const request* req) throw (io_error);
+    virtual void serve(void* buffer, offset_type offset, size_type bytes,
+                       request::request_type type) throw (io_error);
 
     //! Changes the size of the file.
     //! \param new_size value of the new file size

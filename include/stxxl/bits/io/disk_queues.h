@@ -6,6 +6,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -22,11 +23,14 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
+#include <stxxl/bits/io/linuxaio_queue.h>
+#include <stxxl/bits/io/linuxaio_request.h>
+#include <stxxl/bits/io/serving_request.h>
 
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 //! Encapsulates disk queues.
@@ -35,11 +39,8 @@ class disk_queues : public singleton<disk_queues>
 {
     friend class singleton<disk_queues>;
 
-    // 2 queues: write queue and read queue
-    typedef request_queue_impl_qwqr request_queue_type;
-
     typedef stxxl::int64 DISKID;
-    typedef std::map<DISKID, request_queue_type*> request_queue_map;
+    typedef std::map<DISKID, request_queue*> request_queue_map;
 
 protected:
     request_queue_map queues;
@@ -54,12 +55,24 @@ public:
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
         disk = 42;
 #endif
-        if (queues.find(disk) == queues.end())
+        request_queue_map::iterator qi = queues.find(disk);
+        request_queue* q;
+        if (qi == queues.end())
         {
             // create new request queue
-            queues[disk] = new request_queue_type();
+#if STXXL_HAVE_LINUXAIO_FILE
+            if (dynamic_cast<linuxaio_request*>(req.get()))
+                q = queues[disk] = new linuxaio_queue(
+                        dynamic_cast<linuxaio_file*>(req->get_file())->get_desired_queue_length()
+                        );
+            else
+#endif
+            q = queues[disk] = new request_queue_impl_qwqr();
         }
-        queues[disk]->add_request(req);
+        else
+            q = qi->second;
+
+        q->add_request(req);
     }
 
     //! Cancel a request.
@@ -79,6 +92,14 @@ public:
             return queues[disk]->cancel_request(req);
         else
             return false;
+    }
+
+    request_queue * get_queue(DISKID disk)
+    {
+        if (queues.find(disk) != queues.end())
+            return queues[disk];
+        else
+            return NULL;
     }
 
     ~disk_queues()

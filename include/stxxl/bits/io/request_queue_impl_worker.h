@@ -35,9 +35,12 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
+//! Implementation of request queue worker threads. Worker threads can be
+//! started by start_thread and stopped with stop_thread. The queue state is
+//! checked before termination and updated afterwards.
 class request_queue_impl_worker : public request_queue
 {
 protected:

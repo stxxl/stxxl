@@ -24,25 +24,28 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
+//! Implementation of a local request queue having two queues, one for read and
+//! one for write requests, thus having two threads. This is the default
+//! implementation.
 class request_queue_impl_qwqr : public request_queue_impl_worker
 {
 private:
     typedef request_queue_impl_qwqr self;
     typedef std::list<request_ptr> queue_type;
 
-    mutex write_mutex;
-    mutex read_mutex;
-    queue_type write_queue;
-    queue_type read_queue;
+    mutex m_write_mutex;
+    mutex m_read_mutex;
+    queue_type m_write_queue;
+    queue_type m_read_queue;
 
     state<thread_state> m_thread_state;
-    thread_type thread;
-    semaphore sem;
+    thread_type m_thread;
+    semaphore m_sem;
 
-    static const priority_op _priority_op = WRITE;
+    static const priority_op m_priority_op = WRITE;
 
     static void * worker(void* arg);
 

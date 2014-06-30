@@ -18,6 +18,7 @@
 
 
 #include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/namespace.h>
@@ -66,7 +67,7 @@ struct write_time_cmp : public std::binary_function<write_time_pair, write_time_
 static inline int_type get_disk(int_type i, const int_type* disks, int_type D)
 {
     int_type disk = disks[i];
-    if (disk == file::NO_ALLOCATOR)
+    if (disk == file::DEFAULT_DEVICE_ID)
         disk = D;      // remap to sentinel
     assert(0 <= disk && disk <= D);
     return disk;
@@ -82,13 +83,13 @@ int_type simulate_async_write(
     typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
     typedef std::queue<int_type> disk_queue_type;
     assert(L >= D);
-    disk_queue_type* disk_queues = new disk_queue_type[D + 1];       // + sentinel for remapping NO_ALLOCATOR
+    simple_vector<disk_queue_type> disk_queues(D + 1); // + sentinel for remapping NO_ALLOCATOR
     event_queue_type event_queue;
 
     int_type m = m_init;
     int_type i = L - 1;
     int_type oldtime = 0;
-    bool* disk_busy = new bool[D + 1];
+    simple_vector<bool> disk_busy(D + 1);
 
     while (m && (i >= 0))
     {
@@ -162,10 +163,6 @@ int_type simulate_async_write(
     assert(i == -1);
     for (int_type i = 0; i <= D; i++)
         assert(disk_queues[i].empty());
-
-
-    delete[] disk_busy;
-    delete[] disk_queues;
 
     return (oldtime - 1);
 }

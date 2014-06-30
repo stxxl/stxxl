@@ -52,16 +52,21 @@ set(LIBSTXXL_SOURCES
   )
 
 if(NOT MSVC)
-
   # additional sources for non Visual Studio builds
   set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
-
     io/mmap_file.cpp
     io/simdisk_file.cpp
-
     )
-
 endif(NOT MSVC)
+
+if(STXXL_HAVE_LINUXAIO_FILE)
+  # additional sources fo LinuxAIO fileio access method
+  set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
+    io/linuxaio_file.cpp
+    io/linuxaio_queue.cpp
+    io/linuxaio_request.cpp
+    )
+endif()
 
 # tell top-level cmakelists which library we build
 set(STXXL_EXPORTED_LIBS stxxl)

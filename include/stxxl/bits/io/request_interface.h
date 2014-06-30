@@ -24,7 +24,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 class onoff_switch;
@@ -48,12 +48,8 @@ public:
 protected:
     virtual void notify_waiters() = 0;
 
-public:
-    // HACK!
-    virtual void serve() = 0;
-
 protected:
-    virtual void completed() = 0;
+    virtual void completed(bool canceled) = 0;
 
 public:
     //! Suspends calling thread until completion of the request.

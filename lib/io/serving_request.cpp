@@ -45,17 +45,17 @@ serving_request::serving_request(
 void serving_request::serve()
 {
     check_nref();
-    STXXL_VERBOSE2(
-        "[" << static_cast<void*>(this) << "] serving_request::serve(): " <<
-        buffer << " @ [" <<
-        file_ << "|" << file_->get_allocator_id() << "]0x" <<
+    STXXL_VERBOSE2_THIS(
+        "serving_request::serve(): " <<
+        m_buffer << " @ [" <<
+        m_file << "|" << m_file->get_allocator_id() << "]0x" <<
         std::hex << std::setfill('0') << std::setw(8) <<
-        offset << "/0x" << bytes <<
-        ((type == request::READ) ? " READ" : " WRITE"));
+        m_offset << "/0x" << m_bytes <<
+        ((m_type == request::READ) ? " READ" : " WRITE"));
 
     try
     {
-        file_->serve(this);
+        m_file->serve(m_buffer, m_offset, m_bytes, m_type);
     }
     catch (const io_error& ex)
     {
@@ -64,20 +64,12 @@ void serving_request::serve()
 
     check_nref(true);
 
-    completed();
-}
-
-void serving_request::completed()
-{
-    STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] serving_request::completed()");
-    _state.set_to(DONE);
-    request_with_state::completed();
-    _state.set_to(READY2DIE);
+    completed(false);
 }
 
 const char* serving_request::io_type() const
 {
-    return file_->io_type();
+    return m_file->io_type();
 }
 
 STXXL_END_NAMESPACE

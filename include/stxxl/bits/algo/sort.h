@@ -103,7 +103,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks1[i].elem));
+        STXXL_VERBOSE1("stxxl::create_runs posting read " << Blocks1[i].elem);
         bids1[i] = *(it++);
         read_reqs1[i] = Blocks1[i].read(bids1[i]);
     }
@@ -112,7 +112,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks2[i].elem));
+        STXXL_VERBOSE1("stxxl::create_runs posting read " << Blocks2[i].elem);
         bids2[i] = *(it++);
         read_reqs2[i] = Blocks2[i].read(bids2[i]);
     }
@@ -147,7 +147,7 @@ create_runs(
         int_type runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
         for (i = 0; i < m2; ++i)
         {
-            STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
+            STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
             (*run)[i].value = Blocks1[i][0];
             if (i >= runplus2size) {
                 write_reqs[i] = Blocks1[i].write((*run)[i].bid);
@@ -185,7 +185,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
+        STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
         (*run)[i].value = Blocks1[i][0];
         write_reqs[i] = Blocks1[i].write((*run)[i].bid);
     }
@@ -348,7 +348,7 @@ void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        disks_number);
+        config::get_instance()->get_max_device_id());
 #else
     for (unsigned_type i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;

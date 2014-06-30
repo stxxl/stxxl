@@ -1576,6 +1576,7 @@ PREDEFINED             = "STXXL_BEGIN_NAMESPACE=namespace stxxl {" \
                          "STXXL_END_NAMESPACE=}" \
                          "STXXL_DEPRECATED(x)=x" \
                          "STXXL_HAVE_MMAP_FILE=1" \
+                         "STXXL_HAVE_LINUXAIO_FILE=1" \
                          "STXXL_WINDOWS=1" \
                          "STXXL_POSIX_THREADS=1" \
 

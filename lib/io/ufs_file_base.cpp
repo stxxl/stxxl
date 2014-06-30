@@ -31,7 +31,8 @@ const char* ufs_file_base::io_type() const
 
 ufs_file_base::ufs_file_base(
     const std::string& filename,
-    int mode) : file_des(-1), m_mode(mode), filename(filename)
+    int mode)
+    : file_des(-1), m_mode(mode), filename(filename)
 {
     int flags = 0;
 

@@ -97,7 +97,7 @@ int main(int argc, char** argv)
         const my_type::key_type num_elements = 1 * 1024 * 1024;
         const unsigned int records_in_block = block_size / sizeof(my_type);
         stxxl::syscall_file f(argv[2], stxxl::file::CREAT | stxxl::file::RDWR);
-        my_type* array = (my_type*)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
+        my_type* array = (my_type*)stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
         memset(array, 0, block_size);
 
         my_type::key_type cur_key = num_elements;
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
             stxxl::request_ptr req = f.awrite((void*)array, stxxl::int64(i) * block_size, block_size, stxxl::default_completion_handler());
             req->wait();
         }
-        stxxl::aligned_dealloc<BLOCK_ALIGN>(array);
+        stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);
     } else {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
         STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");

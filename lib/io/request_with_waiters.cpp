@@ -28,40 +28,38 @@ bool request_with_waiters::add_waiter(onoff_switch* sw)
     // condition might occur: the state might change and notify_waiters()
     // could be called between poll() and insert() resulting in waiter sw
     // never being notified
-    scoped_mutex_lock lock(waiters_mutex);
+    scoped_mutex_lock lock(m_waiters_mutex);
 
     if (poll())                     // request already finished
     {
         return true;
     }
 
-    waiters.insert(sw);
+    m_waiters.insert(sw);
 
     return false;
 }
 
 void request_with_waiters::delete_waiter(onoff_switch* sw)
 {
-    scoped_mutex_lock lock(waiters_mutex);
-    waiters.erase(sw);
+    scoped_mutex_lock lock(m_waiters_mutex);
+    m_waiters.erase(sw);
 }
 
 void request_with_waiters::notify_waiters()
 {
-    scoped_mutex_lock lock(waiters_mutex);
-    std::for_each(waiters.begin(),
-                  waiters.end(),
+    scoped_mutex_lock lock(m_waiters_mutex);
+    std::for_each(m_waiters.begin(),
+                  m_waiters.end(),
                   std::mem_fun(&onoff_switch::on)
                   _STXXL_FORCE_SEQUENTIAL);
 }
 
-/*
-int request_with_waiters::nwaiters()
+size_t request_with_waiters::num_waiters()
 {
-    scoped_mutex_lock lock(waiters_mutex);
-    return waiters.size();
+    scoped_mutex_lock lock(m_waiters_mutex);
+    return m_waiters.size();
 }
-*/
 
 STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

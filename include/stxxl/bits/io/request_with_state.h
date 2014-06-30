@@ -22,18 +22,18 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup fileimpl
+//! \addtogroup reqlayer
 //! \{
 
 //! Request with completion state.
-class request_with_state : public request, public request_with_waiters
+class request_with_state : public request_with_waiters
 {
 protected:
     //! states of request
     //! OP - operating, DONE - request served, READY2DIE - can be destroyed
     enum request_state { OP = 0, DONE = 1, READY2DIE = 2 };
 
-    state<request_state> _state;
+    state<request_state> m_state;
 
 protected:
     request_with_state(
@@ -43,8 +43,8 @@ protected:
         offset_type off,
         size_type b,
         request_type t) :
-        request(on_cmpl, f, buf, off, b, t),
-        _state(OP)
+        request_with_waiters(on_cmpl, f, buf, off, b, t),
+        m_state(OP)
     { }
 
 public:
@@ -52,6 +52,9 @@ public:
     void wait(bool measure_time = true);
     bool poll();
     bool cancel();
+
+protected:
+    void completed(bool canceled);
 };
 
 //! \}

@@ -24,14 +24,12 @@
 
 STXXL_BEGIN_NAMESPACE
 
-void syscall_file::serve(const request* req) throw (io_error)
+void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
+                         request::request_type type) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    assert(req->get_file() == this);
-    offset_type offset = req->get_offset();
-    char* buffer = static_cast<char*>(req->get_buffer());
-    size_type bytes = req->get_size();
-    request::request_type type = req->get_type();
+
+    char* cbuffer = static_cast<char*>(buffer);
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
@@ -47,7 +45,7 @@ void syscall_file::serve(const request* req) throw (io_error)
                 " path=" << filename <<
                 " fd=" << file_des <<
                 " offset=" << offset <<
-                " buffer=" << (void*)buffer <<
+                " buffer=" << cbuffer <<
                 " bytes=" << bytes <<
                 " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                 " rc=" << rc);
@@ -57,9 +55,9 @@ void syscall_file::serve(const request* req) throw (io_error)
         {
 #if STXXL_MSVC
             assert(bytes <= std::numeric_limits<unsigned int>::max());
-            if ((rc = ::read(file_des, buffer, (unsigned int)bytes)) <= 0)
+            if ((rc = ::read(file_des, cbuffer, (unsigned int)bytes)) <= 0)
 #else
-            if ((rc = ::read(file_des, buffer, bytes)) <= 0)
+            if ((rc = ::read(file_des, cbuffer, bytes)) <= 0)
 #endif
             {
                 STXXL_THROW_ERRNO
@@ -69,20 +67,20 @@ void syscall_file::serve(const request* req) throw (io_error)
                     " path=" << filename <<
                     " fd=" << file_des <<
                     " offset=" << offset <<
-                    " buffer=" << (void*)buffer <<
+                    " buffer=" << buffer <<
                     " bytes=" << bytes <<
                     " type=" << "READ" <<
                     " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;
-            buffer += rc;
+            cbuffer += rc;
 
             if (bytes > 0 && offset == this->_size())
             {
                 // read request extends past end-of-file
                 // fill reminder with zeroes
-                memset(buffer, 0, bytes);
+                memset(cbuffer, 0, bytes);
                 bytes = 0;
             }
         }
@@ -90,9 +88,9 @@ void syscall_file::serve(const request* req) throw (io_error)
         {
 #if STXXL_MSVC
             assert(bytes <= std::numeric_limits<unsigned int>::max());
-            if ((rc = ::write(file_des, buffer, (unsigned int)bytes)) <= 0)
+            if ((rc = ::write(file_des, cbuffer, (unsigned int)bytes)) <= 0)
 #else
-            if ((rc = ::write(file_des, buffer, bytes)) <= 0)
+            if ((rc = ::write(file_des, cbuffer, bytes)) <= 0)
 #endif
             {
                 STXXL_THROW_ERRNO
@@ -102,14 +100,14 @@ void syscall_file::serve(const request* req) throw (io_error)
                     " path=" << filename <<
                     " fd=" << file_des <<
                     " offset=" << offset <<
-                    " buffer=" << (void*)buffer <<
+                    " buffer=" << buffer <<
                     " bytes=" << bytes <<
                     " type=" << "WRITE" <<
                     " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;
-            buffer += rc;
+            cbuffer += rc;
         }
     }
 }

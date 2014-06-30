@@ -31,7 +31,7 @@ public:
 };
 
 template <typename must_be_int>
-bool settings<must_be_int>::native_merge = true;
+bool settings<must_be_int>::native_merge = false;
 
 typedef settings<> SETTINGS;
 

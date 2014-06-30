@@ -91,11 +91,18 @@ public:
     //! different disks. queue=-1 -> default queue (one for each disk).
     int queue;
 
+    //! the selected physical device id (e.g. for calculating prefetching
+    //! sequences). If -1 then the device id is chosen automatically.
+    unsigned int device_id;
+
     //! turned on by syscall fileio when the path points to a raw block device
     bool raw_device;
 
     //! unlink file immediately after opening (available on most Unix)
     bool unlink_on_open;
+
+    //! desired queue length for linuxaio_file and linuxaio_queue
+    int queue_length;
 
     //! \}
 };
@@ -166,6 +173,25 @@ public:
         disks_list.push_back(cfg);
         return *this;
     }
+
+    //! \}
+
+protected:
+    //! \name Automatic Disk Enumeration Functions
+    //! \{
+
+    //! static counter for automatic physical device enumeration
+    unsigned int m_max_device_id;
+
+public:
+    //! Returns automatic physical device id counter
+    unsigned int get_max_device_id();
+
+    //! Returns next automatic physical device id counter
+    unsigned int get_next_device_id();
+
+    //! Update the automatic physical device id counter
+    void update_max_device_id(unsigned int devid);
 
     //! \}
 

@@ -19,50 +19,43 @@
 
 STXXL_BEGIN_NAMESPACE
 
-request::request(const completion_handler& on_compl,
-                 file* file__,
-                 void* buffer_,
-                 offset_type offset_,
-                 size_type bytes_,
-                 request_type type_) :
-    on_complete(on_compl),
-    file_(file__),
-    buffer(buffer_),
-    offset(offset_),
-    bytes(bytes_),
-    type(type_)
+request::request(
+    const completion_handler& on_compl,
+    file* file,
+    void* buffer,
+    offset_type offset,
+    size_type bytes,
+    request_type type)
+    : m_on_complete(on_compl),
+      m_file(file),
+      m_buffer(buffer),
+      m_offset(offset),
+      m_bytes(bytes),
+      m_type(type)
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request::(...), ref_cnt=" << get_reference_count());
-    file_->add_request_ref();
+    STXXL_VERBOSE3_THIS("request::(...), ref_cnt=" << get_reference_count());
+    m_file->add_request_ref();
 }
 
 request::~request()
 {
-    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] request::~(), ref_cnt=" << get_reference_count());
-}
-
-void request::completed()
-{
-    on_complete(this);
-    notify_waiters();
-    file_->delete_request_ref();
-    file_ = 0;
+    STXXL_VERBOSE3_THIS("request::~request(), ref_cnt=" << get_reference_count());
 }
 
 void request::check_alignment() const
 {
-    if (offset % BLOCK_ALIGN != 0)
+    if (m_offset % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Offset is not aligned: modulo " <<
-                     BLOCK_ALIGN << " = " << offset % BLOCK_ALIGN);
+                     STXXL_BLOCK_ALIGN << " = " << m_offset % STXXL_BLOCK_ALIGN);
 
-    if (bytes % BLOCK_ALIGN != 0)
+    if (m_bytes % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Size is not a multiple of " <<
-                     BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
+                     STXXL_BLOCK_ALIGN << ", = " << m_bytes % STXXL_BLOCK_ALIGN);
 
-    if (unsigned_type(buffer) % BLOCK_ALIGN != 0)
+    if (unsigned_type(m_buffer) % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Buffer is not aligned: modulo " <<
-                     BLOCK_ALIGN << " = " << unsigned_type(buffer) % BLOCK_ALIGN <<
-                     " (" << buffer << ")");
+                     STXXL_BLOCK_ALIGN << " = " << unsigned_type(m_buffer) % STXXL_BLOCK_ALIGN <<
+                     " (" << m_buffer << ")");
 }
 
 void request::check_nref_failed(bool after)
@@ -71,22 +64,27 @@ void request::check_nref_failed(bool after)
                  (after ? "after " : "before") << " serve" <<
                  " nref=" << get_reference_count() <<
                  " this=" << this <<
-                 " offset=" << offset <<
-                 " buffer=" << buffer <<
-                 " bytes=" << bytes <<
-                 " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                 " file=" << get_file() <<
-                 " iotype=" << get_file()->io_type()
+                 " offset=" << m_offset <<
+                 " buffer=" << m_buffer <<
+                 " bytes=" << m_bytes <<
+                 " type=" << ((m_type == READ) ? "READ" : "WRITE") <<
+                 " file=" << m_file <<
+                 " iotype=" << m_file->io_type()
                  );
+}
+
+const char* request::io_type() const
+{
+    return m_file->io_type();
 }
 
 std::ostream& request::print(std::ostream& out) const
 {
-    out << "File object address: " << static_cast<void*>(get_file());
-    out << " Buffer address: " << static_cast<void*>(get_buffer());
-    out << " File offset: " << get_offset();
-    out << " Transfer size: " << get_size() << " bytes";
-    out << " Type of transfer: " << ((get_type() == READ) ? "READ" : "WRITE");
+    out << "File object address: " << static_cast<void*>(m_file);
+    out << " Buffer address: " << static_cast<void*>(m_buffer);
+    out << " File offset: " << m_offset;
+    out << " Transfer size: " << m_bytes << " bytes";
+    out << " Type of transfer: " << ((m_type == READ) ? "READ" : "WRITE");
     return out;
 }
 

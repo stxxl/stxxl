@@ -385,7 +385,7 @@ In summary, CMake only looks for Boost at a few locations: C:\\Boost for headers
 
 /** \page install_config Disk Configuration Files
 
-\author Timo Bingmann (2013)
+\author Timo Bingmann (2013-2014)
 
 A main feature of the STXXL is to take advantage of parallel access to <b>multiple disks</b>. For this, you must define the disk configuration in a text file, using the syntax described below. If no file is found at the locations below, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl on Unix or in the user's temp directory on Windows.
 
@@ -423,12 +423,12 @@ disk=<path>,<capacity>,<fileio> <options>
 
 Description of the parameters:
 
-- <tt>\<path></tt> : full disk filename.
+- <b><tt>\<path></tt></b> : full disk filename.
   - In order to access disks STXXL uses <i>file-based access methods</i> (see below). Each disk is represented as a file
   - If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name. \n
   - If the string contains <tt>"###"</tt> (three '#'), then these symbols are replaced by the current process id.
 
-- <tt>\<capacity></tt> : maximum capacity of the disk
+- <b><tt>\<capacity></tt></b> : maximum capacity of the disk
 
   - the following size suffixes are recognized:
     - \c K, \c M, \c G, \c T, \c P (powers of 10),
@@ -437,11 +437,14 @@ Description of the parameters:
 
   - 0 means autogrow, and the file will be deleted afterwards.
 
-- <tt>\<fileio></tt> : \c STXXL has a number of different file access implementations, choose one of them:
+- <b><tt>\<fileio></tt></b> : \c STXXL has a number of different file access implementations, choose one of them (recommended ones in bold):
 
-  - \c syscall : use \c read and \c write system calls which perform disk transfers directly on user memory pages without superfluous copying (currently the fastest method)
+  - \c **syscall** : use \c read and \c write system calls which perform disk transfers directly on user memory pages without superfluous copying (currently the fastest method)
 
-  - \c wincall : on Windows, use direct calls to the Windows API.
+  - \c **wincall** : on Windows, use direct calls to the Windows API.
+
+  - \c **linuxaio** : on Linux, use direct syscalls to the native Linux AIO interface. \n
+  The Linux AIO interface has the advantage of keeping an asynchronous queue inside the kernel. Multiple I/O requests are submitted to the kernel at once, thus the kernel can sort then using its disk schedulers and also forward them to the actual disks as asynchronous operations using NCQ (native command queuing) or TCQ (tagged command queueing).
 
   - \c memory : keeps all data in RAM, for quicker testing
 
@@ -455,24 +458,29 @@ Description of the parameters:
 
   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs), based on \c syscall
 
-- <tt>\<options></tt> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
+- <b><tt>\<options></tt></b> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
 
   - \c autogrow : enables automatic growth of the file beyond the specified capacity.
 
-  - \c direct, \c nodirect, \c direct=[off/try/on] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
+  - \c **direct**, \c nodirect, \c direct=[off/try/on] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
     This is \a recommended as it improves performance, however, not all filesystems support bypassing cache. With \c direct or \c direct=on, STXXL will fail without direct access. With \c nodirect or \c direct=off it is disabled. The default is \c direct=try , which first attempts to open with O_DIRECT and falls back to opening without if it fails.
 
-  - \c unlink (or \c unlink_on_open) : unlink the file from the fs immediately after creation. \n
+  - \c **unlink** (or \c unlink_on_open) : unlink the file from the fs immediately after creation. \n
     This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
 
-  - \c delete (or \c delete_on_exit) : delete file \a after the STXXL program exists \n
+  - \c **delete** (or \c delete_on_exit) : delete file \a after the STXXL program exists \n
     This is the more conservative version of unlink, which also works on Windows. However, if the program crashes, the file is not deleted.
 
-  - \c raw_device : fail if the opened path is not a raw block device. \n
+  - \c **raw_device** : fail if the opened path is not a raw block device. \n
     This flag is not required, raw devices are automatically detected.
 
   - \c queue=# : assign the disk to a specific I/O request queue and thread. \n
     Use this for multiple files that reside on the same physical disk.
+
+  - \c devid=# : assign the disk entry a specific physical device id. \n
+    Usually you can just omit the devid=# option, since disks are enumerated automatically. In sorting and other prefetched operations, the physical device id is used to schedule block transfers from independent devices. Thus you should label files/disks on the same physical devices with the same devid.
+
+  - \c queue_length=# : specify for linuxaio the desired queue inside the linux kernel using this option.
 
 Example:
 \verbatim
@@ -484,6 +492,12 @@ On Windows, one usually uses different disk drives and \c wincall.
 \verbatim
 disk=c:\stxxl.tmp,700G,wincall delete
 disk=d:\stxxl.tmp,200G,wincall delete
+\endverbatim
+
+On Linux you can try to take advantage of NCQ + Kernel AIO queues:
+\verbatim
+disk=/data01/stxxl,500G,linuxaio unlink
+disk=/data02/stxxl,300G,linuxaio unlink
 \endverbatim
 
 \section install_config_filesystem Recommended: File System XFS or Raw Block Devices
@@ -536,10 +550,10 @@ int main()
     disk1.direct = stxxl::disk_config::DIRECT_ON; // force O_DIRECT
 
     // add disk to config
-    config->add_disk(disk1);
+    cfg->add_disk(disk1);
 
     // add another disk
-    config->add_disk( disk_config("disk=/tmp/stxxl-2.tmp, 10 GiB, syscall unlink") );
+    cfg->add_disk( disk_config("disk=/tmp/stxxl-2.tmp, 10 GiB, syscall unlink") );
 
     // ... add more disks
 

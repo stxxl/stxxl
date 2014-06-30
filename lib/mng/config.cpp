@@ -60,6 +60,8 @@ void config::initialize()
         find_config();
     }
 
+    m_max_device_id = 0;
+
     is_initialized = true;
 }
 
@@ -172,6 +174,25 @@ void config::load_config_file(const std::string& config_path)
     }
 }
 
+//! Returns automatic physical device id counter
+unsigned int config::get_max_device_id()
+{
+    return m_max_device_id;
+}
+
+//! Returns next automatic physical device id counter
+unsigned int config::get_next_device_id()
+{
+    return m_max_device_id++;
+}
+
+//! Update the automatic physical device id counter
+void config::update_max_device_id(unsigned int devid)
+{
+    if (m_max_device_id < devid + 1)
+        m_max_device_id = devid + 1;
+}
+
 uint64 config::total_size() const
 {
     assert(is_initialized);
@@ -187,6 +208,8 @@ uint64 config::total_size() const
     return total_size;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 disk_config::disk_config()
     : size(0),
       autogrow(false),
@@ -194,8 +217,10 @@ disk_config::disk_config()
       direct(DIRECT_TRY),
       flash(false),
       queue(file::DEFAULT_QUEUE),
+      device_id(file::DEFAULT_DEVICE_ID),
       raw_device(false),
-      unlink_on_open(false)
+      unlink_on_open(false),
+      queue_length(0)
 { }
 
 disk_config::disk_config(const std::string& _path, uint64 _size,
@@ -208,8 +233,10 @@ disk_config::disk_config(const std::string& _path, uint64 _size,
       direct(DIRECT_TRY),
       flash(false),
       queue(file::DEFAULT_QUEUE),
+      device_id(file::DEFAULT_DEVICE_ID),
       raw_device(false),
-      unlink_on_open(false)
+      unlink_on_open(false),
+      queue_length(0)
 {
     parse_fileio();
 }
@@ -221,8 +248,10 @@ disk_config::disk_config(const std::string& line)
       direct(DIRECT_TRY),
       flash(false),
       queue(file::DEFAULT_QUEUE),
+      device_id(file::DEFAULT_DEVICE_ID),
       raw_device(false),
-      unlink_on_open(false)
+      unlink_on_open(false),
+      queue_length(0)
 {
     parse_line(line);
 }
@@ -250,6 +279,7 @@ void disk_config::parse_line(const std::string& line)
     direct = DIRECT_TRY;
     // flash is already set
     queue = file::DEFAULT_QUEUE;
+    device_id = file::DEFAULT_DEVICE_ID;
     unlink_on_open = false;
 
     // *** Save Basic Options ***
@@ -347,8 +377,21 @@ void disk_config::parse_fileio()
         }
         else if (eq[0] == "queue")
         {
+            if (io_impl == "linuxaio") {
+                STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
+            }
+
             char* endp;
             queue = strtoul(eq[1].c_str(), &endp, 10);
+            if (endp && *endp != 0) {
+                STXXL_THROW(std::runtime_error,
+                            "Invalid parameter '" << *p << "' in disk configuration file.");
+            }
+        }
+        else if (eq[0] == "device_id" || eq[0] == "devid")
+        {
+            char* endp;
+            device_id = strtoul(eq[1].c_str(), &endp, 10);
             if (endp && *endp != 0) {
                 STXXL_THROW(std::runtime_error,
                             "Invalid parameter '" << *p << "' in disk configuration file.");
@@ -364,7 +407,9 @@ void disk_config::parse_fileio()
         }
         else if (*p == "unlink" || *p == "unlink_on_open")
         {
-            if (!(io_impl == "syscall" || io_impl == "mmap") || io_impl == "wbtl") {
+            if (!(io_impl == "syscall" || io_impl == "linuxaio" ||
+                  io_impl == "mmap" || io_impl == "wbtl"))
+            {
                 STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
             }
 
@@ -403,14 +448,20 @@ std::string disk_config::fileio_string() const
     if (flash)
         oss << " flash";
 
-    if (queue != file::DEFAULT_QUEUE)
+    if (queue != file::DEFAULT_QUEUE && queue != file::DEFAULT_LINUXAIO_QUEUE)
         oss << " queue=" << queue;
+
+    if (device_id != file::DEFAULT_DEVICE_ID)
+        oss << " devid=" << device_id;
 
     if (raw_device)
         oss << " raw_device";
 
     if (unlink_on_open)
         oss << " unlink_on_open";
+
+    if (queue_length != 0)
+        oss << " queue_length=" << queue_length;
 
     return oss.str();
 }

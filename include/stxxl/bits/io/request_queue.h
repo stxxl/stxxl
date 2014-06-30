@@ -20,9 +20,10 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
+//! Interface of a request_queue to which requests can be added and canceled.
 class request_queue : private noncopyable
 {
 public:

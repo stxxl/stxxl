@@ -24,7 +24,7 @@ struct my_handler
 void testIO()
 {
     const int size = 1024 * 384;
-    char* buffer = static_cast<char*>(stxxl::aligned_alloc<BLOCK_ALIGN>(size));
+    char* buffer = static_cast<char*>(stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(size));
     memset(buffer, 0, size);
 #if STXXL_WINDOWS
     const char* paths[2] = { "data1", "data2" };
@@ -43,7 +43,7 @@ void testIO()
 
     stxxl::wait_all(req, 16);
 
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
+    stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(buffer);
 
 #if !STXXL_WINDOWS
     file1.close_remove();

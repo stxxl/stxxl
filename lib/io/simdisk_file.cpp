@@ -22,6 +22,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
+const double simdisk_geometry::s_average_speed = (15 * 1024 * 1024);
 
 void simdisk_geometry::add_zone(int& first_cyl, int last_cyl,
                                 int sec_per_track, int& first_sect)
@@ -78,7 +79,7 @@ double simdisk_geometry::get_delay(file::offset_type offset, file::size_type siz
     return delay;
 #else
     STXXL_UNUSED(offset);
-    return double(size) / double(AVERAGE_SPEED);
+    return double(size) / s_average_speed;
 #endif
 }
 
@@ -156,14 +157,10 @@ IC35L080AVVA07::IC35L080AVVA07()
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::serve(const request* req) throw (io_error)
+void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    assert(req->get_file() == this);
-    offset_type offset = req->get_offset();
-    void* buffer = req->get_buffer();
-    size_type bytes = req->get_size();
-    request::request_type type = req->get_type();
+
     double op_start = timestamp();
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
