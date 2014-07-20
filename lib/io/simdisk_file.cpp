@@ -157,7 +157,8 @@ IC35L080AVVA07::IC35L080AVVA07()
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes,
+                          request::request_type type)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
 

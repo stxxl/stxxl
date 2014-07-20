@@ -29,7 +29,7 @@ STXXL_BEGIN_NAMESPACE
 
 
 void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
-                         request::request_type type) throw (io_error)
+                         request::request_type type)
 {
     scoped_mutex_lock fd_lock(m_fd_mutex);
 

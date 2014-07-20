@@ -86,7 +86,7 @@ public:
     }
 
     //! Rises an exception if there were error with the I/O.
-    void check_errors() throw (stxxl::io_error)
+    void check_errors()
     {
         if (m_error.get())
             throw *(m_error.get());
