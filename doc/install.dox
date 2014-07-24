@@ -51,7 +51,7 @@ $ git clone http://github.com/stxxl/stxxl.git my-project
 \verbatim
 $ mkdir my-project/build
 $ cd my-project/build
-$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+$ cmake ..
 <lots of output by cmake>
 $ make
 <lots of compilation messages>
@@ -68,6 +68,8 @@ $ ./test1
 For your own prototype project you can immediately start modifying \c test1.cpp or create a new .cpp in \c local/. The CMake scripts will automatically compile and link all .cpp files in \c local/ correctly with STXXL.
 
 The CMake file has many build options (see \ref install_build_options). Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By setting them with <tt>"-DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON"</tt> on the CMake line, additional subprojects are added to the build.
+
+By default, STXXL compiles in <tt>Debug</tt> mode and includes many assertions and run-time checks, which typically slow down performance dramatically. To use STXXL at **full speed**, please set the build type to <tt>Release</tt> by adding <tt>-DCMAKE_BUILD_TYPE=Release</tt> to the cmake line. 
 
 \section install_unix_subproject Including STXXL as a CMake Subproject
 
@@ -116,7 +118,7 @@ target_link_libraries(project ${STXXL_LIBRARIES})
 $ cp stxxl/local/test1.cpp main.cpp
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+$ cmake ..
 <lots of output by cmake>
 $ make
 <lots of compilation messages>
@@ -160,7 +162,7 @@ See the README at http://github.com/stxxl/myproject
 
 # Create a Disk Configuration File
 
-For STXXL is function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named <b><tt>'.stxxl'</tt></b> the same directory as you execute the program. A basic configuration might be:
+For STXXL to function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named <b><tt>'.stxxl'</tt></b> the same directory as you execute the program. A basic configuration might be:
 \verbatim
 # file path,maximum capacity of the disk,access method
 disk=/tmp/stxxl,1G,syscall unlink
