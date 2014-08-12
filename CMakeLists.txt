@@ -253,6 +253,11 @@ if(USE_GCOV)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov")
 
+  # add cached variable containing parameters for lcov/genhtml
+  set(LCOV_FLAGS "" CACHE STRING "parameters for lcov")
+  set(GENHTML_FLAGS --legend --no-branch-coverage
+    CACHE STRING "parameters for genhtml")
+
   # custom target to run before tests
   add_custom_target(lcov-reset
     COMMAND ${LCOV} -q --directory ${CMAKE_BINARY_DIR} --zerocounters
@@ -273,15 +278,15 @@ if(USE_GCOV)
   # command sequence to gather, clean and generate HTML coverage report
   add_custom_target(lcov-html
     COMMAND ${LCOV} -q --directory . --capture --output-file lcov.info
-    COMMAND ${LCOV} -q --remove lcov.info 'tests/*' 'examples/*' '/usr/*' --output-file lcov-clean.info
-    COMMAND ${GENHTML} -q -o coverage --title "STXXL ${GITDESC}" --prefix ${PROJECT_SOURCE_DIR} --legend lcov-clean.info
+    COMMAND ${LCOV} -q --remove lcov.info '/usr/*' ${LCOV_FLAGS} --output-file lcov-clean.info
+    COMMAND ${GENHTML} -q -o coverage --title "STXXL ${GITDESC}" --prefix ${PROJECT_SOURCE_DIR} ${GENHTML_FLAGS} lcov-clean.info
     COMMENT "Capturing code coverage counters and create HTML coverage report"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
   # top-level target to run tests and generate coverage report
   add_custom_target(test-coverage
     COMMENT "Generate HTML coverage report "
-    DEPENDS lcov-html lcov-runtests)
+    DEPENDS lcov-runtests lcov-html)
 
 endif(USE_GCOV)
 
