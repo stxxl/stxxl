@@ -1,9 +1,5 @@
 language: cpp
 
-branches:
-  only:
-    - master
-
 env:
   global:
     # limit parallel threads (default is 32!)
