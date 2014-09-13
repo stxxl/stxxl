@@ -30,6 +30,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 /*!
  * binary_buffer represents a dynamically growable area of memory, which can be
  * modified by appending integral data types via put() and other basic
@@ -639,6 +642,8 @@ public:
         return br;
     }
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 

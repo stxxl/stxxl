@@ -37,6 +37,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 //! Returns number of seconds since the epoch, high resolution.
 inline double
 timestamp()
@@ -166,6 +169,8 @@ public:
                                   << " @ " << format_IEC_size(uint64(m_bytes / m_timer.seconds())) << "B/s");
     }
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 

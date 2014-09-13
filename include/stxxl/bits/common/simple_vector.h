@@ -25,6 +25,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 /*!
  * Simpler non-growing vector without initialization.
  *
@@ -160,6 +163,9 @@ public:
         memset(m_array, 0, m_size * sizeof(value_type));
     }
 };
+
+// \}
+
 STXXL_END_NAMESPACE
 
 namespace std {

@@ -24,6 +24,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 /*!
  * High-performance smart pointer used as a wrapping reference counting
  * pointer.
@@ -515,6 +518,8 @@ public:
 };
 
 #endif
+
+//! \}
 
 STXXL_END_NAMESPACE
 

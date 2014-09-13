@@ -111,3 +111,43 @@ The following list of authors have contributed to STXXL:
 
  */
 
+// Module Groups are defined here to fix their order:
+
+/*! \defgroup stllayer STL-User Layer
+  Layer which groups STL compatible algorithms and containers
+*/
+
+/*! \defgroup streampack Stream Package
+
+  Package that enables pipelining of consequent sorts and scans of the external data avoiding the saving the intermediate results on the disk, e.g. the output of a sort can be directly fed into a scan procedure without the need to save it on a disk.  All components of the package are contained in the \c stxxl::stream namespace.
+
+   STREAM ALGORITHM CONCEPT (Do not confuse with C++ input/output streams)
+
+\verbatim
+
+   struct stream_algorithm // stream, pipe, whatever
+   {
+     typedef some_type value_type;
+
+     const value_type & operator * () const; // return current element of the stream
+     stream_algorithm & operator ++ ();      // go to next element. precondition: empty() == false
+     bool empty() const;                     // return true if end of stream is reached
+
+   };
+\endverbatim
+*/
+
+/*! \defgroup mnglayer Block Management Layer
+
+  Group of classes which help controlling external memory space, managing disks, and allocating and deallocating blocks of external storage.
+*/
+
+/*! \defgroup iolayer I/O Primitives Layer
+
+  Group of classes which enable abstraction from operating system calls and support system-independent interfaces for asynchronous I/O.
+*/
+
+/*! \defgroup support Common Utilities and Support Classes
+
+Supporting classes also useful for applications, see also \ref common .
+*/

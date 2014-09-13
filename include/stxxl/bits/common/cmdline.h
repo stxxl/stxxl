@@ -26,6 +26,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 /**
  * \brief Command line parser which automatically fills variables and prints
  * nice usage messages.
@@ -585,6 +588,8 @@ public:
     //! print nicely formatted result of processing
     void print_result(std::ostream& os = std::cout);
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 

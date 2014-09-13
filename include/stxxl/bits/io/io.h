@@ -33,13 +33,6 @@
 //! \c STXXL library namespace
 STXXL_BEGIN_NAMESPACE
 
-//! \defgroup iolayer I/O Primitives Layer
-//! Group of classes which enable abstraction from operating system calls and support
-//! system-independent interfaces for asynchronous I/O.
-//! \{
-
-//! \}
-
     STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO_IO_HEADER

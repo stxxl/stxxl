@@ -18,6 +18,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 /*!
  * This class takes a shared pointer, increments its reference count and wraps
  * it in a way that the resulting object can be copied, dumped to disk, and
@@ -108,6 +111,8 @@ public:
         return os << p.get();
     }
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 
