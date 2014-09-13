@@ -18,28 +18,13 @@
 
 bool test_block_cache()
 {
-/*		const int subblock_size = 4;	// size in values
-                const int block_size = 2;		// size in subblocks
-                const int num_blocks = 64;
-
-                const int cache_size = 8;		// size of cache in blocks
-
-                typedef std::pair<int, int> value_type;
-
-                const int subblock_raw_size = subblock_size*sizeof(value_type)+2;
-
-                typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
-                typedef stxxl::typed_block<block_size*sizeof(subblock_type), subblock_type> block_type;
-                typedef block_type::bid_type bid_type;
-                typedef std::vector<bid_type> bid_container_type;*/
-
     typedef std::pair<int, int> value_type;
 
-    const unsigned subblock_raw_size = 1024 * 8;                         // 8KB subblocks
-    const unsigned block_size = 128;                                     // 1MB blocks (=128 subblocks)
+    const unsigned subblock_raw_size = 1024 * 8; // 8KB subblocks
+    const unsigned block_size = 128;             // 1MB blocks (=128 subblocks)
 
-    const unsigned num_blocks = 64;                                      // number of blocks to use for this test
-    const unsigned cache_size = 8;                                       // size of cache in blocks
+    const unsigned num_blocks = 64;              // number of blocks to use for this test
+    const unsigned cache_size = 8;               // size of cache in blocks
 
 
     typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
@@ -56,7 +41,6 @@ bool test_block_cache()
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
     bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
 
-
     block_type* block = new block_type;
     for (unsigned i_block = 0; i_block < num_blocks; i_block++) {
         for (unsigned i_subblock = 0; i_subblock < block_size; i_subblock++) {
@@ -68,6 +52,7 @@ bool test_block_cache()
         stxxl::request_ptr req = block->write(bids[i_block]);
         req->wait();
     }
+
 
     stxxl::random_number32 rand32;
 
@@ -122,24 +107,35 @@ bool test_block_cache()
 
     // test retaining
     cache.clear();
-    STXXL_CHECK(cache.retain_block(bids[0]) == false);                              // not yet cached
+
+    // not yet cached
+    STXXL_CHECK(cache.retain_block(bids[0]) == false);
     cache.prefetch_block(bids[0]);
-    STXXL_CHECK(cache.retain_block(bids[0]) == true);                               // cached, should be retained
-    STXXL_CHECK(cache.release_block(bids[0]) == true);                              // release again
-    STXXL_CHECK(cache.release_block(bids[0]) == false);                             // retrain-count should be 0, release fails
 
-    subblock_type* kicked_subblock = cache.get_subblock(bids[1], 0);                // cache new block
-    for (unsigned i = 0; i < cache_size + 5; i++) {                                 // load other blocks, so that kicked_subblock, well, gets kicked
-        cache.prefetch_block(bids[i + 3]);
-    }
-    STXXL_CHECK(cache.get_subblock(bids[1], 0) != kicked_subblock);                 // load kicked subblock again, should be at a different location
+    // cached, should be retained
+    STXXL_CHECK(cache.retain_block(bids[0]) == true);
+    // release again
+    STXXL_CHECK(cache.release_block(bids[0]) == true);
+    // retrain-count should be 0, release fails
+    STXXL_CHECK(cache.release_block(bids[0]) == false);
 
-    subblock_type* retained_subblock = cache.get_subblock(bids[1], 0);
-    STXXL_CHECK(cache.retain_block(bids[1]) == true);                               // now retain subblock
+    // cache new block
+    subblock_type* kicked_subblock = cache.get_subblock(bids[1], 0);
+    // load other blocks, so that kicked_subblock, well, gets kicked
     for (unsigned i = 0; i < cache_size + 5; i++) {
         cache.prefetch_block(bids[i + 3]);
     }
-    STXXL_CHECK(cache.get_subblock(bids[1], 0) == retained_subblock);               // retained_subblock should not have been kicked
+    // load kicked subblock again, should be at a different location
+    STXXL_CHECK(cache.get_subblock(bids[1], 0) != kicked_subblock);
+
+    subblock_type* retained_subblock = cache.get_subblock(bids[1], 0);
+    // now retain subblock
+    STXXL_CHECK(cache.retain_block(bids[1]) == true);
+    for (unsigned i = 0; i < cache_size + 5; i++) {
+        cache.prefetch_block(bids[i + 3]);
+    }
+    // retained_subblock should not have been kicked
+    STXXL_CHECK(cache.get_subblock(bids[1], 0) == retained_subblock);
     cache.clear();
 
     // test swapping

@@ -22,6 +22,7 @@ STXXL_BEGIN_NAMESPACE
 
 namespace hash_map {
 
+//! Tuning parameters for external memory hash map.
 class tuning : public singleton<tuning>
 {
     friend class singleton<tuning>;
