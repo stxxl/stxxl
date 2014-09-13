@@ -12,9 +12,9 @@
 
 #include <iostream>
 
-#include "stxxl.h"
-#include "stxxl/bits/common/seed.h"
-#include "stxxl/bits/containers/hash_map/block_cache.h"
+#include <stxxl.h>
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/containers/hash_map/block_cache.h>
 
 bool test_block_cache()
 {

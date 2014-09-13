@@ -12,29 +12,21 @@
 
 #include <iostream>
 
-#include "stxxl.h"
-#include "stxxl/bits/common/seed.h"
-#include "stxxl/bits/containers/hash_map/util.h"
+#include <stxxl.h>
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/containers/hash_map/util.h>
 
 void reader_writer_test()
 {
-/*		const int subblock_size = 8;	// size in values
-                const int block_size = 4;		// size in subblocks
-
-                typedef std::pair<int, int> value_type;
-
-                const int subblock_raw_size = subblock_size*sizeof(value_type);
-*/
-
     typedef std::pair<unsigned, unsigned> value_type;
 
-    const unsigned subblock_raw_size = 1024 * 8;                         // 8KB subblocks
-    const unsigned block_size = 128;                                     // 1MB blocks (=128 subblocks)
+    const unsigned subblock_raw_size = 1024 * 8; // 8KB subblocks
+    const unsigned block_size = 128;             // 1MB blocks (=128 subblocks)
 
-    const unsigned n_blocks = 64;                                        // number of blocks to use for this test
-    const unsigned cache_size = 8;                                       // size of cache in blocks
+    const unsigned n_blocks = 64;                // number of blocks to use for this test
+    const unsigned cache_size = 8;               // size of cache in blocks
 
-    const unsigned buffer_size = 4;                                      // write buffer size in blocks
+    const unsigned buffer_size = 4;              // write buffer size in blocks
 
 
     typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
@@ -81,13 +73,15 @@ void reader_writer_test()
 
     // reading with/without prefetching
     {
-        reader_type reader(bids.begin(), bids.end(), &cache, 0, false);             // last parameter disables prefetching
+        // last parameter disables prefetching
+        reader_type reader(bids.begin(), bids.end(), &cache, 0, false);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
             STXXL_CHECK(reader.const_value().first == i);
             ++reader;
         }
 
-        reader_type reader2(bids.begin(), bids.end(), &cache);              // prefetching enabled by default
+        // prefetching enabled by default
+        reader_type reader2(bids.begin(), bids.end(), &cache);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
             STXXL_CHECK(reader2.const_value().first == i);
             ++reader2;
@@ -96,7 +90,8 @@ void reader_writer_test()
 
     // reading with skipping
     {
-        reader_type reader(bids.begin(), bids.end(), &cache, 0, false);              // disable prefetching
+        // disable prefetching
+        reader_type reader(bids.begin(), bids.end(), &cache, 0, false);
 
         // I: first subblock
         reader.skip_to(bids.begin() + 10, 0);
@@ -113,8 +108,6 @@ void reader_writer_test()
         expected = block_size * subblock_size * 13 + subblock_size * 1;
         STXXL_CHECK(reader.const_value().first == expected);
     }
-//		cache.clear();
-
 
     // reading with modifying access
     {
@@ -130,23 +123,23 @@ void reader_writer_test()
             ++reader2;
         }
 
-//			cache.flush();
-//			block_type *block = new block_type;
-//			unsigned i = 0;
-//			for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
-//				stxxl::request_ptr req = block->read(bids[i_block]);
-//				req->wait();
-//
-//				for (unsigned inner = 0; inner < block_size*subblock_size; ++inner) {
-//					STXXL_CHECK( (*block)[inner/subblock_size][inner%subblock_size].first == i);
-//					STXXL_CHECK( (*block)[inner/subblock_size][inner%subblock_size].second == i+1);
-//					i++;
-//				}
-//			}
-//			delete block;
+        cache.flush();
+        block_type* block = new block_type;
+        unsigned i = 0;
+        for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
+            stxxl::request_ptr req = block->read(bids[i_block]);
+            req->wait();
+
+            for (unsigned inner = 0; inner < block_size * subblock_size; ++inner) {
+                STXXL_CHECK((*block)[inner / subblock_size][inner % subblock_size].first == i);
+                STXXL_CHECK((*block)[inner / subblock_size][inner % subblock_size].second == i + 1);
+                i++;
+            }
+        }
+        delete block;
     }
 
-//		cache.__dump_cache();
+    //cache.dump_cache();
 
     cache.clear();
 
@@ -177,7 +170,6 @@ void reader_writer_test()
 
     STXXL_MSG("Passed Reader-Writer Test");
 }
-
 
 int main()
 {

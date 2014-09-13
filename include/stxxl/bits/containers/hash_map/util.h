@@ -14,33 +14,42 @@
 #define STXXL_CONTAINERS_HASH_MAP_UTIL_HEADER
 #define STXXL_CONTAINERS_HASHMAP__UTIL_H
 
-#include "stxxl/bits/mng/block_manager.h"
-#include "stxxl/bits/mng/buf_writer.h"
+#include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/mng/buf_writer.h>
 
-#include "stxxl/bits/containers/hash_map/tuning.h"
-#include "stxxl/bits/containers/hash_map/block_cache.h"
-
+#include <stxxl/bits/containers/hash_map/tuning.h>
+#include <stxxl/bits/containers/hash_map/block_cache.h>
 
 STXXL_BEGIN_NAMESPACE
 
 namespace hash_map {
 
-// For internal memory chaining
-// next-pointer and delete-flag share the same memory: the lowest bit is occupied by the del-flag.
+// For internal memory chaining: struct to compose next-pointer and delete-flag
+// share the same memory: the lowest bit is occupied by the del-flag.
 template <class ValueType>
 struct node
 {
     node<ValueType>* next_and_del_;
     ValueType value_;
 
-    bool deleted() { return ((int_type)next_and_del_ & 0x01) == 1; }
+    //! check if the next node is deleted.
+    bool deleted()
+    {
+        return ((int_type)next_and_del_ & 0x01) == 1;
+    }
+    //! change deleted flag on the next node
     bool deleted(bool d)
     {
         next_and_del_ = (node<ValueType>*)(((int_type)next_and_del_ & ~0x01) | (int_type)d);
         return d;
     }
 
-    node<ValueType> * next() { return (node<ValueType>*)((int_type)next_and_del_ & ~0x01); }
+    //! return the next node, without the "next" flag.
+    node<ValueType> * next()
+    {
+        return (node<ValueType>*)((int_type)next_and_del_ & ~0x01);
+    }
+    //! change the "next" value of next node pointer
     node<ValueType> * next(node<ValueType>* n)
     {
         next_and_del_ = (node<ValueType>*)(((int_type)next_and_del_ & 0x01) | (int_type)n);
@@ -48,35 +57,37 @@ struct node
     }
 };
 
-
 template <class NodeType>
 struct bucket
 {
-    NodeType* list_;                     /* entry point to the chain in internal memory */
+    //! entry point to the chain in internal memory
+    NodeType* list_;
 
-    size_t n_external_;                  /* number of elements in external memory */
+    //! number of elements in external memory
+    size_t n_external_;
 
-    size_t i_block_;                     /* index of first block's bid (to be used as index for hash_map's bids_-array)*/
-    size_t i_subblock_;                  /* index of first subblock */
+    //! index of first block's bid (to be used as index for hash_map's bids_-array
+    size_t i_block_;
 
+    //! index of first subblock
+    size_t i_subblock_;
 
-    bucket() :
-        list_(NULL),
-        n_external_(0),
-        i_block_(0),
-        i_subblock_(0)
+    bucket()
+        : list_(NULL),
+          n_external_(0),
+          i_block_(0),
+          i_subblock_(0)
     { }
 
-    bucket(NodeType* list, size_t n_external, size_t i_block, size_t i_subblock) :
-        list_(list),
-        n_external_(n_external),
-        i_block_(i_block),
-        i_subblock_(i_subblock)
+    bucket(NodeType* list, size_t n_external, size_t i_block, size_t i_subblock)
+        : list_(list),
+          n_external_(n_external),
+          i_block_(i_block),
+          i_subblock_(i_subblock)
     { }
 };
 
-
-//! \brief Used to scan external memory with prefetching.
+//! Used to scan external memory with prefetching.
 template <class CacheType, class BidIt>
 class buffered_reader
 {
@@ -92,38 +103,50 @@ public:
     enum { block_size = block_type::size, subblock_size = subblock_type::size };
 
 private:
-    size_t i_value_;                                    /* index within current block	*/
-    BidIt begin_bid_;                                   /* points to the beginning of the block-squence   */
-    BidIt curr_bid_;                                    /* points to the current block */
-    BidIt end_bid_;                                     /* points to the end of the block-sequence	*/
-    BidIt pref_bid_;                                    /* points to the next block to prefetch */
+    //! index within current block
+    size_t i_value_;
+    //! points to the beginning of the block-sequence
+    BidIt begin_bid_;
+    //! points to the current block
+    BidIt curr_bid_;
+    //! points to the end of the block-sequence
+    BidIt end_bid_;
+    //! points to the next block to prefetch
+    BidIt pref_bid_;
 
-    cache_type* cache_;                                 /* shared block-cache  */
+    //! shared block-cache
+    cache_type* cache_;
 
-    bool prefetch_;                                     /* true if prefetching enabled	 */
-    size_t page_size_;                                  /* pages, which are read at once from disk, consist of this many blocks */
-    size_t prefetch_pages_;                             /* number of pages to prefetch	 */
+    //! true if prefetching enabled
+    bool prefetch_;
+    //! pages, which are read at once from disk, consist of this many blocks
+    size_t page_size_;
+    //! number of pages to prefetch
+    size_t prefetch_pages_;
 
-    bool dirty_;                                        /* current block dirty ? */
-    subblock_type* subblock_;                           /* current subblock		 */
+    //! current block dirty ?
+    bool dirty_;
+    //! current subblock
+    subblock_type* subblock_;
 
 public:
-    //! \brief Create a new buffered reader to read the blocks in [seq_begin, seq_end)
+    //! Create a new buffered reader to read the blocks in [seq_begin, seq_end)
     //! \param seq_begin First block's bid
     //! \param seq_end Last block's bid
     //! \param cache Block-cache used for prefetching
     //! \param i_subblock Start reading from this subblock
     //! \param prefetch Enable/Disable prefetching
-    buffered_reader(BidIt seq_begin, BidIt seq_end, cache_type* cache, size_t i_subblock = 0, bool prefetch = true) :
-        i_value_(0),
-        begin_bid_(seq_begin),
-        curr_bid_(seq_begin),
-        end_bid_(seq_end),
-        cache_(cache),
-        prefetch_(false),
-        page_size_(tuning::get_instance()->prefetch_page_size),
-        prefetch_pages_(tuning::get_instance()->prefetch_pages),
-        dirty_(false)
+    buffered_reader(BidIt seq_begin, BidIt seq_end, cache_type* cache,
+                    size_t i_subblock = 0, bool prefetch = true)
+        : i_value_(0),
+          begin_bid_(seq_begin),
+          curr_bid_(seq_begin),
+          end_bid_(seq_end),
+          cache_(cache),
+          prefetch_(false),
+          page_size_(tuning::get_instance()->prefetch_page_size),
+          prefetch_pages_(tuning::get_instance()->prefetch_pages),
+          dirty_(false)
     {
         if (seq_begin == seq_end)
             return;
@@ -131,7 +154,8 @@ public:
         if (prefetch)
             enable_prefetching();
 
-        skip_to(seq_begin, i_subblock);         // will (amongst other things) set subblock_ and retain current block
+        // will (amongst other things) set subblock_ and retain current block
+        skip_to(seq_begin, i_subblock);
     }
 
     ~buffered_reader()
@@ -140,14 +164,14 @@ public:
             cache_->release_block(*curr_bid_);
     }
 
-
     void enable_prefetching()
     {
         if (prefetch_)
             return;
 
         prefetch_ = true;
-        pref_bid_ = curr_bid_;          // start prefetching page_size*prefetch_pages blocks beginning with current one
+        pref_bid_ = curr_bid_;
+        // start prefetching page_size*prefetch_pages blocks beginning with current one
         for (size_t i = 0; i < page_size_ * prefetch_pages_; i++)
         {
             if (pref_bid_ == end_bid_)
@@ -158,15 +182,14 @@ public:
         }
     }
 
-
-    //! \brief Get const-reference to current value.
+    //! Get const-reference to current value.
     const value_type & const_value()
     {
         return (*subblock_)[i_value_ % subblock_size];
     }
 
-
-    //! \brief Get reference to current value. The current value's block's dirty flag will be set.
+    //! Get reference to current value. The current value's block's dirty flag
+    //! will be set.
     value_type & value()
     {
         if (!dirty_) {
@@ -177,8 +200,7 @@ public:
         return (*subblock_)[i_value_ % subblock_size];
     }
 
-
-    //! \brief Advance to the next value
+    //! Advance to the next value
     //! \return false if last value has been reached, otherwise true.
     bool operator ++ ()
     {
@@ -226,16 +248,14 @@ public:
         return true;
     }
 
-
-    //! \brief Skip remaining values of the current subblock.
+    //! Skip remaining values of the current subblock.
     void next_subblock()
     {
         i_value_ = (i_value_ / subblock_size + 1) * subblock_size - 1;
         operator ++ ();         // takes care of prefetching etc
     }
 
-
-    //! \brief Continue reading at given block and subblock.
+    //! Continue reading at given block and subblock.
     void skip_to(BidIt bid, size_t i_subblock)
     {
         if (curr_bid_ == end_bid_)
@@ -271,8 +291,7 @@ public:
     }
 };
 
-
-//! \brief Buffered writing of values. New Blocks are allocated as needed.
+//! Buffered writing of values. New Blocks are allocated as needed.
 template <class BlkType, class BidContainer>
 class buffered_writer
 {
@@ -286,25 +305,31 @@ public:
     enum { block_size = block_type::size, subblock_size = subblock_type::size };
 
 private:
-    writer_type* writer_;                /* buffered writer */
-    block_type* block_;                  /* current buffer-block */
+    //! buffered writer
+    writer_type* writer_;
+    //! current buffer-block
+    block_type* block_;
 
-    BidContainer* bids_;                 /* sequence of allocated blocks (to be expanded as needed) */
+    //! sequence of allocated blocks (to be expanded as needed)
+    BidContainer* bids_;
 
-    size_t i_block_;                     /* current block's index */
-    size_t i_value_;                     /* current value's index in the range of [0..#values per block[ */
-    size_t increase_;                    /* number of blocks to allocate in a row */
+    //! current block's index
+    size_t i_block_;
+    //! current value's index in the range of [0..#values per block[
+    size_t i_value_;
+    //! number of blocks to allocate in a row
+    size_t increase_;
 
 public:
-    //! \brief Create a new buffered writer.
+    //! Create a new buffered writer.
     //! \param c write values to these blocks (c holds the bids)
     //! \param buffer_size Number of write-buffers to use
     //! \param batch_size bulk buffered writing
-    buffered_writer(BidContainer* c, int_type buffer_size, int_type batch_size) :
-        bids_(c),
-        i_block_(0),
-        i_value_(0),
-        increase_(config::get_instance()->disks_number() * 3)
+    buffered_writer(BidContainer* c, int_type buffer_size, int_type batch_size)
+        : bids_(c),
+          i_block_(0),
+          i_value_(0),
+          increase_(config::get_instance()->disks_number() * 3)
     {
         writer_ = new writer_type(buffer_size, batch_size);
         block_ = writer_->get_free_block();
@@ -316,8 +341,7 @@ public:
         delete writer_;
     }
 
-
-    //! \brief Write all values from given stream.
+    //! Write all values from given stream.
     template <class StreamType>
     void append_from_stream(StreamType& stream)
     {
@@ -328,8 +352,7 @@ public:
         }
     }
 
-
-    //! \brief Write given value.
+    //! Write given value.
     void append(const value_type& value)
     {
         size_t i_subblock = (i_value_ / subblock_size);
@@ -356,16 +379,14 @@ public:
         }
     }
 
-
-    //! \brief Continue writing at the beginning of the next subblock. TODO more efficient
+    //! Continue writing at the beginning of the next subblock. TODO more efficient
     void finish_subblock()
     {
         i_value_ = (i_value_ / subblock_size + 1) * subblock_size - 1;
         append(value_type());           // writing and allocating blocks etc
     }
 
-
-    //! \brief Flushes not yet written blocks.
+    //! Flushes not yet written blocks.
     void flush()
     {
         i_value_ = 0;
@@ -381,21 +402,20 @@ public:
         writer_->flush();
     }
 
-
-    //! \brief Index of current block.
+    //! Index of current block.
     size_t i_block() { return i_block_; }
 
-    //! \brief Index of current subblock.
+    //! Index of current subblock.
     size_t i_subblock() { return i_value_ / subblock_size; }
 };
 
-
-/** Additionial information about a stored value:
-        - the bucket in which it can be found
-        - where it is currently stored (intern or extern)
-        - the buffer-node
-        - the position in external memory
-*/
+/*!
+ * Additional information about a stored value:
+ * - the bucket in which it can be found
+ * - where it is currently stored (intern or extern)
+ * - the buffer-node
+ * - the position in external memory
+ */
 template <class HashMap>
 struct HashedValue
 {
@@ -414,19 +434,22 @@ struct HashedValue
     HashedValue() : i_bucket_(size_type(-1))
     { }
 
-    HashedValue(const value_type& value, size_type i_bucket, source_type src, node_type* node, size_type i_external) :
-        value_(value),
-        i_bucket_(i_bucket),
-        source_(src),
-        node_(node),
-        i_external_(i_external)
+    HashedValue(const value_type& value, size_type i_bucket,
+                source_type src, node_type* node, size_type i_external)
+        : value_(value),
+          i_bucket_(i_bucket),
+          source_(src),
+          node_(node),
+          i_external_(i_external)
     { }
 };
 
-
-/** Stream interface for all value-pairs currently stored in the map. Returned values are HashedValue-objects
-        (actual value enriched with information on where the value can be found (bucket-number, internal, external)).
-        Values, marked as deleted in internal-memory, are not returned; for modified values only the one in internal memory is returned.
+/*!
+ * Stream interface for all value-pairs currently stored in the map. Returned
+ * values are HashedValue-objects (actual value enriched with information on
+ * where the value can be found (bucket-number, internal, external)).  Values,
+ * marked as deleted in internal-memory, are not returned; for modified values
+ * only the one in internal memory is returned.
 */
 template <class HashMap, class Reader>
 struct HashedValuesStream
@@ -449,21 +472,22 @@ struct HashedValuesStream
     size_type i_external_;
     value_type value_;
 
-
-    HashedValuesStream(bucket_iterator begin_bucket, bucket_iterator end_bucket, Reader& reader, bid_iterator begin_bid, hash_map_type* map) :
-        map_(map),
-        reader_(reader),
-        curr_bucket_(begin_bucket),
-        end_bucket_(end_bucket),
-        begin_bid_(begin_bid),
-        i_bucket_(0),
-        node_(curr_bucket_->list_),
-        i_external_(0)
+    HashedValuesStream(bucket_iterator begin_bucket, bucket_iterator end_bucket,
+                       Reader& reader, bid_iterator begin_bid, hash_map_type* map)
+        : map_(map),
+          reader_(reader),
+          curr_bucket_(begin_bucket),
+          end_bucket_(end_bucket),
+          begin_bid_(begin_bid),
+          i_bucket_(0),
+          node_(curr_bucket_->list_),
+          i_external_(0)
     {
         value_ = find_next();
     }
 
     const value_type& operator * () { return value_; }
+
     bool empty() const { return curr_bucket_ == end_bucket_; }
 
     void operator ++ ()
