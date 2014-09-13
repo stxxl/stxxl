@@ -15,6 +15,10 @@ Version 1.4-dev (unreleased)
 
 * stxxl::unordered_map
 
+* stxxl::external_shared_ptr is a proxy class to allow use of shared_ptr
+  classes inside stxxl containers. Reference counts are kept in memory, while
+  data may be swapped out to disk.
+
 Version 1.4.0 (12 December 2013)
 
 * Reorganized Directory Hierarchy

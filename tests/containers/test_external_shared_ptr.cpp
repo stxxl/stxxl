@@ -23,7 +23,7 @@
 #include <stxxl/map>
 #include <stxxl/stats>
 
-#include <stxxl/bits/utils/external_shared_ptr.h>
+#include <stxxl/bits/common/external_shared_ptr.h>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -75,7 +75,6 @@ void test_const_iterator(const my_vec_type& x)
     i--;
     *i;
 }
-
 
 void test_vector()
 {
@@ -214,13 +213,15 @@ typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 
 void test_map()
 {
+    const int max_mult = 8;
+
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     stxxl::stats_data stats_elapsed;
     STXXL_MSG(stats_begin);
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
     STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB");
-    int max_mult = 256;
+
     for (int mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *stxxl::stats::get_instance();
