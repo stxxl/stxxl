@@ -112,7 +112,7 @@ public:
                                const completion_handler& on_cmpl) = 0;
 
     virtual void serve(void* buffer, offset_type offset, size_type bytes,
-                       request::request_type type) throw (io_error) = 0;
+                       request::request_type type) = 0;
 
     //! Changes the size of the file.
     //! \param newsize new file size

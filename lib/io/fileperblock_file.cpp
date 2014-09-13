@@ -78,7 +78,8 @@ std::string fileperblock_file<base_file_type>::filename_for_block(offset_type of
 }
 
 template <class base_file_type>
-void fileperblock_file<base_file_type>::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void fileperblock_file<base_file_type>::serve(void* buffer, offset_type offset,
+                                              size_type bytes, request::request_type type)
 {
     base_file_type base_file(filename_for_block(offset), mode, get_queue_id());
     base_file.set_size(bytes);

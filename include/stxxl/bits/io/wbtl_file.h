@@ -90,7 +90,7 @@ public:
     void set_size(offset_type newsize);
     void lock();
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type) throw (io_error);
+               request::request_type type);
     void discard(offset_type offset, offset_type size);
     const char * io_type() const;
 

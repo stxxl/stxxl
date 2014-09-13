@@ -137,7 +137,7 @@ public:
             std::endl;
     }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type) throw (io_error);
+               request::request_type type);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };

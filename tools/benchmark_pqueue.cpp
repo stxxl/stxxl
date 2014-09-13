@@ -265,8 +265,10 @@ int do_benchmark_pqueue_config(unsigned pqconfig, uint64 size, unsigned opseq)
         return do_benchmark_pqueue<ValueType, 128, 128, 16>(size, opseq);
     else if (pqconfig == 2)
         return do_benchmark_pqueue<ValueType, 512, 512, 64>(size, opseq);
+#if __x86_64__ || __LP64__ || (__WORDSIZE == 64)
     else if (pqconfig == 3)
         return do_benchmark_pqueue<ValueType, 4096, 4096, 512>(size, opseq);
+#endif
     else
         return 0;
 }
@@ -304,7 +306,14 @@ int benchmark_pqueue(int argc, char* argv[])
     cp.add_uint('t', "type", "Value type of tested priority queue:\n 1 = pair of uint32,\n 2 = pair of uint64 (default),\n 3 = 24 byte struct\n 0 = all of the above", type);
 
     unsigned pqconfig = 2;
-    cp.add_uint('p', "pq", "Priority queue configuration to test:\n 1 = small (256 MiB RAM, 4 GiB elements)\n 2 = medium (1 GiB RAM, 16 GiB elements) (default)\n 3 = big (8 GiB RAM, 64 GiB elements)\n 0 = all of the above", pqconfig);
+    cp.add_uint('p', "pq",
+                "Priority queue configuration to test:\n"
+                "1 = small (256 MiB RAM, 4 GiB elements)\n"
+                "2 = medium (1 GiB RAM, 16 GiB elements) (default)\n"
+#if __x86_64__ || __LP64__ || (__WORDSIZE == 64)
+                "3 = big (8 GiB RAM, 64 GiB elements)\n"
+#endif
+                "0 = all of the above", pqconfig);
 
     unsigned opseq = 1;
     cp.add_uint('o', "opseq", "Operation sequence to perform:\n 1 = insert all, delete all (default)\n 2 = insert all, intermixed insert/delete\n 0 = all of the above", opseq);

@@ -56,7 +56,8 @@ wbtl_file::~wbtl_file()
     storage = 0;
 }
 
-void wbtl_file::serve(void* buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void wbtl_file::serve(void* buffer, offset_type offset, size_type bytes,
+                      request::request_type type)
 {
     if (type == request::READ)
     {

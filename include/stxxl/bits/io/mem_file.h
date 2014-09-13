@@ -47,7 +47,7 @@ public:
           m_ptr(NULL), m_size(0)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type) throw (io_error);
+               request::request_type type);
     ~mem_file();
     offset_type size();
     void set_size(offset_type newsize);
