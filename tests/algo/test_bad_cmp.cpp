@@ -24,15 +24,11 @@ struct my_type
 {
     typedef unsigned key_type;
 
-    key_type _key;
-    key_type _data;
-    key_type key() const
-    {
-        return _key;
-    }
+    key_type m_key;
+    key_type m_data;
 
     my_type() { }
-    my_type(key_type __key) : _key(__key), _data(0) { }
+    my_type(key_type k) : m_key(k), m_data(0) { }
 
     static my_type min_value()
     {
@@ -48,23 +44,23 @@ struct my_type
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key;
+    o << obj.m_key;
     return o;
 }
 
 bool operator < (const my_type& a, const my_type& b)
 {
-    return a.key() < b.key();
+    return a.m_key < b.m_key;
 }
 
 bool operator == (const my_type& a, const my_type& b)
 {
-    return a.key() == b.key();
+    return a.m_key == b.m_key;
 }
 
 bool operator != (const my_type& a, const my_type& b)
 {
-    return a.key() != b.key();
+    return a.m_key != b.m_key;
 }
 
 struct cmp : public std::less<my_type>
@@ -99,8 +95,8 @@ int main(int argc, char* argv[])
 
     STXXL_MSG("Filling vector with min_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++) {
-        v[i]._key = 0;
-        v[i]._data = (int)(i + 1);
+        v[i].m_key = 0;
+        v[i].m_data = (int)(i + 1);
     }
 
     STXXL_MSG("Checking order...");
@@ -114,11 +110,11 @@ int main(int argc, char* argv[])
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
-        if (v[i]._data < 1)
+        if (v[i].m_data < 1)
             ++aliens;
-        else if (v[i]._data != i + 1)
+        else if (v[i].m_data != i + 1)
             ++not_stable;
-        v[i]._data = (int)(i + 1);
+        v[i].m_data = (int)(i + 1);
     }
     STXXL_MSG("elements that were not in the input:     " << aliens);
     STXXL_MSG("elements not on their expected location: " << not_stable);
@@ -131,19 +127,19 @@ int main(int argc, char* argv[])
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
-        if (v[i]._data < 1)
+        if (v[i].m_data < 1)
             ++aliens;
-        else if (v[i]._data != i + 1)
+        else if (v[i].m_data != i + 1)
             ++not_stable;
-        v[i]._data = (int)(i + 1);
+        v[i].m_data = (int)(i + 1);
     }
     STXXL_MSG("elements that were not in the input:     " << aliens);
     STXXL_MSG("elements not on their expected location: " << not_stable);
 
     STXXL_MSG("Filling vector with max_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++) {
-        v[i]._key = unsigned(-1);
-        v[i]._data = int(i + 1);
+        v[i].m_key = unsigned(-1);
+        v[i].m_data = int(i + 1);
     }
 
     STXXL_MSG("Sorting subset (using " << (memory_to_use >> 20) << " MiB of memory)...");
@@ -154,11 +150,11 @@ int main(int argc, char* argv[])
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
-        if (v[i]._data < 1)
+        if (v[i].m_data < 1)
             ++aliens;
-        else if (v[i]._data != i + 1)
+        else if (v[i].m_data != i + 1)
             ++not_stable;
-        v[i]._data = int(i + 1);
+        v[i].m_data = int(i + 1);
     }
     STXXL_MSG("elements that were not in the input:     " << aliens);
     STXXL_MSG("elements not on their expected location: " << not_stable);

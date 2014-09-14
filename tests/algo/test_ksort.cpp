@@ -22,16 +22,17 @@ struct my_type
 {
     typedef stxxl::uint64 key_type1;
 
-    key_type1 _key;
-    key_type1 _key_copy;
-    char _data[32 - 2 * sizeof(key_type1)];
+    key_type1 m_key;
+    key_type1 m_key_copy;
+    char m_data[32 - 2 * sizeof(key_type1)];
+
     key_type1 key() const
     {
-        return _key;
+        return m_key;
     }
 
-    my_type() : _key(0), _key_copy(0) { }
-    my_type(key_type1 __key) : _key(__key), _key_copy(__key) { }
+    my_type() : m_key(0), m_key_copy(0) { }
+    my_type(key_type1 k) : m_key(k), m_key_copy(k) { }
 
     my_type min_value() const { return my_type(std::numeric_limits<key_type1>::min()); }
     my_type max_value() const { return my_type(std::numeric_limits<key_type1>::max()); }
@@ -39,7 +40,7 @@ struct my_type
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key << " " << obj._key_copy;
+    o << obj.m_key << " " << obj.m_key_copy;
     return o;
 }
 
@@ -49,7 +50,7 @@ struct get_key
     my_type dummy;
     key_type operator () (const my_type& obj) const
     {
-        return obj._key;
+        return obj.m_key;
     }
     my_type min_value() const
     {
@@ -90,8 +91,8 @@ int main()
     STXXL_MSG("Filling vector... ");
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
-        v[i]._key = rnd() + 1;
-        v[i]._key_copy = v[i]._key;
+        v[i].m_key = rnd() + 1;
+        v[i].m_key_copy = v[i].m_key;
     }
 
     STXXL_MSG("Checking order...");
@@ -107,14 +108,14 @@ int main()
     my_type prev;
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
-        if (v[i]._key != v[i]._key_copy)
+        if (v[i].m_key != v[i].m_key_copy)
         {
             STXXL_MSG("Bug at position " << i);
             abort();
         }
-        if (i > 0 && prev._key == v[i]._key)
+        if (i > 0 && prev.m_key == v[i].m_key)
         {
-            STXXL_MSG("Duplicate at position " << i << " key=" << v[i]._key);
+            STXXL_MSG("Duplicate at position " << i << " key=" << v[i].m_key);
             //abort();
         }
         prev = v[i];

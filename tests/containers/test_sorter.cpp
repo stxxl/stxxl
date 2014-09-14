@@ -22,19 +22,20 @@ struct my_type
 {
     typedef unsigned key_type;
 
-    key_type _key;
-    char _data[RECORD_SIZE - sizeof(key_type)];
+    key_type m_key;
+    char m_data[RECORD_SIZE - sizeof(key_type)];
+
     key_type key() const
     {
-        return _key;
+        return m_key;
     }
 
     my_type() { }
-    my_type(key_type __key)
-        : _key(__key)
+    my_type(key_type k)
+        : m_key(k)
     {
 #if STXXL_WITH_VALGRIND
-        memset(_data, 0, sizeof(_data));
+        memset(m_data, 0, sizeof(m_data));
 #endif
     }
 
@@ -52,7 +53,7 @@ struct my_type
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key;
+    o << obj.m_key;
     return o;
 }
 

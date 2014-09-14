@@ -53,7 +53,7 @@ double simdisk_geometry::get_delay(file::offset_type offset, file::size_type siz
         double(interface_speed);
 
     std::set<Zone, ZoneCmp>::iterator zone = zones.lower_bound(first_sect);
-    //std::cout << __PRETTY_FUNCTION__ << " " << (*zone).first_sector << std::endl;
+    //std::cout << __FUNCTION__ << " " << (*zone).first_sector << std::endl;
     while (1)
     {
         int from_this_zone =

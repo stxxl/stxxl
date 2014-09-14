@@ -22,13 +22,13 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <class _Tp>
+template <class Type>
 struct compat_unique_ptr {
 #if __cplusplus >= 201103L && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
-    typedef std::unique_ptr<_Tp> result;
+    typedef std::unique_ptr<Type> result;
 #else
     // auto_ptr is inherently broken and is deprecated by unique_ptr in c++0x
-    typedef std::auto_ptr<_Tp> result;
+    typedef std::auto_ptr<Type> result;
 #endif
 };
 
@@ -38,17 +38,17 @@ STXXL_END_NAMESPACE
 
 namespace workaround_gcc_3_4 {
 
-// std::swap in gcc 3.4 is broken, __tmp is declared const there
-template <typename _Tp>
+// std::swap in gcc 3.4 is broken, tmp is declared const there
+template <typename Type>
 inline void
-swap(_Tp& __a, _Tp& __b)
+swap(Type& a, Type& b)
 {
     // concept requirements
-    __glibcxx_function_requires(_SGIAssignableConcept<_Tp>)
+    __glibcxx_function_requires(_SGIAssignableConcept<Type>)
 
-    _Tp __tmp = __a;
-    __a = __b;
-    __b = __tmp;
+    Type tmp = a;
+    a = b;
+    b = tmp;
 }
 
 } // namespace workaround_gcc_3_4
@@ -56,8 +56,8 @@ swap(_Tp& __a, _Tp& __b)
 namespace std {
 
 // overload broken std::swap<auto_ptr> to call a working swap()
-template <typename _Tp>
-inline void swap(std::auto_ptr<_Tp>& a, std::auto_ptr<_Tp>& b)
+template <typename Type>
+inline void swap(std::auto_ptr<Type>& a, std::auto_ptr<Type>& b)
 {
     workaround_gcc_3_4::swap(a, b);
 }

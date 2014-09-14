@@ -158,7 +158,22 @@ sub process_cpp {
         {
             if ($ln =~ m!\\brief!) {
                 print("found brief command in $path\n");
-                system("emacsclient -n $path");
+                system("emacsclient -n $path") if $launch_emacs;
+            }
+        }
+    }
+
+    # check for double underscores
+    {
+        foreach my $ln (@data)
+        {
+            next if $ln =~ /^\s*#(if|elif|define|error)/;
+            next if $path eq "include/stxxl/bits/common/types.h";
+
+            if ($ln =~ m@\s__(?!(gnu_parallel|gnu_cxx|glibcxx|typeof__|attribute__|sync_add_and_fetch|FILE__|LINE__|FUNCTION__))@) {
+                print("double-underscore found in $path\n");
+                print $ln."\n";
+                system("emacsclient -n $path") if $launch_emacs;
             }
         }
     }
@@ -238,14 +253,14 @@ sub process_cpp {
         if ($namespace != 0) {
             print "$path\n";
             print "    NAMESPACE MISMATCH!\n";
-            #system("emacsclient -n $path");
+            system("emacsclient -n $path") if $launch_emacs;
         }
 
         if (!array_equal(\@data,\@uncrust)) {
             print "$path\n";
             print diff(\@data, \@uncrust);
             @data = @uncrust;
-            #system("emacsclient -n $path");
+            system("emacsclient -n $path") if $launch_emacs;
         }
     }
 

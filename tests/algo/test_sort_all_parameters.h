@@ -18,12 +18,12 @@
 template <unsigned n>
 struct bulk
 {
-    char _data[n];
+    char m_data[n];
 
     bulk()
     {
 #if STXXL_WITH_VALGRIND
-        memset(_data, 0, n);
+        memset(m_data, 0, n);
 #endif
     }
 };
@@ -37,16 +37,16 @@ struct my_type
 {
     typedef KEY key_type;
 
-    key_type _key;
-    bulk<SIZE - sizeof(key_type)> _data;
+    key_type m_key;
+    bulk<SIZE - sizeof(key_type)> m_data;
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
+    my_type(key_type k) : m_key(k) { }
 
 #ifdef KEY_COMPARE
     key_type key() const
     {
-        return _key;
+        return m_key;
     }
 #endif
 
@@ -63,11 +63,7 @@ struct my_type
 template <typename KEY, unsigned SIZE>
 std::ostream& operator << (std::ostream& o, const my_type<KEY, SIZE> obj)
 {
-#ifndef KEY_COMPARE
-    o << obj._key;
-#else
-    o << obj.key();
-#endif
+    o << obj.m_key;
     return o;
 }
 
@@ -76,19 +72,19 @@ std::ostream& operator << (std::ostream& o, const my_type<KEY, SIZE> obj)
 template <typename KEY, unsigned SIZE>
 bool operator < (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
-    return a._key < b._key;
+    return a.m_key < b.m_key;
 }
 
 template <typename KEY, unsigned SIZE>
 bool operator == (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
-    return a._key == b._key;
+    return a.m_key == b.m_key;
 }
 
 template <typename KEY, unsigned SIZE>
 bool operator != (const my_type<KEY, SIZE>& a, const my_type<KEY, SIZE>& b)
 {
-    return a._key != b._key;
+    return a.m_key != b.m_key;
 }
 
 template <typename T>
@@ -96,7 +92,7 @@ struct Cmp : public std::less<T>
 {
     bool operator () (const T& a, const T& b) const
     {
-        return a._key < b._key;
+        return a.m_key < b.m_key;
     }
 
     static T min_value()

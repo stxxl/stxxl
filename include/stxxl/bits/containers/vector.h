@@ -1865,25 +1865,25 @@ inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize
 template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
           unsigned BlockSize, typename PagerType, unsigned PageSize>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __first,
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last)
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> first,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> last)
 {
     return is_sorted_helper(
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last));
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(first),
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(last));
 }
 
 template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
-          unsigned BlockSize, typename PagerType, unsigned PageSize, typename _StrictWeakOrdering>
+          unsigned BlockSize, typename PagerType, unsigned PageSize, typename StrictWeakOrdering>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __first,
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last,
-    _StrictWeakOrdering __comp)
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> first,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> last,
+    StrictWeakOrdering comp)
 {
     return is_sorted_helper(
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last),
-        __comp);
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(first),
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(last),
+        comp);
 }
 
 ////////////////////////////////////////////////////////////////////////////

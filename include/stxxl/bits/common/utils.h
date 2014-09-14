@@ -197,14 +197,14 @@ unsigned int ilog2_ceil(const IntegerType& i)
 template <typename Integral, typename Integral2>
 inline
 typename compat::remove_const<Integral>::type
-div_ceil(Integral __n, Integral2 __d)
+div_ceil(Integral n, Integral2 d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
-    typedef __typeof__ (std::div(__n, __d)) div_type;
-    div_type result = std::div(__n, __d);
+    typedef __typeof__ (std::div(n, d)) div_type;
+    div_type result = std::div(n, d);
     return result.quot + (result.rem != 0);
 #else
-    return __n / __d + ((__n % __d) != 0);
+    return n / d + ((n % d) != 0);
 #endif
 }
 

@@ -53,12 +53,12 @@ struct my_type
 #endif
 
     my_type() { }
-    my_type(key_type __key) : key(__key) { }
+    my_type(key_type k) : key(k) { }
 #if LOAD
-    my_type(key_type __key, key_type __load) : key(__key), load(__load) { }
+    my_type(key_type k, key_type l) : key(k), load(l) { }
 #endif
 
-    void operator = (const key_type& __key) { key = __key; }
+    void operator = (const key_type& k) { key = k; }
 #if LOAD
     void operator = (const my_type& mt)
     {
