@@ -42,7 +42,6 @@ struct Cmp : public std::binary_function<value_type, value_type, bool>
     }
 };
 
-
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE

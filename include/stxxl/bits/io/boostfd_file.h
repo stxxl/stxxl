@@ -35,7 +35,6 @@
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl

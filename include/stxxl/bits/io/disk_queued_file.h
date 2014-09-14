@@ -19,7 +19,6 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl

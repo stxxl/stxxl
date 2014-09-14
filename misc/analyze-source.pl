@@ -141,6 +141,18 @@ sub process_cpp {
         }
     }
 
+    # check #include "stxxl..." use
+    {
+        foreach my $ln (@data)
+        {
+            if ($ln =~ m@\s*#\s*include\s*"stxxl\S+"@) {
+                print("#include \"stxxl...\" found in $path\n");
+                print $ln."\n";
+                system("emacsclient -n $path") if $launch_emacs;
+            }
+        }
+    }
+
     # check for assert() in test cases
     if ($path =~ /^test/)
     {

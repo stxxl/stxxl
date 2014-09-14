@@ -32,7 +32,6 @@
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/state.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

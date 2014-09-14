@@ -16,12 +16,10 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/buf_writer.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
-
 
 //! Buffered output stream.
 //!

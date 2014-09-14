@@ -18,16 +18,13 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/algo/async_schedule.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
 
-
 // a paranoid check
 #define BUF_ISTREAM_CHECK_END
-
 
 //! Buffered input stream.
 //!
@@ -80,7 +77,6 @@ public:
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
         compute_prefetch_schedule(_begin, _end, prefetch_seq,
                                   nbuffers, mdevid);
-
 
         prefetcher = new prefetcher_type(_begin, _end, prefetch_seq, nbuffers);
 

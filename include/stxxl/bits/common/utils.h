@@ -30,7 +30,6 @@
 #include <stxxl/bits/compat/type_traits.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////

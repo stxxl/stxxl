@@ -31,7 +31,6 @@
  #error "Thread implementation not detected."
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 #if STXXL_STD_THREADS

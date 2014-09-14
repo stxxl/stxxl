@@ -20,7 +20,6 @@ using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
 
-
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
 #endif

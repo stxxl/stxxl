@@ -23,7 +23,6 @@
 
 #include <algorithm>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename ExtIterator_, typename StrictWeakOrdering_>
@@ -41,7 +40,6 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     for (i = 0; i < nblocks; ++i)
         reqs[i] = blocks[i].read(*(first.bid() + i));
 
-
     wait_all(reqs.begin(), nblocks);
 
     unsigned_type last_block_correction = last.block_offset() ? (block_type::size - last.block_offset()) : 0;
@@ -56,7 +54,6 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 
     wait_all(reqs.begin(), nblocks);
 }
-
 
 STXXL_END_NAMESPACE
 

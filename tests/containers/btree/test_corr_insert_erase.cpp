@@ -18,7 +18,6 @@
 #include <stxxl/sort>
 #include <stxxl/random_shuffle>
 
-
 struct comp_type : public std::less<int>
 {
     static int max_value()
@@ -39,7 +38,6 @@ std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
     o << obj.first << " " << obj.second;
     return o;
 }
-
 
 struct rnd_gen
 {
@@ -75,7 +73,6 @@ int main(int argc, char* argv[])
 
     stxxl::ran32State = (unsigned int)time(NULL);
 
-
     stxxl::vector<int> Values(nins);
     STXXL_MSG("Generating " << nins << " random values");
     stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
@@ -94,7 +91,6 @@ int main(int argc, char* argv[])
     STXXL_MSG("Inserting " << Values.size() << " random values into btree");
     for ( ; it != Values.end(); ++it)
         BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
-
 
     STXXL_MSG("Number of elements in btree: " << BTree.size());
 

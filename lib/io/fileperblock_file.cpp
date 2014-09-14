@@ -39,7 +39,6 @@
 #include <stxxl/bits/verbose.h>
 #include "ufs_platform.h"
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <class base_file_type>

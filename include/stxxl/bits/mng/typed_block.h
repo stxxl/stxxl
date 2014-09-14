@@ -27,7 +27,6 @@
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE2
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer

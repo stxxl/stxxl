@@ -119,7 +119,6 @@ struct SortByCaller
     }
 };
 
-
 void print_usage(const char* program)
 {
     std::cout << "Usage: " << program << " logfile main billfile" << std::endl;

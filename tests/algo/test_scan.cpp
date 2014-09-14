@@ -22,7 +22,6 @@
 using stxxl::int64;
 using stxxl::timestamp;
 
-
 template <typename type>
 struct counter
 {
@@ -67,13 +66,11 @@ int main()
 
     stxxl::generate(v.begin(), v.end(), counter<int64>(), 4);
 
-
     STXXL_MSG("for_each_m ...");
     b = timestamp();
     stxxl::for_each_m(v.begin(), v.end(), square<int64>(), 4);
     e = timestamp();
     STXXL_MSG("for_each_m time: " << (e - b));
-
 
     STXXL_MSG("check");
     for (i = 0; i < v.size(); ++i)
@@ -91,7 +88,6 @@ int main()
     stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64>(555), 4);
     e = timestamp();
     STXXL_MSG("generate: " << (e - b));
-
 
     STXXL_MSG("check");
     STXXL_CHECK2(v[0] == 0, "Error at position " << 0);

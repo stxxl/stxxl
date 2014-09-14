@@ -17,7 +17,6 @@
 #include <stxxl/scan>
 #include <stxxl/sort>
 
-
 struct comp_type : public std::less<int>
 {
     static int max_value()
@@ -38,7 +37,6 @@ std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
     o << obj.first << " " << obj.second;
     return o;
 }
-
 
 struct rnd_gen
 {
@@ -82,7 +80,6 @@ int main(int argc, char* argv[])
     STXXL_MSG("Inserting " << nins << " random values into btree");
     for ( ; it != Values.end(); ++it)
         BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
-
 
     STXXL_MSG("Sorting the random values");
     stxxl::sort(Values.begin(), Values.end(), comp_type(), 128 * 1024 * 1024);

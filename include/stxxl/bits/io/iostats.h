@@ -31,7 +31,6 @@
 #include <iostream>
 #include <string>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
@@ -425,7 +424,6 @@ inline void stats::read_finished() { }
 inline void stats::wait_started(wait_op_type) { }
 inline void stats::wait_finished(wait_op_type) { }
 #endif
-
 
 class stats_data
 {

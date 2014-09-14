@@ -20,9 +20,7 @@
 #include "ufs_platform.h"
 #include <sys/mman.h>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
                       request::request_type type)

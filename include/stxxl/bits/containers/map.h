@@ -17,7 +17,6 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/btree/btree.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace btree {

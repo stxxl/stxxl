@@ -19,7 +19,6 @@
 #include <stxxl/bits/io/request_with_waiters.h>
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

@@ -83,7 +83,6 @@ double simdisk_geometry::get_delay(file::offset_type offset, file::size_type siz
 #endif
 }
 
-
 IC35L080AVVA07::IC35L080AVVA07()
 {
     std::cout << "Creating IBM 120GXP IC35L080AVVA07" <<

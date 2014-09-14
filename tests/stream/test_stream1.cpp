@@ -13,7 +13,6 @@
 #include <limits>
 #include <stxxl/stream>
 
-
 struct Input
 {
     typedef unsigned value_type;

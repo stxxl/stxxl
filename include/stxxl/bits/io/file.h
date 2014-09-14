@@ -37,7 +37,6 @@
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer

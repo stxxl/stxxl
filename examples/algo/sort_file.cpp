@@ -22,7 +22,6 @@
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
 
-
 struct my_type
 {
     typedef unsigned key_type;
@@ -47,7 +46,6 @@ struct my_type
         return my_type(std::numeric_limits<key_type>::max());
     }
 };
-
 
 inline bool operator < (const my_type& a, const my_type& b)
 {

@@ -18,7 +18,6 @@
 #include <stxxl/sort>
 #include <stxxl/vector>
 
-
 #define RECORD_SIZE 8
 
 struct my_type
@@ -85,7 +84,6 @@ struct cmp : public std::less<my_type>
     }
 };
 
-
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
@@ -124,7 +122,6 @@ int main()
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
-
 
     STXXL_MSG("Done, output size=" << v.size());
 

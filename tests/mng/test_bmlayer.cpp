@@ -56,7 +56,6 @@ void testIO()
     for (i = 0; i < nblocks; ++i)
         reqs[i] = block->write(bids[i], my_handler());
 
-
     std::cout << "Waiting " << std::endl;
     stxxl::wait_all(reqs, nblocks);
 
@@ -97,7 +96,6 @@ void testIO2()
     bm->delete_blocks(bids.begin(), bids.end());
     delete[] blocks;
 }
-
 
 void testPrefetchPool()
 {

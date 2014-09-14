@@ -17,9 +17,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 #if STXXL_MSVC
 typedef __int8 int8;
@@ -40,7 +38,6 @@ typedef unsigned int uint32;
 typedef long long int int64;
 typedef unsigned long long int uint64;
 #endif
-
 
 // integer types declarations
 enum { my_pointer_size = sizeof(void*) };

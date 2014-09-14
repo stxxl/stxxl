@@ -20,7 +20,6 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 class io_error : public std::ios_base::failure

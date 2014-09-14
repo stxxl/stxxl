@@ -23,7 +23,6 @@
 #include <ostream>
 #include <utility>
 
-
 STXXL_BEGIN_NAMESPACE
 
 void disk_allocator::dump() const
@@ -38,7 +37,6 @@ void disk_allocator::dump() const
     }
     STXXL_ERRMSG("Total bytes: " << total);
 }
-
 
 void disk_allocator::deallocation_error(
     stxxl::int64 block_pos, stxxl::int64 block_size,
@@ -62,7 +60,6 @@ void disk_allocator::deallocation_error(
     }
     dump();
 }
-
 
 void disk_allocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size)
 {

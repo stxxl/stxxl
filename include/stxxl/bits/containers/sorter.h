@@ -99,7 +99,6 @@ public:
     //! \name Constructors
     //! \{
 
-
     //! Constructor allocation memory_to_use bytes in ram for sorted runs.
     sorter(const cmp_type& cmp, unsigned_type memory_to_use)
         : m_state(STATE_INPUT),

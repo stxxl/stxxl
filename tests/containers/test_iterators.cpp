@@ -17,7 +17,6 @@
 #include <vector>
 #include <stxxl.h>
 
-
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
 
 template <typename T>
@@ -348,7 +347,6 @@ void test_random_access_reverse(svt& sv)
     test_inc_dec_random(xsvri);
 }
 
-
 typedef float key_type;
 typedef double data_type;
 
@@ -363,7 +361,6 @@ struct cmp : public std::less<key_type>
         return std::numeric_limits<key_type>::max();
     }
 };
-
 
 template <>
 struct modify<std::pair<const key_type, data_type> >

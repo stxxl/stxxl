@@ -21,7 +21,6 @@
 #include <stxxl/bits/io/syscall_file.h>
 #include "ufs_platform.h"
 
-
 STXXL_BEGIN_NAMESPACE
 
 void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,

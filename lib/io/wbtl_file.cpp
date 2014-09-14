@@ -28,9 +28,7 @@
 #define STXXL_VERBOSE_WBTL STXXL_VERBOSE2
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 wbtl_file::wbtl_file(
     file* backend_file,

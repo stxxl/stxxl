@@ -26,7 +26,6 @@
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/config.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 #if STXXL_MSVC

@@ -24,9 +24,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/version.hpp>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)

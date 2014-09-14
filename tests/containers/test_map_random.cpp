@@ -20,7 +20,6 @@
 #include <stxxl/map>
 #include "map_test_handlers.h"
 
-
 typedef int key_type;
 typedef int data_type;
 
@@ -50,7 +49,6 @@ typedef stxxl::map<key_type, data_type, cmp2,
 #define PERCENT_UPPER 200
 #define PERCENT_FIND 100
 #define PERCENT_ITERATOR 100
-
 
 //#define MAX_KEY 1000
 #define MAX_KEY 10000
@@ -197,7 +195,6 @@ int main(int argc, char* argv[])
             if (xxliter != xxlmap.end())
                 xxlmap.erase(xxliter);
 
-
             STXXL_CHECK(stxxl::not_there(stdmap, key));
             STXXL_CHECK(stxxl::not_there(xxlmap, key));
         }
@@ -224,7 +221,6 @@ int main(int argc, char* argv[])
             unsigned upper = rnd() % MAX_KEY;
             if (lower > upper)
                 std::swap(lower, upper);
-
 
             vector_type v2(upper - lower);
             for (unsigned j = 0; j < (unsigned)(upper - lower); j++)

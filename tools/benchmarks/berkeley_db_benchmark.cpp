@@ -18,12 +18,10 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
-
 #include <stxxl/vector>
 #include <stxxl/map>
 #include <stxxl/timer>
 #include <stxxl/stream>
-
 
 ///// BDB header ////////////
 #include <db_cxx.h>
@@ -42,7 +40,6 @@
 #define NODE_BLOCK_SIZE         (32 * 1024)
 #define LEAF_BLOCK_SIZE         (32 * 1024)
 
-
 #define LEAF_BLOCK_SIZE         (32 * 1024)
 
 #define TOTAL_CACHE_SIZE        (750 * 1024 * 1024)
@@ -56,12 +53,10 @@
 
 #define SORTER_MEM              (TOTAL_CACHE_SIZE - 1024 * 1024 * 2 * 4)
 
-
 #define SCAN_LIMIT(x)   (x)
 
 //#define BDB_FILE "/data3/bdb_file"
 #define BDB_FILE "/var/tmp/bdb_file"
-
 
 // BDB settings
 u_int32_t pagesize = LEAF_BLOCK_SIZE;
@@ -78,7 +73,6 @@ struct my_key
 {
     char keybuf[KEY_SIZE];
 };
-
 
 std::ostream& operator << (std::ostream& o, const my_key& obj)
 {
@@ -118,7 +112,6 @@ bool operator >= (const my_key& a, const my_key& b)
     return strncmp(a.keybuf, b.keybuf, KEY_SIZE) >= 0;
 }
 
-
 struct my_data
 {
     char databuf[DATA_SIZE];
@@ -149,7 +142,6 @@ struct comp_type : std::binary_function<my_key, my_key, bool>
     }
 };
 
-
 /// TPIE  declarations
 // Key type.
 typedef my_key bkey_t;
@@ -168,7 +160,6 @@ struct key_from_el {
     }
 };
 
-
 // Temporary distinction btw UN*X and WIN, since there are some
 // problems with the MMAP collection implementation.
 #ifdef _WIN32
@@ -176,7 +167,6 @@ typedef AMI_btree<bkey_t, el_t, less<bkey_t>, key_from_el, BTE_COLLECTION_UFS> u
 #else
 typedef AMI_btree<bkey_t, el_t, less<bkey_t>, key_from_el> u_btree_t;
 #endif
-
 
 void init()
 {
@@ -194,10 +184,8 @@ typedef stxxl::map<my_key, my_data, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE>
 typedef stxxl::VECTOR_GENERATOR<std::pair<my_key, my_data>, 1, 1>::result vector_type;
 //typedef stxxl::vector<std::pair<my_key,my_data>,1,stxxl::lru_pager<1>,512*1024>  vector_type;
 
-
 //#define KEYPOS        (i % KEY_SIZE)
 //#define VALUE         (myrand() % 26)
-
 
 #if 0
 unsigned ran32State = 0xdeadbeef;
@@ -239,7 +227,6 @@ void run_bdb_btree(stxxl::int64 ops)
     memset(key1_storage.keybuf, 'a', KEY_SIZE);
     memset(data1_storage.databuf, 'b', DATA_SIZE);
 
-
     Db db(NULL, 0);             // Instantiate the Db object
 
     try {
@@ -255,7 +242,6 @@ void run_bdb_btree(stxxl::int64 ops)
                 DB_CREATE,      // Open flags
                 0);             // File mode (using defaults)
 
-
         // here we start with the tests
         Dbt key1(key1_storage.keybuf, KEY_SIZE);
         Dbt data1(data1_storage.databuf, DATA_SIZE);
@@ -266,7 +252,6 @@ void run_bdb_btree(stxxl::int64 ops)
         //comp_type cmp_;
 
         ran32State = 0xdeadbeef;
-
 
         DB_BTREE_STAT* dbstat;
 
@@ -295,7 +280,6 @@ void run_bdb_btree(stxxl::int64 ops)
         /////////////////////////////////////////
         Timer.reset();
         Timer.start();
-
 
         Dbc* cursorp;
         db.cursor(NULL, &cursorp, 0);
@@ -333,13 +317,11 @@ void run_bdb_btree(stxxl::int64 ops)
             if (last_key < key1_storage)
                 std::swap(last_key, key1_storage);
 
-
             Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             Dbt datax(data1_storage.databuf, DATA_SIZE);
 
             if (cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
                 continue;
-
 
             while (*((my_key*)keyx.get_data()) <= last_key)
             {
@@ -360,7 +342,6 @@ void run_bdb_btree(stxxl::int64 ops)
         Timer.stop();
         if (cursorp != NULL)
             cursorp->close();
-
 
         STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
                   " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
@@ -416,7 +397,6 @@ void run_stxxl_map(stxxl::int64 ops)
 
     memset(element.first.keybuf, 'a', KEY_SIZE);
     memset(element.second.databuf, 'b', DATA_SIZE);
-
 
     stxxl::timer Timer;
     stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
@@ -590,7 +570,6 @@ public:
         if (!empty())
             current.first = *in;
 
-
         return *this;
     }
     bool empty() const { return in.empty(); }
@@ -627,7 +606,6 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
         stxxl::stream::materialize(Key2Pair, SortedSeq.begin());
     }
 
-
     Timer.stop();
 
     STXXL_MSG("Finished sorting input. Elapsed time: " <<
@@ -643,7 +621,6 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
                  NODE_CACHE_SIZE, LEAF_CACHE_SIZE, true);
 
     Timer.stop();
-
 
     STXXL_MSG("Records in map: " << Map.size());
     STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
@@ -803,7 +780,6 @@ public:
     }
 };
 
-
 void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 {
     el_t element;
@@ -829,7 +805,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     Timer.start();
 
-
     {
         rand_key_gen Gen(n, element.key_);
         typedef stxxl::stream::sort<rand_key_gen, comp_type> sorter_type;
@@ -845,10 +820,8 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     Timer.stop();
 
-
     STXXL_MSG("Finished sorting input. Elapsed time: " <<
               (Timer.mseconds() / 1000.) << " seconds.");
-
 
     Timer.reset();
     Timer.start();
@@ -875,17 +848,14 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     if (u_btree->load_sorted(is, 1.0, 1.0) != AMI_ERROR_NO_ERROR)
         cerr << "Error during bulk loading.\n";
 
-
     Timer.stop();
 
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-
     ////////////////////////////////////////
     Timer.reset();
-
 
     Timer.start();
 
@@ -902,13 +872,10 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-
     ////////////////////////////////////////////////
     Timer.reset();
 
-
     Timer.start();
-
 
     el_t result;
     for (i = 0; i < n_locates; ++i)
@@ -922,10 +889,8 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-
     ////////////////////////////////////
     Timer.reset();
-
 
     Timer.start();
 
@@ -943,7 +908,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
         else
             n_scanned += u_btree->range_query(begin_key, element.key_, NULL, filter);
 
-
         if (n_scanned >= SCAN_LIMIT(n))
         {
             ++i;
@@ -957,7 +921,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
               " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
-
 
     //////////////////////////////////////
     ran32State = 0xdeadbeef;
@@ -998,7 +961,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
     memset(key1_storage.keybuf, 'a', KEY_SIZE);
     memset(data1_storage.databuf, 'b', DATA_SIZE);
-
 
     Db db(NULL, 0);                   // Instantiate the Db object
 
@@ -1072,7 +1034,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
         ////////////////////////////////////////
 
-
         Timer.reset();
         Timer.start();
 
@@ -1095,7 +1056,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         /////////////////////////////////////////
         Timer.reset();
         Timer.start();
-
 
         Dbc* cursorp;
         db.cursor(NULL, &cursorp, 0);
@@ -1134,7 +1094,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
             if (last_key < key1_storage)
                 std::swap(last_key, key1_storage);
 
-
             //STXXL_MSG("Looking     "<<key1_storage<<" scanned: "<<n_scanned);
             //STXXL_MSG("Upper bound "<<last_key);
 
@@ -1147,11 +1106,9 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
             Dbt datax(data1_storage.databuf, DATA_SIZE);
 #endif
 
-
 #ifdef BDB_BULK_SCAN
             if (cursorp->get(&keyx, &datax, DB_SET_RANGE | DB_MULTIPLE_KEY) == DB_NOTFOUND)
                 continue;
-
 
             do
             {
@@ -1165,7 +1122,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
                 }
                 if (cursorp->get(&keyx, &datax, DB_NEXT | DB_MULTIPLE_KEY) == DB_NOTFOUND)
                     break;
-
 
                 if (*((my_key*)keyx.get_data()) > last_key)
                 {
@@ -1185,7 +1141,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
             }
 #endif
 
-
             if (n_scanned >= SCAN_LIMIT(n))
             {
                 ++i;
@@ -1198,7 +1153,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         Timer.stop();
         if (cursorp != NULL)
             cursorp->close();
-
 
         STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
                   " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
@@ -1250,7 +1204,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 #endif
 }
 
-
 int main(int argc, char* argv[])
 {
     STXXL_MSG("stxxl::map Real Node block size: " << REAL_NODE_BLOCK_SIZE << " bytes");
@@ -1283,7 +1236,6 @@ int main(int argc, char* argv[])
     STXXL_MSG("Operations to perform: " << ops);
     STXXL_MSG("Btree cache size     : " << TOTAL_CACHE_SIZE << " bytes");
     STXXL_MSG("Leaf block size      : " << LEAF_BLOCK_SIZE << " bytes");
-
 
     switch (version)
     {

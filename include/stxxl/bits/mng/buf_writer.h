@@ -20,7 +20,6 @@
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/noncopyable.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \defgroup schedlayer Block Scheduling Sublayer
@@ -29,7 +28,6 @@ STXXL_BEGIN_NAMESPACE
 //! sequences of read and write requests
 //! via prefetching and buffered writing
 //! \{
-
 
 //! Encapsulates asynchronous buffered block writing engine.
 //!

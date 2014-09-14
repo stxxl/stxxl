@@ -18,7 +18,6 @@
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
-
 #ifndef STXXL_THREAD_ID
 # if STXXL_STD_THREADS || STXXL_BOOST_THREADS
 #  define STXXL_THREAD_ID (-1)
@@ -26,7 +25,6 @@
 #  define STXXL_THREAD_ID pthread_self()
 # endif
 #endif
-
 
 STXXL_BEGIN_NAMESPACE
 

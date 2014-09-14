@@ -17,7 +17,6 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
-
 #include "app_config.h"
 
 #include <portability.h>
@@ -33,11 +32,9 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/timer>
 
-
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
 
 #define BLOCK_SIZE       (2 * 1024 * 1024)
-
 
 #ifndef DISKS
  #define DISKS 1
@@ -49,7 +46,6 @@ struct my_record_
     char data[RECORD_SIZE];
     my_record_() { }
 };
-
 
 template <class my_record>
 void run_stack(stxxl::int64 volume)
@@ -89,7 +85,6 @@ void run_stack(stxxl::int64 volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MiB/s");
 
-
     ////////////////////////////////////////////////
     Timer.reset();
     Timer.start();
@@ -114,7 +109,6 @@ void run_stack(stxxl::int64 volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MiB/s");
 }
-
 
 int main(int argc, char* argv[])
 {

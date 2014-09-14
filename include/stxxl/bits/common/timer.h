@@ -34,7 +34,6 @@
   #include <sys/time.h>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! Returns number of seconds since the epoch, high resolution.

@@ -27,7 +27,6 @@
 #include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/serving_request.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

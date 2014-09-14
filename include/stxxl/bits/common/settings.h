@@ -20,7 +20,6 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename must_be_int = int>

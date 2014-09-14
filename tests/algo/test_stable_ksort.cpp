@@ -18,7 +18,6 @@
 #include <stxxl/ksort>
 #include <stxxl/vector>
 
-
 struct my_type
 {
     typedef unsigned key_type;
@@ -72,7 +71,6 @@ int main()
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
-
 
     return 0;
 }

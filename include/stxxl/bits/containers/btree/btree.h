@@ -23,7 +23,6 @@
 #include <stxxl/bits/containers/btree/node.h>
 #include <stxxl/vector>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace btree {
@@ -53,7 +52,6 @@ public:
     typedef const value_type& const_reference;
     typedef value_type* pointer;
     typedef value_type const* const_pointer;
-
 
     // leaf type declarations
     typedef normal_leaf<key_type, data_type, key_compare, RawLeafSize, SelfType> leaf_type;
@@ -101,10 +99,8 @@ private:
     typedef typename root_node_type::const_iterator root_node_const_iterator_type;
     typedef std::pair<key_type, node_bid_type> root_node_pair_type;
 
-
     root_node_type root_node_;
     iterator end_iterator;
-
 
     void insert_into_root(const std::pair<key_type, node_bid_type>& splitter)
     {
@@ -154,7 +150,6 @@ private:
             root_node_.clear();
             root_node_.insert(root_node_pair_type(LeftKey, LeftBid));
             root_node_.insert(root_node_pair_type(RightKey, RightBid));
-
 
             ++height_;
             STXXL_VERBOSE1("btree Increasing height to " << height_);
@@ -408,7 +403,6 @@ public:
         STXXL_VERBOSE1(" elements in a leaf: " << leaf_block_type::size);
         STXXL_VERBOSE1(" size of a node element: " << sizeof(typename node_block_type::value_type));
         STXXL_VERBOSE1(" size of a leaf element: " << sizeof(typename leaf_block_type::value_type));
-
 
         create_empty_leaf();
     }
@@ -955,7 +949,6 @@ public:
         assert(node_cache_.nfixed() == 0);
     }
 
-
     template <class InputIterator>
     btree(InputIterator b,
           InputIterator e,
@@ -1016,7 +1009,6 @@ public:
 
         std::swap(node_cache_, obj.node_cache_);                // OK
         std::swap(leaf_cache_, obj.leaf_cache_);                // OK
-
 
         std::swap(iterator_map_, obj.iterator_map_);            // must update all iterators
 
@@ -1080,7 +1072,6 @@ inline bool operator != (const btree<KeyType, DataType, CompareType, LogNodeSize
     return !(a == b);
 }
 
-
 template <class KeyType,
           class DataType,
           class CompareType,
@@ -1094,7 +1085,6 @@ inline bool operator < (const btree<KeyType, DataType, CompareType, LogNodeSize,
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
 }
 
-
 template <class KeyType,
           class DataType,
           class CompareType,
@@ -1107,7 +1097,6 @@ inline bool operator > (const btree<KeyType, DataType, CompareType, LogNodeSize,
 {
     return b < a;
 }
-
 
 template <class KeyType,
           class DataType,
@@ -1138,7 +1127,6 @@ inline bool operator >= (const btree<KeyType, DataType, CompareType, LogNodeSize
 } // namespace btree
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

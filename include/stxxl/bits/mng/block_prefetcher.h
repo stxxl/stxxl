@@ -23,12 +23,10 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/noncopyable.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
-
 
 class set_switch_handler
 {
@@ -186,7 +184,6 @@ public:
         if (nextconsume >= seq_length)
             return false;
 
-
         buffer = wait(nextconsume++);
 
         return true;
@@ -211,7 +208,6 @@ public:
         for (int_type i = 0; i < nreadblocks; ++i)
             if (read_reqs[i].valid())
                 read_reqs[i]->wait();
-
 
         delete[] read_reqs;
         delete[] read_bids;

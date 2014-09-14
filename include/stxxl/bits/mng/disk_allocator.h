@@ -33,7 +33,6 @@
 #include <ostream>
 #include <utility>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \ingroup mnglayer

@@ -29,7 +29,6 @@
 #include <stxxl/scan>
 #include <stxxl/sort>
 
-
 const unsigned long long megabyte = 1024 * 1024;
 
 //const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
@@ -128,7 +127,6 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
-
     typedef cmp_less_key comparator_type;
     comparator_type cl;
 
@@ -152,7 +150,6 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }
-
 
 int main(int argc, const char** argv)
 {

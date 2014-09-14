@@ -22,7 +22,6 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 /*!

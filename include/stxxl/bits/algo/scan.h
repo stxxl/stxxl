@@ -20,7 +20,6 @@
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
@@ -93,7 +92,6 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
 
     return functor;
 }
-
 
 /*!
  * External equivalent of std::for_each (mutating), see \ref design_algo_foreachm
@@ -172,7 +170,6 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     return functor;
 }
 
-
 /*!
  * External equivalent of std::generate, see \ref design_algo_generate.
  *
@@ -195,7 +192,6 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
 {
     typedef typename ExtIterator::block_type block_type;
     typedef buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
-
 
     while (begin.block_offset())    //  go to the beginning of the block
     //  of the external vector
@@ -249,7 +245,6 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
 
     begin.flush();
 }
-
 
 /*!
  * External equivalent of std::find, see \ref design_algo_find.

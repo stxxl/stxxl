@@ -18,7 +18,6 @@
 #include <limits>
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <class T>
@@ -36,7 +35,6 @@ template <typename T, typename U>
 struct new_alloc_rebind {
     typedef std::allocator<U> other;
 };
-
 
 // designed for typed_block (to use with std::vector)
 template <class T>

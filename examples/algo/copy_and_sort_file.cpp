@@ -23,7 +23,6 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 
-
 struct my_type
 {
     typedef unsigned key_type;
@@ -43,7 +42,6 @@ struct my_type
         return my_type(std::numeric_limits<key_type>::max());
     }
 };
-
 
 inline bool operator < (const my_type& a, const my_type& b)
 {
@@ -79,7 +77,6 @@ std::ostream& operator << (std::ostream& o, const my_type& obj)
     o << obj.m_key;
     return o;
 }
-
 
 int main(int argc, char** argv)
 {

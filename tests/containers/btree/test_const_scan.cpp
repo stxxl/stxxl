@@ -15,7 +15,6 @@
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/timer>
 
-
 struct comp_type : public std::less<int>
 {
     static int max_value()
@@ -112,7 +111,6 @@ int main(int argc, char* argv[])
     {
         btree_type BTree1(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
         btree_type BTree2(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
-
 
         //STXXL_MSG(*stxxl::stats::get_instance());
 

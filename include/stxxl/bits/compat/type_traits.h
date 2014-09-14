@@ -24,7 +24,6 @@
 #include <boost/type_traits/remove_const.hpp>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace compat {
@@ -94,7 +93,6 @@ struct _make_signed<unsigned long long>
 {
     typedef signed long long type;
 };
-
 
 template <typename Type>
 struct make_signed

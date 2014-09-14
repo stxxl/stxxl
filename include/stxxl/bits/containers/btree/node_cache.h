@@ -21,7 +21,6 @@
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/common/error_handling.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 // TODO:  speedup BID2node_ access using search result iterator in the methods
@@ -207,10 +206,8 @@ public:
                 pager_.hit(node2kick);
             } while (fixed_[node2kick]);
 
-
             if (reqs_[node2kick].valid())
                 reqs_[node2kick]->wait();
-
 
             node_type& Node = *(nodes_[node2kick]);
 
@@ -221,7 +218,6 @@ public:
             }
             else
                 ++n_clean_forced;
-
 
             //reqs_[node2kick] = request_ptr(); // reset request
 
@@ -241,7 +237,6 @@ public:
 
             return &Node;
         }
-
 
         int_type free_node = free_nodes_.back();
         free_nodes_.pop_back();
@@ -265,7 +260,6 @@ public:
         return &Node;
     }
 
-
     node_type * get_node(const bid_type& bid, bool fix = false)
     {
         typename BID2node_type::const_iterator it = BID2node_.find(bid);
@@ -282,7 +276,6 @@ public:
 
             if (reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll())
                 reqs_[nodeindex]->wait();
-
 
             ++n_found;
             return nodes_[nodeindex];
@@ -314,7 +307,6 @@ public:
             if (reqs_[node2kick].valid())
                 reqs_[node2kick]->wait();
 
-
             node_type& Node = *(nodes_[node2kick]);
 
             if (dirty_[node2kick])
@@ -324,7 +316,6 @@ public:
             }
             else
                 ++n_clean_forced;
-
 
             BID2node_.erase(Node.my_bid());
 
@@ -379,7 +370,6 @@ public:
             if (reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll())
                 reqs_[nodeindex]->wait();
 
-
             ++n_found;
             return nodes_[nodeindex];
         }
@@ -410,7 +400,6 @@ public:
             if (reqs_[node2kick].valid())
                 reqs_[node2kick]->wait();
 
-
             node_type& Node = *(nodes_[node2kick]);
             if (dirty_[node2kick])
             {
@@ -419,7 +408,6 @@ public:
             }
             else
                 ++n_clean_forced;
-
 
             BID2node_.erase(Node.my_bid());
 
@@ -485,12 +473,10 @@ public:
         bm->delete_block(bid);
     }
 
-
     void prefetch_node(const bid_type& bid)
     {
         if (BID2node_.find(bid) != BID2node_.end())
             return;
-
 
         // the node is not in cache
         if (free_nodes_.empty())
@@ -516,7 +502,6 @@ public:
             if (reqs_[node2kick].valid())
                 reqs_[node2kick]->wait();
 
-
             node_type& Node = *(nodes_[node2kick]);
 
             if (dirty_[node2kick])
@@ -526,7 +511,6 @@ public:
             }
             else
                 ++n_clean_forced;
-
 
             BID2node_.erase(Node.my_bid());
 
@@ -625,7 +609,6 @@ public:
 } // namespace btree
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

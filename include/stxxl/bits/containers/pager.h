@@ -21,7 +21,6 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/simple_vector.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcont_vector

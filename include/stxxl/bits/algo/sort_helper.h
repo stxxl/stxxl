@@ -19,7 +19,6 @@
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/verbose.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \internal

@@ -184,7 +184,6 @@ public:
 #endif // STXXL_MNG_COUNT_ALLOCATION
 };
 
-
 template <class BIDType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks_int(
     const unsigned_type nblocks,
@@ -235,7 +234,6 @@ void block_manager::new_blocks_int(
 #endif // STXXL_MNG_COUNT_ALLOCATION
 }
 
-
 template <unsigned BLK_SIZE>
 void block_manager::delete_block(const BID<BLK_SIZE>& bid)
 {
@@ -252,7 +250,6 @@ void block_manager::delete_block(const BID<BLK_SIZE>& bid)
     m_current_allocation -= BLK_SIZE;
 #endif // STXXL_MNG_COUNT_ALLOCATION
 }
-
 
 template <class BIDIteratorClass>
 void block_manager::delete_blocks(

@@ -55,7 +55,6 @@ std::ostream& operator << (std::ostream& i, const LogEntry& entry)
     return i;
 }
 
-
 int main(int argc, char* argv[])
 {
     if (argc < 5)

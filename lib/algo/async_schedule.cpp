@@ -16,7 +16,6 @@
 // and queued writing on parallel disks, 2005
 // DOI: 10.1137/S0097539703431573
 
-
 #include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/types.h>
@@ -32,7 +31,6 @@
 #include <queue>
 #include <utility>
 #include <vector>
-
 
 STXXL_BEGIN_NAMESPACE
 
@@ -62,7 +60,6 @@ struct write_time_cmp : public std::binary_function<write_time_pair, write_time_
         return a.second > b.second;
     }
 };
-
 
 static inline int_type get_disk(int_type i, const int_type* disks, int_type D)
 {
@@ -121,7 +118,6 @@ int_type simulate_async_write(
             oldtime = cur.timestamp;
         }
 
-
         STXXL_VERBOSE1("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
         o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp);
 
@@ -168,7 +164,6 @@ int_type simulate_async_write(
 }
 
 } // namespace async_schedule_local
-
 
 void compute_prefetch_schedule(
     const int_type* first,

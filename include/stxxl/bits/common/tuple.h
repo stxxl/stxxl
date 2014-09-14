@@ -22,7 +22,6 @@ STXXL_BEGIN_NAMESPACE
 
 struct Plug { };
 
-
 template <class T1,
           class T2,
           class T3,
@@ -54,7 +53,6 @@ struct tuple_base
 */
     };
 };
-
 
 //! k-Tuple data type
 //!
@@ -292,7 +290,6 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     }
 };
 
-
 //! Partial specialization for 3- \c tuple (triple)
 template <class T1,
           class T2,
@@ -483,7 +480,6 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     //! Fifth tuple component type
     typedef T5 fifth_type;
 
-
     template <int I>
     struct item_type
     {
@@ -666,7 +662,6 @@ public:
         return false;
     }
 };
-
 
 /**
  * Concatenates two tuple streams as streamA . streamB

@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <functional>
 
-
 STXXL_BEGIN_NAMESPACE
 
 bool request_with_waiters::add_waiter(onoff_switch* sw)

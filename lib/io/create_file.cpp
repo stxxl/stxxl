@@ -22,7 +22,6 @@
 #include <ostream>
 #include <stdexcept>
 
-
 STXXL_BEGIN_NAMESPACE
 
 file * create_file(const std::string& io_impl,

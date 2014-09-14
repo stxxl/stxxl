@@ -19,7 +19,6 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
-
 #ifndef STXXL_VERBOSE_ALIGNED_ALLOC
 #define STXXL_VERBOSE_ALIGNED_ALLOC STXXL_VERBOSE2
 #endif

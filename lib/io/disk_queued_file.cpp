@@ -19,9 +19,7 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 request_ptr disk_queued_file::aread(
     void* buffer,

@@ -239,7 +239,6 @@ int main(int argc, char* argv[])
 //         BlockSize = Config::BlockSize,
 //         ExtKMAX = Config::ExtKMAX
 
-
 /*  STXXL_MSG ( "Blocks fitting into internal memory m: "<<gen::m );
   STXXL_MSG ( "X : "<<gen::X );  //maximum number of internal elements //X = B * (settings::k - m) / settings::E,
   STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MiB");*/
@@ -259,7 +258,6 @@ int main(int argc, char* argv[])
 
     pq_type p(mem_for_pools / 2, mem_for_pools / 2);
     stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
-
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Peak number of elements (n): " << nelements);

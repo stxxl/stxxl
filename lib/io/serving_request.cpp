@@ -22,7 +22,6 @@
 
 #include <iomanip>
 
-
 STXXL_BEGIN_NAMESPACE
 
 serving_request::serving_request(

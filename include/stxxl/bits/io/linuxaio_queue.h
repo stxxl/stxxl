@@ -24,7 +24,6 @@
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer
@@ -67,7 +66,6 @@ private:
     // 2. A single thread cannot wait for the user program to post requests
     //    and the OS to produce I/O completion events at the same time
     //    (IOCB_CMD_NOOP does not seem to help here either)
-
 
     static const priority_op _priority_op = WRITE;
 

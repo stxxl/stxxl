@@ -19,7 +19,6 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/compat/unique_ptr.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 class request;

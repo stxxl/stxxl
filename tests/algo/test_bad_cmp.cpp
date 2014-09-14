@@ -19,7 +19,6 @@
 #include <stxxl/sort>
 #include <stxxl/vector>
 
-
 struct my_type
 {
     typedef unsigned key_type;
@@ -74,7 +73,6 @@ struct cmp : public std::less<my_type>
         return my_type::max_value();
     }
 };
-
 
 int main(int argc, char* argv[])
 {

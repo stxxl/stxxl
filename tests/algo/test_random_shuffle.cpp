@@ -21,7 +21,6 @@
 #include <stxxl/vector>
 #include <stxxl/random_shuffle>
 
-
 template <typename type>
 struct counter
 {
@@ -56,7 +55,6 @@ void long_test()
 
     STXXL_MSG("Permute randomly...");
     stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 1024 * 1024 * 128);
-
 
     STXXL_MSG("Begin: ");
     for (i = 0; i < 10; i++)

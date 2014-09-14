@@ -21,13 +21,11 @@
 #define KEY_COMPARE
 #include "test_sort_all_parameters.h"
 
-
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 128
 #endif
 
 #define MB (1024 * 1024)
-
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
 void test(stxxl::uint64 data_mem, unsigned memory_to_use)

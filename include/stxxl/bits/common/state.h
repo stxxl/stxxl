@@ -19,7 +19,6 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/condition_variable.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename ValueType = int>

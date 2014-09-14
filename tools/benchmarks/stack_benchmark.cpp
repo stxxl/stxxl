@@ -18,7 +18,6 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
-
 #include <stxxl/stack>
 #include <stxxl/stats>
 #include <stxxl/timer>
@@ -49,7 +48,6 @@ inline std::ostream& operator << (std::ostream& o, const my_record_<RECORD_SIZE>
     o << ".";
     return o;
 }
-
 
 template <typename stack_type>
 void benchmark_insert(stack_type& Stack, stxxl::int64 volume)
@@ -128,7 +126,6 @@ void benchmark_delete(stack_type& Stack, stxxl::int64 volume)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
-
 template <class my_record>
 void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 {
@@ -146,7 +143,6 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
     benchmark_delete(Stack, volume);
 }
 
-
 template <class my_record>
 void run_stxxl_normal_stack(stxxl::int64 volume)
 {
@@ -159,7 +155,6 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
     benchmark_delete(Stack, volume);
 }
 
-
 template <class my_record>
 void run_stl_stack(stxxl::int64 volume)
 {
@@ -170,7 +165,6 @@ void run_stl_stack(stxxl::int64 volume)
     benchmark_insert(Stack, volume);
     benchmark_delete(Stack, volume);
 }
-
 
 int main(int argc, char* argv[])
 {

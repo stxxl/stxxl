@@ -19,7 +19,6 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/config.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \defgroup alloc Allocation Functors

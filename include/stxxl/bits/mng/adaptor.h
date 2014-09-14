@@ -19,13 +19,11 @@
 
 #include <stxxl/bits/common/types.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer
 //!
 //! \{
-
 
 template <unsigned_type modulo>
 class blocked_index
@@ -216,7 +214,6 @@ struct two2one_dim_array_adapter_base
     typedef two2one_dim_array_adapter_base<one_dim_array_type,
                                            data_type, pos_type> _Self;
 
-
     two2one_dim_array_adapter_base()
     { }
 
@@ -229,7 +226,6 @@ struct two2one_dim_array_adapter_base
 
     STXXL_ADAPTOR_ARITHMETICS(pos)
 };
-
 
 //////////////////////////////
 
@@ -310,7 +306,6 @@ struct two2one_dim_array_adapter_base
     {                                                                                                \
         return two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>(a.array, a.pos - off); \
     }
-
 
 #if 0
 //////////////////////////
@@ -402,7 +397,6 @@ struct two2one_dim_array_column_adapter
     STXXL_ADAPTOR_ARITHMETICS(pos)
 };
 #endif
-
 
 template <typename array_type, typename value_type, unsigned_type modulo>
 class array_of_sequences_iterator : public std::iterator<std::random_access_iterator_tag, value_type, unsigned_type>

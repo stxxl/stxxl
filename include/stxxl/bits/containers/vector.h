@@ -31,7 +31,6 @@
 #include <stxxl/bits/mng/buf_istream_reverse.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 #define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void*>(this) << "]::" << msg)
@@ -39,7 +38,6 @@ STXXL_BEGIN_NAMESPACE
 //! \defgroup stlcont Containers
 //! \ingroup stllayer
 //! Containers with STL-compatible interface
-
 
 //! \defgroup stlcont_vector vector
 //! \ingroup stlcont
@@ -1265,7 +1263,6 @@ public:
 
         for (unsigned_type i = 0; i < numpages(); ++i)
             m_free_slots.push(i);
-
 
         // allocate blocks equidistantly and in-order
         size_type offset = 0;

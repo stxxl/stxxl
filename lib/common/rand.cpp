@@ -15,7 +15,6 @@
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 unsigned ran32State = get_next_seed();

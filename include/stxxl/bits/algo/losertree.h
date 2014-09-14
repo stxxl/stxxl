@@ -20,7 +20,6 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename run_cursor_type,

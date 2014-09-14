@@ -15,10 +15,8 @@
 #ifndef STXXL_COMPAT_UNIQUE_PTR_HEADER
 #define STXXL_COMPAT_UNIQUE_PTR_HEADER
 
-
 #include <memory>
 #include <stxxl/bits/namespace.h>
-
 
 STXXL_BEGIN_NAMESPACE
 

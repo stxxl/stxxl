@@ -17,7 +17,6 @@
 //! \example io/test_io_sizes.cpp
 //! This tests the maximum chunk size that a file type can handle with a single request.
 
-
 int main(int argc, char** argv)
 {
     if (argc < 4)

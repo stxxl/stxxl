@@ -17,7 +17,6 @@
 #include <stxxl/ksort>
 #include <stxxl/vector>
 
-
 struct my_type
 {
     typedef stxxl::uint64 key_type1;
@@ -61,7 +60,6 @@ struct get_key
         return my_type((dummy.max_value)());
     }
 };
-
 
 bool operator < (const my_type& a, const my_type& b)
 {

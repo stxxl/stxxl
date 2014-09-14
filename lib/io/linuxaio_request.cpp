@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 void linuxaio_request::completed(bool posted, bool canceled)

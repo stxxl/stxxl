@@ -25,9 +25,7 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/unused.h>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 //! Access to some useful malloc statistics.
 

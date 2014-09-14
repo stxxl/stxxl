@@ -18,17 +18,14 @@
 #include <stxxl/aligned_alloc>
 #include <stxxl/timer>
 
-
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timer;
 using stxxl::uint64;
 
-
 #ifndef BLOCK_ALIGN
  #define BLOCK_ALIGN  4096
 #endif
-
 
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)

@@ -15,7 +15,6 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/version.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 int version_major()

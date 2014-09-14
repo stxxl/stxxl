@@ -16,7 +16,6 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
@@ -156,7 +155,6 @@ public:
 //! \}
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

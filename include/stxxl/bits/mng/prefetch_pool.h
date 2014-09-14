@@ -19,7 +19,6 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/compat/hash_map.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
@@ -264,7 +263,6 @@ public:
             free_blocks_size += diff;
             while (--diff >= 0)
                 free_blocks.push_back(new block_type);
-
 
             return size();
         }
