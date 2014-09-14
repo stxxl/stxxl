@@ -16,7 +16,6 @@
 #include <cmath>
 #include <stxxl/bits/common/types.h>
 
-
 #ifndef STXXL_NO_WARN_RECURSIVE_SORT
 #define STXXL_WARNMSG_RECURSIVE_SORT STXXL_ERRMSG
 #else

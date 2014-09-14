@@ -18,7 +18,6 @@
 #include <limits>
 #include <stxxl/vector>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <class ValueType, class VectorType>

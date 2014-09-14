@@ -17,9 +17,7 @@
 #include <cassert>
 #include <stxxl/bits/verbose.h>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 namespace btree {
 
@@ -298,7 +296,6 @@ public:
     {
         return &(const_access());
     }
-
 
     bool operator == (const iterator& obj) const
     {

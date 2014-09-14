@@ -22,12 +22,10 @@
 
 #define STXXL_VERBOSE_WPOOL(msg) STXXL_VERBOSE1("write_pool[" << static_cast<void*>(this) << "]" << msg)
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
-
 
 //! Implements dynamically resizable buffered writing pool.
 template <class BlockType>
@@ -275,7 +273,6 @@ protected:
 //! \}
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

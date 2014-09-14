@@ -16,7 +16,6 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 request::request(

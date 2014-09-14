@@ -20,7 +20,6 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! IF template metaprogramming statement.
@@ -38,7 +37,6 @@ struct IF<false, Type1, Type2>
 {
     typedef Type2 result;
 };
-
 
 //! If \c Flag is \c true then \c IF<>::result is Num1
 //! otherwise of \c IF<>::result is Num2

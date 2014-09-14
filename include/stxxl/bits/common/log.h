@@ -19,7 +19,6 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 class logger : public singleton<logger>

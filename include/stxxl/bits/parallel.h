@@ -43,7 +43,6 @@
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/verbose.h>
 
-
 #if defined(_GLIBCXX_PARALLEL)
 //use _STXXL_FORCE_SEQUENTIAL to tag calls which are not worthwhile parallelizing
 #define _STXXL_FORCE_SEQUENTIAL , __gnu_parallel::sequential_tag()
@@ -83,7 +82,6 @@
 #include <algorithm>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 inline unsigned sort_memory_usage_factor()
@@ -122,7 +120,6 @@ inline bool do_parallel_merge()
     return false;
 #endif
 }
-
 
 namespace potentially_parallel {
 

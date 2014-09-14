@@ -368,7 +368,6 @@ public:
     { }
 };
 
-
 //! Input strategy for \c runs_creator class.
 //!
 //! This strategy together with \c runs_creator class
@@ -672,7 +671,6 @@ public:
     }
 };
 
-
 //! Input strategy for \c runs_creator class.
 //!
 //! This strategy together with \c runs_creator class
@@ -795,7 +793,6 @@ public:
         if (offset == 0 && iblock == 0)     // current run is empty
             return;
 
-
         result_->runs_sizes.resize(irun + 1);
         result_->runs_sizes.back() = iblock * block_type::size + offset;
 
@@ -841,7 +838,6 @@ public:
         return result_;
     }
 };
-
 
 //! Checker for the sorted runs object created by the \c runs_creator .
 //! \param sruns sorted runs object
@@ -894,7 +890,6 @@ bool check_sorted_runs(const RunsType_& sruns, CompareType_ cmp)
 
     return true;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //     MERGE RUNS                                                     //
@@ -1305,7 +1300,6 @@ public:
     }
 };
 
-
 template <class RunsType_, class CompareType_, class AllocStr_>
 void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
 {
@@ -1443,7 +1437,6 @@ void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
     }                            // end while (nruns > max_arity)
 }
 
-
 //! Merges sorted runs.
 //!
 //! \tparam RunsType_ type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
@@ -1482,7 +1475,6 @@ public:
         : base(cmp, memory_to_use)
     { }
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 //     SORT                                                           //
@@ -1534,7 +1526,6 @@ public:
     {
         sort_helper::verify_sentinel_strict_weak_ordering(c);
     }
-
 
     //! Standard stream method.
     bool empty() const

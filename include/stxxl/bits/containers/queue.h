@@ -27,7 +27,6 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 #ifndef STXXL_VERBOSE_QUEUE

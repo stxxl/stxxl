@@ -25,7 +25,6 @@
 #include <stxxl/bits/compat/unique_ptr.h>
 #include <stxxl/bits/verbose.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

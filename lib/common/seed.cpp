@@ -27,7 +27,6 @@
   #include <sys/time.h>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 inline unsigned initial_seed();

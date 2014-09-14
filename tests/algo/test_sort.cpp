@@ -18,25 +18,24 @@
 #include <stxxl/sort>
 #include <stxxl/vector>
 
-
 #define RECORD_SIZE 8
 
 struct my_type
 {
     typedef unsigned key_type;
 
-    key_type _key;
-    char _data[RECORD_SIZE - sizeof(key_type)];
+    key_type m_key;
+    char m_data[RECORD_SIZE - sizeof(key_type)];
     key_type key() const
     {
-        return _key;
+        return m_key;
     }
 
     my_type() { }
-    my_type(key_type __key) : _key(__key)
+    my_type(key_type k) : m_key(k)
     {
 #if STXXL_WITH_VALGRIND
-        memset(_data, 0, sizeof(_data));
+        memset(m_data, 0, sizeof(m_data));
 #endif
     }
 
@@ -54,7 +53,7 @@ struct my_type
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key;
+    o << obj.m_key;
     return o;
 }
 
@@ -85,7 +84,6 @@ struct cmp : public std::less<my_type>
     }
 };
 
-
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
@@ -114,7 +112,7 @@ int main()
     stxxl::random_number32 rnd;
     STXXL_MSG("Filling vector..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i]._key = 1 + (rnd() % 0xfffffff);
+        v[i].m_key = 1 + (rnd() % 0xfffffff);
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(!stxxl::is_sorted(v.begin(), v.end(), cmp()));
@@ -124,7 +122,6 @@ int main()
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
-
 
     STXXL_MSG("Done, output size=" << v.size());
 

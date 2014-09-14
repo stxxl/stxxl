@@ -137,7 +137,6 @@ protected:
             ExtKMAX,
             alloc_strategy_type> ext_merger_type;
 
-
     int_merger_type int_mergers[num_int_groups];
     pool_type* pool;
     bool pool_owned;
@@ -309,7 +308,6 @@ public:
         for (int i = 0; i < num_ext_groups; ++i)
             dynam_alloc_mem += ext_mergers[i]->mem_cons();
 
-
         return (sizeof(*this) +
                 sizeof(ext_merger_type) * num_ext_groups +
                 dynam_alloc_mem);
@@ -321,7 +319,6 @@ public:
     //! \}
 };
 
-
 template <class ConfigType>
 inline typename priority_queue<ConfigType>::size_type priority_queue<ConfigType>::size() const
 {
@@ -329,7 +326,6 @@ inline typename priority_queue<ConfigType>::size_type priority_queue<ConfigType>
            insert_heap.size() - 1 +
            (delete_buffer_end - delete_buffer_current_min);
 }
-
 
 template <class ConfigType>
 inline const typename priority_queue<ConfigType>::value_type & priority_queue<ConfigType>::top() const
@@ -368,12 +364,10 @@ inline void priority_queue<ConfigType>::push(const value_type& obj)
     if (insert_heap.size() == N + 1)
         empty_insert_heap();
 
-
     assert(!insert_heap.empty());
 
     insert_heap.push(obj);
 }
-
 
 ////////////////////////////////////////////////////////////////
 
@@ -726,7 +720,6 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
     return finalLevel;
 }
 
-
 // empty the insert heap into the main data structure
 template <class ConfigType>
 void priority_queue<ConfigType>::empty_insert_heap()
@@ -936,7 +929,6 @@ struct Parameters_not_found_Try_to_change_the_Tune_parameter
     typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
 };
 
-
 template <unsigned_type AI_, unsigned_type X_, unsigned_type CriticalSize>
 struct compute_N
 {
@@ -962,7 +954,7 @@ struct compute_N<1, X_, CriticalSize_>
 //! \addtogroup stlcont
 //! \{
 
-//! \brief Priority queue type generator. \n
+//! Priority queue type generator. \n
 //! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
 //! <b> Design and Internals </b> of priority queue container: see \ref design_pqueue.
 //!
@@ -1026,7 +1018,6 @@ public:
 //! \}
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

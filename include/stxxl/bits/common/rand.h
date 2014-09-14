@@ -35,7 +35,6 @@
 // 3. stxxl::srandom_number32(); // seed the global state of stxxl::random_number32
 // 4. create all the other prngs used.
 
-
 STXXL_BEGIN_NAMESPACE
 
 extern unsigned ran32State;

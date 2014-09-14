@@ -39,7 +39,6 @@ public:
         return height;
     }
 
-
     T & element(stxxl::unsigned_type x, stxxl::unsigned_type y)
     {
         //row-major

@@ -31,7 +31,6 @@
 #include <stxxl/bits/mng/buf_istream_reverse.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 #define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void*>(this) << "]::" << msg)
@@ -39,7 +38,6 @@ STXXL_BEGIN_NAMESPACE
 //! \defgroup stlcont Containers
 //! \ingroup stllayer
 //! Containers with STL-compatible interface
-
 
 //! \defgroup stlcont_vector vector
 //! \ingroup stlcont
@@ -793,7 +791,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! \brief External vector container. \n
+//! External vector container. \n
 //! <b>Introduction</b> to vector container: see \ref tutorial_vector tutorial. \n
 //! <b>Design and Internals</b> of vector container: see \ref design_vector
 //!
@@ -1038,7 +1036,7 @@ public:
         return size_type(m_bids.size()) * block_type::raw_size;
     }
 
-    /*! \brief Reserves at least n elements in external memory.
+    /*! Reserves at least n elements in external memory.
      *
      * If n is less than or equal to capacity(), this call has no
      * effect. Otherwise, it is a request for allocation of additional \b
@@ -1265,7 +1263,6 @@ public:
 
         for (unsigned_type i = 0; i < numpages(); ++i)
             m_free_slots.push(i);
-
 
         // allocate blocks equidistantly and in-order
         size_type offset = 0;
@@ -1865,25 +1862,25 @@ inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize
 template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
           unsigned BlockSize, typename PagerType, unsigned PageSize>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __first,
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last)
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> first,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> last)
 {
     return is_sorted_helper(
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last));
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(first),
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(last));
 }
 
 template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
-          unsigned BlockSize, typename PagerType, unsigned PageSize, typename _StrictWeakOrdering>
+          unsigned BlockSize, typename PagerType, unsigned PageSize, typename StrictWeakOrdering>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __first,
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last,
-    _StrictWeakOrdering __comp)
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> first,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> last,
+    StrictWeakOrdering comp)
 {
     return is_sorted_helper(
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last),
-        __comp);
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(first),
+        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(last),
+        comp);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -2563,7 +2560,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! \brief External vector type generator.
+//! External vector type generator.
 //!
 //! \tparam ValueType element type of contained objects (POD with no references to internal memory)
 //! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)

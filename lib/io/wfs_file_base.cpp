@@ -24,7 +24,6 @@
 
 STXXL_BEGIN_NAMESPACE
 
-
 const char* wfs_file_base::io_type() const
 {
     return "wfs_base";

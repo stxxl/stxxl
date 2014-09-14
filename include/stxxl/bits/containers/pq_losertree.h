@@ -227,7 +227,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::init()
 #endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 }
 
-
 // rebuild loser tree information from the values in current
 template <class ValTp_, class Cmp_, unsigned KNKMAX>
 void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLoserTree()
@@ -239,7 +238,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLoserTree()
     entry[0].key = *(current[winner]);
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
 }
-
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
 // given any values in the leaves this
@@ -268,7 +266,6 @@ unsigned_type loser_tree<ValTp_, Cmp_, KNKMAX>::initWinner(unsigned_type root)
         }
     }
 }
-
 
 // first go up the tree all the way to the root
 // hand down old winner for the respective subtree
@@ -322,7 +319,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::update_on_insert(
 }
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
-
 // make the tree two times as wide
 template <class ValTp_, class Cmp_, unsigned KNKMAX>
 void loser_tree<ValTp_, Cmp_, KNKMAX>::doubleK()
@@ -352,7 +348,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::doubleK()
     // recompute loser tree information
     rebuildLoserTree();
 }
-
 
 // compact nonempty segments in the left half of the tree
 template <class ValTp_, class Cmp_, unsigned KNKMAX>
@@ -409,7 +404,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::compactTree()
     rebuildLoserTree();
 }
 
-
 // insert segment beginning at target
 // require: is_space_available() == 1
 template <class ValTp_, class Cmp_, unsigned KNKMAX>
@@ -432,7 +426,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::insert_segment(Element* target, unsigned_
         assert(!free_slots.empty());
         unsigned_type index = free_slots.top();
         free_slots.pop();
-
 
         // link new segment
         current[index] = segment[index] = target;
@@ -457,7 +450,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::insert_segment(Element* target, unsigned_
         delete[] target;
     }
 }
-
 
 template <class ValTp_, class Cmp_, unsigned KNKMAX>
 loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
@@ -495,7 +487,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::deallocate_segment(unsigned_type slot)
     // push on the stack of free segment indices
     free_slots.push(slot);
 }
-
 
 // delete the length smallest elements and write them to target
 // empty segments are deallocated
@@ -650,7 +641,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::multi_merge(Element* target, unsigned_typ
         break;
     }
 
-
     size_ -= length;
 
     // compact tree if it got considerably smaller
@@ -676,7 +666,6 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::multi_merge(Element* target, unsigned_typ
     }
     //std::copy(target,target + length,std::ostream_iterator<ValTp_>(std::cout, "\n"));
 }
-
 
 // is this segment empty and does not point to sentinel yet?
 template <class ValTp_, class Cmp_, unsigned KNKMAX>
@@ -715,7 +704,6 @@ multi_merge_k(Element* target, unsigned_type length)
         // remove winner segment if empty now
         if (is_sentinel(winnerKey))     //
             deallocate_segment(winnerIndex);
-
 
         // go up the entry-tree
         for (unsigned_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1) {

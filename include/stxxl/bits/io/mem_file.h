@@ -18,7 +18,6 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl

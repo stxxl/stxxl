@@ -22,7 +22,6 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 class linuxaio_queue;

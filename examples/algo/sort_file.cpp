@@ -22,20 +22,20 @@
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
 
-
 struct my_type
 {
     typedef unsigned key_type;
 
-    key_type _key;
-    char _data[128 - sizeof(key_type)];
+    key_type m_key;
+    char m_data[128 - sizeof(key_type)];
+
     key_type key() const
     {
-        return _key;
+        return m_key;
     }
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
+    my_type(key_type k) : m_key(k) { }
 
     static my_type min_value()
     {
@@ -46,7 +46,6 @@ struct my_type
         return my_type(std::numeric_limits<key_type>::max());
     }
 };
-
 
 inline bool operator < (const my_type& a, const my_type& b)
 {
@@ -79,7 +78,7 @@ struct Cmp
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key;
+    o << obj.key();
     return o;
 }
 
@@ -104,7 +103,7 @@ int main(int argc, char** argv)
         for (unsigned i = 0; i < num_elements / records_in_block; i++)
         {
             for (unsigned j = 0; j < records_in_block; j++)
-                array[j]._key = cur_key--;
+                array[j].m_key = cur_key--;
 
             stxxl::request_ptr req = f.awrite((void*)array, stxxl::int64(i) * block_size, block_size, stxxl::default_completion_handler());
             req->wait();

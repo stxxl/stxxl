@@ -29,7 +29,6 @@
 #include <stxxl/scan>
 #include <stxxl/sort>
 
-
 const unsigned long long megabyte = 1024 * 1024;
 
 //const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
@@ -45,20 +44,20 @@ struct my_type
 {
     typedef unsigned long long key_type;
 
-    key_type _key;
-    key_type _load;
-    char _data[RECORD_SIZE - 2 * sizeof(key_type)];
-    key_type key() const { return _key; }
+    key_type m_key;
+    key_type m_load;
+    char m_data[RECORD_SIZE - 2 * sizeof(key_type)];
+    key_type key() const { return m_key; }
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
-    my_type(key_type __key, key_type __load) : _key(__key), _load(__load) { }
+    my_type(key_type k) : m_key(k) { }
+    my_type(key_type k, key_type l) : m_key(k), m_load(l) { }
 
-    void operator = (const key_type& __key) { _key = __key; }
+    void operator = (const key_type& k) { m_key = k; }
     void operator = (const my_type& mt)
     {
-        _key = mt._key;
-        _load = mt._load;
+        m_key = mt.m_key;
+        m_load = mt.m_load;
     }
 };
 
@@ -76,7 +75,7 @@ inline bool operator == (const my_type& a, const my_type& b)
 
 inline std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key << "/" << obj._load;
+    o << obj.m_key << "/" << obj.m_load;
     return o;
 }
 
@@ -92,7 +91,7 @@ stxxl::unsigned_type checksum(vector_type& input)
 {
     stxxl::unsigned_type sum = 0;
     for (vector_type::const_iterator i = input.begin(); i != input.end(); ++i)
-        sum += (*i)._key;
+        sum += (*i).m_key;
     return sum;
 }
 
@@ -128,7 +127,6 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
-
     typedef cmp_less_key comparator_type;
     comparator_type cl;
 
@@ -152,7 +150,6 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }
-
 
 int main(int argc, const char** argv)
 {

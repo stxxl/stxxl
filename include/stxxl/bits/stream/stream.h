@@ -23,11 +23,9 @@
 #include <stxxl/vector>
 #include <stxxl/bits/compat/unique_ptr.h>
 
-
 #ifndef STXXL_VERBOSE_MATERIALIZE
 #define STXXL_VERBOSE_MATERIALIZE STXXL_VERBOSE3
 #endif
-
 
 STXXL_BEGIN_NAMESPACE
 
@@ -36,7 +34,6 @@ namespace stream {
 
 //! \addtogroup streampack
 //! \{
-
 
 ////////////////////////////////////////////////////////////////////////
 //     STREAMIFY                                                      //
@@ -84,7 +81,6 @@ public:
         return (current_ == end_);
     }
 };
-
 
 //! Input iterator range to stream converter.
 //! \param begin iterator, pointing to the first value
@@ -244,7 +240,6 @@ struct streamify_traits<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, Diff
     typedef vector_iterator2stream<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> > stream_type;
 };
 
-
 //! Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
 //!
 //! small range switches between
@@ -309,7 +304,6 @@ public:
         else
             ++(*vec_it_stream);
 
-
         return *this;
     }
 
@@ -359,7 +353,6 @@ streamify_sr(
                (begin, end, nbuffers);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 //     MATERIALIZE                                                    //
 ////////////////////////////////////////////////////////////////////////
@@ -383,7 +376,6 @@ OutputIterator_ materialize(StreamAlgorithm_& in, OutputIterator_ out)
     return out;
 }
 
-
 //! Stores consecutively stream content to an output iterator range \b until end of the stream or end of the iterator range is reached.
 //! \param in stream to be stored used as source
 //! \param outbegin output iterator used as destination
@@ -405,7 +397,6 @@ OutputIterator_ materialize(StreamAlgorithm_& in, OutputIterator_ outbegin, Outp
     }
     return outbegin;
 }
-
 
 //! Stores consecutively stream content to an output \c stxxl::vector iterator \b until end of the stream or end of the iterator range is reached.
 //! \param in stream to be stored used as source
@@ -430,7 +421,6 @@ materialize(StreamAlgorithm_& in,
     typedef stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> ExtIterator;
     typedef stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
-
 
     while (outbegin.block_offset())     //  go to the beginning of the block
     //  of the external vector
@@ -489,7 +479,6 @@ materialize(StreamAlgorithm_& in,
     return outbegin;
 }
 
-
 //! Stores consecutively stream content to an output \c stxxl::vector iterator.
 //! \param in stream to be stored used as source
 //! \param out output \c stxxl::vector iterator used as destination
@@ -528,7 +517,6 @@ materialize(StreamAlgorithm_& in,
 
     if (nbuffers == 0)
         nbuffers = 2 * config::get_instance()->disks_number();
-
 
     out.flush();     // flush container
 
@@ -575,7 +563,6 @@ materialize(StreamAlgorithm_& in,
     return out;
 }
 
-
 //! Reads stream content and discards it.
 //! Useful where you do not need the processed stream anymore,
 //! but are just interested in side effects, or just for debugging.
@@ -589,7 +576,6 @@ void discard(StreamAlgorithm_& in)
         ++in;
     }
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //     GENERATE                                                       //
@@ -648,7 +634,6 @@ generator2stream<Generator_> streamify(Generator_ gen_)
 {
     return generator2stream<Generator_>(gen_);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //     TRANSFORM                                                      //
@@ -798,7 +783,6 @@ public:
     }
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 //     TRANSFORM (2 input streams)                                    //
 ////////////////////////////////////////////////////////////////////////
@@ -863,7 +847,6 @@ public:
         return i1.empty() || i2.empty();
     }
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 //     TRANSFORM (3 input streams)                                    //
@@ -934,7 +917,6 @@ public:
         return i1.empty() || i2.empty() || i3.empty();
     }
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 //     TRANSFORM (4 input streams)                                    //
@@ -1009,7 +991,6 @@ public:
         return i1.empty() || i2.empty() || i3.empty() || i4.empty();
     }
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 //     TRANSFORM (5 input streams)                                    //
@@ -1089,7 +1070,6 @@ public:
         return i1.empty() || i2.empty() || i3.empty() || i4.empty() || i5.empty();
     }
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 //     MAKE TUPLE                                                     //
@@ -1183,7 +1163,6 @@ public:
                i4.empty() || i5.empty() || i6.empty();
     }
 };
-
 
 //! Creates stream of 2-tuples (pairs) from 2 input streams.
 //!
@@ -1484,17 +1463,14 @@ public:
     }
 };
 
-
 //! \}
 
 } // namespace stream
 
 STXXL_END_NAMESPACE
 
-
 #include <stxxl/bits/stream/choose.h>
 #include <stxxl/bits/stream/unique.h>
-
 
 #endif // !STXXL_STREAM_STREAM_HEADER
 // vim: et:ts=4:sw=4

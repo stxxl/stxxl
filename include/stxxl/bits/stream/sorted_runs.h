@@ -21,14 +21,12 @@
 #include <stxxl/bits/algo/adaptor.h>
 #include <stxxl/bits/common/counting_ptr.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace stream {
 
 //! \addtogroup streampack Stream Package
 //! \{
-
 
 ////////////////////////////////////////////////////////////////////////
 //     SORTED RUNS                                                    //
@@ -118,7 +116,6 @@ private:
         }
     }
 };
-
 
 //! \}
 

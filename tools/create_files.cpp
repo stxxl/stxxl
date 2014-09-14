@@ -23,11 +23,9 @@
  #include <unistd.h>
 #endif
 
-
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
-
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -47,7 +45,6 @@ using stxxl::timestamp;
 
 #define CHECK_AFTER_READ 0
 
-
 #ifdef WATCH_TIMES
 void watch_times(request_ptr reqs[], unsigned n, double* out)
 {
@@ -56,7 +53,6 @@ void watch_times(request_ptr reqs[], unsigned n, double* out)
     unsigned i = 0;
     for (i = 0; i < n; i++)
         finished[i] = false;
-
 
     while (count != n)
     {
@@ -75,7 +71,6 @@ void watch_times(request_ptr reqs[], unsigned n, double* out)
     }
     delete[] finished;
 }
-
 
 void out_stat(double start, double end, double* times, unsigned n, const std::vector<std::string>& names)
 {
@@ -198,7 +193,6 @@ int create_files(int argc, char* argv[])
  #endif
         std::cout << std::setw(7) << int(double(current_block_size) / MB / (end - begin)) << " MiB/s,";
 #endif
-
 
 #ifndef NOREAD
         begin = timestamp();

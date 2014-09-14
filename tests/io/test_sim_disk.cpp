@@ -21,7 +21,6 @@
 using stxxl::file;
 using stxxl::timestamp;
 
-
 int main()
 {
     const stxxl::int64 disk_size = stxxl::int64(1024 * 1024) * 1024 * 40;

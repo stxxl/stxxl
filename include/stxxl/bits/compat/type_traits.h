@@ -24,7 +24,6 @@
 #include <boost/type_traits/remove_const.hpp>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace compat {
@@ -36,16 +35,16 @@ using std::tr1::remove_const;
 #elif STXXL_BOOST_CONFIG
 using boost::remove_const;
 #else
-template <typename _Tp>
+template <typename Type>
 struct remove_const
 {
-    typedef _Tp type;
+    typedef Type type;
 };
 
-template <typename _Tp>
-struct remove_const<_Tp const>
+template <typename Type>
+struct remove_const<Type const>
 {
-    typedef _Tp type;
+    typedef Type type;
 };
 #endif
 
@@ -53,53 +52,52 @@ struct remove_const<_Tp const>
 // That is a small subset of what GCC 4.3 does:
 
 // Utility for finding the signed versions of unsigned integral types.
-template <typename _Tp>
-struct __make_signed
+template <typename Type>
+struct _make_signed
 {
-    typedef _Tp __type;
+    typedef Type type;
 };
 
 template <>
-struct __make_signed<char>
+struct _make_signed<char>
 {
-    typedef signed char __type;
+    typedef signed char type;
 };
 
 template <>
-struct __make_signed<unsigned char>
+struct _make_signed<unsigned char>
 {
-    typedef signed char __type;
+    typedef signed char type;
 };
 
 template <>
-struct __make_signed<unsigned short>
+struct _make_signed<unsigned short>
 {
-    typedef signed short __type;
+    typedef signed short type;
 };
 
 template <>
-struct __make_signed<unsigned int>
+struct _make_signed<unsigned int>
 {
-    typedef signed int __type;
+    typedef signed int type;
 };
 
 template <>
-struct __make_signed<unsigned long>
+struct _make_signed<unsigned long>
 {
-    typedef signed long __type;
+    typedef signed long type;
 };
 
 template <>
-struct __make_signed<unsigned long long>
+struct _make_signed<unsigned long long>
 {
-    typedef signed long long __type;
+    typedef signed long long type;
 };
 
-
-template <typename _Tp>
+template <typename Type>
 struct make_signed
 {
-    typedef typename __make_signed<_Tp>::__type type;
+    typedef typename _make_signed<Type>::type type;
 };
 #endif
 

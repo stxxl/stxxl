@@ -21,7 +21,6 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

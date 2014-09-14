@@ -16,51 +16,50 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
-template <class _ForwardIter>
-bool is_sorted_helper(_ForwardIter __first, _ForwardIter __last)
+template <class ForwardIterator>
+bool is_sorted_helper(ForwardIterator first, ForwardIterator last)
 {
-    if (__first == __last)
+    if (first == last)
         return true;
 
-    _ForwardIter __next = __first;
-    for (++__next; __next != __last; __first = __next, ++__next) {
-        if (*__next < *__first)
+    ForwardIterator next = first;
+    for (++next; next != last; first = next, ++next) {
+        if (*next < *first)
             return false;
     }
 
     return true;
 }
 
-template <class _ForwardIter, class _StrictWeakOrdering>
-bool is_sorted_helper(_ForwardIter __first, _ForwardIter __last,
-                      _StrictWeakOrdering __comp)
+template <class ForwardIterator, class StrictWeakOrdering>
+bool is_sorted_helper(ForwardIterator first, ForwardIterator last,
+                      StrictWeakOrdering comp)
 {
-    if (__first == __last)
+    if (first == last)
         return true;
 
-    _ForwardIter __next = __first;
-    for (++__next; __next != __last; __first = __next, ++__next) {
-        if (__comp(*__next, *__first))
+    ForwardIterator next = first;
+    for (++next; next != last; first = next, ++next) {
+        if (comp(*next, *first))
             return false;
     }
 
     return true;
 }
 
-template <class _ForwardIter>
-bool is_sorted(_ForwardIter __first, _ForwardIter __last)
+template <class ForwardIterator>
+bool is_sorted(ForwardIterator first, ForwardIterator last)
 {
-    return is_sorted_helper(__first, __last);
+    return is_sorted_helper(first, last);
 }
 
-template <class _ForwardIter, class _StrictWeakOrdering>
-bool is_sorted(_ForwardIter __first, _ForwardIter __last,
-               _StrictWeakOrdering __comp)
+template <class ForwardIterator, class StrictWeakOrdering>
+bool is_sorted(ForwardIterator first, ForwardIterator last,
+               StrictWeakOrdering comp)
 {
-    return is_sorted_helper(__first, __last, __comp);
+    return is_sorted_helper(first, last, comp);
 }
 
 STXXL_END_NAMESPACE

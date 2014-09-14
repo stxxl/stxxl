@@ -22,7 +22,6 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-
 #define USE_FORMRUNS_N_MERGE    // comment if you want to use one 'sort' algorithm
                                 // without producing intermediate sorted runs.
 
@@ -56,9 +55,7 @@ using stxxl::stream::streamify_traits;
 using stxxl::stream::make_tuple;
 using stxxl::tuple;
 
-
 const char* phrase = "Hasta la vista, baby";
-
 
 template <class Container_, class It_>
 void fill_input_array(Container_& container, It_ p)
@@ -161,7 +158,6 @@ int main()
 
     input_stream_type input_stream = streamify(input.begin(), input.end());
 
-
     // create counter stream
 #if STXXL_WINDOWS
     typedef stxxl::stream::generator2stream<counter_type> counter_stream_type;
@@ -198,7 +194,6 @@ int main()
     output_array_type::iterator o = stxxl::stream::materialize(transformed_stream, output.begin(), output.end());
     // or materialize(sorted_stream,output.begin());
     STXXL_CHECK(o == output.end());
-
 
     STXXL_MSG("input string (character,position) :");
     for (unsigned i = 0; i < input.size(); ++i)

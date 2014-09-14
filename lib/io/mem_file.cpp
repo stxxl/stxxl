@@ -18,9 +18,7 @@
 #include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/iostats.h>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 void mem_file::serve(void* buffer, offset_type offset, size_type bytes,
                      request::request_type type)

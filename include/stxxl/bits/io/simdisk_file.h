@@ -30,7 +30,6 @@
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \weakgroup fileimpl
@@ -102,7 +101,6 @@ public:
 
     static const double s_average_speed;
 };
-
 
 class IC35L080AVVA07 : public simdisk_geometry              // IBM series 120GXP
 {

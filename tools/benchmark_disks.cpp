@@ -131,7 +131,6 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
 
             std::cout << std::setw(5) << std::setprecision(1) << (double(current_batch_size) / MiB / elapsed) << " MiB/s write, ";
 
-
             begin = timestamp();
 
             if (do_read)

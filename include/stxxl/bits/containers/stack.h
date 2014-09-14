@@ -28,7 +28,6 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \defgroup stlcont_stack stack
@@ -49,7 +48,6 @@ struct stack_config_generator
     enum { block_size = BlockSize };
     typedef SizeType size_type;
 };
-
 
 //! External stack container.
 //! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
@@ -221,7 +219,6 @@ public:
                 requests[i] = (back_page + i)->write(*cur_bid);
             }
 
-
             std::swap(back_page, front_page);
 
             bids.reserve(bids.size() + blocks_per_page);
@@ -292,12 +289,10 @@ private:
         if (offset < blocks_per_page * block_type::size)
             return &((*(back_page + offset / block_type::size))[offset % block_type::size]);
 
-
         unsigned_type unbiased_offset = offset - blocks_per_page * block_type::size;
         return &((*(front_page + unbiased_offset / block_type::size))[unbiased_offset % block_type::size]);
     }
 };
-
 
 //! Efficient implementation that uses prefetching and overlapping using internal buffers.
 //!
@@ -511,7 +506,6 @@ public:
 
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
-
 
             std::swap(cache_buffers, overlap_buffers);
 
@@ -817,7 +811,6 @@ private:
     }
 };
 
-
 //! A stack that migrates from internal memory to external when its size exceeds a certain threshold.
 //!
 //! For semantics of the methods see documentation of the STL \c std::stack.
@@ -971,7 +964,7 @@ public:
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
-//! \brief Stack type generator \n
+//! Stack type generator \n
 //! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
 //! <b> Design and Internals </b> of stack container: see \ref design_stack.
 //!
@@ -1036,7 +1029,6 @@ public:
 //! \}
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

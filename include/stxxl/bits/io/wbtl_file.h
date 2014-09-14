@@ -26,7 +26,6 @@
 
 #include <stxxl/bits/io/disk_queued_file.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl

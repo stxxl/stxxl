@@ -19,7 +19,6 @@
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_istream_reverse.h>
 
-
 #define BLOCK_SIZE (1024 * 512)
 
 typedef stxxl::typed_block<BLOCK_SIZE, unsigned> block_type;

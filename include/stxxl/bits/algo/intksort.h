@@ -19,7 +19,6 @@
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/parallel.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename type_key>
@@ -45,7 +44,6 @@ count(type_key* a, type_key* aEnd, int_type* bucket, int_type K, typename type_k
     }
 }
 
-
 static inline void
 exclusive_prefix_sum(int_type* bucket, int_type K)
 {
@@ -57,7 +55,6 @@ exclusive_prefix_sum(int_type* bucket, int_type K)
         sum += current;
     }
 }
-
 
 // distribute input a to output b using bucket for the starting indices
 template <typename type_key>
@@ -72,7 +69,6 @@ classify(type_key* a, type_key* aEnd, type_key* b, int_type* bucket, typename ty
         bucket[i] = bi + 1;
     }
 }
-
 
 template <class T>
 inline void
@@ -128,7 +124,6 @@ sort3(T& a, T& b, T& c)
     // Assert1 (!(b < a) && !(c < b));
 }
 
-
 template <class T>
 inline void
 sort4(T& a, T& b, T& c, T& d)
@@ -181,7 +176,6 @@ sort4(T& a, T& b, T& c, T& d)
     //Assert1 (!(b < a) && !(c < b) & !(d < c));
 }
 
-
 template <class T>
 inline void
 sort5(T& a, T& b, T& c, T& d, T& e)
@@ -227,7 +221,6 @@ sort5(T& a, T& b, T& c, T& d, T& e)
     }
     //Assert1 (!(b < a) && !(c < b) & !(d < c) & !(e < d));
 }
-
 
 template <class T>
 inline void

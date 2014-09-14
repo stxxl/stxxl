@@ -24,13 +24,12 @@
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer
 //! \{
 
-//! \brief Queue for linuxaio_file(s)
+//! Queue for linuxaio_file(s)
 //!
 //! Only one queue exists in a program, i.e. it is a singleton.
 class linuxaio_queue : public request_queue_impl_worker
@@ -67,7 +66,6 @@ private:
     // 2. A single thread cannot wait for the user program to post requests
     //    and the OS to produce I/O completion events at the same time
     //    (IOCB_CMD_NOOP does not seem to help here either)
-
 
     static const priority_op _priority_op = WRITE;
 

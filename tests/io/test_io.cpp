@@ -22,7 +22,6 @@
 
 using stxxl::file;
 
-
 struct my_handler
 {
     void operator () (stxxl::request* ptr)

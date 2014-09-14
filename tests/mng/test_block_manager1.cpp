@@ -13,7 +13,6 @@
 #include <stxxl/request>
 #include <stxxl/mng>
 
-
 int main()
 {
     typedef stxxl::typed_block<128* 1024, double> block_type;

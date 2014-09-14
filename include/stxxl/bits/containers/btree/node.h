@@ -16,7 +16,6 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/node_cache.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace btree {
@@ -44,7 +43,6 @@ public:
     typedef std::pair<key_type, bid_type> value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
-
 
     struct InfoType
     {
@@ -90,7 +88,6 @@ private:
     key_compare cmp_;
     value_compare vcmp_;
 
-
     std::pair<key_type, bid_type> insert(const std::pair<key_type, bid_type>& splitter,
                                          const block_iterator& place2insert)
     {
@@ -121,7 +118,6 @@ private:
 
             result.first = ((*block_)[end_of_smaller_part - 1]).first;
             result.second = NewBid;
-
 
             const unsigned old_size = size();
             // copy the smaller part
@@ -185,7 +181,6 @@ private:
             // balance
 
             key_type NewSplitter = RightNode->balance(*LeftNode);
-
 
             leftIt->first = NewSplitter;                             // change key
             assert(vcmp_(*leftIt, *rightIt));
@@ -313,7 +308,6 @@ public:
     {
         return *(block_->begin());
     }
-
 
     std::pair<iterator, bool> insert(
         const btree_value_type& x,
@@ -628,7 +622,6 @@ public:
         block_->info.cur_size += SrcSize;
     }
 
-
     key_type balance(normal_node& Left)
     {
         const unsigned TotalSize = Left.size() + size();
@@ -757,8 +750,6 @@ public:
 
 } // namespace btree
 
-
 STXXL_END_NAMESPACE
-
 
 #endif // !STXXL_CONTAINERS_BTREE_NODE_HEADER

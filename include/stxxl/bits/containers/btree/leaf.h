@@ -16,7 +16,6 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/node_cache.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace btree {
@@ -134,10 +133,8 @@ private:
             else
                 (*it2fix)->pos -= end_of_smaller_part;
 
-
             btree_->iterator_map_.register_iterator(**it2fix);
         }
-
 
         STXXL_VERBOSE1("btree::normal_leaf split leaf " << this
                                                         << " splitter: " << splitter.first);
@@ -181,7 +178,6 @@ public:
 
     unsigned max_nelements() const { return max_size; }
     unsigned min_nelements() const { return min_size; }
-
 
     bid_type & succ()
     {
@@ -410,12 +406,10 @@ public:
             if (btree_->prefetching_enabled_ && PredLeaf->pred().valid())
                 btree_->leaf_cache_.prefetch_node(PredLeaf->pred());
 
-
             btree_->leaf_cache_.unfix_node(pred());
         }
         else
             --it.pos;
-
 
         btree_->iterator_map_.register_iterator(it);
     }
@@ -428,7 +422,6 @@ public:
         if (lb == block_->begin() + size() || lb->first != k)
             return btree_->end();
 
-
         return iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
     }
 
@@ -439,7 +432,6 @@ public:
             std::lower_bound(block_->begin(), block_->begin() + size(), searchVal, vcmp_);
         if (lb == block_->begin() + size() || lb->first != k)
             return btree_->end();
-
 
         return const_iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
     }
@@ -550,7 +542,6 @@ public:
         // copy Src to *this leaf
         std::copy(Src.block_->begin(), Src.block_->begin() + SrcSize, block_->begin());
 
-
         std::vector<iterator_base*> Iterators2Fix;
         btree_->iterator_map_.find(my_bid(), 0, size(), Iterators2Fix);
         typename std::vector<iterator_base*>::iterator it2fix = Iterators2Fix.begin();
@@ -631,7 +622,6 @@ public:
                 btree_->iterator_map_.register_iterator(**it2fix);
             }
 
-
             it2fix = Iterators2Fix2.begin();
             for ( ; it2fix != Iterators2Fix2.end(); ++it2fix)
             {
@@ -671,7 +661,6 @@ public:
                 btree_->iterator_map_.register_iterator(**it2fix);
             }
 
-
             it2fix = Iterators2Fix2.begin();
             for ( ; it2fix != Iterators2Fix2.end(); ++it2fix)
             {
@@ -698,7 +687,6 @@ public:
 };
 
 } // namespace btree
-
 
 STXXL_END_NAMESPACE
 

@@ -31,11 +31,9 @@
 #include <stxxl/bits/version.h>
 #include <stxxl/bits/common/cmdline.h>
 
-
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
-
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -44,7 +42,6 @@ using stxxl::timestamp;
 #define BLOCK_ALIGN  4096
 
 #define POLL_DELAY 1000
-
 
 #if STXXL_WINDOWS
 const char* default_file_type = "wincall";
@@ -77,7 +74,6 @@ void watch_times(request_ptr reqs[], unsigned n, double* out)
     }
     delete[] finished;
 }
-
 
 void out_stat(double start, double end, double* times, unsigned n, const std::vector<std::string>& names)
 {
@@ -293,7 +289,6 @@ int benchmark_files(int argc, char* argv[])
             std::cout << std::setw(2) << nfiles << " * "
                       << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
                       << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * nfiles) << " MiB/s write,";
-
 
             begin = end = timestamp();
 

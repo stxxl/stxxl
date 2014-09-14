@@ -20,7 +20,6 @@
 
 typedef stxxl::int64 int64;
 
-
 int main()
 {
     // use non-randomized striping to avoid side effects on random generator

@@ -21,7 +21,6 @@
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

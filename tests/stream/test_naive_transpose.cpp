@@ -25,7 +25,6 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-
 class streamop_matrix_transpose
 {
     unsigned cut, repeat;

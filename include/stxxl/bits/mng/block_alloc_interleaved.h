@@ -19,7 +19,6 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/rand.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 #define CHECK_RUN_BOUNDS(pos)
@@ -79,7 +78,6 @@ struct interleaved_SR : public interleaved_striping
         return begindisk + (i / nruns + offsets[i % nruns]) % diff;
     }
 };
-
 
 struct interleaved_RC : public interleaved_striping
 {

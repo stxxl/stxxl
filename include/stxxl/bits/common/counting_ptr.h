@@ -21,7 +21,6 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup support

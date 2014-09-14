@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 void linuxaio_request::completed(bool posted, bool canceled)
@@ -62,7 +61,7 @@ void linuxaio_request::fill_control_block()
     cb.aio_offset = m_offset;
 }
 
-//! \brief Submits an I/O request to the OS
+//! Submits an I/O request to the OS
 //! \returns false if submission fails
 bool linuxaio_request::post()
 {
@@ -90,7 +89,7 @@ bool linuxaio_request::post()
     return success == 1;
 }
 
-//! \brief Cancel the request
+//! Cancel the request
 //!
 //! Routine is called by user, as part of the request interface.
 bool linuxaio_request::cancel()
@@ -106,7 +105,7 @@ bool linuxaio_request::cancel()
     return queue->cancel_request(req);
 }
 
-//! \brief Cancel already posted request
+//! Cancel already posted request
 bool linuxaio_request::cancel_aio()
 {
     STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] cancel_aio()");

@@ -19,7 +19,6 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/common/error_handling.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace btree {
@@ -65,7 +64,6 @@ private:
     typedef typename multimap_type::value_type pair_type;
     typedef typename multimap_type::iterator mmiterator_type;
     typedef typename multimap_type::const_iterator mmconst_iterator_type;
-
 
     // changes btree pointer in all contained iterators
     void change_btree_pointers(btree_type* b)
@@ -152,7 +150,6 @@ public:
 } // namespace btree
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

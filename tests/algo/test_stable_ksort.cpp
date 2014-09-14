@@ -18,20 +18,20 @@
 #include <stxxl/ksort>
 #include <stxxl/vector>
 
-
 struct my_type
 {
     typedef unsigned key_type;
 
-    key_type _key;
-    char _data[128 - sizeof(key_type)];
+    key_type m_key;
+    char m_data[128 - sizeof(key_type)];
+
     key_type key() const
     {
-        return _key;
+        return m_key;
     }
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
+    my_type(key_type k) : m_key(k) { }
 
     static my_type min_value()
     {
@@ -61,7 +61,7 @@ int main()
     stxxl::random_number32 rnd;
     STXXL_MSG("Filling vector... " << rnd() << " " << rnd() << " " << rnd());
     for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i]._key = (rnd() / 2) * 2;
+        v[i].m_key = (rnd() / 2) * 2;
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(!stxxl::is_sorted(v.begin(), v.end()));
@@ -71,7 +71,6 @@ int main()
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
-
 
     return 0;
 }

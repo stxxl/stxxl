@@ -17,7 +17,6 @@
 // 2. #define STXXL_NON_DEFAULT_EXIT_HANDLER for a handler that does not use atexit()
 // 3. #define STXXL_EXTERNAL_EXIT_HANDLER to provide your own implementation
 
-
 #ifndef STXXL_EXTERNAL_EXIT_HANDLER
 #ifndef STXXL_NON_DEFAULT_EXIT_HANDLER
 

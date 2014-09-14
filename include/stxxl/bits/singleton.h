@@ -20,7 +20,6 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/exithandler.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename INSTANCE, bool destroy_on_exit = true>

@@ -18,7 +18,6 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
-
 #include <limits>
 #include <stxxl/priority_queue>
 #include <stxxl/stats>
@@ -31,9 +30,7 @@
 #define PREFETCH_POOL_SIZE                      ((TOTAL_PQ_MEM_SIZE - PQ_MEM_SIZE) / 2)
 #define WRITE_POOL_SIZE                                         (PREFETCH_POOL_SIZE)
 
-
 #define MAX_ELEMENTS (2000 * 1024 * 1024)
-
 
 struct my_record
 {
@@ -69,7 +66,6 @@ bool operator > (const my_record& a, const my_record& b)
     return a.key > b.key;
 }
 
-
 struct comp_type : std::binary_function<my_record, my_record, bool>
 {
     bool operator () (const my_record& a, const my_record& b) const
@@ -82,14 +78,12 @@ struct comp_type : std::binary_function<my_record, my_record, bool>
     }
 };
 
-
 typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_record, comp_type,
                                         PQ_MEM_SIZE, MAX_ELEMENTS / (1024 / 8)>::result pq_type;
 
 typedef pq_type::block_type block_type;
 
 #define    BLOCK_SIZE block_type::raw_size
-
 
 #if 1
 unsigned ran32State = 0xdeadbeef;
@@ -104,7 +98,6 @@ inline long long unsigned myrand()
     return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL);
 }
 #endif
-
 
 void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 {
@@ -164,7 +157,6 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
-
 
 void run_stxxl_intermixed(stxxl::uint64 ops)
 {
@@ -250,7 +242,6 @@ int main(int argc, char* argv[])
 
     int version = atoi(argv[1]);
     stxxl::uint64 ops = stxxl::atouint64(argv[2]);
-
 
     STXXL_MSG("Running version      : " << version);
     STXXL_MSG("Operations to perform: " << ops);

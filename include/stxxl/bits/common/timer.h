@@ -34,7 +34,6 @@
   #include <sys/time.h>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup support

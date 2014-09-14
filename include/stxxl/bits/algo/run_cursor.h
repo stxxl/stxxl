@@ -17,7 +17,6 @@
 #include <cstdlib>
 #include <stxxl/bits/common/types.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <typename block_type>
@@ -111,7 +110,6 @@ void run_cursor2<block_type, prefetcher_type>::operator ++ ()
     }
 }
 
-
 #if 0
 template <typename block_type>
 struct run_cursor_cmp
@@ -126,7 +124,6 @@ struct run_cursor_cmp
 #endif
 
 STXXL_END_NAMESPACE
-
 
 #endif // !STXXL_ALGO_RUN_CURSOR_HEADER
 // vim: et:ts=4:sw=4

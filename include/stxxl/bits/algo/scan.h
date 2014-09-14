@@ -20,14 +20,13 @@
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
 //! \{
 
 /*!
- * \brief External equivalent of std::for_each, see \ref design_algo_foreach.
+ * External equivalent of std::for_each, see \ref design_algo_foreach.
  *
  * stxxl::for_each applies the function object \c functor to each element in
  * the range [first, last); \c functor's return value, if any, is
@@ -94,9 +93,8 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     return functor;
 }
 
-
 /*!
- * \brief External equivalent of std::for_each (mutating), see \ref design_algo_foreachm
+ * External equivalent of std::for_each (mutating), see \ref design_algo_foreachm
  *
  * stxxl::for_each_m applies the function object \c functor to each element in
  * the range [first, last); \c functor's return value, if any, is
@@ -172,9 +170,8 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     return functor;
 }
 
-
 /*!
- * \brief External equivalent of std::generate, see \ref design_algo_generate.
+ * External equivalent of std::generate, see \ref design_algo_generate.
  *
  * Generate assigns the result of invoking \c generator, a function object that
  * takes no arguments, to each element in the range [first, last). To overlap
@@ -195,7 +192,6 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
 {
     typedef typename ExtIterator::block_type block_type;
     typedef buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
-
 
     while (begin.block_offset())    //  go to the beginning of the block
     //  of the external vector
@@ -250,9 +246,8 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
     begin.flush();
 }
 
-
 /*!
- * \brief External equivalent of std::find, see \ref design_algo_find.
+ * External equivalent of std::find, see \ref design_algo_find.
  *
  * Returns the first iterator \a i in the range [first, last) such that <tt>*i
  * == value</tt>. Returns last if no such iterator exists.  To overlap I/O and

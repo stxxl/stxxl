@@ -63,7 +63,6 @@ int main()
     for (i = 0; i < nblocks; ++i)
         reqs[i] = block->write(bids[i], my_handler());
 
-
     std::cout << "Waiting " << std::endl;
     stxxl::wait_all(reqs, nblocks);
 
@@ -78,7 +77,6 @@ int main()
                                            << " value read: " << block->elem[j].integer);
         }
     }
-
 
     bm->delete_blocks(bids.begin(), bids.end());
 

@@ -274,7 +274,6 @@ public:
         static value_type max_value() { return value_type::max_value(); }
     };
 
-
     /** Check, if last two components of tree quads are equal. */
     template <class quad_type>
     static inline bool quad_eq(const quad_type& a, const quad_type& b)
@@ -390,7 +389,6 @@ public:
         bool empty() const
         { return (A.empty() || B.empty()); }
     };
-
 
     /**
      * Collect three characters t_i, t_{i+1}, t_{i+2} beginning at the index
@@ -540,7 +538,6 @@ public:
         bool empty() const
         { return A.empty(); }
     };
-
 
     /** Create the suffix array from the current sub problem by simple
      *  comparison-based merging.  More precisely: compare characters(out of
@@ -711,7 +708,6 @@ public:
             return *this;
         }
     };
-
 
     /** Helper function for computing the size of the 2/3 subproblem. */
     static inline size_t subp_size(size_t n)

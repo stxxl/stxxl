@@ -253,7 +253,6 @@ protected:
         }
     };
 
-
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
     struct Entry
     {
@@ -363,7 +362,6 @@ private:
         entry[0].key = *(states[winner]);
 #endif      //STXXL_PQ_EXTERNAL_LOSER_TREE
     }
-
 
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
     // given any values in the leaves this
@@ -487,7 +485,6 @@ private:
         rebuild_loser_tree();
     }
 
-
     // compact nonempty segments in the left half of the tree
     void compact_tree()
     {
@@ -534,7 +531,6 @@ private:
         // recompute loser tree information
         rebuild_loser_tree();
     }
-
 
 #if 0
     void swap(ext_merger& obj)
@@ -883,7 +879,6 @@ private:
             if (is_sentinel(winner_key)) //
                 deallocate_segment(winner_index);
 
-
             // go up the entry-tree
             for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
             {
@@ -929,7 +924,6 @@ private:
             // remove winner segment if empty now
             if (is_sentinel(winner_key))
                 deallocate_segment(winner_index);
-
 
             ++target;
 
@@ -986,7 +980,6 @@ public:
             assert(!free_segments.empty());
             unsigned_type free_slot = free_segments.top();
             free_segments.pop();
-
 
             // link new segment
             assert(segment_size);

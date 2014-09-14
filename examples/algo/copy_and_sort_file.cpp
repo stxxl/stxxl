@@ -23,20 +23,15 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 
-
 struct my_type
 {
     typedef unsigned key_type;
 
-    key_type _key;
-    char _data[128 - sizeof(key_type)];
-    key_type key() const
-    {
-        return _key;
-    }
+    key_type m_key;
+    char m_data[128 - sizeof(key_type)];
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
+    my_type(key_type k) : m_key(k) { }
 
     static my_type min_value()
     {
@@ -48,15 +43,14 @@ struct my_type
     }
 };
 
-
 inline bool operator < (const my_type& a, const my_type& b)
 {
-    return a.key() < b.key();
+    return a.m_key < b.m_key;
 }
 
 inline bool operator == (const my_type& a, const my_type& b)
 {
-    return a.key() == b.key();
+    return a.m_key == b.m_key;
 }
 
 struct Cmp
@@ -80,10 +74,9 @@ struct Cmp
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)
 {
-    o << obj._key;
+    o << obj.m_key;
     return o;
 }
-
 
 int main(int argc, char** argv)
 {

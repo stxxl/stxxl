@@ -19,18 +19,14 @@
 //        (free stacks buffers)
 // TODO: shuffle small input in internal memory
 
-
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/scan>
 #include <stxxl/stack>
 
-
 STXXL_BEGIN_NAMESPACE
-
 
 //! \addtogroup stlalgo
 //! \{
-
 
 //! External equivalent of std::random_shuffle
 //! \param first begin of the range to shuffle
@@ -73,7 +69,6 @@ void random_shuffle(ExtIterator_ first,
 
     int_type k = M / (3 * BlockSize_); // number of buckets
 
-
     stxxl::int64 i, j, size = 0;
 
     value_type* temp_array;
@@ -90,7 +85,6 @@ void random_shuffle(ExtIterator_ first,
     buckets = new stack_type*[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
-
 
     ///// Reading input /////////////////////
     typedef typename stream::streamify_traits<ExtIterator_>::stream_type input_stream;
@@ -231,7 +225,6 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     buckets = new stack_type*[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
-
 
     typedef buf_istream<block_type, typename ExtIterator_::bids_container_iterator> buf_istream_type;
     typedef buf_ostream<block_type, typename ExtIterator_::bids_container_iterator> buf_ostream_type;

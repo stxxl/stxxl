@@ -15,7 +15,6 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace btree {

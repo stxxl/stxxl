@@ -28,7 +28,7 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup reqlayer
 //! \{
 
-//! \brief Request for an linuxaio_file.
+//! Request for an linuxaio_file.
 class linuxaio_request : public request_with_state
 {
     template <class base_file_type>

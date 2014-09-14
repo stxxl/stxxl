@@ -20,16 +20,13 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/algo/async_schedule.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
 
-
 // a paranoid check
 #define BUF_ISTREAM_CHECK_END
-
 
 //! Buffered input stream, reading the items in the blocks in reverse order.
 //!

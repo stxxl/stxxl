@@ -17,7 +17,6 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
@@ -26,11 +25,9 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/common/utils.h>
 
-
 #ifndef STXXL_VERBOSE_STABLE_KSORT
 #define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1
 #endif
-
 
 STXXL_BEGIN_NAMESPACE
 
@@ -77,7 +74,6 @@ bool operator > (const type_key<type>& a, const type_key<type>& b)
 {
     return a.key > b.key;
 }
-
 
 template <typename BIDType_, typename AllocStrategy_>
 class bid_sequence
@@ -168,13 +164,11 @@ void distribute(
     for (i = 0; i < nbuckets; i++)
         bucket_blocks[i] = out.get_free_block();
 
-
     ExtIterator_ cur = first - first.block_offset();
 
     // skip part of the block before first untouched
     for ( ; cur != first; cur++)
         ++in;
-
 
     const int_type shift = sizeof(key_type) * 8 - lognbuckets;
     // search in the the range [_begin,_end)
@@ -344,11 +338,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         for (i = 0; i < nbucket_blocks; i++)
             reqs1[i] = blocks1[i].read(bucket_bids[0][i]);
 
-
         nbucket_blocks = div_ceil(bucket_sizes[1], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
-
 
         key_type offset = 0;
         const unsigned log_k1 = STXXL_MAX<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
@@ -410,7 +402,6 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 // write out all
                 for (type_key_* p = d; p < dEnd; p++)
                     out << (*(p->ptr));
-
 
                 delete[] bucket2;
                 c = cEnd;

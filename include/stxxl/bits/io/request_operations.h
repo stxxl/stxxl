@@ -20,14 +20,12 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/onoff_switch.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer
 //! \{
 
 //! Collection of functions to track statuses of a number of requests.
-
 
 //! Suspends calling thread until \b all given requests are completed.
 //! \param reqs_begin begin of request sequence to wait for
@@ -85,7 +83,6 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
     return reqs_end;
 }
 
-
 //! Polls requests.
 //! \param req_array array of request_ptr objects
 //! \param count size of req_array
@@ -97,7 +94,6 @@ inline bool poll_any(request_ptr req_array[], size_t count, size_t& index)
     index = res - req_array;
     return res != (req_array + count);
 }
-
 
 //! Suspends calling thread until \b any of requests is completed.
 //! \param reqs_begin begin of request sequence to wait for
@@ -144,7 +140,6 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 
     return result;
 }
-
 
 //! Suspends calling thread until \b any of requests is completed.
 //! \param req_array array of \c request_ptr objects

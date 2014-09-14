@@ -18,7 +18,6 @@
 
 // Test async schedule algorithm
 
-
 int main(int argc, char* argv[])
 {
     if (argc < 5)
@@ -34,10 +33,8 @@ int main(int argc, char* argv[])
     stxxl::int_type* prefetch_order = new stxxl::int_type[L];
     int* count = new int[D];
 
-
     for (int i = 0; i < D; i++)
         count[i] = 0;
-
 
     stxxl::random_number32 rnd;
     for (int i = 0; i < L; i++)

@@ -24,7 +24,6 @@
 
 #include <string>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl

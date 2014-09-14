@@ -118,7 +118,7 @@ std::ostream& operator << (std::ostream& o, const matrix_operation_statistic_dat
 
 //! \}
 
-//! \internal \brief matrix low-level operations and tools
+//! matrix low-level operations and tools
 namespace matrix_local {
 
 //! A static_quadtree holds 4^Level elements arranged in a quad tree.

@@ -18,7 +18,6 @@
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/adaptor.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 template <unsigned BlockSize, typename RunType, class PosType = int_type>
@@ -126,7 +125,6 @@ struct runs2bid_array_adaptor2
         if (i < 0)
             return &((*(array[(pos) % w])[(pos) / w].bid));
 
-
         PosType _w = w;
         _w--;
         return &((*(array[(i) % _w])[h + (i / _w)].bid));
@@ -139,7 +137,6 @@ struct runs2bid_array_adaptor2
         if (i < 0)
             return (BID<BlockSize>&)((*(array[(n) % w]))[(n) / w].bid);
 
-
         PosType _w = w;
         _w--;
         return (BID<BlockSize>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
@@ -147,7 +144,6 @@ struct runs2bid_array_adaptor2
 };
 
 BLOCK_ADAPTOR_OPERATORS(runs2bid_array_adaptor2)
-
 
 template <typename trigger_iterator_type>
 struct trigger_entry_iterator

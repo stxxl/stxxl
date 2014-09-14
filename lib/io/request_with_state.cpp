@@ -23,7 +23,6 @@
 
 #include <cassert>
 
-
 STXXL_BEGIN_NAMESPACE
 
 request_with_state::~request_with_state()

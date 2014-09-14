@@ -33,7 +33,6 @@
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/utils.h>
 
-
 //#define INTERLEAVED_ALLOC
 
 #define OPT_MERGING
@@ -65,7 +64,6 @@ struct trigger_entry
         return bid;
     }
 };
-
 
 template <typename BIDType, typename KeyType>
 inline bool operator < (const trigger_entry<BIDType, KeyType>& a,
@@ -104,7 +102,6 @@ bool operator > (const type_key<type, key1>& a, const type_key<type, key1>& b)
 {
     return a.key > b.key;
 }
-
 
 template <typename block_type, typename bid_type>
 struct write_completion_handler
@@ -326,7 +323,6 @@ private:
     run_cursor2_cmp() { }
 };
 
-
 template <typename record_type, typename key_extractor>
 class key_comparison : public std::binary_function<record_type, record_type, bool>
 {
@@ -340,7 +336,6 @@ public:
         return ke(a) < ke(b);
     }
 };
-
 
 template <typename block_type, typename run_type, typename key_ext_>
 bool check_ksorted_runs(run_type** runs,
@@ -440,7 +435,6 @@ bool check_ksorted_runs(run_type** runs,
     return true;
 }
 
-
 template <typename block_type, typename run_type, typename key_extractor>
 void merge_runs(run_type** in_runs, unsigned_type nruns, run_type* out_run, unsigned_type _m, key_extractor keyobj)
 {
@@ -489,7 +483,6 @@ void merge_runs(run_type** in_runs, unsigned_type nruns, run_type* out_run, unsi
 
 #endif
 
-
     prefetcher_type prefetcher(consume_seq.begin(),
                                consume_seq.end(),
                                prefetch_seq,
@@ -527,7 +520,6 @@ void merge_runs(run_type** in_runs, unsigned_type nruns, run_type* out_run, unsi
     }
 }
 
-
 template <typename block_type,
           typename alloc_strategy,
           typename input_bid_iterator,
@@ -564,7 +556,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 
     for (i = 0; i < full_runs; i++)
         runs[i] = new run_type(m2);
-
 
 #ifdef INTERLEAVED_ALLOC
     if (partial_runs)
@@ -664,7 +655,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
                             runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
         }
 
-
         // merge all
         runs_left = nruns;
         cur_out_run = 0;
@@ -702,7 +692,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 } // namespace ksort_local
 
 /*!
- * \brief Sort records with integer keys, see \ref design_algo_ksort.
+ * Sort records with integer keys, see \ref design_algo_ksort.
  *
  * stxxl::ksort sorts the elements in [first, last) into ascending order,
  * meaning that if \c i and \c j are any two valid iterators in [first, last)
@@ -734,7 +724,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
     typedef typename ExtIterator::vector_type::value_type value_type;
     typedef typename ExtIterator::block_type block_type;
 
-
     unsigned_type n = 0;
     block_manager* mng = block_manager::get_instance();
 
@@ -762,7 +751,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 mng->new_block(FR(), first_bid);                // try to overlap
                 mng->new_block(FR(), last_bid);
                 req->wait();
-
 
                 req = last_block->read(*last.bid());
 
@@ -802,7 +790,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                         KeyExtractor>
                         (first.bid(), n, M / block_type::raw_size, keyobj);
 
-
                 first_block = new typename ExtIterator::block_type;
                 last_block = new typename ExtIterator::block_type;
                 typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
@@ -830,7 +817,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 }
 
                 req->wait();
-
 
                 req = last_block->write(last_bid);
 
@@ -873,7 +859,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 mng->new_block(FR(), first_bid);                // try to overlap
                 req->wait();
 
-
                 unsigned_type i = 0;
                 for ( ; i < first.block_offset(); i++)
                 {
@@ -897,7 +882,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                         typename ExtIterator::bids_container_iterator,
                         KeyExtractor>
                         (first.bid(), n, M / block_type::raw_size, keyobj);
-
 
                 first_block = new typename ExtIterator::block_type;
 
@@ -977,7 +961,6 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                         typename ExtIterator::bids_container_iterator,
                         KeyExtractor>
                         (first.bid(), n, M / block_type::raw_size, keyobj);
-
 
                 last_block = new typename ExtIterator::block_type;
                 typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
@@ -1066,7 +1049,7 @@ struct ksort_defaultkey
 };
 
 /*!
- * \brief Sort records with integer keys, see \ref design_algo_ksort.
+ * Sort records with integer keys, see \ref design_algo_ksort.
  *
  * stxxl::ksort sorts the elements in [first, last) into ascending order,
  * meaning that if \c i and \c j are any two valid iterators in [first, last)

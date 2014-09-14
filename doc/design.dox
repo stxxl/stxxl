@@ -842,11 +842,11 @@ Example:
 struct MyType
 {
     typedef unsigned long long key_type;
-    key_type _key;
-    char _data[32];
+    key_type m_key;
+    char m_data[32];
     MyType() {}
-    MyType(key_type __key):_key(__key) {}
-    key_type key() { return _key; }
+    MyType(key_type k) : m_key(k) {}
+    key_type key() { return m_key; }
     MyType min_value() const
     { return MyType( std::numeric_limits<key_type>::min() ); }
     MyType max_value() const
@@ -872,16 +872,16 @@ A key extractor object for ordering elements having 64 bit integer keys:
 struct MyType
 {
     typedef unsigned long long key_type;
-    key_type _key;
-    char _data[32];
+    key_type m_key;
+    char m_data[32];
     MyType() {}
-    MyType(key_type __key):_key(__key) {}
+    MyType(key_type k) : m_key(k) {}
 };
 struct GetKey
 {
     typedef MyType::key_type key_type;
     key_type operator() (const MyType & obj)
-    { return obj._key; }
+    { return obj.m_key; }
     MyType min_value() const
     { return MyType( std::numeric_limits<key_type>::min() ); }
     MyType max_value() const
@@ -931,11 +931,11 @@ The same as for \ref design_algo_sort "stxxl::sort".
 struct MyType
 {
     typedef unsigned long long key_type;
-    key_type _key;
-    char _data[32];
+    key_type m_key;
+    char m_data[32];
     MyType() {}
-    MyType(key_type __key):_key(__key) {}
-    key_type key() { return obj._key; }
+    MyType(key_type k) : m_key(k) {}
+    key_type key() { return obj.m_key; }
     static MyType min_value() const
     { return MyType( std::numeric_limits<key_type>::min() ); }
     static MyType max_value() const

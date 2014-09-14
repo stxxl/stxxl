@@ -28,8 +28,7 @@
 STXXL_BEGIN_NAMESPACE
 
 /*!
- * \brief Construct an 40-bit or 48-bit unsigned integer stored in five or six
- * bytes.
+ * Construct an 40-bit or 48-bit unsigned integer stored in five or six bytes.
  *
  * The purpose of this class is to provide integers with smaller data storage
  * footprints when more than 32-bit, but less than 64-bit indexes are

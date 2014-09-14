@@ -16,7 +16,6 @@
 
 #include <stxxl/bits/io/request_with_state.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup reqlayer

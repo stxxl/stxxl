@@ -23,7 +23,6 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/condition_variable.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 class onoff_switch : private noncopyable

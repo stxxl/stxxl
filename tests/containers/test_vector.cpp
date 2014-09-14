@@ -21,7 +21,6 @@
 #include <stxxl/vector>
 #include <stxxl/scan>
 
-
 struct element  // 24 bytes, not a power of 2 intentionally
 {
     stxxl::int64 key;
@@ -101,7 +100,6 @@ void test_vector1()
         v[i].key = i + offset;
         STXXL_CHECK(v[i].key == stxxl::int64(i + offset));
     }
-
 
     // fill the vector with random numbers
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);

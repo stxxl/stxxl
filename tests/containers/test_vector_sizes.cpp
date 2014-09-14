@@ -13,7 +13,6 @@
 #include <stxxl/io>
 #include <stxxl/vector>
 
-
 typedef int my_type;
 typedef stxxl::VECTOR_GENERATOR<my_type>::result vector_type;
 typedef vector_type::block_type block_type;

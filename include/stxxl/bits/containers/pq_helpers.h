@@ -136,16 +136,16 @@ public:
 
     /*!
      * Add data to the %queue.
-     * @param  __x  Data to be added.
+     * @param  x  Data to be added.
      *
      * This is a typical %queue operation.
      * The time complexity of the operation depends on the underlying
      * sequence.
      */
     void
-    push(const value_type& __x)
+    push(const value_type& x)
     {
-        heap[current_size] = __x;
+        heap[current_size] = x;
         ++current_size;
         std::push_heap(heap.begin(), heap.begin() + current_size, comp);
     }

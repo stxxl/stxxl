@@ -16,7 +16,6 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! Stream package subnamespace.
@@ -306,9 +305,7 @@ public:
 
 STXXL_END_NAMESPACE
 
-
 #include <stxxl/bits/stream/unique.h>
-
 
 #endif // !STXXL_STREAM_CHOOSE_HEADER
 // vim: et:ts=4:sw=4

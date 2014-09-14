@@ -18,7 +18,6 @@
 #include <stxxl/stats>
 #include <stxxl/timer>
 
-
 struct comp_type : public std::less<int>
 {
     static int max_value()
@@ -55,7 +54,6 @@ int main(int argc, char* argv[])
     if (nins < 100)
         nins = 100;
 
-
     stxxl::random_number32 rnd;
 
     // .begin() .end() test
@@ -87,7 +85,6 @@ int main(int argc, char* argv[])
     STXXL_CHECK(it == BTree1.end());
     it = BTree1.find(1000);
     STXXL_CHECK(it == BTree1.end());
-
 
     stxxl::unsigned_type f = BTree1.erase(5);
     STXXL_CHECK(f == 1);
@@ -180,7 +177,6 @@ int main(int argc, char* argv[])
     }
     STXXL_MSG("Size of map: " << BTree1.size());
 
-
     BTree1.clear();
 
     for (unsigned int i = 0; i < nins / 2; ++i)
@@ -222,7 +218,6 @@ int main(int argc, char* argv[])
     STXXL_MSG("Size of Btree4 after erase: " << BTree4.size());
     STXXL_CHECK(BTree4.size() == 1);
 
-
     STXXL_MSG("Size of Btree1 before erase: " << BTree1.size());
     BTree1.erase(BTree1.begin(), BTree1.end());
     STXXL_MSG("Size of Btree1 after erase: " << BTree1.size());
@@ -263,7 +258,6 @@ int main(int argc, char* argv[])
     std::pair<btree_type::const_iterator, btree_type::const_iterator> cit_pair = CBTree3.equal_range(1);
 
     STXXL_CHECK(CBTree3.max_size() >= CBTree3.size());
-
 
     CBTree3.key_comp();
     CBTree3.value_comp();

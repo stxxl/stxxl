@@ -15,7 +15,6 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 // There are several possibilities for the exit handlers.

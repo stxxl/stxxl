@@ -130,7 +130,6 @@ void merge3_iterator(
 #undef Merge3Case
 }
 
-
 // merge length elements from the four sentinel terminated input
 // sequences source0, source1, source2 and source3 to target
 // advance source0, source1, source2 and source3 accordingly

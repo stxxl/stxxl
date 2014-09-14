@@ -7,7 +7,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -70,6 +70,22 @@ sub expect_re($$\$$) {
     }
 }
 
+# check equality of two arrays
+sub array_equal {
+    my ($a1ref,$a2ref) = @_;
+
+    my @a1 = @{$a1ref};
+    my @a2 = @{$a2ref};
+
+    return 0 if scalar(@a1) != scalar(@a2);
+
+    for my $i (0..scalar(@a1)-1) {
+        return 0 if $a1[$i] ne $a2[$i];
+    }
+
+    return 1;
+}
+
 # run $text through a external pipe (@program)
 sub filter_program {
     my $text = shift;
@@ -115,11 +131,25 @@ sub process_cpp {
     my @data = <F>;
     close(F);
 
+    my @origdata = @data;
+
     # put all #include lines into the includemap
     foreach my $ln (@data)
     {
         if ($ln =~ m!\s*#\s*include\s*([<"]\S+[">])!) {
             $includemap{$1}{$path} = 1;
+        }
+    }
+
+    # check #include "stxxl..." use
+    {
+        foreach my $ln (@data)
+        {
+            if ($ln =~ m@\s*#\s*include\s*"stxxl\S+"@) {
+                print("#include \"stxxl...\" found in $path\n");
+                print $ln."\n";
+                system("emacsclient -n $path") if $launch_emacs;
+            }
         }
     }
 
@@ -130,6 +160,32 @@ sub process_cpp {
         {
             if ($ln =~ m!assert\(!) {
                 print("found assert() in test $path\n");
+            }
+        }
+    }
+
+    # check for \brief doxygen commands
+    {
+        foreach my $ln (@data)
+        {
+            if ($ln =~ m!\\brief!) {
+                print("found brief command in $path\n");
+                system("emacsclient -n $path") if $launch_emacs;
+            }
+        }
+    }
+
+    # check for double underscores
+    {
+        foreach my $ln (@data)
+        {
+            next if $ln =~ /^\s*#(if|elif|define|error)/;
+            next if $path eq "include/stxxl/bits/common/types.h";
+
+            if ($ln =~ m@\s__(?!(gnu_parallel|gnu_cxx|glibcxx|typeof__|attribute__|sync_add_and_fetch|FILE__|LINE__|FUNCTION__))@) {
+                print("double-underscore found in $path\n");
+                print $ln."\n";
+                system("emacsclient -n $path") if $launch_emacs;
             }
         }
     }
@@ -209,18 +265,18 @@ sub process_cpp {
         if ($namespace != 0) {
             print "$path\n";
             print "    NAMESPACE MISMATCH!\n";
-            #system("emacsclient -n $path");
+            system("emacsclient -n $path") if $launch_emacs;
         }
 
-        if (!(@data ~~ @uncrust)) {
+        if (!array_equal(\@data,\@uncrust)) {
             print "$path\n";
             print diff(\@data, \@uncrust);
             @data = @uncrust;
-            #system("emacsclient -n $path");
+            system("emacsclient -n $path") if $launch_emacs;
         }
     }
 
-    if ($write_changes)
+    if ($write_changes && !array_equal(\@data,\@origdata))
     {
         open(F, "> $path") or die("Cannot write $path: $!");
         print(F join("", @data));

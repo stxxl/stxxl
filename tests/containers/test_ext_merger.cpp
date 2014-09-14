@@ -18,7 +18,6 @@
 typedef int my_type;
 typedef stxxl::typed_block<4096, my_type> block_type;
 
-
 struct dummy_merger
 {
     int& cnt;

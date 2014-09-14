@@ -21,7 +21,6 @@
 #include <string>
 #include <stxxl/bits/unused.h>
 
-
 #define _STXXL_PRNT_COUT        (1 << 0)
 #define _STXXL_PRNT_CERR        (1 << 1)
 #define _STXXL_PRNT_LOG         (1 << 2)
@@ -34,13 +33,11 @@
 #define _STXXL_PRINT_FLAGS_ERROR    (_STXXL_PRNT_CERR | _STXXL_PRNT_ERRLOG)
 #define _STXXL_PRINT_FLAGS_VERBOSE  (_STXXL_PRINT_FLAGS_DEFAULT | _STXXL_PRNT_TIMESTAMP | _STXXL_PRNT_THREAD_ID)
 
-
 STXXL_BEGIN_NAMESPACE
 
 void print_msg(const char* label, const std::string& msg, unsigned flags);
 
 STXXL_END_NAMESPACE
-
 
 #define _STXXL_PRINT(label, message, flags)                                  \
     do {                                                                     \
@@ -72,7 +69,6 @@ STXXL_END_NAMESPACE
 #define STXXL_VERBOSE_LEVEL -1
 #endif
 
-
 #if STXXL_VERBOSE_LEVEL > -10
  #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 #else
@@ -86,7 +82,6 @@ STXXL_END_NAMESPACE
 // Please do not report STXXL problems with STXXL_ERRMSG disabled!
  #define STXXL_ERRMSG(x) _STXXL_NOT_VERBOSE(x)
 #endif
-
 
 // STXXL_VERBOSE0 should be used for current debugging activity only,
 // and afterwards be replaced by STXXL_VERBOSE1 or higher.

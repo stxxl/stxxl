@@ -19,13 +19,11 @@
 
 #include <stxxl/bits/common/types.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer
 //!
 //! \{
-
 
 template <unsigned_type modulo>
 class blocked_index
@@ -216,7 +214,6 @@ struct two2one_dim_array_adapter_base
     typedef two2one_dim_array_adapter_base<one_dim_array_type,
                                            data_type, pos_type> _Self;
 
-
     two2one_dim_array_adapter_base()
     { }
 
@@ -230,87 +227,85 @@ struct two2one_dim_array_adapter_base
     STXXL_ADAPTOR_ARITHMETICS(pos)
 };
 
-
 //////////////////////////////
 
-#define BLOCK_ADAPTOR_OPERATORS(two_to_one_dim_array_adaptor_base)                                      \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& operator ++ (             \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a)                           \
-    {                                                                                                   \
-        a.pos++;                                                                                        \
-        return a;                                                                                       \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator ++ (              \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a, int)                      \
-    {                                                                                                   \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> tmp = a;                      \
-        a.pos++;                                                                                        \
-        return tmp;                                                                                     \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& operator -- (             \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a)                           \
-    {                                                                                                   \
-        a.pos--;                                                                                        \
-        return a;                                                                                       \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator -- (              \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a, int)                      \
-    {                                                                                                   \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> tmp = a;                      \
-        a.pos--;                                                                                        \
-        return tmp;                                                                                     \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& operator -= (             \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a,                           \
-        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)      \
-    {                                                                                                   \
-        a.pos -= off;                                                                                   \
-        return a;                                                                                       \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& operator += (             \
-        two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a,                           \
-        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)      \
-    {                                                                                                   \
-        a.pos += off;                                                                                   \
-        return a;                                                                                       \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator + (               \
-        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a,                     \
-        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)      \
-    {                                                                                                   \
-        return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos + off); \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator + (               \
-        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off,      \
-        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a)                     \
-    {                                                                                                   \
-        return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos + off); \
-    }                                                                                                   \
-                                                                                                        \
-    template <unsigned _blk_sz, typename _run_type, class __pos_type>                                   \
-    inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator - (               \
-        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>& a,                     \
-        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)      \
-    {                                                                                                   \
-        return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos - off); \
+#define BLOCK_ADAPTOR_OPERATORS(two_to_one_dim_array_adaptor_base)                                   \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& operator ++ (             \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a)                           \
+    {                                                                                                \
+        a.pos++;                                                                                     \
+        return a;                                                                                    \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> operator ++ (              \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a, int)                      \
+    {                                                                                                \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> tmp = a;                      \
+        a.pos++;                                                                                     \
+        return tmp;                                                                                  \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& operator -- (             \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a)                           \
+    {                                                                                                \
+        a.pos--;                                                                                     \
+        return a;                                                                                    \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> operator -- (              \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a, int)                      \
+    {                                                                                                \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> tmp = a;                      \
+        a.pos--;                                                                                     \
+        return tmp;                                                                                  \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& operator -= (             \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a,                           \
+        typename two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>::_pos_type off)      \
+    {                                                                                                \
+        a.pos -= off;                                                                                \
+        return a;                                                                                    \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& operator += (             \
+        two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a,                           \
+        typename two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>::_pos_type off)      \
+    {                                                                                                \
+        a.pos += off;                                                                                \
+        return a;                                                                                    \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> operator + (               \
+        const two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a,                     \
+        typename two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>::_pos_type off)      \
+    {                                                                                                \
+        return two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>(a.array, a.pos + off); \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> operator + (               \
+        typename two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>::_pos_type off,      \
+        const two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a)                     \
+    {                                                                                                \
+        return two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>(a.array, a.pos + off); \
+    }                                                                                                \
+                                                                                                     \
+    template <unsigned BlockSize, typename RunType, class PosType>                                   \
+    inline two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType> operator - (               \
+        const two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>& a,                     \
+        typename two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>::_pos_type off)      \
+    {                                                                                                \
+        return two_to_one_dim_array_adaptor_base<BlockSize, RunType, PosType>(a.array, a.pos - off); \
     }
-
 
 #if 0
 //////////////////////////
@@ -402,7 +397,6 @@ struct two2one_dim_array_column_adapter
     STXXL_ADAPTOR_ARITHMETICS(pos)
 };
 #endif
-
 
 template <typename array_type, typename value_type, unsigned_type modulo>
 class array_of_sequences_iterator : public std::iterator<std::random_access_iterator_tag, value_type, unsigned_type>

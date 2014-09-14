@@ -24,7 +24,6 @@
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/common/log.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer
