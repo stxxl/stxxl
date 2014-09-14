@@ -7,7 +7,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -70,6 +70,22 @@ sub expect_re($$\$$) {
     }
 }
 
+# check equality of two arrays
+sub array_equal {
+    my ($a1ref,$a2ref) = @_;
+
+    my @a1 = @{$a1ref};
+    my @a2 = @{$a2ref};
+
+    return 0 if scalar(@a1) != scalar(@a2);
+
+    for my $i (0..scalar(@a1)-1) {
+        return 0 if $a1[$i] ne $a2[$i];
+    }
+
+    return 1;
+}
+
 # run $text through a external pipe (@program)
 sub filter_program {
     my $text = shift;
@@ -114,6 +130,8 @@ sub process_cpp {
     open(F, $path) or die("Cannot read file $path: $!");
     my @data = <F>;
     close(F);
+
+    my @origdata = @data;
 
     # put all #include lines into the includemap
     foreach my $ln (@data)
@@ -212,7 +230,7 @@ sub process_cpp {
             #system("emacsclient -n $path");
         }
 
-        if (!(@data ~~ @uncrust)) {
+        if (!array_equal(\@data,\@uncrust)) {
             print "$path\n";
             print diff(\@data, \@uncrust);
             @data = @uncrust;
@@ -220,7 +238,7 @@ sub process_cpp {
         }
     }
 
-    if ($write_changes)
+    if ($write_changes && !array_equal(\@data,\@origdata))
     {
         open(F, "> $path") or die("Cannot write $path: $!");
         print(F join("", @data));
