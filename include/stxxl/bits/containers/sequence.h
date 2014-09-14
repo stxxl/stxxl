@@ -35,7 +35,7 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlcont
 //! \{
 
-//! \brief External sequence or deque container without random access. \n
+//! External sequence or deque container without random access. \n
 //! <b> Introduction </b> to sequence container: see \ref tutorial_sequence tutorial. \n
 //! <b> Design and Internals </b> of sequence container: see \ref design_queue
 

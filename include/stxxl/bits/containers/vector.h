@@ -793,7 +793,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! \brief External vector container. \n
+//! External vector container. \n
 //! <b>Introduction</b> to vector container: see \ref tutorial_vector tutorial. \n
 //! <b>Design and Internals</b> of vector container: see \ref design_vector
 //!
@@ -1038,7 +1038,7 @@ public:
         return size_type(m_bids.size()) * block_type::raw_size;
     }
 
-    /*! \brief Reserves at least n elements in external memory.
+    /*! Reserves at least n elements in external memory.
      *
      * If n is less than or equal to capacity(), this call has no
      * effect. Otherwise, it is a request for allocation of additional \b
@@ -2563,7 +2563,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! \brief External vector type generator.
+//! External vector type generator.
 //!
 //! \tparam ValueType element type of contained objects (POD with no references to internal memory)
 //! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)

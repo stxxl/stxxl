@@ -27,8 +27,8 @@
 STXXL_BEGIN_NAMESPACE
 
 /**
- * \brief Command line parser which automatically fills variables and prints
- * nice usage messages.
+ * Command line parser which automatically fills variables and prints nice
+ * usage messages.
  *
  * This is a straightforward command line parser in C++, which will recognize
  * short options -s, long options --long and parameters, both required and

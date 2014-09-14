@@ -651,7 +651,7 @@ sort_blocks(input_bid_iterator input_bids,
 } // namespace sort_local
 
 /*!
- * \brief Sort records comparison-based, see \ref design_algo_sort.
+ * Sort records comparison-based, see \ref design_algo_sort.
  *
  * stxxl::sort sorts the elements in [first, last) into ascending order,
  * meaning that if \c i and \c j are any two valid iterators in [first, last)

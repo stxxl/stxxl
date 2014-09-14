@@ -971,7 +971,7 @@ public:
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
-//! \brief Stack type generator \n
+//! Stack type generator \n
 //! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
 //! <b> Design and Internals </b> of stack container: see \ref design_stack.
 //!

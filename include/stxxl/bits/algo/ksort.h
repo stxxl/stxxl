@@ -703,7 +703,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 } // namespace ksort_local
 
 /*!
- * \brief Sort records with integer keys, see \ref design_algo_ksort.
+ * Sort records with integer keys, see \ref design_algo_ksort.
  *
  * stxxl::ksort sorts the elements in [first, last) into ascending order,
  * meaning that if \c i and \c j are any two valid iterators in [first, last)
@@ -1067,7 +1067,7 @@ struct ksort_defaultkey
 };
 
 /*!
- * \brief Sort records with integer keys, see \ref design_algo_ksort.
+ * Sort records with integer keys, see \ref design_algo_ksort.
  *
  * stxxl::ksort sorts the elements in [first, last) into ascending order,
  * meaning that if \c i and \c j are any two valid iterators in [first, last)

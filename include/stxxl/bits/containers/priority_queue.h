@@ -962,7 +962,7 @@ struct compute_N<1, X_, CriticalSize_>
 //! \addtogroup stlcont
 //! \{
 
-//! \brief Priority queue type generator. \n
+//! Priority queue type generator. \n
 //! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
 //! <b> Design and Internals </b> of priority queue container: see \ref design_pqueue.
 //!

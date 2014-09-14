@@ -152,6 +152,17 @@ sub process_cpp {
         }
     }
 
+    # check for \brief doxygen commands
+    {
+        foreach my $ln (@data)
+        {
+            if ($ln =~ m!\\brief!) {
+                print("found brief command in $path\n");
+                system("emacsclient -n $path");
+            }
+        }
+    }
+
     # check source header
     my $i = 0;
     if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # skip emacs mode line

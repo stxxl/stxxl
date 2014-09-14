@@ -30,7 +30,7 @@ STXXL_BEGIN_NAMESPACE
 //! \addtogroup reqlayer
 //! \{
 
-//! \brief Queue for linuxaio_file(s)
+//! Queue for linuxaio_file(s)
 //!
 //! Only one queue exists in a program, i.e. it is a singleton.
 class linuxaio_queue : public request_queue_impl_worker
