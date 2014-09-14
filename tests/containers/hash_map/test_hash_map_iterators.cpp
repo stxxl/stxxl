@@ -12,11 +12,11 @@
 
 #include <iostream>
 
-#include "stxxl.h"
-#include "stxxl/bits/common/seed.h"
-#include "stxxl/bits/common/rand.h"
-#include "stxxl/bits/containers/hash_map/hash_map.h"
-#include "stxxl/bits/compat/hash_map.h"
+#include <stxxl.h>
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/containers/hash_map/hash_map.h>
+#include <stxxl/bits/compat/hash_map.h>
 
 struct rand_pairs {
     stxxl::random_number32& rand_;
@@ -52,8 +52,7 @@ struct cmp : public std::less<int>{
     int max_value() const { return (std::numeric_limits<int>::max)(); }
 };
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void cmp_with_internal_map()
 {
     typedef std::pair<int, int> value_type;
@@ -87,9 +86,11 @@ void cmp_with_internal_map()
     std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
     std::generate(values3.begin(), values3.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
 
-    // --- initial import: create a nice mix of externally (values1) and internally (values2) stored values
+    // --- initial import: create a nice mix of externally (values1) and
+    // --- internally (values2) stored values
     map.insert(values1.begin(), values1.end(), mem_to_sort);
     int_map.insert(values1.begin(), values1.end());
+
     // seems bind1st has problems with a member that takes a reference
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&int_hash_map::insert), &int_map ));
@@ -134,13 +135,11 @@ void cmp_with_internal_map()
     std::cout << "passed" << std::endl;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void basic_iterator_test()
 {
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
-
 
     const unsigned n_values = 50000;
     const unsigned n_tests = 1000;
@@ -156,7 +155,6 @@ void basic_iterator_test()
     typedef hash_map::iterator iterator;
     typedef hash_map::const_iterator const_iterator;
 
-
     hash_map map;
     map.max_buffer_size(buffer_size);
     const hash_map& cmap = map;
@@ -169,8 +167,8 @@ void basic_iterator_test()
     std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
     std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
 
-
-    // --- initial import: create a nice mix of externally (values1) and internally (values2) stored values
+    // --- initial import: create a nice mix of externally (values1) and
+    // --- internally (values2) stored values
     std::cout << "Initial import...";
     STXXL_CHECK(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
@@ -182,7 +180,6 @@ void basic_iterator_test()
     STXXL_CHECK(map.begin() != map.end());
     STXXL_CHECK(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
-
 
     // --- actual testing begins: modfiy random values via iterator
     std::cout << "Lookup and modify...";
@@ -304,7 +301,7 @@ void basic_iterator_test()
     std::cout << "passed" << std::endl;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void more_iterator_test()
 {
     typedef std::pair<int, int> value_type;
@@ -373,7 +370,8 @@ void more_iterator_test()
     std::cout << "passed" << std::endl;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 int main()
 {
     cmp_with_internal_map();

@@ -31,7 +31,6 @@ class hash_map_const_iterator;
 template <class HashMap>
 class block_cache;
 
-
 template <class HashMap>
 class hash_map_iterator_base
 {
@@ -57,77 +56,93 @@ public:
 protected:
     HashMap* map_;
     reader_type* reader_;
-    bool prefetch_;                     /* true if prefetching enabled; false by default, will be set to true when incrementing (see find_next()) */
-    size_type i_bucket_;                /* index of current bucket */
-    source_type source_;                /* source of current value: external or internal */
-    node_type* node_;                   /* current (source=internal) or old (src=external) internal node */
-    size_type i_external_;              /* position of current (source=external) or next (source=internal) external value (see _ext_valid) */
-    key_type key_;                      /* key of current value */
-    bool ext_valid_;                    /* true if i_external points to the current or next external value
-                                                                   example: iterator was created by hash_map::find() and the value was found in internal memory
-                                                                   => iterator pointing to internal node is created and location of next external value is unknown (_ext_valid == false)
-                                                                   => when incrementing the iterator the external values will be scanned from the beginning of the bucket to find the valid external index */
-    bool end_;                          /* true if iterator equals end() */
+    //! true if prefetching enabled; false by default, will be set to true when incrementing (see find_next())
+    bool prefetch_;
+    //! index of current bucket
+    size_type i_bucket_;
+    //! source of current value: external or internal
+    source_type source_;
+    //! current (source=internal) or old (src=external) internal node
+    node_type* node_;
+    //! position of current (source=external) or next (source=internal) external value (see _ext_valid)
+    size_type i_external_;
+    //! key of current value
+    key_type key_;
+    /*! true if i_external points to the current or next external value
+
+      example: iterator was created by hash_map::find() and the value was found
+      in internal memory
+
+      => iterator pointing to internal node is created and location of next
+      external value is unknown (_ext_valid == false)
+
+      => when incrementing the iterator the external values will be scanned
+      from the beginning of the bucket to find the valid external index
+    */
+    bool ext_valid_;
+    //! true if iterator equals end()
+    bool end_;
 
 private:
     hash_map_iterator_base()
     { }
 
 public:
-    //! \brief Construct a new iterator
-    hash_map_iterator_base(HashMap* map, size_type i_bucket, node_type* node, size_type i_external, source_type source, bool ext_valid, key_type key) :
-        map_(map),
-        reader_(NULL),
-        prefetch_(false),
-        i_bucket_(i_bucket),
-        source_(source),
-        node_(node),
-        i_external_(i_external),
-        key_(key),
-        ext_valid_(ext_valid),
-        end_(false)
+    //! Construct a new iterator
+    hash_map_iterator_base(HashMap* map, size_type i_bucket, node_type* node,
+                           size_type i_external, source_type source,
+                           bool ext_valid, key_type key)
+        : map_(map),
+          reader_(NULL),
+          prefetch_(false),
+          i_bucket_(i_bucket),
+          source_(source),
+          node_(node),
+          i_external_(i_external),
+          key_(key),
+          ext_valid_(ext_valid),
+          end_(false)
     {
         STXXL_VERBOSE3("hash_map_iterator_base parameter construct addr=" << this);
         map_->iterator_map_.register_iterator(*this);
     }
 
-
-    //! \brief Construct a new iterator pointing to the end of the given hash-map.
-    hash_map_iterator_base(hash_map_type* map) :
-        map_(map),
-        reader_(NULL),
-        prefetch_(false),
-        i_bucket_(0),
-        node_(NULL),
-        i_external_(0),
-        ext_valid_(false),
-        end_(true)
+    //! Construct a new iterator pointing to the end of the given hash-map.
+    hash_map_iterator_base(hash_map_type* map)
+        : map_(map),
+          reader_(NULL),
+          prefetch_(false),
+          i_bucket_(0),
+          node_(NULL),
+          i_external_(0),
+          ext_valid_(false),
+          end_(true)
     { }
 
-
-    //! \brief Construct a new iterator from an existing one
-    hash_map_iterator_base(const hash_map_iterator_base& obj) :
-        map_(obj.map_),
-        reader_(NULL),
-        prefetch_(obj.prefetch_),
-        i_bucket_(obj.i_bucket_),
-        source_(obj.source_),
-        node_(obj.node_),
-        i_external_(obj.i_external_),
-        key_(obj.key_),
-        ext_valid_(obj.ext_valid_),
-        end_(obj.end_)
+    //! Construct a new iterator from an existing one
+    hash_map_iterator_base(const hash_map_iterator_base& obj)
+        : map_(obj.map_),
+          reader_(NULL),
+          prefetch_(obj.prefetch_),
+          i_bucket_(obj.i_bucket_),
+          source_(obj.source_),
+          node_(obj.node_),
+          i_external_(obj.i_external_),
+          key_(obj.key_),
+          ext_valid_(obj.ext_valid_),
+          end_(obj.end_)
     {
         STXXL_VERBOSE3("hash_map_iterator_base constr from" << (&obj) << " to " << this);
+
         if (!end_ && map_)
             map_->iterator_map_.register_iterator(*this);
     }
 
-
-    //! \brief Assignment operator
+    //! Assignment operator
     hash_map_iterator_base& operator = (const hash_map_iterator_base& obj)
     {
         STXXL_VERBOSE3("hash_map_iterator_base copy from" << (&obj) << " to " << this);
+
         if (&obj != this)
         {
             if (map_ && !end_)
@@ -151,8 +166,7 @@ public:
         return *this;
     }
 
-
-    //! \brief Two iterators are equal if the point to the same value in the same map
+    //! Two iterators are equal if the point to the same value in the same map
     bool operator == (const hash_map_iterator_base& obj) const
     {
         if (end_ && obj.end_)
@@ -167,14 +181,13 @@ public:
             return i_external_ == obj.i_external_;
     }
 
-
     bool operator != (const hash_map_iterator_base& obj) const
     {
         return ! operator == (obj);
     }
 
 protected:
-    //! \brief Initialize reader object to scan external values
+    //! Initialize reader object to scan external values
     void init_reader()
     {
         const bucket_type& bucket = map_->buckets_[i_bucket_];
@@ -203,7 +216,7 @@ protected:
             i_external_ = 0;
             while (i_external_ < bucket.n_external_)
             {
-                if (map_->__gt(reader_->const_value().first, node_->value_.first))
+                if (map_->_gt(reader_->const_value().first, node_->value_.first))
                     break;
 
                 ++(*reader_);
@@ -214,8 +227,7 @@ protected:
         }
     }
 
-
-    //! \brief Reset reader-object
+    //! Reset reader-object
     void reset_reader()
     {
         if (reader_ != NULL) {
@@ -225,11 +237,11 @@ protected:
     }
 
 public:
-    //! \brief Advance iterator to the next value
+    //! Advance iterator to the next value
     //! The next value is determined in the following way
-    //!	- if there are remaining internal or external values in the current bucket, choose the smallest among them, that is not marked as deleted
+    //!	- if there are remaining internal or external values in the current
+    //!	  bucket, choose the smallest among them, that is not marked as deleted
     //!	- otherwise continue with the next bucket
-    //!
     void find_next(bool start_prefetching = false)
     {
         // invariant: current external value is always > current internal value
@@ -241,7 +253,8 @@ public:
         if (reader_ == NULL)
             init_reader();
 
-        // when incremented once, more increments are likely to follow; therefore start prefetching
+        // when incremented once, more increments are likely to follow;
+        // therefore start prefetching
         if (start_prefetching && !prefetch_)
         {
             reader_->enable_prefetching();
@@ -254,7 +267,7 @@ public:
         node_type* tmp_node = (node_) ? node_ : bucket.list_;
         if (source_ == hash_map_type::src_external)
         {
-            while (tmp_node && map_->__leq(tmp_node->value_.first, key_))
+            while (tmp_node && map_->_leq(tmp_node->value_.first, key_))
                 tmp_node = tmp_node->next();
 
             ++i_external_;
@@ -264,16 +277,15 @@ public:
             tmp_node = node_->next();
         // else (source unknown): tmp_node and reader_ already point to the correct values
 
-
         while (true) {
             // internal and external values available
             while (tmp_node && i_external_ < bucket.n_external_)
             {
                 // internal value less or equal external value => internal wins
-                if (map_->__leq(tmp_node->value_.first, reader_->const_value().first))
+                if (map_->_leq(tmp_node->value_.first, reader_->const_value().first))
                 {
                     node_ = tmp_node;
-                    if (map_->__eq(node_->value_.first, reader_->const_value().first))
+                    if (map_->_eq(node_->value_.first, reader_->const_value().first))
                     {
                         ++i_external_;
                         ++(*reader_);
@@ -283,10 +295,10 @@ public:
                     {
                         key_ = node_->value_.first;
                         source_ = hash_map_type::src_internal;
-                        goto end_search;                                        // just this once - I promise...
+                        goto end_search;              // just this once - I promise...
                     }
                     else
-                        tmp_node = tmp_node->next();                            // continue search if internal value flaged as deleted
+                        tmp_node = tmp_node->next();  // continue search if internal value flaged as deleted
                 }
                 // otherwise external wins
                 else
@@ -316,7 +328,6 @@ public:
                 else
                     tmp_node = tmp_node->next();                        // continue search
             }
-
 
             // at this point there are obviously no more values in the current bucket
             // let's try the next one (outer while-loop!)
@@ -349,7 +360,6 @@ end_search:
         }
     }
 
-
     virtual ~hash_map_iterator_base()
     {
         STXXL_VERBOSE3("hash_map_iterator_base deconst " << this);
@@ -359,7 +369,6 @@ end_search:
         reset_reader();
     }
 };
-
 
 template <class HashMap>
 class hash_map_iterator : public hash_map_iterator_base<HashMap>
@@ -376,7 +385,8 @@ public:
     typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
     typedef typename hash_map_type::source_type source_type;
 
-    typedef buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
+    typedef buffered_reader<typename hash_map_type::block_cache_type,
+                            bid_iterator_type> reader_type;
 
     typedef std::forward_iterator_tag iterator_category;
 
@@ -384,18 +394,24 @@ public:
     typedef stxxl::hash_map::hash_map_const_iterator<hash_map_type> hash_map_const_iterator;
 
 private:
-    hash_map_iterator() :
-        base_type() { }
+    hash_map_iterator()
+        : base_type()
+    { }
 
 public:
-    hash_map_iterator(hash_map_type* map, size_type i_bucket, node_type* node, size_type i_external, source_type source, bool ext_valid, key_type key) :
-        base_type(map, i_bucket, node, i_external, source, ext_valid, key) { }
+    hash_map_iterator(hash_map_type* map, size_type i_bucket,
+                      node_type* node, size_type i_external,
+                      source_type source, bool ext_valid, key_type key)
+        : base_type(map, i_bucket, node, i_external, source, ext_valid, key)
+    { }
 
-    hash_map_iterator(hash_map_type* map) :
-        base_type(map) { }
+    hash_map_iterator(hash_map_type* map)
+        : base_type(map)
+    { }
 
-    hash_map_iterator(const hash_map_iterator& obj) :
-        base_type(obj) { }
+    hash_map_iterator(const hash_map_iterator& obj)
+        : base_type(obj)
+    { }
 
     hash_map_iterator& operator = (const hash_map_iterator& obj)
     {
@@ -423,12 +439,14 @@ public:
         return base_type::operator != (obj);
     }
 
-    //! \brief Return reference to current value. If source is external, mark the value's block as dirty
+    //! Return reference to current value. If source is external, mark the
+    //! value's block as dirty
     reference operator * ()
     {
         if (this->source_ == hash_map_type::src_internal)
+        {
             return this->node_->value_;
-
+        }
         else
         {
             if (this->reader_ == NULL)
@@ -438,14 +456,13 @@ public:
         }
     }
 
-    //! \brief Increment iterator
+    //! Increment iterator
     hash_map_iterator<hash_map_type>& operator ++ ()
     {
         base_type::find_next(true);
         return *this;
     }
 };
-
 
 template <class HashMap>
 class hash_map_const_iterator : public hash_map_iterator_base<HashMap>
@@ -462,7 +479,8 @@ public:
     typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
     typedef typename hash_map_type::source_type source_type;
 
-    typedef buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
+    typedef buffered_reader<typename hash_map_type::block_cache_type,
+                            bid_iterator_type> reader_type;
 
     typedef std::forward_iterator_tag iterator_category;
 
@@ -470,24 +488,27 @@ public:
     typedef stxxl::hash_map::hash_map_iterator<hash_map_type> hash_map_iterator;
 
 private:
-    hash_map_const_iterator() :
-        base_type() { }
+    hash_map_const_iterator()
+        : base_type()
+    { }
 
 public:
-    hash_map_const_iterator(hash_map_type* map, size_type i_bucket, node_type* node, size_type i_external, source_type source, bool ext_valid, key_type key) :
-        base_type(map, i_bucket, node, i_external, source, ext_valid, key)
+    hash_map_const_iterator(hash_map_type* map, size_type i_bucket,
+                            node_type* node, size_type i_external,
+                            source_type source, bool ext_valid, key_type key)
+        : base_type(map, i_bucket, node, i_external, source, ext_valid, key)
     { }
 
-    hash_map_const_iterator(hash_map_type* map) :
-        base_type(map)
+    hash_map_const_iterator(hash_map_type* map)
+        : base_type(map)
     { }
 
-    hash_map_const_iterator(const hash_map_iterator& obj) :
-        base_type(obj)
+    hash_map_const_iterator(const hash_map_iterator& obj)
+        : base_type(obj)
     { }
 
-    hash_map_const_iterator(const hash_map_const_iterator& obj) :
-        base_type(obj)
+    hash_map_const_iterator(const hash_map_const_iterator& obj)
+        : base_type(obj)
     { }
 
     hash_map_const_iterator& operator = (const hash_map_const_iterator& obj)
@@ -516,12 +537,13 @@ public:
         return base_type::operator != (obj);
     }
 
-    //! \brief Return const-reference to current value
+    //! Return const-reference to current value
     const_reference operator * ()
     {
         if (this->source_ == hash_map_type::src_internal)
+        {
             return this->node_->value_;
-
+        }
         else
         {
             if (this->reader_ == NULL)
@@ -531,7 +553,7 @@ public:
         }
     }
 
-    //! \brief Increment iterator
+    //! Increment iterator
     hash_map_const_iterator<hash_map_type>& operator ++ ()
     {
         base_type::find_next(true);
@@ -540,7 +562,6 @@ public:
 };
 
 } // namespace hash_map
-
 
 STXXL_END_NAMESPACE
 

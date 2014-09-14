@@ -18,7 +18,6 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/hash_map/iterator.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace hash_map {
@@ -44,37 +43,31 @@ private:
 //            }
 //        };
 //        typedef __gnu_cxx::hash_multimap<size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
+
     typedef std::multimap<size_type, iterator_base*> multimap_type;
 
-    typedef typename multimap_type::value_type pair_type;                                       /* bucket-index and pointer to iterator_base */
+    //! bucket-index and pointer to iterator_base
+    typedef typename multimap_type::value_type pair_type;
     typedef typename multimap_type::iterator mmiterator_type;
     typedef typename multimap_type::const_iterator const_mmiterator_type;
 
     hash_map_type* map_;
     multimap_type it_map_;
 
-    // forbidden
-    iterator_map();
-    iterator_map(const iterator_map&);
-    iterator_map& operator = (const iterator_map&);
-
 public:
-    iterator_map(hash_map_type* map) :
-        map_(map)
+    iterator_map(hash_map_type* map)
+        : map_(map)
     { }
-
 
     ~iterator_map()
     {
         it_map_.clear();
     }
 
-
     void register_iterator(iterator_base& it)
     {
         register_iterator(it, it.i_bucket_);
     }
-
 
     void register_iterator(iterator_base& it, size_type i_bucket)
     {
@@ -82,18 +75,18 @@ public:
         it_map_.insert(pair_type(i_bucket, &it));
     }
 
-
     void unregister_iterator(iterator_base& it)
     {
         unregister_iterator(it, it.i_bucket_);
     }
 
-
     void unregister_iterator(iterator_base& it, size_type i_bucket)
     {
         STXXL_VERBOSE2("hash_map::iterator_map unregister_iterator addr=" << &it << " bucket=" << i_bucket);
 
-        std::pair<mmiterator_type, mmiterator_type> range = it_map_.equal_range(i_bucket);
+        std::pair<mmiterator_type, mmiterator_type> range
+            = it_map_.equal_range(i_bucket);
+
         assert(range.first != range.second);
 
         for (mmiterator_type i = range.first; i != range.second; ++i)
@@ -108,19 +101,21 @@ public:
         throw std::runtime_error("unregister_iterator Panic in hash_map::iterator_map, can not find and unregister iterator");
     }
 
-
-    //! \brief Update iterators with given key and bucket and make them point to the specified location in external memory (will be called during re-hashing)
-    void fix_iterators_2ext(size_type i_bucket_old, const key_type& key, size_type i_bucket_new, size_type i_ext)
+    //! Update iterators with given key and bucket and make them point to the
+    //! specified location in external memory (will be called during
+    //! re-hashing)
+    void fix_iterators_2ext(size_type i_bucket_old, const key_type& key,
+                            size_type i_bucket_new, size_type i_ext)
     {
         STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2ext i_bucket=" << i_bucket_old << " key=" << key << ", new_i_ext=" << i_ext);
 
         std::vector<iterator_base*> its2fix;
-        __find(i_bucket_old, its2fix);
+        _find(i_bucket_old, its2fix);
 
-        typename std::vector<iterator_base*>::iterator it2fix = its2fix.begin();
-        for ( ; it2fix != its2fix.end(); ++it2fix)
+        for (typename std::vector<iterator_base*>::iterator
+             it2fix = its2fix.begin(); it2fix != its2fix.end(); ++it2fix)
         {
-            if (!map_->__eq(key, (**it2fix).key_))
+            if (!map_->_eq(key, (**it2fix).key_))
                 continue;
 
             if (i_bucket_old != i_bucket_new)
@@ -133,25 +128,26 @@ public:
             (**it2fix).node_ = NULL;
             (**it2fix).i_external_ = i_ext;
             (**it2fix).source_ = hash_map_type::src_external;
-            (**it2fix).ext_valid_ = true;               // external position is now known (i_ext) and therefore valid
+            // external position is now known (i_ext) and therefore valid
+            (**it2fix).ext_valid_ = true;
             (**it2fix).reset_reader();
             (**it2fix).reader_ = NULL;
         }
     }
 
-
-    //! \brief Update iterators with given key and bucket and make them point to the specified node in internal memory (will be called by insert_oblivious)
+    //! Update iterators with given key and bucket and make them point to the
+    //! specified node in internal memory (will be called by insert_oblivious)
     void fix_iterators_2int(size_type i_bucket, const key_type& key, node_type* node)
     {
         STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2int i_bucket=" << i_bucket << " key=" << key << " node=" << node);
 
         std::vector<iterator_base*> its2fix;
-        __find(i_bucket, its2fix);
+        _find(i_bucket, its2fix);
 
-        typename std::vector<iterator_base*>::iterator it2fix = its2fix.begin();
-        for ( ; it2fix != its2fix.end(); ++it2fix)
+        for (typename std::vector<iterator_base*>::iterator
+             it2fix = its2fix.begin(); it2fix != its2fix.end(); ++it2fix)
         {
-            if (!map_->__eq((**it2fix).key_, key))
+            if (!map_->_eq((**it2fix).key_, key))
                 continue;
 
             assert((**it2fix).source_ == hash_map_type::src_external);
@@ -164,19 +160,19 @@ public:
         }
     }
 
-
-    //! \brief Update iterators with given key and bucket and make them point to the end of the hash-map (called by erase and erase_oblivious)
+    //! Update iterators with given key and bucket and make them point to the
+    //! end of the hash-map (called by erase and erase_oblivious)
     void fix_iterators_2end(size_type i_bucket, const key_type& key)
     {
         STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2end i_bucket=" << i_bucket << " key=" << key);
 
         std::vector<iterator_base*> its2fix;
-        __find(i_bucket, its2fix);
+        _find(i_bucket, its2fix);
 
-        typename std::vector<iterator_base*>::iterator it2fix = its2fix.begin();
-        for ( ; it2fix != its2fix.end(); ++it2fix)
+        for (typename std::vector<iterator_base*>::iterator
+             it2fix = its2fix.begin(); it2fix != its2fix.end(); ++it2fix)
         {
-            if (!map_->__eq(key, (**it2fix).key_))
+            if (!map_->_eq(key, (**it2fix).key_))
                 continue;
 
             (**it2fix).end_ = true;
@@ -185,12 +181,12 @@ public:
         }
     }
 
-
-    //! \brief Update all iterators and make them point to the end of the hash-map (used by clear())
+    //! Update all iterators and make them point to the end of the hash-map
+    //! (used by clear())
     void fix_iterators_all2end()
     {
-        mmiterator_type it2fix = it_map_.begin();
-        for ( ; it2fix != it_map_.end(); ++it2fix)
+        for (mmiterator_type it2fix = it_map_.begin();
+             it2fix != it_map_.end(); ++it2fix)
         {
             (*it2fix).second->end_ = true;
             (*it2fix).second->reset_reader();
@@ -199,25 +195,22 @@ public:
     }
 
 private:
-    //! \brief Find all iterators registered with given bucket and add them to outc
+    //! Find all iterators registered with given bucket and add them to outc
     template <class OutputContainer>
-    void __find(size_type i_bucket, OutputContainer& outc)
+    void _find(size_type i_bucket, OutputContainer& outc)
     {
-        std::pair<mmiterator_type, mmiterator_type> range = it_map_.equal_range(i_bucket);
+        std::pair<mmiterator_type, mmiterator_type> range
+            = it_map_.equal_range(i_bucket);
 
         for (mmiterator_type i = range.first; i != range.second; ++i)
-        {
             outc.push_back((*i).second);
-        }
     }
-
 
     // changes hash_map pointer in all contained iterators
     void change_hash_map_pointers(hash_map_type* map)
     {
-        for (mmiterator_type it = it_map_.begin(); it != it_map_.end(); ++it) {
+        for (mmiterator_type it = it_map_.begin(); it != it_map_.end(); ++it)
             ((*it).second)->map_ = map;
-        }
     }
 
 public:
@@ -230,25 +223,26 @@ public:
         obj.change_hash_map_pointers(obj.map_);
     }
 
-
     void print_statistics(std::ostream& o = std::cout) const
     {
         o << "Registered iterators: " << it_map_.size() << "\n";
-        const_mmiterator_type i = it_map_.begin();
-        for ( ; i != it_map_.end(); ++i)
+
+        for (const_mmiterator_type i = it_map_.begin(); i != it_map_.end(); ++i)
         {
-            o << "  Address=" << (*i).second << ", Bucket=" << (*i).second->i_bucket_
-              << ", Node=" << (*i).second->node_ << ", i_ext=" << (*i).second->i_external_
-              << ", " << (((*i).source_ == hash_map_type::src_external) ? "external" : "internal") << std::endl;
+            o << "  Address=" << (*i).second
+              << ", Bucket=" << (*i).second->i_bucket_
+              << ", Node=" << (*i).second->node_
+              << ", i_ext=" << (*i).second->i_external_
+              << ", "
+              << (((*i).second->source_ == hash_map_type::src_external)
+                  ? "external" : "internal") << std::endl;
         }
     }
 };
 
 } // namespace hash_map
 
-
 STXXL_END_NAMESPACE
-
 
 namespace std {
 
@@ -261,6 +255,5 @@ void swap(stxxl::hash_map::iterator_map<HashMapType>& a,
 }
 
 } // namespace std
-
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_ITERATOR_MAP_HEADER

@@ -13,9 +13,8 @@
 #include <iostream>
 
 #include <stxxl.h>
-#include "stxxl/bits/common/seed.h"
-#include "stxxl/bits/common/rand.h"
-
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/rand.h>
 
 struct rand_pairs {
     stxxl::random_number32& rand_;
@@ -51,12 +50,13 @@ struct cmp : public std::less<int>{
     int max_value() const { return (std::numeric_limits<int>::max)(); }
 };
 
+// forced instantiation
+template class stxxl::unordered_map<int, int, hash_int, cmp, 4 * 1024, 4>;
 
 void basic_test()
 {
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
-
 
     const unsigned n_values = 50000;
     const unsigned n_tests = 1000;
@@ -72,11 +72,9 @@ void basic_test()
     typedef unordered_map::iterator iterator;
     typedef unordered_map::const_iterator const_iterator;
 
-
     unordered_map map;
     map.max_buffer_size(buffer_size);
     const unordered_map& cmap = map;
-
 
     // generate random values
     stxxl::random_number32 rand32;
@@ -88,7 +86,6 @@ void basic_test()
     std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
     std::generate(values3.begin(), values3.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
 
-
     // --- initial import
     std::cout << "Initial import...";
     STXXL_CHECK(map.begin() == map.end());
@@ -96,10 +93,11 @@ void basic_test()
     STXXL_CHECK(map.begin() != map.end());
     STXXL_CHECK(map.size() == n_values);
     std::cout << "passed" << std::endl;
-    // (*) all these values are stored in external memory; the remaining changes will be buffered in internal memory
+    // (*) all these values are stored in external memory; the remaining
+    // changes will be buffered in internal memory
 
-
-    // --- insert: new (from values2) and existing (from values1) values, with and without checking
+    // --- insert: new (from values2) and existing (from values1) values, with
+    // --- and without checking
     std::cout << "Insert...";
     for (unsigned i = 0; i < n_values / 2; i++) {
         // new without checking
@@ -115,10 +113,11 @@ void basic_test()
     }
     STXXL_CHECK(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
-    // "old" values are stored in external memory, "new" values are stored in internal memory
+    // "old" values are stored in external memory, "new" values are stored in
+    // internal memory
 
-
-    // --- find: existing (from external and internal memory) and non-existing values
+    // --- find: existing (from external and internal memory) and non-existing
+    // --- values
     std::cout << "Find...";
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
@@ -153,7 +152,6 @@ void basic_test()
     }
     std::cout << "passed" << std::endl;
 
-
     // --- erase: existing and non-existing values, with and without checking
     std::cout << "Erase...";
     std::random_shuffle(values1.begin(), values1.end());
@@ -180,9 +178,10 @@ void basic_test()
     map.clear();
     STXXL_CHECK(map.size() == 0);
 
-
     // --- find and manipulate values by []-operator
-    // make sure there are some values in our unordered_map: externally [0..n/2) and internally [n/2..n) from values1
+
+    // make sure there are some values in our unordered_map: externally
+    // [0..n/2) and internally [n/2..n) from values1
     std::cout << "[ ]-operator...";
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     for (unsigned i = n_values / 2; i < n_values; i++) {
@@ -211,10 +210,8 @@ void basic_test()
     STXXL_CHECK(map.size() == n_values + 2);
     std::cout << "passed" << std::endl;
 
-
     map.clear();
     STXXL_CHECK(map.size() == 0);
-
 
     // --- additional bulk insert test
     std::cout << "additional bulk-insert...";
@@ -227,12 +224,10 @@ void basic_test()
         STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
 
-
     std::cout << "\nAll tests passed" << std::endl;
 
     map.buffer_size();
 }
-
 
 int main()
 {

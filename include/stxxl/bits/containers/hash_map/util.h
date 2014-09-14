@@ -88,17 +88,18 @@ struct bucket
 };
 
 //! Used to scan external memory with prefetching.
-template <class CacheType, class BidIt>
+template <class CacheType, class BidIterator>
 class buffered_reader
 {
 public:
     typedef CacheType cache_type;
+    typedef BidIterator bid_iterator;
 
     typedef typename cache_type::block_type block_type;
     typedef typename block_type::value_type subblock_type;
     typedef typename subblock_type::value_type value_type;
 
-    typedef typename BidIt::value_type bid_type;
+    typedef typename bid_iterator::value_type bid_type;
 
     enum { block_size = block_type::size, subblock_size = subblock_type::size };
 
@@ -106,13 +107,13 @@ private:
     //! index within current block
     size_t i_value_;
     //! points to the beginning of the block-sequence
-    BidIt begin_bid_;
+    bid_iterator begin_bid_;
     //! points to the current block
-    BidIt curr_bid_;
+    bid_iterator curr_bid_;
     //! points to the end of the block-sequence
-    BidIt end_bid_;
+    bid_iterator end_bid_;
     //! points to the next block to prefetch
-    BidIt pref_bid_;
+    bid_iterator pref_bid_;
 
     //! shared block-cache
     cache_type* cache_;
@@ -136,7 +137,8 @@ public:
     //! \param cache Block-cache used for prefetching
     //! \param i_subblock Start reading from this subblock
     //! \param prefetch Enable/Disable prefetching
-    buffered_reader(BidIt seq_begin, BidIt seq_end, cache_type* cache,
+    buffered_reader(bid_iterator seq_begin, bid_iterator seq_end,
+                    cache_type* cache,
                     size_t i_subblock = 0, bool prefetch = true)
         : i_value_(0),
           begin_bid_(seq_begin),
@@ -256,7 +258,7 @@ public:
     }
 
     //! Continue reading at given block and subblock.
-    void skip_to(BidIt bid, size_t i_subblock)
+    void skip_to(bid_iterator bid, size_t i_subblock)
     {
         if (curr_bid_ == end_bid_)
             return;
@@ -292,17 +294,22 @@ public:
 };
 
 //! Buffered writing of values. New Blocks are allocated as needed.
-template <class BlkType, class BidContainer>
+template <class BlockType, class BidContainer>
 class buffered_writer
 {
 public:
-    typedef BlkType block_type;
+    typedef BlockType block_type;
+    typedef BidContainer bid_container_type;
+
     typedef typename block_type::value_type subblock_type;
     typedef typename subblock_type::value_type value_type;
 
     typedef stxxl::buffered_writer<block_type> writer_type;
 
-    enum { block_size = block_type::size, subblock_size = subblock_type::size };
+    enum {
+        block_size = block_type::size,
+        subblock_size = subblock_type::size
+    };
 
 private:
     //! buffered writer
@@ -311,11 +318,11 @@ private:
     block_type* block_;
 
     //! sequence of allocated blocks (to be expanded as needed)
-    BidContainer* bids_;
+    bid_container_type* bids_;
 
     //! current block's index
     size_t i_block_;
-    //! current value's index in the range of [0..#values per block[
+    //! current value's index in the range of [0..\#values per block[
     size_t i_value_;
     //! number of blocks to allocate in a row
     size_t increase_;
@@ -325,7 +332,8 @@ public:
     //! \param c write values to these blocks (c holds the bids)
     //! \param buffer_size Number of write-buffers to use
     //! \param batch_size bulk buffered writing
-    buffered_writer(BidContainer* c, int_type buffer_size, int_type batch_size)
+    buffered_writer(bid_container_type* c,
+                    int_type buffer_size, int_type batch_size)
         : bids_(c),
           i_block_(0),
           i_value_(0),
@@ -379,7 +387,8 @@ public:
         }
     }
 
-    //! Continue writing at the beginning of the next subblock. TODO more efficient
+    //! Continue writing at the beginning of the next subblock. TODO more
+    //! efficient
     void finish_subblock()
     {
         i_value_ = (i_value_ / subblock_size + 1) * subblock_size - 1;
@@ -431,7 +440,8 @@ struct HashedValue
     node_type* node_;
     size_type i_external_;
 
-    HashedValue() : i_bucket_(size_type(-1))
+    HashedValue()
+        : i_bucket_(size_type(-1))
     { }
 
     HashedValue(const value_type& value, size_type i_bucket,
@@ -509,9 +519,9 @@ struct HashedValuesStream
             // internal and external elements available
             while (node_ && i_external_ < curr_bucket_->n_external_)
             {
-                if (map_->__leq(node_->value_.first, reader_.const_value().first))
+                if (map_->_leq(node_->value_.first, reader_.const_value().first))
                 {
-                    if (map_->__eq(node_->value_.first, reader_.const_value().first))
+                    if (map_->_eq(node_->value_.first, reader_.const_value().first))
                     {
                         ++reader_;
                         ++i_external_;

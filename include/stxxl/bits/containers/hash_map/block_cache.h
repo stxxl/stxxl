@@ -141,12 +141,13 @@ protected:
 #ifdef BOOST_MSVC
         bool operator () (const bid_type& a, const bid_type& b) const
         {
-            return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
+            return (a.storage < b.storage) ||
+                   (a.storage == b.storage && a.offset < b.offset);
         }
         enum
-        {                                       // parameters for hash table
-            bucket_size = 4,                    // 0 < bucket_size
-            min_buckets = 8                     // min_buckets = 2 ^^ N, 0 < N
+        {                                  // parameters for hash table
+            bucket_size = 4,               // 0 < bucket_size
+            min_buckets = 8                // min_buckets = 2 ^^ N, 0 < N
         };
 #endif
     };
@@ -154,11 +155,10 @@ protected:
     typedef stxxl::lru_pager<> pager_type;
     typedef block_cache_write_buffer<block_type> write_buffer_type;
 
-    typedef typename compat_hash_map<bid_type, unsigned_type, bid_hash>::result bid_map_type;
-
+    typedef typename compat_hash_map<bid_type, unsigned_type,
+                                     bid_hash>::result bid_map_type;
 
     enum { valid_all = block_type::size };
-
 
     write_buffer_type write_buffer_;
 
@@ -234,8 +234,10 @@ public:
             if (reqs_[i_block].valid())
                 reqs_[i_block]->wait();
 
-            if (dirty_[i_block])
-                blocks_[i_block] = write_buffer_.write(blocks_[i_block], bids_[i_block]);
+            if (dirty_[i_block]) {
+                blocks_[i_block] =
+                    write_buffer_.write(blocks_[i_block], bids_[i_block]);
+            }
         }
         write_buffer_.flush();
 
@@ -262,12 +264,16 @@ protected:
             pager_.hit(i_block2kick);
         } while (retain_count_[i_block2kick] > 0);
 
-        if (valid_subblock_[i_block2kick] == valid_all && reqs_[i_block2kick].valid())
+        if (valid_subblock_[i_block2kick] == valid_all &&
+            reqs_[i_block2kick].valid())
+        {
             reqs_[i_block2kick]->wait();
+        }
 
         if (dirty_[i_block2kick])
         {
-            blocks_[i_block2kick] = write_buffer_.write(blocks_[i_block2kick], bids_[i_block2kick]);
+            blocks_[i_block2kick] =
+                write_buffer_.write(blocks_[i_block2kick], bids_[i_block2kick]);
             ++n_written;
         }
         else
@@ -343,7 +349,6 @@ public:
         return true;
     }
 
-
     //! Retrieve a subblock from the cache. If not yet cached, only the
     //! subblock will be loaded.
     //!
@@ -364,12 +369,16 @@ public:
             block = blocks_[i_block];
 
             // complete block or wanted subblock is in the cache
-            if (valid_subblock_[i_block] == valid_all || valid_subblock_[i_block] == i_subblock)
+            if (valid_subblock_[i_block] == valid_all ||
+                valid_subblock_[i_block] == i_subblock)
             {
                 ++n_found;
-                if (valid_subblock_[i_block] == valid_all && reqs_[i_block].valid())
+
+                if (valid_subblock_[i_block] == valid_all &&
+                    reqs_[i_block].valid())
                 {
-                    if (reqs_[i_block]->poll() == false) // request not yet completed
+                    // request not yet completed?
+                    if (reqs_[i_block]->poll() == false)
                         reqs_[i_block]->wait();
                 }
 
@@ -405,7 +414,9 @@ public:
         }
 
         // now actually load the wanted subblock and store it within *block
-        subblock_bid_type subblock_bid(bid.storage, bid.offset + i_subblock * subblock_type::raw_size);
+        subblock_bid_type subblock_bid(
+            bid.storage, bid.offset + i_subblock * subblock_type::raw_size
+            );
         request_ptr req = ((*block)[i_subblock]).read(subblock_bid);
         req->wait();
 
@@ -464,7 +475,9 @@ public:
             const unsigned_type i_block = (*i).second;
             if (dirty_[i_block])
             {
-                blocks_[i_block] = write_buffer_.write(blocks_[i_block], bids_[i_block]);
+                blocks_[i_block] =
+                    write_buffer_.write(blocks_[i_block], bids_[i_block]);
+
                 dirty_[i_block] = false;
             }
         }
@@ -551,7 +564,8 @@ public:
 
             for (unsigned k = 0; k < block_type::size; k++) {
                 os << "  Subbblock " << k << ": ";
-                if (valid_subblock_[i] != valid_all && valid_subblock_[i] != k) {
+                if (valid_subblock_[i] != valid_all && valid_subblock_[i] != k)
+                {
                     os << "not valid\n";
                     continue;
                 }

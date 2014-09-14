@@ -17,7 +17,6 @@
 #include <stxxl/mng>
 #include <stxxl/bits/singleton.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace hash_map {
@@ -34,10 +33,10 @@ public:
 
 private:
     /** set reasonable default values for tuning params */
-    tuning() :
-        prefetch_page_size(config::get_instance()->disks_number() * 2),
-        prefetch_pages(2),
-        blockcache_size(config::get_instance()->disks_number() * 12)
+    tuning()
+        : prefetch_page_size(config::get_instance()->disks_number() * 2),
+          prefetch_pages(2),
+          blockcache_size(config::get_instance()->disks_number() * 12)
     { }
 };
 

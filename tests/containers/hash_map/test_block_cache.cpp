@@ -26,7 +26,6 @@ bool test_block_cache()
     const unsigned num_blocks = 64;              // number of blocks to use for this test
     const unsigned cache_size = 8;               // size of cache in blocks
 
-
     typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
     typedef stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type> block_type;
 
@@ -34,7 +33,6 @@ bool test_block_cache()
 
     typedef block_type::bid_type bid_type;
     typedef std::vector<bid_type> bid_container_type;
-
 
     // prepare test: allocate blocks, fill them with values and write to disk
     bid_container_type bids(num_blocks);
@@ -52,7 +50,6 @@ bool test_block_cache()
         stxxl::request_ptr req = block->write(bids[i_block]);
         req->wait();
     }
-
 
     stxxl::random_number32 rand32;
 

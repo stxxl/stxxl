@@ -28,7 +28,6 @@ void reader_writer_test()
 
     const unsigned buffer_size = 4;              // write buffer size in blocks
 
-
     typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
     typedef stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type> block_type;
 
@@ -42,7 +41,6 @@ void reader_writer_test()
 
     typedef stxxl::hash_map::buffered_writer<block_type, bid_container_type> writer_type;
     typedef stxxl::hash_map::buffered_reader<cache_type, bid_iterator_type> reader_type;
-
 
     bid_container_type bids;
     cache_type cache(cache_size);
