@@ -183,15 +183,14 @@ public:
     template <class InputIterator>
     hash_map(InputIterator f, InputIterator l,
              size_type mem_to_sort = 256*1024*1024,
-             size_type n = 10000,
+             size_type n = 0,
              const hasher& hf = hasher(),
              const key_compare_type& cmp = key_compare_type(),
              size_type buffer_size = 100*1024*1024,
              const allocator_type& a = allocator_type())
         : hash_(hf),
           cmp_(cmp),
-          //  buckets_(n),
-          buckets_(0),                 // insert will determine a good size
+          buckets_(n),                 // insert will determine a good size
           bids_(0),
           buffer_size_(0),
           iterator_map_(this),
