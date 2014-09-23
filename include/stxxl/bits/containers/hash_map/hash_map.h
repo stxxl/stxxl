@@ -30,6 +30,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+#define STXXL_VERBOSE_HASH_MAP(m) \
+    STXXL_MSG("hash_map[" << static_cast<const void*>(this) << "]::" << m)
+
 //! External memory hash-map
 namespace hash_map {
 
@@ -494,6 +497,8 @@ public:
     //! Reset hash-map: erase all values, invalidate all iterators
     void clear()
     {
+        STXXL_VERBOSE_HASH_MAP("clear()");
+
         iterator_map_.fix_iterators_all2end();
         block_cache_.flush();
         block_cache_.clear();
@@ -1045,6 +1050,8 @@ protected:
     /*	Rebuild hash-map. The desired number of buckets may be supplied. */
     void _rebuild_buckets(size_type n_desired = 0)
     {
+        STXXL_VERBOSE_HASH_MAP("_rebuild_buckets()");
+
         typedef buffered_writer<block_type, bid_container_type> writer_type;
         typedef HashedValuesStream<self_type, reader_type> values_stream_type;
         typedef HashingStream<values_stream_type, HashedValueExtractor> hashing_stream_type;
@@ -1060,14 +1067,20 @@ protected:
             n_new = std::min<size_type>(n_desired, max_bucket_count());
 
         // allocate new buckets and bids
-        buckets_container_type* old_buckets = new buckets_container_type(n_new);
-        std::swap(buckets_, *old_buckets);
-        bid_container_type* old_bids = new bid_container_type();
-        std::swap(bids_, *old_bids);
+        buckets_container_type old_buckets(n_new);
+        std::swap(buckets_, old_buckets);
+
+        bid_container_type old_bids;
+        std::swap(bids_, old_bids);
 
         // read stored values in consecutive order
-        reader_type* reader = new reader_type(old_bids->begin(), old_bids->end(), &block_cache_);               // use new to controll point of destruction (see below)
-        values_stream_type values_stream(old_buckets->begin(), old_buckets->end(), *reader, old_bids->begin(), this);
+
+        // use new to control point of destruction (see below)
+        reader_type* reader
+            = new reader_type(old_bids.begin(), old_bids.end(), &block_cache_);
+
+        values_stream_type values_stream(old_buckets.begin(), old_buckets.end(),
+                                         *reader, old_bids.begin(), this);
 
         writer_type writer(&bids_, write_buffer_size, write_buffer_size / 2);
 
@@ -1100,14 +1113,19 @@ protected:
             num_total_ += hasher.bucket_size_;
         }
         writer.flush();
-        delete reader;          // reader must be deleted before deleting old_bids because its destructor will dereference the bid-iterator
+        // reader must be deleted before deleting old_bids because its
+        // destructor will dereference the bid-iterator
+        delete reader;
         block_cache_.clear();
 
         // get rid of old blocks and buckets
         block_manager* bm = stxxl::block_manager::get_instance();
-        bm->delete_blocks(old_bids->begin(), old_bids->end());
-        delete old_bids;
-        delete old_buckets;
+        bm->delete_blocks(old_bids.begin(), old_bids.end());
+
+        for (size_type i_bucket = 0; i_bucket < old_buckets.size(); i_bucket++) {
+            _erase_nodes(old_buckets[i_bucket].list_, NULL);
+            old_buckets[i_bucket] = bucket_type();
+        }
 
         buffer_size_ = 0;
         oblivious_ = false;
@@ -1125,7 +1143,9 @@ protected:
         self_type* map_;
         InputStream& in_;
 
-        UniqueValueStream(InputStream& input, self_type* map) : map_(map), in_(input) { }
+        UniqueValueStream(InputStream& input, self_type* map)
+            : map_(map), in_(input)
+        { }
 
         bool empty() const { return in_.empty(); }
 
@@ -1147,10 +1167,15 @@ protected:
         self_type* map_;
         InputStream& in_;
 
-        AddHashStream(InputStream& input, self_type* map) : map_(map), in_(input) { }
+        AddHashStream(InputStream& input, self_type* map)
+            : map_(map), in_(input)
+        { }
 
         bool empty() const { return in_.empty(); }
-        value_type operator * () { return value_type(map_->hash_((*in_).first), *in_); }
+
+        value_type operator * ()
+        { return value_type(map_->hash_((*in_).first), *in_); }
+
         void operator ++ () { ++in_; }
     };
 
@@ -1233,14 +1258,15 @@ public:
             n_new = max_bucket_count();
 
         // prepare new buckets and bids
-        buckets_container_type* old_buckets = new buckets_container_type(n_new);
-        std::swap(buckets_, *old_buckets);
-        bid_container_type* old_bids = new bid_container_type();                // writer will allocate new blocks as necessary
-        std::swap(bids_, *old_bids);
+        buckets_container_type old_buckets(n_new);
+        std::swap(buckets_, old_buckets);
+        // writer will allocate new blocks as necessary
+        bid_container_type old_bids;
+        std::swap(bids_, old_bids);
 
         // already stored values ("old values")
-        reader_type* reader = new reader_type(old_bids->begin(), old_bids->end(), &block_cache_);
-        old_values_stream old_values(old_buckets->begin(), old_buckets->end(), *reader, old_bids->begin(), this);
+        reader_type* reader = new reader_type(old_bids.begin(), old_bids.end(), &block_cache_);
+        old_values_stream old_values(old_buckets.begin(), old_buckets.end(), *reader, old_bids.begin(), this);
 
         // values to insert ("new values")
         input_stream input = stxxl::stream::streamify(f, l);
@@ -1316,10 +1342,15 @@ public:
         delete reader;
         block_cache_.clear();
 
+        // release old blocks
         block_manager* bm = stxxl::block_manager::get_instance();
-        bm->delete_blocks(old_bids->begin(), old_bids->end());
-        delete old_bids;
-        delete old_buckets;
+        bm->delete_blocks(old_bids.begin(), old_bids.end());
+
+        // free nodes in old bucket lists
+        for (size_type i_bucket = 0; i_bucket < old_buckets.size(); i_bucket++) {
+            _erase_nodes(old_buckets[i_bucket].list_, NULL);
+            old_buckets[i_bucket] = bucket_type();
+        }
 
         buffer_size_ = 0;
         oblivious_ = false;
@@ -1410,7 +1441,7 @@ protected:
         std::cout << "number of buckets: " << buckets_.size() << std::endl;
         for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
             const bucket_type& bucket = buckets_[i_bucket];
-            std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
+            std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << ", list=" << bucket.list_ << std::endl;
         }
     }
 #endif
