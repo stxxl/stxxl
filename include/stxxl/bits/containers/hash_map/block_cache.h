@@ -469,8 +469,8 @@ public:
     //! Write all dirty blocks back to disk
     void flush()
     {
-        typename bid_map_type::const_iterator i = bid_map_.begin();
-        for ( ; i != bid_map_.end(); ++i)
+        for (typename bid_map_type::const_iterator i = bid_map_.begin();
+             i != bid_map_.end(); ++i)
         {
             const unsigned_type i_block = (*i).second;
             if (dirty_[i_block])
@@ -490,6 +490,11 @@ public:
         free_blocks_.clear();
         for (unsigned_type i = 0; i < size(); i++)
         {
+            if (reqs_[i].valid()) {
+                reqs_[i]->cancel();
+                reqs_[i]->wait();
+            }
+
             free_blocks_.push_back(i);
         }
         bid_map_.clear();

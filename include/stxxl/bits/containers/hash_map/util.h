@@ -91,7 +91,7 @@ struct bucket
 
 //! Used to scan external memory with prefetching.
 template <class CacheType, class BidIterator>
-class buffered_reader
+class buffered_reader : private noncopyable
 {
 public:
     typedef CacheType cache_type;
@@ -297,7 +297,7 @@ public:
 
 //! Buffered writing of values. New Blocks are allocated as needed.
 template <class BlockType, class BidContainer>
-class buffered_writer
+class buffered_writer : private noncopyable
 {
 public:
     typedef BlockType block_type;
