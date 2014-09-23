@@ -229,13 +229,13 @@ public:
 
         for (const_mmiterator_type i = it_map_.begin(); i != it_map_.end(); ++i)
         {
-            o << "  Address=" << (*i).second
-              << ", Bucket=" << (*i).second->i_bucket_
-              << ", Node=" << (*i).second->node_
-              << ", i_ext=" << (*i).second->i_external_
+            o << "  Address=" << i->second
+              << ", Bucket=" << i->second->i_bucket_
+              << ", Node=" << i->second->node_
+              << ", i_ext=" << i->second->i_external_
               << ", "
-              << (((*i).second->source_ == hash_map_type::src_external)
-                  ? "external" : "internal") << std::endl;
+              << ((i->second->source_ == hash_map_type::src_external)
+                ? "external" : "internal") << std::endl;
         }
     }
 };

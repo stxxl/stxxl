@@ -113,6 +113,7 @@ public:
           reader_(NULL),
           prefetch_(false),
           i_bucket_(0),
+          source_(hash_map_type::src_unknown),
           node_(NULL),
           i_external_(0),
           ext_valid_(false),
@@ -172,7 +173,9 @@ public:
         if (end_ && obj.end_)
             return true;
 
-        if (map_ != obj.map_ || i_bucket_ != obj.i_bucket_ || source_ != obj.source_)
+        if (map_ != obj.map_ ||
+            i_bucket_ != obj.i_bucket_ ||
+            source_ != obj.source_)
             return false;
 
         if (source_ == hash_map_type::src_internal)
@@ -195,12 +198,14 @@ protected:
         bid_iterator_type begin = map_->bids_.begin() + bucket.i_block_;
         bid_iterator_type end = map_->bids_.end();
 
-        reader_ = new reader_type(begin, end, &(map_->block_cache_), bucket.i_subblock_, prefetch_);
+        reader_ = new reader_type(begin, end, &(map_->block_cache_),
+                                  bucket.i_subblock_, prefetch_);
 
         // external value's index already known
         if (ext_valid_)
         {
-            for (size_type i = 0; i < i_external_; i++)                         // TODO: speed this up (go directly to i_external_
+            // TODO: speed this up (go directly to i_external_
+            for (size_type i = 0; i < i_external_; i++)
                 ++(*reader_);
         }
         // otw lookup external value.
@@ -222,7 +227,8 @@ protected:
                 ++(*reader_);
                 ++i_external_;
             }
-            // note: i_external==num_external just means that there was no external value > internal value (which is perfectly OK)
+            // note: i_external==num_external just means that there was no
+            // external value > internal value (which is perfectly OK)
             ext_valid_ = true;
         }
     }
@@ -275,7 +281,8 @@ public:
         }
         else if (source_ == hash_map_type::src_internal)
             tmp_node = node_->next();
-        // else (source unknown): tmp_node and reader_ already point to the correct values
+        // else (source unknown): tmp_node and reader_ already point to the
+        // correct values
 
         while (true) {
             // internal and external values available
@@ -295,10 +302,11 @@ public:
                     {
                         key_ = node_->value_.first;
                         source_ = hash_map_type::src_internal;
-                        goto end_search;              // just this once - I promise...
+                        goto end_search;       // just this once - I promise...
                     }
                     else
-                        tmp_node = tmp_node->next();  // continue search if internal value flaged as deleted
+                        // continue search if internal value flaged as deleted
+                        tmp_node = tmp_node->next();
                 }
                 // otherwise external wins
                 else
@@ -326,11 +334,11 @@ public:
                     goto end_search;
                 }
                 else
-                    tmp_node = tmp_node->next();                        // continue search
+                    tmp_node = tmp_node->next();        // continue search
             }
 
-            // at this point there are obviously no more values in the current bucket
-            // let's try the next one (outer while-loop!)
+            // at this point there are obviously no more values in the current
+            // bucket let's try the next one (outer while-loop!)
             i_bucket_++;
             if (i_bucket_ == map_->buckets_.size())
             {
