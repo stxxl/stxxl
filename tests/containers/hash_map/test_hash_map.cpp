@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,61 +17,69 @@
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/rand.h>
 
-struct rand_pairs {
+struct rand_pairs
+{
     stxxl::random_number32& rand_;
 
-    rand_pairs(stxxl::random_number32& rand) : rand_(rand)
+    rand_pairs(stxxl::random_number32& rand)
+        : rand_(rand)
     { }
 
     std::pair<int, int> operator () ()
     {
-        int v = rand_();
+        int v = (int)rand_();
         return std::pair<int, int>(v, v);
     }
 };
 
-struct hash_int {
+struct hash_int
+{
     stxxl::uint64 operator () (stxxl::uint64 key) const
     {
-        key = (~key) + (key << 21);                    // key = (key << 21) - key - 1;
+        key = (~key) + (key << 21);              // key = (key << 21) - key - 1;
         key = key ^ (key >> 24);
-        key = (key + (key << 3)) + (key << 8);         // key * 265
+        key = (key + (key << 3)) + (key << 8);   // key * 265
         key = key ^ (key >> 14);
-        key = (key + (key << 2)) + (key << 4);         // key * 21
+        key = (key + (key << 2)) + (key << 4);   // key * 21
         key = key ^ (key >> 28);
         key = key + (key << 31);
         return key;
     }
 
-    stxxl::uint64 hash(stxxl::uint64 key) const { return (* this)(key); }
+    stxxl::uint64 hash(stxxl::uint64 key) const { return operator () (key); }
 };
 
-struct cmp : public std::less<int>{
-    int min_value() const { return (std::numeric_limits<int>::min)(); }
-    int max_value() const { return (std::numeric_limits<int>::max)(); }
+struct cmp : public std::less<int>
+{
+    int min_value() const { return std::numeric_limits<int>::min(); }
+    int max_value() const { return std::numeric_limits<int>::max(); }
 };
 
 // forced instantiation
-template class stxxl::unordered_map<int, int, hash_int, cmp, 4 * 1024, 4>;
+template class stxxl::unordered_map<int, int, hash_int, cmp, 4* 1024, 4>;
 
 void basic_test()
 {
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 50000;
-    const unsigned n_tests = 1000;
+    const unsigned n_values = 100000;
+    const unsigned n_tests = 10000;
 
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));    // make sure all changes will be buffered (*)
+    // make sure all changes will be buffered (*)
+    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
 
-    const unsigned mem_to_sort = 10 * 1024 * 1024;
+    const unsigned mem_to_sort = 32 * 1024 * 1024;
 
     const unsigned subblock_raw_size = 4 * 1024;
     const unsigned block_size = 4;
 
-    typedef stxxl::unordered_map<int, int, hash_int, cmp, subblock_raw_size, block_size> unordered_map;
+    typedef stxxl::unordered_map<int, int, hash_int, cmp,
+                                 subblock_raw_size, block_size> unordered_map;
     typedef unordered_map::iterator iterator;
     typedef unordered_map::const_iterator const_iterator;
+
+    stxxl::stats_data stats_begin;
 
     unordered_map map;
     map.max_buffer_size(buffer_size);
@@ -88,17 +97,24 @@ void basic_test()
 
     // --- initial import
     std::cout << "Initial import...";
+    stats_begin = *stxxl::stats::get_instance();
+
     STXXL_CHECK(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
     STXXL_CHECK(map.begin() != map.end());
     STXXL_CHECK(map.size() == n_values);
+
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+
     // (*) all these values are stored in external memory; the remaining
     // changes will be buffered in internal memory
 
     // --- insert: new (from values2) and existing (from values1) values, with
     // --- and without checking
     std::cout << "Insert...";
+    stats_begin = *stxxl::stats::get_instance();
+
     for (unsigned i = 0; i < n_values / 2; i++) {
         // new without checking
         map.insert_oblivious(values2[2 * i]);
@@ -111,14 +127,19 @@ void basic_test()
         res = map.insert(values1[2 * i + 1]);
         STXXL_CHECK(!res.second && (*(res.first)).first == values1[2 * i + 1].first);
     }
+
     STXXL_CHECK(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+
     // "old" values are stored in external memory, "new" values are stored in
     // internal memory
 
     // --- find: existing (from external and internal memory) and non-existing
     // --- values
     std::cout << "Find...";
+    stats_begin = *stxxl::stats::get_instance();
+
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
     for (unsigned i = 0; i < n_tests; i++) {
@@ -127,9 +148,12 @@ void basic_test()
         STXXL_CHECK(cmap.find(values3[i].first) == cmap.end());
     }
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 
     // --- insert with overwriting
     std::cout << "Insert with overwriting...";
+    stats_begin = *stxxl::stats::get_instance();
+
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
     for (unsigned i = 0; i < n_tests; i++) {
@@ -151,9 +175,12 @@ void basic_test()
         STXXL_CHECK((*it2).second == values2[i].second + 1);
     }
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 
     // --- erase: existing and non-existing values, with and without checking
     std::cout << "Erase...";
+    stats_begin = *stxxl::stats::get_instance();
+
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
     std::random_shuffle(values3.begin(), values3.end());
@@ -168,12 +195,13 @@ void basic_test()
         map.erase_oblivious(values2[2 * i].first);
         // existing with checking
         STXXL_CHECK(map.erase(values2[2 * i + 1].first) == 1);
-        // non-existing without chekcing
+        // non-existing without checking
         map.erase_oblivious(values3[i].first);
         // non-existing with checking
     }
     STXXL_CHECK(map.size() == 2 * n_values - 2 * n_tests);
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 
     map.clear();
     STXXL_CHECK(map.size() == 0);
@@ -183,11 +211,13 @@ void basic_test()
     // make sure there are some values in our unordered_map: externally
     // [0..n/2) and internally [n/2..n) from values1
     std::cout << "[ ]-operator...";
+    stats_begin = *stxxl::stats::get_instance();
+
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     for (unsigned i = n_values / 2; i < n_values; i++) {
         map.insert_oblivious(values1[i]);
     }
-    // lookup of exsisting values
+    // lookup of existing values
     STXXL_CHECK(map[values1[5].first] == values1[5].second);                               // external
     STXXL_CHECK(map[values1[n_values / 2 + 5].first] == values1[n_values / 2 + 5].second); // internal
     // manipulate existing values
@@ -209,12 +239,15 @@ void basic_test()
     }
     STXXL_CHECK(map.size() == n_values + 2);
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 
     map.clear();
     STXXL_CHECK(map.size() == 0);
 
     // --- additional bulk insert test
     std::cout << "additional bulk-insert...";
+    stats_begin = *stxxl::stats::get_instance();
+
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     map.insert(values1.begin() + n_values / 2, values1.end(), mem_to_sort);
     STXXL_CHECK(map.size() == n_values);
@@ -223,6 +256,7 @@ void basic_test()
     for (unsigned i = 0; i < n_tests; i++)
         STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 
     std::cout << "\nAll tests passed" << std::endl;
 

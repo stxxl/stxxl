@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,10 +19,12 @@
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 #include <stxxl/bits/compat/hash_map.h>
 
-struct rand_pairs {
+struct rand_pairs
+{
     stxxl::random_number32& rand_;
 
-    rand_pairs(stxxl::random_number32& rand) : rand_(rand)
+    rand_pairs(stxxl::random_number32& rand)
+        : rand_(rand)
     { }
 
     std::pair<int, int> operator () ()
@@ -31,25 +34,27 @@ struct rand_pairs {
     }
 };
 
-struct hash_int {
+struct hash_int
+{
     stxxl::uint64 operator () (stxxl::uint64 key) const
     {
-        key = (~key) + (key << 21);                    // key = (key << 21) - key - 1;
+        key = (~key) + (key << 21);              // key = (key << 21) - key - 1;
         key = key ^ (key >> 24);
-        key = (key + (key << 3)) + (key << 8);         // key * 265
+        key = (key + (key << 3)) + (key << 8);   // key * 265
         key = key ^ (key >> 14);
-        key = (key + (key << 2)) + (key << 4);         // key * 21
+        key = (key + (key << 2)) + (key << 4);   // key * 21
         key = key ^ (key >> 28);
         key = key + (key << 31);
         return key;
     }
 
-    stxxl::uint64 hash(stxxl::uint64 key) const { return (* this)(key); }
+    stxxl::uint64 hash(stxxl::uint64 key) const { return operator () (key); }
 };
 
-struct cmp : public std::less<int>{
-    int min_value() const { return (std::numeric_limits<int>::min)(); }
-    int max_value() const { return (std::numeric_limits<int>::max)(); }
+struct cmp : public std::less<int>
+{
+    int min_value() const { return std::numeric_limits<int>::min(); }
+    int max_value() const { return std::numeric_limits<int>::max(); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,19 +63,23 @@ void cmp_with_internal_map()
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 50000;
-    const unsigned n_tests = 1000;
+    const unsigned n_values = 200000;
+    const unsigned n_tests = 10000;
 
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));    // make sure all changes will be buffered
-    const unsigned mem_to_sort = 10 * 1024 * 1024;
+    // make sure all changes will be buffered
+    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned mem_to_sort = 32 * 1024 * 1024;
 
     const unsigned subblock_raw_size = 4 * 1024;
     const unsigned block_size = 4;
 
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp, subblock_raw_size, block_size> hash_map;
+    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
+                                      subblock_raw_size, block_size> hash_map;
     typedef hash_map::const_iterator const_iterator;
 
     typedef stxxl::compat_hash_map<int, int>::result int_hash_map;
+
+    stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -88,12 +97,11 @@ void cmp_with_internal_map()
 
     // --- initial import: create a nice mix of externally (values1) and
     // --- internally (values2) stored values
+    std::cout << "Initial import...";
+
     map.insert(values1.begin(), values1.end(), mem_to_sort);
     int_map.insert(values1.begin(), values1.end());
 
-    // seems bind1st has problems with a member that takes a reference
-//	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
-//	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&int_hash_map::insert), &int_map ));
     std::vector<value_type>::iterator val_it = values2.begin();
     for ( ; val_it != values2.end(); ++val_it) {
         map.insert_oblivious(*val_it);
@@ -133,6 +141,7 @@ void cmp_with_internal_map()
         STXXL_CHECK(int_map.find(key) != int_map.end());
     }
     std::cout << "passed" << std::endl;
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,19 +150,23 @@ void basic_iterator_test()
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 50000;
-    const unsigned n_tests = 1000;
+    const unsigned n_values = 100000;
+    const unsigned n_tests = 10000;
 
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));    // make sure all changes will be buffered
+    // make sure all changes will be buffered
+    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
 
-    const unsigned mem_to_sort = 10 * 1024 * 1024;
+    const unsigned mem_to_sort = 32 * 1024 * 1024;
 
     const unsigned subblock_raw_size = 4 * 1024;
     const unsigned block_size = 4;
 
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp, subblock_raw_size, block_size> hash_map;
+    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
+                                      subblock_raw_size, block_size> hash_map;
     typedef hash_map::iterator iterator;
     typedef hash_map::const_iterator const_iterator;
+
+    stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -170,12 +183,11 @@ void basic_iterator_test()
     // --- initial import: create a nice mix of externally (values1) and
     // --- internally (values2) stored values
     std::cout << "Initial import...";
+
     STXXL_CHECK(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
-    // seems bind1st has problems with a member that takes a reference
-//	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
-    std::vector<value_type>::iterator val_it = values2.begin();
-    for ( ; val_it != values2.end(); ++val_it)
+    for (std::vector<value_type>::iterator val_it = values2.begin();
+         val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
     STXXL_CHECK(map.begin() != map.end());
     STXXL_CHECK(map.size() == 2 * n_values);
@@ -209,16 +221,11 @@ void basic_iterator_test()
     // --- scan and modify
     std::cout << "Scan and modify...";
     {
-        iterator it = map.begin();
-        for ( ; it != map.end(); ++it)
+        for (iterator it = map.begin(); it != map.end(); ++it)
             (*it).second = (*it).first + 1;
 
-        const_iterator cit = cmap.begin();
-        for ( ; cit != cmap.end(); ++cit) {
-            if ((*cit).second != (*cit).first + 1) {
-                std::cout << "helloe";
-            }
-//			STXXL_CHECK((*cit).second == (*cit).first+1);
+        for (const_iterator cit = cmap.begin(); cit != cmap.end(); ++cit) {
+            STXXL_CHECK((*cit).second == (*cit).first + 1);
         }
     }
     std::cout << "passed" << std::endl;
@@ -299,6 +306,8 @@ void basic_iterator_test()
         STXXL_CHECK(cit2 == cmap.end());
     }
     std::cout << "passed" << std::endl;
+
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,16 +316,20 @@ void more_iterator_test()
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 50000;
+    const unsigned n_values = 500000;
 
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));    // make sure all changes will be buffered
-    const unsigned mem_to_sort = 10 * 1024 * 1024;
+    // make sure all changes will be buffered
+    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned mem_to_sort = 32 * 1024 * 1024;
 
     const unsigned subblock_raw_size = 4 * 1024;
     const unsigned block_size = 4;
 
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp, subblock_raw_size, block_size> hash_map;
+    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
+                                      subblock_raw_size, block_size> hash_map;
     typedef hash_map::const_iterator const_iterator;
+
+    stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -331,8 +344,8 @@ void more_iterator_test()
 
     // --- initial import
     map.insert(values1.begin(), values1.end(), mem_to_sort);
-    std::vector<value_type>::iterator val_it = values2.begin();
-    for ( ; val_it != values2.end(); ++val_it)
+    for (std::vector<value_type>::iterator val_it = values2.begin();
+         val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
 
     // --- store some iterators, rebuild and check
@@ -368,6 +381,8 @@ void more_iterator_test()
         STXXL_CHECK(cit1 == cit2);
     }
     std::cout << "passed" << std::endl;
+
+    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
