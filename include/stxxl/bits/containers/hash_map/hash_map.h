@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -285,7 +286,7 @@ public:
             bool old_deleted = node->deleted();
             if (old_deleted)
             {
-                node->deleted(false);
+                node->set_deleted(false);
                 node->value_ = value;
                 ++num_total_;
             }
@@ -308,9 +309,10 @@ public:
             else
             {
                 ++num_total_;
-                node_type* new_node = node
-                                      ? node->next(_new_node(value, node->next(), false))
-                                      : (bucket.list_ = _new_node(value, bucket.list_, false));
+                node_type* new_node =
+                    node
+                    ? node->set_next(_new_node(value, node->next(), false))
+                    : (bucket.list_ = _new_node(value, bucket.list_, false));
 
                 iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
 
@@ -339,7 +341,7 @@ public:
             if (node->deleted())
                 ++num_total_;
 
-            node->deleted(false);
+            node->set_deleted(false);
             node->value_ = value;
             return iterator(this, i_bucket, node, 0, src_internal, false, value.first);
         }
@@ -351,7 +353,7 @@ public:
             ++num_total_;
             node_type* new_node =
                 node
-                ? node->next(_new_node(value, node->next(), false))
+                ? node->set_next(_new_node(value, node->next(), false))
                 : (bucket.list_ = _new_node(value, bucket.list_, false));
 
             // there may be some iterators that reference the newly inserted
@@ -378,7 +380,7 @@ public:
 
         if (it.source_ == src_internal)
         {
-            it.node_->deleted(true);
+            it.node_->set_deleted(true);
             iterator_map_.fix_iterators_2end(it.i_bucket_, it.key_);
         }
         else {
@@ -388,7 +390,7 @@ public:
 
             // add delete-node to buffer
             if (node)
-                node->next(_new_node(value_type(it.key_, mapped_type()), node->next(), true));
+                node->set_next(_new_node(value_type(it.key_, mapped_type()), node->next(), true));
             else
                 bucket.list_ = _new_node(value_type(it.key_, mapped_type()), bucket.list_, true);
 
@@ -414,7 +416,7 @@ public:
         {
             if (!node->deleted())
             {
-                node->deleted(true);
+                node->set_deleted(true);
                 --num_total_;
                 iterator_map_.fix_iterators_2end(i_bucket, key);
                 return 1;
@@ -435,7 +437,7 @@ public:
                 --num_total_;
 
                 if (node)
-                    node->next(_new_node(value_type(key, mapped_type()), node->next(), true));
+                    node->set_next(_new_node(value_type(key, mapped_type()), node->next(), true));
                 else
                     bucket.list_ = _new_node(value_type(key, mapped_type()), bucket.list_, true);
 
@@ -467,7 +469,7 @@ public:
             if (!node->deleted())
             {
                 --num_total_;
-                node->deleted(true);
+                node->set_deleted(true);
                 iterator_map_.fix_iterators_2end(i_bucket, key);
             }
         }
@@ -478,7 +480,7 @@ public:
             --num_total_;
 
             if (node)
-                node->next(_new_node(value_type(key, mapped_type()), node->next(), true));
+                node->set_next(_new_node(value_type(key, mapped_type()), node->next(), true));
             else
                 bucket.list_ = _new_node(value_type(key, mapped_type()), bucket.list_, true);
 
@@ -601,7 +603,7 @@ public:
                 // rebuild is neccessary here.
                 node_type* new_node =
                     node
-                    ? node->next(_new_node(value, node->next(), false))
+                    ? node->set_next(_new_node(value, node->next(), false))
                     : (bucket.list_ = _new_node(value, bucket.list_, false));
 
                 ++buffer_size_;
@@ -694,7 +696,7 @@ public:
         // found in internal-memory buffer
         if (node && _eq(node->value_.first, key)) {
             if (node->deleted()) {
-                node->deleted(false);
+                node->set_deleted(false);
                 node->value_.second = mapped_type();
                 ++num_total_;
             }
@@ -713,9 +715,11 @@ public:
             // add a new node to the buffer. this new node's value overwrites
             // the external value if it was found and otherwise is set to (key,
             // mapped_type())
-            node_type* new_node = (node) ?
-                                  (node->next(_new_node(buffer_value, node->next(), false))) :
-                                  (bucket.list_ = _new_node(buffer_value, bucket.list_, false));
+            node_type* new_node =
+                node
+                ? node->set_next(_new_node(buffer_value, node->next(), false))
+                : (bucket.list_ = _new_node(buffer_value, bucket.list_, false));
+
             ++buffer_size_;
             // note that we already checked the buffer-size in (*)
 
@@ -829,8 +833,8 @@ protected:
     {
         node_type* node = _get_node();
         node->value_ = value;
-        node->next(nxt);
-        node->deleted(del);
+        node->set_next(nxt);
+        node->set_deleted(del);
         return node;
     }
 
@@ -878,13 +882,14 @@ protected:
         x = a * d + c * b;
         y = ((low >> 32) & 0xffffffff) + x;
 
-//		low = (low & 0xffffffff) | ((y & 0xffffffff) << 32);	// we actually do not need the lower part
+        // we actually do not need the lower part
+        // low = (low & 0xffffffff) | ((y & 0xffffffff) << 32);
         high = (y >> 32) & 0xffffffff;
         high += a * c;
 
         return high;
 
-//		return (size_type)((double)n * ((double)hash_(key)/(double)std::numeric_limits<size_type>::max()));
+        // return (size_type)((double)n * ((double)hash_(key)/(double)std::numeric_limits<size_type>::max()));
     }
 
     /*!
@@ -897,12 +902,13 @@ protected:
     node_type * _find_key_internal(const bucket_type& bucket,
                                    const key_type& key) const
     {
-        node_type* curr = bucket.list_;
-        node_type* old = 0;
-        for ( ; curr && _leq(curr->value_.first, key); curr = curr->next()) {
+        node_type* old = NULL;
+        for (node_type* curr = bucket.list_;
+             curr && _leq(curr->value_.first, key);
+             curr = curr->next())
+        {
             old = curr;
         }
-
         return old;
     }
 

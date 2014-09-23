@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -38,7 +39,7 @@ struct node
         return ((int_type)next_and_del_ & 0x01) == 1;
     }
     //! change deleted flag on the next node
-    bool deleted(bool d)
+    bool set_deleted(bool d)
     {
         next_and_del_ = (node<ValueType>*)(((int_type)next_and_del_ & ~0x01) | (int_type)d);
         return d;
@@ -50,7 +51,7 @@ struct node
         return (node<ValueType>*)((int_type)next_and_del_ & ~0x01);
     }
     //! change the "next" value of next node pointer
-    node<ValueType> * next(node<ValueType>* n)
+    node<ValueType> * set_next(node<ValueType>* n)
     {
         next_and_del_ = (node<ValueType>*)(((int_type)next_and_del_ & 0x01) | (int_type)n);
         return n;
@@ -66,7 +67,8 @@ struct bucket
     //! number of elements in external memory
     size_t n_external_;
 
-    //! index of first block's bid (to be used as index for hash_map's bids_-array
+    //! index of first block's bid (to be used as index for hash_map's
+    //! bids_-array
     size_t i_block_;
 
     //! index of first subblock
