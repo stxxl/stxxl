@@ -58,10 +58,10 @@ public:
     //! \param _begin \c bid_iterator pointing to the first block of the stream
     //! \param _end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_istream(bid_iterator_type _begin, bid_iterator_type _end, int_type nbuffers) :
-        current_elem(0)
+    buf_istream(bid_iterator_type _begin, bid_iterator_type _end, int_type nbuffers)
+        : current_elem(0)
 #ifdef BUF_ISTREAM_CHECK_END
-        , not_finished(true)
+          , not_finished(true)
 #endif
     {
         const unsigned_type ndisks = config::get_instance()->disks_number();

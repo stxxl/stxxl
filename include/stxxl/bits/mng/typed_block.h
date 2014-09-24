@@ -168,8 +168,8 @@ public:
 
 //! Contains per block information for \c stxxl::typed_block , not intended for direct use.
 template <typename Type, unsigned RawSize, unsigned NBids, typename MetaInfoType = void>
-class block_w_info :
-    public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids - sizeof(MetaInfoType)) / sizeof(Type)), RawSize, NBids>
+class block_w_info
+    : public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids - sizeof(MetaInfoType)) / sizeof(Type)), RawSize, NBids>
 {
 public:
     //! Type of per block information element.
@@ -182,8 +182,8 @@ public:
 };
 
 template <typename Type, unsigned RawSize, unsigned NBids>
-class block_w_info<Type, RawSize, NBids, void>:
-    public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids) / sizeof(Type)), RawSize, NBids>
+class block_w_info<Type, RawSize, NBids, void>
+    : public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids) / sizeof(Type)), RawSize, NBids>
 {
 public:
     typedef void info_type;
@@ -234,8 +234,8 @@ class expand_struct : public add_filler<Type, RawSize - sizeof(Type)>
 //! function variable for example), because Linux POSIX library limits the stack size for the
 //! main thread to (2MB - system page size)
 template <unsigned RawSize, typename Type, unsigned NRef = 0, typename MetaInfoType = void>
-class typed_block :
-    public mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>
+class typed_block
+    : public mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>
 {
     typedef mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize> Base;
 

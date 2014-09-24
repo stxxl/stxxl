@@ -439,44 +439,44 @@ class stats_data
     double elapsed;
 
 public:
-    stats_data() :
-        reads(0),
-        writes(0),
-        volume_read(0),
-        volume_written(0),
-        c_reads(0),
-        c_writes(0),
-        c_volume_read(0),
-        c_volume_written(0),
-        t_reads(0.0),
-        t_writes(0.0),
-        p_reads(0.0),
-        p_writes(0.0),
-        p_ios(0.0),
-        t_wait(0.0),
-        t_wait_read(0.0),
-        t_wait_write(0.0),
-        elapsed(0.0)
+    stats_data()
+        : reads(0),
+          writes(0),
+          volume_read(0),
+          volume_written(0),
+          c_reads(0),
+          c_writes(0),
+          c_volume_read(0),
+          c_volume_written(0),
+          t_reads(0.0),
+          t_writes(0.0),
+          p_reads(0.0),
+          p_writes(0.0),
+          p_ios(0.0),
+          t_wait(0.0),
+          t_wait_read(0.0),
+          t_wait_write(0.0),
+          elapsed(0.0)
     { }
 
-    stats_data(const stats& s) :
-        reads(s.get_reads()),
-        writes(s.get_writes()),
-        volume_read(s.get_read_volume()),
-        volume_written(s.get_written_volume()),
-        c_reads(s.get_cached_reads()),
-        c_writes(s.get_cached_writes()),
-        c_volume_read(s.get_cached_read_volume()),
-        c_volume_written(s.get_cached_written_volume()),
-        t_reads(s.get_read_time()),
-        t_writes(s.get_write_time()),
-        p_reads(s.get_pread_time()),
-        p_writes(s.get_pwrite_time()),
-        p_ios(s.get_pio_time()),
-        t_wait(s.get_io_wait_time()),
-        t_wait_read(s.get_wait_read_time()),
-        t_wait_write(s.get_wait_write_time()),
-        elapsed(timestamp() - s.get_last_reset_time())
+    stats_data(const stats& s)
+        : reads(s.get_reads()),
+          writes(s.get_writes()),
+          volume_read(s.get_read_volume()),
+          volume_written(s.get_written_volume()),
+          c_reads(s.get_cached_reads()),
+          c_writes(s.get_cached_writes()),
+          c_volume_read(s.get_cached_read_volume()),
+          c_volume_written(s.get_cached_written_volume()),
+          t_reads(s.get_read_time()),
+          t_writes(s.get_write_time()),
+          p_reads(s.get_pread_time()),
+          p_writes(s.get_pwrite_time()),
+          p_ios(s.get_pio_time()),
+          t_wait(s.get_io_wait_time()),
+          t_wait_read(s.get_wait_read_time()),
+          t_wait_write(s.get_wait_write_time()),
+          elapsed(timestamp() - s.get_last_reset_time())
     { }
 
     stats_data operator + (const stats_data& a) const

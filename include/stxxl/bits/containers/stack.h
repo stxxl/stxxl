@@ -599,13 +599,13 @@ public:
         grow_shrink_stack2(prefetch_pool<block_type>& p_pool_,
                            write_pool<block_type>& w_pool_,
                            unsigned_type prefetch_aggressiveness = 0)
-        ) :
-        m_size(0),
-        cache_offset(0),
-        cache(new block_type),
-        pref_aggr(prefetch_aggressiveness),
-        owned_pool(new pool_type(p_pool_, w_pool_)),
-        pool(owned_pool)
+        )
+        : m_size(0),
+          cache_offset(0),
+          cache(new block_type),
+          pref_aggr(prefetch_aggressiveness),
+          owned_pool(new pool_type(p_pool_, w_pool_)),
+          pool(owned_pool)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }

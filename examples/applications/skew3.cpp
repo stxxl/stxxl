@@ -300,8 +300,8 @@ public:
         skew_pair_type result;
 
     public:
-        naming(Input& A_, bool& unique_) :
-            A(A_), unique(unique_), lexname(0)
+        naming(Input& A_, bool& unique_)
+            : A(A_), unique(unique_), lexname(0)
         {
             assert(!A.empty());
             unique = true;

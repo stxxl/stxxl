@@ -104,15 +104,15 @@ public:
         int_type* _pref_seq,
         int_type _prefetch_buf_size,
         completion_handler do_after_fetch = default_completion_handler()
-        ) :
-        consume_seq_begin(_cons_begin),
-        consume_seq_end(_cons_end),
-        seq_length(_cons_end - _cons_begin),
-        prefetch_seq(_pref_seq),
-        nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
-        nextconsume(0),
-        nreadblocks(nextread),
-        do_after_fetch(do_after_fetch)
+        )
+        : consume_seq_begin(_cons_begin),
+          consume_seq_end(_cons_end),
+          seq_length(_cons_end - _cons_begin),
+          prefetch_seq(_pref_seq),
+          nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
+          nextconsume(0),
+          nreadblocks(nextread),
+          do_after_fetch(do_after_fetch)
     {
         STXXL_VERBOSE1("block_prefetcher: seq_length=" << seq_length);
         STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size=" << _prefetch_buf_size);

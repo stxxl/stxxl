@@ -73,10 +73,13 @@ public:
     //! Standard stream typedef.
     typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
-    iterator2stream(InputIterator_ begin, InputIterator_ end) :
-        current_(begin), end_(end) { }
+    iterator2stream(InputIterator_ begin, InputIterator_ end)
+        : current_(begin), end_(end)
+    { }
 
-    iterator2stream(const iterator2stream& a) : current_(a.current_), end_(a.end_) { }
+    iterator2stream(const iterator2stream& a)
+        : current_(a.current_), end_(a.end_)
+    { }
 
     //! Standard stream method.
     const value_type& operator * () const
@@ -147,8 +150,8 @@ public:
     //! Standard stream typedef.
     typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
-    vector_iterator2stream(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0) :
-        current_(begin), end_(end), in(static_cast<buf_istream_type*>(NULL))
+    vector_iterator2stream(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0)
+        : current_(begin), end_(end), in(static_cast<buf_istream_type*>(NULL))
     {
         if (empty())
             return;
@@ -169,8 +172,9 @@ public:
         }
     }
 
-    vector_iterator2stream(const Self_& a) :
-        current_(a.current_), end_(a.end_), in(a.in.release()) { }
+    vector_iterator2stream(const Self_& a)
+        : current_(a.current_), end_(a.end_), in(a.in.release())
+    { }
 
     //! Standard stream method.
     const value_type& operator * () const
@@ -618,8 +622,9 @@ private:
     value_type current_;
 
 public:
-    generator2stream(Generator_ g) :
-        gen_(g), current_(gen_()) { }
+    generator2stream(Generator_ g)
+        : gen_(g), current_(gen_())
+    { }
 
     generator2stream(const generator2stream& a) : gen_(a.gen_), current_(a.current_) { }
 
@@ -701,8 +706,8 @@ private:
 public:
     //! Construction.
     transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_, Input4_& i4_,
-              Input5_& i5_, Input5_& i6_) :
-        op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
+              Input5_& i5_, Input5_& i6_)
+        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
     {
         if (!empty())
             current = op(*i1, *i2, *i3, *i4, *i5, *i6);
@@ -903,8 +908,8 @@ private:
 
 public:
     //! Construction.
-    transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_) :
-        op(o), i1(i1_), i2(i2_), i3(i3_)
+    transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_)
+        : op(o), i1(i1_), i2(i2_), i3(i3_)
     {
         if (!empty())
             current = op(*i1, *i2, *i3);
@@ -976,8 +981,8 @@ private:
 
 public:
     //! Construction.
-    transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_, Input4_& i4_) :
-        op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
+    transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_, Input4_& i4_)
+        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
     {
         if (!empty())
             current = op(*i1, *i2, *i3, *i4);
@@ -1053,9 +1058,9 @@ private:
 
 public:
     //! Construction.
-    transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_, Input4_& i4_,
-              Input5_& i5_) :
-        op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
+    transform(Operation_& o, Input1_& i1_, Input2_& i2_, Input3_& i3_,
+              Input4_& i4_, Input5_& i5_)
+        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
     {
         if (!empty())
             current = op(*i1, *i2, *i3, *i4, *i5);
@@ -1137,15 +1142,13 @@ private:
 
 public:
     //! Construction.
-    make_tuple(
-        Input1_& i1_,
-        Input2_& i2_,
-        Input3_& i3_,
-        Input4_& i4_,
-        Input5_& i5_,
-        Input6_& i6_
-        ) :
-        i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
+    make_tuple(Input1_& i1_,
+               Input2_& i2_,
+               Input3_& i3_,
+               Input4_& i4_,
+               Input5_& i5_,
+               Input6_& i6_)
+        : i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
     {
         if (!empty())
             current = value_type(*i1, *i2, *i3, *i4, *i5, *i6);
@@ -1211,11 +1214,9 @@ private:
 
 public:
     //! Construction.
-    make_tuple(
-        Input1_& i1_,
-        Input2_& i2_
-        ) :
-        i1(i1_), i2(i2_)
+    make_tuple(Input1_& i1_,
+               Input2_& i2_)
+        : i1(i1_), i2(i2_)
     {
         if (!empty())
             current = value_type(*i1, *i2);
@@ -1280,12 +1281,10 @@ private:
 
 public:
     //! Construction.
-    make_tuple(
-        Input1_& i1_,
-        Input2_& i2_,
-        Input3_& i3_
-        ) :
-        i1(i1_), i2(i2_), i3(i3_)
+    make_tuple(Input1_& i1_,
+               Input2_& i2_,
+               Input3_& i3_)
+        : i1(i1_), i2(i2_), i3(i3_)
     {
         if (!empty())
             current = value_type(*i1, *i2, *i3);
@@ -1355,13 +1354,11 @@ private:
 
 public:
     //! Construction.
-    make_tuple(
-        Input1_& i1_,
-        Input2_& i2_,
-        Input3_& i3_,
-        Input4_& i4_
-        ) :
-        i1(i1_), i2(i2_), i3(i3_), i4(i4_)
+    make_tuple(Input1_& i1_,
+               Input2_& i2_,
+               Input3_& i3_,
+               Input4_& i4_)
+        : i1(i1_), i2(i2_), i3(i3_), i4(i4_)
     {
         if (!empty())
             current = value_type(*i1, *i2, *i3, *i4);
@@ -1438,14 +1435,12 @@ private:
 
 public:
     //! Construction.
-    make_tuple(
-        Input1_& i1_,
-        Input2_& i2_,
-        Input3_& i3_,
-        Input4_& i4_,
-        Input5_& i5_
-        ) :
-        i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
+    make_tuple(Input1_& i1_,
+               Input2_& i2_,
+               Input3_& i3_,
+               Input4_& i4_,
+               Input5_& i5_)
+        : i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
     {
         if (!empty())
             current = value_type(*i1, *i2, *i3, *i4, *i5);

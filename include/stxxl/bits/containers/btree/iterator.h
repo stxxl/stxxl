@@ -185,8 +185,8 @@ public:
     btree_iterator() : btree_iterator_base<btree_type>()
     { }
 
-    btree_iterator(const btree_iterator& obj) :
-        btree_iterator_base<btree_type>(obj)
+    btree_iterator(const btree_iterator& obj)
+        : btree_iterator_base<btree_type>(obj)
     { }
 
     btree_iterator& operator = (const btree_iterator& obj)
@@ -273,12 +273,12 @@ public:
     btree_const_iterator() : btree_iterator_base<btree_type>()
     { }
 
-    btree_const_iterator(const btree_const_iterator& obj) :
-        btree_iterator_base<btree_type>(obj)
+    btree_const_iterator(const btree_const_iterator& obj)
+        : btree_iterator_base<btree_type>(obj)
     { }
 
-    btree_const_iterator(const iterator& obj) :
-        btree_iterator_base<btree_type>(obj)
+    btree_const_iterator(const iterator& obj)
+        : btree_iterator_base<btree_type>(obj)
     { }
 
     btree_const_iterator& operator = (const btree_const_iterator& obj)

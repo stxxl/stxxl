@@ -30,8 +30,8 @@ serving_request::serving_request(
     void* buf,
     offset_type off,
     size_type b,
-    request_type t) :
-    request_with_state(on_cmpl, f, buf, off, b, t)
+    request_type t)
+    : request_with_state(on_cmpl, f, buf, off, b, t)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,

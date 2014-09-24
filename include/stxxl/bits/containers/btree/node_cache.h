@@ -112,17 +112,17 @@ public:
     node_cache(unsigned_type cache_size_in_bytes,
                btree_type* btree__,
                key_compare comp__
-               ) :
-        btree_(btree__),
-        comp_(comp__),
-        bm(block_manager::get_instance()),
-        n_found(0),
-        n_not_found(0),
-        n_created(0),
-        n_deleted(0),
-        n_read(0),
-        n_written(0),
-        n_clean_forced(0)
+               )
+        : btree_(btree__),
+          comp_(comp__),
+          bm(block_manager::get_instance()),
+          n_found(0),
+          n_not_found(0),
+          n_created(0),
+          n_deleted(0),
+          n_read(0),
+          n_written(0),
+          n_clean_forced(0)
     {
         const unsigned_type nnodes = cache_size_in_bytes / block_type::raw_size;
         STXXL_VERBOSE1("btree::node_cache constructor nodes=" << nnodes);

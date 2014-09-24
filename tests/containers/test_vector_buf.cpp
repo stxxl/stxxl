@@ -57,8 +57,8 @@ class MyStream
 public:
     typedef ValueType value_type;
 
-    MyStream() :
-        i(0)
+    MyStream()
+        : i(0)
     { }
 
     value_type operator * () const

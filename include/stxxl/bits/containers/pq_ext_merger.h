@@ -46,8 +46,8 @@ private:
     origin_type m_origin;
 
 public:
-    short_sequence(Iterator first, Iterator last, origin_type origin) :
-        pair(first, last), m_origin(origin)
+    short_sequence(Iterator first, Iterator last, origin_type origin)
+        : pair(first, last), m_origin(origin)
     { }
 
     iterator begin()
@@ -287,15 +287,15 @@ protected:
     block_type* sentinel_block;
 
 public:
-    ext_merger() :
-        size_(0), log_k(0), k(1), pool(0)
+    ext_merger()
+        : size_(0), log_k(0), k(1), pool(0)
     {
         init();
     }
 
-    ext_merger(pool_type* pool_) :
-        size_(0), log_k(0), k(1),
-        pool(pool_)
+    ext_merger(pool_type* pool_)
+        : size_(0), log_k(0), k(1),
+          pool(pool_)
     {
         init();
     }

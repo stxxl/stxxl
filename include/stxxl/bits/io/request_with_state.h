@@ -41,9 +41,9 @@ protected:
         void* buf,
         offset_type off,
         size_type b,
-        request_type t) :
-        request_with_waiters(on_cmpl, f, buf, off, b, t),
-        m_state(OP)
+        request_type t)
+        : request_with_waiters(on_cmpl, f, buf, off, b, t),
+          m_state(OP)
     { }
 
 public:

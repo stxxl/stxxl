@@ -44,8 +44,8 @@ public:
 
         busy_entry() : block(NULL) { }
         busy_entry(const busy_entry& a) : block(a.block), req(a.req), bid(a.bid) { }
-        busy_entry(block_type*& bl, request_ptr& r, bid_type& bi) :
-            block(bl), req(r), bid(bi) { }
+        busy_entry(block_type*& bl, request_ptr& r, bid_type& bi)
+            : block(bl), req(r), bid(bi) { }
 
         operator request_ptr () { return req; }
     };

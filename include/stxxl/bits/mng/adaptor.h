@@ -311,8 +311,8 @@ struct two2one_dim_array_adapter_base
 //////////////////////////
 template <class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type = blocked_index<dim_size> >
-struct two2one_dim_array_row_adapter :
-    public two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>
+struct two2one_dim_array_row_adapter
+    : public two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>
 {
     typedef two2one_dim_array_row_adapter<one_dim_array_type,
                                           data_type, dim_size, pos_type> _Self;

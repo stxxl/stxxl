@@ -46,9 +46,9 @@ public:
     //! Constructs output stream object.
     //! \param first_bid \c bid_iterator pointing to the first block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_ostream(bid_iterator_type first_bid, int_type nbuffers) :
-        writer(nbuffers, nbuffers / 2), current_bid(first_bid),
-        current_elem(0)
+    buf_ostream(bid_iterator_type first_bid, int_type nbuffers)
+        : writer(nbuffers, nbuffers / 2), current_bid(first_bid),
+          current_elem(0)
     {
         current_blk = writer.get_free_block();
     }

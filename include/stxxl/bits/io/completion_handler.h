@@ -63,17 +63,17 @@ class completion_handler
     compat_unique_ptr<completion_handler_impl>::result sp_impl_;
 
 public:
-    completion_handler() :
-        sp_impl_(static_cast<completion_handler_impl*>(0))
+    completion_handler()
+        : sp_impl_(static_cast<completion_handler_impl*>(0))
     { }
 
-    completion_handler(const completion_handler& obj) :
-        sp_impl_(obj.sp_impl_.get()->clone())
+    completion_handler(const completion_handler& obj)
+        : sp_impl_(obj.sp_impl_.get()->clone())
     { }
 
     template <typename handler_type>
-    completion_handler(const handler_type& handler__) :
-        sp_impl_(new completion_handler1<handler_type>(handler__))
+    completion_handler(const handler_type& handler__)
+        : sp_impl_(new completion_handler1<handler_type>(handler__))
     { }
 
     completion_handler& operator = (const completion_handler& obj)

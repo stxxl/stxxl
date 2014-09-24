@@ -161,11 +161,11 @@ public:
     }
 
     normal_leaf(btree_type* btree__,
-                key_compare cmp) :
-        block_(new block_type),
-        btree_(btree__),
-        cmp_(cmp),
-        vcmp_(cmp)
+                key_compare cmp)
+        : block_(new block_type),
+          btree_(btree__),
+          cmp_(cmp),
+          vcmp_(cmp)
     {
         assert(min_nelements() >= 2);
         assert(2 * min_nelements() - 1 <= max_nelements());

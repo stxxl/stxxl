@@ -372,12 +372,12 @@ inline void priority_queue<ConfigType>::push(const value_type& obj)
 ////////////////////////////////////////////////////////////////
 
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(pool_type& pool_) :
-    pool(&pool_),
-    pool_owned(false),
-    delete_buffer_end(delete_buffer + delete_buffer_size),
-    insert_heap(N + 2),
-    num_active_groups(0), size_(0)
+priority_queue<ConfigType>::priority_queue(pool_type& pool_)
+    : pool(&pool_),
+      pool_owned(false),
+      delete_buffer_end(delete_buffer + delete_buffer_size),
+      insert_heap(N + 2),
+      num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE_PQ("priority_queue(pool)");
     init();
@@ -385,24 +385,24 @@ priority_queue<ConfigType>::priority_queue(pool_type& pool_) :
 
 // DEPRECATED
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type>& p_pool_, write_pool<block_type>& w_pool_) :
-    pool(new pool_type(p_pool_, w_pool_)),
-    pool_owned(true),
-    delete_buffer_end(delete_buffer + delete_buffer_size),
-    insert_heap(N + 2),
-    num_active_groups(0), size_(0)
+priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type>& p_pool_, write_pool<block_type>& w_pool_)
+    : pool(new pool_type(p_pool_, w_pool_)),
+      pool_owned(true),
+      delete_buffer_end(delete_buffer + delete_buffer_size),
+      insert_heap(N + 2),
+      num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE_PQ("priority_queue(p_pool, w_pool)");
     init();
 }
 
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) :
-    pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
-    pool_owned(true),
-    delete_buffer_end(delete_buffer + delete_buffer_size),
-    insert_heap(N + 2),
-    num_active_groups(0), size_(0)
+priority_queue<ConfigType>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem)
+    : pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
+      pool_owned(true),
+      delete_buffer_end(delete_buffer + delete_buffer_size),
+      insert_heap(N + 2),
+      num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE_PQ("priority_queue(pool sizes)");
     init();

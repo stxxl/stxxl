@@ -387,14 +387,14 @@ private:
 public:
     btree(unsigned_type node_cache_size_in_bytes,
           unsigned_type leaf_cache_size_in_bytes
-          ) :
-        node_cache_(node_cache_size_in_bytes, this, key_compare_),
-        leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
-        iterator_map_(this),
-        size_(0),
-        height_(2),
-        prefetching_enabled_(true),
-        bm_(block_manager::get_instance())
+          )
+        : node_cache_(node_cache_size_in_bytes, this, key_compare_),
+          leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
+          iterator_map_(this),
+          size_(0),
+          height_(2),
+          prefetching_enabled_(true),
+          bm_(block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
@@ -410,15 +410,15 @@ public:
     btree(const key_compare& c_,
           unsigned_type node_cache_size_in_bytes,
           unsigned_type leaf_cache_size_in_bytes
-          ) :
-        key_compare_(c_),
-        node_cache_(node_cache_size_in_bytes, this, key_compare_),
-        leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
-        iterator_map_(this),
-        size_(0),
-        height_(2),
-        prefetching_enabled_(true),
-        bm_(block_manager::get_instance())
+          )
+        : key_compare_(c_),
+          node_cache_(node_cache_size_in_bytes, this, key_compare_),
+          leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
+          iterator_map_(this),
+          size_(0),
+          height_(2),
+          prefetching_enabled_(true),
+          bm_(block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
@@ -921,15 +921,15 @@ public:
           bool range_sorted = false,
           double node_fill_factor = 0.75,
           double leaf_fill_factor = 0.6
-          ) :
-        key_compare_(c_),
-        node_cache_(node_cache_size_in_bytes, this, key_compare_),
-        leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
-        iterator_map_(this),
-        size_(0),
-        height_(2),
-        prefetching_enabled_(true),
-        bm_(block_manager::get_instance())
+          )
+        : key_compare_(c_),
+          node_cache_(node_cache_size_in_bytes, this, key_compare_),
+          leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
+          iterator_map_(this),
+          size_(0),
+          height_(2),
+          prefetching_enabled_(true),
+          bm_(block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
@@ -957,14 +957,14 @@ public:
           bool range_sorted = false,
           double node_fill_factor = 0.75,
           double leaf_fill_factor = 0.6
-          ) :
-        node_cache_(node_cache_size_in_bytes, this, key_compare_),
-        leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
-        iterator_map_(this),
-        size_(0),
-        height_(2),
-        prefetching_enabled_(true),
-        bm_(block_manager::get_instance())
+          )
+        : node_cache_(node_cache_size_in_bytes, this, key_compare_),
+          leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
+          iterator_map_(this),
+          size_(0),
+          height_(2),
+          prefetching_enabled_(true),
+          bm_(block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);

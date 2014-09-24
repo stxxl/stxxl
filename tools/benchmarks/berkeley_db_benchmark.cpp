@@ -525,8 +525,8 @@ class rand_key_gen
 public:
     typedef my_key value_type;
 
-    rand_key_gen(stxxl::int64 el, my_key& cur) :
-        counter(el), current(cur)
+    rand_key_gen(stxxl::int64 el, my_key& cur)
+        : counter(el), current(cur)
     {
         //const stxxl::int64  & i = counter;
         //current.keybuf[KEYPOS] = letters[VALUE];

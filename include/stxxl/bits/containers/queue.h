@@ -86,11 +86,11 @@ public:
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
     //!           memory consumption will be 2 * D + 2 blocks
     //!           (first and last block, D blocks as write cache, D block for prefetching)
-    explicit queue(int_type D = -1) :
-        m_size(0),
-        delete_pool(true),
-        alloc_count(0),
-        bm(block_manager::get_instance())
+    explicit queue(int_type D = -1)
+        : m_size(0),
+          delete_pool(true),
+          alloc_count(0),
+          bm(block_manager::get_instance())
     {
         if (D < 1)
             D = config::get_instance()->disks_number();
@@ -105,11 +105,11 @@ public:
     //! \param p_pool_size  number of blocks in the prefetch pool, recommended at least 1
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of block in the prefetch pool
-    explicit queue(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch_ = -1) :
-        m_size(0),
-        delete_pool(true),
-        alloc_count(0),
-        bm(block_manager::get_instance())
+    explicit queue(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch_ = -1)
+        : m_size(0),
+          delete_pool(true),
+          alloc_count(0),
+          bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
         pool = new pool_type(p_pool_size, w_pool_size);
@@ -125,11 +125,11 @@ public:
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
     STXXL_DEPRECATED(
-        queue(write_pool<block_type>& w_pool, prefetch_pool<block_type>& p_pool, int blocks2prefetch_ = -1)) :
-        m_size(0),
-        delete_pool(true),
-        alloc_count(0),
-        bm(block_manager::get_instance())
+        queue(write_pool<block_type>& w_pool, prefetch_pool<block_type>& p_pool, int blocks2prefetch_ = -1))
+        : m_size(0),
+          delete_pool(true),
+          alloc_count(0),
+          bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
         pool = new pool_type(p_pool, w_pool);
@@ -143,12 +143,12 @@ public:
     //!                          default is number of blocks in the prefetch pool
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    queue(pool_type& pool_, int blocks2prefetch_ = -1) :
-        m_size(0),
-        delete_pool(false),
-        pool(&pool_),
-        alloc_count(0),
-        bm(block_manager::get_instance())
+    queue(pool_type& pool_, int blocks2prefetch_ = -1)
+        : m_size(0),
+          delete_pool(false),
+          pool(&pool_),
+          alloc_count(0),
+          bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
         init(blocks2prefetch_);

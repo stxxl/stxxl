@@ -58,14 +58,15 @@ class simdisk_geometry : private noncopyable
 #endif
             int _first_sector,
             int _sectors,
-            double _rate) :
+            double _rate)
+            :
 #if 0
-            last_cyl(_last_cyl),
-            sect_per_track(_sect_per_track),
+              last_cyl(_last_cyl),
+              sect_per_track(_sect_per_track),
 #endif
-            first_sector(_first_sector),
-            sectors(_sectors),
-            sustained_data_rate(_rate)
+              first_sector(_first_sector),
+              sectors(_sectors),
+              sustained_data_rate(_rate)
         { }
     };
     struct ZoneCmp

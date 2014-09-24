@@ -70,9 +70,9 @@ public:
     //! \param write_buf_size number of write buffers to use
     //! \param write_batch_size number of blocks to accumulate in
     //!        order to flush write requests (bulk buffered writing)
-    buffered_writer(unsigned_type write_buf_size, unsigned_type write_batch_size) :
-        nwriteblocks((write_buf_size > 2) ? write_buf_size : 2),
-        writebatchsize(write_batch_size ? write_batch_size : 1)
+    buffered_writer(unsigned_type write_buf_size, unsigned_type write_batch_size)
+        : nwriteblocks((write_buf_size > 2) ? write_buf_size : 2),
+          writebatchsize(write_batch_size ? write_batch_size : 1)
     {
         write_buffers = new block_type[nwriteblocks];
         write_reqs = new request_ptr[nwriteblocks];

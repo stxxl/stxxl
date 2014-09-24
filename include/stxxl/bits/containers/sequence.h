@@ -122,11 +122,11 @@ public:
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
     //!           memory consumption will be 2 * D + 2 blocks
     //!           (first and last block, D blocks as write cache, D block for prefetching)
-    explicit sequence(int_type D = -1) :
-        m_size(0),
-        m_owns_pool(true),
-        m_alloc_count(0),
-        m_bm(block_manager::get_instance())
+    explicit sequence(int_type D = -1)
+        : m_size(0),
+          m_owns_pool(true),
+          m_alloc_count(0),
+          m_bm(block_manager::get_instance())
     {
         if (D < 1) D = config::get_instance()->disks_number();
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(D)");
@@ -140,11 +140,11 @@ public:
     //! \param p_pool_size  number of blocks in the prefetch pool, recommended at least 1
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of block in the prefetch pool
-    explicit sequence(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch = -1) :
-        m_size(0),
-        m_owns_pool(true),
-        m_alloc_count(0),
-        m_bm(block_manager::get_instance())
+    explicit sequence(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch = -1)
+        : m_size(0),
+          m_owns_pool(true),
+          m_alloc_count(0),
+          m_bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(sizes)");
         m_pool = new pool_type(p_pool_size, w_pool_size);
@@ -157,12 +157,12 @@ public:
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side), default is number of blocks in the prefetch pool
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    sequence(pool_type& pool, int blocks2prefetch = -1) :
-        m_size(0),
-        m_owns_pool(false),
-        m_pool(&pool),
-        m_alloc_count(0),
-        m_bm(block_manager::get_instance())
+    sequence(pool_type& pool, int blocks2prefetch = -1)
+        : m_size(0),
+          m_owns_pool(false),
+          m_pool(&pool),
+          m_alloc_count(0),
+          m_bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(pool)");
         init(blocks2prefetch);

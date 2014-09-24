@@ -525,14 +525,14 @@ public:
     //! Creates the object.
     //! \param cmp comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    runs_creator(CompareType_ cmp, unsigned_type memory_to_use) :
-        m_cmp(cmp),
-        m_memory_to_use(memory_to_use),
-        m_memsize(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
-        m_m2(m_memsize / 2),
-        m_el_in_run(m_m2 * block_type::size),
-        m_blocks1(NULL), m_blocks2(NULL),
-        m_write_reqs(NULL)
+    runs_creator(CompareType_ cmp, unsigned_type memory_to_use)
+        : m_cmp(cmp),
+          m_memory_to_use(memory_to_use),
+          m_memsize(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
+          m_m2(m_memsize / 2),
+          m_el_in_run(m_m2 * block_type::size),
+          m_blocks1(NULL), m_blocks2(NULL),
+          m_write_reqs(NULL)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
         if (!(2 * BlockSize_ * sort_memory_usage_factor() <= m_memory_to_use)) {
@@ -737,15 +737,15 @@ public:
     //! \param c comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes.
     //! Recommended value: 2 * block_size * D
-    runs_creator(CompareType_ c, unsigned_type memory_to_use) :
-        cmp(c),
-        result_(new sorted_runs_data_type),
-        m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
-        writer(m_, m_ / 2),
-        cur_block(writer.get_free_block()),
-        offset(0),
-        iblock(0),
-        irun(0)
+    runs_creator(CompareType_ c, unsigned_type memory_to_use)
+        : cmp(c),
+          result_(new sorted_runs_data_type),
+          m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
+          writer(m_, m_ / 2),
+          cur_block(writer.get_free_block()),
+          offset(0),
+          iblock(0),
+          irun(0)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         assert(m_ > 0);
@@ -1510,9 +1510,9 @@ public:
     //! \param in input stream
     //! \param c comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    sort(Input_& in, CompareType_ c, unsigned_type memory_to_use) :
-        creator(in, c, memory_to_use),
-        merger(creator.result(), c, memory_to_use)
+    sort(Input_& in, CompareType_ c, unsigned_type memory_to_use)
+        : creator(in, c, memory_to_use),
+          merger(creator.result(), c, memory_to_use)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(c);
     }
@@ -1522,9 +1522,9 @@ public:
     //! \param c comparator object
     //! \param m_memory_to_userc memory amount that is allowed to used by the runs creator in bytes
     //! \param m_memory_to_use memory amount that is allowed to used by the merger in bytes
-    sort(Input_& in, CompareType_ c, unsigned_type m_memory_to_userc, unsigned_type m_memory_to_use) :
-        creator(in, c, m_memory_to_userc),
-        merger(creator.result(), c, m_memory_to_use)
+    sort(Input_& in, CompareType_ c, unsigned_type m_memory_to_userc, unsigned_type m_memory_to_use)
+        : creator(in, c, m_memory_to_userc),
+          merger(creator.result(), c, m_memory_to_use)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(c);
     }
