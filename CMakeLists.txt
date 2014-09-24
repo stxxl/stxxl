@@ -41,11 +41,22 @@ set(STXXL_VERSION_PATCH "99")
 set(STXXL_VERSION_STRING "${STXXL_VERSION_MAJOR}.${STXXL_VERSION_MINOR}.${STXXL_VERSION_PATCH}")
 set(STXXL_VERSION_PHASE "prerelease/${CMAKE_BUILD_TYPE}")
 
-# read .git directory (if it exists) and find git sha
-include(GetGitRevisionDescription)
-get_git_head_revision(STXXL_VERSION_GIT_REFSPEC STXXL_VERSION_GIT_SHA1)
-if(STXXL_VERSION_GIT_REFSPEC)
-  message(STATUS "Detected git refspec ${STXXL_VERSION_GIT_REFSPEC} sha ${STXXL_VERSION_GIT_SHA1}")
+# read git directory (if it exists) and find git sha
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+  find_package(Git)
+  if(GIT_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe HEAD
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+      OUTPUT_VARIABLE "STXXL_VERSION_GIT_REFSPEC"
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+      OUTPUT_VARIABLE "STXXL_VERSION_GIT_SHA1"
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Detected git refspec ${STXXL_VERSION_GIT_REFSPEC} sha ${STXXL_VERSION_GIT_SHA1}")
+  endif()
 endif()
 
 ###############################################################################
