@@ -64,7 +64,7 @@ struct write_time_cmp : public std::binary_function<write_time_pair, write_time_
 static inline int_type get_disk(int_type i, const int_type* disks, int_type D)
 {
     int_type disk = disks[i];
-    if (disk == file::DEFAULT_DEVICE_ID)
+    if (disk == (int_type)file::DEFAULT_DEVICE_ID)
         disk = D;      // remap to sentinel
     assert(0 <= disk && disk <= D);
     return disk;

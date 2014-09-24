@@ -71,7 +71,7 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                     " type=" << "READ" <<
                     " rc=" << rc);
             }
-            bytes -= rc;
+            bytes = (size_type)(bytes - rc);
             offset += rc;
             cbuffer += rc;
 
@@ -104,7 +104,7 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                     " type=" << "WRITE" <<
                     " rc=" << rc);
             }
-            bytes -= rc;
+            bytes = (size_type)(bytes - rc);
             offset += rc;
             cbuffer += rc;
         }

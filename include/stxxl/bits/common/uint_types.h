@@ -64,7 +64,7 @@ private:
     high_type high;
 
     //! return highest value storable in lower part, also used as a mask.
-    static low_type low_max()
+    static unsigned_type low_max()
     {
         return std::numeric_limits<low_type>::max();
     }
@@ -73,7 +73,7 @@ private:
     static const int low_bits = 8 * sizeof(low_type);
 
     //! return highest value storable in higher part, also used as a mask.
-    static high_type high_max()
+    static unsigned_type high_max()
     {
         return std::numeric_limits<high_type>::max();
     }
@@ -122,13 +122,13 @@ public:
         if (a >= 0)
             low = a;
         else
-            low = a, high = high_max();
+            low = a, high = (high_type)high_max();
     }
 
     //! construct from an uint64 (unsigned long long)
     inline uint_pair(const uint64& a)
         : low((low_type)(a & low_max())),
-          high((high_type)(a >> low_bits) & high_max())
+          high((high_type)((a >> low_bits) & high_max()))
     {
         // check for overflow
         assert((a >> (low_bits + high_bits)) == 0);
@@ -166,7 +166,7 @@ public:
     inline uint_pair& operator -- ()
     {
         if (UNLIKELY(low == 0))
-            --high, low = low_max();
+            --high, low = (low_type)low_max();
         else
             --low;
         return *this;

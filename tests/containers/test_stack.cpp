@@ -41,9 +41,9 @@ void test_lvalue_correctness(stack_type& stack, int a, int b)
         stack.push(i);
     for (i = 0; i < b; ++i)
         stack.pop();
-    if ((stack.top() != int(0xbeeff00d))) {
+    if ((stack.top() != (size_t)(0xbeeff00d))) {
         STXXL_ERRMSG("STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)");
-        STXXL_CHECK(stack.top() == int(0xbeeff00d));
+        STXXL_CHECK(stack.top() == (size_t)(0xbeeff00d));
     }
     for (i = 0; i < a; ++i)
         stack.pop();
@@ -93,7 +93,7 @@ void simple_test(stack_type& my_stack, size_t test_size)
     {
         int_stack.push(i);
         STXXL_CHECK(int_stack.top() == i);
-        STXXL_CHECK(int(int_stack.size()) == i + 1);
+        STXXL_CHECK(int_stack.size() == i + 1);
     }
 
     stack_type my_stack1(int_stack);
