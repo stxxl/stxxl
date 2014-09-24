@@ -64,6 +64,8 @@ public:
     typedef typename sorted_runs_data_type::run_type run_type;
     typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
 
+    typedef typename element_iterator_traits<block_type, external_size_type>::element_iterator element_iterator;
+
 protected:
     Input_& m_input;                    //! reference to the input stream
     CompareType_ m_cmp;                 //! comparator used to sort block groups
@@ -76,8 +78,7 @@ private:
     //! Fetch data from input into blocks[first_idx,last_idx).
     unsigned_type fetch(block_type* blocks, unsigned_type first_idx, unsigned_type last_idx)
     {
-        typename element_iterator_traits<block_type>::element_iterator output =
-            make_element_iterator(blocks, first_idx);
+        element_iterator output = make_element_iterator(blocks, first_idx);
         unsigned_type curr_idx = first_idx;
         while (!m_input.empty() && curr_idx != last_idx) {
             *output = *m_input;
@@ -93,8 +94,7 @@ private:
     {
         unsigned_type last_idx = num_blocks * block_type::size;
         if (first_idx < last_idx) {
-            typename element_iterator_traits<block_type>::element_iterator curr =
-                make_element_iterator(blocks, first_idx);
+            element_iterator curr = make_element_iterator(blocks, first_idx);
             while (first_idx != last_idx) {
                 *curr = m_cmp.max_value();
                 ++curr;
@@ -412,6 +412,8 @@ public:
     typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
     typedef sorted_runs_type result_type;
 
+    typedef typename element_iterator_traits<block_type, external_size_type>::element_iterator element_iterator;
+
 private:
     //! comparator object to sort runs
     CompareType_ m_cmp;
@@ -437,7 +439,7 @@ private:
     const unsigned_type m_el_in_run;
 
     //! current number of elements in the run m_blocks1
-    unsigned_type m_cur_el;
+    internal_size_type m_cur_el;
 
     //! accumulation buffer of size m_m2 blocks, half the available memory size
     block_type* m_blocks1;
@@ -457,8 +459,7 @@ protected:
     {
         unsigned_type last_idx = num_blocks * block_type::size;
         if (first_idx < last_idx) {
-            typename element_iterator_traits<block_type>::element_iterator curr =
-                make_element_iterator(blocks, first_idx);
+            element_iterator curr = make_element_iterator(blocks, first_idx);
             while (first_idx != last_idx) {
                 *curr = m_cmp.max_value();
                 ++curr;
@@ -653,7 +654,7 @@ public:
     }
 
     //! number of items currently inserted.
-    unsigned_type size() const
+    external_size_type size() const
     {
         return m_result->elements + m_cur_el;
     }
@@ -874,9 +875,10 @@ bool check_sorted_runs(const RunsType_& sruns, CompareType_ cmp)
                 return false;
             }
         }
-        if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
-                              make_element_iterator(blocks, sruns->runs_sizes[irun]),
-                              cmp))
+        if (!stxxl::is_sorted(
+                make_element_iterator(blocks, 0),
+                make_element_iterator(blocks, sruns->runs_sizes[irun]),
+                cmp))
         {
             STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
             delete[] blocks;
@@ -1358,7 +1360,7 @@ void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
                 new_runs.runs_sizes[cur_out_run] = elements_in_new_run;
 
                 // calculate blocks in run
-                const unsigned_type blocks_in_new_run = div_ceil(elements_in_new_run, block_type::size);
+                const unsigned_type blocks_in_new_run = (unsigned_type)div_ceil(elements_in_new_run, block_type::size);
 
                 // allocate blocks for the new runs
                 new_runs.runs[cur_out_run].resize(blocks_in_new_run);
@@ -1398,7 +1400,7 @@ void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
                     {
                         *out = *merger;
                         if ((cnt % block_type::size) == 0)     // have to write the trigger value
-                            new_runs.runs[cur_out_run][cnt / size_type(block_type::size)].value = *merger;
+                            new_runs.runs[cur_out_run][(unsigned_type)(cnt / size_type(block_type::size))].value = *merger;
 
                         ++cnt, ++out, ++merger;
                     }

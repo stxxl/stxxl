@@ -37,12 +37,13 @@ namespace priority_queue_local {
 // require: at least length nonsentinel elements available in source0, source1
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-template <class InputIterator, class OutputIterator, class CompareType>
+template <class InputIterator, class OutputIterator,
+          class CompareType, typename SizeType>
 void merge_iterator(
     InputIterator& source0,
     InputIterator& source1,
     OutputIterator target,
-    unsigned_type length,
+    SizeType length,
     CompareType& cmp)
 {
     OutputIterator done = target + length;
@@ -69,13 +70,14 @@ void merge_iterator(
 // require: at least length nonsentinel elements available in source0, source1 and source2
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-template <class InputIterator, class OutputIterator, class CompareType>
+template <class InputIterator, class OutputIterator,
+          class CompareType, typename SizeType>
 void merge3_iterator(
     InputIterator& source0,
     InputIterator& source1,
     InputIterator& source2,
     OutputIterator target,
-    unsigned_type length,
+    SizeType length,
     CompareType& cmp)
 {
     OutputIterator done = target + length;
@@ -136,18 +138,21 @@ void merge3_iterator(
 // require: at least length nonsentinel elements available in source0, source1, source2 and source3
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-template <class InputIterator, class OutputIterator, class CompareType>
+template <class InputIterator, class OutputIterator,
+          class CompareType, typename SizeType>
 void merge4_iterator(
     InputIterator& source0,
     InputIterator& source1,
     InputIterator& source2,
     InputIterator& source3,
-    OutputIterator target, unsigned_type length, CompareType& cmp)
+    OutputIterator target, SizeType length, CompareType& cmp)
 {
     OutputIterator done = target + length;
 
-#define StartMerge4(a, b, c, d)                                                                                         \
-    if ((!cmp(*source ## a, *source ## b)) && (!cmp(*source ## b, *source ## c)) && (!cmp(*source ## c, *source ## d))) \
+#define StartMerge4(a, b, c, d)               \
+    if ((!cmp(*source ## a, *source ## b)) && \
+        (!cmp(*source ## b, *source ## c)) && \
+        (!cmp(*source ## c, *source ## d)))   \
         goto s ## a ## b ## c ## d;
 
     // b>a c>b d>c

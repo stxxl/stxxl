@@ -38,7 +38,7 @@ int do_mlock(int argc, char* argv[])
                        );
     cp.set_author("Andreas Beckmann <beckmann@cs.uni-frankfurt.de>");
 
-    stxxl::uint64 M;
+    stxxl::unsigned_type M;
     cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 4GiB)", M);
 
     if (!cp.process(argc, argv))

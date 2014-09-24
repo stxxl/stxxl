@@ -166,7 +166,7 @@ private:
     void init();
 
     void refill_delete_buffer();
-    unsigned_type refill_group_buffer(unsigned_type k);
+    size_type refill_group_buffer(unsigned_type k);
 
     unsigned_type make_space_available(unsigned_type level);
     void empty_insert_heap();
@@ -446,12 +446,13 @@ priority_queue<ConfigType>::~priority_queue()
 
 // refill group_buffers[j] and return number of elements found
 template <class ConfigType>
-unsigned_type priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
+typename priority_queue<ConfigType>::size_type
+priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
 {
     STXXL_VERBOSE_PQ("refill_group_buffer(" << group << ")");
 
     value_type* target;
-    unsigned_type length;
+    size_type length;
     size_type group_size = (group < num_int_groups) ?
                            int_mergers[group].size() :
                            ext_mergers[group - num_int_groups]->size();                        // elements left in segments
@@ -475,7 +476,8 @@ unsigned_type priority_queue<ConfigType>::refill_group_buffer(unsigned_type grou
 
         // fill remaining space from group
         if (group < num_int_groups)
-            int_mergers[group].multi_merge(target + left_elements, length);
+            int_mergers[group].multi_merge(target + left_elements,
+                                           (unsigned_type)length);
         else
             ext_mergers[group - num_int_groups]->multi_merge(
                 target + left_elements,
@@ -510,11 +512,12 @@ void priority_queue<ConfigType>::refill_delete_buffer()
 
     size_type total_group_size = 0;
     //num_active_groups is <= 4
-    for (int i = (int)num_active_groups - 1; i >= 0; i--)
+    for (unsigned_type i = num_active_groups; i > 0; )
     {
+        --i;
         if ((group_buffers[i] + N) - group_buffer_current_mins[i] < delete_buffer_size)
         {
-            unsigned_type length = refill_group_buffer(i);
+            size_type length = refill_group_buffer(i);
             // max active level dry now?
             if (length == 0 && unsigned(i) == num_active_groups - 1)
                 --num_active_groups;
@@ -525,7 +528,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
             total_group_size += delete_buffer_size;  // actually only a sufficient lower bound
     }
 
-    unsigned_type length;
+    size_type length;
     if (total_group_size >= delete_buffer_size)      // buffer can be filled completely
     {
         length = delete_buffer_size;                 // amount to be copied
@@ -534,7 +537,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
     else
     {
         length = total_group_size;
-        assert(size_ == size_type(length)); // trees and group_buffers get empty
+        assert(size_ == length); // trees and group_buffers get empty
         size_ = 0;
     }
 

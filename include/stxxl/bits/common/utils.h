@@ -227,7 +227,7 @@ div_ceil(Integral n, Integral2 d)
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline uint64 longhash1(uint64 key_)
+inline size_t longhash1(uint64 key_)
 {
     key_ += ~(key_ << 32);
     key_ ^= (key_ >> 22);
@@ -237,7 +237,7 @@ inline uint64 longhash1(uint64 key_)
     key_ ^= (key_ >> 15);
     key_ += ~(key_ << 27);
     key_ ^= (key_ >> 31);
-    return key_;
+    return (size_t)key_;
 }
 
 ////////////////////////////////////////////////////////////////////////////

@@ -91,14 +91,14 @@ public:
     //! \{
 
     //! Default constructor: creates empty stack.
-    normal_stack() :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        front_page(cache.begin() + blocks_per_page),
-        back_page(cache.begin()),
-        bids(0)
+    normal_stack()
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          front_page(cache.begin() + blocks_per_page),
+          back_page(cache.begin()),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
     }
@@ -126,31 +126,30 @@ public:
     //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
-    template <class stack_type>
-    normal_stack(const stack_type& stack_) :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        front_page(cache.begin() + blocks_per_page),
-        back_page(cache.begin()),
-        bids(0)
+    template <class StackType>
+    normal_stack(const StackType& stack_)
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          front_page(cache.begin() + blocks_per_page),
+          back_page(cache.begin()),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
 
-        stack_type stack_copy = stack_;
-        const size_type sz = stack_copy.size();
-        size_type i;
+        StackType stack_copy = stack_;
+        size_t sz = stack_copy.size();
 
         std::vector<value_type> tmp(sz);
 
-        for (i = 0; i < sz; ++i)
-        {
+        for (size_t i = 0; i < sz; ++i) {
             tmp[sz - i - 1] = stack_copy.top();
             stack_copy.pop();
         }
-        for (i = 0; i < sz; ++i)
-            this->push(tmp[i]);
+
+        for (size_t i = 0; i < sz; ++i)
+            push(tmp[i]);
     }
 
     virtual ~normal_stack()
@@ -334,15 +333,15 @@ public:
     //! \{
 
     //! Default constructor: creates empty stack.
-    grow_shrink_stack() :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        cache_buffers(cache.begin()),
-        overlap_buffers(cache.begin() + blocks_per_page),
-        requests(blocks_per_page),
-        bids(0)
+    grow_shrink_stack()
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          cache_buffers(cache.begin()),
+          overlap_buffers(cache.begin() + blocks_per_page),
+          requests(blocks_per_page),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
     }
@@ -373,32 +372,32 @@ public:
     //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
-    template <class stack_type>
-    grow_shrink_stack(const stack_type& stack_) :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        cache_buffers(cache.begin()),
-        overlap_buffers(cache.begin() + blocks_per_page),
-        requests(blocks_per_page),
-        bids(0)
+    template <class StackType>
+    grow_shrink_stack(const StackType& stack_)
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          cache_buffers(cache.begin()),
+          overlap_buffers(cache.begin() + blocks_per_page),
+          requests(blocks_per_page),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
 
-        stack_type stack_copy = stack_;
-        const size_type sz = stack_copy.size();
-        size_type i;
+        StackType stack_copy = stack_;
+        size_t sz = stack_copy.size();
 
         std::vector<value_type> tmp(sz);
 
-        for (i = 0; i < sz; ++i)
+        for (size_t i = 0; i < sz; ++i)
         {
             tmp[sz - i - 1] = stack_copy.top();
             stack_copy.pop();
         }
-        for (i = 0; i < sz; ++i)
-            this->push(tmp[i]);
+
+        for (size_t i = 0; i < sz; ++i)
+            push(tmp[i]);
     }
     virtual ~grow_shrink_stack()
     {
@@ -576,9 +575,8 @@ public:
     //! read_write_pool for prefetching and buffered writing.
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
-    grow_shrink_stack2(
-        pool_type& pool_,
-        unsigned_type prefetch_aggressiveness = 0)
+    grow_shrink_stack2(pool_type& pool_,
+                       unsigned_type prefetch_aggressiveness = 0)
         : m_size(0),
           cache_offset(0),
           cache(new block_type),
@@ -598,10 +596,9 @@ public:
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     STXXL_DEPRECATED(
-        grow_shrink_stack2(
-            prefetch_pool<block_type>& p_pool_,
-            write_pool<block_type>& w_pool_,
-            unsigned_type prefetch_aggressiveness = 0)
+        grow_shrink_stack2(prefetch_pool<block_type>& p_pool_,
+                           write_pool<block_type>& w_pool_,
+                           unsigned_type prefetch_aggressiveness = 0)
         ) :
         m_size(0),
         cache_offset(0),
@@ -839,8 +836,8 @@ private:
 
     //! Copy-construction from a another stack of any type.
     //! \warning not implemented yet!
-    template <class stack_type>
-    migrating_stack(const stack_type& stack_);
+    template <class StackType>
+    migrating_stack(const StackType& stack_);
 
 public:
     //! \name Constructors/Destructors

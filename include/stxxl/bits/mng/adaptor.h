@@ -575,37 +575,41 @@ public:
 
 namespace helper {
 
-template <typename BlockType, bool can_use_trivial_pointer>
+template <typename BlockType, typename SizeType, bool can_use_trivial_pointer>
 class element_iterator_generator
 { };
 
 // default case for blocks with fillers or other data: use array_of_sequences_iterator
-template <typename BlockType>
-class element_iterator_generator<BlockType, false>
+template <typename BlockType, typename SizeType>
+class element_iterator_generator<BlockType, SizeType, false>
 {
     typedef BlockType block_type;
     typedef typename block_type::value_type value_type;
 
+    typedef SizeType size_type;
+
 public:
     typedef array_of_sequences_iterator<block_type, value_type, block_type::size> iterator;
 
-    iterator operator () (block_type* blocks, unsigned_type offset) const
+    iterator operator () (block_type* blocks, SizeType offset) const
     {
         return iterator(blocks, offset);
     }
 };
 
 // special case for completely filled blocks: use trivial pointers
-template <typename BlockType>
-class element_iterator_generator<BlockType, true>
+template <typename BlockType, typename SizeType>
+class element_iterator_generator<BlockType, SizeType, true>
 {
     typedef BlockType block_type;
     typedef typename block_type::value_type value_type;
 
+    typedef SizeType size_type;
+
 public:
     typedef value_type* iterator;
 
-    iterator operator () (block_type* blocks, unsigned_type offset) const
+    iterator operator () (block_type* blocks, SizeType offset) const
     {
         return blocks[0].elem + offset;
     }
@@ -613,18 +617,22 @@ public:
 
 } // namespace helper
 
-template <typename BlockType>
+template <typename BlockType, typename SizeType>
 struct element_iterator_traits
 {
-    typedef typename helper::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator element_iterator;
+    typedef typename helper::element_iterator_generator<
+            BlockType, SizeType, BlockType::has_only_data
+            >::iterator element_iterator;
 };
 
-template <typename BlockType>
+template <typename BlockType, typename SizeType>
 inline
-typename element_iterator_traits<BlockType>::element_iterator
-make_element_iterator(BlockType* blocks, unsigned_type offset)
+typename element_iterator_traits<BlockType, SizeType>::element_iterator
+make_element_iterator(BlockType* blocks, SizeType offset)
 {
-    helper::element_iterator_generator<BlockType, BlockType::has_only_data> iter_gen;
+    helper::element_iterator_generator<
+        BlockType, SizeType, BlockType::has_only_data
+        > iter_gen;
     return iter_gen(blocks, offset);
 }
 

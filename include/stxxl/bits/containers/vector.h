@@ -1120,7 +1120,7 @@ private:
     void _resize_shrink_capacity(size_type n)
     {
         unsigned_type old_bids_size = m_bids.size();
-        unsigned_type new_bids_size = div_ceil(n, block_type::size);
+        unsigned_type new_bids_size = (unsigned_type)div_ceil(n, block_type::size);
 
         if (new_bids_size > old_bids_size)
         {
@@ -1703,7 +1703,9 @@ private:
 
     void block_externally_updated(size_type offset) const
     {
-        page_externally_updated(offset / (block_type::size * page_size));
+        page_externally_updated(
+            (unsigned_type)(offset / (block_type::size * page_size))
+            );
     }
 
     void block_externally_updated(const blocked_index_type& offset) const
@@ -1929,6 +1931,9 @@ public:
     //! construct an iterator for vector_bufreader (for C++11 range-based for loop)
     typedef vector_bufreader_iterator<vector_bufreader> bufreader_iterator;
 
+    //! size of remaining data
+    typedef typename vector_type::size_type size_type;
+
 protected:
     //! iterator to the beginning of the range.
     vector_iterator m_begin;
@@ -1953,7 +1958,8 @@ public:
     //! \param begin iterator to position were to start reading in vector
     //! \param end iterator to position were to end reading in vector
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader(vector_iterator begin, vector_iterator end, unsigned_type nbuffers = 0)
+    vector_bufreader(vector_iterator begin, vector_iterator end,
+                     unsigned_type nbuffers = 0)
         : m_begin(begin), m_end(end),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -2047,10 +2053,10 @@ public:
     }
 
     //! Return remaining size.
-    size_t size() const
+    size_type size() const
     {
         assert(m_begin <= m_iter && m_iter <= m_end);
-        return (m_end - m_iter);
+        return (size_type)(m_end - m_iter);
     }
 
     //! Returns true once the whole range has been read.
@@ -2193,6 +2199,9 @@ public:
     //! construct output buffered stream used for overlapped reading
     typedef buf_istream_reverse<block_type, bids_container_iterator> buf_istream_type;
 
+    //! size of remaining data
+    typedef typename vector_type::size_type size_type;
+
 protected:
     //! iterator to the beginning of the range.
     vector_iterator m_begin;
@@ -2214,7 +2223,8 @@ public:
     //! \param begin iterator to position were to start reading in vector
     //! \param end iterator to position were to end reading in vector
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader_reverse(vector_iterator begin, vector_iterator end, unsigned_type nbuffers = 0)
+    vector_bufreader_reverse(vector_iterator begin, vector_iterator end,
+                             unsigned_type nbuffers = 0)
         : m_begin(begin), m_end(end),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -2314,10 +2324,10 @@ public:
     }
 
     //! Return remaining size.
-    size_t size() const
+    size_type size() const
     {
         assert(m_begin <= m_iter && m_iter <= m_end);
-        return (m_iter - m_begin);
+        return (size_type)(m_iter - m_begin);
     }
 
     //! Returns true once the whole range has been read.

@@ -116,7 +116,11 @@ int main()
         merger.multi_merge(output.begin(), output.begin());
 
         while (merger.size() > 0) {
-            stxxl::uint64 l = std::min<stxxl::uint64>(merger.size(), output.size());
+            stxxl::unsigned_type l =
+                std::min<stxxl::unsigned_type>(
+                    (stxxl::unsigned_type)merger.size(), output.size()
+                    );
+
             merger.multi_merge(output.begin(), output.begin() + l);
             STXXL_CHECK(stxxl::is_sorted(output.begin(), output.begin() + l));
             STXXL_MSG("merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")");

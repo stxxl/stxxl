@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     it = BTree1.find(1000);
     STXXL_CHECK(it == BTree1.end());
 
-    stxxl::unsigned_type f = BTree1.erase(5);
+    btree_type::size_type f = BTree1.erase(5);
     STXXL_CHECK(f == 1);
     f = BTree1.erase(6);
     STXXL_CHECK(f == 0);

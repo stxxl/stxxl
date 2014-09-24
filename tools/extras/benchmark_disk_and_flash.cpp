@@ -64,12 +64,12 @@ void run(char* buffer, file** disks, stxxl::int64 offset, stxxl::int64 length,
         for (i = 0; i < 2; i++)
         {
             for (j = 0; j < info[i].n; j++) {
-                stxxl::int64 bytes = info[i].bytes;
+                unsigned bytes = info[i].bytes;
                 stxxl::int64 position = (bytes * (rand() & 0xffff)) % length;
                 reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes,
                                                      stxxl::default_completion_handler());
                 buf += bytes;
-                volume += bytes;
+                volume += (double)bytes;
             }
         }
 
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
     }
 
     const size_t ndisks = disks_arr.size();
-    stxxl::int64 buffer_size = 1024 * MB;
+    stxxl::unsigned_type buffer_size = 1024 * MB;
     const stxxl::int64 buffer_size_int = buffer_size / sizeof(int);
 
     unsigned i;

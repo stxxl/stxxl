@@ -83,6 +83,9 @@ public:
     typedef stream::runs_merger<typename runs_creator_type::sorted_runs_type,
                                 cmp_type, alloc_strategy_type> runs_merger_type;
 
+    //! size type
+    typedef typename runs_merger_type::size_type size_type;
+
 protected:
     // *** Object Attributes
 
@@ -228,7 +231,7 @@ public:
     //! \{
 
     //! Number of items pushed or items remaining to be read.
-    unsigned_type size() const
+    size_type size() const
     {
         if (m_state == STATE_INPUT)
             return m_runs_creator.size();

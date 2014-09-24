@@ -25,7 +25,9 @@ int main()
 
     for (size_t i = 0; i < config->disks_number(); ++i)
         totalsize += config->disk_size(i);
-    stxxl::unsigned_type totalblocks = totalsize / block_type::raw_size;
+
+    stxxl::unsigned_type totalblocks =
+        (stxxl::unsigned_type)(totalsize / block_type::raw_size);
 
     STXXL_MSG("external memory: " << totalsize << " bytes  ==  " << totalblocks << " blocks");
 

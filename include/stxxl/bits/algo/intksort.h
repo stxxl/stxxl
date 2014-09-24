@@ -23,8 +23,8 @@ STXXL_BEGIN_NAMESPACE
 
 template <typename type_key>
 static void
-count(type_key* a, type_key* aEnd, int_type* bucket, int_type K, typename type_key::key_type offset,
-      unsigned shift)
+count(type_key* a, type_key* aEnd, int_type* bucket, int_type K,
+      typename type_key::key_type offset, unsigned shift)
 {
     // reset buckets
     std::fill(bucket, bucket + K, 0);
@@ -32,7 +32,7 @@ count(type_key* a, type_key* aEnd, int_type* bucket, int_type K, typename type_k
     // count occupancies
     for (type_key* p = a; p < aEnd; p++)
     {
-        int_type i = (p->key - offset) >> shift;
+        int_type i = (int_type)((p->key - offset) >> shift);
         /*
         if (!(i < K && i >= 0))
         {
@@ -63,7 +63,7 @@ classify(type_key* a, type_key* aEnd, type_key* b, int_type* bucket, typename ty
 {
     for (type_key* p = a; p < aEnd; p++)
     {
-        int_type i = (p->key - offset) >> shift;
+        int_type i = (int_type)((p->key - offset) >> shift);
         int_type bi = bucket[i];
         b[bi] = *p;
         bucket[i] = bi + 1;
@@ -332,7 +332,7 @@ void classify_block(type* begin, type* end, type_key*& out,
     {
         out->ptr = p;
         typename key_extractor::key_type key = keyobj(*p);
-        int_type ibucket = (key - offset) >> shift;
+        int_type ibucket = (int_type)((key - offset) >> shift);
         out->key = key;
         bucket[ibucket]++;
     }

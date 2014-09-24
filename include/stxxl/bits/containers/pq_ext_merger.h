@@ -561,20 +561,22 @@ public:
     template <class OutputIterator>
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
-        size_type length = end - begin;
+        ssize_t length = end - begin;
 
-        STXXL_VERBOSE1("ext_merger::multi_merge from " << k << " sequence(s), length = " << length);
+        STXXL_VERBOSE1("ext_merger::multi_merge from " << k << " sequence(s),"
+                       " length = " << length);
 
         if (length == 0)
             return;
 
         assert(k > 0);
-        assert(length <= size_);
+        assert(length <= (ssize_t)size_);
 
         //This is the place to make statistics about external multi_merge calls.
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         typedef stxxl::int64 diff_type;
+
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
 
         std::vector<sequence> seqs;
@@ -765,7 +767,7 @@ public:
             assert(free_segments.empty());
             //memcpy(target, states[0], length * sizeof(value_type));
             //std::copy(states[0],states[0]+length,target);
-            for (size_type i = 0; i < length; ++i, ++(states[0]), ++begin)
+            for (ssize_t i = 0; i < length; ++i, ++(states[0]), ++begin)
                 *begin = *(states[0]);
 
             entry[0].key = **states;
@@ -983,7 +985,7 @@ public:
 
             // link new segment
             assert(segment_size);
-            unsigned_type nblocks = segment_size / block_type::size;
+            unsigned_type nblocks = (unsigned_type)(segment_size / block_type::size);
             //assert(nblocks); // at least one block
             STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks);
             if (nblocks == 0)
@@ -992,7 +994,7 @@ public:
                                nblocks << " blocks");
                 STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
             }
-            unsigned_type first_size = segment_size % block_type::size;
+            unsigned_type first_size = (unsigned_type)(segment_size % block_type::size);
             if (first_size == 0)
             {
                 first_size = block_type::size;

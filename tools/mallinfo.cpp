@@ -51,7 +51,7 @@ int do_mallinfo(int argc, char* argv[])
                        "Needs to run as root to block more than 64 KiB in default settings."
                        );
 
-    stxxl::uint64 M;
+    stxxl::internal_size_type M;
     cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 1GiB)", M);
 
     if (!cp.process(argc, argv))

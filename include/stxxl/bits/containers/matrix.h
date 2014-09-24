@@ -1076,18 +1076,28 @@ public:
     //! \param bs block scheduler used
     //! \param height height of the created matrix
     //! \param width width of the created matrix
-    matrix(block_scheduler_type& bs, const elem_size_type height, const elem_size_type width)
+    matrix(block_scheduler_type& bs,
+           const elem_size_type height, const elem_size_type width)
         : height(height),
           width(width),
-          data(new swappable_block_matrix_type
-                   (bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength)))
+          data(
+              new swappable_block_matrix_type(
+                  bs,
+                  div_ceil(height, BlockSideLength),
+                  div_ceil(width, BlockSideLength))
+              )
     { }
 
-    matrix(block_scheduler_type& bs, const column_vector_type& left, const row_vector_type& right)
-        : height(left.size()),
-          width(right.size()),
-          data(new swappable_block_matrix_type
-                   (bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength)))
+    matrix(block_scheduler_type& bs,
+           const column_vector_type& left, const row_vector_type& right)
+        : height((elem_size_type)left.size()),
+          width((elem_size_type)right.size()),
+          data(
+              new swappable_block_matrix_type(
+                  bs,
+                  div_ceil(height, BlockSideLength),
+                  div_ceil(width, BlockSideLength))
+              )
     { Ops::recursive_matrix_from_vectors(*data, left, right); }
 
     ~matrix() { }

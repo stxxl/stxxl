@@ -213,11 +213,14 @@ int benchmark_sort(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    BenchmarkSort<pair32_type, stxxl::random_number32>("pair of uint32", length, memsize);
+    BenchmarkSort<pair32_type, stxxl::random_number32>
+        ("pair of uint32", length, (unsigned_type)memsize);
 
-    BenchmarkSort<pair64_type, stxxl::random_number32>("pair of uint64", length, memsize);
+    BenchmarkSort<pair64_type, stxxl::random_number32>
+        ("pair of uint64", length, (unsigned_type)memsize);
 
-    BenchmarkSort<struct64_type, stxxl::random_number32>("struct of 64 bytes", length, memsize);
+    BenchmarkSort<struct64_type, stxxl::random_number32>
+        ("struct of 64 bytes", length, (unsigned_type)memsize);
 
     return 0;
 }

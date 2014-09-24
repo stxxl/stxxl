@@ -22,6 +22,7 @@ using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timer;
 using stxxl::uint64;
+using stxxl::unsigned_type;
 
 #ifndef BLOCK_ALIGN
  #define BLOCK_ALIGN  4096
@@ -46,7 +47,7 @@ inline double throughput(stxxl::uint64 bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
-    return bytes / (1024 * 1024) / seconds;
+    return (double)bytes / (1024 * 1024) / seconds;
 }
 
 int main(int argc, char* argv[])
@@ -54,12 +55,12 @@ int main(int argc, char* argv[])
     if (argc < 5)
         usage(argv[0]);
 
-    uint64 num_blocks = stxxl::atouint64(argv[1]);
-    uint64 blocks_per_round = stxxl::atouint64(argv[2]);
-    uint64 block_size = stxxl::atouint64(argv[3]);
+    unsigned_type num_blocks = (unsigned_type)stxxl::atouint64(argv[1]);
+    unsigned_type blocks_per_round = (unsigned_type)stxxl::atouint64(argv[2]);
+    unsigned_type block_size = (unsigned_type)stxxl::atouint64(argv[3]);
     const char* filebase = argv[4];
 
-    uint64 num_rounds = stxxl::div_ceil(num_blocks, blocks_per_round);
+    unsigned_type num_rounds = stxxl::div_ceil(num_blocks, blocks_per_round);
 
     std::cout << "# Splitting '" << filebase << "' into "
               << num_rounds * blocks_per_round << " blocks of size "

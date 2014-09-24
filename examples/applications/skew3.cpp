@@ -711,7 +711,7 @@ public:
     };
 
     /** Helper function for computing the size of the 2/3 subproblem. */
-    static inline size_t subp_size(size_t n)
+    static inline size_type subp_size(size_type n)
     {
         return (n / 3) * 2 + ((n % 3) == 2);
     }
@@ -788,7 +788,7 @@ public:
         value_type result;
 
     public:
-        build_sa(S& source_, Mod1& mod_1_, Mod2& mod_2_, size_t a_size, size_t memsize)
+        build_sa(S& source_, Mod1& mod_1_, Mod2& mod_2_, size_type a_size, size_t memsize)
             : source(source_), mod_1(mod_1_), mod_2(mod_2_), index(0), ready(false)
         {
             assert(!source_.empty());
