@@ -18,6 +18,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/compat/unique_ptr.h>
+#include <cstdlib>
 
 STXXL_BEGIN_NAMESPACE
 

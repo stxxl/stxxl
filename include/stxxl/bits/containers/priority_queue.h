@@ -774,7 +774,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
     // merge the rest to the new segment
     // note that merge exactly trips into the footsteps
     // of itself
-    priority_queue_local::merge_iterator(pos, newPos, newSegment, N, cmp);
+    priority_queue_local::merge_iterator(pos, newPos, newSegment, (unsigned_type)N, cmp);
 
     // and insert it
     unsigned_type freeLevel = make_space_available(0);
