@@ -19,6 +19,7 @@
 #include <stxxl/bits/containers/matrix.h>
 
 using stxxl::uint64;
+using stxxl::unsigned_type;
 using stxxl::int_type;
 
 int main(int argc, char** argv)
@@ -30,7 +31,7 @@ int main(int argc, char** argv)
     #endif
 
     int rank = 10000;
-    uint64 internal_memory = 256 * 1024 * 1024;
+    unsigned_type internal_memory = 256 * 1024 * 1024;
     int mult_algo_num = 5;
     int sched_algo_num = 2;
 

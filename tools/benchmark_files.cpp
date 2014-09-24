@@ -105,7 +105,7 @@ int benchmark_files(int argc, char* argv[])
     bool sync_io = false;
     bool resize_after_open = false;
     std::string file_type = default_file_type;
-    uint64 block_size = 0;
+    unsigned_type block_size = 0;
     unsigned int batch_size = 1;
     std::string opstr = "wv";
     unsigned pattern = 0;
@@ -185,8 +185,8 @@ int benchmark_files(int argc, char* argv[])
     const size_t nfiles = files_arr.size();
     bool verify_failed = false;
 
-    const unsigned_type step_size = (unsigned_type)block_size * batch_size;
-    const uint64 block_size_int = block_size / sizeof(int);
+    const unsigned_type step_size = block_size * batch_size;
+    const unsigned_type block_size_int = block_size / sizeof(int);
     const uint64 step_size_int = step_size / sizeof(int);
 
     unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);

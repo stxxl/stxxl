@@ -50,7 +50,7 @@ using stxxl::uint64;
 #define KiB (1024)
 #define MiB (1024 * 1024)
 
-template <unsigned RawBlockSize, typename AllocStrategy>
+template <unsigned_type RawBlockSize, typename AllocStrategy>
 int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
                                     std::string optrw)
 {
@@ -192,7 +192,8 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
 }
 
 template <typename AllocStrategy>
-int benchmark_disks_alloc(uint64 length, uint64 batch_size, uint64 block_size,
+int benchmark_disks_alloc(uint64 length, uint64 batch_size,
+                          unsigned_type block_size,
                           std::string optrw)
 {
 #define run(bs) benchmark_disks_blocksize_alloc<bs, AllocStrategy>(length, batch_size, optrw)
@@ -244,7 +245,7 @@ int benchmark_disks(int argc, char* argv[])
 
     uint64 length = 0;
     unsigned int batch_size = 0;
-    uint64 block_size = 8 * MiB;
+    unsigned_type block_size = 8 * MiB;
     std::string optrw = "rw", allocstr;
 
     cp.add_param_bytes("size", "Amount of data to write/read from disks (e.g. 10GiB)", length);

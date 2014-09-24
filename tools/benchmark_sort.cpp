@@ -27,6 +27,7 @@
 using stxxl::timestamp;
 using stxxl::uint32;
 using stxxl::uint64;
+using stxxl::unsigned_type;
 
 #define MB (1024 * 1024)
 
@@ -123,11 +124,12 @@ class BenchmarkSort
     static void output_result(double elapsed, uint64 vec_size)
     {
         std::cout << "finished in " << elapsed << " seconds @ "
-                  << (vec_size * sizeof(value_type) / MB / elapsed) << " MiB/s" << std::endl;
+                  << ((double)vec_size * sizeof(value_type) / MB / elapsed)
+                  << " MiB/s" << std::endl;
     }
 
 public:
-    BenchmarkSort(const char* desc, uint64 length, uint64 memsize)
+    BenchmarkSort(const char* desc, uint64 length, unsigned_type memsize)
     {
         // construct vector
         typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
@@ -205,7 +207,7 @@ int benchmark_sort(int argc, char* argv[])
     uint64 length = 0;
     cp.add_param_bytes("size", "Amount of data to sort (e.g. 1GiB)", length);
 
-    uint64 memsize = 256 * MB;
+    unsigned_type memsize = 256 * MB;
     cp.add_bytes('M', "ram", "Amount of RAM to use when sorting, default: 256 MiB", memsize);
 
     if (!cp.process(argc, argv))
