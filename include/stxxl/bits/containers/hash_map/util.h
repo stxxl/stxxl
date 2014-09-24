@@ -118,7 +118,7 @@ private:
     bid_iterator pref_bid_;
 
     //! shared block-cache
-    cache_type* cache_;
+    cache_type& cache_;
 
     //! true if prefetching enabled
     bool prefetch_;
@@ -140,7 +140,7 @@ public:
     //! \param i_subblock Start reading from this subblock
     //! \param prefetch Enable/Disable prefetching
     buffered_reader(bid_iterator seq_begin, bid_iterator seq_end,
-                    cache_type* cache,
+                    cache_type& cache,
                     size_t i_subblock = 0, bool prefetch = true)
         : i_value_(0),
           begin_bid_(seq_begin),
@@ -165,7 +165,7 @@ public:
     ~buffered_reader()
     {
         if (curr_bid_ != end_bid_)
-            cache_->release_block(*curr_bid_);
+            cache_.release_block(*curr_bid_);
     }
 
     void enable_prefetching()
@@ -181,7 +181,7 @@ public:
             if (pref_bid_ == end_bid_)
                 break;
 
-            cache_->prefetch_block(*pref_bid_);
+            cache_.prefetch_block(*pref_bid_);
             ++pref_bid_;
         }
     }
@@ -197,7 +197,7 @@ public:
     value_type & value()
     {
         if (!dirty_) {
-            cache_->make_dirty(*curr_bid_);
+            cache_.make_dirty(*curr_bid_);
             dirty_ = true;
         }
 
@@ -219,7 +219,7 @@ public:
         // entered new block
         else
         {
-            cache_->release_block(*curr_bid_);
+            cache_.release_block(*curr_bid_);
 
             i_value_ = 0;
             dirty_ = false;
@@ -228,7 +228,7 @@ public:
             if (curr_bid_ == end_bid_)
                 return false;
 
-            cache_->retain_block(*curr_bid_);
+            cache_.retain_block(*curr_bid_);
 
             // if a complete page has been consumed, prefetch the next one
             if (prefetch_ && (curr_bid_ - begin_bid_) % page_size_ == 0)
@@ -237,7 +237,7 @@ public:
                 {
                     if (pref_bid_ == end_bid_)
                         break;
-                    cache_->prefetch_block(*pref_bid_);
+                    cache_.prefetch_block(*pref_bid_);
                     ++pref_bid_;
                 }
             }
@@ -246,7 +246,7 @@ public:
         // entered new subblock
         if (i_value_ % subblock_size == 0)
         {
-            subblock_ = cache_->get_subblock(*curr_bid_, i_value_ / subblock_size);
+            subblock_ = cache_.get_subblock(*curr_bid_, i_value_ / subblock_size);
         }
 
         return true;
@@ -268,7 +268,7 @@ public:
         if (bid != curr_bid_)
             dirty_ = false;
 
-        cache_->release_block(*curr_bid_);
+        cache_.release_block(*curr_bid_);
 
         if (bid == end_bid_)
             return;
@@ -283,15 +283,15 @@ public:
                 {
                     if (pref_bid_ == end_bid_)
                         break;
-                    cache_->prefetch_block(*pref_bid_);
+                    cache_.prefetch_block(*pref_bid_);
                     ++pref_bid_;
                 }
             }
         }
         // skip to subblock
         i_value_ = i_subblock * subblock_size;
-        subblock_ = cache_->get_subblock(*curr_bid_, i_subblock);
-        cache_->retain_block(*curr_bid_);
+        subblock_ = cache_.get_subblock(*curr_bid_, i_subblock);
+        cache_.retain_block(*curr_bid_);
     }
 };
 
@@ -315,7 +315,7 @@ public:
 
 private:
     //! buffered writer
-    writer_type* writer_;
+    writer_type writer_;
     //! current buffer-block
     block_type* block_;
 
@@ -336,19 +336,18 @@ public:
     //! \param batch_size bulk buffered writing
     buffered_writer(bid_container_type* c,
                     int_type buffer_size, int_type batch_size)
-        : bids_(c),
+        : writer_(buffer_size, batch_size),
+          bids_(c),
           i_block_(0),
           i_value_(0),
           increase_(config::get_instance()->disks_number() * 3)
     {
-        writer_ = new writer_type(buffer_size, batch_size);
-        block_ = writer_->get_free_block();
+        block_ = writer_.get_free_block();
     }
 
     ~buffered_writer()
     {
         flush();
-        delete writer_;
     }
 
     //! Write all values from given stream.
@@ -383,7 +382,7 @@ public:
                 bm->new_blocks(striping(), bids_->end() - increase_, bids_->end());
             }
             // ... and write current block
-            block_ = writer_->write(block_, (*bids_)[i_block_]);
+            block_ = writer_.write(block_, (*bids_)[i_block_]);
 
             i_block_++;
         }
@@ -407,10 +406,10 @@ public:
             block_manager* bm = stxxl::block_manager::get_instance();
             bm->new_blocks(striping(), bids_->end() - increase_, bids_->end());
         }
-        block_ = writer_->write(block_, (*bids_)[i_block_]);
+        block_ = writer_.write(block_, (*bids_)[i_block_]);
         i_block_++;
 
-        writer_->flush();
+        writer_.flush();
     }
 
     //! Index of current block.
@@ -474,7 +473,7 @@ struct HashedValuesStream
     typedef typename hash_map_type::bid_container_type::iterator bid_iterator;
     typedef typename hash_map_type::buckets_container_type::iterator bucket_iterator;
 
-    hash_map_type* map_;
+    hash_map_type& map_;
     Reader& reader_;
     bucket_iterator curr_bucket_;
     bucket_iterator end_bucket_;
@@ -485,7 +484,8 @@ struct HashedValuesStream
     value_type value_;
 
     HashedValuesStream(bucket_iterator begin_bucket, bucket_iterator end_bucket,
-                       Reader& reader, bid_iterator begin_bid, hash_map_type* map)
+                       Reader& reader, bid_iterator begin_bid,
+                       hash_map_type& map)
         : map_(map),
           reader_(reader),
           curr_bucket_(begin_bucket),
@@ -521,9 +521,9 @@ struct HashedValuesStream
             // internal and external elements available
             while (node_ && i_external_ < curr_bucket_->n_external_)
             {
-                if (map_->_leq(node_->value_.first, reader_.const_value().first))
+                if (map_._leq(node_->value_.first, reader_.const_value().first))
                 {
-                    if (map_->_eq(node_->value_.first, reader_.const_value().first))
+                    if (map_._eq(node_->value_.first, reader_.const_value().first))
                     {
                         ++reader_;
                         ++i_external_;

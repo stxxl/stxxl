@@ -199,7 +199,7 @@ protected:
         bid_iterator_type begin = map_->bids_.begin() + bucket.i_block_;
         bid_iterator_type end = map_->bids_.end();
 
-        reader_ = new reader_type(begin, end, &(map_->block_cache_),
+        reader_ = new reader_type(begin, end, map_->block_cache_,
                                   bucket.i_subblock_, prefetch_);
 
         // external value's index already known

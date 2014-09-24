@@ -238,9 +238,9 @@ protected:
         typedef HashedValuesStream<self_type, reader_type> values_stream_type;
 
         // this will start prefetching automatically
-        reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
+        reader_type reader(bids_.begin(), bids_.end(), block_cache_);
         values_stream_type values(buckets_.begin(), buckets_.end(),
-                                  reader, bids_.begin(), (self_type*)this);
+                                  reader, bids_.begin(), *this);
 
         num_total_ = 0;
         while (!values.empty())
@@ -292,7 +292,9 @@ public:
                 node->value_ = value;
                 ++num_total_;
             }
-            return std::pair<iterator, bool>(iterator(this, i_bucket, node, 0, src_internal, false, value.first), old_deleted);
+            return std::pair<iterator, bool>(
+                iterator(this, i_bucket, node,
+                         0, src_internal, false, value.first), old_deleted);
         }
 
         // search external memory ...
@@ -305,7 +307,9 @@ public:
             // ... if found, return iterator pointing to external position ...
             if (i_external < bucket.n_external_ && _eq(ext_value.first, value.first))
             {
-                return std::pair<iterator, bool>(iterator(this, i_bucket, node, i_external, src_external, true, value.first), false);
+                return std::pair<iterator, bool>(
+                    iterator(this, i_bucket, node,
+                             i_external, src_external, true, value.first), false);
             }
             // ... otherwise create a new buffer-node to add the value
             else
@@ -316,7 +320,8 @@ public:
                     ? node->set_next(_new_node(value, node->next(), false))
                     : (bucket.list_ = _new_node(value, bucket.list_, false));
 
-                iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
+                iterator it(this, i_bucket, new_node,
+                            0, src_internal, false, value.first);
 
                 ++buffer_size_;
                 if (buffer_size_ >= max_buffer_size_)
@@ -345,7 +350,8 @@ public:
 
             node->set_deleted(false);
             node->value_ = value;
-            return iterator(this, i_bucket, node, 0, src_internal, false, value.first);
+            return iterator(this, i_bucket, node,
+                            0, src_internal, false, value.first);
         }
         // not found; ignore external memory and add a new node to the
         // internal-memory buffer
@@ -363,7 +369,8 @@ public:
             // to new_node)
             iterator_map_.fix_iterators_2int(i_bucket, value.first, new_node);
 
-            iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
+            iterator it(this, i_bucket, new_node,
+                        0, src_internal, false, value.first);
 
             ++buffer_size_;
             if (buffer_size_ >= max_buffer_size_)
@@ -1077,10 +1084,10 @@ protected:
 
         // use new to control point of destruction (see below)
         reader_type* reader
-            = new reader_type(old_bids.begin(), old_bids.end(), &block_cache_);
+            = new reader_type(old_bids.begin(), old_bids.end(), block_cache_);
 
         values_stream_type values_stream(old_buckets.begin(), old_buckets.end(),
-                                         *reader, old_bids.begin(), this);
+                                         *reader, old_bids.begin(), *this);
 
         writer_type writer(&bids_, write_buffer_size, write_buffer_size / 2);
 
@@ -1140,16 +1147,16 @@ protected:
     struct UniqueValueStream
     {
         typedef typename InputStream::value_type value_type;
-        self_type* map_;
+        self_type& map_;
         InputStream& in_;
 
-        UniqueValueStream(InputStream& input, self_type* map)
+        UniqueValueStream(InputStream& input, self_type& map)
             : map_(map), in_(input)
         { }
 
         bool empty() const { return in_.empty(); }
 
-        value_type operator * () { return *in_; }
+        const value_type& operator * () { return *in_; }
 
         void operator ++ ()
         {
@@ -1164,17 +1171,17 @@ protected:
     struct AddHashStream
     {
         typedef std::pair<size_type, typename InputStream::value_type> value_type;
-        self_type* map_;
+        self_type& map_;
         InputStream& in_;
 
-        AddHashStream(InputStream& input, self_type* map)
+        AddHashStream(InputStream& input, self_type& map)
             : map_(map), in_(input)
         { }
 
         bool empty() const { return in_.empty(); }
 
         value_type operator * ()
-        { return value_type(map_->hash_((*in_).first), *in_); }
+        { return value_type(map_.hash_((*in_).first), *in_); }
 
         void operator ++ () { ++in_; }
     };
@@ -1185,7 +1192,7 @@ protected:
      */
     struct StripHashFunctor
     {
-        value_type& operator () (std::pair<size_type, value_type>& v)
+        const value_type& operator () (std::pair<size_type, value_type>& v)
         { return v.second; }
     };
 
@@ -1197,27 +1204,27 @@ protected:
     struct Cmp : public std::binary_function<std::pair<size_type, value_type>,
                                              std::pair<size_type, value_type>, bool>
     {
-        self_type* map_;
-        Cmp(self_type* map) : map_(map) { }
+        self_type& map_;
+        Cmp(self_type& map) : map_(map) { }
 
         bool operator () (const std::pair<size_type, value_type>& a,
                           const std::pair<size_type, value_type>& b) const
         {
             return (a.first < b.first) ||
-                   ((a.first == b.first) && map_->cmp_(a.second.first, b.second.first));
+                   ((a.first == b.first) && map_.cmp_(a.second.first, b.second.first));
         }
         std::pair<size_type, value_type> min_value() const
         {
             return std::pair<size_type, value_type>(
                 std::numeric_limits<size_type>::min(),
-                value_type(map_->cmp_.min_value(), mapped_type())
+                value_type(map_.cmp_.min_value(), mapped_type())
                 );
         }
         std::pair<size_type, value_type> max_value() const
         {
             return std::pair<size_type, value_type>(
                 std::numeric_limits<size_type>::max(),
-                value_type(map_->cmp_.max_value(), mapped_type())
+                value_type(map_.cmp_.max_value(), mapped_type())
                 );
         }
     };
@@ -1265,14 +1272,14 @@ public:
         std::swap(bids_, old_bids);
 
         // already stored values ("old values")
-        reader_type* reader = new reader_type(old_bids.begin(), old_bids.end(), &block_cache_);
-        old_values_stream old_values(old_buckets.begin(), old_buckets.end(), *reader, old_bids.begin(), this);
+        reader_type* reader = new reader_type(old_bids.begin(), old_bids.end(), block_cache_);
+        old_values_stream old_values(old_buckets.begin(), old_buckets.end(), *reader, old_bids.begin(), *this);
 
         // values to insert ("new values")
         input_stream input = stxxl::stream::streamify(f, l);
-        new_values_stream new_values(input, this);
-        new_sorted_values_stream new_sorted_values(new_values, Cmp(this), mem);
-        new_unique_values_stream new_unique_values(new_sorted_values, this);
+        new_values_stream new_values(input, *this);
+        new_sorted_values_stream new_sorted_values(new_values, Cmp(*this), mem);
+        new_unique_values_stream new_unique_values(new_sorted_values, *this);
 
         writer_type writer(&bids_, write_buffer_size, write_buffer_size / 2);
 

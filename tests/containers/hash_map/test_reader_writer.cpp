@@ -72,14 +72,14 @@ void reader_writer_test()
     // reading with/without prefetching
     {
         // last parameter disables prefetching
-        reader_type reader(bids.begin(), bids.end(), &cache, 0, false);
+        reader_type reader(bids.begin(), bids.end(), cache, 0, false);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
             STXXL_CHECK(reader.const_value().first == i);
             ++reader;
         }
 
         // prefetching enabled by default
-        reader_type reader2(bids.begin(), bids.end(), &cache);
+        reader_type reader2(bids.begin(), bids.end(), cache);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
             STXXL_CHECK(reader2.const_value().first == i);
             ++reader2;
@@ -89,7 +89,7 @@ void reader_writer_test()
     // reading with skipping
     {
         // disable prefetching
-        reader_type reader(bids.begin(), bids.end(), &cache, 0, false);
+        reader_type reader(bids.begin(), bids.end(), cache, 0, false);
 
         // I: first subblock
         reader.skip_to(bids.begin() + 10, 0);
@@ -109,13 +109,13 @@ void reader_writer_test()
 
     // reading with modifying access
     {
-        reader_type reader(bids.begin(), bids.end(), &cache);
+        reader_type reader(bids.begin(), bids.end(), cache);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
             reader.value().second = reader.const_value().first + 1;
             ++reader;
         }
 
-        reader_type reader2(bids.begin(), bids.end(), &cache);
+        reader_type reader2(bids.begin(), bids.end(), cache);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
             STXXL_CHECK(reader2.const_value().second == reader2.const_value().first + 1);
             ++reader2;
@@ -154,7 +154,7 @@ void reader_writer_test()
         }
         writer.flush();
 
-        reader_type reader(bids.begin(), bids.end(), &cache);
+        reader_type reader(bids.begin(), bids.end(), cache);
         i = 0;
         for (unsigned outer = 0; outer < n_blocks * block_size; ++outer) {
             for (unsigned inner = 0; inner < subblock_size / 2; ++inner) {
