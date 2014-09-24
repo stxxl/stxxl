@@ -41,11 +41,11 @@ public:
 protected:
     std::vector<block_type*> blocks_;
     std::vector<request_ptr> reqs_;
-    std::vector<unsigned> free_blocks_;
-    std::list<unsigned> busy_blocks_; // TODO make that a circular-buffer
+    std::vector<unsigned_type> free_blocks_;
+    std::list<unsigned_type> busy_blocks_; // TODO make that a circular-buffer
 
 public:
-    block_cache_write_buffer(unsigned size)
+    block_cache_write_buffer(unsigned_type size)
     {
         blocks_.reserve(size);
         free_blocks_.reserve(size);
@@ -62,7 +62,7 @@ public:
     block_type * write(block_type* write_block, const bid_type& bid)
     {
         if (free_blocks_.empty()) {
-            unsigned i_buffer = busy_blocks_.front();
+            unsigned_type i_buffer = busy_blocks_.front();
             busy_blocks_.pop_front();
 
             if (reqs_[i_buffer].valid())
@@ -71,7 +71,7 @@ public:
             free_blocks_.push_back(i_buffer);
         }
 
-        unsigned i_buffer = free_blocks_.back();
+        unsigned_type i_buffer = free_blocks_.back();
         free_blocks_.pop_back();
         block_type* buffer = blocks_[i_buffer];
 
@@ -85,14 +85,14 @@ public:
     void flush()
     {
         while (!busy_blocks_.empty()) {
-            unsigned i_buffer = busy_blocks_.front();
+            unsigned_type i_buffer = busy_blocks_.front();
             busy_blocks_.pop_front();
             if (reqs_[i_buffer].valid())
                 reqs_[i_buffer]->wait();
         }
         busy_blocks_.clear();
         free_blocks_.clear();
-        for (unsigned i = 0; i < blocks_.size(); i++)
+        for (unsigned_type i = 0; i < blocks_.size(); i++)
             free_blocks_.push_back(i);
     }
 
@@ -107,7 +107,7 @@ public:
     ~block_cache_write_buffer()
     {
         flush();
-        for (unsigned i = 0; i < blocks_.size(); i++)
+        for (unsigned_type i = 0; i < blocks_.size(); i++)
             delete blocks_[i];
     }
 };
@@ -138,7 +138,7 @@ protected:
         {
             return longhash1(bid.offset + uint64(bid.storage));
         }
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
         bool operator () (const bid_type& a, const bid_type& b) const
         {
             return (a.storage < b.storage) ||
@@ -259,7 +259,10 @@ protected:
             i_block2kick = pager_.kick();
             if (i == max_tries)
             {
-                throw std::runtime_error("The block cache is too small, no block can be kicked out (all blocks are retained)!");
+                throw std::runtime_error(
+                    "The block cache is too small,"
+                    "no block can be kicked out (all blocks are retained)!"
+                    );
             }
             pager_.hit(i_block2kick);
         } while (retain_count_[i_block2kick] > 0);
@@ -549,12 +552,12 @@ public:
         std::swap(n_wrong_subblock, obj.n_wrong_subblock);
     }
 
-#if 0   // for debugging
+#if 0   // for debugging, requires data items to be ostream-able.
 
     //! Show currently cached blocks
     void dump_cache(std::ostream& os) const
     {
-        for (unsigned i = 0; i < blocks_.size(); i++)
+        for (size_t i = 0; i < blocks_.size(); i++)
         {
             bid_type bid = bids_[i];
             if (bid_map_.count(bid) == 0) {
@@ -567,14 +570,14 @@ public:
                << " retain_count=" << retain_count_[i]
                << " valid_subblock=" << valid_subblock_[i] << "\n";
 
-            for (unsigned k = 0; k < block_type::size; k++) {
+            for (size_t k = 0; k < block_type::size; k++) {
                 os << "  Subbblock " << k << ": ";
                 if (valid_subblock_[i] != valid_all && valid_subblock_[i] != k)
                 {
                     os << "not valid\n";
                     continue;
                 }
-                for (unsigned l = 0; l < block_type::value_type::size; l++) {
+                for (size_t l = 0; l < block_type::value_type::size; l++) {
                     os << "(" << (*blocks_[i])[k][l].first
                        << ", " << (*blocks_[i])[k][l].second << ") ";
                 }
