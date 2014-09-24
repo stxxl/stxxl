@@ -20,10 +20,10 @@
 #include <stxxl/stack>
 
 // forced instantiation
-template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>;
-template class stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096>;
-template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 4096>;
-template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink2, 1, 4096>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::normal, 4, 4096>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink, 4, 4096>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink2, 1, 4096>;
 
 template <typename stack_type>
 void test_lvalue_correctness(stack_type& stack, int a, int b)
@@ -50,25 +50,24 @@ void test_lvalue_correctness(stack_type& stack, int a, int b)
 }
 
 template <typename stack_type>
-void simple_test(stack_type& my_stack, int test_size)
+void simple_test(stack_type& my_stack, size_t test_size)
 {
-    int i;
-
-    for (i = 0; i < test_size; i++)
+    for (size_t i = 0; i < test_size; i++)
     {
         my_stack.push(i);
         STXXL_CHECK(my_stack.top() == i);
         STXXL_CHECK(my_stack.size() == i + 1);
     }
 
-    for (i = test_size - 1; i >= 0; i--)
+    for (size_t i = test_size; i > 0; )
     {
+        --i;
         STXXL_CHECK(my_stack.top() == i);
         my_stack.pop();
         STXXL_CHECK(my_stack.size() == i);
     }
 
-    for (i = 0; i < test_size; i++)
+    for (size_t i = 0; i < test_size; i++)
     {
         my_stack.push(i);
         STXXL_CHECK(my_stack.top() == i);
@@ -80,16 +79,17 @@ void simple_test(stack_type& my_stack, int test_size)
     std::swap(s2, my_stack);
     std::swap(s2, my_stack);
 
-    for (i = test_size - 1; i >= 0; i--)
+    for (size_t i = test_size; i > 0; )
     {
+        --i;
         STXXL_CHECK(my_stack.top() == i);
         my_stack.pop();
         STXXL_CHECK(my_stack.size() == i);
     }
 
-    std::stack<int> int_stack;
+    std::stack<size_t> int_stack;
 
-    for (i = 0; i < test_size; i++)
+    for (size_t i = 0; i < test_size; i++)
     {
         int_stack.push(i);
         STXXL_CHECK(int_stack.top() == i);
@@ -98,8 +98,9 @@ void simple_test(stack_type& my_stack, int test_size)
 
     stack_type my_stack1(int_stack);
 
-    for (i = test_size - 1; i >= 0; i--)
+    for (size_t i = test_size; i > 0; )
     {
+        --i;
         STXXL_CHECK(my_stack1.top() == i);
         my_stack1.pop();
         STXXL_CHECK(my_stack1.size() == i);
@@ -112,10 +113,10 @@ void simple_test(stack_type& my_stack, int test_size)
 
 int main(int argc, char* argv[])
 {
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result ext_normal_stack_type;
-    typedef stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096>::result ext_migrating_stack_type;
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 4096>::result ext_stack_type;
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink2, 1, 4096>::result ext_stack_type2;
+    typedef stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::normal, 4, 4096>::result ext_normal_stack_type;
+    typedef stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096>::result ext_migrating_stack_type;
+    typedef stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink, 4, 4096>::result ext_stack_type;
+    typedef stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink2, 1, 4096>::result ext_stack_type2;
 
     if (argc < 2)
     {
@@ -139,23 +140,24 @@ int main(int argc, char* argv[])
         stxxl::read_write_pool<ext_stack_type2::block_type> pool(10, 10);
         // create a stack that does not prefetch (level of prefetch aggressiveness 0)
         ext_stack_type2 my_stack(pool, 0);
-        int test_size = atoi(argv[1]) * 4 * 4096 / sizeof(int), i;
+        size_t test_size = atoi(argv[1]) * 4 * 4096 / sizeof(int);
 
-        for (i = 0; i < test_size; i++)
+        for (size_t i = 0; i < test_size; i++)
         {
             my_stack.push(i);
             STXXL_CHECK(my_stack.top() == i);
             STXXL_CHECK(my_stack.size() == i + 1);
         }
         my_stack.set_prefetch_aggr(10);
-        for (i = test_size - 1; i >= 0; i--)
+        for (size_t i = test_size; i > 0; )
         {
+            --i;
             STXXL_CHECK(my_stack.top() == i);
             my_stack.pop();
             STXXL_CHECK(my_stack.size() == i);
         }
 
-        for (i = 0; i < test_size; i++)
+        for (size_t i = 0; i < test_size; i++)
         {
             my_stack.push(i);
             STXXL_CHECK(my_stack.top() == i);
@@ -167,8 +169,9 @@ int main(int argc, char* argv[])
         std::swap(s2, my_stack);
         std::swap(s2, my_stack);
 
-        for (i = test_size - 1; i >= 0; i--)
+        for (size_t i = test_size; i > 0; )
         {
+            --i;
             STXXL_CHECK(my_stack.top() == i);
             my_stack.pop();
             STXXL_CHECK(my_stack.size() == i);

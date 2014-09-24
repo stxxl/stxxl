@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     std::for_each(v.begin(), v.end(), ProduceBill(out));
 
 #else
-    const unsigned M = atol(argv[2]) * 1024 * 1024;
+    const stxxl::internal_size_type M = atol(argv[2]) * 1024 * 1024;
 
     stxxl::sort(v.begin(), v.end(), SortByCaller(), M);
     std::fstream out(argv[3], std::ios::out);

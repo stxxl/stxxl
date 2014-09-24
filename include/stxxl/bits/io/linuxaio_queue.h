@@ -72,7 +72,7 @@ private:
     static void * post_async(void* arg);   // thread start callback
     static void * wait_async(void* arg);   // thread start callback
     void post_requests();
-    void handle_events(io_event* events, int num_events, bool canceled);
+    void handle_events(io_event* events, long num_events, bool canceled);
     void wait_requests();
     void suspend();
 

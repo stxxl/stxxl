@@ -31,6 +31,7 @@ static const char* description =
 
 using stxxl::uint32;
 using stxxl::uint64;
+using stxxl::internal_size_type;
 
 #define MiB (1024 * 1024)
 #define PRINTMOD (16 * MiB)
@@ -86,11 +87,11 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
     if ((i % PRINTMOD) == 0)
         STXXL_MSG(text << " " << i << " ("
                        << std::setprecision(5)
-                       << (i * 100.0 / nelements) << " %)");
+                       << ((double)i * 100.0 / (double)nelements) << " %)");
 }
 
 template <typename PQType>
-void run_pqueue_insert_delete(uint64 nelements, uint64 mem_for_pools)
+void run_pqueue_insert_delete(uint64 nelements, internal_size_type mem_for_pools)
 {
     typedef typename PQType::value_type ValueType;
 
@@ -141,7 +142,7 @@ void run_pqueue_insert_delete(uint64 nelements, uint64 mem_for_pools)
 }
 
 template <typename PQType>
-void run_pqueue_insert_intermixed(uint64 nelements, uint64 mem_for_pools)
+void run_pqueue_insert_intermixed(uint64 nelements, internal_size_type mem_for_pools)
 {
     typedef typename PQType::value_type ValueType;
 
@@ -202,11 +203,13 @@ void run_pqueue_insert_intermixed(uint64 nelements, uint64 mem_for_pools)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
-template <typename ValueType, uint64 mib_for_queue, uint64 mib_for_pools, uint64 maxvolume>
+template <typename ValueType,
+          internal_size_type mib_for_queue, internal_size_type mib_for_pools,
+          uint64 maxvolume>
 int do_benchmark_pqueue(uint64 volume, int opseq)
 {
-    const uint64 mem_for_queue = mib_for_queue * MiB;
-    const uint64 mem_for_pools = mib_for_pools * MiB;
+    const internal_size_type mem_for_queue = mib_for_queue * MiB;
+    const internal_size_type mem_for_pools = mib_for_pools * MiB;
 
     typedef typename stxxl::PRIORITY_QUEUE_GENERATOR<
             ValueType, my_cmp<ValueType>,

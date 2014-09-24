@@ -34,6 +34,8 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
+using stxxl::unsigned_type;
+using stxxl::uint64;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -92,18 +94,18 @@ static inline double throughput(stxxl::int64 bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
-    return bytes / (1024 * 1024) / seconds;
+    return (double)bytes / (1024 * 1024) / seconds;
 }
 
 int benchmark_files(int argc, char* argv[])
 {
-    stxxl::uint64 offset = 0, length = 0;
+    uint64 offset = 0, length = 0;
 
     bool no_direct_io = false;
     bool sync_io = false;
     bool resize_after_open = false;
     std::string file_type = default_file_type;
-    stxxl::uint64 block_size = 0;
+    uint64 block_size = 0;
     unsigned int batch_size = 1;
     std::string opstr = "wv";
     unsigned pattern = 0;
@@ -141,7 +143,7 @@ int benchmark_files(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    stxxl::uint64 endpos = offset + length;
+    uint64 endpos = offset + length;
 
     if (block_size == 0)
         block_size = 8 * MB;
@@ -183,9 +185,9 @@ int benchmark_files(int argc, char* argv[])
     const size_t nfiles = files_arr.size();
     bool verify_failed = false;
 
-    const stxxl::unsigned_type step_size = block_size * batch_size;
-    const stxxl::uint64 block_size_int = block_size / sizeof(int);
-    const stxxl::uint64 step_size_int = step_size / sizeof(int);
+    const unsigned_type step_size = (unsigned_type)block_size * batch_size;
+    const uint64 block_size_int = block_size / sizeof(int);
+    const uint64 step_size_int = step_size / sizeof(int);
 
     unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);
     file** files = new file*[nfiles];
@@ -230,11 +232,11 @@ int benchmark_files(int argc, char* argv[])
 
     stxxl::timer t_total(true);
     try {
-        while (offset + stxxl::uint64(step_size) <= endpos || length == 0)
+        while (offset + uint64(step_size) <= endpos || length == 0)
         {
-            const stxxl::uint64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
-            const stxxl::uint64 current_step_size_int = current_step_size / sizeof(int);
-            const stxxl::uint64 current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
+            const uint64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
+            const uint64 current_step_size_int = current_step_size / sizeof(int);
+            const unsigned_type current_num_blocks = (unsigned_type)stxxl::div_ceil(current_step_size, block_size);
 
             std::cout << "File offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
@@ -243,7 +245,7 @@ int benchmark_files(int argc, char* argv[])
             if (do_write)
             {
                 // write block number (512 byte blocks) into each block at position 42 * sizeof(unsigned)
-                for (stxxl::uint64 j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
+                for (uint64 j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
                 {
                     for (unsigned i = 0; i < nfiles; i++)
                         buffer[current_step_size_int * i + j] = (unsigned int)b;
@@ -251,11 +253,11 @@ int benchmark_files(int argc, char* argv[])
 
                 for (unsigned i = 0; i < nfiles; i++)
                 {
-                    for (unsigned j = 0; j < current_num_blocks; j++)
+                    for (unsigned_type j = 0; j < current_num_blocks; j++)
                         reqs[i * current_num_blocks + j] =
                             files[i]->awrite(buffer + current_step_size_int * i + j * block_size_int,
                                              offset + j * block_size,
-                                             block_size,
+                                             (unsigned_type)block_size,
                                              stxxl::default_completion_handler());
                 }
 
@@ -287,8 +289,10 @@ int benchmark_files(int argc, char* argv[])
             out_stat(begin, end, w_finish_times, nfiles, files_arr);
  #endif
             std::cout << std::setw(2) << nfiles << " * "
-                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
-                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * nfiles) << " MiB/s write,";
+                      << std::setw(8) << std::setprecision(3)
+                      << (throughput(current_step_size, elapsed)) << " = "
+                      << std::setw(8) << std::setprecision(3)
+                      << (throughput(current_step_size, elapsed) * (double)nfiles) << " MiB/s write,";
 
             begin = end = timestamp();
 
@@ -297,10 +301,11 @@ int benchmark_files(int argc, char* argv[])
                 for (unsigned i = 0; i < nfiles; i++)
                 {
                     for (unsigned j = 0; j < current_num_blocks; j++)
-                        reqs[i * current_num_blocks + j] = files[i]->aread(buffer + current_step_size_int * i + j * block_size_int,
-                                                                           offset + j * block_size,
-                                                                           block_size,
-                                                                           stxxl::default_completion_handler());
+                        reqs[i * current_num_blocks + j] =
+                            files[i]->aread(buffer + current_step_size_int * i + j * block_size_int,
+                                            offset + j * block_size,
+                                            (unsigned_type)block_size,
+                                            stxxl::default_completion_handler());
                 }
 
  #ifdef WATCH_TIMES
@@ -328,8 +333,10 @@ int benchmark_files(int argc, char* argv[])
 #endif
 
             std::cout << std::setw(2) << nfiles << " * "
-                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
-                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * nfiles) << " MiB/s read";
+                      << std::setw(8) << std::setprecision(3)
+                      << (throughput(current_step_size, elapsed)) << " = "
+                      << std::setw(8) << std::setprecision(3)
+                      << (throughput(current_step_size, elapsed) * (double)nfiles) << " MiB/s read";
 
 #ifdef WATCH_TIMES
             out_stat(begin, end, r_finish_times, nfiles, files_arr);
@@ -340,8 +347,8 @@ int benchmark_files(int argc, char* argv[])
                 for (unsigned d = 0; d < nfiles; ++d)
                 {
                     for (unsigned s = 0; s < (current_step_size >> 9); ++s) {
-                        stxxl::uint64 i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
-                        stxxl::uint64 b = (offset >> 9) + s;
+                        uint64 i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
+                        uint64 b = (offset >> 9) + s;
                         if (buffer[i] != b)
                         {
                             verify_failed = true;
@@ -353,12 +360,12 @@ int benchmark_files(int argc, char* argv[])
                     }
                 }
 
-                for (stxxl::uint64 i = 0; i < nfiles * current_step_size_int; i++)
+                for (uint64 i = 0; i < nfiles * current_step_size_int; i++)
                 {
                     if (buffer[i] != (pattern ? pattern : i))
                     {
                         stxxl::int64 ibuf = i / current_step_size_int;
-                        stxxl::uint64 pos = i % current_step_size_int;
+                        uint64 pos = i % current_step_size_int;
 
                         std::cout << std::endl
                                   << "Error on file " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
@@ -387,21 +394,32 @@ int benchmark_files(int argc, char* argv[])
     // the following line of output is parsed by misc/filebench-avgplot.sh
     std::cout << "# Average over " << std::setw(8) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
     std::cout << std::setw(2) << nfiles << " * "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite)) << " = "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite) * nfiles) << " MiB/s write,";
+              << std::setw(8) << std::setprecision(3)
+              << (throughput(totalsizewrite, totaltimewrite)) << " = "
+              << std::setw(8) << std::setprecision(3)
+              << (throughput(totalsizewrite, totaltimewrite) * (double)nfiles) << " MiB/s write,";
+
     std::cout << std::setw(2) << nfiles << " * "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " = "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread) * nfiles) << " MiB/s read"
+              << std::setw(8) << std::setprecision(3)
+              << (throughput(totalsizeread, totaltimeread)) << " = "
+              << std::setw(8) << std::setprecision(3)
+              << (throughput(totalsizeread, totaltimeread) * (double)nfiles) << " MiB/s read"
               << std::endl;
+
     if (totaltimewrite != 0.0)
         std::cout << "# Write time   " << std::setw(8) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
     if (totaltimeread != 0.0)
         std::cout << "# Read time    " << std::setw(8) << std::setprecision(3) << totaltimeread << " s" << std::endl;
-    std::cout << "# Non-I/O time " << std::setw(8) << std::setprecision(3) << (t_total.seconds() - totaltimewrite - totaltimeread) << " s, average throughput "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total.seconds() - totaltimewrite - totaltimeread) * nfiles) << " MiB/s"
+
+    std::cout << "# Non-I/O time " << std::setw(8) << std::setprecision(3)
+              << (t_total.seconds() - totaltimewrite - totaltimeread) << " s, average throughput "
+              << std::setw(8) << std::setprecision(3)
+              << (throughput(totalsizewrite + totalsizeread, t_total.seconds() - totaltimewrite - totaltimeread) * (double)nfiles) << " MiB/s"
               << std::endl;
+
     std::cout << "# Total time   " << std::setw(8) << std::setprecision(3) << t_total.seconds() << " s, average throughput "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total.seconds()) * nfiles) << " MiB/s"
+              << std::setw(8) << std::setprecision(3)
+              << (throughput(totalsizewrite + totalsizeread, t_total.seconds()) * (double)nfiles) << " MiB/s"
               << std::endl;
 
     if (do_verify)

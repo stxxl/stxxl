@@ -183,13 +183,14 @@ struct shuffle
                 stxxl::uint64 combined = current;
                 combined = combined << 32 | *input;
                 combined = (1ul << count_bits(combined)) - 1;
-                current = combined >> 32;
+                current = (value_type)(combined >> 32);
                 next = (value_type)combined;
             }
         }
     }
 
-    shuffle(Input& _input) : input(_input), current(0), next(0), even(true), is_empty(false)
+    shuffle(Input& _input)
+        : input(_input), current(0), next(0), even(true), is_empty(false)
     {
         apply_shuffle();
     }

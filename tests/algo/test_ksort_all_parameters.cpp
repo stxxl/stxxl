@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
-    stxxl::set_seed(strtoul(argv[5], NULL, 10));
+    stxxl::set_seed((unsigned)strtoul(argv[5], NULL, 10));
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 

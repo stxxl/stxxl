@@ -79,14 +79,14 @@ private:
     }
 
     //! number of bits in the higher integer part, used a bit shift value.
-    static const int high_bits = 8 * sizeof(high_type);
+    static const size_t high_bits = 8 * sizeof(high_type);
 
 public:
     //! number of binary digits (bits) in uint_pair
-    static const int digits = low_bits + high_bits;
+    static const size_t digits = low_bits + high_bits;
 
     //! number of bytes in uint_pair
-    static const int bytes = sizeof(low_type) + sizeof(high_type);
+    static const size_t bytes = sizeof(low_type) + sizeof(high_type);
 
     //! empty constructor, does not even initialize to zero!
     inline uint_pair()
@@ -127,8 +127,8 @@ public:
 
     //! construct from an uint64 (unsigned long long)
     inline uint_pair(const uint64& a)
-        : low(a & low_max()),
-          high((a >> low_bits) & high_max())
+        : low((low_type)(a & low_max())),
+          high((high_type)(a >> low_bits) & high_max())
     {
         // check for overflow
         assert((a >> (low_bits + high_bits)) == 0);
@@ -176,8 +176,8 @@ public:
     inline uint_pair& operator += (const uint_pair& b)
     {
         uint64 add = low + b.low;
-        low = add & low_max();
-        high += b.high + ((add >> low_bits) & high_max());
+        low = (low_type)(add & low_max());
+        high = (high_type)(high + b.high + ((add >> low_bits) & high_max()));
         return *this;
     }
 

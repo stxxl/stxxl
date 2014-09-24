@@ -91,10 +91,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const unsigned int block_size = sizeof(my_type) * 4096;
+    const stxxl::unsigned_type block_size = sizeof(my_type) * 4096;
+
     if (strcmp(argv[1], "generate") == 0) {
         const my_type::key_type num_elements = 1 * 1024 * 1024;
-        const unsigned int records_in_block = block_size / sizeof(my_type);
+        const stxxl::unsigned_type records_in_block = block_size / sizeof(my_type);
         stxxl::syscall_file f(argv[2], stxxl::file::CREAT | stxxl::file::RDWR);
         my_type* array = (my_type*)stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
         memset(array, 0, block_size);

@@ -281,26 +281,26 @@ public:
             put<uint8>(uint8(v));
         }
         else if (v < 128 * 128) {
-            put<uint8>(((v >> 0) & 0x7F) | 0x80);
-            put<uint8>(((v >> 7) & 0x7F));
+            put<uint8>((uint8)((v >> 0) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 7) & 0x7F));
         }
         else if (v < 128 * 128 * 128) {
-            put<uint8>(((v >> 0) & 0x7F) | 0x80);
-            put<uint8>(((v >> 7) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F));
+            put<uint8>((uint8)((v >> 0) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 7) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F));
         }
         else if (v < 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 0) & 0x7F) | 0x80);
-            put<uint8>(((v >> 7) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F));
+            put<uint8>((uint8)((v >> 0) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 7) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F));
         }
         else {
-            put<uint8>(((v >> 0) & 0x7F) | 0x80);
-            put<uint8>(((v >> 7) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F));
+            put<uint8>((uint8)((v >> 0) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 7) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F));
         }
 
         return *this;
@@ -319,76 +319,76 @@ public:
             put<uint8>(uint8(v));
         }
         else if (v < 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F));
         }
         else if (v < 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F));
         }
         else if (v < 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F));
         }
         else if (v < ((uint64)128) * 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F));
         }
         else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F) | 0x80);
-            put<uint8>(((v >> 35) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 35) & 0x7F));
         }
         else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F) | 0x80);
-            put<uint8>(((v >> 35) & 0x7F) | 0x80);
-            put<uint8>(((v >> 42) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 35) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 42) & 0x7F));
         }
         else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F) | 0x80);
-            put<uint8>(((v >> 35) & 0x7F) | 0x80);
-            put<uint8>(((v >> 42) & 0x7F) | 0x80);
-            put<uint8>(((v >> 49) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 35) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 42) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 49) & 0x7F));
         }
         else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F) | 0x80);
-            put<uint8>(((v >> 35) & 0x7F) | 0x80);
-            put<uint8>(((v >> 42) & 0x7F) | 0x80);
-            put<uint8>(((v >> 49) & 0x7F) | 0x80);
-            put<uint8>(((v >> 56) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 35) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 42) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 49) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 56) & 0x7F));
         }
         else {
-            put<uint8>(((v >> 00) & 0x7F) | 0x80);
-            put<uint8>(((v >> 07) & 0x7F) | 0x80);
-            put<uint8>(((v >> 14) & 0x7F) | 0x80);
-            put<uint8>(((v >> 21) & 0x7F) | 0x80);
-            put<uint8>(((v >> 28) & 0x7F) | 0x80);
-            put<uint8>(((v >> 35) & 0x7F) | 0x80);
-            put<uint8>(((v >> 42) & 0x7F) | 0x80);
-            put<uint8>(((v >> 49) & 0x7F) | 0x80);
-            put<uint8>(((v >> 56) & 0x7F) | 0x80);
-            put<uint8>(((v >> 63) & 0x7F));
+            put<uint8>((uint8)((v >> 00) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 07) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 14) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 21) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 28) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 35) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 42) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 49) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 56) & 0x7F) | 0x80);
+            put<uint8>((uint8)((v >> 63) & 0x7F));
         }
 
         return *this;

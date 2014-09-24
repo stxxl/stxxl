@@ -39,7 +39,7 @@ template <class ValueType,
           unsigned BlocksPerPage = 4,
           unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-          class SizeType = stxxl::int64>
+          class SizeType = stxxl::uint64>
 struct stack_config_generator
 {
     typedef ValueType value_type;
@@ -994,7 +994,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!
 //! \tparam AllocStr one of allocation strategies: striping, RC, SR, or FR. Default is \b RC.
 //!
-//! \tparam SizeType size type, default is \b stxxl::int64.
+//! \tparam SizeType size type, default is \b stxxl::uint64.
 //!
 //! The configured stack type is available as STACK_GENERATOR<>::result.
 //!
@@ -1009,7 +1009,7 @@ template <
     unsigned_type MigrCritSize = (2* BlocksPerPage* BlockSize),
 
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-    class SizeType = stxxl::int64
+    class SizeType = stxxl::uint64
     >
 class STACK_GENERATOR
 {

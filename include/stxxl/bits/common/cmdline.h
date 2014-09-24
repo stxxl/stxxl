@@ -303,9 +303,9 @@ protected:
     arglist_type m_paramlist;
 
     //! formatting width for options, '-s, --switch <#>'
-    size_t m_opt_maxlong;
+    int m_opt_maxlong;
     //! formatting width for parameters, 'param <#>'
-    size_t m_param_maxlong;
+    int m_param_maxlong;
 
     //! argv[0] for usage.
     const char* m_progname;
@@ -328,13 +328,15 @@ private:
     //! update maximum formatting width for new option
     void calc_opt_max(const argument* arg)
     {
-        m_opt_maxlong = STXXL_MAX(arg->option_text().size() + 2, m_opt_maxlong);
+        m_opt_maxlong = STXXL_MAX((int)arg->option_text().size() + 2,
+                                  m_opt_maxlong);
     }
 
     //! update maximum formatting width for new parameter
     void calc_param_max(const argument* arg)
     {
-        m_param_maxlong = STXXL_MAX(arg->param_text().size() + 2, m_param_maxlong);
+        m_param_maxlong = STXXL_MAX((int)arg->param_text().size() + 2,
+                                    m_param_maxlong);
     }
 
 public:

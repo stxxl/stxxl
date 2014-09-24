@@ -280,7 +280,8 @@ int main(int argc, char* argv[])
     {
         if ((i % mega) == 0)
             STXXL_MSG(
-                std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
+                std::fixed << std::setprecision(2) << std::setw(5)
+                           << (100.0 * (double)i / (double)nelements) << "% "
                            << "Inserting element " << i << " top() == " << least.key << " @ "
                            << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
@@ -376,7 +377,8 @@ int main(int argc, char* argv[])
 
         if ((i % mega) == 0)
             STXXL_MSG(
-                std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
+                std::fixed << std::setprecision(2) << std::setw(5)
+                           << (100.0 * (double)i / (double)nelements) << "% "
                            << "Popped element " << i << " == " << least.key << " @ "
                            << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));

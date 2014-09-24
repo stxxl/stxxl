@@ -55,10 +55,12 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
-    stxxl::int64 num_blocks = stxxl::div_ceil(worksize, raw_block_size);
-    stxxl::int64 num_blocks_in_span = stxxl::div_ceil(span, raw_block_size);
-    num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
+    stxxl::unsigned_type num_blocks =
+        (stxxl::unsigned_type)stxxl::div_ceil(worksize, raw_block_size);
+    stxxl::unsigned_type num_blocks_in_span =
+        (stxxl::unsigned_type)stxxl::div_ceil(span, raw_block_size);
 
+    num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
     if (num_blocks == 0) num_blocks = num_blocks_in_span;
 
     worksize = num_blocks * raw_block_size;

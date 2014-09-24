@@ -34,6 +34,7 @@
 #include <stxxl/bits/common/cmdline.h>
 
 using stxxl::timestamp;
+using stxxl::unsigned_type;
 using stxxl::uint64;
 
 #ifdef BLOCK_ALIGN
@@ -63,8 +64,8 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
 
     // construct block type
 
-    const unsigned raw_block_size = RawBlockSize;
-    const unsigned block_size = raw_block_size / sizeof(int);
+    const unsigned_type raw_block_size = RawBlockSize;
+    const unsigned_type block_size = raw_block_size / sizeof(int);
 
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
@@ -94,7 +95,7 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
     // touch data, so it is actually allcoated
     for (unsigned j = 0; j < num_blocks_per_batch; ++j)
         for (unsigned i = 0; i < block_size; ++i)
-            buffer[j][i] = j * block_size + i;
+            buffer[j][i] = (unsigned)(j * block_size + i);
 
     try {
         AllocStrategy alloc;
@@ -104,11 +105,11 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
 #if CHECK_AFTER_READ
             const stxxl::int64 current_batch_size_int = current_batch_size / sizeof(int);
 #endif
-            const uint64 current_num_blocks_per_batch = stxxl::div_ceil(current_batch_size, raw_block_size);
+            const unsigned_type current_num_blocks_per_batch = (unsigned_type)stxxl::div_ceil(current_batch_size, raw_block_size);
 
             std::cout << "Offset    " << std::setw(7) << offset / MiB << " MiB: " << std::fixed;
 
-            stxxl::unsigned_type num_total_blocks = blocks.size();
+            unsigned_type num_total_blocks = blocks.size();
             blocks.resize(num_total_blocks + current_num_blocks_per_batch);
             stxxl::block_manager::get_instance()->new_blocks(alloc, blocks.begin() + num_total_blocks, blocks.end());
 

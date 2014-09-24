@@ -109,12 +109,12 @@ int main_usage(const char* arg0)
     std::cout << "Usage: " << arg0 << " <subtool> ..." << std::endl
               << "Available subtools: " << std::endl;
 
-    size_t shortlen = 0;
+    int shortlen = 0;
 
     for (unsigned int i = 0; subtools[i].name; ++i)
     {
         if (!subtools[i].shortline) continue;
-        shortlen = std::max(shortlen, strlen(subtools[i].name));
+        shortlen = std::max(shortlen, (int)strlen(subtools[i].name));
     }
 
     for (unsigned int i = 0; subtools[i].name; ++i)

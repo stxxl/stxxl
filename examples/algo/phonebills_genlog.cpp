@@ -67,9 +67,9 @@ int main(int argc, char* argv[])
 
         return 0;
     }
-    unsigned M = atol(argv[3]) * 1024 * 1024;
+    stxxl::internal_size_type M = atol(argv[3]) * 1024 * 1024;
     const stxxl::uint64 ncalls = stxxl::atouint64(argv[1]);
-    const int av_calls = atol(argv[2]);
+    const long av_calls = atol(argv[2]);
     const stxxl::uint64 nclients = ncalls / av_calls;
     stxxl::uint64 calls_made = 0;
 
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
         while (serv-- > 0)
         {
-            cur += 1 + rnd(3600 * 24);
+            cur += (time_t)(1 + rnd(3600 * 24));
 
             e.to = rnd(nclients);
             e.timestamp = cur;
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
             e.event = 1;
             log.push_back(e);
 
-            cur += 1 + rnd(1800);
+            cur += (time_t)(1 + rnd(1800));
             e.timestamp = cur;
             e.event = 2;
 

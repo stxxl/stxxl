@@ -202,7 +202,7 @@ void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes,
     if (seconds_to_wait)
         sleep(seconds_to_wait);
 
-    usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
+    usleep((useconds_t)((delay - seconds_to_wait) * 1000000.));
 }
 
 const char* sim_disk_file::io_type() const

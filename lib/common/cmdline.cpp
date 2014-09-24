@@ -102,7 +102,8 @@ void cmdline_parser::print_usage(std::ostream& os)
         {
             const argument* arg = *it;
 
-            os << "  " << std::setw(m_param_maxlong) << std::left << arg->param_text();
+            os << "  " << std::setw(m_param_maxlong) << std::left
+               << arg->param_text();
             output_wrap(os, arg->m_desc, m_linewrap,
                         0, m_param_maxlong + 2, m_param_maxlong + 2, 8);
         }
@@ -117,7 +118,8 @@ void cmdline_parser::print_usage(std::ostream& os)
         {
             const argument* arg = *it;
 
-            os << "  " << std::setw(m_opt_maxlong) << std::left << arg->option_text();
+            os << "  " << std::setw(m_opt_maxlong) << std::left
+               << arg->option_text();
             output_wrap(os, arg->m_desc, m_linewrap,
                         0, m_opt_maxlong + 2, m_opt_maxlong + 2, 8);
         }
@@ -126,8 +128,9 @@ void cmdline_parser::print_usage(std::ostream& os)
     os.copyfmt(state);
 }
 
-void cmdline_parser::print_option_error(int argc, const char* const* argv, const argument* arg,
-                                        std::ostream& os)
+void cmdline_parser::print_option_error(
+    int argc, const char* const* argv, const argument* arg,
+    std::ostream& os)
 {
     os << "Error: Argument ";
     if (argc != 0)
@@ -305,7 +308,7 @@ void cmdline_parser::print_result(std::ostream& os)
     std::ios state(NULL);
     state.copyfmt(os);
 
-    size_t maxlong = STXXL_MAX(m_param_maxlong, m_opt_maxlong);
+    int maxlong = STXXL_MAX(m_param_maxlong, m_opt_maxlong);
 
     if (m_paramlist.size())
     {

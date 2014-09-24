@@ -46,7 +46,7 @@ linuxaio_queue::linuxaio_queue(int desired_queue_length)
 
     // negotiate maximum number of simultaneous events with the OS
     context = 0;
-    int result;
+    long result;
     while ((result = syscall(SYS_io_setup, max_events, &context)) == -1 &&
            errno == EAGAIN && max_events > 1)
     {
@@ -174,7 +174,7 @@ void linuxaio_queue::post_requests()
                 // empty, then try again.
 
                 // wait for at least one event to complete, no time limit
-                int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
+                long num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
                 if (num_events < 0) {
                     STXXL_THROW2(io_error, "linuxaio_queue::post_requests",
                                  "io_getevents() nr_events=" << num_events);
@@ -203,7 +203,7 @@ void linuxaio_queue::post_requests()
     delete[] events;
 }
 
-void linuxaio_queue::handle_events(io_event* events, int num_events, bool canceled)
+void linuxaio_queue::handle_events(io_event* events, long num_events, bool canceled)
 {
     for (int e = 0; e < num_events; ++e)
     {
@@ -232,7 +232,7 @@ void linuxaio_queue::wait_requests()
             break;
 
         // wait for at least one of them to finish
-        int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
+        long num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
         if (num_events < 0) {
             STXXL_THROW2(io_error, "linuxaio_queue::wait_requests",
                          "io_getevents() nr_events=" << max_events);

@@ -382,7 +382,7 @@ void disk_config::parse_fileio()
             }
 
             char* endp;
-            queue = strtoul(eq[1].c_str(), &endp, 10);
+            queue = (int)strtoul(eq[1].c_str(), &endp, 10);
             if (endp && *endp != 0) {
                 STXXL_THROW(std::runtime_error,
                             "Invalid parameter '" << *p << "' in disk configuration file.");
@@ -391,7 +391,7 @@ void disk_config::parse_fileio()
         else if (eq[0] == "device_id" || eq[0] == "devid")
         {
             char* endp;
-            device_id = strtoul(eq[1].c_str(), &endp, 10);
+            device_id = (int)strtoul(eq[1].c_str(), &endp, 10);
             if (endp && *endp != 0) {
                 STXXL_THROW(std::runtime_error,
                             "Invalid parameter '" << *p << "' in disk configuration file.");

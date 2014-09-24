@@ -21,20 +21,20 @@
 
 // forced instantiation
 const unsigned critical_size = 8 * 4096;
-template class stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<int>, critical_size>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<size_t>, critical_size>;
 
 int main()
 {
-    typedef stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<int>, critical_size>::result migrating_stack_type;
+    typedef stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<size_t>, critical_size>::result migrating_stack_type;
 
     STXXL_MSG("Starting test.");
 
     migrating_stack_type my_stack;
-    int test_size = 1 * 1024 * 1024 / sizeof(int), i;
+    size_t test_size = 1 * 1024 * 1024 / sizeof(int);
 
     STXXL_MSG("Filling stack.");
 
-    for (i = 0; i < test_size; i++)
+    for (size_t i = 0; i < test_size; i++)
     {
         my_stack.push(i);
         STXXL_CHECK(my_stack.top() == i);
@@ -50,8 +50,9 @@ int main()
 
     STXXL_MSG("Removing elements from " <<
               (my_stack.external() ? "external" : "internal") << " stack");
-    for (i = test_size - 1; i >= 0; i--)
+    for (size_t i = test_size; i > 0; )
     {
+        --i;
         STXXL_CHECK(my_stack.top() == i);
         STXXL_CHECK(my_stack.size() == i + 1);
         my_stack.pop();

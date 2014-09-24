@@ -26,6 +26,7 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
+using stxxl::unsigned_type;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -107,15 +108,15 @@ int create_files(int argc, char* argv[])
     const size_t ndisks = disks_arr.size();
 
 #if STXXL_WINDOWS
-    unsigned buffer_size = 64 * MB;
+    unsigned_type buffer_size = 64 * MB;
 #else
-    unsigned buffer_size = 256 * MB;
+    unsigned_type buffer_size = 256 * MB;
 #endif
-    const unsigned buffer_size_int = buffer_size / sizeof(int);
+    const unsigned_type buffer_size_int = buffer_size / sizeof(int);
 
     unsigned chunks = 2;
-    const unsigned chunk_size = buffer_size / chunks;
-    const unsigned chunk_size_int = chunk_size / sizeof(int);
+    const unsigned_type chunk_size = buffer_size / chunks;
+    const unsigned_type chunk_size_int = chunk_size / sizeof(int);
 
     unsigned i = 0, j = 0;
 
@@ -153,8 +154,12 @@ int create_files(int argc, char* argv[])
 
     while (offset < endpos)
     {
-        const stxxl::int64 current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
-        const stxxl::int64 current_chunk_size = current_block_size / chunks;
+        const unsigned_type current_block_size =
+            length
+            ? (unsigned_type)std::min<stxxl::int64>(buffer_size, endpos - offset)
+            : buffer_size;
+
+        const unsigned_type current_chunk_size = current_block_size / chunks;
 
         std::cout << "Disk offset " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 

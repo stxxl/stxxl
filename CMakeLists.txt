@@ -379,7 +379,7 @@ else()
   check_cxx_source_compiles("
 #include <unistd.h>
 #include <fcntl.h>
-int main(int argc, char * argv[]) { argc = O_DIRECT; }
+int main() { return ((int)O_DIRECT) != 0; }
 " STXXL_HAVE_O_DIRECT)
 
   if(STXXL_HAVE_O_DIRECT)
