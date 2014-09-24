@@ -1155,7 +1155,7 @@ protected:
         {
             value_type v_old = *in_;
             ++in_;
-            while (!in_.empty() && map_->_eq(v_old.first, (*in_).first))
+            while (!in_.empty() && v_old.first == (*in_).first)
                 ++in_;
         }
     };
