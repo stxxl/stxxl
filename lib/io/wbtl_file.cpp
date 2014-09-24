@@ -237,7 +237,7 @@ void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
     else
     {
         // block is not cached
-        request_ptr req = storage->aread(buffer, physical_offset, bytes, default_completion_handler());
+        request_ptr req = storage->aread(buffer, physical_offset, bytes);
         req->wait(false);
     }
     STXXL_VERBOSE_WBTL("wbtl:sread   l" << FMT_A_S(offset, bytes) << " @    p" << FMT_A(physical_offset) << " " << std::dec << cached);
@@ -275,7 +275,7 @@ void wbtl_file::swrite(void* buffer, offset_type offset, size_type bytes)
                 backend_request->wait(false);
             }
 
-            backend_request = storage->awrite(write_buffer[curbuf], buffer_address[curbuf], write_block_size, default_completion_handler());
+            backend_request = storage->awrite(write_buffer[curbuf], buffer_address[curbuf], write_block_size);
         }
 
         curbuf = 1 - curbuf;

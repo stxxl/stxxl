@@ -97,7 +97,7 @@ void fileperblock_file<base_file_type>::lock()
         memset(one_page, 0, page_size);
 #endif
         lock_file.set_size(page_size);
-        request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
+        request_ptr r = lock_file.awrite(one_page, 0, page_size);
         r->wait();
         aligned_dealloc<STXXL_BLOCK_ALIGN>(one_page);
         lock_file_created = true;

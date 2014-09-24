@@ -103,7 +103,7 @@ public:
         bid_iterator_type _cons_end,
         int_type* _pref_seq,
         int_type _prefetch_buf_size,
-        completion_handler do_after_fetch = default_completion_handler()
+        completion_handler do_after_fetch = completion_handler()
         )
         : consume_seq_begin(_cons_begin),
           consume_seq_end(_cons_end),

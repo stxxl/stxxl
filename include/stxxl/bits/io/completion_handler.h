@@ -31,68 +31,66 @@ public:
     virtual ~completion_handler_impl() { }
 };
 
-template <typename handler_type>
+template <typename HandlerType>
 class completion_handler1 : public completion_handler_impl
 {
 private:
-    handler_type handler_;
+    HandlerType m_handler;
 
 public:
-    completion_handler1(const handler_type& handler__) : handler_(handler__) { }
+    completion_handler1(const HandlerType& handler)
+        : m_handler(handler)
+    { }
     completion_handler1 * clone() const
     {
         return new completion_handler1(*this);
     }
     void operator () (request* req)
     {
-        handler_(req);
+        m_handler(req);
     }
 };
 
 //! Completion handler class (Loki-style).
 //!
-//! In some situations one needs to execute
-//! some actions after completion of an I/O
-//! request. In these cases one can use
-//! an I/O completion handler - a function
-//! object that can be passed as a parameter
-//! to asynchronous I/O calls \c stxxl::file::aread
-//! and \c stxxl::file::awrite .
+//! In some situations one needs to execute some actions after completion of an
+//! I/O request. In these cases one can use an I/O completion handler - a
+//! function object that can be passed as a parameter to asynchronous I/O calls
+//! \c stxxl::file::aread and \c stxxl::file::awrite .
 class completion_handler
 {
-    compat_unique_ptr<completion_handler_impl>::result sp_impl_;
+    compat_unique_ptr<completion_handler_impl>::result m_ptr;
 
 public:
+    //! Construct default, no operation completion handler.
     completion_handler()
-        : sp_impl_(static_cast<completion_handler_impl*>(0))
+        : m_ptr(static_cast<completion_handler_impl*>(NULL))
     { }
 
+    //! Copy constructor.
     completion_handler(const completion_handler& obj)
-        : sp_impl_(obj.sp_impl_.get()->clone())
+        : m_ptr(obj.m_ptr ? obj.m_ptr.get()->clone() : NULL)
     { }
 
-    template <typename handler_type>
-    completion_handler(const handler_type& handler__)
-        : sp_impl_(new completion_handler1<handler_type>(handler__))
+    //! Construct a completion handler which calls some function.
+    template <typename HandlerType>
+    completion_handler(const HandlerType& handler)
+        : m_ptr(new completion_handler1<HandlerType>(handler))
     { }
 
+    //! Assignment operator
     completion_handler& operator = (const completion_handler& obj)
     {
-        sp_impl_.reset(obj.sp_impl_.get()->clone());
+        m_ptr.reset(obj.m_ptr ? obj.m_ptr.get()->clone() : NULL);
         return *this;
     }
+
+    //! Call the enclosed completion handler.
     void operator () (request* req)
     {
-        (* sp_impl_)(req);
+        if (m_ptr)
+            (* m_ptr)(req);
     }
-};
-
-//! Default completion handler class.
-
-struct default_completion_handler
-{
-    //! An operator that does nothing.
-    void operator () (request*) { }
 };
 
 STXXL_END_NAMESPACE

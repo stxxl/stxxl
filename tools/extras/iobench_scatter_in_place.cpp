@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
                 timer t_op(true);
                 // read a block
                 {
-                    input_file.aread(buffer + i * block_size, offset, block_size, stxxl::default_completion_handler())->wait();
+                    input_file.aread(buffer + i * block_size, offset, block_size)->wait();
                 }
                 t_op.stop();
                 totalsizeread += block_size;
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
                     char cfn[4096]; // PATH_MAX
                     snprintf(cfn, sizeof(cfn), "%s_%012llX", filebase, offset);
                     file_type chunk_file(cfn, file::CREAT | file::RDWR | file::DIRECT, 0);
-                    chunk_file.awrite(buffer + i * block_size, 0, block_size, stxxl::default_completion_handler())->wait();
+                    chunk_file.awrite(buffer + i * block_size, 0, block_size)->wait();
                 }
                 t_op.stop();
                 totalsizewrite += block_size;

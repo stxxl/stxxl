@@ -47,7 +47,7 @@ int main()
     for (i = 0; i < 40; i++)
     {
         double begin = timestamp();
-        req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
+        req = file1.awrite(buffer, pos, block_size);
         req->wait();
         double end = timestamp();
 
@@ -64,7 +64,7 @@ int main()
     {
         pos = (stxxl::int64)rnd(disk_size / block_size) * block_size;
         double begin = timestamp();
-        req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
+        req = file1.awrite(buffer, pos, block_size);
         req->wait();
         double diff = timestamp() - begin;
 

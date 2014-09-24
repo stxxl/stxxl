@@ -40,13 +40,13 @@ public:
         void* buffer,
         offset_type pos,
         size_type bytes,
-        const completion_handler& on_cmpl);
+        const completion_handler& on_cmpl = completion_handler());
 
     request_ptr awrite(
         void* buffer,
         offset_type pos,
         size_type bytes,
-        const completion_handler& on_cmpl);
+        const completion_handler& on_cmpl = completion_handler());
 
     virtual int get_queue_id() const
     {

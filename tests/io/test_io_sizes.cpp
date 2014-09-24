@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
             //write
             STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being written at once");
-            req = file->awrite(buffer, 0, size, stxxl::default_completion_handler());
+            req = file->awrite(buffer, 0, size);
             wait_all(&req, 1);
 
             //fill with wrong data
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 
             //read again
             STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being read at once");
-            req = file->aread(buffer, 0, size, stxxl::default_completion_handler());
+            req = file->aread(buffer, 0, size);
             wait_all(&req, 1);
 
             //check

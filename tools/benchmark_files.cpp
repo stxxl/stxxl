@@ -257,8 +257,7 @@ int benchmark_files(int argc, char* argv[])
                         reqs[i * current_num_blocks + j] =
                             files[i]->awrite(buffer + current_step_size_int * i + j * block_size_int,
                                              offset + j * block_size,
-                                             (unsigned_type)block_size,
-                                             stxxl::default_completion_handler());
+                                             (unsigned_type)block_size);
                 }
 
  #ifdef WATCH_TIMES
@@ -304,8 +303,7 @@ int benchmark_files(int argc, char* argv[])
                         reqs[i * current_num_blocks + j] =
                             files[i]->aread(buffer + current_step_size_int * i + j * block_size_int,
                                             offset + j * block_size,
-                                            (unsigned_type)block_size,
-                                            stxxl::default_completion_handler());
+                                            (unsigned_type)block_size);
                 }
 
  #ifdef WATCH_TIMES

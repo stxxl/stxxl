@@ -106,7 +106,7 @@ int main(int argc, char** argv)
             for (unsigned j = 0; j < records_in_block; j++)
                 array[j].m_key = cur_key--;
 
-            stxxl::request_ptr req = f.awrite((void*)array, stxxl::int64(i) * block_size, block_size, stxxl::default_completion_handler());
+            stxxl::request_ptr req = f.awrite((void*)array, stxxl::int64(i) * block_size, block_size);
             req->wait();
         }
         stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);

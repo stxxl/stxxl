@@ -172,8 +172,7 @@ int create_files(int argc, char* argv[])
                 reqs[i * chunks + j] =
                     disks[i]->awrite(buffer + buffer_size_int * i + j * chunk_size_int,
                                      offset + j * current_chunk_size,
-                                     current_chunk_size,
-                                     stxxl::default_completion_handler());
+                                     current_chunk_size);
         }
 
  #ifdef WATCH_TIMES
@@ -207,8 +206,7 @@ int create_files(int argc, char* argv[])
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] = disks[i]->aread(buffer + buffer_size_int * i + j * chunk_size_int,
                                                        offset + j * current_chunk_size,
-                                                       current_chunk_size,
-                                                       stxxl::default_completion_handler());
+                                                       current_chunk_size);
         }
 
  #ifdef WATCH_TIMES

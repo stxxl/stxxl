@@ -281,7 +281,7 @@ public:
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr write(const bid_type& bid,
-                      completion_handler on_cmpl = default_completion_handler())
+                      completion_handler on_cmpl = completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
         return bid.storage->awrite(this, bid.offset, raw_size, on_cmpl);
@@ -293,7 +293,7 @@ public:
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr read(const bid_type& bid,
-                     completion_handler on_cmpl = default_completion_handler())
+                     completion_handler on_cmpl = completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);

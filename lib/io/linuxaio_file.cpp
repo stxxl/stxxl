@@ -50,9 +50,9 @@ void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes,
 {
     // req need not be an linuxaio_request
     if (type == request::READ)
-        aread(buffer, offset, bytes, default_completion_handler())->wait();
+        aread(buffer, offset, bytes)->wait();
     else
-        awrite(buffer, offset, bytes, default_completion_handler())->wait();
+        awrite(buffer, offset, bytes)->wait();
 }
 
 const char* linuxaio_file::io_type() const

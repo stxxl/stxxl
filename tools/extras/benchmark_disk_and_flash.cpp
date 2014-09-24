@@ -66,8 +66,7 @@ void run(char* buffer, file** disks, stxxl::int64 offset, stxxl::int64 length,
             for (j = 0; j < info[i].n; j++) {
                 unsigned bytes = info[i].bytes;
                 stxxl::int64 position = (bytes * (rand() & 0xffff)) % length;
-                reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes,
-                                                     stxxl::default_completion_handler());
+                reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes);
                 buf += bytes;
                 volume += (double)bytes;
             }

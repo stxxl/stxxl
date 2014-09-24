@@ -137,7 +137,7 @@ public:
 
     //! Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
     //! \return A request pointer to the I/O.
-    request_ptr read_async(completion_handler on_cmpl = default_completion_handler())
+    request_ptr read_async(completion_handler on_cmpl = completion_handler())
     {
         assert(is_internal());
         assert(has_external_block());
@@ -154,7 +154,7 @@ public:
 
     //! Write asyncronusly from internal_block to external_block if necessary.
     //! \return A request pointer to the I/O, an invalid request pointer if not necessary.
-    request_ptr clean_async(completion_handler on_cmpl = default_completion_handler())
+    request_ptr clean_async(completion_handler on_cmpl = completion_handler())
     {
         if (! is_dirty())
             return request_ptr();
