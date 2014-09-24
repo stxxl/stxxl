@@ -25,28 +25,28 @@ namespace stream {
 //     CHOOSE                                                         //
 ////////////////////////////////////////////////////////////////////////
 
-template <class Input_, int Which>
+template <class Input, int Which>
 class choose
 { };
 
 //! Creates stream from a tuple stream taking the first component of each tuple.
 //!
-//! \tparam Input_ type of the input tuple stream
+//! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input_>
-class choose<Input_, 1>
+template <class Input>
+class choose<Input, 1>
 {
-    Input_& in;
+    Input& in;
 
-    typedef typename Input_::value_type tuple_type;
+    typedef typename Input::value_type tuple_type;
 
 public:
     //! Standard stream typedef.
     typedef typename tuple_type::first_type value_type;
 
     //! Construction.
-    choose(Input_& in_) : in(in_)
+    choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -76,22 +76,22 @@ public:
 
 //! Creates stream from a tuple stream taking the second component of each tuple.
 //!
-//! \tparam Input_ type of the input tuple stream
+//! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input_>
-class choose<Input_, 2>
+template <class Input>
+class choose<Input, 2>
 {
-    Input_& in;
+    Input& in;
 
-    typedef typename Input_::value_type tuple_type;
+    typedef typename Input::value_type tuple_type;
 
 public:
     //! Standard stream typedef.
     typedef typename tuple_type::second_type value_type;
 
     //! Construction.
-    choose(Input_& in_) : in(in_)
+    choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -121,22 +121,22 @@ public:
 
 //! Creates stream from a tuple stream taking the third component of each tuple.
 //!
-//! \tparam Input_ type of the input tuple stream
+//! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input_>
-class choose<Input_, 3>
+template <class Input>
+class choose<Input, 3>
 {
-    Input_& in;
+    Input& in;
 
-    typedef typename Input_::value_type tuple_type;
+    typedef typename Input::value_type tuple_type;
 
 public:
     //! Standard stream typedef.
     typedef typename tuple_type::third_type value_type;
 
     //! Construction.
-    choose(Input_& in_) : in(in_)
+    choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -166,22 +166,22 @@ public:
 
 //! Creates stream from a tuple stream taking the fourth component of each tuple.
 //!
-//! \tparam Input_ type of the input tuple stream
+//! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input_>
-class choose<Input_, 4>
+template <class Input>
+class choose<Input, 4>
 {
-    Input_& in;
+    Input& in;
 
-    typedef typename Input_::value_type tuple_type;
+    typedef typename Input::value_type tuple_type;
 
 public:
     //! Standard stream typedef.
     typedef typename tuple_type::fourth_type value_type;
 
     //! Construction.
-    choose(Input_& in_) : in(in_)
+    choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -211,22 +211,22 @@ public:
 
 //! Creates stream from a tuple stream taking the fifth component of each tuple.
 //!
-//! \tparam Input_ type of the input tuple stream
+//! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input_>
-class choose<Input_, 5>
+template <class Input>
+class choose<Input, 5>
 {
-    Input_& in;
+    Input& in;
 
-    typedef typename Input_::value_type tuple_type;
+    typedef typename Input::value_type tuple_type;
 
 public:
     //! Standard stream typedef.
     typedef typename tuple_type::fifth_type value_type;
 
     //! Construction.
-    choose(Input_& in_) : in(in_)
+    choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -256,22 +256,22 @@ public:
 
 //! Creates stream from a tuple stream taking the sixth component of each tuple.
 //!
-//! \tparam Input_ type of the input tuple stream
+//! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input_>
-class choose<Input_, 6>
+template <class Input>
+class choose<Input, 6>
 {
-    Input_& in;
+    Input& in;
 
-    typedef typename Input_::value_type tuple_type;
+    typedef typename Input::value_type tuple_type;
 
 public:
     //! Standard stream typedef.
     typedef typename tuple_type::sixth_type value_type;
 
     //! Construction.
-    choose(Input_& in_) : in(in_)
+    choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
