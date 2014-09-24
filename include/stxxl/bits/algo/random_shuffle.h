@@ -279,7 +279,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
             STXXL_VERBOSE1("random_shuffle: no recursion");
 
             // copy bucket into temp. array
-            temp_array = new value_type[size];
+            temp_array = new value_type[(size_t)size];
             for (j = 0; j < size; j++) {
                 temp_array[j] = buckets[i]->top();
                 buckets[i]->pop();

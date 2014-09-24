@@ -561,7 +561,7 @@ public:
     template <class OutputIterator>
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
-        ssize_t length = end - begin;
+        int_type length = end - begin;
 
         STXXL_VERBOSE1("ext_merger::multi_merge from " << k << " sequence(s),"
                        " length = " << length);
@@ -570,7 +570,7 @@ public:
             return;
 
         assert(k > 0);
-        assert(length <= (ssize_t)size_);
+        assert(length <= (int_type)size_);
 
         //This is the place to make statistics about external multi_merge calls.
 
@@ -767,7 +767,7 @@ public:
             assert(free_segments.empty());
             //memcpy(target, states[0], length * sizeof(value_type));
             //std::copy(states[0],states[0]+length,target);
-            for (ssize_t i = 0; i < length; ++i, ++(states[0]), ++begin)
+            for (int_type i = 0; i < length; ++i, ++(states[0]), ++begin)
                 *begin = *(states[0]);
 
             entry[0].key = **states;

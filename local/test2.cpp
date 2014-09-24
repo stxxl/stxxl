@@ -29,7 +29,7 @@ struct my_less : std::less<int64_t>
 int main()
 {
     stxxl::scoped_print_timer
-        timer("overall work", 600 * 1024 * 1024 * sizeof(int64_t));
+        timer("overall work", 600 * 1024 * 1024 * (uint64_t)sizeof(int64_t));
 
     // create sorter
     stxxl::sorter<int64_t, my_less> sorter(my_less(), 256 * 1024 * 1024);
@@ -37,7 +37,7 @@ int main()
     // fill sorter with random integers
     {
         stxxl::scoped_print_timer
-            timer("presort+write random numbers", 600 * 1024 * 1024 * sizeof(int64_t));
+            timer("presort+write random numbers", 600 * 1024 * 1024 * (uint64_t)sizeof(int64_t));
 
         stxxl::random_number32 random;
 
@@ -51,7 +51,7 @@ int main()
     // get data back in sorted order
     {
         stxxl::scoped_print_timer
-            timer("read+merge random numbers", 600 * 1024 * 1024 * sizeof(int64_t));
+            timer("read+merge random numbers", 600 * 1024 * 1024 * (uint64_t)sizeof(int64_t));
 
         int64_t first = *sorter, last = first, count = 1;
         ++sorter;

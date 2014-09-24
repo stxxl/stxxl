@@ -332,8 +332,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         block_type* blocks2 = new block_type[max_bucket_size_bl];
         request_ptr* reqs1 = new request_ptr[max_bucket_size_bl];
         request_ptr* reqs2 = new request_ptr[max_bucket_size_bl];
-        type_key_* refs1 = new type_key_[max_bucket_size_rec];
-        type_key_* refs2 = new type_key_[max_bucket_size_rec];
+        type_key_* refs1 = new type_key_[(size_t)max_bucket_size_rec];
+        type_key_* refs2 = new type_key_[(size_t)max_bucket_size_rec];
 
         // submit reading first 2 buckets (Peter's scheme)
         unsigned_type nbucket_blocks = (unsigned_type)div_ceil(bucket_sizes[0], block_type::size);

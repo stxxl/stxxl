@@ -76,7 +76,7 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
     // calculate total bytes processed in a batch
     batch_size = raw_block_size * batch_size;
 
-    uint64 num_blocks_per_batch = stxxl::div_ceil(batch_size, raw_block_size);
+    unsigned_type num_blocks_per_batch = (unsigned_type)stxxl::div_ceil(batch_size, raw_block_size);
     batch_size = num_blocks_per_batch * raw_block_size;
 
     block_type* buffer = new block_type[num_blocks_per_batch];

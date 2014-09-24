@@ -69,7 +69,7 @@ public:
 
     //! Copy constructor.
     completion_handler(const completion_handler& obj)
-        : m_ptr(obj.m_ptr ? obj.m_ptr.get()->clone() : NULL)
+        : m_ptr(obj.m_ptr.get() ? obj.m_ptr.get()->clone() : NULL)
     { }
 
     //! Construct a completion handler which calls some function.
@@ -81,14 +81,14 @@ public:
     //! Assignment operator
     completion_handler& operator = (const completion_handler& obj)
     {
-        m_ptr.reset(obj.m_ptr ? obj.m_ptr.get()->clone() : NULL);
+        m_ptr.reset(obj.m_ptr.get() ? obj.m_ptr.get()->clone() : NULL);
         return *this;
     }
 
     //! Call the enclosed completion handler.
     void operator () (request* req)
     {
-        if (m_ptr)
+        if (m_ptr.get())
             (* m_ptr)(req);
     }
 };
