@@ -17,6 +17,8 @@
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/rand.h>
 
+using stxxl::unsigned_type;
+
 struct rand_pairs
 {
     stxxl::random_number32& rand_;
@@ -102,18 +104,18 @@ template class stxxl::unordered_map<
 void basic_test()
 {
     typedef std::pair<int, int> value_type;
-    const unsigned value_size = sizeof(value_type);
+    const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned n_values = 40000;
-    const unsigned n_tests = 10000;
+    const unsigned_type n_values = 40000;
+    const unsigned_type n_tests = 10000;
 
     // make sure all changes will be buffered (*)
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
 
-    const unsigned mem_to_sort = 32 * 1024 * 1024;
+    const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
-    const unsigned subblock_raw_size = 4 * 1024;
-    const unsigned block_size = 4;
+    const unsigned_type subblock_raw_size = 4 * 1024;
+    const unsigned_type block_size = 4;
 
     typedef stxxl::unordered_map<int, int, hash_int, cmp,
                                  subblock_raw_size, block_size> unordered_map;
@@ -156,7 +158,7 @@ void basic_test()
     std::cout << "Insert...";
     stats_begin = *stxxl::stats::get_instance();
 
-    for (unsigned i = 0; i < n_values / 2; i++) {
+    for (unsigned_type i = 0; i < n_values / 2; i++) {
         // new without checking
         map.insert_oblivious(values2[2 * i]);
         // new with checking
@@ -183,7 +185,7 @@ void basic_test()
 
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
         STXXL_CHECK(cmap.find(values2[i].first) != cmap.end());
         STXXL_CHECK(cmap.find(values3[i].first) == cmap.end());
@@ -197,7 +199,7 @@ void basic_test()
 
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         value_type value1 = values1[i];         // in external memory
         value1.second++;
         map.insert_oblivious(value1);
@@ -208,7 +210,7 @@ void basic_test()
     }
     // now check
     STXXL_CHECK(map.size() == 2 * n_values);         // nothing added, nothing removed
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         const_iterator it1 = cmap.find(values1[i].first);
         const_iterator it2 = cmap.find(values2[i].first);
 
@@ -225,13 +227,13 @@ void basic_test()
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
     std::random_shuffle(values3.begin(), values3.end());
-    for (unsigned i = 0; i < n_tests / 2; i++) {        // external
+    for (unsigned_type i = 0; i < n_tests / 2; i++) {        // external
         // existing without checking
         map.erase_oblivious(values1[2 * i].first);
         // existing with checking
         STXXL_CHECK(map.erase(values1[2 * i + 1].first) == 1);
     }
-    for (unsigned i = 0; i < n_tests / 2; i++) {        // internal
+    for (unsigned_type i = 0; i < n_tests / 2; i++) {        // internal
         // existing without checking
         map.erase_oblivious(values2[2 * i].first);
         // existing with checking
@@ -255,7 +257,7 @@ void basic_test()
     stats_begin = *stxxl::stats::get_instance();
 
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
-    for (unsigned i = n_values / 2; i < n_values; i++) {
+    for (unsigned_type i = n_values / 2; i < n_values; i++) {
         map.insert_oblivious(values1[i]);
     }
     // lookup of existing values
@@ -294,7 +296,7 @@ void basic_test()
     STXXL_CHECK(map.size() == n_values);
     // lookup some random values
     std::random_shuffle(values1.begin(), values1.end());
-    for (unsigned i = 0; i < n_tests; i++)
+    for (unsigned_type i = 0; i < n_tests; i++)
         STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
     STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);

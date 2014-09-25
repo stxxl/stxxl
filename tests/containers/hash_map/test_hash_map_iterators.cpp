@@ -19,6 +19,8 @@
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 #include <stxxl/bits/compat/hash_map.h>
 
+using stxxl::unsigned_type;
+
 struct rand_pairs
 {
     stxxl::random_number32& rand_;
@@ -55,17 +57,17 @@ struct cmp : public std::less<int>
 void cmp_with_internal_map()
 {
     typedef std::pair<int, int> value_type;
-    const unsigned value_size = sizeof(value_type);
+    const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned n_values = 20000;
-    const unsigned n_tests = 10000;
+    const unsigned_type n_values = 20000;
+    const unsigned_type n_tests = 10000;
 
     // make sure all changes will be buffered
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
-    const unsigned mem_to_sort = 32 * 1024 * 1024;
+    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
-    const unsigned subblock_raw_size = 4 * 1024;
-    const unsigned block_size = 4;
+    const unsigned_type subblock_raw_size = 4 * 1024;
+    const unsigned_type block_size = 4;
 
     typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
                                       subblock_raw_size, block_size> hash_map;
@@ -142,18 +144,18 @@ void cmp_with_internal_map()
 void basic_iterator_test()
 {
     typedef std::pair<int, int> value_type;
-    const unsigned value_size = sizeof(value_type);
+    const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned n_values = 20000;
-    const unsigned n_tests = 10000;
+    const unsigned_type n_values = 20000;
+    const unsigned_type n_tests = 10000;
 
     // make sure all changes will be buffered
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
 
-    const unsigned mem_to_sort = 32 * 1024 * 1024;
+    const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
-    const unsigned subblock_raw_size = 4 * 1024;
-    const unsigned block_size = 4;
+    const unsigned_type subblock_raw_size = 4 * 1024;
+    const unsigned_type block_size = 4;
 
     typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
                                       subblock_raw_size, block_size> hash_map;
@@ -191,7 +193,7 @@ void basic_iterator_test()
     std::cout << "Lookup and modify...";
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
-    for (unsigned i = 0; i < n_tests; ++i) {
+    for (unsigned_type i = 0; i < n_tests; ++i) {
         iterator it1 = map.find(values1[i].first);
         iterator it2 = map.find(values2[i].first);
         STXXL_CHECK(it1 != map.end());
@@ -200,7 +202,7 @@ void basic_iterator_test()
         (*it2).second++;
     }
     // check again
-    for (unsigned i = 0; i < n_tests; ++i) {
+    for (unsigned_type i = 0; i < n_tests; ++i) {
         const_iterator cit1 = cmap.find(values1[i].first);
         const_iterator cit2 = cmap.find(values2[i].first);
         STXXL_CHECK(cit1 != map.end());
@@ -228,7 +230,7 @@ void basic_iterator_test()
     std::cout << "Iterator-value altered by insert_oblivious...";
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         int key1 = values1[i].first;
         int key2 = values2[i].first;
         const_iterator cit1 = cmap.find(key1);
@@ -248,7 +250,7 @@ void basic_iterator_test()
     std::cout << "Iterator-value altered by other iterator...";
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         const_iterator cit1 = cmap.find(values1[i].first);
         STXXL_CHECK(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(values2[i].first);
@@ -269,7 +271,7 @@ void basic_iterator_test()
     std::cout << "Erase by iterator...";
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         const_iterator cit1 = cmap.find(values1[i].first);
         STXXL_CHECK(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(values2[i].first);
@@ -288,7 +290,7 @@ void basic_iterator_test()
 
     // --- erase by value (key)
     std::cout << "Erase by key...";
-    for (unsigned i = 0; i < n_tests; i++) {
+    for (unsigned_type i = 0; i < n_tests; i++) {
         const_iterator cit1 = cmap.find(values1[i + n_tests].first);
         STXXL_CHECK(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(values2[i + n_tests].first);
@@ -308,16 +310,16 @@ void basic_iterator_test()
 void more_iterator_test()
 {
     typedef std::pair<int, int> value_type;
-    const unsigned value_size = sizeof(value_type);
+    const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned n_values = 20000;
+    const unsigned_type n_values = 20000;
 
     // make sure all changes will be buffered
-    const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
-    const unsigned mem_to_sort = 32 * 1024 * 1024;
+    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
-    const unsigned subblock_raw_size = 4 * 1024;
-    const unsigned block_size = 4;
+    const unsigned_type subblock_raw_size = 4 * 1024;
+    const unsigned_type block_size = 4;
 
     typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
                                       subblock_raw_size, block_size> hash_map;

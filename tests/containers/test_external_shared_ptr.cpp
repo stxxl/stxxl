@@ -213,7 +213,7 @@ typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 
 void test_map()
 {
-    const int max_mult = 8;
+    const unsigned max_mult = 8;
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     stxxl::stats_data stats_elapsed;
@@ -222,7 +222,7 @@ void test_map()
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
     STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB");
 
-    for (int mult = 1; mult < max_mult; mult *= 2)
+    for (unsigned mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *stxxl::stats::get_instance();
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
