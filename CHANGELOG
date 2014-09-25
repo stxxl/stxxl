@@ -1,17 +1,23 @@
 Version 1.4-dev (unreleased)
 
-  - support kernel based asynchronous I/O on Linux (new file type "linuxaio"),
-    which exploits Native Command Queuing (NCQ) if available
-    disable/enable with the define STXXL_FILE_LINUXAIO 0/1 via cmake
+* support kernel based asynchronous I/O on Linux (new file type "linuxaio"),
+  which exploits Native Command Queuing (NCQ) if available
+  disable/enable with the define STXXL_FILE_LINUXAIO 0/1 via cmake
 
-  - adding new disk_config entry device_id, which specifies the physical device
-    id of the "disk" used during prefetching sequence calculations. This used
-    to be identical with the queue id, however, for linuxaio there is only one
-    queue; thus the distinction had to be made. In a default config, no changes
-    are necessary, as the device_id parameter is automatically enumerated.
+* adding new disk_config entry device_id, which specifies the physical device
+  id of the "disk" used during prefetching sequence calculations. This used to
+  be identical with the queue id, however, for linuxaio there is only one
+  queue; thus the distinction had to be made. In a default config, no changes
+  are necessary, as the device_id parameter is automatically enumerated.
 
-  - adding stxxl::binary_buffer which can be used for compact serialization and
-    reading via a stxxl::binary_reader cursor interface.
+* adding stxxl::binary_buffer which can be used for compact serialization and
+  reading via a stxxl::binary_reader cursor interface.
+
+* stxxl::unordered_map
+
+* stxxl::external_shared_ptr is a proxy class to allow use of shared_ptr
+  classes inside stxxl containers. Reference counts are kept in memory, while
+  data may be swapped out to disk.
 
   - removing struct default_completion_handler, using a NULL pointer in default
     complete handler instead, since otherwise a default_completion_handler

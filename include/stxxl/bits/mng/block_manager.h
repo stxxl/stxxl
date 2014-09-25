@@ -51,9 +51,7 @@ STXXL_BEGIN_NAMESPACE
 #define STXXL_MNG_COUNT_ALLOCATION 1
 #endif // STXXL_MNG_COUNT_ALLOCATION
 
-//! \defgroup mnglayer Block Management Layer
-//! Group of classes which help controlling external memory space,
-//! managing disks, and allocating and deallocating blocks of external storage
+//! \addtogroup mnglayer
 //! \{
 
 //! Block manager class.

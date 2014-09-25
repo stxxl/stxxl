@@ -39,8 +39,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! \defgroup stllayer STL-User Layer
-//! Layer which groups STL compatible algorithms and containers
+//! \addtogroup stllayer
 
 //! \defgroup stlalgo Algorithms
 //! \ingroup stllayer

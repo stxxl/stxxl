@@ -39,6 +39,9 @@ STXXL_BEGIN_NAMESPACE
 
 extern unsigned ran32State;
 
+//! \addtogroup support
+//! \{
+
 //! Fast uniform [0, 2^32) pseudo-random generator with period 2^32, random
 //! bits: 32.
 //! \warning Uses a global state and is not reentrant or thread-safe!
@@ -281,6 +284,8 @@ struct random_number64
 #if STXXL_MSVC
 #pragma warning(pop) // assignment operator could not be generated
 #endif
+
+//! \}
 
 STXXL_END_NAMESPACE
 

@@ -11,10 +11,14 @@
 ############################################################################
 
 add_subdirectory(btree)
+add_subdirectory(hash_map)
 
 stxxl_build_test(test_deque)
 stxxl_build_test(test_ext_merger)
 stxxl_build_test(test_ext_merger2)
+if(USE_BOOST)
+  stxxl_build_test(test_external_shared_ptr)
+endif(USE_BOOST)
 stxxl_build_test(test_iterators)
 stxxl_build_test(test_many_stacks)
 stxxl_build_test(test_matrix)
@@ -61,7 +65,7 @@ endif(USE_BOOST)
 stxxl_build_test(test_map)
 stxxl_build_test(test_map_random)
 
-stxxl_test(test_map 12)
+stxxl_test(test_map 8)
 stxxl_test(test_map_random 2000)
 
 #-tb longer test for map

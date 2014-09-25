@@ -36,6 +36,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 //! Returns number of seconds since the epoch, high resolution.
 inline double
 timestamp()
@@ -171,6 +174,8 @@ public:
         }
     }
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 

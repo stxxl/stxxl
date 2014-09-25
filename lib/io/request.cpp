@@ -60,7 +60,7 @@ void request::check_alignment() const
 void request::check_nref_failed(bool after)
 {
     STXXL_ERRMSG("WARNING: serious error, reference to the request is lost " <<
-                 (after ? "after " : "before") << " serve" <<
+                 (after ? "after" : "before") << " serve()" <<
                  " nref=" << get_reference_count() <<
                  " this=" << this <<
                  " offset=" << m_offset <<

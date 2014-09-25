@@ -244,11 +244,16 @@ public:
 __attribute__ ((packed));
 #endif
 
+//! \addtogroup support
+//! \{
+
 //! Construct a 40-bit unsigned integer stored in five bytes.
 typedef uint_pair<uint8> uint40;
 
 //! Construct a 48-bit unsigned integer stored in six bytes.
 typedef uint_pair<uint16> uint48;
+
+//! \}
 
 STXXL_END_NAMESPACE
 
