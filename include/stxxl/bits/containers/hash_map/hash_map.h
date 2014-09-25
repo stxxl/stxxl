@@ -160,7 +160,7 @@ public:
     //! \param hf hash-function
     //! \param cmp comparator-object
     //! \param buffer_size size for internal-memory buffer in bytes
-    hash_map(internal_size_type n = 10000,
+    hash_map(internal_size_type n = 0,
              const hasher& hf = hasher(),
              const key_compare_type& cmp = key_compare_type(),
              internal_size_type buffer_size = 100*1024*1024,
@@ -813,8 +813,14 @@ protected:
     template <class Iterator>
     Iterator _begin() const
     {
+        self_type* non_const_this = (self_type*)this;
+
+        if (buckets_.size() == 0)
+            return _end<Iterator>();
+
         // correct key will be set by find_next()
-        Iterator it((self_type*)this, 0, buckets_[0].list_, 0, src_unknown, true, key_type());
+        Iterator it(non_const_this, 0, buckets_[0].list_,
+                    0, src_unknown, true, key_type());
         it.find_next();
 
         return it;
@@ -1293,8 +1299,10 @@ public:
         std::swap(bids_, old_bids);
 
         // already stored values ("old values")
-        reader_type* reader = new reader_type(old_bids.begin(), old_bids.end(), block_cache_);
-        old_values_stream old_values(old_buckets.begin(), old_buckets.end(), *reader, old_bids.begin(), *this);
+        reader_type* reader = new reader_type(old_bids.begin(), old_bids.end(),
+                                              block_cache_);
+        old_values_stream old_values(old_buckets.begin(), old_buckets.end(),
+                                     *reader, old_bids.begin(), *this);
 
         // values to insert ("new values")
         input_stream input = stxxl::stream::streamify(f, l);

@@ -91,7 +91,7 @@ public:
     //! \param cmp comparator-object
     //! \param buffer_size size of internal-memory buffer in bytes
     //! \param a allocation-strategory for internal-memory buffer
-    unordered_map(internal_size_type n = 10000,
+    unordered_map(internal_size_type n = 0,
                   const hasher& hf = hasher(),
                   const key_compare& cmp = key_compare(),
                   internal_size_type buffer_size = 100*1024*1024,

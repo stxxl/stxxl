@@ -497,10 +497,11 @@ struct HashedValuesStream
           end_bucket_(end_bucket),
           begin_bid_(begin_bid),
           i_bucket_(0),
-          node_(curr_bucket_->list_),
+          node_(curr_bucket_ != end_bucket_ ? curr_bucket_->list_ : NULL),
           i_external_(0)
     {
-        value_ = find_next();
+        if (!empty())
+            value_ = find_next();
     }
 
     const value_type& operator * () { return value_; }
