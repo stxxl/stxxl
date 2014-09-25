@@ -28,10 +28,7 @@
 #include <stxxl/stats>
 #include <stxxl/timer>
 
-const stxxl::unsigned_type mega = 1024 * 1024;    //1 * 1024 does not work here
-
-//const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
-const stxxl::unsigned_type block_size = 4 * mega;
+const stxxl::unsigned_type mega = 1024 * 1024;
 
 #define RECORD_SIZE 16
 #define LOAD 0
