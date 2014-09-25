@@ -31,7 +31,7 @@
 STXXL_BEGIN_NAMESPACE
 
 #define STXXL_VERBOSE_HASH_MAP(m) \
-    STXXL_MSG("hash_map[" << static_cast<const void*>(this) << "]::" << m)
+    STXXL_VERBOSE1("hash_map[" << static_cast<const void*>(this) << "]::" << m)
 
 //! External memory hash-map
 namespace hash_map {

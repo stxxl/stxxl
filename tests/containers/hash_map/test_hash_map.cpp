@@ -52,6 +52,53 @@ struct cmp : public std::less<int>
 // forced instantiation
 template class stxxl::unordered_map<int, int, hash_int, cmp, 4* 1024, 4>;
 
+struct structA
+{
+    int x, y;
+
+    structA() { }
+    structA(int _x, int _y) : x(_x), y(_y) { }
+};
+
+struct structB
+{
+    double u, v;
+};
+
+struct hash_structA
+{
+    size_t operator () (const structA& key) const
+    {
+        // a simple integer hash function
+        return (size_t)((key.x + key.y) * 2654435761);
+    }
+};
+
+struct cmp_structA
+{
+    bool operator () (const structA& a, const structA& b) const
+    {
+        if (a.x == b.x) return a.y < b.y;
+        return a.x < b.x;
+    }
+
+    structA min_value() const
+    {
+        return structA(std::numeric_limits<int>::min(),
+                       std::numeric_limits<int>::min());
+    }
+    structA max_value() const
+    {
+        return structA(std::numeric_limits<int>::max(),
+                       std::numeric_limits<int>::max());
+    }
+};
+
+// forced instantiation of a struct
+template class stxxl::unordered_map<
+    structA, structB, hash_structA, cmp_structA, 4* 1024, 4
+    >;
+
 void basic_test()
 {
     typedef std::pair<int, int> value_type;

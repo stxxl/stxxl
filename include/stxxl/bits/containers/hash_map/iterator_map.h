@@ -110,7 +110,7 @@ public:
     void fix_iterators_2ext(internal_size_type i_bucket_old, const key_type& key,
                             internal_size_type i_bucket_new, external_size_type i_ext)
     {
-        STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2ext i_bucket=" << i_bucket_old << " key=" << key << ", new_i_ext=" << i_ext);
+        STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2ext i_bucket=" << i_bucket_old << " new_i_ext=" << i_ext);
 
         std::vector<iterator_base*> its2fix;
         _find(i_bucket_old, its2fix);
@@ -142,7 +142,7 @@ public:
     //! specified node in internal memory (will be called by insert_oblivious)
     void fix_iterators_2int(internal_size_type i_bucket, const key_type& key, node_type* node)
     {
-        STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2int i_bucket=" << i_bucket << " key=" << key << " node=" << node);
+        STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2int i_bucket=" << i_bucket << " node=" << node);
 
         std::vector<iterator_base*> its2fix;
         _find(i_bucket, its2fix);
@@ -167,7 +167,7 @@ public:
     //! end of the hash-map (called by erase and erase_oblivious)
     void fix_iterators_2end(internal_size_type i_bucket, const key_type& key)
     {
-        STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2end i_bucket=" << i_bucket << " key=" << key);
+        STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2end i_bucket=" << i_bucket);
 
         std::vector<iterator_base*> its2fix;
         _find(i_bucket, its2fix);
