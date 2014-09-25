@@ -104,7 +104,7 @@ void basic_test()
     typedef std::pair<int, int> value_type;
     const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned_type n_values = 40000;
+    const unsigned_type n_values = 20000;
     const unsigned_type n_tests = 10000;
 
     // make sure all changes will be buffered (*)

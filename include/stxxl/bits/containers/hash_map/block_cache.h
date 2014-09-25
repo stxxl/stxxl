@@ -136,7 +136,7 @@ protected:
     {
         size_t operator () (const bid_type& bid) const
         {
-            return longhash1(bid.offset + uint64(bid.storage));
+            return longhash1(bid.offset + reinterpret_cast<uint64>(bid.storage));
         }
 #ifdef STXXL_MSVC
         bool operator () (const bid_type& a, const bid_type& b) const
