@@ -28,10 +28,12 @@ class iterator_map : private noncopyable
 {
 public:
     typedef HashMap hash_map_type;
-    typedef typename hash_map_type::size_type size_type;
     typedef typename hash_map_type::node_type node_type;
     typedef typename hash_map_type::source_type source_type;
     typedef typename hash_map_type::key_type key_type;
+
+    typedef typename hash_map_type::internal_size_type internal_size_type;
+    typedef typename hash_map_type::external_size_type external_size_type;
 
     typedef hash_map_iterator_base<hash_map_type> iterator_base;
 
@@ -43,9 +45,9 @@ private:
 //                return longhash1(key);
 //            }
 //        };
-//        typedef __gnu_cxx::hash_multimap<size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
+//        typedef __gnu_cxx::hash_multimap<internal_size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
 
-    typedef std::multimap<size_type, iterator_base*> multimap_type;
+    typedef std::multimap<internal_size_type, iterator_base*> multimap_type;
 
     //! bucket-index and pointer to iterator_base
     typedef typename multimap_type::value_type pair_type;
@@ -70,7 +72,7 @@ public:
         register_iterator(it, it.i_bucket_);
     }
 
-    void register_iterator(iterator_base& it, size_type i_bucket)
+    void register_iterator(iterator_base& it, internal_size_type i_bucket)
     {
         STXXL_VERBOSE2("hash_map::iterator_map register_iterator addr=" << &it << " bucket=" << i_bucket);
         it_map_.insert(pair_type(i_bucket, &it));
@@ -81,7 +83,7 @@ public:
         unregister_iterator(it, it.i_bucket_);
     }
 
-    void unregister_iterator(iterator_base& it, size_type i_bucket)
+    void unregister_iterator(iterator_base& it, internal_size_type i_bucket)
     {
         STXXL_VERBOSE2("hash_map::iterator_map unregister_iterator addr=" << &it << " bucket=" << i_bucket);
 
@@ -105,8 +107,8 @@ public:
     //! Update iterators with given key and bucket and make them point to the
     //! specified location in external memory (will be called during
     //! re-hashing)
-    void fix_iterators_2ext(size_type i_bucket_old, const key_type& key,
-                            size_type i_bucket_new, size_type i_ext)
+    void fix_iterators_2ext(internal_size_type i_bucket_old, const key_type& key,
+                            internal_size_type i_bucket_new, external_size_type i_ext)
     {
         STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2ext i_bucket=" << i_bucket_old << " key=" << key << ", new_i_ext=" << i_ext);
 
@@ -138,7 +140,7 @@ public:
 
     //! Update iterators with given key and bucket and make them point to the
     //! specified node in internal memory (will be called by insert_oblivious)
-    void fix_iterators_2int(size_type i_bucket, const key_type& key, node_type* node)
+    void fix_iterators_2int(internal_size_type i_bucket, const key_type& key, node_type* node)
     {
         STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2int i_bucket=" << i_bucket << " key=" << key << " node=" << node);
 
@@ -163,7 +165,7 @@ public:
 
     //! Update iterators with given key and bucket and make them point to the
     //! end of the hash-map (called by erase and erase_oblivious)
-    void fix_iterators_2end(size_type i_bucket, const key_type& key)
+    void fix_iterators_2end(internal_size_type i_bucket, const key_type& key)
     {
         STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2end i_bucket=" << i_bucket << " key=" << key);
 
@@ -198,7 +200,7 @@ public:
 private:
     //! Find all iterators registered with given bucket and add them to outc
     template <class OutputContainer>
-    void _find(size_type i_bucket, OutputContainer& outc)
+    void _find(internal_size_type i_bucket, OutputContainer& outc)
     {
         std::pair<mmiterator_type, mmiterator_type> range
             = it_map_.equal_range(i_bucket);

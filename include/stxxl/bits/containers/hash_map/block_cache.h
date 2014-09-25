@@ -260,9 +260,9 @@ protected:
             if (i == max_tries)
             {
                 throw std::runtime_error(
-                    "The block cache is too small,"
-                    "no block can be kicked out (all blocks are retained)!"
-                    );
+                          "The block cache is too small,"
+                          "no block can be kicked out (all blocks are retained)!"
+                          );
             }
             pager_.hit(i_block2kick);
         } while (retain_count_[i_block2kick] > 0);

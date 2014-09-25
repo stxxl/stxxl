@@ -65,14 +65,14 @@ struct bucket
     NodeType* list_;
 
     //! number of elements in external memory
-    size_t n_external_;
+    external_size_type n_external_;
 
     //! index of first block's bid (to be used as index for hash_map's
     //! bids_-array
-    size_t i_block_;
+    internal_size_type i_block_;
 
     //! index of first subblock
-    size_t i_subblock_;
+    internal_size_type i_subblock_;
 
     bucket()
         : list_(NULL),
@@ -81,7 +81,8 @@ struct bucket
           i_subblock_(0)
     { }
 
-    bucket(NodeType* list, size_t n_external, size_t i_block, size_t i_subblock)
+    bucket(NodeType* list, external_size_type n_external,
+           internal_size_type i_block, internal_size_type i_subblock)
         : list_(list),
           n_external_(n_external),
           i_block_(i_block),
@@ -107,7 +108,7 @@ public:
 
 private:
     //! index within current block
-    size_t i_value_;
+    unsigned_type i_value_;
     //! points to the beginning of the block-sequence
     bid_iterator begin_bid_;
     //! points to the current block
@@ -123,9 +124,9 @@ private:
     //! true if prefetching enabled
     bool prefetch_;
     //! pages, which are read at once from disk, consist of this many blocks
-    size_t page_size_;
+    unsigned_type page_size_;
     //! number of pages to prefetch
-    size_t prefetch_pages_;
+    unsigned_type prefetch_pages_;
 
     //! current block dirty ?
     bool dirty_;
@@ -141,7 +142,7 @@ public:
     //! \param prefetch Enable/Disable prefetching
     buffered_reader(bid_iterator seq_begin, bid_iterator seq_end,
                     cache_type& cache,
-                    size_t i_subblock = 0, bool prefetch = true)
+                    internal_size_type i_subblock = 0, bool prefetch = true)
         : i_value_(0),
           begin_bid_(seq_begin),
           curr_bid_(seq_begin),
@@ -176,7 +177,7 @@ public:
         prefetch_ = true;
         pref_bid_ = curr_bid_;
         // start prefetching page_size*prefetch_pages blocks beginning with current one
-        for (size_t i = 0; i < page_size_ * prefetch_pages_; i++)
+        for (unsigned_type i = 0; i < page_size_ * prefetch_pages_; i++)
         {
             if (pref_bid_ == end_bid_)
                 break;
@@ -260,7 +261,7 @@ public:
     }
 
     //! Continue reading at given block and subblock.
-    void skip_to(bid_iterator bid, size_t i_subblock)
+    void skip_to(bid_iterator bid, internal_size_type i_subblock)
     {
         if (curr_bid_ == end_bid_)
             return;
@@ -323,11 +324,11 @@ private:
     bid_container_type* bids_;
 
     //! current block's index
-    size_t i_block_;
+    unsigned_type i_block_;
     //! current value's index in the range of [0..\#values per block[
-    size_t i_value_;
+    unsigned_type i_value_;
     //! number of blocks to allocate in a row
-    size_t increase_;
+    unsigned_type increase_;
 
 public:
     //! Create a new buffered writer.
@@ -364,7 +365,7 @@ public:
     //! Write given value.
     void append(const value_type& value)
     {
-        size_t i_subblock = (i_value_ / subblock_size);
+        internal_size_type i_subblock = (i_value_ / subblock_size);
         (*block_)[i_subblock][i_value_ % subblock_size] = value;
 
         if (i_value_ + 1 < block_size * subblock_size)
@@ -413,10 +414,10 @@ public:
     }
 
     //! Index of current block.
-    size_t i_block() { return i_block_; }
+    internal_size_type i_block() { return i_block_; }
 
     //! Index of current subblock.
-    size_t i_subblock() { return i_value_ / subblock_size; }
+    internal_size_type i_subblock() { return i_value_ / subblock_size; }
 };
 
 /*!
@@ -431,22 +432,24 @@ struct HashedValue
 {
     typedef HashMap hash_map_type;
     typedef typename hash_map_type::value_type value_type;
-    typedef typename hash_map_type::size_type size_type;
     typedef typename hash_map_type::source_type source_type;
     typedef typename hash_map_type::node_type node_type;
 
+    typedef typename hash_map_type::internal_size_type internal_size_type;
+    typedef typename hash_map_type::external_size_type external_size_type;
+
     value_type value_;
-    size_type i_bucket_;
+    internal_size_type i_bucket_;
     source_type source_;
     node_type* node_;
-    size_type i_external_;
+    external_size_type i_external_;
 
     HashedValue()
-        : i_bucket_(size_type(-1))
+        : i_bucket_(internal_size_type(-1))
     { }
 
-    HashedValue(const value_type& value, size_type i_bucket,
-                source_type src, node_type* node, size_type i_external)
+    HashedValue(const value_type& value, internal_size_type i_bucket,
+                source_type src, node_type* node, external_size_type i_external)
         : value_(value),
           i_bucket_(i_bucket),
           source_(src),
@@ -468,19 +471,21 @@ struct HashedValuesStream
     typedef HashMap hash_map_type;
     typedef HashedValue<HashMap> value_type;
 
-    typedef typename hash_map_type::size_type size_type;
     typedef typename hash_map_type::node_type node_type;
     typedef typename hash_map_type::bid_container_type::iterator bid_iterator;
     typedef typename hash_map_type::buckets_container_type::iterator bucket_iterator;
+
+    typedef typename hash_map_type::internal_size_type internal_size_type;
+    typedef typename hash_map_type::external_size_type external_size_type;
 
     hash_map_type& map_;
     Reader& reader_;
     bucket_iterator curr_bucket_;
     bucket_iterator end_bucket_;
     bid_iterator begin_bid_;
-    size_type i_bucket_;
+    internal_size_type i_bucket_;
     node_type* node_;
-    size_type i_external_;
+    external_size_type i_external_;
     value_type value_;
 
     HashedValuesStream(bucket_iterator begin_bucket, bucket_iterator end_bucket,

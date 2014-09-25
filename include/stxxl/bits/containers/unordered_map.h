@@ -69,8 +69,11 @@ public:
     typedef typename impl_type::pointer pointer;
     typedef typename impl_type::const_pointer const_pointer;
 
-    typedef typename impl_type::size_type size_type;
+    typedef typename impl_type::external_size_type size_type;
     typedef typename impl_type::difference_type difference_type;
+
+    typedef typename impl_type::external_size_type external_size_type;
+    typedef typename impl_type::internal_size_type internal_size_type;
 
     typedef typename impl_type::iterator iterator;
     typedef typename impl_type::const_iterator const_iterator;
@@ -88,10 +91,10 @@ public:
     //! \param cmp comparator-object
     //! \param buffer_size size of internal-memory buffer in bytes
     //! \param a allocation-strategory for internal-memory buffer
-    unordered_map(size_type n = 10000,
+    unordered_map(internal_size_type n = 10000,
                   const hasher& hf = hasher(),
                   const key_compare& cmp = key_compare(),
-                  size_type buffer_size = 100*1024*1024,
+                  internal_size_type buffer_size = 100*1024*1024,
                   const Alloc& a = Alloc())
         : impl(n, hf, cmp, buffer_size, a)
     { }
@@ -107,12 +110,12 @@ public:
     template <class InputIterator>
     unordered_map(InputIterator f,
                   InputIterator l,
-                  size_type mem = 256*1024*1024,
+                  internal_size_type mem = 256*1024*1024,
                   const hasher& hf = hasher(),
                   const key_compare& cmp = key_compare(),
-                  size_type buffer_size = 100*1024*1024,
-                  const Alloc& a = Alloc()
-                  ) : impl(f, l, mem, hf, cmp, buffer_size, a)
+                  internal_size_type buffer_size = 100*1024*1024,
+                  const Alloc& a = Alloc())
+        : impl(f, l, mem, hf, cmp, buffer_size, a)
     { }
 
     void swap(unordered_map& obj)
@@ -121,11 +124,11 @@ public:
     }
 
     // size and capacity
-    size_type size() const
+    external_size_type size() const
     {
         return impl.size();
     }
-    size_type max_size() const
+    external_size_type max_size() const
     {
         return impl.max_size();
     }
@@ -162,7 +165,7 @@ public:
         return impl.insert_oblivious(obj);
     }
     template <class InputIterator>
-    void insert(InputIterator first, InputIterator last, size_type mem)
+    void insert(InputIterator first, InputIterator last, internal_size_type mem)
     {
         impl.insert(first, last, mem);
     }
@@ -172,7 +175,7 @@ public:
     {
         impl.erase(position);
     }
-    size_type erase(const key_type& key)
+    internal_size_type erase(const key_type& key)
     {
         return impl.erase(key);
     }
@@ -194,7 +197,7 @@ public:
     {
         return impl.find(key);
     }
-    size_type count(const key_type& key) const
+    internal_size_type count(const key_type& key) const
     {
         return impl.count(key);
     }
@@ -222,15 +225,15 @@ public:
     }
 
     // bucket interface
-    size_type bucket_count() const
+    internal_size_type bucket_count() const
     {
         return impl.bucket_count();
     }
-    size_type max_bucket_count() const
+    internal_size_type max_bucket_count() const
     {
         return impl.max_bucket_count();
     }
-    size_type bucket(const key_type& k) const
+    internal_size_type bucket(const key_type& k) const
     {
         return impl.bucket_index(k);
     }
@@ -248,21 +251,21 @@ public:
     {
         impl.opt_load_factor(z);
     }
-    void rehash(size_type n)
+    void rehash(internal_size_type buckets)
     {
-        impl.rehash(n);
+        impl.rehash(buckets);
     }
 
     // buffer policy
-    size_type buffer_size() const
+    internal_size_type buffer_size() const
     {
         return impl.buffer_size();
     }
-    size_type max_buffer_size() const
+    internal_size_type max_buffer_size() const
     {
         return impl.max_buffer_size();
     }
-    void max_buffer_size(size_type bs)
+    void max_buffer_size(internal_size_type bs)
     {
         impl.max_buffer_size(bs);
     }

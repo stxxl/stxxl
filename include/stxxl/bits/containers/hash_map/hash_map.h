@@ -69,7 +69,8 @@ public:
     //! const pointer to type of keys
     typedef value_type const* const_pointer;
 
-    typedef stxxl::uint64 size_type;
+    typedef stxxl::external_size_type external_size_type;
+    typedef stxxl::internal_size_type internal_size_type;
     typedef stxxl::int64 difference_type;
 
     //! type of (mother) hash-function
@@ -136,9 +137,9 @@ protected:
     //! blocks-ids of allocated blocks
     bid_container_type bids_;
     //! size of internal-memory buffer in number of entries
-    size_type buffer_size_;
+    internal_size_type buffer_size_;
     //! maximum size for internal-memory buffer
-    size_type max_buffer_size_;
+    internal_size_type max_buffer_size_;
     //! keeps track of all active iterators
     iterator_map_type iterator_map_;
 
@@ -149,7 +150,7 @@ protected:
     //! estimated (true); see *oblivious_-methods
     mutable bool oblivious_;
     //! (estimated) number of values
-    mutable size_type num_total_;
+    mutable external_size_type num_total_;
     //! desired load factor after rehashing
     float opt_load_factor_;
 
@@ -159,10 +160,10 @@ public:
     //! \param hf hash-function
     //! \param cmp comparator-object
     //! \param buffer_size size for internal-memory buffer in bytes
-    hash_map(size_type n = 10000,
+    hash_map(internal_size_type n = 10000,
              const hasher& hf = hasher(),
              const key_compare_type& cmp = key_compare_type(),
-             size_type buffer_size = 100*1024*1024,
+             internal_size_type buffer_size = 100*1024*1024,
              const allocator_type& a = allocator_type())
         : hash_(hf),
           cmp_(cmp),
@@ -185,11 +186,11 @@ public:
     //! \param mem_to_sort additional memory (in bytes) for bulk-insert
     template <class InputIterator>
     hash_map(InputIterator f, InputIterator l,
-             size_type mem_to_sort = 256*1024*1024,
-             size_type n = 0,
+             internal_size_type mem_to_sort = 256*1024*1024,
+             internal_size_type n = 0,
              const hasher& hf = hasher(),
              const key_compare_type& cmp = key_compare_type(),
-             size_type buffer_size = 100*1024*1024,
+             internal_size_type buffer_size = 100*1024*1024,
              const allocator_type& a = allocator_type())
         : hash_(hf),
           cmp_(cmp),
@@ -231,7 +232,7 @@ protected:
      * calculate the exact number.
      */
     void _make_conscious()
-    { /* const */                           // todo: make const again
+    { /* const */                           //! \TODO: make const again
         if (!oblivious_)
             return;
 
@@ -252,10 +253,10 @@ protected:
     }
 
 public:
-    //! Number of values currenlty stored. Note: If the correct number is
+    //! Number of values currently stored. Note: If the correct number is
     //! currently unknown (because *_oblivous-methods were used), external
     //! memory will be scanned.
-    size_type size() const
+    external_size_type size() const
     {
         if (oblivious_)
             ((self_type*)this)->_make_conscious();
@@ -263,9 +264,9 @@ public:
     }
 
     //! The hash-map may store up to this number of values
-    size_type max_size() const
+    external_size_type max_size() const
     {
-        return std::numeric_limits<size_type>::max();
+        return std::numeric_limits<external_size_type>::max();
     }
 
     //! Insert a new value if no value with the same key is already present;
@@ -278,7 +279,7 @@ public:
     //! iterator pointing to the newly inserted or already stored value
     std::pair<iterator, bool> insert(const value_type& value)
     {
-        size_type i_bucket = _bkt_num(value.first);
+        internal_size_type i_bucket = _bkt_num(value.first);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, value.first);
 
@@ -300,8 +301,10 @@ public:
         // search external memory ...
         else
         {
-            tuple<size_type, value_type> result = _find_key_external(bucket, value.first);
-            size_type i_external = result.first;
+            tuple<external_size_type, value_type> result
+                = _find_key_external(bucket, value.first);
+
+            external_size_type i_external = result.first;
             value_type ext_value = result.second;
 
             // ... if found, return iterator pointing to external position ...
@@ -338,7 +341,7 @@ public:
     //! \return iterator pointing to the inserted value
     iterator insert_oblivious(const value_type& value)
     {
-        size_type i_bucket = _bkt_num(value.first);
+        internal_size_type i_bucket = _bkt_num(value.first);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, value.first);
 
@@ -414,9 +417,9 @@ public:
     //! Erase value by key; check external memory
     //! \param key key of value to erase
     //! \return number of values actually erased (0 or 1)
-    size_type erase(const key_type& key)
+    internal_size_type erase(const key_type& key)
     {
-        size_type i_bucket = _bkt_num(key);
+        internal_size_type i_bucket = _bkt_num(key);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, key);
 
@@ -436,8 +439,10 @@ public:
         // check external memory
         else
         {
-            tuple<size_type, value_type> result = _find_key_external(bucket, key);
-            size_type i_external = result.first;
+            tuple<external_size_type, value_type> result
+                = _find_key_external(bucket, key);
+
+            external_size_type i_external = result.first;
             value_type ext_value = result.second;
 
             // found in external memory; add delete-node
@@ -468,7 +473,7 @@ public:
     //! \param key key for value to release
     void erase_oblivious(const key_type& key)
     {
-        size_type i_bucket = _bkt_num(key);
+        internal_size_type i_bucket = _bkt_num(key);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, key);
 
@@ -511,7 +516,9 @@ public:
         block_cache_.clear();
 
         // reset buckets and release buffer-memory
-        for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+        for (internal_size_type i_bucket = 0;
+             i_bucket < buckets_.size(); i_bucket++)
+        {
             _erase_nodes(buckets_[i_bucket].list_, NULL);
             buckets_[i_bucket] = bucket_type();
         }
@@ -552,10 +559,10 @@ public:
 
 protected:
     // find statistics
-    mutable size_type n_subblocks_loaded;
-    mutable size_type n_found_internal;
-    mutable size_type n_found_external;
-    mutable size_type n_not_found;
+    mutable external_size_type n_subblocks_loaded;
+    mutable external_size_type n_found_internal;
+    mutable external_size_type n_found_external;
+    mutable external_size_type n_not_found;
 
 public:
     void reset_statistics()
@@ -583,7 +590,7 @@ public:
         if (buffer_size_ + 1 >= max_buffer_size_)       // (*)
             _rebuild_buckets();
 
-        size_type i_bucket = _bkt_num(key);
+        internal_size_type i_bucket = _bkt_num(key);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, key);
 
@@ -597,8 +604,10 @@ public:
         }
         // search external elements
         else {
-            tuple<size_type, value_type> result = _find_key_external(bucket, key);
-            size_type i_external = result.first;
+            tuple<external_size_type, value_type> result
+                = _find_key_external(bucket, key);
+
+            external_size_type i_external = result.first;
             value_type value = result.second;
 
             // found in external memory
@@ -635,7 +644,7 @@ public:
     //! \param key key for value to look up
     const_iterator find(const key_type& key) const
     {
-        size_type i_bucket = _bkt_num(key);
+        internal_size_type i_bucket = _bkt_num(key);
         const bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, key);
 
@@ -649,8 +658,10 @@ public:
         }
         // search external elements
         else {
-            tuple<size_type, value_type> result = _find_key_external(bucket, key);
-            size_type i_external = result.first;
+            tuple<external_size_type, value_type> result
+                = _find_key_external(bucket, key);
+
+            external_size_type i_external = result.first;
             value_type value = result.second;
 
             // found in external memory
@@ -669,7 +680,7 @@ public:
     //! Number of values with given key
     //! \param k key for value to look up
     //! \return 0 or 1 depending on the presence of a value with the given key
-    size_type count(const key_type& k) const
+    internal_size_type count(const key_type& k) const
     {
         const_iterator cit = find(k);
         return (cit == end()) ? 0 : 1;
@@ -700,7 +711,7 @@ public:
         if (buffer_size_ + 1 >= max_buffer_size_)       // (*)
             _rebuild_buckets();
 
-        size_type i_bucket = _bkt_num(key);
+        internal_size_type i_bucket = _bkt_num(key);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, key);
 
@@ -715,13 +726,16 @@ public:
         }
         // search external elements
         else {
-            tuple<size_type, value_type> result = _find_key_external(bucket, key);
-            size_type i_external = result.first;
+            tuple<external_size_type, value_type> result
+                = _find_key_external(bucket, key);
+
+            external_size_type i_external = result.first;
             value_type found_value = result.second;
 
-            value_type buffer_value = (i_external < bucket.n_external_ && _eq(found_value.first, key)) ?
-                                      found_value :
-                                      value_type(key, mapped_type());
+            value_type buffer_value =
+                (i_external < bucket.n_external_ && _eq(found_value.first, key))
+                ? found_value
+                : value_type(key, mapped_type());
 
             // add a new node to the buffer. this new node's value overwrites
             // the external value if it was found and otherwise is set to (key,
@@ -739,13 +753,16 @@ public:
     }
 
     //! Number of buckets
-    size_type bucket_count() const { return buckets_.size(); }
+    internal_size_type bucket_count() const
+    { return buckets_.size(); }
 
     //! Maximum number of buckets
-    size_type max_bucket_count() const { return max_size() / subblock_size; }
+    internal_size_type max_bucket_count() const
+    { return (internal_size_type)(max_size() / subblock_size); }
 
     //! Bucket-index for values with given key.
-    size_type bucket_index(const key_type& k) const { return _bkt_num(k); }
+    internal_size_type bucket_index(const key_type& k) const
+    { return _bkt_num(k); }
 
 public:
     //! Average number of (sub)blocks occupied by a bucket.
@@ -764,27 +781,27 @@ public:
     }
 
     //! Rehash with (at least) n buckets
-    void rehash(size_type n = 0)
+    void rehash(internal_size_type n = 0)
     {
         _rebuild_buckets(n);
     }
 
     //! Number of bytes occupied by buffer
-    size_type buffer_size() const
+    internal_size_type buffer_size() const
     {
         // buffer-size internally stored as number of nodes
         return buffer_size_ * sizeof(node_type);
     }
 
     //! Maximum buffer size in byte
-    size_type max_buffer_size() const
+    internal_size_type max_buffer_size() const
     {
         return max_buffer_size_ * sizeof(node_type);
     }
 
     //! Set maximum buffer size
     //! \param buffer_size new size in byte
-    void max_buffer_size(size_type buffer_size)
+    void max_buffer_size(internal_size_type buffer_size)
     {
         max_buffer_size_ = buffer_size / sizeof(node_type);
         if (buffer_size_ >= max_buffer_size_)
@@ -863,7 +880,7 @@ protected:
     }
 
     //! Bucket-index for values with given key
-    size_type _bkt_num(const key_type& key) const
+    internal_size_type _bkt_num(const key_type& key) const
     {
         return _bkt_num(key, buckets_.size());
     }
@@ -872,35 +889,19 @@ protected:
      * Bucket-index for values with given key. The total number of buckets has
      * to be specified as well.  The bucket number is determined by \f$
      * bucket_num = (hash/max_hash)*n_buckets \f$ max_hash is in fact 2^63-1
-     * (size_type=uint64) but we rather divide by 2^64, so we can use plain
-     * integer arithmetic easily (there should be only a small difference):
-     * this way we must only calculate the upper 64 bits of the product
-     * hash*n_buckets and we're done. See
+     * (internal_size_type=uint64 (or uint32)) but we rather divide by 2^64, so
+     * we can use plain integer arithmetic easily (there should be only a small
+     * difference): this way we must only calculate the upper 64 bits of the
+     * product hash*n_buckets and we're done. See
      * http://www.cs.uaf.edu/~cs301/notes/Chapter5/node5.html
     */
-    size_type _bkt_num(const key_type& key, size_type n) const
+    internal_size_type _bkt_num(const key_type& key, internal_size_type n) const
     {
-        size_type a, b, c, d, x, y;
-        size_type low, high;
-
-        const size_type hash = hash_(key);
-        a = (hash >> 32) & 0xffffffff;
-        b = hash & 0xffffffff;
-        c = (n >> 32) & 0xffffffff;
-        d = n & 0xffffffff;
-
-        low = b * d;
-        x = a * d + c * b;
-        y = ((low >> 32) & 0xffffffff) + x;
-
-        // we actually do not need the lower part
-        // low = (low & 0xffffffff) | ((y & 0xffffffff) << 32);
-        high = (y >> 32) & 0xffffffff;
-        high += a * c;
-
-        return high;
-
-        // return (size_type)((double)n * ((double)hash_(key)/(double)std::numeric_limits<size_type>::max()));
+        //! \TODO maybe specialize double arithmetic to integer. the old code
+        //! was faulty -tb.
+        return (internal_size_type)(
+            (double)n * ((double)hash_(key) / (double)std::numeric_limits<internal_size_type>::max())
+            );
     }
 
     /*!
@@ -910,8 +911,8 @@ protected:
      * chained list is empty or because the given key is smaller than all other
      * keys in the chained list.
      */
-    node_type * _find_key_internal(const bucket_type& bucket,
-                                   const key_type& key) const
+    node_type*
+    _find_key_internal(const bucket_type& bucket, const key_type& key) const
     {
         node_type* old = NULL;
         for (node_type* curr = bucket.list_;
@@ -927,35 +928,41 @@ protected:
      * Search for key in external part of bucket. Return value is (i_external,
      * value), where i_ext = bucket._num_external if key could not be found.
      */
-    tuple<size_type, value_type> _find_key_external(const bucket_type& bucket,
-                                                    const key_type& key) const
+    tuple<external_size_type, value_type>
+    _find_key_external(const bucket_type& bucket, const key_type& key) const
     {
         subblock_type* subblock;
 
         // number of subblocks occupied by bucket
-        size_type n_subblocks = bucket.n_external_ / subblock_size;
+        internal_size_type n_subblocks = (internal_size_type)(
+            bucket.n_external_ / subblock_size
+            );
         if (bucket.n_external_ % subblock_size != 0)
             n_subblocks++;
 
-        for (size_type i_subblock = 0; i_subblock < n_subblocks; i_subblock++)
+        for (internal_size_type i_subblock = 0;
+             i_subblock < n_subblocks; i_subblock++)
         {
             subblock = _load_subblock(bucket, i_subblock);
             // number of values in i-th subblock
-            size_type n_values = (i_subblock + 1 < n_subblocks)
-                                 ? static_cast<size_type>(subblock_size)
-                                 : (bucket.n_external_ - i_subblock * subblock_size);
+            internal_size_type n_values =
+                (i_subblock + 1 < n_subblocks)
+                ? (internal_size_type)subblock_size
+                : (internal_size_type)(
+                    bucket.n_external_ - i_subblock * subblock_size
+                    );
 
-            // TODO: replace with bucket.n_external_ % subblock_size
+            //! \TODO: replace with bucket.n_external_ % subblock_size
 
             // biggest key in current subblock still too small => next subblock
             if (_lt((*subblock)[n_values - 1].first, key))
                 continue;
 
             // binary search in current subblock
-            size_type i_lower = 0, i_upper = n_values;
+            internal_size_type i_lower = 0, i_upper = n_values;
             while (i_lower + 1 != i_upper)
             {
-                size_type i_middle = (i_lower + i_upper) / 2;
+                internal_size_type i_middle = (i_lower + i_upper) / 2;
                 if (_leq((*subblock)[i_middle].first, key))
                     i_lower = i_middle;
                 else
@@ -965,12 +972,15 @@ protected:
             value_type value = (*subblock)[i_lower];
 
             if (_eq(value.first, key))
-                return tuple<size_type, value_type>(i_subblock * subblock_size + i_lower, value);
+                return tuple<external_size_type, value_type>
+                           (i_subblock * subblock_size + i_lower, value);
             else
-                return tuple<size_type, value_type>(bucket.n_external_, value_type());
+                return tuple<external_size_type, value_type>
+                           (bucket.n_external_, value_type());
         }
 
-        return tuple<size_type, value_type>(bucket.n_external_, value_type());
+        return tuple<external_size_type, value_type>
+                   (bucket.n_external_, value_type());
     }
 
     /*!
@@ -979,16 +989,19 @@ protected:
      * 1. determine in which block the requested subblock is located
      * 2. at which position within the obove-mentioned block the questioned subblock is located
      */
-    subblock_type * _load_subblock(const bucket_type& bucket,
-                                   size_type which_subblock) const
+    subblock_type*
+    _load_subblock(const bucket_type& bucket, internal_size_type which_subblock) const
     {
         n_subblocks_loaded++;
 
-        // index of the requested subblock counted from the very beginning of the bucket's first block
-        size_type i_abs_subblock = bucket.i_subblock_ + which_subblock;
+        // index of the requested subblock counted from the very beginning of
+        // the bucket's first block
+        external_size_type i_abs_subblock = bucket.i_subblock_ + which_subblock;
 
-        bid_type bid = bids_[bucket.i_block_ + (i_abs_subblock / block_size)];       /* 1. */
-        size_type i_subblock_within = i_abs_subblock % block_size;                   /* 2. */
+        /* 1. */
+        bid_type bid = bids_[bucket.i_block_ + (internal_size_type)(i_abs_subblock / block_size)];
+        /* 2. */
+        internal_size_type i_subblock_within = i_abs_subblock % block_size;
 
         return block_cache_.get_subblock(bid, i_subblock_within);
     }
@@ -1014,13 +1027,13 @@ protected:
 
         self_type* map_;
         InputStream& input_;
-        size_type i_bucket_;
-        size_type bucket_size_;
+        internal_size_type i_bucket_;
+        external_size_type bucket_size_;
         value_type value_;
         bool empty_;
         ValueExtractor vextract_;
 
-        HashingStream(InputStream& input, size_type i_bucket,
+        HashingStream(InputStream& input, internal_size_type i_bucket,
                       ValueExtractor vextract, self_type* map)
             : map_(map),
               input_(input),
@@ -1055,7 +1068,7 @@ protected:
     };
 
     /*	Rebuild hash-map. The desired number of buckets may be supplied. */
-    void _rebuild_buckets(size_type n_desired = 0)
+    void _rebuild_buckets(internal_size_type n_desired = 0)
     {
         STXXL_VERBOSE_HASH_MAP("_rebuild_buckets()");
 
@@ -1066,12 +1079,12 @@ protected:
         const int_type write_buffer_size = config::get_instance()->disks_number() * 4;
 
         // determine new number of buckets from desired load_factor ...
-        size_type n_new;
-        n_new = (size_type)ceil((double)num_total_ / ((double)subblock_size * (double)opt_load_factor()));
+        internal_size_type n_new;
+        n_new = (internal_size_type)ceil((double)num_total_ / ((double)subblock_size * (double)opt_load_factor()));
 
         // ... but give the user the chance to request even more buckets
         if (n_desired > n_new)
-            n_new = std::min<size_type>(n_desired, max_bucket_count());
+            n_new = std::min<internal_size_type>(n_desired, max_bucket_count());
 
         // allocate new buckets and bids
         buckets_container_type old_buckets(n_new);
@@ -1097,14 +1110,15 @@ protected:
         // resizing, value1 will preceed value2 after resizing as well (uniform
         // rehashing)
         num_total_ = 0;
-        for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++)
+        for (internal_size_type i_bucket = 0;
+             i_bucket < buckets_.size(); i_bucket++)
         {
             buckets_[i_bucket] = bucket_type();
             buckets_[i_bucket].i_block_ = writer.i_block();
             buckets_[i_bucket].i_subblock_ = writer.i_subblock();
 
             hashing_stream_type hasher(values_stream, i_bucket, HashedValueExtractor(), this);
-            size_type i_ext = 0;
+            external_size_type i_ext = 0;
             while (!hasher.empty())
             {
                 const hashed_value_type& hvalue = *hasher;
@@ -1129,7 +1143,9 @@ protected:
         block_manager* bm = stxxl::block_manager::get_instance();
         bm->delete_blocks(old_bids.begin(), old_bids.end());
 
-        for (size_type i_bucket = 0; i_bucket < old_buckets.size(); i_bucket++) {
+        for (internal_size_type i_bucket = 0;
+             i_bucket < old_buckets.size(); i_bucket++)
+        {
             _erase_nodes(old_buckets[i_bucket].list_, NULL);
             old_buckets[i_bucket] = bucket_type();
         }
@@ -1170,7 +1186,8 @@ protected:
     template <class InputStream>
     struct AddHashStream
     {
-        typedef std::pair<size_type, typename InputStream::value_type> value_type;
+        //! (hash,value)
+        typedef std::pair<internal_size_type, typename InputStream::value_type> value_type;
         self_type& map_;
         InputStream& in_;
 
@@ -1192,7 +1209,7 @@ protected:
      */
     struct StripHashFunctor
     {
-        const value_type& operator () (std::pair<size_type, value_type>& v)
+        const value_type& operator () (std::pair<internal_size_type, value_type>& v)
         { return v.second; }
     };
 
@@ -1201,29 +1218,31 @@ protected:
      * lexicographically by <hash-value, key> Note: the hash-value has already
      * been computed.
      */
-    struct Cmp : public std::binary_function<std::pair<size_type, value_type>,
-                                             std::pair<size_type, value_type>, bool>
+    struct Cmp : public std::binary_function<
+                     std::pair<internal_size_type, value_type>,
+                     std::pair<internal_size_type, value_type>, bool
+                     >
     {
         self_type& map_;
         Cmp(self_type& map) : map_(map) { }
 
-        bool operator () (const std::pair<size_type, value_type>& a,
-                          const std::pair<size_type, value_type>& b) const
+        bool operator () (const std::pair<internal_size_type, value_type>& a,
+                          const std::pair<internal_size_type, value_type>& b) const
         {
             return (a.first < b.first) ||
                    ((a.first == b.first) && map_.cmp_(a.second.first, b.second.first));
         }
-        std::pair<size_type, value_type> min_value() const
+        std::pair<internal_size_type, value_type> min_value() const
         {
-            return std::pair<size_type, value_type>(
-                std::numeric_limits<size_type>::min(),
+            return std::pair<internal_size_type, value_type>(
+                std::numeric_limits<internal_size_type>::min(),
                 value_type(map_.cmp_.min_value(), mapped_type())
                 );
         }
-        std::pair<size_type, value_type> max_value() const
+        std::pair<internal_size_type, value_type> max_value() const
         {
-            return std::pair<size_type, value_type>(
-                std::numeric_limits<size_type>::max(),
+            return std::pair<internal_size_type, value_type>(
+                std::numeric_limits<internal_size_type>::max(),
                 value_type(map_.cmp_.max_value(), mapped_type())
                 );
         }
@@ -1235,7 +1254,7 @@ public:
     //! \param l end of the range
     //! \param mem internal memory that may be used (note: this memory will be used additionally to the buffer). The more the better
     template <class InputIterator>
-    void insert(InputIterator f, InputIterator l, size_type mem)
+    void insert(InputIterator f, InputIterator l, internal_size_type mem)
     {
         //! values already stored in the hashtable ("old values")
         typedef HashedValuesStream<self_type, reader_type> old_values_stream;
@@ -1259,13 +1278,15 @@ public:
         int_type write_buffer_size = config::get_instance()->disks_number() * 2;
 
         // calculate new number of buckets
-        size_type num_total_new = num_total_ + (l - f);         // estimated number of elements
-        size_type n_new = (size_type)ceil((double)num_total_new / ((double)subblock_size * (double)opt_load_factor()));
-        if (n_new > max_bucket_count())
-            n_new = max_bucket_count();
+        external_size_type num_total_new = num_total_ + (l - f);         // estimated number of elements
+        external_size_type n_buckets_new = (external_size_type)ceil((double)num_total_new / ((double)subblock_size * (double)opt_load_factor()));
+        if (n_buckets_new > max_bucket_count())
+            n_buckets_new = max_bucket_count();
+
+        STXXL_VERBOSE_HASH_MAP("insert() items=" << (l - f) << " buckets_new=" << n_buckets_new);
 
         // prepare new buckets and bids
-        buckets_container_type old_buckets(n_new);
+        buckets_container_type old_buckets((internal_size_type)n_buckets_new);
         std::swap(buckets_, old_buckets);
         // writer will allocate new blocks as necessary
         bid_container_type old_bids;
@@ -1284,7 +1305,7 @@ public:
         writer_type writer(&bids_, write_buffer_size, write_buffer_size / 2);
 
         num_total_ = 0;
-        for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++)
+        for (internal_size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++)
         {
             buckets_[i_bucket] = bucket_type();
             buckets_[i_bucket].i_block_ = writer.i_block();
@@ -1292,13 +1313,13 @@ public:
 
             old_hashing_stream old_hasher(old_values, i_bucket, HashedValueExtractor(), this);
             new_hashing_stream new_hasher(new_unique_values, i_bucket, StripHashFunctor(), this);
-            size_type bucket_size = 0;
+            internal_size_type bucket_size = 0;
 
             // more old and new values for the current bucket => choose smallest
             while (!old_hasher.empty() && !new_hasher.empty())
             {
-                size_type old_hash = hash_((*old_hasher).value_.first);
-                size_type new_hash = (*new_hasher).first;
+                internal_size_type old_hash = hash_((*old_hasher).value_.first);
+                internal_size_type new_hash = (*new_hasher).first;
                 key_type old_key = (*old_hasher).value_.first;
                 key_type new_key = (*new_hasher).second.first;
 
@@ -1354,7 +1375,9 @@ public:
         bm->delete_blocks(old_bids.begin(), old_bids.end());
 
         // free nodes in old bucket lists
-        for (size_type i_bucket = 0; i_bucket < old_buckets.size(); i_bucket++) {
+        for (internal_size_type i_bucket = 0;
+             i_bucket < old_buckets.size(); i_bucket++)
+        {
             _erase_nodes(old_buckets[i_bucket].list_, NULL);
             old_buckets[i_bucket] = bucket_type();
         }
@@ -1369,8 +1392,8 @@ protected:
     */
     bool _lt(const key_type& a, const key_type& b) const
     {
-        size_type hash_a = hash_(a);
-        size_type hash_b = hash_(b);
+        internal_size_type hash_a = hash_(a);
+        internal_size_type hash_b = hash_(b);
 
         return (hash_a < hash_b) ||
                ((hash_a == hash_b) && cmp_(a, b));
@@ -1400,13 +1423,13 @@ protected:
     {
         reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
 
-        for (size_type i_block = 0; i_block < bids_.size(); i_block++) {
+        for (internal_size_type i_block = 0; i_block < bids_.size(); i_block++) {
             std::cout << "block " << i_block << ":\n";
 
-            for (size_type i_subblock = 0; i_subblock < block_size; i_subblock++) {
+            for (internal_size_type i_subblock = 0; i_subblock < block_size; i_subblock++) {
                 std::cout << "  subblock " << i_subblock << ":\n    ";
 
-                for (size_type i_element = 0; i_element < subblock_size; i_element++) {
+                for (external_size_type i_element = 0; i_element < subblock_size; i_element++) {
                     std::cout << reader.const_value().first << ", ";
                     ++reader;
                 }
@@ -1420,7 +1443,7 @@ protected:
         reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
 
         std::cout << "number of buckets: " << buckets_.size() << std::endl;
-        for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+        for (internal_size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
             const bucket_type& bucket = buckets_[i_bucket];
             reader.skip_to(bids_.begin() + bucket.i_block_, bucket.i_subblock_);
 
@@ -1435,7 +1458,7 @@ protected:
             std::cout << std::endl;
 
             std::cout << "     external=";
-            for (size_type i_element = 0; i_element < bucket.n_external_; i_element++) {
+            for (external_size_type i_element = 0; i_element < bucket.n_external_; i_element++) {
                 std::cout << reader.const_value().first << ", ";
                 ++reader;
             }
@@ -1446,7 +1469,7 @@ protected:
     void _dump_bucket_statistics()
     {
         std::cout << "number of buckets: " << buckets_.size() << std::endl;
-        for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+        for (internal_size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
             const bucket_type& bucket = buckets_[i_bucket];
             std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << ", list=" << bucket.list_ << std::endl;
         }
@@ -1458,11 +1481,12 @@ public:
     //! values per bucket
     void print_load_statistics(std::ostream& o = std::cout) const
     {
-        size_type sum_external = 0;
-        size_type square_sum_external = 0;
-        size_type max_external = 0;
+        external_size_type sum_external = 0;
+        external_size_type square_sum_external = 0;
+        external_size_type max_external = 0;
 
-        for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+        for (internal_size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++)
+        {
             const bucket_type& b = buckets_[i_bucket];
 
             sum_external += b.n_external_;

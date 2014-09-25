@@ -40,7 +40,8 @@ public:
     friend void HashMap::erase(hash_map_const_iterator<HashMap> it);
 
     typedef HashMap hash_map_type;
-    typedef typename hash_map_type::size_type size_type;
+    typedef typename hash_map_type::internal_size_type internal_size_type;
+    typedef typename hash_map_type::external_size_type external_size_type;
     typedef typename hash_map_type::value_type value_type;
     typedef typename hash_map_type::key_type key_type;
     typedef typename hash_map_type::reference reference;
@@ -60,13 +61,13 @@ protected:
     //! true if prefetching enabled; false by default, will be set to true when incrementing (see find_next())
     bool prefetch_;
     //! index of current bucket
-    size_type i_bucket_;
+    internal_size_type i_bucket_;
     //! source of current value: external or internal
     source_type source_;
     //! current (source=internal) or old (src=external) internal node
     node_type* node_;
     //! position of current (source=external) or next (source=internal) external value (see _ext_valid)
-    size_type i_external_;
+    external_size_type i_external_;
     //! key of current value
     key_type key_;
     /*! true if i_external points to the current or next external value
@@ -90,8 +91,8 @@ private:
 
 public:
     //! Construct a new iterator
-    hash_map_iterator_base(HashMap* map, size_type i_bucket, node_type* node,
-                           size_type i_external, source_type source,
+    hash_map_iterator_base(HashMap* map, internal_size_type i_bucket, node_type* node,
+                           external_size_type i_external, source_type source,
                            bool ext_valid, key_type key)
         : map_(map),
           reader_(NULL),
@@ -206,7 +207,7 @@ protected:
         if (ext_valid_)
         {
             // TODO: speed this up (go directly to i_external_
-            for (size_type i = 0; i < i_external_; i++)
+            for (external_size_type i = 0; i < i_external_; i++)
                 ++(*reader_);
         }
         // otw lookup external value.
@@ -254,7 +255,7 @@ public:
         // invariant: current external value is always > current internal value
         assert(!end_);
 
-        size_type i_bucket_old = i_bucket_;
+        internal_size_type i_bucket_old = i_bucket_;
         bucket_type bucket = map_->buckets_[i_bucket_];
 
         if (reader_ == NULL)
@@ -384,7 +385,8 @@ class hash_map_iterator : public hash_map_iterator_base<HashMap>
 {
 public:
     typedef HashMap hash_map_type;
-    typedef typename hash_map_type::size_type size_type;
+    typedef typename hash_map_type::internal_size_type internal_size_type;
+    typedef typename hash_map_type::external_size_type external_size_type;
     typedef typename hash_map_type::value_type value_type;
     typedef typename hash_map_type::key_type key_type;
     typedef typename hash_map_type::reference reference;
@@ -408,8 +410,8 @@ private:
     { }
 
 public:
-    hash_map_iterator(hash_map_type* map, size_type i_bucket,
-                      node_type* node, size_type i_external,
+    hash_map_iterator(hash_map_type* map, internal_size_type i_bucket,
+                      node_type* node, external_size_type i_external,
                       source_type source, bool ext_valid, key_type key)
         : base_type(map, i_bucket, node, i_external, source, ext_valid, key)
     { }
@@ -478,7 +480,8 @@ class hash_map_const_iterator : public hash_map_iterator_base<HashMap>
 {
 public:
     typedef HashMap hash_map_type;
-    typedef typename hash_map_type::size_type size_type;
+    typedef typename hash_map_type::internal_size_type internal_size_type;
+    typedef typename hash_map_type::external_size_type external_size_type;
     typedef typename hash_map_type::value_type value_type;
     typedef typename hash_map_type::key_type key_type;
     typedef typename hash_map_type::reference reference;
@@ -502,8 +505,8 @@ private:
     { }
 
 public:
-    hash_map_const_iterator(hash_map_type* map, size_type i_bucket,
-                            node_type* node, size_type i_external,
+    hash_map_const_iterator(hash_map_type* map, internal_size_type i_bucket,
+                            node_type* node, external_size_type i_external,
                             source_type source, bool ext_valid, key_type key)
         : base_type(map, i_bucket, node, i_external, source, ext_valid, key)
     { }

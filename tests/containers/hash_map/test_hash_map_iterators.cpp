@@ -36,19 +36,13 @@ struct rand_pairs
 
 struct hash_int
 {
-    stxxl::uint64 operator () (stxxl::uint64 key) const
+    size_t operator () (int key) const
     {
-        key = (~key) + (key << 21);              // key = (key << 21) - key - 1;
-        key = key ^ (key >> 24);
-        key = (key + (key << 3)) + (key << 8);   // key * 265
-        key = key ^ (key >> 14);
-        key = (key + (key << 2)) + (key << 4);   // key * 21
-        key = key ^ (key >> 28);
-        key = key + (key << 31);
-        return key;
+        // a simple integer hash function
+        return (size_t)(key * 2654435761);
     }
 
-    stxxl::uint64 hash(stxxl::uint64 key) const { return operator () (key); }
+    size_t hash(int key) const { return operator () (key); }
 };
 
 struct cmp : public std::less<int>
@@ -63,7 +57,7 @@ void cmp_with_internal_map()
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 200000;
+    const unsigned n_values = 20000;
     const unsigned n_tests = 10000;
 
     // make sure all changes will be buffered
@@ -150,7 +144,7 @@ void basic_iterator_test()
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 100000;
+    const unsigned n_values = 20000;
     const unsigned n_tests = 10000;
 
     // make sure all changes will be buffered
@@ -316,7 +310,7 @@ void more_iterator_test()
     typedef std::pair<int, int> value_type;
     const unsigned value_size = sizeof(value_type);
 
-    const unsigned n_values = 500000;
+    const unsigned n_values = 20000;
 
     // make sure all changes will be buffered
     const unsigned buffer_size = 5 * n_values * (value_size + sizeof(int*));
