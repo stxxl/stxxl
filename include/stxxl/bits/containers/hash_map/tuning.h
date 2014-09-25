@@ -27,12 +27,15 @@ class tuning : public singleton<tuning>
     friend class singleton<tuning>;
 
 public:
-    size_t prefetch_page_size;                          /* see buffered_reader */
-    size_t prefetch_pages;                              /* see buffered_reader */
-    size_t blockcache_size;                             /* see block_cache and hash_map */
+    //! see buffered_reader
+    size_t prefetch_page_size;
+    //! see buffered_reader
+    size_t prefetch_pages;
+    //! see block_cache and hash_map
+    size_t blockcache_size;
 
 private:
-    /** set reasonable default values for tuning params */
+    /*! set reasonable default values for tuning params */
     tuning()
         : prefetch_page_size(config::get_instance()->disks_number() * 2),
           prefetch_pages(2),

@@ -7,6 +7,7 @@
  *
  *  Copyright (C) 2008, 2010, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009, 2010 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -32,31 +33,47 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <class _Tp>
+template <class KeyType>
 struct compat_hash {
 #if __cplusplus >= 201103L
-    typedef std::hash<_Tp> result;
+    typedef std::hash<KeyType> result;
 #elif STXXL_MSVC
-    typedef stdext::hash_compare<_Tp> result;
+    typedef stdext::hash_compare<KeyType> result;
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) && \
     (!defined(__ICC) || (__ICC > 1110))
-    typedef std::tr1::hash<_Tp> result;
+    typedef std::tr1::hash<KeyType> result;
 #else
-    typedef __gnu_cxx::hash<_Tp> result;
+    typedef __gnu_cxx::hash<KeyType> result;
 #endif
 };
 
-template <class _Key, class _Tp, class _Hash = typename compat_hash<_Key>::result>
+template <class KeyType, class MappedType,
+          class HashType = typename compat_hash<KeyType>::result>
 struct compat_hash_map {
 #if __cplusplus >= 201103L
-    typedef std::unordered_map<_Key, _Tp, _Hash> result;
+    typedef std::unordered_map<KeyType, MappedType, HashType> result;
 #elif STXXL_MSVC
-    typedef stdext::hash_map<_Key, _Tp, _Hash> result;
+    typedef stdext::hash_map<KeyType, MappedType, HashType> result;
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) && \
     (!defined(__ICC) || (__ICC > 1110))
-    typedef std::tr1::unordered_map<_Key, _Tp, _Hash> result;
+    typedef std::tr1::unordered_map<KeyType, MappedType, HashType> result;
 #else
-    typedef __gnu_cxx::hash_map<_Key, _Tp, _Hash> result;
+    typedef __gnu_cxx::hash_map<KeyType, MappedType, HashType> result;
+#endif
+};
+
+template <class KeyType, class MappedType,
+          class HashType = typename compat_hash<KeyType>::result>
+struct compat_hash_multimap {
+#if __cplusplus >= 201103L
+    typedef std::unordered_multimap<KeyType, MappedType, HashType> result;
+#elif STXXL_MSVC
+    typedef stdext::hash_multimap<KeyType, MappedType, HashType> result;
+#elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) && \
+    (!defined(__ICC) || (__ICC > 1110))
+    typedef std::tr1::unordered_multimap<KeyType, MappedType, HashType> result;
+#else
+    typedef __gnu_cxx::hash_multimap<KeyType, MappedType, HashType> result;
 #endif
 };
 

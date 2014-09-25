@@ -17,6 +17,7 @@
 #include <map>
 
 #include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/compat/hash_map.h>
 #include <stxxl/bits/containers/hash_map/iterator.h>
 
 STXXL_BEGIN_NAMESPACE
@@ -38,16 +39,32 @@ public:
     typedef hash_map_iterator_base<hash_map_type> iterator_base;
 
 private:
-//        struct hasher
-//        {
-//            size_t operator () (const key_type & key) const
-//            {
-//                return longhash1(key);
-//            }
-//        };
-//        typedef __gnu_cxx::hash_multimap<internal_size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
-
+#if 0
     typedef std::multimap<internal_size_type, iterator_base*> multimap_type;
+#else
+    struct hasher
+    {
+        size_t operator () (const internal_size_type& key) const
+        {
+            return longhash1(key);
+        }
+#if STXXL_MSVC
+        bool operator () (const internal_size_type& a, const internal_size_type& b) const
+        {
+            return (a < b);
+        }
+        enum
+        {                                       // parameters for hash table
+            bucket_size = 4,                    // 0 < bucket_size
+            min_buckets = 8                     // min_buckets = 2 ^^ N, 0 < N
+        };
+#endif
+    };
+    // store iterators by bucket-index
+    typedef typename compat_hash_multimap<
+            internal_size_type, iterator_base*, hasher
+            >::result multimap_type;
+#endif
 
     //! bucket-index and pointer to iterator_base
     typedef typename multimap_type::value_type pair_type;
