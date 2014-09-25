@@ -3,7 +3,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,6 +24,7 @@ stxxl_build_example(sorter1)
 stxxl_build_example(sorter2)
 stxxl_build_example(stack1)
 stxxl_build_example(stack2)
+stxxl_build_example(unordered_map1)
 stxxl_build_example(vector1)
 stxxl_build_example(vector2)
 stxxl_build_example(vector_buf)
@@ -41,6 +42,7 @@ stxxl_test(sorter1)
 stxxl_test(sorter2)
 stxxl_test(stack1)
 stxxl_test(stack2)
+stxxl_test(unordered_map1)
 stxxl_test(vector1)
 stxxl_test(vector2)
 stxxl_test(vector_buf)

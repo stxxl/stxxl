@@ -13,16 +13,19 @@ Version 1.4-dev (unreleased)
 * adding stxxl::binary_buffer which can be used for compact serialization and
   reading via a stxxl::binary_reader cursor interface.
 
-* stxxl::unordered_map
+* stxxl::unordered_map is a hash map, backed by external memory. It probably
+  only works well when lots of internal memory is used to buffer access to a
+  relatively small working set. Then, however, fast direct in-memory item
+  access can be used.
 
 * stxxl::external_shared_ptr is a proxy class to allow use of shared_ptr
   classes inside stxxl containers. Reference counts are kept in memory, while
   data may be swapped out to disk.
 
-  - removing struct default_completion_handler, using a NULL pointer in default
-    complete handler instead, since otherwise a default_completion_handler
-    objects is cloned for _each_io_request_! Using a NULL pointer avoids
-    superfluous new/delete work on the heap.
+* removing struct default_completion_handler, using a NULL pointer in default
+  complete handler instead, since otherwise a default_completion_handler
+  objects is cloned for _each_io_request_! Using a NULL pointer avoids
+  superfluous new/delete work on the heap.
 
 Version 1.4.0 (12 December 2013)
 

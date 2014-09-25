@@ -58,7 +58,8 @@ public:
 protected:
     HashMap* map_;
     reader_type* reader_;
-    //! true if prefetching enabled; false by default, will be set to true when incrementing (see find_next())
+    //! true if prefetching enabled; false by default, will be set to true when
+    //! incrementing (see find_next())
     bool prefetch_;
     //! index of current bucket
     internal_size_type i_bucket_;
@@ -66,7 +67,8 @@ protected:
     source_type source_;
     //! current (source=internal) or old (src=external) internal node
     node_type* node_;
-    //! position of current (source=external) or next (source=internal) external value (see _ext_valid)
+    //! position of current (source=external) or next (source=internal)
+    //! external value (see _ext_valid)
     external_size_type i_external_;
     //! key of current value
     key_type key_;
@@ -84,10 +86,6 @@ protected:
     bool ext_valid_;
     //! true if iterator equals end()
     bool end_;
-
-private:
-    hash_map_iterator_base()
-    { }
 
 public:
     //! Construct a new iterator
@@ -238,7 +236,7 @@ protected:
     //! Reset reader-object
     void reset_reader()
     {
-        if (reader_ != NULL) {
+        if (reader_) {
             delete reader_;
             reader_ = NULL;
         }
@@ -391,6 +389,8 @@ public:
     typedef typename hash_map_type::key_type key_type;
     typedef typename hash_map_type::reference reference;
     typedef typename hash_map_type::const_reference const_reference;
+    typedef typename hash_map_type::pointer pointer;
+    typedef typename hash_map_type::const_pointer const_pointer;
     typedef typename hash_map_type::node_type node_type;
     typedef typename hash_map_type::bucket_type bucket_type;
     typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
@@ -404,16 +404,15 @@ public:
     typedef stxxl::hash_map::hash_map_iterator_base<hash_map_type> base_type;
     typedef stxxl::hash_map::hash_map_const_iterator<hash_map_type> hash_map_const_iterator;
 
-private:
-    hash_map_iterator()
-        : base_type()
-    { }
-
 public:
     hash_map_iterator(hash_map_type* map, internal_size_type i_bucket,
                       node_type* node, external_size_type i_external,
                       source_type source, bool ext_valid, key_type key)
         : base_type(map, i_bucket, node, i_external, source, ext_valid, key)
+    { }
+
+    hash_map_iterator()
+        : base_type(NULL)
     { }
 
     hash_map_iterator(hash_map_type* map)
@@ -467,6 +466,13 @@ public:
         }
     }
 
+    //! Return reference to current value. If source is external, mark the
+    //! value's block as dirty
+    pointer operator -> ()
+    {
+        return &operator * ();
+    }
+
     //! Increment iterator
     hash_map_iterator<hash_map_type>& operator ++ ()
     {
@@ -486,6 +492,8 @@ public:
     typedef typename hash_map_type::key_type key_type;
     typedef typename hash_map_type::reference reference;
     typedef typename hash_map_type::const_reference const_reference;
+    typedef typename hash_map_type::pointer pointer;
+    typedef typename hash_map_type::const_pointer const_pointer;
     typedef typename hash_map_type::node_type node_type;
     typedef typename hash_map_type::bucket_type bucket_type;
     typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
@@ -499,16 +507,15 @@ public:
     typedef stxxl::hash_map::hash_map_iterator_base<hash_map_type> base_type;
     typedef stxxl::hash_map::hash_map_iterator<hash_map_type> hash_map_iterator;
 
-private:
-    hash_map_const_iterator()
-        : base_type()
-    { }
-
 public:
     hash_map_const_iterator(hash_map_type* map, internal_size_type i_bucket,
                             node_type* node, external_size_type i_external,
                             source_type source, bool ext_valid, key_type key)
         : base_type(map, i_bucket, node, i_external, source, ext_valid, key)
+    { }
+
+    hash_map_const_iterator()
+        : base_type(NULL)
     { }
 
     hash_map_const_iterator(hash_map_type* map)

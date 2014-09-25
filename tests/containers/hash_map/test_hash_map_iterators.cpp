@@ -43,8 +43,6 @@ struct hash_int
         // a simple integer hash function
         return (size_t)(key * 2654435761u);
     }
-
-    size_t hash(int key) const { return operator () (key); }
 };
 
 struct cmp : public std::less<int>

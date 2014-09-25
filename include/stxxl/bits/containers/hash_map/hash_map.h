@@ -38,20 +38,30 @@ namespace hash_map {
 
 /*!
  * Main implementation of external memory hash map.
+ *
+ * \tparam KeyType the key type
+ * \tparam MappedType the mapped type associated with a key
+ * \tparam HashType a hash functional
+ * \tparam CompareType a less comparison relation for KeyType
+ * \tparam SubBlockSize the raw size of a subblock (caching granularity)
+ * (default: 8192)
+ * \tparam SubBlocksPerBlock the number of subblocks per external block
+ * (default: 256 -> 2MB blocks)
+ * \tparam AllocType allocator for internal-memory buffer
  */
 template <class KeyType,
           class MappedType,
           class HashType,
           class KeyCompareType,
           unsigned SubBlockSize = 4*1024,
-          unsigned BlockSize = 256,
+          unsigned SubBlocksPerBlock = 256,
           class AllocatorType = std::allocator<std::pair<const KeyType, MappedType> >
           >
 class hash_map : private noncopyable
 {
 protected:
     typedef hash_map<KeyType, MappedType, HashType, KeyCompareType,
-                     SubBlockSize, BlockSize> self_type;
+                     SubBlockSize, SubBlocksPerBlock> self_type;
 
 public:
     //! type of the keys being used
@@ -85,13 +95,13 @@ public:
 
     //! subblock- and block-size in bytes
     enum {
-        block_raw_size = BlockSize * SubBlockSize,
+        block_raw_size = SubBlocksPerBlock * SubBlockSize,
         subblock_raw_size = SubBlockSize
     };
 
     //! Subblock-size as number of elements, block-size as number of subblocks
     enum {
-        block_size = BlockSize,
+        subblocks_per_block = SubBlocksPerBlock,
         subblock_size = SubBlockSize / sizeof(value_type)
     };
 
@@ -155,12 +165,14 @@ protected:
     float opt_load_factor_;
 
 public:
-    //! Construct a new hash-map
-    //! \param n initial number of buckets
-    //! \param hf hash-function
-    //! \param cmp comparator-object
-    //! \param buffer_size size for internal-memory buffer in bytes
-    //! \param a allocator of internal memory nodes
+    /*!
+     * Construct a new hash-map
+     * \param n initial number of buckets
+     * \param hf hash-function
+     * \param cmp comparator-object
+     * \param buffer_size size of internal-memory buffer in bytes
+     * \param a allocation-strategory for internal-memory buffer
+     */
     hash_map(internal_size_type n = 0,
              const hasher& hf = hasher(),
              const key_compare& cmp = key_compare(),
@@ -181,17 +193,21 @@ public:
         max_buffer_size_ = buffer_size / sizeof(node_type);
     }
 
-    //! Construct a new hash-map and insert all values in the range [f,l)
-    //! \param f beginning of the range
-    //! \param l end of the range
-    //! \param mem_to_sort additional memory (in bytes) for bulk-insert
-    //! \param n initial number of buckets
-    //! \param hf hash-function
-    //! \param cmp comparator-object
-    //! \param buffer_size size for internal-memory buffer in bytes
-    //! \param a allocator of internal memory nodes
+    /*!
+     * Construct a new hash-map and insert all values in the range [f,l)
+     *
+     * \param begin beginning of the range
+     * \param end end of the range
+     * \param mem_to_sort internal memory that may be used for bulk-construction (not
+     * to be confused with the buffer-memory)
+     * \param n initial number of buckets
+     * \param hf hash-function
+     * \param cmp comparator-object
+     * \param buffer_size size of internal-memory buffer in bytes
+     * \param a allocation-strategory for internal-memory buffer
+     */
     template <class InputIterator>
-    hash_map(InputIterator f, InputIterator l,
+    hash_map(InputIterator begin, InputIterator end,
              internal_size_type mem_to_sort = 256*1024*1024,
              internal_size_type n = 0,
              const hasher& hf = hasher(),
@@ -211,7 +227,7 @@ public:
           opt_load_factor_(0.875)
     {
         max_buffer_size_ = buffer_size / sizeof(node_type);
-        insert(f, l, mem_to_sort);
+        insert(begin, end, mem_to_sort);
     }
 
     ~hash_map()
@@ -282,16 +298,20 @@ public:
         return size() != 0;
     }
 
-    //! Insert a new value if no value with the same key is already present;
-    //! external memory must therefore be accessed
-    //!
-    //! \param value what to insert
-    //!
-    //! \return a tuple whose second part is true iff the value was actually
-    //! added (no value with the same key present); the first part is an
-    //! iterator pointing to the newly inserted or already stored value
+    /*!
+     * Insert a new value if no value with the same key is already present;
+     * external memory must therefore be accessed
+     *
+     * \param value what to insert
+     * \return a tuple whose second part is true iff the value was actually
+     * added (no value with the same key present); the first part is an
+     * iterator pointing to the newly inserted or already stored value
+     */
     std::pair<iterator, bool> insert(const value_type& value)
     {
+        if (buckets_.size() == 0)
+            _rebuild_buckets(128);
+
         internal_size_type i_bucket = _bkt_num(value.first);
         bucket_type& bucket = buckets_[i_bucket];
         node_type* node = _find_key_internal(bucket, value.first);
@@ -1020,9 +1040,9 @@ protected:
         external_size_type i_abs_subblock = bucket.i_subblock_ + which_subblock;
 
         /* 1. */
-        bid_type bid = bids_[bucket.i_block_ + (internal_size_type)(i_abs_subblock / block_size)];
+        bid_type bid = bids_[bucket.i_block_ + (internal_size_type)(i_abs_subblock / subblocks_per_block)];
         /* 2. */
-        internal_size_type i_subblock_within = (internal_size_type)(i_abs_subblock % block_size);
+        internal_size_type i_subblock_within = (internal_size_type)(i_abs_subblock % subblocks_per_block);
 
         return block_cache_.get_subblock(bid, i_subblock_within);
     }
@@ -1449,10 +1469,10 @@ protected:
         for (internal_size_type i_block = 0; i_block < bids_.size(); i_block++) {
             std::cout << "block " << i_block << ":\n";
 
-            for (internal_size_type i_subblock = 0; i_subblock < block_size; i_subblock++) {
+            for (internal_size_type i_subblock = 0; i_subblock < subblocks_per_block; i_subblock++) {
                 std::cout << "  subblock " << i_subblock << ":\n    ";
 
-                for (external_size_type i_element = 0; i_element < subblock_size; i_element++) {
+                for (external_size_type i_element = 0; i_element < subblocks_per_block; i_element++) {
                     std::cout << reader.const_value().first << ", ";
                     ++reader;
                 }
@@ -1574,11 +1594,11 @@ STXXL_END_NAMESPACE
 namespace std {
 
 template <class KeyType, class MappedType, class HashType, class KeyCompareType,
-          unsigned SubBlockSize, unsigned BlockSize, class AllocType>
+          unsigned SubBlockSize, unsigned SubBlocksPerBlock, class AllocType>
 void swap(stxxl::hash_map::hash_map<KeyType, MappedType, HashType, KeyCompareType,
-                                    SubBlockSize, BlockSize, AllocType>& a,
+                                    SubBlockSize, SubBlocksPerBlock, AllocType>& a,
           stxxl::hash_map::hash_map<KeyType, MappedType, HashType, KeyCompareType,
-                                    SubBlockSize, BlockSize, AllocType>& b)
+                                    SubBlockSize, SubBlocksPerBlock, AllocType>& b)
 {
     if (&a != &b)
         a.swap(b);

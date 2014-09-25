@@ -39,6 +39,7 @@ The practical part about it: STXXL containers which have an internal counterpart
 - \subpage tutorial_queue "stxxl::queue tutorial"
 - \subpage tutorial_deque "stxxl::deque tutorial"
 - \subpage tutorial_map "stxxl::map tutorial"
+- \subpage tutorial_unordered_map "stxxl::unordered_map tutorial"
 
 Beyond these, STXXL also provides a set of containers that are not part of the STL:
 

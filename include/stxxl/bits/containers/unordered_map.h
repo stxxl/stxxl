@@ -27,7 +27,7 @@ template <
     class HashType,
     class CompareType,
     unsigned SubBlockSize,
-    unsigned BlockSize,
+    unsigned SubBlocksPerBlock,
     class Alloc
     >
 class hash_map;
@@ -39,24 +39,32 @@ class hash_map;
 
 /*!
  * An external memory implementation of the STL unordered_map container, which
- * is based on an external memory hash map.
+ * is based on an external memory hash map. For more information see \ref
+ * tutorial_unordered_map.
+ *
+ * \tparam KeyType the key type
+ * \tparam MappedType the mapped type associated with a key
+ * \tparam HashType a hash functional
+ * \tparam CompareType a less comparison relation for KeyType
+ * \tparam SubBlockSize the raw size of a subblock (caching granularity)
+ * (default: 8192)
+ * \tparam SubBlocksPerBlock the number of subblocks per external block
+ * (default: 256 -> 2MB blocks)
+ * \tparam AllocType allocator for internal-memory buffer
  */
 template <
     class KeyType,
     class MappedType,
     class HashType,
     class CompareType,
-    //! subblock raw size; 8k default
-    unsigned SubBlockSize = 8*1024,
-    //! block size as number of subblocks; default 256*8KB = 2MB
-    unsigned BlockSize = 256,
-    //! allocator for internal-memory buffer
-    class Alloc = std::allocator<std::pair<const KeyType, MappedType> >
+    unsigned SubBlockSize = 8* 1024,
+    unsigned SubBlocksPerBlock = 256,
+    class AllocType = std::allocator<std::pair<const KeyType, MappedType> >
     >
 class unordered_map : private noncopyable
 {
     typedef hash_map::hash_map<KeyType, MappedType, HashType, CompareType,
-                               SubBlockSize, BlockSize, Alloc> impl_type;
+                               SubBlockSize, SubBlocksPerBlock, AllocType> impl_type;
 
     impl_type impl;
 
@@ -74,8 +82,8 @@ public:
     typedef typename impl_type::hasher hasher;
     //! the fourth template parameter (CompareType) (!!! not: equality compare)
     typedef typename impl_type::key_compare key_compare;
-    //! the fifth template parameter (Alloc)
-    typedef Alloc allocator_type;
+    //! the fifth template parameter (AllocType)
+    typedef AllocType allocator_type;
 
     typedef typename impl_type::reference reference;
     typedef typename impl_type::const_reference const_reference;
@@ -99,37 +107,45 @@ public:
     //! \name Constructors
     //! \{
 
-    //! A constructor
-    //! \param n initial number of buckets
-    //! \param hf hash-function
-    //! \param cmp comparator-object
-    //! \param buffer_size size of internal-memory buffer in bytes
-    //! \param a allocation-strategory for internal-memory buffer
+    /*!
+     * Construct a new hash-map
+     *
+     * \param n initial number of buckets
+     * \param hf hash-function
+     * \param cmp comparator-object
+     * \param buffer_size size of internal-memory buffer in bytes
+     * \param a allocation-strategory for internal-memory buffer
+     */
     unordered_map(internal_size_type n = 0,
                   const hasher& hf = hasher(),
                   const key_compare& cmp = key_compare(),
                   internal_size_type buffer_size = 100*1024*1024,
-                  const Alloc& a = Alloc())
+                  const allocator_type& a = allocator_type())
         : impl(n, hf, cmp, buffer_size, a)
     { }
 
-    //! Constructs a unordered-map from a given input range
-    //! \param f beginning of the range
-    //! \param l end of the range
-    //! \param mem internal memory that may be used for bulk-construction (not to be confused with the buffer-memory)
-    //! \param hf hash-function
-    //! \param cmp comparator-object
-    //! \param buffer_size size of internal-memory buffer in bytes
-    //! \param a allocation-strategory for internal-memory buffer
+    /*!
+     * Construct a new hash-map and insert all values in the range [begin,end)
+     *
+     * \param begin beginning of the range
+     * \param end end of the range
+     * \param mem_to_sort internal memory that may be used for
+     * bulk-construction (not to be confused with the buffer-memory)
+     * \param n initial number of buckets
+     * \param hf hash-function
+     * \param cmp comparator-object
+     * \param buffer_size size of internal-memory buffer in bytes
+     * \param a allocation-strategory for internal-memory buffer
+     */
     template <class InputIterator>
-    unordered_map(InputIterator f,
-                  InputIterator l,
-                  internal_size_type mem = 256*1024*1024,
+    unordered_map(InputIterator begin, InputIterator end,
+                  internal_size_type mem_to_sort = 256*1024*1024,
+                  internal_size_type n = 0,
                   const hasher& hf = hasher(),
                   const key_compare& cmp = key_compare(),
                   internal_size_type buffer_size = 100*1024*1024,
-                  const Alloc& a = Alloc())
-        : impl(f, l, mem, hf, cmp, buffer_size, a)
+                  const allocator_type& a = allocator_type())
+        : impl(begin, end, mem_to_sort, n, hf, cmp, buffer_size, a)
     { }
 
     //! \}
@@ -225,7 +241,8 @@ public:
     //! Finds a range containing all values with given key. Non-const access
     //! \param key key to look for#
     //! \return range may be empty or contains exactly one value
-    std::pair<iterator, iterator> equal_range(const key_type& key)
+    std::pair<iterator, iterator>
+    equal_range(const key_type& key)
     {
         return impl.equal_range(key);
     }
@@ -233,7 +250,8 @@ public:
     //! Finds a range containing all values with given key. Const access
     //! \param key key to look for#
     //! \return range may be empty or contains exactly one value
-    std::pair<const_iterator, const_iterator> equal_range(const key_type& key) const
+    std::pair<const_iterator, const_iterator>
+    equal_range(const key_type& key) const
     {
         return impl.equal_range(key);
     }
@@ -243,12 +261,15 @@ public:
     //! \name Modifiers: Insert
     //! \{
 
-    //! Insert a new value if no value with the same key is already present;
-    //! external memory must therefore be accessed
-    //! \param value what to insert
-    //! \return a tuple whose second part is true iff the value was actually
-    //! added (no value with the same key present); the first part is an
-    //! iterator pointing to the newly inserted or already stored value
+    /*!
+     * Insert a new value if no value with the same key is already present;
+     * external memory must therefore be accessed
+     *
+     * \param value what to insert
+     * \return a tuple whose second part is true iff the value was actually
+     * added (no value with the same key present); the first part is an
+     * iterator pointing to the newly inserted or already stored value
+     */
     std::pair<iterator, bool> insert(const value_type& value)
     {
         return impl.insert(value);
@@ -460,11 +481,13 @@ template <
     class HashType,
     class CompareType,
     unsigned SubBlockSize,
-    unsigned BlockSize,
-    class Alloc
+    unsigned SubBlocksPerBlock,
+    class AllocType
     >
-void swap(stxxl::unordered_map<KeyType, MappedType, HashType, CompareType, SubBlockSize, BlockSize, Alloc>& a,
-          stxxl::unordered_map<KeyType, MappedType, HashType, CompareType, SubBlockSize, BlockSize, Alloc>& b
+void swap(stxxl::unordered_map<KeyType, MappedType, HashType, CompareType,
+                               SubBlockSize, SubBlocksPerBlock, AllocType>& a,
+          stxxl::unordered_map<KeyType, MappedType, HashType, CompareType,
+                               SubBlockSize, SubBlocksPerBlock, AllocType>& b
           )
 {
     a.swap(b);
