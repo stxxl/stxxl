@@ -427,15 +427,23 @@ inline void stats::wait_finished(wait_op_type) { }
 
 class stats_data
 {
-    unsigned reads, writes;                    // number of operations
-    int64 volume_read, volume_written;         // number of bytes read/written
-    unsigned c_reads, c_writes;                // number of cached operations
-    int64 c_volume_read, c_volume_written;     // number of bytes read/written from/to cache
-    double t_reads, t_writes;                  // seconds spent in operations
-    double p_reads, p_writes;                  // seconds spent in parallel operations
-    double p_ios;                              // seconds spent in all parallel I/O operations (read and write)
-    double t_wait;                             // seconds spent waiting for completion of I/O operations
-    double t_wait_read, t_wait_write;          //
+    //! number of operations
+    unsigned reads, writes;
+    //! number of bytes read/written
+    int64 volume_read, volume_written;
+    //! number of cached operations
+    unsigned c_reads, c_writes;
+    //! number of bytes read/written from/to cache
+    int64 c_volume_read, c_volume_written;
+    //! seconds spent in operations
+    double t_reads, t_writes;
+    //! seconds spent in parallel operations
+    double p_reads, p_writes;
+    //! seconds spent in all parallel I/O operations (read and write)
+    double p_ios;
+    //! seconds spent waiting for completion of I/O operations
+    double t_wait;
+    double t_wait_read, t_wait_write;
     double elapsed;
 
 public:

@@ -70,7 +70,7 @@ private:
     }
 
     //! number of bits in the lower integer part, used a bit shift value.
-    static const int low_bits = 8 * sizeof(low_type);
+    static const size_t low_bits = 8 * sizeof(low_type);
 
     //! return highest value storable in higher part, also used as a mask.
     static unsigned_type high_max()

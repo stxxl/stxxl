@@ -55,10 +55,10 @@ public:
     typedef buf_istream<block_type, bid_iterator_type> _Self;
 
     //! Constructs input stream object.
-    //! \param _begin \c bid_iterator pointing to the first block of the stream
-    //! \param _end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
+    //! \param begin \c bid_iterator pointing to the first block of the stream
+    //! \param end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_istream(bid_iterator_type _begin, bid_iterator_type _end, int_type nbuffers)
+    buf_istream(bid_iterator_type begin, bid_iterator_type end, unsigned_type nbuffers)
         : current_elem(0)
 #ifdef BUF_ISTREAM_CHECK_END
           , not_finished(true)
@@ -66,7 +66,7 @@ public:
     {
         const unsigned_type ndisks = config::get_instance()->disks_number();
         const unsigned_type mdevid = config::get_instance()->get_max_device_id();
-        const int_type seq_length = _end - _begin;
+        const int_type seq_length = end - begin;
         prefetch_seq = new int_type[seq_length];
 
         // obvious schedule
@@ -75,10 +75,10 @@ public:
 
         // optimal schedule
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
-        compute_prefetch_schedule(_begin, _end, prefetch_seq,
+        compute_prefetch_schedule(begin, end, prefetch_seq,
                                   nbuffers, mdevid);
 
-        prefetcher = new prefetcher_type(_begin, _end, prefetch_seq, nbuffers);
+        prefetcher = new prefetcher_type(begin, end, prefetch_seq, nbuffers);
 
         current_blk = prefetcher->pull_block();
     }
