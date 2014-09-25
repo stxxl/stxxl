@@ -315,7 +315,7 @@ void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_
     typename run_type::iterator copy_start = consume_seq.begin();
     for (int_type i = 0; i < nruns; i++)
     {
-        // TODO: try to avoid copy
+        // \todo: try to avoid copy
         copy_start = std::copy(
             in_runs[i]->begin(),
             in_runs[i]->end(),

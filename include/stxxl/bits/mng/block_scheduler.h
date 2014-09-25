@@ -1598,7 +1598,7 @@ protected:
 
     void deinit()
     {
-        // todo remove
+        // TODO remove
         if (! scheduled_blocks.empty())
             STXXL_MSG("deinit while scheduled_blocks not empty");
         if (! scheduled_evictable_blocks.empty())

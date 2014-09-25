@@ -76,7 +76,7 @@ public:
     //! type of (mother) hash-function
     typedef HashType hasher;
     //! functor that imposes a ordering on keys (but see _lt())
-    typedef KeyCompareType key_compare_type;
+    typedef KeyCompareType key_compare;
     //! allocator template type
     typedef AllocatorType allocator_type;
 
@@ -131,7 +131,7 @@ protected:
     //! user supplied mother hash-function
     hasher hash_;
     //! user supplied strict-weak-ordering for keys
-    key_compare_type cmp_;
+    key_compare cmp_;
     //! array of bucket
     buckets_container_type buckets_;
     //! blocks-ids of allocated blocks
@@ -160,10 +160,11 @@ public:
     //! \param hf hash-function
     //! \param cmp comparator-object
     //! \param buffer_size size for internal-memory buffer in bytes
+    //! \param a allocator of internal memory nodes
     hash_map(internal_size_type n = 0,
              const hasher& hf = hasher(),
-             const key_compare_type& cmp = key_compare_type(),
-             internal_size_type buffer_size = 100*1024*1024,
+             const key_compare& cmp = key_compare(),
+             internal_size_type buffer_size = 128*1024*1024,
              const allocator_type& a = allocator_type())
         : hash_(hf),
           cmp_(cmp),
@@ -184,13 +185,18 @@ public:
     //! \param f beginning of the range
     //! \param l end of the range
     //! \param mem_to_sort additional memory (in bytes) for bulk-insert
+    //! \param n initial number of buckets
+    //! \param hf hash-function
+    //! \param cmp comparator-object
+    //! \param buffer_size size for internal-memory buffer in bytes
+    //! \param a allocator of internal memory nodes
     template <class InputIterator>
     hash_map(InputIterator f, InputIterator l,
              internal_size_type mem_to_sort = 256*1024*1024,
              internal_size_type n = 0,
              const hasher& hf = hasher(),
-             const key_compare_type& cmp = key_compare_type(),
-             internal_size_type buffer_size = 100*1024*1024,
+             const key_compare& cmp = key_compare(),
+             internal_size_type buffer_size = 128*1024*1024,
              const allocator_type& a = allocator_type())
         : hash_(hf),
           cmp_(cmp),
@@ -219,11 +225,12 @@ public:
     { return hash_; }
 
     //! Strict-weak-ordering used by this hash-map
-    key_compare_type key_cmp() const
+    key_compare key_cmp() const
     { return cmp_; }
 
-    bool empty() const
-    { return size() != 0; }
+    //! Get node memory allocator
+    allocator_type get_allocator() const
+    { return node_allocator_; }
 
 protected:
     /*!
@@ -232,7 +239,7 @@ protected:
      * calculate the exact number.
      */
     void _make_conscious()
-    { /* const */                           //! \TODO: make const again
+    { /* const */                           //! TODO: make const again
         if (!oblivious_)
             return;
 
@@ -267,6 +274,12 @@ public:
     external_size_type max_size() const
     {
         return std::numeric_limits<external_size_type>::max();
+    }
+
+    //! Check if container is empty.
+    bool empty() const
+    {
+        return size() != 0;
     }
 
     //! Insert a new value if no value with the same key is already present;
@@ -565,12 +578,14 @@ protected:
     mutable external_size_type n_not_found;
 
 public:
+    //! Reset hash-map statistics
     void reset_statistics()
     {
         block_cache_.reset_statistics();
         n_subblocks_loaded = n_found_external = n_found_internal = n_not_found = 0;
     }
 
+    //! Print short general statistics to output stream
     void print_statistics(std::ostream& o = std::cout) const
     {
         o << "Find-statistics:" << std::endl;
@@ -769,7 +784,7 @@ public:
     float load_factor() const
     { return (float)num_total_ / ((float)subblock_size * (float)buckets_.size()); }
 
-    //! Set desired load-factor
+    //! Get desired load-factor
     float opt_load_factor() const { return opt_load_factor_; }
 
     //! Set desired load-factor
@@ -903,7 +918,7 @@ protected:
     */
     internal_size_type _bkt_num(const key_type& key, internal_size_type n) const
     {
-        //! \TODO maybe specialize double arithmetic to integer. the old code
+        //! TODO maybe specialize double arithmetic to integer. the old code
         //! was faulty -tb.
         return (internal_size_type)(
             (double)n * ((double)hash_(key) / (double)std::numeric_limits<internal_size_type>::max())
@@ -958,7 +973,7 @@ protected:
                     bucket.n_external_ - i_subblock * subblock_size
                     );
 
-            //! \TODO: replace with bucket.n_external_ % subblock_size
+            //! TODO: replace with bucket.n_external_ % subblock_size
 
             // biggest key in current subblock still too small => next subblock
             if (_lt((*subblock)[n_values - 1].first, key))
@@ -1483,6 +1498,39 @@ protected:
         }
     }
 #endif
+
+public:
+    //! Construct an equality predicate from the comparison operator
+    struct equal_to : public std::binary_function<key_type, key_type, bool>
+    {
+        //! reference to hash_map
+        const self_type& m_map;
+
+        //! constructor requires reference to hash_map
+        equal_to(const self_type& map) : m_map(map) { }
+
+        //! return whether the arguments compare equal (x==y).
+        bool operator () (const key_type& x, const key_type& y) const
+        {
+            return m_map._eq(x, y);
+        }
+
+        //! C++11 required type
+        typedef key_type first_argument_type;
+        //! C++11 required type
+        typedef key_type second_argument_type;
+        //! C++11 required type
+        typedef bool result_type;
+    };
+
+    //! Type of constructed equality predicate
+    typedef equal_to key_equal;
+
+    //! Constructed equality predicate used by this hash-map
+    key_equal key_eq() const
+    {
+        return equal_to(*this);
+    }
 
 public:
     //! Even more statistics: Number of buckets, number of values, buffer-size,

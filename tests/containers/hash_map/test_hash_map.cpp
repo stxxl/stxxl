@@ -301,6 +301,11 @@ void basic_test()
     std::cout << "passed" << std::endl;
     STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
 
+    // --- test equality predicate
+    unordered_map::key_equal key_eq = map.key_eq();
+    STXXL_CHECK(key_eq(42, 42));
+    STXXL_CHECK(!key_eq(42, 6 * 9));
+
     std::cout << "\nAll tests passed" << std::endl;
 
     map.buffer_size();

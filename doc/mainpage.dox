@@ -81,7 +81,7 @@ Many people have contributed to STXXL, see all \ref authors.
 - \subpage authors
 - \subpage textfiles_install
 - \subpage license
-- \subpage todo
+- \subpage textfiles_todo
 
 \page readme README
 
@@ -105,7 +105,7 @@ The following list of authors have contributed to STXXL:
 
 \verbinclude LICENSE_1_0.txt
 
-\page todo TODO
+\page textfiles_todo TODO
 
 \verbinclude TODO
 
