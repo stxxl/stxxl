@@ -750,7 +750,7 @@ public:
 public:
     //! Average number of (sub)blocks occupied by a bucket.
     float load_factor() const
-    { return num_total_ / ((float)subblock_size * (float)buckets_.size()); }
+    { return (float)num_total_ / ((float)subblock_size * (float)buckets_.size()); }
 
     //! Set desired load-factor
     float opt_load_factor() const { return opt_load_factor_; }
