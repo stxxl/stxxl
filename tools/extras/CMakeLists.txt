@@ -10,6 +10,6 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
-stxxl_build_extra_tool(benchmark_disk_and_flash)
-stxxl_build_extra_tool(iobench_scatter_in_place)
-stxxl_build_extra_tool(pq_param)
+stxxl_build_test(benchmark_disk_and_flash)
+stxxl_build_test(iobench_scatter_in_place)
+stxxl_build_test(pq_param)
