@@ -1007,7 +1007,7 @@ protected:
         /* 1. */
         bid_type bid = bids_[bucket.i_block_ + (internal_size_type)(i_abs_subblock / block_size)];
         /* 2. */
-        internal_size_type i_subblock_within = i_abs_subblock % block_size;
+        internal_size_type i_subblock_within = (internal_size_type)(i_abs_subblock % block_size);
 
         return block_cache_.get_subblock(bid, i_subblock_within);
     }

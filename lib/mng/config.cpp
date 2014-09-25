@@ -443,7 +443,7 @@ std::string disk_config::fileio_string() const
     else if (direct == DIRECT_ON)
         oss << " direct=on";
     else
-        assert("Invalid setting for 'direct' option." == NULL);
+        STXXL_THROW(std::runtime_error, "Invalid setting for 'direct' option.");
 
     if (flash)
         oss << " flash";

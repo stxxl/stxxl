@@ -181,7 +181,7 @@ void test_vector()
     }
 }
 
-typedef unsigned int key_type;
+typedef size_t key_type;
 
 struct test_data {
     unsigned char a;
@@ -225,20 +225,20 @@ void test_map()
     for (unsigned mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *stxxl::stats::get_instance();
-        const unsigned el = mult * (CACHE_ELEMENTS / 8);
+        const size_t el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
         map_type* DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
         map_type& Map = *DMap;
 
-        for (unsigned i = 0; i < el; ++i)
+        for (size_t i = 0; i < el; ++i)
         {
             test_data_ptr test = boost::make_shared<test_data>();
 
-            test->a = (i + 1) % 256;
+            test->a = (unsigned char)(i + 1);
             for (unsigned j = 0; j < 3; j++)
-                test->b[j] = i + 2;
-            test->c = i + 3;
+                test->b[j] = (unsigned long)(i + 2);
+            test->c = (unsigned int)(i + 3);
 
             data_type data(test);
             Map[i] = data;
@@ -251,7 +251,7 @@ void test_map()
 
         stats_begin = *stxxl::stats::get_instance();
         STXXL_MSG("Doing search");
-        unsigned queries = el;
+        size_t queries = el;
         stxxl::random_number32 myrandom;
         for (unsigned i = 0; i < queries; ++i)
         {
@@ -261,14 +261,14 @@ void test_map()
             data_type data = (*result).second;
             test_data_ptr tmp = data.get();
 
-            STXXL_CHECK(tmp->a == (key + 1) % 256);
+            STXXL_CHECK(tmp->a == (unsigned char)(key + 1));
             for (unsigned j = 0; j < 3; ++j)
-                STXXL_CHECK(tmp->b[j] == (key + 2));
-            STXXL_CHECK(tmp->c == (key + 3));
+                STXXL_CHECK(tmp->b[j] == (unsigned long)(key + 2));
+            STXXL_CHECK(tmp->c == (unsigned int)(key + 3));
         }
         stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_reads()) / logel;
-        double readsperq = double(stats_elapsed.get_reads()) / queries;
+        double readsperq = double(stats_elapsed.get_reads()) / (double)queries;
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
         STXXL_MSG(stats_elapsed);
 

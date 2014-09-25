@@ -39,7 +39,7 @@ struct hash_int
     size_t operator () (int key) const
     {
         // a simple integer hash function
-        return (size_t)(key * 2654435761);
+        return (size_t)(key * 2654435761u);
     }
 
     stxxl::uint64 hash(int key) const { return operator () (key); }
@@ -72,7 +72,7 @@ struct hash_structA
     size_t operator () (const structA& key) const
     {
         // a simple integer hash function
-        return (size_t)((key.x + key.y) * 2654435761);
+        return (size_t)((key.x + key.y) * 2654435761u);
     }
 };
 
