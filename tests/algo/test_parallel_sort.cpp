@@ -124,7 +124,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
-    typedef __typeof__ (stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+    typedef stxxl::stream::streamify_traits<vector_type::iterator>::stream_type input_stream_type;
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 

@@ -39,26 +39,26 @@ namespace stream {
 
 //! Forms sorted runs of data from a stream.
 //!
-//! \tparam Input_ type of the input stream
-//! \tparam CompareType_ type of comparison object used for sorting the runs
-//! \tparam BlockSize_ size of blocks used to store the runs (in bytes)
-//! \tparam AllocStr_ functor that defines allocation strategy for the runs
+//! \tparam Input type of the input stream
+//! \tparam CompareType type of comparison object used for sorting the runs
+//! \tparam BlockSize size of blocks used to store the runs (in bytes)
+//! \tparam AllocStr functor that defines allocation strategy for the runs
 template <
-    class Input_,
-    class CompareType_,
-    unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
-    class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
+    class Input,
+    class CompareType,
+    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
+    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
 class basic_runs_creator : private noncopyable
 {
 public:
-    typedef Input_ input_type;
-    typedef CompareType_ cmp_type;
-    static const unsigned block_size = BlockSize_;
-    typedef AllocStr_ allocation_strategy_type;
+    typedef Input input_type;
+    typedef CompareType cmp_type;
+    static const unsigned block_size = BlockSize;
+    typedef AllocStr allocation_strategy_type;
 
 public:
-    typedef typename Input_::value_type value_type;
-    typedef typed_block<BlockSize_, value_type> block_type;
+    typedef typename Input::value_type value_type;
+    typedef typed_block<BlockSize, value_type> block_type;
     typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
     typedef sorted_runs<trigger_entry_type, cmp_type> sorted_runs_data_type;
     typedef typename sorted_runs_data_type::run_type run_type;
@@ -67,16 +67,22 @@ public:
     typedef typename element_iterator_traits<block_type, external_size_type>::element_iterator element_iterator;
 
 protected:
-    Input_& m_input;                    //! reference to the input stream
-    CompareType_ m_cmp;                 //! comparator used to sort block groups
+    //! reference to the input stream
+    Input& m_input;
+    //! comparator used to sort block groups
+    CompareType m_cmp;
 
 private:
-    sorted_runs_type m_result;          //! stores the result (sorted runs) as smart pointer
-    unsigned_type m_memsize;            //! memory for internal use in blocks
-    bool m_result_computed;             //! true iff result is already computed (used in 'result()' method)
+    //! stores the result (sorted runs) as smart pointer
+    sorted_runs_type m_result;
+    //! memory for internal use in blocks
+    unsigned_type m_memsize;
+    //! true iff result is already computed (used in 'result()' method)
+    bool m_result_computed;
 
     //! Fetch data from input into blocks[first_idx,last_idx).
-    unsigned_type fetch(block_type* blocks, unsigned_type first_idx, unsigned_type last_idx)
+    unsigned_type fetch(block_type* blocks,
+                        unsigned_type first_idx, unsigned_type last_idx)
     {
         element_iterator output = make_element_iterator(blocks, first_idx);
         unsigned_type curr_idx = first_idx;
@@ -89,8 +95,9 @@ private:
         return curr_idx;
     }
 
-    //!  fill the rest of the block with max values
-    void fill_with_max_value(block_type* blocks, unsigned_type num_blocks, unsigned_type first_idx)
+    //! fill the rest of the block with max values
+    void fill_with_max_value(block_type* blocks, unsigned_type num_blocks,
+                             unsigned_type first_idx)
     {
         unsigned_type last_idx = num_blocks * block_type::size;
         if (first_idx < last_idx) {
@@ -118,17 +125,21 @@ public:
     //! Create the object.
     //! \param input input stream
     //! \param cmp comparator object
-    //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    basic_runs_creator(Input_& input, CompareType_ cmp, unsigned_type memory_to_use)
+    //! \param memory_to_use memory amount that is allowed to used by the
+    //! sorter in bytes
+    basic_runs_creator(Input& input, CompareType cmp,
+                       unsigned_type memory_to_use)
         : m_input(input),
           m_cmp(cmp),
           m_result(new sorted_runs_data_type),
-          m_memsize(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
+          m_memsize(memory_to_use / BlockSize / sort_memory_usage_factor()),
           m_result_computed(false)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
-        if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
-            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+        if (!(2 * BlockSize * sort_memory_usage_factor() <= memory_to_use)) {
+            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): "
+                                "INSUFFICIENT MEMORY provided, "
+                                "please increase parameter 'memory_to_use'");
         }
         assert(m_memsize > 0);
     }
@@ -153,8 +164,8 @@ public:
 //! Finish the results, i. e. create all runs.
 //!
 //! This is the main routine of this class.
-template <class Input_, class CompareType_, unsigned BlockSize_, class AllocStr_>
-void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_result()
+template <class Input, class CompareType, unsigned BlockSize, class AllocStr>
+void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result()
 {
     unsigned_type i = 0;
     unsigned_type m2 = m_memsize / 2;
@@ -177,7 +188,8 @@ void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_re
     if (blocks1_length == block_type::size && !input.empty())
     {
         Blocks1 = new block_type[m2 * 2];
-        std::copy(m_result->small_run.begin(), m_result->small_run.end(), Blocks1[0].begin());
+        std::copy(m_result->small_run.begin(), m_result->small_run.end(),
+                  Blocks1[0].begin());
         m_result->small_run.clear();
     }
     else
@@ -214,7 +226,7 @@ void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_re
 
     unsigned_type cur_run_size = div_ceil(blocks1_length, block_type::size);      // in blocks
     run.resize(cur_run_size);
-    bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
+    bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
     disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
@@ -253,7 +265,7 @@ void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_re
 
         cur_run_size = div_ceil(blocks2_length, block_type::size);
         run.resize(cur_run_size);
-        bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
+        bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
         // fill the rest of the last block with max values
         fill_with_max_value(Blocks1, cur_run_size, blocks2_length);
@@ -295,7 +307,7 @@ void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_re
 
     cur_run_size = div_ceil(blocks2_length, block_type::size);      // in blocks
     run.resize(cur_run_size);
-    bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
+    bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
     for (i = 0; i < cur_run_size; ++i)
     {
@@ -313,7 +325,7 @@ void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_re
         sort_run(Blocks1, blocks1_length);
         cur_run_size = div_ceil(blocks1_length, block_type::size);      // in blocks
         run.resize(cur_run_size);
-        bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
+        bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
         // fill the rest of the last block with max values (occurs only on the last run)
         fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
@@ -337,19 +349,20 @@ void basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>::compute_re
 
 //! Forms sorted runs of data from a stream.
 //!
-//! \tparam Input_ type of the input stream
-//! \tparam CompareType_ type of omparison object used for sorting the runs
-//! \tparam BlockSize_ size of blocks used to store the runs
-//! \tparam AllocStr_ functor that defines allocation strategy for the runs
+//! \tparam Input type of the input stream
+//! \tparam CompareType type of omparison object used for sorting the runs
+//! \tparam BlockSize size of blocks used to store the runs
+//! \tparam AllocStr functor that defines allocation strategy for the runs
 template <
-    class Input_,
-    class CompareType_,
-    unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
-    class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
-class runs_creator : public basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_>
+    class Input,
+    class CompareType,
+    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
+    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY
+    >
+class runs_creator : public basic_runs_creator<Input, CompareType, BlockSize, AllocStr>
 {
 private:
-    typedef basic_runs_creator<Input_, CompareType_, BlockSize_, AllocStr_> base;
+    typedef basic_runs_creator<Input, CompareType, BlockSize, AllocStr> base;
 
 public:
     typedef typename base::cmp_type cmp_type;
@@ -362,8 +375,9 @@ public:
     //! Creates the object.
     //! \param input input stream
     //! \param cmp comparator object
-    //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    runs_creator(Input_& input, CompareType_ cmp, unsigned_type memory_to_use)
+    //! \param memory_to_use memory amount that is allowed to used by the
+    //! sorter in bytes
+    runs_creator(Input& input, CompareType cmp, unsigned_type memory_to_use)
         : base(input, cmp, memory_to_use)
     { }
 };
@@ -375,10 +389,10 @@ public:
 //! data structure usable for \c runs_merger
 //! pushing elements into the sorter
 //! (using runs_creator::push())
-template <class ValueType_>
+template <class ValueType>
 struct use_push
 {
-    typedef ValueType_ value_type;
+    typedef ValueType value_type;
 };
 
 //! Forms sorted runs of elements passed in push() method.
@@ -387,26 +401,27 @@ struct use_push
 //! allows to create sorted runs
 //! data structure usable for \c runs_merger from
 //! elements passed in sorted push() method. <BR>
-//! \tparam ValueType_ type of values (parameter for \c use_push strategy)
-//! \tparam CompareType_ type of comparison object used for sorting the runs
-//! \tparam BlockSize_ size of blocks used to store the runs
-//! \tparam AllocStr_ functor that defines allocation strategy for the runs
+//! \tparam ValueType type of values (parameter for \c use_push strategy)
+//! \tparam CompareType type of comparison object used for sorting the runs
+//! \tparam BlockSize size of blocks used to store the runs
+//! \tparam AllocStr functor that defines allocation strategy for the runs
 template <
-    class ValueType_,
-    class CompareType_,
-    unsigned BlockSize_,
-    class AllocStr_>
+    class ValueType,
+    class CompareType,
+    unsigned BlockSize,
+    class AllocStr
+    >
 class runs_creator<
-    use_push<ValueType_>,
-    CompareType_,
-    BlockSize_,
-    AllocStr_>
-    : private noncopyable
+    use_push<ValueType>,
+    CompareType,
+    BlockSize,
+    AllocStr
+    >: private noncopyable
 {
 public:
-    typedef CompareType_ cmp_type;
-    typedef ValueType_ value_type;
-    typedef typed_block<BlockSize_, value_type> block_type;
+    typedef CompareType cmp_type;
+    typedef ValueType value_type;
+    typedef typed_block<BlockSize, value_type> block_type;
     typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
     typedef sorted_runs<trigger_entry_type, cmp_type> sorted_runs_data_type;
     typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
@@ -416,7 +431,7 @@ public:
 
 private:
     //! comparator object to sort runs
-    CompareType_ m_cmp;
+    CompareType m_cmp;
 
     typedef typename sorted_runs_data_type::run_type run_type;
 
@@ -447,7 +462,8 @@ private:
     //! accumulation buffer that is currently being written to disk
     block_type* m_blocks2;
 
-    //! reference to write requests transporting the last accumulation buffer to disk
+    //! reference to write requests transporting the last accumulation buffer
+    //! to disk
     request_ptr* m_write_reqs;
 
     //! run object containing block ids of the run being written to disk
@@ -455,7 +471,8 @@ private:
 
 protected:
     //!  fill the rest of the block with max values
-    void fill_with_max_value(block_type* blocks, unsigned_type num_blocks, unsigned_type first_idx)
+    void fill_with_max_value(block_type* blocks, unsigned_type num_blocks,
+                             unsigned_type first_idx)
     {
         unsigned_type last_idx = num_blocks * block_type::size;
         if (first_idx < last_idx) {
@@ -496,7 +513,7 @@ protected:
         const unsigned_type cur_run_size = div_ceil(m_cur_el, block_type::size);         // in blocks
         run.resize(cur_run_size);
         block_manager* bm = block_manager::get_instance();
-        bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
+        bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
@@ -525,18 +542,20 @@ public:
     //! Creates the object.
     //! \param cmp comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    runs_creator(CompareType_ cmp, unsigned_type memory_to_use)
+    runs_creator(CompareType cmp, unsigned_type memory_to_use)
         : m_cmp(cmp),
           m_memory_to_use(memory_to_use),
-          m_memsize(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
+          m_memsize(memory_to_use / BlockSize / sort_memory_usage_factor()),
           m_m2(m_memsize / 2),
           m_el_in_run(m_m2 * block_type::size),
           m_blocks1(NULL), m_blocks2(NULL),
           m_write_reqs(NULL)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
-        if (!(2 * BlockSize_ * sort_memory_usage_factor() <= m_memory_to_use)) {
-            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+        if (!(2 * BlockSize * sort_memory_usage_factor() <= m_memory_to_use)) {
+            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): "
+                                "INSUFFICIENT MEMORY provided, "
+                                "please increase parameter 'memory_to_use'");
         }
         assert(m_m2 > 0);
 
@@ -617,7 +636,7 @@ public:
         const unsigned_type cur_run_blocks = div_ceil(m_el_in_run, block_type::size);        // in blocks
         run.resize(cur_run_blocks);
         block_manager* bm = block_manager::get_instance();
-        bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
+        bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
@@ -678,10 +697,10 @@ public:
 //! allows to create sorted runs
 //! data structure usable for \c runs_merger from
 //! sequences of elements in sorted order
-template <class ValueType_>
+template <class ValueType>
 struct from_sorted_sequences
 {
-    typedef ValueType_ value_type;
+    typedef ValueType value_type;
 };
 
 //! Forms sorted runs of data taking elements in sorted order (element by element).
@@ -690,30 +709,31 @@ struct from_sorted_sequences
 //! allows to create sorted runs
 //! data structure usable for \c runs_merger from
 //! sequences of elements in sorted order. <BR>
-//! \tparam ValueType_ type of values (parameter for \c from_sorted_sequences strategy)
-//! \tparam CompareType_ type of comparison object used for sorting the runs
-//! \tparam BlockSize_ size of blocks used to store the runs
-//! \tparam AllocStr_ functor that defines allocation strategy for the runs
+//! \tparam ValueType type of values (parameter for \c from_sorted_sequences strategy)
+//! \tparam CompareType type of comparison object used for sorting the runs
+//! \tparam BlockSize size of blocks used to store the runs
+//! \tparam AllocStr functor that defines allocation strategy for the runs
 template <
-    class ValueType_,
-    class CompareType_,
-    unsigned BlockSize_,
-    class AllocStr_>
+    class ValueType,
+    class CompareType,
+    unsigned BlockSize,
+    class AllocStr
+    >
 class runs_creator<
-    from_sorted_sequences<ValueType_>,
-    CompareType_,
-    BlockSize_,
-    AllocStr_>
-    : private noncopyable
+    from_sorted_sequences<ValueType>,
+    CompareType,
+    BlockSize,
+    AllocStr
+    >: private noncopyable
 {
 public:
-    typedef ValueType_ value_type;
-    typedef typed_block<BlockSize_, value_type> block_type;
+    typedef ValueType value_type;
+    typedef typed_block<BlockSize, value_type> block_type;
     typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-    typedef AllocStr_ alloc_strategy_type;
+    typedef AllocStr alloc_strategy_type;
 
 public:
-    typedef CompareType_ cmp_type;
+    typedef CompareType cmp_type;
     typedef sorted_runs<trigger_entry_type, cmp_type> sorted_runs_data_type;
     typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
     typedef sorted_runs_type result_type;
@@ -721,26 +741,29 @@ public:
 private:
     typedef typename sorted_runs_data_type::run_type run_type;
 
-    CompareType_ cmp;
+    CompareType cmp;
 
-    sorted_runs_type result_;     // stores the result (sorted runs)
-    unsigned_type m_;             // memory for internal use in blocks
+    //! stores the result (sorted runs)
+    sorted_runs_type result_;
+    //! memory for internal use in blocks
+    unsigned_type m_;
     buffered_writer<block_type> writer;
     block_type* cur_block;
     unsigned_type offset;
     unsigned_type iblock;
     unsigned_type irun;
-    alloc_strategy_type alloc_strategy;      // needs to be reset after each run
+    //! needs to be reset after each run
+    alloc_strategy_type alloc_strategy;
 
 public:
     //! Creates the object.
     //! \param c comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes.
     //! Recommended value: 2 * block_size * D
-    runs_creator(CompareType_ c, unsigned_type memory_to_use)
+    runs_creator(CompareType c, unsigned_type memory_to_use)
         : cmp(c),
           result_(new sorted_runs_data_type),
-          m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
+          m_(memory_to_use / BlockSize / sort_memory_usage_factor()),
           writer(m_, m_ / 2),
           cur_block(writer.get_free_block()),
           offset(0),
@@ -749,8 +772,10 @@ public:
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         assert(m_ > 0);
-        if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
-            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+        if (!(2 * BlockSize * sort_memory_usage_factor() <= memory_to_use)) {
+            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): "
+                                "INSUFFICIENT MEMORY provided, "
+                                "please increase parameter 'memory_to_use'");
         }
     }
 
@@ -844,11 +869,11 @@ public:
 //! \param sruns sorted runs object
 //! \param cmp comparison object used for checking the order of elements in runs
 //! \return \c true if runs are sorted, \c false otherwise
-template <class RunsType_, class CompareType_>
-bool check_sorted_runs(const RunsType_& sruns, CompareType_ cmp)
+template <class RunsType, class CompareType>
+bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
-    typedef typename RunsType_::element_type::block_type block_type;
+    typedef typename RunsType::element_type::block_type block_type;
     STXXL_VERBOSE2("Elements: " << sruns->elements);
     unsigned_type nruns = sruns->runs.size();
     STXXL_VERBOSE2("Runs: " << nruns);
@@ -899,19 +924,19 @@ bool check_sorted_runs(const RunsType_& sruns, CompareType_ cmp)
 
 //! Merges sorted runs.
 //!
-//! \tparam RunsType_ type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
-//! \tparam CompareType_ type of comparison object used for merging
-//! \tparam AllocStr_ allocation strategy used to allocate the blocks for
+//! \tparam RunsType type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
+//! \tparam CompareType type of comparison object used for merging
+//! \tparam AllocStr allocation strategy used to allocate the blocks for
 //! storing intermediate results if several merge passes are required
-template <class RunsType_,
-          class CompareType_,
-          class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
+template <class RunsType,
+          class CompareType,
+          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
 class basic_runs_merger : private noncopyable
 {
 public:
-    typedef RunsType_ sorted_runs_type;
-    typedef CompareType_ value_cmp;
-    typedef AllocStr_ alloc_strategy;
+    typedef RunsType sorted_runs_type;
+    typedef CompareType value_cmp;
+    typedef AllocStr alloc_strategy;
 
     typedef typename sorted_runs_type::element_type sorted_runs_data_type;
     typedef typename sorted_runs_data_type::size_type size_type;
@@ -1127,7 +1152,10 @@ public:
 
         int_type disks_number = config::get_instance()->disks_number();
         unsigned_type min_prefetch_buffers = 2 * disks_number;
-        unsigned_type input_buffers = (m_memory_to_use > sizeof(out_block_type) ? m_memory_to_use - sizeof(out_block_type) : 0) / block_type::raw_size;
+        unsigned_type input_buffers =
+            (m_memory_to_use > sizeof(out_block_type)
+             ? m_memory_to_use - sizeof(out_block_type)
+             : 0) / block_type::raw_size;
         unsigned_type nruns = m_sruns->runs.size();
 
         if (input_buffers < nruns + min_prefetch_buffers)
@@ -1302,15 +1330,16 @@ public:
     }
 };
 
-template <class RunsType_, class CompareType_, class AllocStr_>
-void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
+template <class RunsType, class CompareType, class AllocStr>
+void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 {
     block_manager* bm = block_manager::get_instance();
     unsigned_type ndisks = config::get_instance()->disks_number();
     unsigned_type nwrite_buffers = 2 * ndisks;
     unsigned_type memory_for_write_buffers = nwrite_buffers * sizeof(block_type);
 
-    // memory consumption of the recursive merger (uses block_type as out_block_type)
+    // memory consumption of the recursive merger (uses block_type as
+    // out_block_type)
     unsigned_type recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
     unsigned_type recursive_merger_memory_out_block = sizeof(block_type);
     unsigned_type memory_for_buffers = memory_for_write_buffers
@@ -1331,7 +1360,8 @@ void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
                   " opt_merge_factor: " << merge_factor <<
                   " max_arity: " << max_arity << " new_nruns: " << new_nruns);
 
-        // construct new sorted_runs data object which will be swapped into m_sruns
+        // construct new sorted_runs data object which will be swapped into
+        // m_sruns
 
         sorted_runs_data_type new_runs;
         new_runs.runs.resize(new_nruns);
@@ -1385,7 +1415,8 @@ void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
 
                 // construct recursive merger
 
-                basic_runs_merger<RunsType_, CompareType_, AllocStr_> merger(m_cmp, m_memory_to_use - memory_for_write_buffers);
+                basic_runs_merger<RunsType, CompareType, AllocStr>
+                merger(m_cmp, m_memory_to_use - memory_for_write_buffers);
                 merger.initialize(cur_runs);
 
                 {       // make sure everything is being destroyed in right time
@@ -1432,29 +1463,33 @@ void basic_runs_merger<RunsType_, CompareType_, AllocStr_>::merge_recursively()
 
         assert(elements_left == 0);
 
-        m_sruns->runs.clear();   // clear bid vector of m_sruns to skip deallocation of blocks in destructor
+        // clear bid vector of m_sruns to skip deallocation of blocks in
+        // destructor
+        m_sruns->runs.clear();
 
+        // replaces data in referenced counted object m_sruns end while (nruns
+        // > max_arity)
         std::swap(nruns, new_nruns);
-        m_sruns->swap(new_runs); // replaces data in referenced counted object m_sruns
-    }                            // end while (nruns > max_arity)
+        m_sruns->swap(new_runs);
+    }
 }
 
 //! Merges sorted runs.
 //!
-//! \tparam RunsType_ type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
-//! \tparam CompareType_ type of comparison object used for merging
-//! \tparam AllocStr_ allocation strategy used to allocate the blocks for
+//! \tparam RunsType type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
+//! \tparam CompareType type of comparison object used for merging
+//! \tparam AllocStr allocation strategy used to allocate the blocks for
 //! storing intermediate results if several merge passes are required
-template <class RunsType_,
-          class CompareType_ = typename RunsType_::element_type::cmp_type,
-          class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
-class runs_merger : public basic_runs_merger<RunsType_, CompareType_, AllocStr_>
+template <class RunsType,
+          class CompareType = typename RunsType::element_type::cmp_type,
+          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+class runs_merger : public basic_runs_merger<RunsType, CompareType, AllocStr>
 {
 protected:
-    typedef basic_runs_merger<RunsType_, CompareType_, AllocStr_> base;
+    typedef basic_runs_merger<RunsType, CompareType, AllocStr> base;
 
 public:
-    typedef RunsType_ sorted_runs_type;
+    typedef RunsType sorted_runs_type;
     typedef typename base::value_cmp value_cmp;
     typedef typename base::value_cmp cmp_type;
     typedef typename base::block_type block_type;
@@ -1464,7 +1499,8 @@ public:
     //! \param sruns input sorted runs object
     //! \param cmp comparison object
     //! \param memory_to_use amount of memory available for the merger in bytes
-    runs_merger(sorted_runs_type& sruns, value_cmp cmp, unsigned_type memory_to_use)
+    runs_merger(sorted_runs_type& sruns, value_cmp cmp,
+                unsigned_type memory_to_use)
         : base(cmp, memory_to_use)
     {
         this->initialize(sruns);
@@ -1484,33 +1520,36 @@ public:
 
 //! Produces sorted stream from input stream.
 //!
-//! \tparam Input_ type of the input stream
-//! \tparam CompareType_ type of comparison object used for sorting the runs
-//! \tparam BlockSize_ size of blocks used to store the runs
-//! \tparam AllocStr_ functor that defines allocation strategy for the runs
+//! \tparam Input type of the input stream
+//! \tparam CompareType type of comparison object used for sorting the runs
+//! \tparam BlockSize size of blocks used to store the runs
+//! \tparam AllocStr functor that defines allocation strategy for the runs
 //! \remark Implemented as the composition of \c runs_creator and \c runs_merger .
-template <class Input_,
-          class CompareType_,
-          unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
-          class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
-          class runs_creator_type = runs_creator<Input_, CompareType_, BlockSize_, AllocStr_> >
+template <
+    class Input,
+    class CompareType,
+    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
+    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+    class RunsCreatorType = runs_creator<Input, CompareType, BlockSize, AllocStr>
+    >
 class sort : public noncopyable
 {
+    typedef RunsCreatorType runs_creator_type;
     typedef typename runs_creator_type::sorted_runs_type sorted_runs_type;
-    typedef runs_merger<sorted_runs_type, CompareType_, AllocStr_> runs_merger_type;
+    typedef runs_merger<sorted_runs_type, CompareType, AllocStr> runs_merger_type;
 
     runs_creator_type creator;
     runs_merger_type merger;
 
 public:
     //! Standard stream typedef.
-    typedef typename Input_::value_type value_type;
+    typedef typename Input::value_type value_type;
 
     //! Creates the object.
     //! \param in input stream
     //! \param c comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    sort(Input_& in, CompareType_ c, unsigned_type memory_to_use)
+    sort(Input& in, CompareType c, unsigned_type memory_to_use)
         : creator(in, c, memory_to_use),
           merger(creator.result(), c, memory_to_use)
     {
@@ -1522,7 +1561,8 @@ public:
     //! \param c comparator object
     //! \param m_memory_to_userc memory amount that is allowed to used by the runs creator in bytes
     //! \param m_memory_to_use memory amount that is allowed to used by the merger in bytes
-    sort(Input_& in, CompareType_ c, unsigned_type m_memory_to_userc, unsigned_type m_memory_to_use)
+    sort(Input& in, CompareType c, unsigned_type m_memory_to_userc,
+         unsigned_type m_memory_to_use)
         : creator(in, c, m_memory_to_userc),
           merger(creator.result(), c, m_memory_to_use)
     {
@@ -1558,15 +1598,16 @@ public:
 
 //! Computes sorted runs type from value type and block size.
 //!
-//! \tparam ValueType_ type of values ins sorted runs
-//! \tparam BlockSize_ size of blocks where sorted runs stored
+//! \tparam ValueType type of values ins sorted runs
+//! \tparam BlockSize size of blocks where sorted runs stored
 template <
-    class ValueType_,
-    unsigned BlockSize_>
+    class ValueType,
+    unsigned BlockSize
+    >
 class compute_sorted_runs_type
 {
-    typedef ValueType_ value_type;
-    typedef BID<BlockSize_> bid_type;
+    typedef ValueType value_type;
+    typedef BID<BlockSize> bid_type;
     typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
 
 public:
@@ -1590,10 +1631,12 @@ public:
 //!
 //! The \c BlockSize template parameter defines the block size to use (in bytes)
 //! \warning Slower than External Iterator Sort
-template <unsigned BlockSize,
-          class RandomAccessIterator,
-          class CmpType,
-          class AllocStr>
+template <
+    unsigned BlockSize,
+    class RandomAccessIterator,
+    class CmpType,
+    class AllocStr
+    >
 void sort(RandomAccessIterator begin,
           RandomAccessIterator end,
           CmpType cmp,
@@ -1601,11 +1644,7 @@ void sort(RandomAccessIterator begin,
           AllocStr AS)
 {
     STXXL_UNUSED(AS);
-#if STXXL_MSVC
-    typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;
-#else
-    typedef __typeof__ (stream::streamify(begin, end)) InputType;
-#endif // STXXL_MSVC
+    typedef typename stream::streamify_traits<RandomAccessIterator>::stream_type InputType;
     InputType Input(begin, end);
     typedef stream::sort<InputType, CmpType, BlockSize, AllocStr> sorter_type;
     sorter_type Sort(Input, cmp, MemSize);

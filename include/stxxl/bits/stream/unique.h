@@ -25,13 +25,13 @@ namespace stream {
 //     UNIQUE                                                         //
 ////////////////////////////////////////////////////////////////////////
 
-struct dummy_cmp_unique_ { };
+struct dummy_cmp_unique { };
 
 //! Equivalent to std::unique algorithms.
 //!
 //! Removes consecutive duplicates from the stream.
 //! Uses BinaryPredicate to compare elements of the stream
-template <class Input, class BinaryPredicate = dummy_cmp_unique_>
+template <class Input, class BinaryPredicate = dummy_cmp_unique>
 class unique
 {
     Input& input;
@@ -42,7 +42,8 @@ public:
     //! Standard stream typedef.
     typedef typename Input::value_type value_type;
 
-    unique(Input& input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
+    unique(Input& input_, BinaryPredicate binary_pred_)
+        : input(input_), binary_pred(binary_pred_)
     {
         if (!input.empty())
             current = *input;
@@ -81,7 +82,7 @@ public:
 //!
 //! Removes consecutive duplicates from the stream.
 template <class Input>
-class unique<Input, dummy_cmp_unique_>
+class unique<Input, dummy_cmp_unique>
 {
     Input& input;
     typename Input::value_type current;

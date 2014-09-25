@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/test_external_shared_ptr.cpp
+ *  tests/common/test_external_shared_ptr.cpp
  *
  *  This file has been derived from the following tests written
  *  by Roman Dementiev:

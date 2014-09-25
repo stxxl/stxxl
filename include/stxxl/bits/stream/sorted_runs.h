@@ -38,7 +38,8 @@ struct sorted_runs : private noncopyable, public counted_object
 {
     typedef TriggerEntryType trigger_entry_type;
     typedef typename trigger_entry_type::block_type block_type;
-    typedef typename block_type::value_type value_type;      // may differ from trigger_entry_type::value_type
+    //! may differ from trigger_entry_type::value_type
+    typedef typename block_type::value_type value_type;
     typedef std::vector<trigger_entry_type> run_type;
     typedef std::vector<value_type> small_run_type;
     typedef stxxl::external_size_type size_type;
