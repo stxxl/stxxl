@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/hash_map/test_reader_writer.cpp
+ *  tests/containers/hash_map/test_hash_map_reader_writer.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

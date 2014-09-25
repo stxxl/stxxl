@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/hash_map/test_block_cache.cpp
+ *  tests/containers/hash_map/test_hash_map_block_cache.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

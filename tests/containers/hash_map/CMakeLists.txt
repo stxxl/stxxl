@@ -10,12 +10,12 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
-stxxl_build_test(test_block_cache)
 stxxl_build_test(test_hash_map)
+stxxl_build_test(test_hash_map_block_cache)
 stxxl_build_test(test_hash_map_iterators)
-stxxl_build_test(test_reader_writer)
+stxxl_build_test(test_hash_map_reader_writer)
 
-stxxl_test(test_block_cache)
 stxxl_test(test_hash_map)
+stxxl_test(test_hash_map_block_cache)
 stxxl_test(test_hash_map_iterators)
-stxxl_test(test_reader_writer)
+stxxl_test(test_hash_map_reader_writer)
