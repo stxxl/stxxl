@@ -30,8 +30,8 @@ STXXL_BEGIN_NAMESPACE
 //! Suspends calling thread until \b all given requests are completed.
 //! \param reqs_begin begin of request sequence to wait for
 //! \param reqs_end end of request sequence to wait for
-template <class request_iterator_>
-void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+template <class RequestIterator>
+void wait_all(RequestIterator reqs_begin, RequestIterator reqs_end)
 {
     for ( ; reqs_begin != reqs_end; ++reqs_begin)
         (request_ptr(*reqs_begin))->wait();
@@ -53,10 +53,11 @@ inline void wait_all(request_ptr req_array[], size_t count)
 //! \param reqs_begin begin of request sequence
 //! \param reqs_end end of request sequence
 //! \return number of request canceled
-template <class request_iterator_>
-typename std::iterator_traits<request_iterator_>::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+template <class RequestIterator>
+typename std::iterator_traits<RequestIterator>::difference_type
+cancel_all(RequestIterator reqs_begin, RequestIterator reqs_end)
 {
-    typename std::iterator_traits<request_iterator_>::difference_type num_canceled = 0;
+    typename std::iterator_traits<RequestIterator>::difference_type num_canceled = 0;
     while (reqs_begin != reqs_end)
     {
         if ((request_ptr(*reqs_begin))->cancel())
@@ -70,8 +71,8 @@ typename std::iterator_traits<request_iterator_>::difference_type cancel_all(req
 //! \param reqs_begin begin of request sequence to poll
 //! \param reqs_end end of request sequence to poll
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
-template <class request_iterator_>
-request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+template <class RequestIterator>
+RequestIterator poll_any(RequestIterator reqs_begin, RequestIterator reqs_end)
 {
     while (reqs_begin != reqs_end)
     {
@@ -99,14 +100,14 @@ inline bool poll_any(request_ptr req_array[], size_t count, size_t& index)
 //! \param reqs_begin begin of request sequence to wait for
 //! \param reqs_end end of request sequence to wait for
 //! \return index in req_array pointing to the \b first completed request
-template <class request_iterator_>
-request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+template <class RequestIterator>
+RequestIterator wait_any(RequestIterator reqs_begin, RequestIterator reqs_end)
 {
     stats::scoped_wait_timer wait_timer(stats::WAIT_OP_ANY);
 
     onoff_switch sw;
 
-    request_iterator_ cur = reqs_begin, result = reqs_end;
+    RequestIterator cur = reqs_begin, result = reqs_end;
 
     for ( ; cur != reqs_end; cur++)
     {

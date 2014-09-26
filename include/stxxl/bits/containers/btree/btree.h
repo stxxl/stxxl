@@ -409,7 +409,7 @@ private:
             }
 
             STXXL_VERBOSE1("btree parent_bids.size()=" << parent_bids.size()
-                           << " bids.size()=" << bids.size());
+                                                       << " bids.size()=" << bids.size());
 
             std::swap(parent_bids, bids);
 

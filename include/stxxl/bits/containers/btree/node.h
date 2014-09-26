@@ -626,7 +626,7 @@ public:
         m_block->info.cur_size += src_size;
     }
 
-    key_type balance(normal_node& left, bool check_constraints=true)
+    key_type balance(normal_node& left, bool check_constraints = true)
     {
         const unsigned total_size = left.size() + size();
         unsigned new_left_size = total_size / 2;
@@ -659,7 +659,7 @@ public:
             assert(new_right_size < size());
 
             // #elements to move from *this to left
-            const unsigned nEl2Move = size() - new_right_size; 
+            const unsigned nEl2Move = size() - new_right_size;
 
             // copy *this to left
             std::copy(m_block->begin(),
@@ -669,7 +669,7 @@ public:
                       m_block->begin() + size(), m_block->begin());
         }
 
-        m_block->info.cur_size = new_right_size;                             // update size
+        m_block->info.cur_size = new_right_size;                           // update size
         left.m_block->info.cur_size = new_left_size;                       // update size
 
         return left.back().first;
