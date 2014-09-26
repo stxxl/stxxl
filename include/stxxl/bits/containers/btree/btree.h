@@ -335,20 +335,25 @@ private:
 
         bids.push_back(key_bid_pair(key_compare::max_value(), (node_bid_type)new_bid));
 
-        const unsigned_type max_node_elements = unsigned_type(double(max_node_size) * node_fill_factor);
+        const unsigned_type max_node_elements = unsigned_type(
+            double(max_node_size) * node_fill_factor
+            );
 
-        while (bids.size() > max_node_elements)
+        //-tb fixes bug with only one child remaining in m_root_node
+        while (bids.size() > node_type::max_nelements())
         {
             key_bid_vector_type parent_bids;
 
             stxxl::uint64 nparents = div_ceil(bids.size(), max_node_elements);
             assert(nparents >= 2);
-            STXXL_VERBOSE1("btree bulk construct bids.size() "
-                           << bids.size() << " nparents: " << nparents
-                           << " max_node_elements: " << max_node_elements);
-            typename key_bid_vector_type::const_iterator it = bids.begin();
+            STXXL_VERBOSE1("btree bulk construct"
+                           << " bids.size=" << bids.size()
+                           << " nparents=" << nparents
+                           << " max_node_elements=" << max_node_elements
+                           << " node_type::max_nelements=" << node_type::max_nelements());
 
-            do
+            for (typename key_bid_vector_type::const_iterator it = bids.begin();
+                 it != bids.end(); )
             {
                 node_bid_type new_bid;
                 node_type* node = m_node_cache.get_new_node(new_bid);
@@ -359,8 +364,8 @@ private:
                 {
                     node->push_back(*it);
                 }
-                STXXL_VERBOSE1("btree bulk construct node size : " << node->size() << " limits: " <<
-                               node->min_nelements() << " " << node->max_nelements() << " max_node_elements: " << max_node_elements);
+
+                STXXL_VERBOSE1("btree bulk construct node size : " << node->size() << " limits: " << node->min_nelements() << " " << node->max_nelements() << " max_node_elements: " << max_node_elements);
 
                 if (node->underflows())
                 {
@@ -370,8 +375,13 @@ private:
 
                     node_type* left_node = m_node_cache.get_node(parent_bids.back().second);
                     assert(left_node);
-                    if (left_node->size() + node->size() <= node->max_nelements())     // can fuse
+                    if (left_node->size() + node->size() <= node->max_nelements())
                     {
+                        // can fuse
+                        STXXL_VERBOSE1("btree bulk construct fuse last nodes:"
+                                       << " left_node.size=" << left_node->size()
+                                       << " node.size=" << node->size());
+
                         node->fuse(*left_node);
                         m_node_cache.delete_node(parent_bids.back().second);
                         parent_bids.pop_back();
@@ -379,15 +389,27 @@ private:
                     else
                     {
                         // need to rebalance
-                        const key_type NewSplitter = node->balance(*left_node);
-                        parent_bids.back().first = NewSplitter;
+                        STXXL_VERBOSE1("btree bulk construct rebalance last nodes:"
+                                       << " left_node.size=" << left_node->size()
+                                       << " node.size=" << node->size());
+
+                        const key_type new_splitter = node->balance(*left_node, false);
+                        parent_bids.back().first = new_splitter;
+
+                        STXXL_VERBOSE1("btree bulk construct after rebalance:"
+                                       << " left_node.size=" << left_node->size()
+                                       << " node.size=" << node->size());
+
                         assert(!left_node->overflows() && !left_node->underflows());
                     }
                 }
                 assert(!node->overflows() && !node->underflows());
 
                 parent_bids.push_back(key_bid_pair(node->back().first, new_bid));
-            } while (it != bids.end());
+            }
+
+            STXXL_VERBOSE1("btree parent_bids.size()=" << parent_bids.size()
+                           << " bids.size()=" << bids.size());
 
             std::swap(parent_bids, bids);
 

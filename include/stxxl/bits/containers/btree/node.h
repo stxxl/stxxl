@@ -223,8 +223,8 @@ public:
     bool overflows() const { return m_block->info.cur_size > max_nelements(); }
     bool underflows() const { return m_block->info.cur_size < min_nelements(); }
 
-    unsigned max_nelements() const { return max_size; }
-    unsigned min_nelements() const { return min_size; }
+    static unsigned max_nelements() { return max_size; }
+    static unsigned min_nelements() { return min_size; }
 
     /*
        template <class InputIterator>
@@ -627,21 +627,22 @@ public:
         m_block->info.cur_size += src_size;
     }
 
-    key_type balance(normal_node& left)
+    key_type balance(normal_node& left, bool check_constraints=true)
     {
         const unsigned total_size = left.size() + size();
         unsigned new_left_size = total_size / 2;
-        assert(new_left_size <= left.max_nelements());
-        assert(new_left_size >= left.min_nelements());
-        unsigned newRightSize = total_size - new_left_size;
-        assert(newRightSize <= max_nelements());
-        assert(newRightSize >= min_nelements());
+        assert(!check_constraints || new_left_size <= left.max_nelements());
+        assert(!check_constraints || new_left_size >= left.min_nelements());
+        unsigned new_right_size = total_size - new_left_size;
+        assert(!check_constraints || new_right_size <= max_nelements());
+        assert(!check_constraints || new_right_size >= min_nelements());
 
         assert(m_vcmp(left.back(), front()) || size() == 0);
 
         if (new_left_size < left.size())
         {
-            const unsigned nEl2Move = left.size() - new_left_size;                            // #elements to move from Left to *this
+            // #elements to move from left to *this
+            const unsigned nEl2Move = left.size() - new_left_size;
 
             block_iterator cur = m_block->begin() + size() - 1;
             block_const_iterator begin = m_block->begin();
@@ -650,17 +651,18 @@ public:
                 *(cur + nEl2Move) = *cur;
             // move elements to make space for Src elements
 
-            // copy Left to *this leaf
+            // copy left to *this leaf
             std::copy(left.m_block->begin() + new_left_size,
                       left.m_block->begin() + left.size(), m_block->begin());
         }
         else
         {
-            assert(newRightSize < size());
+            assert(new_right_size < size());
 
-            const unsigned nEl2Move = size() - newRightSize;                            // #elements to move from *this to Left
+            // #elements to move from *this to left
+            const unsigned nEl2Move = size() - new_right_size; 
 
-            // copy *this to Left
+            // copy *this to left
             std::copy(m_block->begin(),
                       m_block->begin() + nEl2Move, left.m_block->begin() + left.size());
             // move elements in *this
@@ -668,7 +670,7 @@ public:
                       m_block->begin() + size(), m_block->begin());
         }
 
-        m_block->info.cur_size = newRightSize;                             // update size
+        m_block->info.cur_size = new_right_size;                             // update size
         left.m_block->info.cur_size = new_left_size;                       // update size
 
         return left.back().first;

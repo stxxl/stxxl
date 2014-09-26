@@ -180,8 +180,8 @@ public:
     bool overflows() const { return m_block->info.cur_size > max_nelements(); }
     bool underflows() const { return m_block->info.cur_size < min_nelements(); }
 
-    unsigned max_nelements() const { return max_size; }
-    unsigned min_nelements() const { return min_size; }
+    static unsigned max_nelements() { return max_size; }
+    static unsigned min_nelements() { return min_size; }
 
     bid_type & succ()
     {
