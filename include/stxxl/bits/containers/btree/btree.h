@@ -344,9 +344,8 @@ private:
             stxxl::uint64 nparents = div_ceil(bids.size(), max_node_elements);
             assert(nparents >= 2);
             STXXL_VERBOSE1("btree bulk construct bids.size() "
-                           << bids.size() << " nparents: " << nparents << " max_ns: "
-                           << max_node_elements);
-            STXXL_UNUSED(nparents);
+                           << bids.size() << " nparents: " << nparents
+                           << " max_node_elements: " << max_node_elements);
             typename key_bid_vector_type::const_iterator it = bids.begin();
 
             do

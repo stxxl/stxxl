@@ -330,7 +330,6 @@ public:
         assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
-        STXXL_UNUSED(found_bid);
 
         if (height == 2)                        // found_bid points to a leaf
         {

@@ -684,7 +684,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
                   after_runs_creation - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
     STXXL_VERBOSE(*stats::get_instance());
-    STXXL_UNUSED(begin + after_runs_creation + end + io_wait_after_rf);
 
     return result;
 }
