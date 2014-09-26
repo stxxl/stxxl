@@ -316,8 +316,7 @@ public:
     }
 
     std::pair<iterator, bool>
-    insert(const btree_value_type& x,
-           unsigned height,
+    insert(const btree_value_type& x, unsigned height,
            std::pair<key_type, bid_type>& splitter)
     {
         assert(size() <= max_nelements());
@@ -329,7 +328,7 @@ public:
 
         assert(it != (m_block->begin() + size()));
 
-        bid_type found_bid = it->second;
+        //bid_type found_bid = it->second;
 
         if (height == 2)                        // found_bid points to a leaf
         {

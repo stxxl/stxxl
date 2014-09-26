@@ -412,7 +412,7 @@ check_cxx_source_compiles(
    #include <linux/aio_abi.h>
    int main() {
        aio_context_t context;
-       int r = syscall(SYS_io_setup, 5, &context);
+       long r = syscall(SYS_io_setup, 5, &context);
        return (r == 0) ? 0 : -1;
    }"
    STXXL_HAVE_LINUXAIO_FILE)
@@ -640,11 +640,14 @@ if(TRY_COMPILE_HEADERS)
   list(SORT header_files)
 
   foreach(file ${header_files})
+    string(REPLACE "/" "_" compilename "${file}") # replace / to _ to fix warnings
+    string(REPLACE "." "_" compilename "${compilename}")
+
     check_cxx_source_compiles(
       "#include \"${file}\"
-      int main() { return 0; }" IsSelfContained-${file})
+      int main() { return 0; }" IsSelfContained${compilename})
 
-    if(NOT IsSelfContained-${file})
+    if(NOT IsSelfContained${compilename})
       message(SEND_ERROR "Compilation FAILED for ${file}\n\nCompiler output:\n${OUTPUT}")
     endif()
   endforeach()
