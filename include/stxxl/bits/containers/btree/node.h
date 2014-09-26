@@ -23,33 +23,33 @@ namespace btree {
 template <class NodeType, class BTreeType>
 class node_cache;
 
-template <class KeyType_, class KeyCmp_, unsigned RawSize_, class BTreeType>
+template <class KeyType, class KeyCmp, unsigned RawSize, class BTreeType>
 class normal_node : private noncopyable
 {
 public:
-    typedef normal_node<KeyType_, KeyCmp_, RawSize_, BTreeType> SelfType;
+    typedef normal_node<KeyType, KeyCmp, RawSize, BTreeType> self_type;
 
-    friend class node_cache<SelfType, BTreeType>;
+    friend class node_cache<self_type, BTreeType>;
 
-    typedef KeyType_ key_type;
-    typedef KeyCmp_ key_compare;
+    typedef KeyType key_type;
+    typedef KeyCmp key_compare;
 
     enum {
-        raw_size = RawSize_
+        raw_size = RawSize
     };
     typedef BID<raw_size> bid_type;
     typedef bid_type node_bid_type;
-    typedef SelfType node_type;
+    typedef self_type node_type;
     typedef std::pair<key_type, bid_type> value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
 
-    struct InfoType
+    struct metainfo_type
     {
         bid_type me;
         unsigned cur_size;
     };
-    typedef typed_block<raw_size, value_type, 0, InfoType> block_type;
+    typedef typed_block<raw_size, value_type, 0, metainfo_type> block_type;
 
     enum {
         nelements = block_type::size - 1,
@@ -83,10 +83,10 @@ private:
         }
     };
 
-    block_type* block_;
-    btree_type* btree_;
-    key_compare cmp_;
-    value_compare vcmp_;
+    block_type* m_block;
+    btree_type* m_btree;
+    key_compare m_cmp;
+    value_compare m_vcmp;
 
     std::pair<key_type, bid_type> insert(const std::pair<key_type, bid_type>& splitter,
                                          const block_iterator& place2insert)
@@ -94,42 +94,42 @@ private:
         std::pair<key_type, bid_type> result(key_compare::max_value(), bid_type());
 
         // splitter != *place2insert
-        assert(vcmp_(*place2insert, splitter) || vcmp_(splitter, *place2insert));
+        assert(m_vcmp(*place2insert, splitter) || m_vcmp(splitter, *place2insert));
 
-        block_iterator cur = block_->begin() + size() - 1;
+        block_iterator cur = m_block->begin() + size() - 1;
         for ( ; cur >= place2insert; --cur)
             *(cur + 1) = *cur;
         // copy elements to make space for the new element
 
         *place2insert = splitter;               // insert
 
-        ++(block_->info.cur_size);
+        ++(m_block->info.cur_size);
 
         if (size() > max_nelements())           // overflow! need to split
         {
             STXXL_VERBOSE1("btree::normal_node::insert overflow happened, splitting");
 
-            bid_type NewBid;
-            btree_->node_cache_.get_new_node(NewBid);                             // new (left) node
-            normal_node* NewNode = btree_->node_cache_.get_node(NewBid, true);
-            assert(NewNode);
+            bid_type new_bid;
+            m_btree->m_node_cache.get_new_node(new_bid);                             // new (left) node
+            normal_node* new_node = m_btree->m_node_cache.get_node(new_bid, true);
+            assert(new_node);
 
             const unsigned end_of_smaller_part = size() / 2;
 
-            result.first = ((*block_)[end_of_smaller_part - 1]).first;
-            result.second = NewBid;
+            result.first = ((*m_block)[end_of_smaller_part - 1]).first;
+            result.second = new_bid;
 
             const unsigned old_size = size();
             // copy the smaller part
-            std::copy(block_->begin(), block_->begin() + end_of_smaller_part, NewNode->block_->begin());
-            NewNode->block_->info.cur_size = end_of_smaller_part;
+            std::copy(m_block->begin(), m_block->begin() + end_of_smaller_part, new_node->m_block->begin());
+            new_node->m_block->info.cur_size = end_of_smaller_part;
             // copy the larger part
-            std::copy(block_->begin() + end_of_smaller_part,
-                      block_->begin() + old_size, block_->begin());
-            block_->info.cur_size = old_size - end_of_smaller_part;
-            assert(size() + NewNode->size() == old_size);
+            std::copy(m_block->begin() + end_of_smaller_part,
+                      m_block->begin() + old_size, m_block->begin());
+            m_block->info.cur_size = old_size - end_of_smaller_part;
+            assert(size() + new_node->size() == old_size);
 
-            btree_->node_cache_.unfix_node(NewBid);
+            m_btree->m_node_cache.unfix_node(new_bid);
 
             STXXL_VERBOSE1("btree::normal_node split leaf " << this
                                                             << " splitter: " << result.first);
@@ -139,15 +139,15 @@ private:
     }
 
     template <class CacheType>
-    void fuse_or_balance(block_iterator UIt, CacheType& cache_)
+    void fuse_or_balance(block_iterator UIt, CacheType& cache)
     {
         typedef typename CacheType::node_type local_node_type;
         typedef typename local_node_type::bid_type local_bid_type;
 
         block_iterator leftIt, rightIt;
-        if (UIt == (block_->begin() + size() - 1))                      // UIt is the last entry in the root
+        if (UIt == (m_block->begin() + size() - 1))                      // UIt is the last entry in the root
         {
-            assert(UIt != block_->begin());
+            assert(UIt != m_block->begin());
             rightIt = UIt;
             leftIt = --UIt;
         }
@@ -155,67 +155,73 @@ private:
         {
             leftIt = UIt;
             rightIt = ++UIt;
-            assert(rightIt != (block_->begin() + size()));
+            assert(rightIt != (m_block->begin() + size()));
         }
 
         // now fuse or balance nodes pointed by leftIt and rightIt
-        local_bid_type LeftBid = (local_bid_type)leftIt->second;
-        local_bid_type RightBid = (local_bid_type)rightIt->second;
-        local_node_type* LeftNode = cache_.get_node(LeftBid, true);
-        local_node_type* RightNode = cache_.get_node(RightBid, true);
+        local_bid_type left_bid = (local_bid_type)leftIt->second;
+        local_bid_type right_bid = (local_bid_type)rightIt->second;
+        local_node_type* left_node = cache.get_node(left_bid, true);
+        local_node_type* right_node = cache.get_node(right_bid, true);
 
-        const unsigned TotalSize = LeftNode->size() + RightNode->size();
-        if (TotalSize <= RightNode->max_nelements())
+        const unsigned total_size = left_node->size() + right_node->size();
+        if (total_size <= right_node->max_nelements())
         {
-            // fuse
-            RightNode->fuse(*LeftNode);                                         // add the content of LeftNode to RightNode
+            // --- fuse ---
 
-            cache_.unfix_node(RightBid);
-            cache_.delete_node(LeftBid);                                        // 'delete_node' unfixes LeftBid also
+            // add the content of left_node to right_node
+            right_node->fuse(*left_node);
 
-            std::copy(leftIt + 1, block_->begin() + size(), leftIt);            // delete left BID from the root
-            --(block_->info.cur_size);
+            cache.unfix_node(right_bid);
+            // 'delete_node' unfixes left-bid also
+            cache.delete_node(left_bid);
+
+            // delete left BID from the root
+            std::copy(leftIt + 1, m_block->begin() + size(), leftIt);
+            --(m_block->info.cur_size);
         }
         else
         {
-            // balance
+            // --- balance ---
 
-            key_type NewSplitter = RightNode->balance(*LeftNode);
+            key_type new_splitter = right_node->balance(*left_node);
 
-            leftIt->first = NewSplitter;                             // change key
-            assert(vcmp_(*leftIt, *rightIt));
+            // change key
+            leftIt->first = new_splitter;
+            assert(m_vcmp(*leftIt, *rightIt));
 
-            cache_.unfix_node(LeftBid);
-            cache_.unfix_node(RightBid);
+            cache.unfix_node(left_bid);
+            cache.unfix_node(right_bid);
         }
     }
 
 public:
     virtual ~normal_node()
     {
-        delete block_;
+        delete m_block;
     }
 
-    normal_node(btree_type* btree__,
+    normal_node(btree_type* btree,
                 key_compare cmp)
-        : block_(new block_type),
-          btree_(btree__),
-          cmp_(cmp),
-          vcmp_(cmp)
+        : m_block(new block_type),
+          m_btree(btree),
+          m_cmp(cmp),
+          m_vcmp(cmp)
     {
         assert(min_nelements() >= 2);
         assert(2 * min_nelements() - 1 <= max_nelements());
         assert(max_nelements() <= nelements);
-        assert(unsigned(block_type::size) >= nelements + 1);                       // extra space for an overflow
+        // extra space for an overflow
+        assert(unsigned(block_type::size) >= nelements + 1);
     }
 
     block_type & block()
     {
-        return *block_;
+        return *m_block;
     }
 
-    bool overflows() const { return block_->info.cur_size > max_nelements(); }
-    bool underflows() const { return block_->info.cur_size < min_nelements(); }
+    bool overflows() const { return m_block->info.cur_size > max_nelements(); }
+    bool underflows() const { return m_block->info.cur_size < min_nelements(); }
 
     unsigned max_nelements() const { return max_size; }
     unsigned min_nelements() const { return min_size; }
@@ -223,12 +229,12 @@ public:
     /*
        template <class InputIterator>
        normal_node(InputIterator begin_, InputIterator end_,
-            btree_type * btree__,
+            btree_type * btree,
             key_compare cmp):
-            block_(new block_type),
-            btree_(btree__),
-            cmp_(cmp),
-            vcmp_(cmp)
+            m_block(new block_type),
+            m_btree(btree),
+            m_cmp(cmp),
+            m_vcmp(cmp)
        {
             assert(min_nelements() >=2);
             assert(2*min_nelements() - 1 <= max_nelements());
@@ -239,30 +245,30 @@ public:
             assert(new_size <= max_nelements());
             assert(new_size >= min_nelements());
 
-            std::copy(begin_,end_,block_->begin());
-            assert(stxxl::is_sorted(block_->begin(),block_->begin() + new_size, vcmp_));
-            block_->info.cur_size = new_size;
+            std::copy(begin_,end_,m_block->begin());
+            assert(stxxl::is_sorted(m_block->begin(),m_block->begin() + new_size, m_vcmp));
+            m_block->info.cur_size = new_size;
        }*/
 
     unsigned size() const
     {
-        return block_->info.cur_size;
+        return m_block->info.cur_size;
     }
 
     bid_type my_bid() const
     {
-        return block_->info.me;
+        return m_block->info.me;
     }
 
     void save()
     {
-        request_ptr req = block_->write(my_bid());
+        request_ptr req = m_block->write(my_bid());
         req->wait();
     }
 
     request_ptr load(const bid_type& bid)
     {
-        request_ptr req = block_->read(bid);
+        request_ptr req = m_block->read(bid);
         req->wait();
         assert(bid == my_bid());
         return req;
@@ -270,58 +276,58 @@ public:
 
     request_ptr prefetch(const bid_type& bid)
     {
-        return block_->read(bid);
+        return m_block->read(bid);
     }
 
     void init(const bid_type& my_bid_)
     {
-        block_->info.me = my_bid_;
-        block_->info.cur_size = 0;
+        m_block->info.me = my_bid_;
+        m_block->info.cur_size = 0;
     }
 
     reference operator [] (int i)
     {
-        return (*block_)[i];
+        return (*m_block)[i];
     }
 
     const_reference operator [] (int i) const
     {
-        return (*block_)[i];
+        return (*m_block)[i];
     }
 
     reference back()
     {
-        return (*block_)[size() - 1];
+        return (*m_block)[size() - 1];
     }
 
     reference front()
     {
-        return *(block_->begin());
+        return *(m_block->begin());
     }
 
     const_reference back() const
     {
-        return (*block_)[size() - 1];
+        return (*m_block)[size() - 1];
     }
 
     const_reference front() const
     {
-        return *(block_->begin());
+        return *(m_block->begin());
     }
 
-    std::pair<iterator, bool> insert(
-        const btree_value_type& x,
-        unsigned height,
-        std::pair<key_type, bid_type>& splitter)
+    std::pair<iterator, bool>
+    insert(const btree_value_type& x,
+           unsigned height,
+           std::pair<key_type, bid_type>& splitter)
     {
         assert(size() <= max_nelements());
         splitter.first = key_compare::max_value();
 
-        value_type Key2Search(x.first, bid_type());
+        value_type key2search(x.first, bid_type());
         block_iterator it =
-            std::lower_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::lower_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
         STXXL_UNUSED(found_bid);
@@ -329,40 +335,40 @@ public:
         if (height == 2)                        // found_bid points to a leaf
         {
             STXXL_VERBOSE1("btree::normal_node Inserting new value into a leaf");
-            leaf_type* Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)it->second, true);
-            assert(Leaf);
-            std::pair<key_type, leaf_bid_type> BotSplitter;
-            std::pair<iterator, bool> result = Leaf->insert(x, BotSplitter);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)it->second);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            assert(leaf);
+            std::pair<key_type, leaf_bid_type> bot_splitter;
+            std::pair<iterator, bool> result = leaf->insert(x, bot_splitter);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)it->second);
             //if(key_compare::max_value() == BotSplitter.first)
-            if (!(cmp_(key_compare::max_value(), BotSplitter.first) ||
-                  cmp_(BotSplitter.first, key_compare::max_value())))
+            if (!(m_cmp(key_compare::max_value(), bot_splitter.first) ||
+                  m_cmp(bot_splitter.first, key_compare::max_value())))
                 return result;
             // no overflow/splitting happened
 
             STXXL_VERBOSE1("btree::normal_node Inserting new value in *this");
 
-            splitter = insert(std::make_pair(BotSplitter.first, bid_type(BotSplitter.second)), it);
+            splitter = insert(std::make_pair(bot_splitter.first, bid_type(bot_splitter.second)), it);
 
             return result;
         }
         else
         {                               // found_bid points to a node
             STXXL_VERBOSE1("btree::normal_node Inserting new value into a node");
-            node_type* Node = btree_->node_cache_.get_node((node_bid_type)it->second, true);
-            assert(Node);
-            std::pair<key_type, node_bid_type> BotSplitter;
-            std::pair<iterator, bool> result = Node->insert(x, height - 1, BotSplitter);
-            btree_->node_cache_.unfix_node((node_bid_type)it->second);
+            node_type* node = m_btree->m_node_cache.get_node((node_bid_type)it->second, true);
+            assert(node);
+            std::pair<key_type, node_bid_type> bot_splitter;
+            std::pair<iterator, bool> result = node->insert(x, height - 1, bot_splitter);
+            m_btree->m_node_cache.unfix_node((node_bid_type)it->second);
             //if(key_compare::max_value() == BotSplitter.first)
-            if (!(cmp_(key_compare::max_value(), BotSplitter.first) ||
-                  cmp_(BotSplitter.first, key_compare::max_value())))
+            if (!(m_cmp(key_compare::max_value(), bot_splitter.first) ||
+                  m_cmp(bot_splitter.first, key_compare::max_value())))
                 return result;
             // no overflow/splitting happened
 
             STXXL_VERBOSE1("btree::normal_node Inserting new value in *this");
 
-            splitter = insert(BotSplitter, it);
+            splitter = insert(bot_splitter, it);
 
             return result;
         }
@@ -370,284 +376,284 @@ public:
 
     iterator begin(unsigned height)
     {
-        bid_type FirstBid = block_->begin()->second;
+        bid_type first_bid = m_block->begin()->second;
         if (height == 2)                        // FirstBid points to a leaf
         {
             assert(size() > 1);
             STXXL_VERBOSE1("btree::node retrieveing begin() from the first leaf");
-            leaf_type* Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)FirstBid);
-            assert(Leaf);
-            return Leaf->begin();
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)first_bid);
+            assert(leaf);
+            return leaf->begin();
         }
         else
         {                         // FirstBid points to a node
             STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
-            node_type* Node = btree_->node_cache_.get_node((node_bid_type)FirstBid, true);
-            assert(Node);
-            iterator result = Node->begin(height - 1);
-            btree_->node_cache_.unfix_node((node_bid_type)FirstBid);
+            node_type* node = m_btree->m_node_cache.get_node((node_bid_type)first_bid, true);
+            assert(node);
+            iterator result = node->begin(height - 1);
+            m_btree->m_node_cache.unfix_node((node_bid_type)first_bid);
             return result;
         }
     }
 
     const_iterator begin(unsigned height) const
     {
-        bid_type FirstBid = block_->begin()->second;
+        bid_type FirstBid = m_block->begin()->second;
         if (height == 2)                        // FirstBid points to a leaf
         {
             assert(size() > 1);
             STXXL_VERBOSE1("btree::node retrieveing begin() from the first leaf");
-            leaf_type const* Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)FirstBid);
-            assert(Leaf);
-            return Leaf->begin();
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)FirstBid);
+            assert(leaf);
+            return leaf->begin();
         }
         else
         {                         // FirstBid points to a node
             STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
-            node_type const* Node = btree_->node_cache_.get_const_node((node_bid_type)FirstBid, true);
-            assert(Node);
-            const_iterator result = Node->begin(height - 1);
-            btree_->node_cache_.unfix_node((node_bid_type)FirstBid);
+            const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)FirstBid, true);
+            assert(node);
+            const_iterator result = node->begin(height - 1);
+            m_btree->m_node_cache.unfix_node((node_bid_type)FirstBid);
             return result;
         }
     }
 
     iterator find(const key_type& k, unsigned height)
     {
-        value_type Key2Search(k, bid_type());
+        value_type key2search(k, bid_type());
 
         block_iterator it =
-            std::lower_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::lower_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
         if (height == 2)                // found_bid points to a leaf
         {
             STXXL_VERBOSE1("Searching in a leaf");
-            leaf_type* Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            iterator result = Leaf->find(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            iterator result = leaf->find(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
 
             return result;
         }
 
         // found_bid points to a node
         STXXL_VERBOSE1("Searching in a node");
-        node_type* Node = btree_->node_cache_.get_node((node_bid_type)found_bid, true);
-        assert(Node);
-        iterator result = Node->find(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        assert(node);
+        iterator result = node->find(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
 
         return result;
     }
 
     const_iterator find(const key_type& k, unsigned height) const
     {
-        value_type Key2Search(k, bid_type());
+        value_type key2search(k, bid_type());
 
         block_iterator it =
-            std::lower_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::lower_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
         if (height == 2)                // found_bid points to a leaf
         {
             STXXL_VERBOSE1("Searching in a leaf");
-            leaf_type const* Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            const_iterator result = Leaf->find(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            const_iterator result = leaf->find(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
 
             return result;
         }
 
         // found_bid points to a node
         STXXL_VERBOSE1("Searching in a node");
-        node_type const* Node = btree_->node_cache_.get_const_node((node_bid_type)found_bid, true);
-        assert(Node);
-        const_iterator result = Node->find(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+        const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)found_bid, true);
+        assert(node);
+        const_iterator result = node->find(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
 
         return result;
     }
 
     iterator lower_bound(const key_type& k, unsigned height)
     {
-        value_type Key2Search(k, bid_type());
-        assert(!vcmp_(back(), Key2Search));
+        value_type key2search(k, bid_type());
+        assert(!m_vcmp(back(), key2search));
         block_iterator it =
-            std::lower_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::lower_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
         if (height == 2)                // found_bid points to a leaf
         {
             STXXL_VERBOSE1("Searching lower bound in a leaf");
-            leaf_type* Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            iterator result = Leaf->lower_bound(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            iterator result = leaf->lower_bound(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
 
             return result;
         }
 
         // found_bid points to a node
         STXXL_VERBOSE1("Searching lower bound in a node");
-        node_type* Node = btree_->node_cache_.get_node((node_bid_type)found_bid, true);
-        assert(Node);
-        iterator result = Node->lower_bound(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        assert(node);
+        iterator result = node->lower_bound(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
 
         return result;
     }
 
     const_iterator lower_bound(const key_type& k, unsigned height) const
     {
-        value_type Key2Search(k, bid_type());
-        assert(!vcmp_(back(), Key2Search));
+        value_type key2search(k, bid_type());
+        assert(!m_vcmp(back(), key2search));
         block_iterator it =
-            std::lower_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::lower_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
         if (height == 2)                // found_bid points to a leaf
         {
             STXXL_VERBOSE1("Searching lower bound in a leaf");
-            leaf_type const* Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            const_iterator result = Leaf->lower_bound(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            const_iterator result = leaf->lower_bound(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
 
             return result;
         }
 
         // found_bid points to a node
         STXXL_VERBOSE1("Searching lower bound in a node");
-        node_type const* Node = btree_->node_cache_.get_const_node((node_bid_type)found_bid, true);
-        assert(Node);
-        const_iterator result = Node->lower_bound(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+        const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)found_bid, true);
+        assert(node);
+        const_iterator result = node->lower_bound(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
 
         return result;
     }
 
     iterator upper_bound(const key_type& k, unsigned height)
     {
-        value_type Key2Search(k, bid_type());
-        assert(vcmp_(Key2Search, back()));
+        value_type key2search(k, bid_type());
+        assert(m_vcmp(key2search, back()));
         block_iterator it =
-            std::upper_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::upper_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
         if (height == 2)                // found_bid points to a leaf
         {
             STXXL_VERBOSE1("Searching upper bound in a leaf");
-            leaf_type* Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            iterator result = Leaf->upper_bound(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            iterator result = leaf->upper_bound(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
 
             return result;
         }
 
         // found_bid points to a node
         STXXL_VERBOSE1("Searching upper bound in a node");
-        node_type* Node = btree_->node_cache_.get_node((node_bid_type)found_bid, true);
-        assert(Node);
-        iterator result = Node->upper_bound(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        assert(node);
+        iterator result = node->upper_bound(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
 
         return result;
     }
 
     const_iterator upper_bound(const key_type& k, unsigned height) const
     {
-        value_type Key2Search(k, bid_type());
-        assert(vcmp_(Key2Search, back()));
+        value_type key2search(k, bid_type());
+        assert(m_vcmp(key2search, back()));
         block_iterator it =
-            std::upper_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::upper_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
         if (height == 2)                // found_bid points to a leaf
         {
             STXXL_VERBOSE1("Searching upper bound in a leaf");
-            leaf_type const* Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            const_iterator result = Leaf->upper_bound(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            const_iterator result = leaf->upper_bound(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
 
             return result;
         }
 
         // found_bid points to a node
         STXXL_VERBOSE1("Searching upper bound in a node");
-        node_type const* Node = btree_->node_cache_.get_const_node((node_bid_type)found_bid, true);
-        assert(Node);
-        const_iterator result = Node->upper_bound(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+        const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)found_bid, true);
+        assert(node);
+        const_iterator result = node->upper_bound(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
 
         return result;
     }
 
-    void fuse(const normal_node& Src)
+    void fuse(const normal_node& src)
     {
-        assert(vcmp_(Src.back(), front()));
-        const unsigned SrcSize = Src.size();
+        assert(m_vcmp(src.back(), front()));
+        const unsigned src_size = src.size();
 
-        block_iterator cur = block_->begin() + size() - 1;
-        block_const_iterator begin = block_->begin();
+        block_iterator cur = m_block->begin() + size() - 1;
+        block_const_iterator begin = m_block->begin();
 
         for ( ; cur >= begin; --cur)
-            *(cur + SrcSize) = *cur;
+            *(cur + src_size) = *cur;
         // move elements to make space for Src elements
 
         // copy Src to *this leaf
-        std::copy(Src.block_->begin(), Src.block_->begin() + SrcSize, block_->begin());
+        std::copy(src.m_block->begin(), src.m_block->begin() + src_size, m_block->begin());
 
-        block_->info.cur_size += SrcSize;
+        m_block->info.cur_size += src_size;
     }
 
-    key_type balance(normal_node& Left)
+    key_type balance(normal_node& left)
     {
-        const unsigned TotalSize = Left.size() + size();
-        unsigned newLeftSize = TotalSize / 2;
-        assert(newLeftSize <= Left.max_nelements());
-        assert(newLeftSize >= Left.min_nelements());
-        unsigned newRightSize = TotalSize - newLeftSize;
+        const unsigned total_size = left.size() + size();
+        unsigned new_left_size = total_size / 2;
+        assert(new_left_size <= left.max_nelements());
+        assert(new_left_size >= left.min_nelements());
+        unsigned newRightSize = total_size - new_left_size;
         assert(newRightSize <= max_nelements());
         assert(newRightSize >= min_nelements());
 
-        assert(vcmp_(Left.back(), front()) || size() == 0);
+        assert(m_vcmp(left.back(), front()) || size() == 0);
 
-        if (newLeftSize < Left.size())
+        if (new_left_size < left.size())
         {
-            const unsigned nEl2Move = Left.size() - newLeftSize;                            // #elements to move from Left to *this
+            const unsigned nEl2Move = left.size() - new_left_size;                            // #elements to move from Left to *this
 
-            block_iterator cur = block_->begin() + size() - 1;
-            block_const_iterator begin = block_->begin();
+            block_iterator cur = m_block->begin() + size() - 1;
+            block_const_iterator begin = m_block->begin();
 
             for ( ; cur >= begin; --cur)
                 *(cur + nEl2Move) = *cur;
             // move elements to make space for Src elements
 
             // copy Left to *this leaf
-            std::copy(Left.block_->begin() + newLeftSize,
-                      Left.block_->begin() + Left.size(), block_->begin());
+            std::copy(left.m_block->begin() + new_left_size,
+                      left.m_block->begin() + left.size(), m_block->begin());
         }
         else
         {
@@ -656,27 +662,27 @@ public:
             const unsigned nEl2Move = size() - newRightSize;                            // #elements to move from *this to Left
 
             // copy *this to Left
-            std::copy(block_->begin(),
-                      block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
+            std::copy(m_block->begin(),
+                      m_block->begin() + nEl2Move, left.m_block->begin() + left.size());
             // move elements in *this
-            std::copy(block_->begin() + nEl2Move,
-                      block_->begin() + size(), block_->begin());
+            std::copy(m_block->begin() + nEl2Move,
+                      m_block->begin() + size(), m_block->begin());
         }
 
-        block_->info.cur_size = newRightSize;                             // update size
-        Left.block_->info.cur_size = newLeftSize;                         // update size
+        m_block->info.cur_size = newRightSize;                             // update size
+        left.m_block->info.cur_size = new_left_size;                       // update size
 
-        return Left.back().first;
+        return left.back().first;
     }
 
     size_type erase(const key_type& k, unsigned height)
     {
-        value_type Key2Search(k, bid_type());
+        value_type key2search(k, bid_type());
 
         block_iterator it =
-            std::lower_bound(block_->begin(), block_->begin() + size(), Key2Search, vcmp_);
+            std::lower_bound(m_block->begin(), m_block->begin() + size(), key2search, m_vcmp);
 
-        assert(it != (block_->begin() + size()));
+        assert(it != (m_block->begin() + size()));
 
         bid_type found_bid = it->second;
 
@@ -685,32 +691,32 @@ public:
         if (height == 2)                        // 'found_bid' points to a leaf
         {
             STXXL_VERBOSE1("btree::normal_node Deleting key from a leaf");
-            leaf_type* Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid, true);
-            assert(Leaf);
-            size_type result = Leaf->erase(k);
-            btree_->leaf_cache_.unfix_node((leaf_bid_type)it->second);
-            if (!Leaf->underflows())
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            assert(leaf);
+            size_type result = leaf->erase(k);
+            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            if (!leaf->underflows())
                 return result;
             // no underflow or root has a special degree 1 (too few elements)
 
             STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a leaf");
-            fuse_or_balance(it, btree_->leaf_cache_);
+            fuse_or_balance(it, m_btree->m_leaf_cache);
 
             return result;
         }
 
         // 'found_bid' points to a node
         STXXL_VERBOSE1("btree::normal_node Deleting key from a node");
-        node_type* Node = btree_->node_cache_.get_node((node_bid_type)found_bid, true);
-        assert(Node);
-        size_type result = Node->erase(k, height - 1);
-        btree_->node_cache_.unfix_node((node_bid_type)found_bid);
-        if (!Node->underflows())
+        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        assert(node);
+        size_type result = node->erase(k, height - 1);
+        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        if (!node->underflows())
             return result;
         // no underflow happened
 
         STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a node");
-        fuse_or_balance(it, btree_->node_cache_);
+        fuse_or_balance(it, m_btree->m_node_cache);
 
         return result;
     }
@@ -720,23 +726,23 @@ public:
         if (height == 2)
         {
             // we have children leaves here
-            block_const_iterator it = block().begin();
-            for ( ; it != block().begin() + size(); ++it)
+            for (block_const_iterator it = block().begin();
+                 it != block().begin() + size(); ++it)
             {
                 // delete from leaf cache and deallocate bid
-                btree_->leaf_cache_.delete_node((leaf_bid_type)it->second);
+                m_btree->m_leaf_cache.delete_node((leaf_bid_type)it->second);
             }
         }
         else
         {
-            block_const_iterator it = block().begin();
-            for ( ; it != block().begin() + size(); ++it)
+            for (block_const_iterator it = block().begin();
+                 it != block().begin() + size(); ++it)
             {
-                node_type* Node = btree_->node_cache_.get_node((node_bid_type)it->second);
-                assert(Node);
-                Node->deallocate_children(height - 1);
+                node_type* node = m_btree->m_node_cache.get_node((node_bid_type)it->second);
+                assert(node);
+                node->deallocate_children(height - 1);
                 // delete from node cache and deallocate bid
-                btree_->node_cache_.delete_node((node_bid_type)it->second);
+                m_btree->m_node_cache.delete_node((node_bid_type)it->second);
             }
         }
     }
@@ -744,7 +750,7 @@ public:
     void push_back(const value_type& x)
     {
         (*this)[size()] = x;
-        ++(block_->info.cur_size);
+        ++(m_block->info.cur_size);
     }
 };
 

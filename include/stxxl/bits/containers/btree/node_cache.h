@@ -23,6 +23,8 @@
 
 STXXL_BEGIN_NAMESPACE
 
+#define STXXL_BTREE_CACHE_VERBOSE STXXL_VERBOSE2
+
 // TODO:  speedup BID2node_ access using search result iterator in the methods
 
 namespace btree {
@@ -41,8 +43,8 @@ public:
     typedef stxxl::lru_pager<> pager_type;
 
 private:
-    btree_type* btree_;
-    key_compare comp_;
+    btree_type* m_btree;
+    key_compare m_cmp;
 
 /*
         struct bid_comp
@@ -59,7 +61,7 @@ private:
         size_t operator () (const bid_type& bid) const
         {
             size_t result =
-                longhash1(bid.offset + uint64(unsigned_type(bid.storage)));
+                longhash1(bid.offset + reinterpret_cast<uint64>(bid.storage));
             return result;
         }
 #if STXXL_MSVC
@@ -75,20 +77,20 @@ private:
 #endif
     };
 
-    std::vector<node_type*> nodes_;
-    std::vector<request_ptr> reqs_;
-    std::vector<bool> fixed_;
-    std::vector<bool> dirty_;
-    std::vector<int_type> free_nodes_;
+    std::vector<node_type*> m_nodes;
+    std::vector<request_ptr> m_reqs;
+    std::vector<bool> m_fixed;
+    std::vector<bool> m_dirty;
+    std::vector<int_type> m_free_nodes;
     typedef typename compat_hash_map<bid_type, int_type, bid_hash>::result hash_map_type;
 
     //typedef std::map<bid_type,int_type,bid_comp> BID2node_type;
-    typedef hash_map_type BID2node_type;
+    typedef hash_map_type bid2node_type;
 
-    BID2node_type BID2node_;
-    pager_type pager_;
-    block_manager* bm;
-    alloc_strategy_type alloc_strategy_;
+    bid2node_type m_bid2node;
+    pager_type m_pager;
+    block_manager* m_bm;
+    alloc_strategy_type m_alloc_strategy;
 
     int64 n_found;
     int64 n_not_found;
@@ -101,21 +103,20 @@ private:
     // changes btree pointer in all contained iterators
     void change_btree_pointers(btree_type* b)
     {
-        typename std::vector<node_type*>::const_iterator it = nodes_.begin();
-        for ( ; it != nodes_.end(); ++it)
+        for (typename std::vector<node_type*>::const_iterator it = m_nodes.begin();
+             it != m_nodes.end(); ++it)
         {
-            (*it)->btree_ = b;
+            (*it)->m_btree = b;
         }
     }
 
 public:
     node_cache(unsigned_type cache_size_in_bytes,
-               btree_type* btree__,
-               key_compare comp__
-               )
-        : btree_(btree__),
-          comp_(comp__),
-          bm(block_manager::get_instance()),
+               btree_type* btree,
+               key_compare cmp)
+        : m_btree(btree),
+          m_cmp(cmp),
+          m_bm(block_manager::get_instance()),
           n_found(0),
           n_not_found(0),
           n_created(0),
@@ -125,40 +126,40 @@ public:
           n_clean_forced(0)
     {
         const unsigned_type nnodes = cache_size_in_bytes / block_type::raw_size;
-        STXXL_VERBOSE1("btree::node_cache constructor nodes=" << nnodes);
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache constructor nodes=" << nnodes);
         if (nnodes < 3)
         {
             STXXL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
         }
-        nodes_.reserve(nnodes);
-        reqs_.resize(nnodes);
-        free_nodes_.reserve(nnodes);
-        fixed_.resize(nnodes, false);
-        dirty_.resize(nnodes, true);
+        m_nodes.reserve(nnodes);
+        m_reqs.resize(nnodes);
+        m_free_nodes.reserve(nnodes);
+        m_fixed.resize(nnodes, false);
+        m_dirty.resize(nnodes, true);
         for (unsigned_type i = 0; i < nnodes; ++i)
         {
-            nodes_.push_back(new node_type(btree_, comp_));
-            free_nodes_.push_back(i);
+            m_nodes.push_back(new node_type(m_btree, m_cmp));
+            m_free_nodes.push_back(i);
         }
 
         pager_type tmp_pager(nnodes);
-        std::swap(pager_, tmp_pager);
+        std::swap(m_pager, tmp_pager);
     }
 
     unsigned_type size() const
     {
-        return nodes_.size();
+        return m_nodes.size();
     }
 
     // returns the number of fixed pages
     unsigned_type nfixed() const
     {
-        typename BID2node_type::const_iterator i = BID2node_.begin();
-        typename BID2node_type::const_iterator end = BID2node_.end();
+        typename bid2node_type::const_iterator i = m_bid2node.begin();
+        typename bid2node_type::const_iterator end = m_bid2node.end();
         unsigned_type cnt = 0;
         for ( ; i != end; ++i)
         {
-            if (fixed_[(*i).second])
+            if (m_fixed[(*i).second])
                 ++cnt;
         }
         return cnt;
@@ -166,27 +167,27 @@ public:
 
     ~node_cache()
     {
-        STXXL_VERBOSE1("btree::node_cache destructor addr=" << this);
-        typename BID2node_type::const_iterator i = BID2node_.begin();
-        typename BID2node_type::const_iterator end = BID2node_.end();
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache destructor addr=" << this);
+        typename bid2node_type::const_iterator i = m_bid2node.begin();
+        typename bid2node_type::const_iterator end = m_bid2node.end();
         for ( ; i != end; ++i)
         {
             const unsigned_type p = (*i).second;
-            if (reqs_[p].valid())
-                reqs_[p]->wait();
+            if (m_reqs[p].valid())
+                m_reqs[p]->wait();
 
-            if (dirty_[p])
-                nodes_[p]->save();
+            if (m_dirty[p])
+                m_nodes[p]->save();
         }
         for (unsigned_type i = 0; i < size(); ++i)
-            delete nodes_[i];
+            delete m_nodes[i];
     }
 
     node_type * get_new_node(bid_type& new_bid)
     {
         ++n_created;
 
-        if (free_nodes_.empty())
+        if (m_free_nodes.empty())
         {
             // need to kick a node
             int_type node2kick;
@@ -195,7 +196,7 @@ public:
             do
             {
                 ++i;
-                node2kick = pager_.kick();
+                node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
                     STXXL_ERRMSG(
@@ -203,17 +204,17 @@ public:
                     STXXL_ERRMSG("Returning NULL node.");
                     return NULL;
                 }
-                pager_.hit(node2kick);
-            } while (fixed_[node2kick]);
+                m_pager.hit(node2kick);
+            } while (m_fixed[node2kick]);
 
-            if (reqs_[node2kick].valid())
-                reqs_[node2kick]->wait();
+            if (m_reqs[node2kick].valid())
+                m_reqs[node2kick]->wait();
 
-            node_type& Node = *(nodes_[node2kick]);
+            node_type& node = *(m_nodes[node2kick]);
 
-            if (dirty_[node2kick])
+            if (m_dirty[node2kick])
             {
-                Node.save();
+                node.save();
                 ++n_written;
             }
             else
@@ -221,70 +222,70 @@ public:
 
             //reqs_[node2kick] = request_ptr(); // reset request
 
-            assert(BID2node_.find(Node.my_bid()) != BID2node_.end());
-            BID2node_.erase(Node.my_bid());
-            bm->new_block(alloc_strategy_, new_bid);
+            assert(m_bid2node.find(node.my_bid()) != m_bid2node.end());
+            m_bid2node.erase(node.my_bid());
+            m_bm->new_block(m_alloc_strategy, new_bid);
 
-            BID2node_[new_bid] = node2kick;
+            m_bid2node[new_bid] = node2kick;
 
-            Node.init(new_bid);
+            node.init(new_bid);
 
-            dirty_[node2kick] = true;
+            m_dirty[node2kick] = true;
 
-            assert(size() == BID2node_.size() + free_nodes_.size());
+            assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_VERBOSE1("btree::node_cache get_new_node, need to kick node " << node2kick);
+            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_new_node, need to kick node " << node2kick);
 
-            return &Node;
+            return &node;
         }
 
-        int_type free_node = free_nodes_.back();
-        free_nodes_.pop_back();
-        assert(fixed_[free_node] == false);
+        int_type free_node = m_free_nodes.back();
+        m_free_nodes.pop_back();
+        assert(m_fixed[free_node] == false);
 
-        bm->new_block(alloc_strategy_, new_bid);
-        BID2node_[new_bid] = free_node;
-        node_type& Node = *(nodes_[free_node]);
-        Node.init(new_bid);
+        m_bm->new_block(m_alloc_strategy, new_bid);
+        m_bid2node[new_bid] = free_node;
+        node_type& node = *(m_nodes[free_node]);
+        node.init(new_bid);
 
         // assert(!(reqs_[free_node].valid()));
 
-        pager_.hit(free_node);
+        m_pager.hit(free_node);
 
-        dirty_[free_node] = true;
+        m_dirty[free_node] = true;
 
-        assert(size() == BID2node_.size() + free_nodes_.size());
+        assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_VERBOSE1("btree::node_cache get_new_node, free node " << free_node << "available");
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_new_node, free node " << free_node << "available");
 
-        return &Node;
+        return &node;
     }
 
     node_type * get_node(const bid_type& bid, bool fix = false)
     {
-        typename BID2node_type::const_iterator it = BID2node_.find(bid);
+        typename bid2node_type::const_iterator it = m_bid2node.find(bid);
         ++n_read;
 
-        if (it != BID2node_.end())
+        if (it != m_bid2node.end())
         {
             // the node is in cache
             const int_type nodeindex = it->second;
-            STXXL_VERBOSE1("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
-            fixed_[nodeindex] = fix;
-            pager_.hit(nodeindex);
-            dirty_[nodeindex] = true;
+            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
+            m_fixed[nodeindex] = fix;
+            m_pager.hit(nodeindex);
+            m_dirty[nodeindex] = true;
 
-            if (reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll())
-                reqs_[nodeindex]->wait();
+            if (m_reqs[nodeindex].valid() && !m_reqs[nodeindex]->poll())
+                m_reqs[nodeindex]->wait();
 
             ++n_found;
-            return nodes_[nodeindex];
+            return m_nodes[nodeindex];
         }
 
         ++n_not_found;
 
         // the node is not in cache
-        if (free_nodes_.empty())
+        if (m_free_nodes.empty())
         {
             // need to kick a node
             int_type node2kick;
@@ -293,7 +294,7 @@ public:
             do
             {
                 ++i;
-                node2kick = pager_.kick();
+                node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
                     STXXL_ERRMSG(
@@ -301,83 +302,83 @@ public:
                     STXXL_ERRMSG("Returning NULL node.");
                     return NULL;
                 }
-                pager_.hit(node2kick);
-            } while (fixed_[node2kick]);
+                m_pager.hit(node2kick);
+            } while (m_fixed[node2kick]);
 
-            if (reqs_[node2kick].valid())
-                reqs_[node2kick]->wait();
+            if (m_reqs[node2kick].valid())
+                m_reqs[node2kick]->wait();
 
-            node_type& Node = *(nodes_[node2kick]);
+            node_type& node = *(m_nodes[node2kick]);
 
-            if (dirty_[node2kick])
+            if (m_dirty[node2kick])
             {
-                Node.save();
+                node.save();
                 ++n_written;
             }
             else
                 ++n_clean_forced;
 
-            BID2node_.erase(Node.my_bid());
+            m_bid2node.erase(node.my_bid());
 
-            reqs_[node2kick] = Node.load(bid);
-            BID2node_[bid] = node2kick;
+            m_reqs[node2kick] = node.load(bid);
+            m_bid2node[bid] = node2kick;
 
-            fixed_[node2kick] = fix;
+            m_fixed[node2kick] = fix;
 
-            dirty_[node2kick] = true;
+            m_dirty[node2kick] = true;
 
-            assert(size() == BID2node_.size() + free_nodes_.size());
+            assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_VERBOSE1("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
+            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
 
-            return &Node;
+            return &node;
         }
 
-        int_type free_node = free_nodes_.back();
-        free_nodes_.pop_back();
-        assert(fixed_[free_node] == false);
+        int_type free_node = m_free_nodes.back();
+        m_free_nodes.pop_back();
+        assert(m_fixed[free_node] == false);
 
-        node_type& Node = *(nodes_[free_node]);
-        reqs_[free_node] = Node.load(bid);
-        BID2node_[bid] = free_node;
+        node_type& node = *(m_nodes[free_node]);
+        m_reqs[free_node] = node.load(bid);
+        m_bid2node[bid] = free_node;
 
-        pager_.hit(free_node);
+        m_pager.hit(free_node);
 
-        fixed_[free_node] = fix;
+        m_fixed[free_node] = fix;
 
-        dirty_[free_node] = true;
+        m_dirty[free_node] = true;
 
-        assert(size() == BID2node_.size() + free_nodes_.size());
+        assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_VERBOSE1("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
 
-        return &Node;
+        return &node;
     }
 
     node_type const * get_const_node(const bid_type& bid, bool fix = false)
     {
-        typename BID2node_type::const_iterator it = BID2node_.find(bid);
+        typename bid2node_type::const_iterator it = m_bid2node.find(bid);
         ++n_read;
 
-        if (it != BID2node_.end())
+        if (it != m_bid2node.end())
         {
             // the node is in cache
             const int_type nodeindex = it->second;
-            STXXL_VERBOSE1("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
-            fixed_[nodeindex] = fix;
-            pager_.hit(nodeindex);
+            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
+            m_fixed[nodeindex] = fix;
+            m_pager.hit(nodeindex);
 
-            if (reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll())
-                reqs_[nodeindex]->wait();
+            if (m_reqs[nodeindex].valid() && !m_reqs[nodeindex]->poll())
+                m_reqs[nodeindex]->wait();
 
             ++n_found;
-            return nodes_[nodeindex];
+            return m_nodes[nodeindex];
         }
 
         ++n_not_found;
 
         // the node is not in cache
-        if (free_nodes_.empty())
+        if (m_free_nodes.empty())
         {
             // need to kick a node
             int_type node2kick;
@@ -386,7 +387,7 @@ public:
             do
             {
                 ++i;
-                node2kick = pager_.kick();
+                node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
                     STXXL_ERRMSG(
@@ -394,92 +395,92 @@ public:
                     STXXL_ERRMSG("Returning NULL node.");
                     return NULL;
                 }
-                pager_.hit(node2kick);
-            } while (fixed_[node2kick]);
+                m_pager.hit(node2kick);
+            } while (m_fixed[node2kick]);
 
-            if (reqs_[node2kick].valid())
-                reqs_[node2kick]->wait();
+            if (m_reqs[node2kick].valid())
+                m_reqs[node2kick]->wait();
 
-            node_type& Node = *(nodes_[node2kick]);
-            if (dirty_[node2kick])
+            node_type& node = *(m_nodes[node2kick]);
+            if (m_dirty[node2kick])
             {
-                Node.save();
+                node.save();
                 ++n_written;
             }
             else
                 ++n_clean_forced;
 
-            BID2node_.erase(Node.my_bid());
+            m_bid2node.erase(node.my_bid());
 
-            reqs_[node2kick] = Node.load(bid);
-            BID2node_[bid] = node2kick;
+            m_reqs[node2kick] = node.load(bid);
+            m_bid2node[bid] = node2kick;
 
-            fixed_[node2kick] = fix;
+            m_fixed[node2kick] = fix;
 
-            dirty_[node2kick] = false;
+            m_dirty[node2kick] = false;
 
-            assert(size() == BID2node_.size() + free_nodes_.size());
+            assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_VERBOSE1("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
+            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
 
-            return &Node;
+            return &node;
         }
 
-        int_type free_node = free_nodes_.back();
-        free_nodes_.pop_back();
-        assert(fixed_[free_node] == false);
+        int_type free_node = m_free_nodes.back();
+        m_free_nodes.pop_back();
+        assert(m_fixed[free_node] == false);
 
-        node_type& Node = *(nodes_[free_node]);
-        reqs_[free_node] = Node.load(bid);
-        BID2node_[bid] = free_node;
+        node_type& node = *(m_nodes[free_node]);
+        m_reqs[free_node] = node.load(bid);
+        m_bid2node[bid] = free_node;
 
-        pager_.hit(free_node);
+        m_pager.hit(free_node);
 
-        fixed_[free_node] = fix;
+        m_fixed[free_node] = fix;
 
-        dirty_[free_node] = false;
+        m_dirty[free_node] = false;
 
-        assert(size() == BID2node_.size() + free_nodes_.size());
+        assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_VERBOSE1("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
 
-        return &Node;
+        return &node;
     }
 
     void delete_node(const bid_type& bid)
     {
-        typename BID2node_type::const_iterator it = BID2node_.find(bid);
+        typename bid2node_type::const_iterator it = m_bid2node.find(bid);
         try
         {
-            if (it != BID2node_.end())
+            if (it != m_bid2node.end())
             {
                 // the node is in the cache
                 const int_type nodeindex = it->second;
-                STXXL_VERBOSE1("btree::node_cache delete_node " << nodeindex << " from cache.");
-                if (reqs_[nodeindex].valid())
-                    reqs_[nodeindex]->wait();
+                STXXL_BTREE_CACHE_VERBOSE("btree::node_cache delete_node " << nodeindex << " from cache.");
+                if (m_reqs[nodeindex].valid())
+                    m_reqs[nodeindex]->wait();
 
                 //reqs_[nodeindex] = request_ptr(); // reset request
-                free_nodes_.push_back(nodeindex);
-                BID2node_.erase(bid);
-                fixed_[nodeindex] = false;
+                m_free_nodes.push_back(nodeindex);
+                m_bid2node.erase(bid);
+                m_fixed[nodeindex] = false;
             }
             ++n_deleted;
         } catch (const io_error& ex)
         {
-            bm->delete_block(bid);
+            m_bm->delete_block(bid);
             throw io_error(ex.what());
         }
-        bm->delete_block(bid);
+        m_bm->delete_block(bid);
     }
 
     void prefetch_node(const bid_type& bid)
     {
-        if (BID2node_.find(bid) != BID2node_.end())
+        if (m_bid2node.find(bid) != m_bid2node.end())
             return;
 
         // the node is not in cache
-        if (free_nodes_.empty())
+        if (m_free_nodes.empty())
         {
             // need to kick a node
             int_type node2kick;
@@ -488,7 +489,7 @@ public:
             do
             {
                 ++i;
-                node2kick = pager_.kick();
+                node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
                     STXXL_ERRMSG(
@@ -496,78 +497,78 @@ public:
                     STXXL_ERRMSG("Returning NULL node.");
                     return;
                 }
-                pager_.hit(node2kick);
-            } while (fixed_[node2kick]);
+                m_pager.hit(node2kick);
+            } while (m_fixed[node2kick]);
 
-            if (reqs_[node2kick].valid())
-                reqs_[node2kick]->wait();
+            if (m_reqs[node2kick].valid())
+                m_reqs[node2kick]->wait();
 
-            node_type& Node = *(nodes_[node2kick]);
+            node_type& node = *(m_nodes[node2kick]);
 
-            if (dirty_[node2kick])
+            if (m_dirty[node2kick])
             {
-                Node.save();
+                node.save();
                 ++n_written;
             }
             else
                 ++n_clean_forced;
 
-            BID2node_.erase(Node.my_bid());
+            m_bid2node.erase(node.my_bid());
 
-            reqs_[node2kick] = Node.prefetch(bid);
-            BID2node_[bid] = node2kick;
+            m_reqs[node2kick] = node.prefetch(bid);
+            m_bid2node[bid] = node2kick;
 
-            fixed_[node2kick] = false;
+            m_fixed[node2kick] = false;
 
-            dirty_[node2kick] = false;
+            m_dirty[node2kick] = false;
 
-            assert(size() == BID2node_.size() + free_nodes_.size());
+            assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_VERBOSE1("btree::node_cache prefetch_node, need to kick node" << node2kick << " ");
+            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache prefetch_node, need to kick node" << node2kick << " ");
 
             return;
         }
 
-        int_type free_node = free_nodes_.back();
-        free_nodes_.pop_back();
-        assert(fixed_[free_node] == false);
+        int_type free_node = m_free_nodes.back();
+        m_free_nodes.pop_back();
+        assert(m_fixed[free_node] == false);
 
-        node_type& Node = *(nodes_[free_node]);
-        reqs_[free_node] = Node.prefetch(bid);
-        BID2node_[bid] = free_node;
+        node_type& node = *(m_nodes[free_node]);
+        m_reqs[free_node] = node.prefetch(bid);
+        m_bid2node[bid] = free_node;
 
-        pager_.hit(free_node);
+        m_pager.hit(free_node);
 
-        fixed_[free_node] = false;
+        m_fixed[free_node] = false;
 
-        dirty_[free_node] = false;
+        m_dirty[free_node] = false;
 
-        assert(size() == BID2node_.size() + free_nodes_.size());
+        assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_VERBOSE1("btree::node_cache prefetch_node, free node " << free_node << "available");
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache prefetch_node, free node " << free_node << "available");
 
         return;
     }
 
     void unfix_node(const bid_type& bid)
     {
-        assert(BID2node_.find(bid) != BID2node_.end());
-        fixed_[BID2node_[bid]] = false;
-        STXXL_VERBOSE1("btree::node_cache unfix_node,  node " << BID2node_[bid]);
+        assert(m_bid2node.find(bid) != m_bid2node.end());
+        m_fixed[m_bid2node[bid]] = false;
+        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache unfix_node,  node " << m_bid2node[bid]);
     }
 
     void swap(node_cache& obj)
     {
-        std::swap(comp_, obj.comp_);
-        std::swap(nodes_, obj.nodes_);
-        std::swap(reqs_, obj.reqs_);
-        change_btree_pointers(btree_);
-        obj.change_btree_pointers(obj.btree_);
-        std::swap(fixed_, obj.fixed_);
-        std::swap(free_nodes_, obj.free_nodes_);
-        std::swap(BID2node_, obj.BID2node_);
-        std::swap(pager_, obj.pager_);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(m_cmp, obj.m_cmp);
+        std::swap(m_nodes, obj.m_nodes);
+        std::swap(m_reqs, obj.m_reqs);
+        change_btree_pointers(m_btree);
+        obj.change_btree_pointers(obj.m_btree);
+        std::swap(m_fixed, obj.m_fixed);
+        std::swap(m_free_nodes, obj.m_free_nodes);
+        std::swap(m_bid2node, obj.m_bid2node);
+        std::swap(m_pager, obj.m_pager);
+        std::swap(m_alloc_strategy, obj.m_alloc_strategy);
         std::swap(n_found, obj.n_found);
         std::swap(n_not_found, obj.n_found);
         std::swap(n_created, obj.n_created);
@@ -582,7 +583,6 @@ public:
         if (n_read)
             o << "Found blocks                      : " << n_found << " (" <<
                 100. * double(n_found) / double(n_read) << "%)" << std::endl;
-
         else
             o << "Found blocks                      : " << n_found << " (" <<
                 100 << "%)" << std::endl;

@@ -35,9 +35,10 @@ private:
     struct Key
     {
         bid_type bid;
-        unsigned pos;
+        unsigned_type pos;
         Key() { }
-        Key(const bid_type& b, unsigned p) : bid(b), pos(p) { }
+        Key(const bid_type& b, unsigned_type p)
+            : bid(b), pos(p) { }
     };
 
     struct bid_comp
@@ -58,54 +59,55 @@ private:
 
     typedef std::multimap<Key, iterator_base*, KeyCmp> multimap_type;
 
-    multimap_type It2Addr_;
-    btree_type* btree_;
+    multimap_type m_it2addr;
+    btree_type* m_btree;
 
     typedef typename multimap_type::value_type pair_type;
     typedef typename multimap_type::iterator mmiterator_type;
     typedef typename multimap_type::const_iterator mmconst_iterator_type;
 
-    // changes btree pointer in all contained iterators
+    //! changes btree pointer in all contained iterators
     void change_btree_pointers(btree_type* b)
     {
-        mmconst_iterator_type it = It2Addr_.begin();
-        for ( ; it != It2Addr_.end(); ++it)
+        for (mmconst_iterator_type it = m_it2addr.begin();
+             it != m_it2addr.end(); ++it)
         {
-            (it->second)->btree_ = b;
+            (it->second)->btree = b;
         }
     }
 
 public:
-    iterator_map(btree_type* b) : btree_(b)
+    iterator_map(btree_type* b)
+        : m_btree(b)
     { }
 
     void register_iterator(iterator_base& it)
     {
         STXXL_VERBOSE2("btree::iterator_map register_iterator addr=" << &it <<
                        " BID: " << it.bid << " POS: " << it.pos);
-        It2Addr_.insert(pair_type(Key(it.bid, it.pos), &it));
+        m_it2addr.insert(pair_type(Key(it.bid, it.pos), &it));
     }
     void unregister_iterator(iterator_base& it)
     {
         STXXL_VERBOSE2("btree::iterator_map unregister_iterator addr=" << &it <<
                        " BID: " << it.bid << " POS: " << it.pos);
-        assert(!It2Addr_.empty());
+        assert(!m_it2addr.empty());
         Key key(it.bid, it.pos);
         std::pair<mmiterator_type, mmiterator_type> range =
-            It2Addr_.equal_range(key);
+            m_it2addr.equal_range(key);
 
         assert(range.first != range.second);
 
         mmiterator_type i = range.first;
         for ( ; i != range.second; ++i)
         {
-            assert(it.bid == (*i).first.bid);
-            assert(it.pos == (*i).first.pos);
+            assert(it.bid == i->first.bid);
+            assert(it.pos == i->first.pos);
 
-            if ((*i).second == &it)
+            if (i->second == &it)
             {
                 // found it
-                It2Addr_.erase(i);
+                m_it2addr.erase(i);
                 return;
             }
         }
@@ -114,36 +116,37 @@ public:
     }
     template <class OutputContainer>
     void find(const bid_type& bid,
-              unsigned first_pos,
-              unsigned last_pos,
-              OutputContainer& out
-              )
+              unsigned_type first_pos,
+              unsigned_type last_pos,
+              OutputContainer& out)
     {
         Key firstkey(bid, first_pos);
         Key lastkey(bid, last_pos);
-        mmconst_iterator_type begin = It2Addr_.lower_bound(firstkey);
-        mmconst_iterator_type end = It2Addr_.upper_bound(lastkey);
+        mmconst_iterator_type begin = m_it2addr.lower_bound(firstkey);
+        mmconst_iterator_type end = m_it2addr.upper_bound(lastkey);
 
-        mmconst_iterator_type i = begin;
-        for ( ; i != end; ++i)
+        for (mmconst_iterator_type i = begin;
+             i != end; ++i)
         {
-            assert(bid == (*i).first.bid);
-            out.push_back((*i).second);
+            assert(bid == i->first.bid);
+            out.push_back(i->second);
         }
     }
 
     virtual ~iterator_map()
     {
-        mmconst_iterator_type it = It2Addr_.begin();
-        for ( ; it != It2Addr_.end(); ++it)
-            (it->second)->make_invalid();
+        for (mmconst_iterator_type it = m_it2addr.begin();
+             it != m_it2addr.end(); ++it)
+        {
+            it->second->make_invalid();
+        }
     }
 
     void swap(iterator_map& obj)
     {
-        std::swap(It2Addr_, obj.It2Addr_);
-        change_btree_pointers(btree_);
-        obj.change_btree_pointers(obj.btree_);
+        std::swap(m_it2addr, obj.m_it2addr);
+        change_btree_pointers(m_btree);
+        obj.change_btree_pointers(obj.m_btree);
     }
 };
 
