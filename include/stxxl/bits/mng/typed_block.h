@@ -302,7 +302,7 @@ public:
     static void* operator new (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
-        STXXL_VERBOSE1("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
+        STXXL_VERBOSE_TYPED_BLOCK("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
 
         void* result = aligned_alloc<STXXL_BLOCK_ALIGN>(
             bytes - meta_info_size, meta_info_size);
@@ -316,7 +316,7 @@ public:
     static void* operator new[] (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
-        STXXL_VERBOSE1("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
+        STXXL_VERBOSE_TYPED_BLOCK("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
 
         void* result = aligned_alloc<STXXL_BLOCK_ALIGN>(
             bytes - meta_info_size, meta_info_size);
