@@ -36,6 +36,4 @@ before_script:
     -DUSE_BOOST=$USE_BOOST $CMAKE_ARGS ../
 
 script:
-  - make -j4
-  - ./tools/stxxl_tool info
-  - make test
+  - make -j4 && ./tools/stxxl_tool info && ctest -V
