@@ -233,7 +233,7 @@ public:
     //! Number of values with given key
     //! \param key key for value to look up
     //! \return 0 or 1 depending on the presence of a value with the given key
-    internal_size_type count(const key_type& key) const
+    external_size_type count(const key_type& key) const
     {
         return impl.count(key);
     }
@@ -310,7 +310,7 @@ public:
     //! Erase value by key; check external memory
     //! \param key key of value to erase
     //! \return number of values actually erased (0 or 1)
-    internal_size_type erase(const key_type& key)
+    external_size_type erase(const key_type& key)
     {
         return impl.erase(key);
     }

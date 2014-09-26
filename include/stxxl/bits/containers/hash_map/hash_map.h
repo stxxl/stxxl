@@ -450,7 +450,7 @@ public:
     //! Erase value by key; check external memory
     //! \param key key of value to erase
     //! \return number of values actually erased (0 or 1)
-    internal_size_type erase(const key_type& key)
+    external_size_type erase(const key_type& key)
     {
         internal_size_type i_bucket = _bkt_num(key);
         bucket_type& bucket = buckets_[i_bucket];
@@ -715,7 +715,7 @@ public:
     //! Number of values with given key
     //! \param k key for value to look up
     //! \return 0 or 1 depending on the presence of a value with the given key
-    internal_size_type count(const key_type& k) const
+    external_size_type count(const key_type& k) const
     {
         const_iterator cit = find(k);
         return (cit == end()) ? 0 : 1;
