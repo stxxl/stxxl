@@ -32,8 +32,7 @@ if(USE_BOOST)
   stxxl_test(test_cancel boostfd "${STXXL_TMPDIR}/testdisk1")
   stxxl_test(test_cancel fileperblock_boostfd "${STXXL_TMPDIR}/testdisk1")
 endif(USE_BOOST)
-# TODO: fails on Travis for unknown reasons
-#stxxl_test(test_cancel memory "${STXXL_TMPDIR}/testdisk1")
+stxxl_test(test_cancel memory "${STXXL_TMPDIR}/testdisk1")
 # TODO: asserts!
 #stxxl_test(test_cancel wbtl "${STXXL_TMPDIR}/testdisk1")
 
