@@ -41,7 +41,10 @@ int main(int argc, char** argv)
     memset(buffer, 0, size);
 
     stxxl::compat_unique_ptr<stxxl::file>::result file(
-        stxxl::create_file(argv[1], argv[2], stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT));
+        stxxl::create_file(
+            argv[1], argv[2],
+            stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT)
+        );
 
     file->set_size(num_blocks * size);
     stxxl::request_ptr req[num_blocks];

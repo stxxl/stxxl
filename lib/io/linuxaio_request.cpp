@@ -51,12 +51,12 @@ void linuxaio_request::fill_control_block()
     linuxaio_file* af = dynamic_cast<linuxaio_file*>(m_file);
 
     memset(&cb, 0, sizeof(cb));
-    // indirection, so the I/O system retains an auto_ptr reference
+    // indirection, so the I/O system retains a counting_ptr reference
     cb.aio_data = reinterpret_cast<__u64>(new request_ptr(this));
     cb.aio_fildes = af->file_des;
     cb.aio_lio_opcode = (m_type == READ) ? IOCB_CMD_PREAD : IOCB_CMD_PWRITE;
     cb.aio_reqprio = 0;
-    cb.aio_buf = reinterpret_cast<__u64>(m_buffer);
+    cb.aio_buf = static_cast<__u64>((unsigned long)(m_buffer));
     cb.aio_nbytes = m_bytes;
     cb.aio_offset = m_offset;
 }
@@ -84,7 +84,8 @@ bool linuxaio_request::post()
             stats::get_instance()->write_started(m_bytes, now);
     }
     else if (success == -1 && errno != EAGAIN)
-        STXXL_THROW2(io_error, "linuxaio_request::post", "io_submit()");
+        STXXL_THROW_ERRNO(io_error, "linuxaio_request::post"
+                          " io_submit()");
 
     return success == 1;
 }
