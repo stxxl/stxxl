@@ -320,7 +320,8 @@ public:
 };
 
 template <class ConfigType>
-inline typename priority_queue<ConfigType>::size_type priority_queue<ConfigType>::size() const
+inline typename priority_queue<ConfigType>::size_type
+priority_queue<ConfigType>::size() const
 {
     return size_ +
            insert_heap.size() - 1 +
@@ -328,7 +329,8 @@ inline typename priority_queue<ConfigType>::size_type priority_queue<ConfigType>
 }
 
 template <class ConfigType>
-inline const typename priority_queue<ConfigType>::value_type & priority_queue<ConfigType>::top() const
+inline const typename priority_queue<ConfigType>::value_type &
+priority_queue<ConfigType>::top() const
 {
     assert(!insert_heap.empty());
 

@@ -32,15 +32,16 @@ namespace priority_queue_local {
 // The data structure from Knuth, "Sorting and Searching", Section 5.4.1
 /*!
  * Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
- * \param  KNKMAX  maximum arity of loser tree, has to be a power of two
+ * \param  MaxArity  maximum arity of loser tree, has to be a power of two
  */
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
+template <class ValueType, class CompareType, unsigned MaxArity>
 class loser_tree : private noncopyable
 {
 public:
-    typedef ValTp_ value_type;
-    typedef Cmp_ comparator_type;
+    typedef ValueType value_type;
+    typedef CompareType comparator_type;
     typedef value_type Element;
+    enum { max_arity = MaxArity };
 
 private:
 #if STXXL_PQ_INTERNAL_LOSER_TREE
@@ -53,7 +54,7 @@ private:
 
     comparator_type cmp;
     // stack of free segment indices
-    internal_bounded_stack<unsigned_type, KNKMAX> free_slots;
+    internal_bounded_stack<unsigned_type, MaxArity> free_slots;
 
     unsigned_type size_;     // total number of elements stored
     unsigned_type logK;      // log of current tree size
@@ -64,16 +65,16 @@ private:
 #if STXXL_PQ_INTERNAL_LOSER_TREE
     // upper levels of loser trees
     // entry[0] contains the winner info
-    Entry entry[KNKMAX];
+    Entry entry[MaxArity];
 #endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
     // leaf information
     // note that Knuth uses indices k..k-1
     // while we use 0..k-1
-    Element* current[KNKMAX];               // pointer to current element
-    Element* current_end[KNKMAX];           // pointer to end of block for current element
-    Element* segment[KNKMAX];               // start of Segments
-    unsigned_type segment_size[KNKMAX];     // just to count the internal memory consumption, in bytes
+    Element* current[MaxArity];               // pointer to current element
+    Element* current_end[MaxArity];           // pointer to end of block for current element
+    Element* segment[MaxArity];               // start of Segments
+    unsigned_type segment_size[MaxArity];     // just to count the internal memory consumption, in bytes
 
     unsigned_type mem_cons_;
 
@@ -177,12 +178,12 @@ public:
         std::swap(k, obj.k);
         std::swap(sentinel, obj.sentinel);
 #if STXXL_PQ_INTERNAL_LOSER_TREE
-        swap_1D_arrays(entry, obj.entry, KNKMAX);
+        swap_1D_arrays(entry, obj.entry, MaxArity);
 #endif      //STXXL_PQ_INTERNAL_LOSER_TREE
-        swap_1D_arrays(current, obj.current, KNKMAX);
-        swap_1D_arrays(current_end, obj.current_end, KNKMAX);
-        swap_1D_arrays(segment, obj.segment, KNKMAX);
-        swap_1D_arrays(segment_size, obj.segment_size, KNKMAX);
+        swap_1D_arrays(current, obj.current, MaxArity);
+        swap_1D_arrays(current_end, obj.current_end, MaxArity);
+        swap_1D_arrays(segment, obj.segment, MaxArity);
+        swap_1D_arrays(segment_size, obj.segment_size, MaxArity);
         std::swap(mem_cons_, obj.mem_cons_);
     }
 
@@ -196,16 +197,19 @@ public:
 
     bool is_space_available() const     // for new segment
     {
-        return (k < KNKMAX) || !free_slots.empty();
+        return (k < MaxArity) || !free_slots.empty();
     }
 
-    void insert_segment(Element * target, unsigned_type length);     // insert segment beginning at target
+    //! insert segment beginning at target
+    void insert_segment(Element * target, unsigned_type length);
+
     unsigned_type size() const { return size_; }
 };
 
 ///////////////////////// LoserTree ///////////////////////////////////
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-loser_tree<ValTp_, Cmp_, KNKMAX>::loser_tree() : size_(0), logK(0), k(1), mem_cons_(0)
+template <class ValueType, class CompareType, unsigned MaxArity>
+loser_tree<ValueType, CompareType, MaxArity>::loser_tree()
+    : size_(0), logK(0), k(1), mem_cons_(0)
 {
     free_slots.push(0);
     segment[0] = NULL;
@@ -216,8 +220,8 @@ loser_tree<ValTp_, Cmp_, KNKMAX>::loser_tree() : size_(0), logK(0), k(1), mem_co
     init();
 }
 
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::init()
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::init()
 {
     assert(!cmp(cmp.min_value(), cmp.min_value()));     // verify strict weak ordering
     sentinel = cmp.min_value();
@@ -228,15 +232,16 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::init()
 }
 
 // rebuild loser tree information from the values in current
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLoserTree()
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::rebuildLoserTree()
 {
 #if STXXL_PQ_INTERNAL_LOSER_TREE
-    assert(LOG2<KNKMAX>::floor == LOG2<KNKMAX>::ceil);     // KNKMAX needs to be a power of two
+    // MaxArity needs to be a power of two
+    assert(LOG2<MaxArity>::floor == LOG2<MaxArity>::ceil);
     unsigned_type winner = initWinner(1);
     entry[0].index = winner;
     entry[0].key = *(current[winner]);
-#endif //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 }
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
@@ -245,8 +250,8 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLoserTree()
 // from scratch in linear time
 // initialize entry[root].index and the subtree rooted there
 // return winner index
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-unsigned_type loser_tree<ValTp_, Cmp_, KNKMAX>::initWinner(unsigned_type root)
+template <class ValueType, class CompareType, unsigned MaxArity>
+unsigned_type loser_tree<ValueType, CompareType, MaxArity>::initWinner(unsigned_type root)
 {
     if (root >= k) {     // leaf reached
         return root - k;
@@ -272,8 +277,8 @@ unsigned_type loser_tree<ValTp_, Cmp_, KNKMAX>::initWinner(unsigned_type root)
 // based on new value, and old winner and loser
 // update each node on the path to the root top down.
 // This is implemented recursively
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::update_on_insert(
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::update_on_insert(
     unsigned_type node,
     const Element& newKey,
     unsigned_type newIndex,
@@ -320,12 +325,12 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::update_on_insert(
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
 // make the tree two times as wide
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::doubleK()
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::doubleK()
 {
-    STXXL_VERBOSE3("loser_tree::doubleK (before) k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("loser_tree::doubleK (before) k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(k > 0);
-    assert(k < KNKMAX);
+    assert(k < MaxArity);
     assert(free_slots.empty());                          // stack was free (probably not needed)
 
     // make all new entries free
@@ -342,7 +347,7 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::doubleK()
     k *= 2;
     logK++;
 
-    STXXL_VERBOSE3("loser_tree::doubleK (after)  k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("loser_tree::doubleK (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(!free_slots.empty());
 
     // recompute loser tree information
@@ -350,8 +355,8 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::doubleK()
 }
 
 // compact nonempty segments in the left half of the tree
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::compactTree()
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::compactTree()
 {
     STXXL_VERBOSE3("loser_tree::compactTree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
     assert(logK > 0);
@@ -406,11 +411,12 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::compactTree()
 
 // insert segment beginning at target
 // require: is_space_available() == 1
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::insert_segment(Element* target, unsigned_type length)
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::
+insert_segment(Element* target, unsigned_type length)
 {
     STXXL_VERBOSE2("loser_tree::insert_segment(" << target << "," << length << ")");
-    //std::copy(target,target + length,std::ostream_iterator<ValTp_>(std::cout, "\n"));
+    //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
 
     if (length > 0)
     {
@@ -451,8 +457,8 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::insert_segment(Element* target, unsigned_
     }
 }
 
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
+template <class ValueType, class CompareType, unsigned MaxArity>
+loser_tree<ValueType, CompareType, MaxArity>::~loser_tree()
 {
     STXXL_VERBOSE1("loser_tree::~loser_tree()");
     for (unsigned_type i = 0; i < k; ++i)
@@ -469,8 +475,9 @@ loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
 }
 
 // free an empty segment .
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::deallocate_segment(unsigned_type slot)
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::
+deallocate_segment(unsigned_type slot)
 {
     // reroute current pointer to some empty sentinel segment
     // with a sentinel key
@@ -493,8 +500,9 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::deallocate_segment(unsigned_type slot)
 // require:
 // - there are at least length elements
 // - segments are ended by sentinels
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::multi_merge(Element* target, unsigned_type length)
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::
+multi_merge(Element* target, unsigned_type length)
 {
     STXXL_VERBOSE3("loser_tree::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
 
@@ -507,7 +515,7 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::multi_merge(Element* target, unsigned_typ
     //This is the place to make statistics about internal multi_merge calls.
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-    priority_queue_local::invert_order<Cmp_, value_type, value_type> inv_cmp(cmp);
+    priority_queue_local::invert_order<CompareType, value_type, value_type> inv_cmp(cmp);
 #endif
     switch (logK) {
     case 0:
@@ -664,20 +672,21 @@ void loser_tree<ValTp_, Cmp_, KNKMAX>::multi_merge(Element* target, unsigned_typ
             compactTree();
         }
     }
-    //std::copy(target,target + length,std::ostream_iterator<ValTp_>(std::cout, "\n"));
+    //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
 }
 
 // is this segment empty and does not point to sentinel yet?
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-inline bool loser_tree<ValTp_, Cmp_, KNKMAX>::is_segment_empty(unsigned_type slot)
+template <class ValueType, class CompareType, unsigned MaxArity>
+inline bool loser_tree<ValueType, CompareType, MaxArity>::
+is_segment_empty(unsigned_type slot)
 {
     return (is_sentinel(*(current[slot])) && (current[slot] != &sentinel));
 }
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
 // multi-merge for arbitrary K
-template <class ValTp_, class Cmp_, unsigned KNKMAX>
-void loser_tree<ValTp_, Cmp_, KNKMAX>::
+template <class ValueType, class CompareType, unsigned MaxArity>
+void loser_tree<ValueType, CompareType, MaxArity>::
 multi_merge_k(Element* target, unsigned_type length)
 {
     Entry* currentPos;

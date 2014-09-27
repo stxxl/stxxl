@@ -87,24 +87,22 @@ namespace priority_queue_local {
  * - Provides access to underlying heap, so (parallel) sorting in place is possible.
  * - Can be cleared "at once", without reallocation.
  */
-template <typename _Tp, typename _Sequence = std::vector<_Tp>,
-          typename _Compare = std::less<typename _Sequence::value_type> >
+template <typename ValueType, typename ContainerType = std::vector<ValueType>,
+          typename CompareType = std::less<ValueType> >
 class internal_priority_queue
 {
-    // concept requirements
-    typedef typename _Sequence::value_type _Sequence_value_type;
-
 public:
-    typedef typename _Sequence::value_type value_type;
-    typedef typename _Sequence::reference reference;
-    typedef typename _Sequence::const_reference const_reference;
-    typedef typename _Sequence::size_type size_type;
-    typedef          _Sequence container_type;
+    typedef ValueType value_type;
+    typedef ContainerType container_type;
+    typedef CompareType compare_type;
+    typedef typename container_type::reference reference;
+    typedef typename container_type::const_reference const_reference;
+    typedef typename container_type::size_type size_type;
 
 protected:
     //  See queue::heap for notes on these names.
-    _Sequence heap;
-    _Compare comp;
+    container_type heap;
+    CompareType comp;
     size_type current_size;
 
 public:
@@ -140,7 +138,7 @@ public:
      *
      * This is a typical %queue operation.
      * The time complexity of the operation depends on the underlying
-     * sequence.
+     * container.
      */
     void
     push(const value_type& x)
@@ -155,7 +153,7 @@ public:
      *
      * This is a typical %queue operation.  It shrinks the %queue
      * by one.  The time complexity of the operation depends on the
-     * underlying sequence.
+     * underlying container.
      *
      * Note that no data is returned, and if the first element's
      * data is needed, it should be retrieved before pop() is
@@ -185,7 +183,7 @@ public:
 };
 
 //! Inverts the order of a comparison functor by swapping its arguments.
-template <class Predicate, typename first_argument_type, typename second_argument_type>
+template <class Predicate, typename FirstType, typename SecondType>
 class invert_order
 {
 protected:
@@ -195,7 +193,7 @@ public:
     explicit
     invert_order(const Predicate& _pred) : pred(_pred) { }
 
-    bool operator () (const first_argument_type& x, const second_argument_type& y) const
+    bool operator () (const FirstType& x, const SecondType& y) const
     {
         return pred(y, x);
     }
@@ -206,50 +204,50 @@ public:
  * - Maximum size is fixed at compilation time, so an array can be used.
  * - Can be cleared "at once", without reallocation.
  */
-template <typename Tp_, unsigned_type max_size_>
+template <typename ValueType, unsigned_type MaxSize>
 class internal_bounded_stack
 {
-    typedef Tp_ value_type;
+    typedef ValueType value_type;
     typedef unsigned_type size_type;
-    enum { max_size = max_size_ };
+    enum { max_size = MaxSize };
 
-    size_type size_;
-    value_type array[max_size];
+    size_type m_size;
+    value_type m_array[max_size];
 
 public:
-    internal_bounded_stack() : size_(0) { }
+    internal_bounded_stack() : m_size(0) { }
 
     void push(const value_type& x)
     {
-        assert(size_ < max_size);
-        array[size_++] = x;
+        assert(m_size < max_size);
+        m_array[m_size++] = x;
     }
 
     const value_type & top() const
     {
-        assert(size_ > 0);
-        return array[size_ - 1];
+        assert(m_size > 0);
+        return m_array[m_size - 1];
     }
 
     void pop()
     {
-        assert(size_ > 0);
-        --size_;
+        assert(m_size > 0);
+        --m_size;
     }
 
     void clear()
     {
-        size_ = 0;
+        m_size = 0;
     }
 
     size_type size() const
     {
-        return size_;
+        return m_size;
     }
 
     bool empty() const
     {
-        return size_ == 0;
+        return m_size == 0;
     }
 };
 

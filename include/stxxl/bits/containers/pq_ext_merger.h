@@ -120,23 +120,23 @@ public:
  * External merger, based on the loser tree data structure.
  * \param Arity_  maximum arity of merger, does not need to be a power of 2
  */
-template <class BlockType_,
-          class Cmp_,
-          unsigned Arity_,
-          class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
+template <class BlockType,
+          class Cmp,
+          unsigned Arity,
+          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
 class ext_merger : private noncopyable
 {
 public:
     typedef stxxl::uint64 size_type;
-    typedef BlockType_ block_type;
+    typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
     typedef typename block_type::value_type value_type;
-    typedef Cmp_ comparator_type;
-    typedef AllocStr_ alloc_strategy;
+    typedef Cmp comparator_type;
+    typedef AllocStr alloc_strategy;
     typedef read_write_pool<block_type> pool_type;
 
     // arity_bound / 2  <  arity  <=  arity_bound
-    enum { arity = Arity_, arity_bound = 1UL << (LOG2<Arity_>::ceil) };
+    enum { arity = Arity, arity_bound = 1UL << (LOG2<Arity>::ceil) };
 
 protected:
     comparator_type cmp;
@@ -582,8 +582,8 @@ public:
         std::vector<sequence> seqs;
         std::vector<unsigned_type> orig_seq_index;
 
-        Cmp_ cmp;
-        priority_queue_local::invert_order<Cmp_, value_type, value_type> inv_cmp(cmp);
+        Cmp cmp;
+        priority_queue_local::invert_order<Cmp, value_type, value_type> inv_cmp(cmp);
 
         for (unsigned_type i = 0; i < k; ++i) //initialize sequences
         {

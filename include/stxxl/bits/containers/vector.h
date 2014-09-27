@@ -44,9 +44,11 @@ STXXL_BEGIN_NAMESPACE
 //! Vector and support classes
 //! \{
 
-template <typename size_type, size_type modulo2, size_type modulo1>
+template <typename SizeType, SizeType modulo2, SizeType modulo1>
 class double_blocked_index
 {
+    typedef SizeType size_type;
+
     static const size_type modulo12 = modulo1 * modulo2;
 
     size_type pos;
@@ -272,10 +274,14 @@ template <typename ValueType, typename AllocStr, typename SizeType, typename Dif
           unsigned BlockSize, typename PagerType, unsigned PageSize>
 class vector_iterator
 {
-    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> self_type;
-    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> const_self_type;
+    typedef vector_iterator<ValueType, AllocStr, SizeType,
+                            DiffType, BlockSize, PagerType, PageSize> self_type;
 
-    friend class const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
+    typedef const_vector_iterator<ValueType, AllocStr, SizeType,
+                                  DiffType, BlockSize, PagerType, PageSize> const_self_type;
+
+    friend class const_vector_iterator<ValueType, AllocStr, SizeType,
+                                       DiffType, BlockSize, PagerType, PageSize>;
 
 public:
     //! \name Types
@@ -544,10 +550,14 @@ template <typename ValueType, typename AllocStr, typename SizeType, typename Dif
           unsigned BlockSize, typename PagerType, unsigned PageSize>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> self_type;
-    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> mutable_self_type;
+    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType,
+                                  BlockSize, PagerType, PageSize> self_type;
 
-    friend class vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
+    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType,
+                            BlockSize, PagerType, PageSize> mutable_self_type;
+
+    friend class vector_iterator<ValueType, AllocStr, SizeType, DiffType,
+                                 BlockSize, PagerType, PageSize>;
 
 public:
     //! \name Types
