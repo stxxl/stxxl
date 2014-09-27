@@ -37,13 +37,13 @@ STXXL_BEGIN_NAMESPACE
 //! Block identifier class.
 //!
 //! Stores block identity, given by file and offset within the file
-template <unsigned SIZE>
+template <unsigned Size>
 struct BID
 {
     enum
     {
-        size = SIZE,         //!< Block size
-        t_size = SIZE        //!< Blocks size, given by the parameter
+        size = Size,         //!< Block size
+        t_size = Size        //!< Blocks size, given by the parameter
     };
 
     file* storage;           //!< pointer to the file of the block
@@ -64,7 +64,8 @@ struct BID
     { }
 
     template <unsigned BlockSize>
-    explicit BID(const BID<BlockSize>& obj) : storage(obj.storage), offset(obj.offset)
+    explicit BID(const BID<BlockSize>& obj)
+        : storage(obj.storage), offset(obj.offset)
     { }
 
     template <unsigned BlockSize>
@@ -108,20 +109,20 @@ struct BID<0>
     }
 };
 
-template <unsigned blk_sz>
-bool operator == (const BID<blk_sz>& a, const BID<blk_sz>& b)
+template <unsigned BlockSize>
+bool operator == (const BID<BlockSize>& a, const BID<BlockSize>& b)
 {
     return (a.storage == b.storage) && (a.offset == b.offset) && (a.size == b.size);
 }
 
-template <unsigned blk_sz>
-bool operator != (const BID<blk_sz>& a, const BID<blk_sz>& b)
+template <unsigned BlockSize>
+bool operator != (const BID<BlockSize>& a, const BID<BlockSize>& b)
 {
     return (a.storage != b.storage) || (a.offset != b.offset) || (a.size != b.size);
 }
 
-template <unsigned blk_sz>
-std::ostream& operator << (std::ostream& s, const BID<blk_sz>& bid)
+template <unsigned BlockSize>
+std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
 {
     // [0x12345678|0]0x00100000/0x00010000
     // [file ptr|file id]offset/size
@@ -140,16 +141,16 @@ std::ostream& operator << (std::ostream& s, const BID<blk_sz>& bid)
     return s;
 }
 
-template <unsigned BLK_SIZE>
-class BIDArray : public simple_vector<BID<BLK_SIZE> >
+template <unsigned BlockSize>
+class BIDArray : public simple_vector<BID<BlockSize> >
 {
 public:
     BIDArray()
-        : simple_vector<BID<BLK_SIZE> >()
+        : simple_vector<BID<BlockSize> >()
     { }
 
     BIDArray(unsigned_type size)
-        : simple_vector<BID<BLK_SIZE> >(size)
+        : simple_vector<BID<BlockSize> >(size)
     { }
 };
 

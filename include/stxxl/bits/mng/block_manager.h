@@ -232,8 +232,8 @@ void block_manager::new_blocks_int(
 #endif // STXXL_MNG_COUNT_ALLOCATION
 }
 
-template <unsigned BLK_SIZE>
-void block_manager::delete_block(const BID<BLK_SIZE>& bid)
+template <unsigned BlockSize>
+void block_manager::delete_block(const BID<BlockSize>& bid)
 {
     // do not uncomment it
     //assert(bid.storage->get_allocator_id() < config::get_instance()->disks_number());
@@ -245,7 +245,7 @@ void block_manager::delete_block(const BID<BLK_SIZE>& bid)
     disk_files[bid.storage->get_allocator_id()]->discard(bid.offset, bid.size);
 
 #if STXXL_MNG_COUNT_ALLOCATION
-    m_current_allocation -= BLK_SIZE;
+    m_current_allocation -= BlockSize;
 #endif // STXXL_MNG_COUNT_ALLOCATION
 }
 

@@ -216,25 +216,25 @@ struct single_disk
 //! Allocator functor adaptor.
 //!
 //! Gives offset to disk number sequence defined in constructor
-template <class BaseAllocator_>
+template <class BaseAllocator>
 struct offset_allocator
 {
-    BaseAllocator_ base;
+    BaseAllocator base;
     int_type offset;
 
-    //! Creates functor based on instance of \c BaseAllocator_ functor
+    //! Creates functor based on instance of \c BaseAllocator functor
     //! with offset \c offset_.
     //! \param offset_ offset
     //! \param base_ used to create a copy
-    offset_allocator(int_type offset_, const BaseAllocator_& base_) : base(base_), offset(offset_)
+    offset_allocator(int_type offset_, const BaseAllocator& base_) : base(base_), offset(offset_)
     { }
 
-    //! Creates functor based on instance of \c BaseAllocator_ functor.
+    //! Creates functor based on instance of \c BaseAllocator functor.
     //! \param base_ used to create a copy
-    offset_allocator(const BaseAllocator_& base_) : base(base_), offset(0)
+    offset_allocator(const BaseAllocator& base_) : base(base_), offset(0)
     { }
 
-    //! Creates functor based on default \c BaseAllocator_ functor.
+    //! Creates functor based on default \c BaseAllocator functor.
     offset_allocator() : offset(0)
     { }
 

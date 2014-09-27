@@ -30,12 +30,12 @@ STXXL_BEGIN_NAMESPACE
 //!
 //! Reads data records from the stream of blocks.
 //! \remark Reading performed in the background, i.e. with overlapping of I/O and computation
-template <typename BlockType, typename BIDIteratorType>
+template <typename BlockType, typename BidIteratorType>
 class buf_istream : private noncopyable
 {
 public:
     typedef BlockType block_type;
-    typedef BIDIteratorType bid_iterator_type;
+    typedef BidIteratorType bid_iterator_type;
 
 private:
     buf_istream() { }
@@ -52,7 +52,7 @@ protected:
 
 public:
     typedef typename block_type::reference reference;
-    typedef buf_istream<block_type, bid_iterator_type> _Self;
+    typedef buf_istream<block_type, bid_iterator_type> self_type;
 
     //! Constructs input stream object.
     //! \param begin \c bid_iterator pointing to the first block of the stream
@@ -87,7 +87,7 @@ public:
     //! \param record reference to the block record type,
     //!        contains value of the next record in the stream after the call of the operator
     //! \return reference to itself (stream object)
-    _Self& operator >> (reference record)
+    self_type& operator >> (reference record)
     {
 #ifdef BUF_ISTREAM_CHECK_END
         assert(not_finished);
@@ -122,7 +122,7 @@ public:
 
     //! Moves to the next record in the stream.
     //! \return reference to itself after the advance
-    _Self& operator ++ ()
+    self_type& operator ++ ()
     {
 #ifdef BUF_ISTREAM_CHECK_END
         assert(not_finished);

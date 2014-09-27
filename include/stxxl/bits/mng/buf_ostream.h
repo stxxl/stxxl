@@ -25,12 +25,12 @@ STXXL_BEGIN_NAMESPACE
 //!
 //! Writes data records to the stream of blocks.
 //! \remark Writing performed in the background, i.e. with overlapping of I/O and computation
-template <typename BlockType, typename BIDIteratorType>
+template <typename BlockType, typename BidIteratorType>
 class buf_ostream : private noncopyable
 {
 public:
     typedef BlockType block_type;
-    typedef BIDIteratorType bid_iterator_type;
+    typedef BidIteratorType bid_iterator_type;
 
 protected:
     buffered_writer<block_type> writer;
@@ -41,7 +41,7 @@ protected:
 public:
     typedef typename block_type::const_reference const_reference;
     typedef typename block_type::reference reference;
-    typedef buf_ostream<block_type, bid_iterator_type> _Self;
+    typedef buf_ostream<block_type, bid_iterator_type> self_type;
 
     //! Constructs output stream object.
     //! \param first_bid \c bid_iterator pointing to the first block of the stream
@@ -56,7 +56,7 @@ public:
     //! Output stream operator, writes out \c record.
     //! \param record const reference to block record type, containing a value of record to write to the stream
     //! \return reference to itself (stream object)
-    _Self& operator << (const_reference record)
+    self_type& operator << (const_reference record)
     {
         current_blk->elem[current_elem++] = record;
         if (UNLIKELY(current_elem >= block_type::size))
@@ -83,7 +83,7 @@ public:
 
     //! Moves to the next record in the stream.
     //! \return reference to itself after the advance
-    _Self& operator ++ ()
+    self_type& operator ++ ()
     {
         ++current_elem;
         if (UNLIKELY(current_elem >= block_type::size))
@@ -95,7 +95,7 @@ public:
     }
 
     //! Fill current block with padding and flush
-    _Self & fill(const_reference record)
+    self_type & fill(const_reference record)
     {
         while (current_elem != 0)
         {
@@ -106,7 +106,7 @@ public:
 
     //! Force flush of current block, for finishing writing within a block.
     //! \warning Use with caution as the block may contain uninitialized data
-    _Self & flush()
+    self_type & flush()
     {
         current_elem = 0;
         current_blk = writer.write(current_blk, *(current_bid++));

@@ -116,30 +116,30 @@ public:
         return disk_bytes;
     }
 
-    template <unsigned BLK_SIZE>
-    void new_blocks(BIDArray<BLK_SIZE>& bids)
+    template <unsigned BlockSize>
+    void new_blocks(BIDArray<BlockSize>& bids)
     {
         new_blocks(bids.begin(), bids.end());
     }
 
-    template <unsigned BLK_SIZE>
-    void new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end);
+    template <unsigned BlockSize>
+    void new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end);
 
 #if 0
-    template <unsigned BLK_SIZE>
-    void delete_blocks(const BIDArray<BLK_SIZE>& bids)
+    template <unsigned BlockSize>
+    void delete_blocks(const BIDArray<BlockSize>& bids)
     {
         for (unsigned i = 0; i < bids.size(); ++i)
             delete_block(bids[i]);
     }
 #endif
 
-    template <unsigned BLK_SIZE>
-    void delete_block(const BID<BLK_SIZE>& bid)
+    template <unsigned BlockSize>
+    void delete_block(const BID<BlockSize>& bid)
     {
         scoped_mutex_lock lock(mutex);
 
-        STXXL_VERBOSE2("disk_allocator::delete_block<" << BLK_SIZE <<
+        STXXL_VERBOSE2("disk_allocator::delete_block<" << BlockSize <<
                        ">(pos=" << bid.offset << ", size=" << bid.size <<
                        "), free:" << free_bytes << " total:" << disk_bytes);
 
@@ -147,12 +147,12 @@ public:
     }
 };
 
-template <unsigned BLK_SIZE>
-void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
+template <unsigned BlockSize>
+void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 {
     stxxl::int64 requested_size = 0;
 
-    for (typename BIDArray<BLK_SIZE>::iterator cur = begin; cur != end; ++cur)
+    for (typename BIDArray<BlockSize>::iterator cur = begin; cur != end; ++cur)
     {
         STXXL_VERBOSE2("Asking for a block with size: " << (cur->size));
         requested_size += cur->size;
@@ -160,7 +160,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
 
     scoped_mutex_lock lock(mutex);
 
-    STXXL_VERBOSE2("disk_allocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
+    STXXL_VERBOSE2("disk_allocator::new_blocks<BlockSize>,  BlockSize = " << BlockSize <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
                    ", blocks: " << (end - begin) <<
                    " begin: " << static_cast<void*>(begin) <<
@@ -184,7 +184,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
     space = std::find_if(free_space.begin(), free_space.end(),
                          bind2nd(first_fit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
 
-    if (space == free_space.end() && requested_size == BLK_SIZE)
+    if (space == free_space.end() && requested_size == BlockSize)
     {
         assert(end - begin == 1);
 
@@ -197,7 +197,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
                          " bytes free. Trying to extend the external memory space...");
         }
 
-        grow_file(BLK_SIZE);
+        grow_file(BlockSize);
 
         space = std::find_if(free_space.begin(), free_space.end(),
                              bind2nd(first_fit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
@@ -226,12 +226,12 @@ void disk_allocator::new_blocks(BID<BLK_SIZE>* begin, BID<BLK_SIZE>* end)
     STXXL_VERBOSE1("Warning, when allocating an external memory space, no contiguous region found");
     STXXL_VERBOSE1("It might harm the performance");
 
-    assert(requested_size > BLK_SIZE);
+    assert(requested_size > BlockSize);
     assert(end - begin > 1);
 
     lock.unlock();
 
-    BID<BLK_SIZE>* middle = begin + ((end - begin) / 2);
+    BID<BlockSize>* middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
 }

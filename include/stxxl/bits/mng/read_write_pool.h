@@ -61,7 +61,7 @@ public:
     }
 
     //! Waits for completion of all ongoing requests and frees memory.
-    virtual ~read_write_pool()
+    ~read_write_pool()
     {
         if (delete_pools) {
             delete w_pool;

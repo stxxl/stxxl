@@ -77,7 +77,7 @@ public:
     }
 
     //! Waits for completion of all ongoing write requests and frees memory.
-    virtual ~write_pool()
+    ~write_pool()
     {
         STXXL_VERBOSE_WPOOL("::~write_pool free_blocks.size()=" << free_blocks.size() <<
                             " busy_blocks.size()=" << busy_blocks.size());

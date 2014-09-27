@@ -34,13 +34,15 @@ class set_switch_handler
     completion_handler on_compl;
 
 public:
-    set_switch_handler(onoff_switch& switch__, const completion_handler& on_compl)
-        : switch_(switch__), on_compl(on_compl)
+    set_switch_handler(onoff_switch& _switch, const completion_handler& on_compl)
+        : switch_(_switch), on_compl(on_compl)
     { }
 
     void operator () (request* req)
     {
-        on_compl(req);  //call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
+        // call before setting switch to on, otherwise, user has no way to wait
+        // for the completion handler to be executed
+        on_compl(req);
         switch_.on();
     }
 };
@@ -49,9 +51,13 @@ public:
 //!
 //! \c block_prefetcher overlaps I/Os with consumption of read data.
 //! Utilizes optimal asynchronous prefetch scheduling (by Peter Sanders et.al.)
-template <typename block_type, typename bid_iterator_type>
+template <typename BlockType, typename BidIteratorType>
 class block_prefetcher : private noncopyable
 {
+public:
+    typedef BlockType block_type;
+    typedef BidIteratorType bid_iterator_type;
+
     typedef typename block_type::bid_type bid_type;
 
 protected:
@@ -103,8 +109,7 @@ public:
         bid_iterator_type _cons_end,
         int_type* _pref_seq,
         int_type _prefetch_buf_size,
-        completion_handler do_after_fetch = completion_handler()
-        )
+        completion_handler do_after_fetch = completion_handler())
         : consume_seq_begin(_cons_begin),
           consume_seq_end(_cons_end),
           seq_length(_cons_end - _cons_begin),

@@ -32,12 +32,13 @@ STXXL_BEGIN_NAMESPACE
 //! Encapsulates asynchronous buffered block writing engine.
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
-template <typename block_type>
+template <typename BlockType>
 class buffered_writer : private noncopyable
 {
-protected:
+    typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
 
+protected:
     const unsigned_type nwriteblocks;
     block_type* write_buffers;
     bid_type* write_bids;
@@ -76,6 +77,7 @@ public:
     {
         write_buffers = new block_type[nwriteblocks];
         write_reqs = new request_ptr[nwriteblocks];
+
         write_bids = new bid_type[nwriteblocks];
 
         for (unsigned_type i = 0; i < nwriteblocks; i++)
@@ -184,7 +186,7 @@ public:
     }
 
     //! Flushes not yet written buffers and frees used memory.
-    virtual ~buffered_writer()
+    ~buffered_writer()
     {
         int_type ibuffer;
         while (!batch_write_blocks.empty())

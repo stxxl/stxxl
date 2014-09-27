@@ -134,85 +134,89 @@ public:
     }
 };
 
-#define STXXL_ADAPTOR_ARITHMETICS(pos)         \
-    bool operator == (const _Self& a) const    \
-    {                                          \
-        return (a.pos == pos);                 \
-    }                                          \
-    bool operator != (const _Self& a) const    \
-    {                                          \
-        return (a.pos != pos);                 \
-    }                                          \
-    bool operator < (const _Self& a) const     \
-    {                                          \
-        return (pos < a.pos);                  \
-    }                                          \
-    bool operator > (const _Self& a) const     \
-    {                                          \
-        return (pos > a.pos);                  \
-    }                                          \
-    bool operator <= (const _Self& a) const    \
-    {                                          \
-        return (pos <= a.pos);                 \
-    }                                          \
-    bool operator >= (const _Self& a) const    \
-    {                                          \
-        return (pos >= a.pos);                 \
-    }                                          \
-    _Self operator + (pos_type off) const      \
-    {                                          \
-        return _Self(array, pos + off);        \
-    }                                          \
-    _Self operator - (pos_type off) const      \
-    {                                          \
-        return _Self(array, pos - off);        \
-    }                                          \
-    _Self& operator ++ ()                      \
-    {                                          \
-        pos++;                                 \
-        return *this;                          \
-    }                                          \
-    _Self operator ++ (int)                    \
-    {                                          \
-        _Self tmp = *this;                     \
-        pos++;                                 \
-        return tmp;                            \
-    }                                          \
-    _Self& operator -- ()                      \
-    {                                          \
-        pos--;                                 \
-        return *this;                          \
-    }                                          \
-    _Self operator -- (int)                    \
-    {                                          \
-        _Self tmp = *this;                     \
-        pos--;                                 \
-        return tmp;                            \
-    }                                          \
-    pos_type operator - (const _Self& a) const \
-    {                                          \
-        return pos - a.pos;                    \
-    }                                          \
-    _Self& operator -= (pos_type off)          \
-    {                                          \
-        pos -= off;                            \
-        return *this;                          \
-    }                                          \
-    _Self& operator += (pos_type off)          \
-    {                                          \
-        pos += off;                            \
-        return *this;                          \
+#define STXXL_ADAPTOR_ARITHMETICS(pos)             \
+    bool operator == (const self_type& a) const    \
+    {                                              \
+        return (a.pos == pos);                     \
+    }                                              \
+    bool operator != (const self_type& a) const    \
+    {                                              \
+        return (a.pos != pos);                     \
+    }                                              \
+    bool operator < (const self_type& a) const     \
+    {                                              \
+        return (pos < a.pos);                      \
+    }                                              \
+    bool operator > (const self_type& a) const     \
+    {                                              \
+        return (pos > a.pos);                      \
+    }                                              \
+    bool operator <= (const self_type& a) const    \
+    {                                              \
+        return (pos <= a.pos);                     \
+    }                                              \
+    bool operator >= (const self_type& a) const    \
+    {                                              \
+        return (pos >= a.pos);                     \
+    }                                              \
+    self_type operator + (pos_type off) const      \
+    {                                              \
+        return self_type(array, pos + off);        \
+    }                                              \
+    self_type operator - (pos_type off) const      \
+    {                                              \
+        return self_type(array, pos - off);        \
+    }                                              \
+    self_type& operator ++ ()                      \
+    {                                              \
+        pos++;                                     \
+        return *this;                              \
+    }                                              \
+    self_type operator ++ (int)                    \
+    {                                              \
+        self_type tmp = *this;                     \
+        pos++;                                     \
+        return tmp;                                \
+    }                                              \
+    self_type& operator -- ()                      \
+    {                                              \
+        pos--;                                     \
+        return *this;                              \
+    }                                              \
+    self_type operator -- (int)                    \
+    {                                              \
+        self_type tmp = *this;                     \
+        pos--;                                     \
+        return tmp;                                \
+    }                                              \
+    pos_type operator - (const self_type& a) const \
+    {                                              \
+        return pos - a.pos;                        \
+    }                                              \
+    self_type& operator -= (pos_type off)          \
+    {                                              \
+        pos -= off;                                \
+        return *this;                              \
+    }                                              \
+    self_type& operator += (pos_type off)          \
+    {                                              \
+        pos += off;                                \
+        return *this;                              \
     }
 
-template <class one_dim_array_type, class data_type, class pos_type>
+template <class OneDimArrayType, class DataType, class PosType>
 struct two2one_dim_array_adapter_base
-    : public std::iterator<std::random_access_iterator_tag, data_type, unsigned_type>
+    : public std::iterator<std::random_access_iterator_tag, DataType, unsigned_type>
 {
+    typedef OneDimArrayType one_dim_array_type;
+    typedef DataType data_type;
+    typedef PosType pos_type;
+
+    typedef two2one_dim_array_adapter_base<one_dim_array_type,
+                                           data_type, pos_type> self_type;
+
     one_dim_array_type* array;
     pos_type pos;
-    typedef pos_type _pos_type;
-    typedef two2one_dim_array_adapter_base<one_dim_array_type,
-                                           data_type, pos_type> _Self;
 
     two2one_dim_array_adapter_base()
     { }
@@ -309,18 +313,23 @@ struct two2one_dim_array_adapter_base
 
 #if 0
 //////////////////////////
-template <class one_dim_array_type, class data_type,
-          unsigned dim_size, class pos_type = blocked_index<dim_size> >
+template <class OneDimArrayType, class DataType,
+          unsigned DimSize, class PosType = blocked_index<DimSize> >
 struct two2one_dim_array_row_adapter
-    : public two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>
+    : public two2one_dim_array_adapter_base<OneDimArrayType, DataType, PosType>
 {
+    typedef OneDimArrayType one_dim_array_type;
+    typedef DataType data_type;
+    typedef DimSize dim_type;
+    typedef PosType pos_type;
+
     typedef two2one_dim_array_row_adapter<one_dim_array_type,
-                                          data_type, dim_size, pos_type> _Self;
+                                          data_type, dim_size, pos_type> self_type;
 
     typedef two2one_dim_array_adapter_base<one_dim_array_type,
-                                           data_type, pos_type> _Parent;
-    using _Parent::array;
-    using _Parent::pos;
+                                           data_type, pos_type> base_type;
+    using base_type::array;
+    using base_type::pos;
 
     two2one_dim_array_row_adapter()
     { }
@@ -355,13 +364,13 @@ struct two2one_dim_array_row_adapter
     STXXL_ADAPTOR_ARITHMETICS(pos)
 };
 
-template <class one_dim_array_type, class data_type,
-          unsigned dim_size, class pos_type = blocked_index<dim_size> >
+template <class OneDimArrayType, class DataType,
+          unsigned DimSize, class PosType = blocked_index<DimSize> >
 struct two2one_dim_array_column_adapter
-    : public two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>
+    : public two2one_dim_array_adapter_base<OneDimArrayType, DataType, PosType>
 {
     typedef two2one_dim_array_column_adapter<one_dim_array_type,
-                                             data_type, dim_size, pos_type> _Self;
+                                             data_type, dim_size, pos_type> self_type;
 
     using two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>::pos;
     using two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>::array;
@@ -369,7 +378,7 @@ struct two2one_dim_array_column_adapter
     two2one_dim_array_column_adapter(one_dim_array_type* a, pos_type p)
         : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a, p)
     { }
-    two2one_dim_array_column_adapter(const _Self& a)
+    two2one_dim_array_column_adapter(const self_type& a)
         : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a)
     { }
 
@@ -398,9 +407,15 @@ struct two2one_dim_array_column_adapter
 };
 #endif
 
-template <typename array_type, typename value_type, unsigned_type modulo>
-class array_of_sequences_iterator : public std::iterator<std::random_access_iterator_tag, value_type, unsigned_type>
+template <typename ArrayType, typename ValueType, unsigned_type modulo>
+class array_of_sequences_iterator
+    : public std::iterator<std::random_access_iterator_tag, ValueType, unsigned_type>
 {
+public:
+    typedef ArrayType array_type;
+    typedef ValueType value_type;
+
+protected:
     unsigned_type pos;
     unsigned_type offset;
     array_type* arrays;
@@ -575,7 +590,7 @@ public:
 
 namespace helper {
 
-template <typename BlockType, typename SizeType, bool can_use_trivial_pointer>
+template <typename BlockType, typename SizeType, bool CanUseTrivialPointer>
 class element_iterator_generator
 { };
 
