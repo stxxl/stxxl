@@ -17,14 +17,17 @@
 
 STXXL_BEGIN_NAMESPACE
 
-// There are several possibilities for the exit handlers.
-// To use the default implementation (which uses atexit()), nothing special has to be done.
+// There are several possibilities for the exit handlers.  To use the default
+// implementation (which uses atexit()), nothing special has to be done.
 //
-// To work around problems with atexit() being used in a dll you may #define STXXL_NON_DEFAULT_EXIT_HANDLER at library compilation time.
-// In this case the library/application should call stxxl::run_exit_handlers() during shutdown.
+// To work around problems with atexit() being used in a dll you may #define
+// STXXL_NON_DEFAULT_EXIT_HANDLER at library compilation time.  In this case
+// the library/application should call stxxl::run_exit_handlers() during
+// shutdown.
 //
-// To provide your own exit handler implementation, #define STXXL_EXTERNAL_EXIT_HANDLER and implement
-// stxxl::register_exit_handler(void (*)(void)) and stxxl::run_exit_handlers() in your application.
+// To provide your own exit handler implementation, #define
+// STXXL_EXTERNAL_EXIT_HANDLER and implement stxxl::register_exit_handler(void
+// (*)(void)) and stxxl::run_exit_handlers() in your application.
 
 int register_exit_handler(void (* function)(void));
 void run_exit_handlers();

@@ -21,22 +21,23 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! An internal fifo queue that allows removing elements addressed with (a copy of) themselves.
+//! An internal fifo queue that allows removing elements addressed with (a copy
+//! of) themselves.
 //! \tparam KeyType Type of contained elements.
 template <typename KeyType>
 class addressable_fifo_queue
 {
-    typedef std::list<KeyType> container_t;
-    typedef typename container_t::iterator container_iter_t;
-    typedef std::map<KeyType, container_iter_t> meta_t;
-    typedef typename meta_t::iterator meta_iter_t;
+    typedef std::list<KeyType> container_type;
+    typedef typename container_type::iterator container_iterator;
+    typedef std::map<KeyType, container_iterator> meta_type;
+    typedef typename meta_type::iterator meta_iterator;
 
-    container_t vals;
-    meta_t meta;
+    container_type vals;
+    meta_type meta;
 
 public:
     //! Type of handle to an entry. For use with insert and remove.
-    typedef meta_iter_t handle;
+    typedef meta_iterator handle;
 
     //! Create an empty queue.
     addressable_fifo_queue() { }
@@ -47,12 +48,14 @@ public:
     bool empty() const
     { return vals.empty(); }
 
-    //! Insert new element. If the element is already in, it is moved to the back.
+    //! Insert new element. If the element is already in, it is moved to the
+    //! back.
     //! \param e Element to insert.
-    //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
+    //! \return pair<handle, bool> Iterator to element; if element was newly
+    //! inserted.
     std::pair<handle, bool> insert(const KeyType& e)
     {
-        container_iter_t ei = vals.insert(vals.end(), e);
+        container_iterator ei = vals.insert(vals.end(), e);
         std::pair<handle, bool> r = meta.insert(std::make_pair(e, ei));
         if (! r.second)
         {
@@ -101,7 +104,8 @@ public:
     }
 };
 
-//! An internal priority queue that allows removing elements addressed with (a copy of) themselves.
+//! An internal priority queue that allows removing elements addressed with (a
+//! copy of) themselves.
 //! \tparam KeyType Type of contained elements.
 //! \tparam PriorityType Type of Priority.
 template <typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >
@@ -118,17 +122,17 @@ class addressable_priority_queue
         }
     };
 
-    typedef std::set<std::pair<PriorityType, KeyType>, cmp> container_t;
-    typedef typename container_t::iterator container_iter_t;
-    typedef std::map<KeyType, container_iter_t> meta_t;
-    typedef typename meta_t::iterator meta_iter_t;
+    typedef std::set<std::pair<PriorityType, KeyType>, cmp> container_type;
+    typedef typename container_type::iterator container_iterator;
+    typedef std::map<KeyType, container_iterator> meta_type;
+    typedef typename meta_type::iterator meta_iterator;
 
-    container_t vals;
-    meta_t meta;
+    container_type vals;
+    meta_type meta;
 
 public:
     //! Type of handle to an entry. For use with insert and remove.
-    typedef meta_iter_t handle;
+    typedef meta_iterator handle;
 
     //! Create an empty queue.
     addressable_priority_queue() { }
@@ -145,7 +149,7 @@ public:
     //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
     std::pair<handle, bool> insert(const KeyType& e, const PriorityType o)
     {
-        std::pair<container_iter_t, bool> s = vals.insert(std::make_pair(o, e));
+        std::pair<container_iterator, bool> s = vals.insert(std::make_pair(o, e));
         std::pair<handle, bool> r = meta.insert(std::make_pair(e, s.first));
         if (! r.second && s.second)
         {

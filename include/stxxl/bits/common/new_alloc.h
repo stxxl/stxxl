@@ -20,40 +20,40 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <class T>
+template <class Type>
 class new_alloc;
 
-template <typename T, typename U>
+template <typename Type, typename Rebind>
 struct new_alloc_rebind;
 
-template <typename T>
-struct new_alloc_rebind<T, T>{
-    typedef new_alloc<T> other;
+template <typename Type>
+struct new_alloc_rebind<Type, Type>{
+    typedef new_alloc<Type> other;
 };
 
-template <typename T, typename U>
+template <typename Type, typename Rebind>
 struct new_alloc_rebind {
-    typedef std::allocator<U> other;
+    typedef std::allocator<Rebind> other;
 };
 
 // designed for typed_block (to use with std::vector)
-template <class T>
+template <class Type>
 class new_alloc
 {
 public:
     // type definitions
-    typedef T value_type;
-    typedef T* pointer;
-    typedef const T* const_pointer;
-    typedef T& reference;
-    typedef const T& const_reference;
+    typedef Type value_type;
+    typedef Type* pointer;
+    typedef const Type* const_pointer;
+    typedef Type& reference;
+    typedef const Type& const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    // rebind allocator to type U, use new_alloc only if U == T
-    template <class U>
+    // rebind allocator to type Rebind, use new_alloc only if Rebind == Type
+    template <class Rebind>
     struct rebind {
-        typedef typename new_alloc_rebind<T, U>::other other;
+        typedef typename new_alloc_rebind<Type, Rebind>::other other;
     };
 
     // return address of values
@@ -68,43 +68,43 @@ public:
 
     new_alloc() throw () { }
     new_alloc(const new_alloc&) throw () { }
-    template <class U>
-    new_alloc(const new_alloc<U>&) throw () { }
+    template <class Rebind>
+    new_alloc(const new_alloc<Rebind>&) throw () { }
     ~new_alloc() throw () { }
 
-    template <class U>
-    operator std::allocator<U>()
+    template <class Rebind>
+    operator std::allocator<Rebind>()
     {
-        static std::allocator<U> helper_allocator;
+        static std::allocator<Rebind> helper_allocator;
         return helper_allocator;
     }
 
     // return maximum number of elements that can be allocated
     size_type max_size() const throw ()
     {
-        return std::numeric_limits<size_type>::max() / sizeof(T);
+        return std::numeric_limits<size_type>::max() / sizeof(Type);
     }
 
-    // allocate but don't initialize num elements of type T
+    // allocate but don't initialize num elements of type Type
     pointer allocate(size_type num, const void* = 0)
     {
-        return static_cast<T*>(T::operator new (num * sizeof(T)));
+        return static_cast<Type*>(Type::operator new (num * sizeof(Type)));
     }
 
     // _GLIBCXX_RESOLVE_LIB_DEFECTS
     // 402. wrong new expression in [some_] allocator::construct
     // initialize elements of allocated storage p with value value
-    void construct(pointer p, const T& value)
+    void construct(pointer p, const Type& value)
     {
         // initialize memory with placement new
-        ::new ((void*)p)T(value);
+        ::new ((void*)p)Type(value);
     }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
     template <typename ... Args>
     void construct(pointer p, Args&& ... args)
     {
-        ::new ((void*)p)T(std::forward<Args>(args) ...);
+        ::new ((void*)p)Type(std::forward<Args>(args) ...);
     }
 #endif
 
@@ -112,27 +112,27 @@ public:
     void destroy(pointer p)
     {
         // destroy objects by calling their destructor
-        p->~T();
+        p->~Type();
     }
 
     // deallocate storage p of deleted elements
     void deallocate(pointer p, size_type /*num*/)
     {
-        T::operator delete (p);
+        Type::operator delete (p);
     }
 };
 
 // return that all specializations of this allocator are interchangeable
-template <class T1, class T2>
-inline bool operator == (const new_alloc<T1>&,
-                         const new_alloc<T2>&) throw ()
+template <class Type1, class Type2>
+inline bool operator == (const new_alloc<Type1>&,
+                         const new_alloc<Type2>&) throw ()
 {
     return true;
 }
 
-template <class T1, class T2>
-inline bool operator != (const new_alloc<T1>&,
-                         const new_alloc<T2>&) throw ()
+template <class Type1, class Type2>
+inline bool operator != (const new_alloc<Type1>&,
+                         const new_alloc<Type2>&) throw ()
 {
     return false;
 }

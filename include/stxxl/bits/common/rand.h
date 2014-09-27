@@ -243,11 +243,11 @@ struct random_uniform_slow
 };
 
 //! Uniform [0, N) pseudo-random generator
-template <class UniformRGen_ = random_uniform_fast>
+template <class UniformRGen = random_uniform_fast>
 struct random_number
 {
     typedef unsigned value_type;
-    UniformRGen_ uniform;
+    UniformRGen uniform;
 
     random_number(unsigned seed = 0) : uniform(seed)
     { }

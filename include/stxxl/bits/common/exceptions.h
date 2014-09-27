@@ -29,8 +29,8 @@ public:
         : std::ios_base::failure("")
     { }
 
-    io_error(const std::string& msg_) throw ()
-        : std::ios_base::failure(msg_)
+    io_error(const std::string& message) throw ()
+        : std::ios_base::failure(message)
     { }
 };
 
@@ -41,8 +41,8 @@ public:
         : std::runtime_error("")
     { }
 
-    resource_error(const std::string& msg_) throw ()
-        : std::runtime_error(msg_)
+    resource_error(const std::string& message) throw ()
+        : std::runtime_error(message)
     { }
 };
 
@@ -53,8 +53,8 @@ public:
         : std::runtime_error("")
     { }
 
-    bad_ext_alloc(const std::string& msg_) throw ()
-        : std::runtime_error(msg_)
+    bad_ext_alloc(const std::string& message) throw ()
+        : std::runtime_error(message)
     { }
 };
 
@@ -65,8 +65,8 @@ public:
         : std::runtime_error("")
     { }
 
-    bad_parameter(const std::string& msg_) throw ()
-        : std::runtime_error(msg_)
+    bad_parameter(const std::string& message) throw ()
+        : std::runtime_error(message)
     { }
 };
 
@@ -77,8 +77,8 @@ public:
         : std::runtime_error("")
     { }
 
-    unreachable(const std::string& msg_) throw ()
-        : std::runtime_error(msg_)
+    unreachable(const std::string& message) throw ()
+        : std::runtime_error(message)
     { }
 };
 

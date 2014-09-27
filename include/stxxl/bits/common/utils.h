@@ -141,18 +141,18 @@ inline stxxl::uint64 atouint64(const char* s)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Tp>
-inline const Tp&
-STXXL_MIN(const Tp& a, const Tp& b)
+template <typename Type>
+inline const Type&
+STXXL_MIN(const Type& a, const Type& b)
 {
-    return std::min<Tp>(a, b);
+    return std::min<Type>(a, b);
 }
 
-template <typename Tp>
-inline const Tp&
-STXXL_MAX(const Tp& a, const Tp& b)
+template <typename Type>
+inline const Type&
+STXXL_MAX(const Type& a, const Type& b)
 {
-    return std::max<Tp>(a, b);
+    return std::max<Type>(a, b);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -242,8 +242,8 @@ inline size_t longhash1(uint64 key_)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <class T>
-inline void swap_1D_arrays(T* a, T* b, unsigned_type size)
+template <class Type>
+inline void swap_1D_arrays(Type* a, Type* b, unsigned_type size)
 {
     for (unsigned_type i = 0; i < size; ++i)
         std::swap(a[i], b[i]);
