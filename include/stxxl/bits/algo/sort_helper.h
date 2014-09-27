@@ -33,12 +33,12 @@ inline void verify_sentinel_strict_weak_ordering(StrictWeakOrdering cmp)
     STXXL_ASSERT(!cmp(cmp.max_value(), cmp.max_value()));
 }
 
-template <typename BlockTp_, typename ValTp_ = typename BlockTp_::value_type>
+template <typename BlockType, typename ValueType = typename BlockType::value_type>
 struct trigger_entry
 {
-    typedef BlockTp_ block_type;
+    typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
-    typedef ValTp_ value_type;
+    typedef ValueType value_type;
 
     bid_type bid;
     value_type value;
@@ -49,12 +49,13 @@ struct trigger_entry
     }
 };
 
-template <typename TriggerEntryTp_, typename ValueCmp_>
-struct trigger_entry_cmp : public std::binary_function<TriggerEntryTp_, TriggerEntryTp_, bool>
+template <typename TriggerEntryType, typename ValueCmp>
+struct trigger_entry_cmp
+    : public std::binary_function<TriggerEntryType, TriggerEntryType, bool>
 {
-    typedef TriggerEntryTp_ trigger_entry_type;
-    ValueCmp_ cmp;
-    trigger_entry_cmp(ValueCmp_ c) : cmp(c) { }
+    typedef TriggerEntryType trigger_entry_type;
+    ValueCmp cmp;
+    trigger_entry_cmp(ValueCmp c) : cmp(c) { }
     trigger_entry_cmp(const trigger_entry_cmp& a) : cmp(a.cmp) { }
     bool operator () (const trigger_entry_type& a, const trigger_entry_type& b) const
     {
@@ -62,11 +63,20 @@ struct trigger_entry_cmp : public std::binary_function<TriggerEntryTp_, TriggerE
     }
 };
 
-template <typename block_type,
-          typename prefetcher_type,
-          typename value_cmp>
-struct run_cursor2_cmp : public std::binary_function<run_cursor2<block_type, prefetcher_type>, run_cursor2<block_type, prefetcher_type>, bool>
+template <typename BlockType,
+          typename PrefetcherType,
+          typename ValueCmp>
+struct run_cursor2_cmp
+    : public std::binary_function<
+          run_cursor2<BlockType, PrefetcherType>,
+          run_cursor2<BlockType, PrefetcherType>,
+          bool
+          >
 {
+    typedef BlockType block_type;
+    typedef PrefetcherType prefetcher_type;
+    typedef ValueCmp value_cmp;
+
     typedef run_cursor2<block_type, prefetcher_type> cursor_type;
     value_cmp cmp;
 
@@ -87,8 +97,9 @@ struct run_cursor2_cmp : public std::binary_function<run_cursor2<block_type, pre
 
 // this function is used by parallel mergers
 template <typename SequenceVector, typename ValueType, typename Comparator>
-inline
-unsigned_type count_elements_less_equal(const SequenceVector& seqs, const ValueType& bound, Comparator cmp)
+inline unsigned_type
+count_elements_less_equal(const SequenceVector& seqs,
+                          const ValueType& bound, Comparator cmp)
 {
     typedef typename SequenceVector::size_type seqs_size_type;
     typedef typename SequenceVector::value_type::first_type iterator;
@@ -106,10 +117,10 @@ unsigned_type count_elements_less_equal(const SequenceVector& seqs, const ValueT
 
 // this function is used by parallel mergers
 template <typename SequenceVector, typename BufferPtrVector, typename Prefetcher>
-inline
-void refill_or_remove_empty_sequences(SequenceVector& seqs,
-                                      BufferPtrVector& buffers,
-                                      Prefetcher& prefetcher)
+inline void
+refill_or_remove_empty_sequences(SequenceVector& seqs,
+                                 BufferPtrVector& buffers,
+                                 Prefetcher& prefetcher)
 {
     typedef typename SequenceVector::size_type seqs_size_type;
 

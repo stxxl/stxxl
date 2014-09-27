@@ -79,35 +79,35 @@ inline bool operator > (const trigger_entry<BIDType, KeyType>& a,
     return (a.key > b.key);
 }
 
-template <typename type, typename key_type1>
+template <typename Type, typename KeyType>
 struct type_key
 {
-    typedef key_type1 key_type;
+    typedef KeyType key_type;
     key_type key;
-    type* ptr;
+    Type* ptr;
 
     type_key() { }
-    type_key(key_type k, type* p) : key(k), ptr(p)
+    type_key(key_type k, Type* p) : key(k), ptr(p)
     { }
 };
 
-template <typename type, typename key1>
-bool operator < (const type_key<type, key1>& a, const type_key<type, key1>& b)
+template <typename Type, typename KeyType>
+bool operator < (const type_key<Type, KeyType>& a, const type_key<Type, KeyType>& b)
 {
     return a.key < b.key;
 }
 
-template <typename type, typename key1>
-bool operator > (const type_key<type, key1>& a, const type_key<type, key1>& b)
+template <typename Type, typename KeyType>
+bool operator > (const type_key<Type, KeyType>& a, const type_key<Type, KeyType>& b)
 {
     return a.key > b.key;
 }
 
-template <typename block_type, typename bid_type>
+template <typename BlockType, typename BidType>
 struct write_completion_handler
 {
-    block_type* block;
-    bid_type bid;
+    BlockType* block;
+    BidType bid;
     request_ptr* req;
     void operator () (request* /*completed_req*/)
     {
@@ -115,34 +115,34 @@ struct write_completion_handler
     }
 };
 
-template <typename type_key_,
-          typename block_type,
-          typename run_type,
-          typename input_bid_iterator,
-          typename key_extractor>
+template <typename TypeKey,
+          typename BlockType,
+          typename RunType,
+          typename InputBidIterator,
+          typename KeyExtractor>
 inline void write_out(
-    type_key_* begin,
-    type_key_* end,
-    block_type*& cur_blk,
-    const block_type* end_blk,
+    TypeKey* begin,
+    TypeKey* end,
+    BlockType*& cur_blk,
+    const BlockType* end_blk,
     int_type& out_block,
     int_type& out_pos,
-    run_type& run,
-    write_completion_handler<block_type, typename block_type::bid_type>*& next_read,
-    typename block_type::bid_type*& bids,
+    RunType& run,
+    write_completion_handler<BlockType, typename BlockType::bid_type>*& next_read,
+    typename BlockType::bid_type*& bids,
     request_ptr* write_reqs,
     request_ptr* read_reqs,
-    input_bid_iterator& it,
-    key_extractor keyobj)
+    InputBidIterator& it,
+    KeyExtractor keyobj)
 {
-    typedef typename block_type::type type;
+    typedef typename BlockType::type type;
 
     type* elem = cur_blk->elem;
-    for (type_key_* p = begin; p < end; p++)
+    for (TypeKey* p = begin; p < end; p++)
     {
         elem[out_pos++] = *(p->ptr);
 
-        if (out_pos >= block_type::size)
+        if (out_pos >= BlockType::size)
         {
             run[out_block].key = keyobj(*(cur_blk->elem));
 
@@ -173,40 +173,40 @@ inline void write_out(
 }
 
 template <
-    typename block_type,
-    typename run_type,
-    typename input_bid_iterator,
-    typename key_extractor>
+    typename BlockType,
+    typename RunType,
+    typename InputBidIterator,
+    typename KeyExtractor>
 void
 create_runs(
-    input_bid_iterator it,
-    run_type** runs,
+    InputBidIterator it,
+    RunType** runs,
     const unsigned_type nruns,
     const unsigned_type m2,
-    key_extractor keyobj)
+    KeyExtractor keyobj)
 {
-    typedef typename block_type::value_type type;
-    typedef typename block_type::bid_type bid_type;
-    typedef typename key_extractor::key_type key_type;
+    typedef typename BlockType::value_type type;
+    typedef typename BlockType::bid_type bid_type;
+    typedef typename KeyExtractor::key_type key_type;
     typedef type_key<type, key_type> type_key_;
 
     block_manager* bm = block_manager::get_instance();
-    block_type* Blocks1 = new block_type[m2];
-    block_type* Blocks2 = new block_type[m2];
+    BlockType* Blocks1 = new BlockType[m2];
+    BlockType* Blocks2 = new BlockType[m2];
     bid_type* bids = new bid_type[m2];
     type_key_* refs1 = new type_key_[m2 * Blocks1->size];
     type_key_* refs2 = new type_key_[m2 * Blocks1->size];
     request_ptr* read_reqs = new request_ptr[m2];
     request_ptr* write_reqs = new request_ptr[m2];
-    write_completion_handler<block_type, bid_type>* next_run_reads =
-        new write_completion_handler<block_type, bid_type>[m2];
+    write_completion_handler<BlockType, bid_type>* next_run_reads =
+        new write_completion_handler<BlockType, bid_type>[m2];
 
-    run_type* run;
+    RunType* run;
     run = *runs;
     int_type run_size = (*runs)->size();
     key_type offset = 0;
-    const int log_k1 = ilog2_ceil((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
-                                  (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
+    const int log_k1 = ilog2_ceil((m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
+                                  (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
     const int log_k2 = ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
     STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
     const int_type k1 = int_type(1) << log_k1;
@@ -258,9 +258,9 @@ create_runs(
         // recurse on each bucket
         type_key_* c = refs2;
         type_key_* d = refs1;
-        block_type* cur_blk = Blocks2;
-        block_type* end_blk = Blocks2 + next_run_size;
-        write_completion_handler<block_type, bid_type>* next_read = next_run_reads;
+        BlockType* cur_blk = Blocks2;
+        BlockType* end_blk = Blocks2 + next_run_size;
+        write_completion_handler<BlockType, bid_type>* next_read = next_run_reads;
 
         for (i = 0; i < k1; i++)
         {
@@ -296,17 +296,20 @@ create_runs(
     delete[] write_reqs;
 }
 
-template <typename block_type,
+template <typename BlockType,
           typename prefetcher_type,
-          typename key_extractor>
-struct run_cursor2_cmp : public std::binary_function<run_cursor2<block_type, prefetcher_type>, run_cursor2<block_type, prefetcher_type>, bool>
+          typename KeyExtractor>
+struct run_cursor2_cmp : public std::binary_function<
+                             run_cursor2<BlockType, prefetcher_type>,
+                             run_cursor2<BlockType, prefetcher_type>,
+                             bool
+                             >
 {
-    typedef run_cursor2<block_type, prefetcher_type> cursor_type;
-    key_extractor keyobj;
-    run_cursor2_cmp(key_extractor keyobj_)
-    {
-        keyobj = keyobj_;
-    }
+    typedef run_cursor2<BlockType, prefetcher_type> cursor_type;
+    KeyExtractor keyobj;
+    run_cursor2_cmp(KeyExtractor _keyobj)
+        : keyobj(_keyobj)
+    { }
     inline bool operator () (const cursor_type& a, const cursor_type& b) const
     {
         if (UNLIKELY(b.empty()))
@@ -323,27 +326,28 @@ private:
     run_cursor2_cmp() { }
 };
 
-template <typename record_type, typename key_extractor>
-class key_comparison : public std::binary_function<record_type, record_type, bool>
+template <typename RecordType, typename KeyExtractor>
+class key_comparison : public std::binary_function<RecordType, RecordType, bool>
 {
-    key_extractor ke;
+    KeyExtractor ke;
 
 public:
     key_comparison() { }
-    key_comparison(key_extractor ke_) : ke(ke_) { }
-    bool operator () (const record_type& a, const record_type& b) const
+    key_comparison(KeyExtractor ke_) : ke(ke_) { }
+    bool operator () (const RecordType& a, const RecordType& b) const
     {
         return ke(a) < ke(b);
     }
 };
 
-template <typename block_type, typename run_type, typename key_ext_>
-bool check_ksorted_runs(run_type** runs,
+template <typename BlockType, typename RunType, typename KeyExtractor>
+bool check_ksorted_runs(RunType** runs,
                         unsigned_type nruns,
                         unsigned_type m,
-                        key_ext_ keyext)
+                        KeyExtractor keyext)
 {
-    typedef typename block_type::value_type value_type;
+    typedef BlockType block_type;
+    typedef typename BlockType::value_type value_type;
 
     STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
     unsigned_type irun = 0;
@@ -405,7 +409,7 @@ bool check_ksorted_runs(run_type** runs,
             }
             if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
                                   make_element_iterator(blocks, nelements),
-                                  key_comparison<value_type, key_ext_>()))
+                                  key_comparison<value_type, KeyExtractor>()))
             {
                 STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                 STXXL_MSG("Data in blocks:");
@@ -435,18 +439,19 @@ bool check_ksorted_runs(run_type** runs,
     return true;
 }
 
-template <typename block_type, typename run_type, typename key_extractor>
-void merge_runs(run_type** in_runs, unsigned_type nruns, run_type* out_run, unsigned_type _m, key_extractor keyobj)
+template <typename BlockType, typename RunType, typename KeyExtractor>
+void merge_runs(RunType** in_runs, unsigned_type nruns, RunType* out_run, unsigned_type _m, KeyExtractor keyobj)
 {
-    typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
-    typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
+    typedef BlockType block_type;
+    typedef block_prefetcher<BlockType, typename RunType::iterator> prefetcher_type;
+    typedef run_cursor2<BlockType, prefetcher_type> run_cursor_type;
 
     unsigned_type i;
-    run_type consume_seq(out_run->size());
+    RunType consume_seq(out_run->size());
 
     int_type* prefetch_seq = new int_type[out_run->size()];
 
-    typename run_type::iterator copy_start = consume_seq.begin();
+    typename RunType::iterator copy_start = consume_seq.begin();
     for (i = 0; i < nruns; i++)
     {
         // TODO: try to avoid copy
@@ -492,10 +497,10 @@ void merge_runs(run_type** in_runs, unsigned_type nruns, run_type* out_run, unsi
 
     unsigned_type out_run_size = out_run->size();
 
-    run_cursor2_cmp<block_type, prefetcher_type, key_extractor> cmp(keyobj);
+    run_cursor2_cmp<block_type, prefetcher_type, KeyExtractor> cmp(keyobj);
     loser_tree<
         run_cursor_type,
-        run_cursor2_cmp<block_type, prefetcher_type, key_extractor> >
+        run_cursor2_cmp<block_type, prefetcher_type, KeyExtractor> >
     losers(&prefetcher, nruns, cmp);
 
     block_type* out_buffer = writer.get_free_block();
@@ -520,26 +525,29 @@ void merge_runs(run_type** in_runs, unsigned_type nruns, run_type* out_run, unsi
     }
 }
 
-template <typename block_type,
-          typename alloc_strategy,
-          typename input_bid_iterator,
-          typename key_extractor>
-
-simple_vector<trigger_entry<typename block_type::bid_type, typename key_extractor::key_type> >*
-ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, key_extractor keyobj)
+template <typename BlockType,
+          typename AllocStrategy,
+          typename InputBidIterator,
+          typename KeyExtractor>
+simple_vector<
+    trigger_entry<typename BlockType::bid_type, typename KeyExtractor::key_type>
+    >*
+ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
+             unsigned_type _m, KeyExtractor keyobj)
 {
-    typedef typename block_type::value_type type;
-    typedef typename key_extractor::key_type key_type;
-    typedef typename block_type::bid_type bid_type;
-    typedef trigger_entry<bid_type, typename key_extractor::key_type> trigger_entry_type;
+    typedef BlockType block_type;
+    typedef typename BlockType::value_type type;
+    typedef typename KeyExtractor::key_type key_type;
+    typedef typename BlockType::bid_type bid_type;
+    typedef trigger_entry<bid_type, typename KeyExtractor::key_type> trigger_entry_type;
     typedef simple_vector<trigger_entry_type> run_type;
-    typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
+    typedef typename interleaved_alloc_traits<AllocStrategy>::strategy interleaved_alloc_strategy;
 
     unsigned_type m2 = div_ceil(_m, 2);
     const unsigned_type m2_rf = m2 * block_type::raw_size /
                                 (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
     STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
-                  m2_rf << " due to key size: " << sizeof(typename key_extractor::key_type) << " bytes");
+                  m2_rf << " due to key size: " << sizeof(typename KeyExtractor::key_type) << " bytes");
     m2 = m2_rf;
     unsigned_type full_runs = _n / m2;
     unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
@@ -563,14 +571,14 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
         unsigned_type last_run_size = _n - full_runs * m2;
         runs[i] = new run_type(last_run_size);
 
-        mng->new_blocks(interleaved_alloc_strategy(nruns, alloc_strategy()),
+        mng->new_blocks(interleaved_alloc_strategy(nruns, AllocStrategy()),
                         runs2bid_array_adaptor2<block_type::raw_size, run_type>
                             (runs, 0, nruns, last_run_size),
                         runs2bid_array_adaptor2<block_type::raw_size, run_type>
                             (runs, _n, nruns, last_run_size));
     }
     else
-        mng->new_blocks(interleaved_alloc_strategy(nruns, alloc_strategy()),
+        mng->new_blocks(interleaved_alloc_strategy(nruns, AllocStrategy()),
                         runs2bid_array_adaptor<block_type::raw_size, run_type>
                             (runs, 0, nruns),
                         runs2bid_array_adaptor<block_type::raw_size, run_type>
@@ -582,14 +590,12 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 
     for (i = 0; i < nruns; i++)
     {
-        mng->new_blocks(alloc_strategy(), make_bid_iterator(runs[i]->begin()), make_bid_iterator(runs[i]->end()));
+        mng->new_blocks(AllocStrategy(), make_bid_iterator(runs[i]->begin()), make_bid_iterator(runs[i]->end()));
     }
 #endif
 
-    create_runs<block_type,
-                run_type,
-                input_bid_iterator,
-                key_extractor>(input_bids, runs, nruns, m2, keyobj);
+    create_runs<block_type, run_type, InputBidIterator, KeyExtractor>(
+        input_bids, runs, nruns, m2, keyobj);
 
     after_runs_creation = timestamp();
 
@@ -627,7 +633,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
         if (cur_out_run == 1 && blocks_in_new_run == int_type(_n) && !input_bids->is_managed())
         {
             // if we sort a file we can reuse the input bids for the output
-            input_bid_iterator cur = input_bids;
+            InputBidIterator cur = input_bids;
             for (int_type i = 0; cur != (input_bids + _n); ++cur)
             {
                 (*new_runs[0])[i++].bid = *cur;
@@ -650,7 +656,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
         }
         else
         {
-            mng->new_blocks(interleaved_alloc_strategy(new_nruns, alloc_strategy()),
+            mng->new_blocks(interleaved_alloc_strategy(new_nruns, AllocStrategy()),
                             runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
                             runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
         }
@@ -662,11 +668,11 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
         {
             int_type runs2merge = STXXL_MIN(runs_left, merge_factor);
 #if STXXL_CHECK_ORDER_IN_SORTS
-            assert((check_ksorted_runs<block_type, run_type, key_extractor>(runs + nruns - runs_left, runs2merge, m2, keyobj)));
+            assert((check_ksorted_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left, runs2merge, m2, keyobj)));
 #endif
             STXXL_VERBOSE("Merging " << runs2merge << " runs");
-            merge_runs<block_type, run_type, key_extractor>(runs + nruns - runs_left,
-                                                            runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
+            merge_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left,
+                                                           runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
             runs_left -= runs2merge;
         }
 
@@ -718,10 +724,16 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 template <typename ExtIterator, typename KeyExtractor>
 void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_type M)
 {
-    typedef simple_vector<ksort_local::trigger_entry<typename ExtIterator::bid_type,
-                                                     typename KeyExtractor::key_type> > run_type;
+    typedef simple_vector<
+            ksort_local::trigger_entry<
+                typename ExtIterator::bid_type, typename KeyExtractor::key_type
+                >
+            > run_type;
     typedef typename ExtIterator::vector_type::value_type value_type;
+    typedef typename ExtIterator::bid_type bid_type;
     typedef typename ExtIterator::block_type block_type;
+    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy_type;
+    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
 
     unsigned_type n = 0;
     block_manager* mng = block_manager::get_instance();
@@ -730,7 +742,8 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
     if ((last - first) * sizeof(value_type) < M)
     {
-        stl_in_memory_sort(first, last, ksort_local::key_comparison<value_type, KeyExtractor>(keyobj));
+        stl_in_memory_sort(first, last,
+                           ksort_local::key_comparison<value_type, KeyExtractor>(keyobj));
     }
     else
     {
@@ -741,9 +754,9 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
             if (last.block_offset())            // first and last element reside
             // not in the beginning of the block
             {
-                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::bid_type first_bid, last_bid;
+                block_type* first_block = new block_type;
+                block_type* last_block = new block_type;
+                bid_type first_bid, last_bid;
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
@@ -783,16 +796,14 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 run_type* out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator,
-                        KeyExtractor>
-                        (first.bid(), n, M / block_type::raw_size, keyobj);
+                        block_type, alloc_strategy_type,
+                        bids_container_iterator, KeyExtractor
+                        >(first.bid(), n, M / block_type::raw_size, keyobj);
 
-                first_block = new typename ExtIterator::block_type;
-                last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
+                first_block = new block_type;
+                last_block = new block_type;
+                block_type* sorted_first_block = new block_type;
+                block_type* sorted_last_block = new block_type;
                 request_ptr* reqs = new request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
@@ -827,7 +838,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 typename run_type::iterator it = out->begin();
                 it++;
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
                 cur_bid++;
 
                 for ( ; cur_bid != last.bid(); cur_bid++, it++)
@@ -850,8 +861,8 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 // first element resides
                 // not in the beginning of the block
 
-                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
-                typename ExtIterator::bid_type first_bid;
+                block_type* first_block = new block_type;
+                bid_type first_bid;
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
@@ -876,15 +887,13 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 run_type* out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator,
-                        KeyExtractor>
-                        (first.bid(), n, M / block_type::raw_size, keyobj);
+                        block_type, alloc_strategy_type,
+                        bids_container_iterator, KeyExtractor
+                        >(first.bid(), n, M / block_type::raw_size, keyobj);
 
-                first_block = new typename ExtIterator::block_type;
+                first_block = new block_type;
 
-                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
+                block_type* sorted_first_block = new block_type;
 
                 request_ptr* reqs = new request_ptr[2];
 
@@ -905,7 +914,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 typename run_type::iterator it = out->begin();
                 it++;
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
                 cur_bid++;
 
                 for ( ; cur_bid != last.bid(); cur_bid++, it++)
@@ -929,8 +938,8 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
             if (last.block_offset())            // last element resides
             // not in the beginning of the block
             {
-                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::bid_type last_bid;
+                block_type* last_block = new block_type;
+                bid_type last_bid;
                 request_ptr req;
                 unsigned_type i;
 
@@ -955,14 +964,12 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 run_type* out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator,
-                        KeyExtractor>
-                        (first.bid(), n, M / block_type::raw_size, keyobj);
+                        block_type, alloc_strategy_type,
+                        bids_container_iterator, KeyExtractor
+                        >(first.bid(), n, M / block_type::raw_size, keyobj);
 
-                last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
+                last_block = new block_type;
+                block_type* sorted_last_block = new block_type;
                 request_ptr* reqs = new request_ptr[2];
 
                 reqs[0] = last_block->read(last_bid);
@@ -981,7 +988,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 *last.bid() = last_bid;
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
 
                 for ( ; cur_bid != last.bid(); cur_bid++, it++)
                 {
@@ -1003,14 +1010,12 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 run_type* out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator,
-                        KeyExtractor>
-                        (first.bid(), n, M / block_type::raw_size, keyobj);
+                        block_type, alloc_strategy_type,
+                        bids_container_iterator, KeyExtractor
+                        >(first.bid(), n, M / block_type::raw_size, keyobj);
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
 
                 for ( ; cur_bid != last.bid(); cur_bid++, it++)
                 {
@@ -1029,21 +1034,21 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 #endif
 }
 
-template <typename record_type>
+template <typename RecordType>
 struct ksort_defaultkey
 {
-    typedef typename record_type::key_type key_type;
-    key_type operator () (const record_type& obj) const
+    typedef typename RecordType::key_type key_type;
+    key_type operator () (const RecordType& obj) const
     {
         return obj.key();
     }
-    record_type max_value() const
+    RecordType max_value() const
     {
-        return record_type::max_value();
+        return RecordType::max_value();
     }
-    record_type min_value() const
+    RecordType min_value() const
     {
-        return record_type::min_value();
+        return RecordType::min_value();
     }
 };
 

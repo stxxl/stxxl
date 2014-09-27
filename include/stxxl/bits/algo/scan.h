@@ -47,12 +47,18 @@ STXXL_BEGIN_NAMESPACE
  * \warning nested stxxl::for_each are not supported
  */
 template <typename ExtIterator, typename UnaryFunction>
-UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers = 0)
+UnaryFunction for_each(ExtIterator begin, ExtIterator end,
+                       UnaryFunction functor, int_type nbuffers = 0)
 {
     if (begin == end)
         return functor;
 
-    typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
+    typedef typename ExtIterator::value_type value_type;
+
+    typedef buf_istream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_istream_type;
 
     begin.flush();     // flush container
 
@@ -67,14 +73,14 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     // leave part of the block before begin untouched (e.g. copy)
     for ( ; cur != begin; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
     }
 
     // apply functor to the range [begin,end)
     for ( ; cur != end; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
         functor(tmp);
     }
@@ -82,10 +88,10 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     // leave part of the block after end untouched
     if (end.block_offset())
     {
-        ExtIterator _last_block_end = end - end.block_offset() + ExtIterator::block_type::size;
-        for ( ; cur != _last_block_end; ++cur)
+        ExtIterator last_block_end = end - end.block_offset() + ExtIterator::block_type::size;
+        for ( ; cur != last_block_end; ++cur)
         {
-            typename ExtIterator::value_type tmp;
+            value_type tmp;
             in >> tmp;
         }
     }
@@ -116,13 +122,23 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
  * \warning nested stxxl::for_each_m are not supported
  */
 template <typename ExtIterator, typename UnaryFunction>
-UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers = 0)
+UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
+                         UnaryFunction functor, int_type nbuffers = 0)
 {
     if (begin == end)
         return functor;
 
-    typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
-    typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
+    typedef typename ExtIterator::value_type value_type;
+
+    typedef buf_istream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_istream_type;
+
+    typedef buf_ostream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_ostream_type;
 
     begin.flush();     // flush container
 
@@ -141,7 +157,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     // leave part of the block before begin untouched (e.g. copy)
     for ( ; cur != begin; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
         out << tmp;
     }
@@ -149,7 +165,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     // apply functor to the range [begin,end)
     for ( ; cur != end; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
         functor(tmp);
         out << tmp;
@@ -161,7 +177,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
         ExtIterator _last_block_end = end - end.block_offset() + ExtIterator::block_type::size;
         for ( ; cur != _last_block_end; ++cur)
         {
-            typename ExtIterator::value_type tmp;
+            value_type tmp;
             in >> tmp;
             out << tmp;
         }
@@ -188,10 +204,14 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
  * \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D, or zero for automaticl 2*D)
  */
 template <typename ExtIterator, typename Generator>
-void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type nbuffers = 0)
+void generate(ExtIterator begin, ExtIterator end,
+              Generator generator, int_type nbuffers = 0)
 {
     typedef typename ExtIterator::block_type block_type;
-    typedef buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
+
+    typedef buf_ostream<
+            block_type, typename ExtIterator::bids_container_iterator
+            > buf_ostream_type;
 
     while (begin.block_offset())    //  go to the beginning of the block
     //  of the external vector
@@ -266,12 +286,16 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
  *         such exists then \c end
  */
 template <typename ExtIterator, typename EqualityComparable>
-ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& value, int_type nbuffers = 0)
+ExtIterator find(ExtIterator begin, ExtIterator end,
+                 const EqualityComparable& value, int_type nbuffers = 0)
 {
     if (begin == end)
         return end;
 
-    typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
+    typedef buf_istream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_istream_type;
 
     begin.flush();     // flush container
 

@@ -38,52 +38,52 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace stable_ksort_local {
 
-template <class type_, class type_key>
-void classify_block(type_* begin, type_* end, type_key*& out,
-                    int_type* bucket, typename type_::key_type offset,
+template <class Type, class TypeKey>
+void classify_block(Type* begin, Type* end, TypeKey*& out,
+                    int_type* bucket, typename Type::key_type offset,
                     unsigned shift)
 {
-    for (type_* p = begin; p < end; p++, out++)      // count & create references
+    for (Type* p = begin; p < end; p++, out++)      // count & create references
     {
         out->ptr = p;
-        typename type_::key_type key = p->key();
+        typename Type::key_type key = p->key();
         int_type ibucket = (int_type)((key - offset) >> shift);
         out->key = key;
         bucket[ibucket]++;
     }
 }
 
-template <typename type>
+template <typename Type>
 struct type_key
 {
-    typedef typename type::key_type key_type;
+    typedef typename Type::key_type key_type;
     key_type key;
-    type* ptr;
+    Type* ptr;
 
     type_key() { }
-    type_key(key_type k, type* p) : key(k), ptr(p)
+    type_key(key_type k, Type* p) : key(k), ptr(p)
     { }
 };
 
-template <typename type>
-bool operator < (const type_key<type>& a, const type_key<type>& b)
+template <typename Type>
+bool operator < (const type_key<Type>& a, const type_key<Type>& b)
 {
     return a.key < b.key;
 }
 
-template <typename type>
-bool operator > (const type_key<type>& a, const type_key<type>& b)
+template <typename Type>
+bool operator > (const type_key<Type>& a, const type_key<Type>& b)
 {
     return a.key > b.key;
 }
 
-template <typename BIDType_, typename AllocStrategy_>
+template <typename BIDType, typename AllocStrategy>
 class bid_sequence
 {
 public:
-    typedef BIDType_ bid_type;
+    typedef BIDType bid_type;
     typedef bid_type& reference;
-    typedef AllocStrategy_ alloc_strategy;
+    typedef AllocStrategy alloc_strategy;
     typedef typename simple_vector<bid_type>::size_type size_type;
     typedef typename simple_vector<bid_type>::iterator iterator;
 
@@ -128,23 +128,24 @@ public:
     }
 };
 
-template <typename ExtIterator_>
+template <typename ExtIterator>
 void distribute(
-    bid_sequence<typename ExtIterator_::vector_type::block_type::bid_type,
-                 typename ExtIterator_::vector_type::alloc_strategy_type>* bucket_bids,
+    bid_sequence<typename ExtIterator::vector_type::block_type::bid_type,
+                 typename ExtIterator::vector_type::alloc_strategy_type>* bucket_bids,
     int64* bucket_sizes,
     const int_type nbuckets,
     const int_type lognbuckets,
-    ExtIterator_ first,
-    ExtIterator_ last,
+    ExtIterator first,
+    ExtIterator last,
     const int_type nread_buffers,
     const int_type nwrite_buffers)
 {
-    typedef typename ExtIterator_::vector_type::value_type value_type;
+    typedef typename ExtIterator::vector_type::value_type value_type;
     typedef typename value_type::key_type key_type;
-    typedef typename ExtIterator_::block_type block_type;
-    typedef buf_istream<typename ExtIterator_::block_type,
-                        typename ExtIterator_::bids_container_iterator> buf_istream_type;
+    typedef typename ExtIterator::block_type block_type;
+    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
+
+    typedef buf_istream<block_type, bids_container_iterator> buf_istream_type;
 
     int_type i = 0;
 
@@ -166,7 +167,7 @@ void distribute(
     for (i = 0; i < nbuckets; i++)
         bucket_blocks[i] = out.get_free_block();
 
-    ExtIterator_ cur = first - first.block_offset();
+    ExtIterator cur = first - first.block_offset();
 
     // skip part of the block before first untouched
     for ( ; cur != first; cur++)
@@ -216,15 +217,16 @@ void distribute(
 //! \remark Elements must provide a method key() which returns the integer key.
 //! \remark Not yet fully implemented, it assumes that the keys are uniformly
 //! distributed between [0,std::numeric_limits<key_type>::max().
-template <typename ExtIterator_>
-void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
+template <typename ExtIterator>
+void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 {
     STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
-    typedef typename ExtIterator_::vector_type::value_type value_type;
+    typedef typename ExtIterator::vector_type::value_type value_type;
     typedef typename value_type::key_type key_type;
-    typedef typename ExtIterator_::block_type block_type;
+    typedef typename ExtIterator::block_type block_type;
+    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
     typedef typename block_type::bid_type bid_type;
-    typedef typename ExtIterator_::vector_type::alloc_strategy_type alloc_strategy;
+    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy;
     typedef stable_ksort_local::bid_sequence<bid_type, alloc_strategy> bucket_bids_type;
     typedef stable_ksort_local::type_key<value_type> type_key_;
 
@@ -309,7 +311,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         const unsigned_type nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
         STXXL_VERBOSE_STABLE_KSORT("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
-        typedef buf_ostream<block_type, typename ExtIterator_::bids_container_iterator> buf_ostream_type;
+        typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
         disk_queues::get_instance()->set_priority_op(request_queue::READ);

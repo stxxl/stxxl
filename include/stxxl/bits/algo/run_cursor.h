@@ -19,15 +19,15 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <typename block_type>
+template <typename BlockType>
 struct run_cursor
 {
     unsigned_type pos;
-    block_type* buffer;
+    BlockType* buffer;
 
     run_cursor() : pos(0), buffer(NULL) { }
 
-    inline typename block_type::const_reference current() const
+    inline typename BlockType::const_reference current() const
     {
         return (*buffer)[pos];
     }
@@ -39,7 +39,7 @@ struct run_cursor
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
 
-template <typename must_be_void = void>
+template <typename MustBeVoid = void>
 struct have_prefetcher
 {
     static void* untyped_prefetcher;
@@ -47,14 +47,15 @@ struct have_prefetcher
 
 #endif
 
-template <typename block_type,
-          typename prefetcher_type_>
-struct run_cursor2 : public run_cursor<block_type>
+template <typename BlockType,
+          typename PrefetcherType>
+struct run_cursor2 : public run_cursor<BlockType>
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
                      , public have_prefetcher<>
 #endif
 {
-    typedef prefetcher_type_ prefetcher_type;
+    typedef BlockType block_type;
+    typedef PrefetcherType prefetcher_type;
     typedef run_cursor2<block_type, prefetcher_type> _Self;
     typedef typename block_type::value_type value_type;
 
@@ -85,7 +86,16 @@ struct run_cursor2 : public run_cursor<block_type>
     {
         return (pos >= block_type::size);
     }
-    inline void operator ++ ();
+    inline void operator ++ ()
+    {
+        assert(!empty());
+        ++pos;
+        if (UNLIKELY(pos >= block_type::size))
+        {
+            if (prefetcher()->block_consumed(buffer))
+                pos = 0;
+        }
+    }
     inline void make_inf()
     {
         pos = block_type::size;
@@ -93,22 +103,9 @@ struct run_cursor2 : public run_cursor<block_type>
 };
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-template <typename must_be_void>
-void* have_prefetcher<must_be_void>::untyped_prefetcher = NULL;
+template <typename MustBeVoid>
+void* have_prefetcher<MustBeVoid>::untyped_prefetcher = NULL;
 #endif
-
-template <typename block_type,
-          typename prefetcher_type>
-void run_cursor2<block_type, prefetcher_type>::operator ++ ()
-{
-    assert(!empty());
-    ++pos;
-    if (UNLIKELY(pos >= block_type::size))
-    {
-        if (prefetcher()->block_consumed(buffer))
-            pos = 0;
-    }
-}
 
 #if 0
 template <typename block_type>

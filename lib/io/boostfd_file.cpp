@@ -189,12 +189,10 @@ file::offset_type boostfd_file::size()
 void boostfd_file::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(m_fd_mutex);
-#ifndef NDEBUG
     offset_type oldsize = _size();
-#endif // NDEBUG
     m_file_des.seek(newsize, BOOST_IOS::beg);
     m_file_des.seek(0, BOOST_IOS::beg); // not important ?
-    assert(_size() >= oldsize);
+    STXXL_ASSERT(_size() >= oldsize);
 }
 
 void boostfd_file::lock()

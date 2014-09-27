@@ -26,7 +26,9 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     typedef runs2bid_array_adaptor<BlockSize, RunType, PosType> self_type;
     typedef BID<BlockSize> data_type;
 
-    enum    { block_size = BlockSize };
+    enum {
+        block_size = BlockSize
+    };
 
     unsigned_type dim_size;
 
@@ -78,13 +80,14 @@ struct runs2bid_array_adaptor2
     typedef runs2bid_array_adaptor2<BlockSize, RunType, PosType> self_type;
     typedef BID<BlockSize> data_type;
 
-    typedef two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType> ParentClass_;
+    typedef two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType> base_type;
 
-    using ParentClass_::pos;
-    using ParentClass_::array;
+    using base_type::pos;
+    using base_type::array;
 
-    enum
-    { block_size = BlockSize };
+    enum {
+        block_size = BlockSize
+    };
 
     PosType w, h, K;
 

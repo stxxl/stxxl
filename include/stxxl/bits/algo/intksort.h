@@ -21,16 +21,16 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <typename type_key>
+template <typename TypeKey>
 static void
-count(type_key* a, type_key* aEnd, int_type* bucket, int_type K,
-      typename type_key::key_type offset, unsigned shift)
+count(TypeKey* a, TypeKey* aEnd, int_type* bucket, int_type K,
+      typename TypeKey::key_type offset, unsigned shift)
 {
     // reset buckets
     std::fill(bucket, bucket + K, 0);
 
     // count occupancies
-    for (type_key* p = a; p < aEnd; p++)
+    for (TypeKey* p = a; p < aEnd; p++)
     {
         int_type i = (int_type)((p->key - offset) >> shift);
         /*
@@ -57,11 +57,12 @@ exclusive_prefix_sum(int_type* bucket, int_type K)
 }
 
 // distribute input a to output b using bucket for the starting indices
-template <typename type_key>
+template <typename TypeKey>
 static void
-classify(type_key* a, type_key* aEnd, type_key* b, int_type* bucket, typename type_key::key_type offset, unsigned shift)
+classify(TypeKey* a, TypeKey* aEnd, TypeKey* b, int_type* bucket,
+         typename TypeKey::key_type offset, unsigned shift)
 {
-    for (type_key* p = a; p < aEnd; p++)
+    for (TypeKey* p = a; p < aEnd; p++)
     {
         int_type i = (int_type)((p->key - offset) >> shift);
         int_type bi = bucket[i];
@@ -70,19 +71,19 @@ classify(type_key* a, type_key* aEnd, type_key* b, int_type* bucket, typename ty
     }
 }
 
-template <class T>
+template <class Type>
 inline void
-sort2(T& a, T& b)
+sort2(Type& a, Type& b)
 {
     if (b < a)
         std::swap(a, b);
 }
 
-template <class T>
+template <class Type>
 inline void
-sort3(T& a, T& b, T& c)
+sort3(Type& a, Type& b, Type& c)
 {
-    T temp;
+    Type temp;
     if (b < a)
     {
         if (c < a)
@@ -124,9 +125,9 @@ sort3(T& a, T& b, T& c)
     // Assert1 (!(b < a) && !(c < b));
 }
 
-template <class T>
+template <class Type>
 inline void
-sort4(T& a, T& b, T& c, T& d)
+sort4(Type& a, Type& b, Type& c, Type& d)
 {
     sort2(a, b);
     sort2(c, d);                // a < b ; c < d
@@ -141,7 +142,7 @@ sort4(T& a, T& b, T& c, T& d)
         {                       // c < a < {db}
             if (d < b)
             {                   // c < a < d < b
-                T temp = a;
+                Type temp = a;
                 a = c;
                 c = d;
                 d = b;
@@ -149,7 +150,7 @@ sort4(T& a, T& b, T& c, T& d)
             }
             else
             {                   // c < a < b < d
-                T temp = a;
+                Type temp = a;
                 a = c;
                 c = b;
                 b = temp;
@@ -162,7 +163,7 @@ sort4(T& a, T& b, T& c, T& d)
         {                       // c < (bd)
             if (d < b)
             {                   // c < d < b
-                T temp = b;
+                Type temp = b;
                 b = c;
                 c = d;
                 d = temp;
@@ -176,9 +177,9 @@ sort4(T& a, T& b, T& c, T& d)
     //Assert1 (!(b < a) && !(c < b) & !(d < c));
 }
 
-template <class T>
+template <class Type>
 inline void
-sort5(T& a, T& b, T& c, T& d, T& e)
+sort5(Type& a, Type& b, Type& c, Type& d, Type& e)
 {
     sort2(a, b);
     sort2(d, e);
@@ -201,7 +202,7 @@ sort5(T& a, T& b, T& c, T& d, T& e)
     {                           // c < d < {be}
         if (e < b)
         {                       // c < d < e < b
-            T temp = b;
+            Type temp = b;
             b = c;
             c = d;
             d = e;
@@ -209,7 +210,7 @@ sort5(T& a, T& b, T& c, T& d, T& e)
         }
         else
         {                       // c < d < b < e
-            T temp = b;
+            Type temp = b;
             b = c;
             c = d;
             d = temp;
@@ -222,15 +223,15 @@ sort5(T& a, T& b, T& c, T& d, T& e)
     //Assert1 (!(b < a) && !(c < b) & !(d < c) & !(e < d));
 }
 
-template <class T>
+template <class Type>
 inline void
-insertion_sort(T* a, T* aEnd)
+insertion_sort(Type* a, Type* aEnd)
 {
-    T* pp;
-    for (T* p = a + 1; p < aEnd; p++)
+    Type* pp;
+    for (Type* p = a + 1; p < aEnd; p++)
     {
         // Invariant a..p-1 is sorted;
-        T t = *p;
+        Type t = *p;
         if (t < *a)
         {   // new minimum
             // move stuff to the right
@@ -255,14 +256,14 @@ insertion_sort(T* a, T* aEnd)
 // sort each bucket
 // bucket[i] is an index one off to the right from
 // the end of the i-th bucket
-template <class T>
+template <class Type>
 static void
-cleanup(T* b, int_type* bucket, int_type K)
+cleanup(Type* b, int_type* bucket, int_type K)
 {
-    T* c = b;
+    Type* c = b;
     for (int_type i = 0; i < K; i++)
     {
-        T* cEnd = b + bucket[i];
+        Type* cEnd = b + bucket[i];
         switch (cEnd - c)
         {
         case 0:
@@ -311,11 +312,12 @@ cleanup(T* b, int_type* bucket, int_type K)
 // and using (key(x) - offset) >> shift to index buckets.
 // the input comes from a..aEnd-1
 // the output goes to b
-template <typename type_key>
+template <typename TypeKey>
 void
-l1sort(type_key* a,
-       type_key* aEnd,
-       type_key* b, int_type* bucket, int_type K, typename type_key::key_type offset, int shift)
+l1sort(TypeKey* a,
+       TypeKey* aEnd,
+       TypeKey* b, int_type* bucket, int_type K,
+       typename TypeKey::key_type offset, int shift)
 {
     count(a, aEnd, bucket, K, offset, shift);
     exclusive_prefix_sum(bucket, K);
@@ -323,29 +325,29 @@ l1sort(type_key* a,
     cleanup(b, bucket, K);
 }
 
-template <typename type, typename type_key, typename key_extractor>
-void classify_block(type* begin, type* end, type_key*& out,
-                    int_type* bucket, typename key_extractor::key_type offset, unsigned shift, key_extractor keyobj)
+template <typename Type, typename TypeKey, typename KeyExtractor>
+void classify_block(Type* begin, Type* end, TypeKey*& out,
+                    int_type* bucket, typename KeyExtractor::key_type offset, unsigned shift, KeyExtractor keyobj)
 {
-    assert(shift < (sizeof(typename key_extractor::key_type) * 8 + 1));
-    for (type* p = begin; p < end; p++, out++)  // count & create references
+    assert(shift < (sizeof(typename KeyExtractor::key_type) * 8 + 1));
+    for (Type* p = begin; p < end; p++, out++)  // count & create references
     {
         out->ptr = p;
-        typename key_extractor::key_type key = keyobj(*p);
+        typename KeyExtractor::key_type key = keyobj(*p);
         int_type ibucket = (int_type)((key - offset) >> shift);
         out->key = key;
         bucket[ibucket]++;
     }
 }
-template <typename type, typename type_key, typename key_extractor>
-void classify_block(type* begin, type* end, type_key*& out, int_type* bucket, typename type::key_type offset, unsigned shift,
-                    const int_type K, key_extractor keyobj)
+template <typename Type, typename TypeKey, typename KeyExtractor>
+void classify_block(Type* begin, Type* end, TypeKey*& out, int_type* bucket, typename Type::key_type offset, unsigned shift,
+                    const int_type K, KeyExtractor keyobj)
 {
-    assert(shift < (sizeof(typename type::key_type) * 8 + 1));
-    for (type* p = begin; p < end; p++, out++)  // count & create references
+    assert(shift < (sizeof(typename Type::key_type) * 8 + 1));
+    for (Type* p = begin; p < end; p++, out++)  // count & create references
     {
         out->ptr = p;
-        typename type::key_type key = keyobj(*p);
+        typename Type::key_type key = keyobj(*p);
         int_type ibucket = (key - offset) >> shift;
         /*
         if (!(ibucket < K && ibucket >= 0))

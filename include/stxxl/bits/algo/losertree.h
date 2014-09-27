@@ -22,15 +22,15 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <typename run_cursor_type,
-          typename run_cursor_cmp_type>
+template <typename RunCursorType,
+          typename RunCursorCmpType>
 class loser_tree : private noncopyable
 {
     int logK;
     int_type k;
     int_type* entry;
-    run_cursor_type* current;
-    run_cursor_cmp_type cmp;
+    RunCursorType* current;
+    RunCursorCmpType cmp;
 
     int_type init_winner(int_type root)
     {
@@ -56,13 +56,14 @@ class loser_tree : private noncopyable
     }
 
 public:
-    typedef typename run_cursor_type::prefetcher_type prefetcher_type;
-    typedef typename run_cursor_type::value_type value_type;
+    typedef typename RunCursorType::prefetcher_type prefetcher_type;
+    typedef typename RunCursorType::value_type value_type;
 
     loser_tree(
         prefetcher_type* p,
         int_type nruns,
-        run_cursor_cmp_type c) : cmp(c)
+        RunCursorCmpType c)
+        : cmp(c)
     {
         int_type i;
         logK = ilog2_ceil(nruns);
@@ -71,10 +72,10 @@ public:
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-        current = new run_cursor_type[kReg];
-        run_cursor_type::set_prefetcher(p);
+        current = new RunCursorType[kReg];
+        RunCursorType::set_prefetcher(p);
 #else
-        current = new run_cursor_type[kReg];
+        current = new RunCursorType[kReg];
         for (i = 0; i < kReg; ++i)
             current[i].prefetcher() = p;
 #endif
@@ -114,7 +115,7 @@ private:
     template <int LogK>
     void multi_merge_unrolled(value_type* out_first, value_type* out_last)
     {
-        run_cursor_type* currentE, * winnerE;
+        RunCursorType* currentE, * winnerE;
         int_type* regEntry = entry;
         int_type winnerIndex = regEntry[0];
 
@@ -168,7 +169,7 @@ private:
 
     void multi_merge_k(value_type* out_first, value_type* out_last)
     {
-        run_cursor_type* currentE, * winnerE;
+        RunCursorType* currentE, * winnerE;
         int_type kReg = k;
         int_type winnerIndex = entry[0];
 
@@ -244,10 +245,10 @@ STXXL_END_NAMESPACE
 
 namespace std {
 
-template <typename run_cursor_type,
-          typename run_cursor_cmp_type>
-void swap(stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type>& a,
-          stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type>& b)
+template <typename RunCursorType,
+          typename RunCursorCmpType>
+void swap(stxxl::loser_tree<RunCursorType, RunCursorCmpType>& a,
+          stxxl::loser_tree<RunCursorType, RunCursorCmpType>& b)
 {
     a.swap(b);
 }

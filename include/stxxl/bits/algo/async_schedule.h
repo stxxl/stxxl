@@ -42,9 +42,9 @@ inline void compute_prefetch_schedule(
     compute_prefetch_schedule(static_cast<const int_type*>(first), last, out_first, m, D);
 }
 
-template <typename run_type>
+template <typename RunType>
 void compute_prefetch_schedule(
-    const run_type& input,
+    const RunType& input,
     int_type* out_first,
     int_type m,
     int_type D)
@@ -56,10 +56,10 @@ void compute_prefetch_schedule(
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
 
-template <typename bid_iterator_type>
+template <typename BidIteratorType>
 void compute_prefetch_schedule(
-    bid_iterator_type input_begin,
-    bid_iterator_type input_end,
+    BidIteratorType input_begin,
+    BidIteratorType input_end,
     int_type* out_first,
     int_type m,
     int_type D)
@@ -67,7 +67,7 @@ void compute_prefetch_schedule(
     const int_type L = input_end - input_begin;
     simple_vector<int_type> disks(L);
     int_type i = 0;
-    for (bid_iterator_type it = input_begin; it != input_end; ++it, ++i)
+    for (BidIteratorType it = input_begin; it != input_end; ++it, ++i)
         disks[i] = it->storage->get_device_id();
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
