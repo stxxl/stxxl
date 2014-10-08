@@ -102,7 +102,7 @@ public:
     }
 
     //! return currently accumulated time in milliseconds
-    inline double mseconds()
+    inline double mseconds() const
     {
         if (running)
             return (accumulated + timestamp() - last_clock) * 1000.;
@@ -111,7 +111,7 @@ public:
     }
 
     //! return currently accumulated time in microseconds
-    inline double useconds()
+    inline double useconds() const
     {
         if (running)
             return (accumulated + timestamp() - last_clock) * 1000000.;
@@ -120,7 +120,7 @@ public:
     }
 
     //! return currently accumulated time in seconds (as double)
-    inline double seconds()
+    inline double seconds() const
     {
         if (running)
             return (accumulated + timestamp() - last_clock);
