@@ -76,6 +76,20 @@ STXXL_END_NAMESPACE
  #define STXXL_MSG(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
+// STXXL_VARDUMP(x) prints the name of x together with its value.
+#if STXXL_VERBOSE_LEVEL > -10
+ #define STXXL_VARDUMP(x) _STXXL_PRINT("STXXL-MSG", #x " = " << x, _STXXL_PRINT_FLAGS_DEFAULT)
+#else
+ #define STXXL_VARDUMP(x) _STXXL_NOT_VERBOSE
+#endif
+
+// STXXL_MEMDUMP(x) prints the name of x together with its value as an amount of memory in IEC units.
+#if STXXL_VERBOSE_LEVEL > -10
+ #define STXXL_MEMDUMP(x) _STXXL_PRINT("STXXL-MSG", #x " = " << stxxl::format_IEC_size(x) << "B", _STXXL_PRINT_FLAGS_DEFAULT)
+#else
+ #define STXXL_MEMDUMP(x) _STXXL_NOT_VERBOSE
+#endif
+
 #if STXXL_VERBOSE_LEVEL > -100
  #define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
 #else
@@ -148,6 +162,18 @@ STXXL_END_NAMESPACE
                          text << " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
                          _STXXL_PRINT_FLAGS_ERROR); abort();                               \
         }                                                                                  \
+    } while (0)
+    
+// STXXL_CHECK_EQUAL(a,b) is an assertion macro for unit tests, similar to
+// STXXL_CHECK(a==b). The difference is that STXXL_CHECK_EQUAL(a,b) also prints
+// the values of a and b. Attention: a and b must be printable with std::cout!
+#define STXXL_CHECK_EQUAL(a, b)                                                                         \
+    do {                                                                                                \
+        if (!(a == b)) {                                                                                \
+            _STXXL_PRINT("STXXL-CHECK",                                                                 \
+                         a << " = " #a " == " #b " = " << b << " - FAILED @ " __FILE__ ":" << __LINE__, \
+                         _STXXL_PRINT_FLAGS_ERROR); abort();                                            \
+        }                                                                                               \
     } while (0)
 
 // STXXL_ASSERT is an assertion macro almost identical to assert(). The only
