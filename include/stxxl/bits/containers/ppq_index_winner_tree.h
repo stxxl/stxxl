@@ -1,0 +1,281 @@
+/***************************************************************************
+ *  include/stxxl/bits/containers/ppq_index_winner_tree.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2014 Thomas Keh <thomas.keh@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+#ifndef STXXL_CONTAINERS_PPQ_INDEX_WINNER_TREE_HEADER
+#define STXXL_CONTAINERS_PPQ_INDEX_WINNER_TREE_HEADER
+
+#include <vector>
+#include <stack>
+#include <assert.h>
+#include <cmath>
+
+#include <stxxl/bits/common/custom_stats.h>
+#include <stxxl/bits/verbose.h>
+
+STXXL_BEGIN_NAMESPACE
+
+/**
+ * \brief index_winner_tree is a binary tournament tree. There are n=2^k so
+ * called players which compete for the winning position. The winner is the
+ * smallest one regarding the comparator m_less. Each player is identified with
+ * it's index. The comparator should use this index in order to compare the
+ * actual values.
+ *
+ * A change of one players value results in O(log n) operations.  The winner
+ * can be determined in O(1) operations.
+ *
+ * There is a number of fixed players which remain at the same index forever,
+ * even if they were deactivated in between. Additionally any number of players
+ * can be added dynamically. They are assigned to a free slot and if one gets
+ * removed the slot will be marked free again.
+ */
+template <typename Comparator>
+class index_winner_tree
+{
+private:
+    //! the binary tree of size 2^(k+1)-1
+    std::vector<int> m_tree;
+
+    //! the comparator object of this tree
+    Comparator& m_less;
+
+    //! number of slots for the players (2^k)
+    unsigned int m_num_slots;
+
+    //! Record statistical data.
+    // typedef custom_stats stats_type;
+
+    //! Don't record statistical data.
+    typedef dummy_custom_stats stats_type;
+
+    stats_type stats;
+
+public:
+    /**
+     * Constructor. Reserves space, registers free slots. No games are played here!
+     * All players and slots are deactivated in the beginning.
+     *
+     * \param num_players	Number of fixed players. Fixed players remain at the same index forever,
+     *						even if they were deactivated in between.
+     *
+     * \param less			The comparator. It should use two given indices, compare the corresponding
+     *						values and return the index of one with the smaller value.
+     */
+    index_winner_tree(unsigned int num_players, Comparator& less)
+        : m_less(less)
+    {
+        assert(num_players > 1);
+
+        m_num_slots = (1 << (int)(log2(num_players - 1) + 1));
+        unsigned int treesize = (m_num_slots << 1) - 1;
+        m_tree.resize(treesize, -1);
+
+        stats.add_timer("replay_time");
+        stats.add_timer("double_num_slots_time");
+        stats.add_timer("remove_player_time");
+    }
+
+    //! activate one of the static players or add a new one and replay
+    inline void activate_player(unsigned int index)
+    {
+        while (index >= m_num_slots)
+            double_num_slots();
+        replay_on_change(index);
+    }
+
+    /**
+     * deactivate a player and replay.
+     */
+    inline void deactivate_player(unsigned int index)
+    {
+        assert(index < m_num_slots);
+        replay_on_change(index, true);
+    }
+
+    /**
+     * deactivate one player in a batch of deactivations
+     * run replay_on_deactivation() afterwards.
+     * If there are multiple consecutive removes you
+     * should run deactivate_player() for all of them first
+     * and afterwards run replay_on_deactivation() for each one
+     * of them.
+     */
+    inline void deactivate_player_step(unsigned int index)
+    {
+        stats.start_timer("remove_player_time");
+        assert(index < m_num_slots);
+        int p = (m_tree.size() / 2) + index;
+
+        // Needed for following deactivations...
+        while (p >= 0 && m_tree[p] == (int)index) {
+            m_tree[p] = -1;
+            p -= (p + 1) % 2;
+            p /= 2;
+        }
+
+        stats.stop_timer("remove_player_time");
+    }
+
+    //! Replay after the player at index <index> has been deactivated.
+    inline void replay_on_deactivations(unsigned int index)
+    {
+        assert(index < m_num_slots);
+        replay_on_change(index, true);
+    }
+
+    //! Notify that the value of the player at index <index> has changed.
+    inline void notify_change(unsigned int index)
+    {
+        replay_on_change(index);
+    }
+
+    //! Returns the winner.
+    //! Remember running replay_on_pop() if the value of the winner changes.
+    inline int top() const
+    {
+        return m_tree[0];
+    }
+
+    //! Returns if all players are deactivated.
+    inline bool empty() const
+    {
+        return (m_tree[0] < 0);
+    }
+
+    //! Replay after the value of the winning player has changed.
+    inline void replay_on_pop()
+    {
+        replay_on_change(m_tree[0]);
+    }
+
+    /**
+     * Replays all games the player with the given index is involved in.
+     * This corresponds to the path from leaf <index> to root.
+     * If only the value of player <index> has changed the result is
+     * a valid winner tree.
+     *
+     * \param index	The player whose value has changed.
+     *
+     * \param done	Set done to true if the player has been deactivated
+     *				or removed. All games will be lost then.
+     */
+    inline void replay_on_change(unsigned int index, bool done = false)
+    {
+        stats.start_timer("replay_time");
+
+        int top;
+        int p = (m_tree.size() / 2) + index;
+
+        if (!done) {
+            top = index;
+        } else {
+            top = -1;
+        }
+
+        while (p > 0) {
+            m_tree[p] = top;
+            p -= (p + 1) % 2;           // round down to left node position
+
+            if (m_tree[p] < 0)
+                top = m_tree[p + 1];
+            else if (m_tree[p + 1] < 0)
+                top = m_tree[p];
+            else if (m_less(m_tree[p], m_tree[p + 1]))
+                top = m_tree[p];
+            else
+                top = m_tree[p + 1];
+
+            p /= 2;
+        }
+
+        m_tree[p] = top;
+
+        stats.stop_timer("replay_time");
+    }
+
+    //! Doubles the number of slots and adapts the tree
+    //! so it's a valid winner tree again.
+    inline void double_num_slots()
+    {
+        stats.start_timer("double_num_slots_time");
+
+        m_num_slots = m_num_slots << 1;
+        unsigned int old_tree_size = m_tree.size();
+        unsigned int tree_size = (m_num_slots << 1) - 1;
+        m_tree.resize(tree_size, -1);
+
+        for (int i = old_tree_size - 1; i >= 0; --i) {
+            unsigned int old_index = i;
+            unsigned int old_level = log2(old_index + 1);
+            unsigned int new_index = old_index + (1 << old_level);
+            m_tree[new_index] = m_tree[old_index];
+        }
+
+        unsigned int step_size = (1 << (int)log2(old_tree_size));
+        unsigned int index = tree_size - 1;
+
+        while (step_size > 0) {
+            for (unsigned int i = 0; i < step_size; ++i) {
+                m_tree[index] = -1;
+                --index;
+            }
+            index -= step_size;
+            step_size /= 2;
+        }
+
+        stats.stop_timer("double_num_slots_time");
+    }
+
+    //! Deactivate all players
+    inline void clear()
+    {
+        std::fill(m_tree.begin(), m_tree.end(), -1);
+    }
+
+    //! Deactivate all players and resize the tree.
+    inline void resize_and_clear(unsigned num_players)
+    {
+        m_num_slots = (1 << (int)(log2(num_players - 1) + 1));
+        unsigned int treesize = (m_num_slots << 1) - 1;
+        m_tree.resize(treesize, -1);
+        clear();
+    }
+
+    //! Returns a readable representation of the winner tree as string.
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        int levelsize = 1;
+        int j = 0;
+        for (unsigned int i = 0; i < m_tree.size(); ++i) {
+            if ((int)i >= j + levelsize) {
+                ss << "\n";
+                j = i;
+                levelsize *= 2;
+            }
+            ss << m_tree[i] << " ";
+        }
+        ss << "\n";
+        return ss.str();
+    }
+
+    //! Print statistical data.
+    void print_stats() const
+    {
+        STXXL_VARDUMP(m_num_slots);
+        stats.print_all();
+    }
+};
+
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_CONTAINERS_PPQ_INDEX_WINNER_TREE_HEADER
