@@ -25,7 +25,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/misc/cmake)
 
 # prohibit in-source builds
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-  message(SEND_ERROR "In-source builds are not allowed.")
+  message(FATAL_ERROR "In-source builds are not allowed.")
 endif()
 
 # default to Debug building for single-config generators
