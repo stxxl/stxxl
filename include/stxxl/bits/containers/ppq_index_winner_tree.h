@@ -50,13 +50,22 @@ private:
 
     //! number of slots for the players (2^k)
     unsigned int m_num_slots;
+    
+    typedef custom_stats_timer stats_timer;
 
-    //! Record statistical data.
-    // typedef custom_stats stats_type;
-
-    //! Don't record statistical data.
-    typedef dummy_custom_stats stats_type;
-
+    struct stats_type
+    {
+        stats_timer replay_time;
+        stats_timer double_num_slots_time;
+        stats_timer remove_player_time;
+        friend std::ostream& operator<<(std::ostream& os, const stats_type& o)
+        {
+            return os << "replay_time=" << o.replay_time << std::endl
+                << "double_num_slots_time=" << o.double_num_slots_time << std::endl
+                << "remove_player_time=" << o.remove_player_time << std::endl;
+        }
+    };
+    
     stats_type stats;
 
 public:
@@ -78,10 +87,6 @@ public:
         m_num_slots = (1 << (int)(log2(num_players - 1) + 1));
         unsigned int treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, -1);
-
-        stats.add_timer("replay_time");
-        stats.add_timer("double_num_slots_time");
-        stats.add_timer("remove_player_time");
     }
 
     //! activate one of the static players or add a new one and replay
@@ -111,7 +116,7 @@ public:
      */
     inline void deactivate_player_step(unsigned int index)
     {
-        stats.start_timer("remove_player_time");
+        stats.remove_player_time.start();
         assert(index < m_num_slots);
         int p = (m_tree.size() / 2) + index;
 
@@ -122,7 +127,7 @@ public:
             p /= 2;
         }
 
-        stats.stop_timer("remove_player_time");
+        stats.remove_player_time.stop();
     }
 
     //! Replay after the player at index <index> has been deactivated.
@@ -170,7 +175,7 @@ public:
      */
     inline void replay_on_change(unsigned int index, bool done = false)
     {
-        stats.start_timer("replay_time");
+        stats.replay_time.start();
 
         int top;
         int p = (m_tree.size() / 2) + index;
@@ -199,14 +204,14 @@ public:
 
         m_tree[p] = top;
 
-        stats.stop_timer("replay_time");
+        stats.replay_time.stop();
     }
 
     //! Doubles the number of slots and adapts the tree
     //! so it's a valid winner tree again.
     inline void double_num_slots()
     {
-        stats.start_timer("double_num_slots_time");
+        stats.double_num_slots_time.start();
 
         m_num_slots = m_num_slots << 1;
         unsigned int old_tree_size = m_tree.size();
@@ -232,7 +237,7 @@ public:
             step_size /= 2;
         }
 
-        stats.stop_timer("double_num_slots_time");
+        stats.double_num_slots_time.stop();
     }
 
     //! Deactivate all players
@@ -272,7 +277,7 @@ public:
     void print_stats() const
     {
         STXXL_VARDUMP(m_num_slots);
-        stats.print_all();
+        STXXL_MSG(stats);
     }
 };
 

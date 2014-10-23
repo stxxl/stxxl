@@ -14,7 +14,6 @@
 #define STXXL_COMMON_CUSTOM_STATS_HEADER
 
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <algorithm>
 #include <stxxl/bits/common/timer.h>
@@ -22,125 +21,146 @@
 
 STXXL_BEGIN_NAMESPACE
 
-class custom_stats
+//! This class provides a statistical counter that can easily be
+//! deactivated using a typedef to dummy_custom_stats_counter.
+//! It's basically a wrapper for a unsigned long long value.
+//!
+//! \see dummy_custom_stats_counter
+//! \see custom_stats_timer
+class custom_stats_counter
 {
+    //! The counter type
+    typedef unsigned long long counter_type;
+    //! The counter's value
+    counter_type val;
 public:
-    inline void add_counter(std::string name)
+    //! The constructor. Initializes the counter to 0.
+    custom_stats_counter() : val(0) { }
+    //! Increases the counter by right.
+    //! \param right The corresponding integer value
+    custom_stats_counter& operator+=(counter_type right)
     {
-        assert(m_counters.count(name) == 0);
-        m_counters[name] = 0;
+        val += right;
+        return *this;
     }
-
-    inline void inc_counter(std::string name)
+    //! Increases the counter by 1 (prefix).
+    custom_stats_counter& operator++()
     {
-        assert(m_counters.count(name) == 1);
-        ++m_counters[name];
+        ++val;
+        return *this;
     }
-
-    inline void inc_counter(std::string name, long amount)
+    //! Increases the counter by 1 (postfix).
+    custom_stats_counter& operator++(int)
     {
-        assert(m_counters.count(name) == 1);
-        m_counters[name] += amount;
+        custom_stats_counter * result = this;
+        ++val;
+        return *result;
     }
-
-    inline void max_counter(std::string name, long value)
+    //! Set the counter to other
+    //! \param other The corresponding integer value
+    custom_stats_counter& operator=(counter_type other)
     {
-        assert(m_counters.count(name) == 1);
-        m_counters[name] = std::max(m_counters[name], value);
+        val = other;
+        return *this;
     }
-
-    inline long get_counter(std::string name)
+    //! Set the counter to other if other is larger than the current counter value.
+    //! \param other The corresponding integer value
+    void set_max(counter_type other)
     {
-        assert(m_counters.count(name) == 1);
-        return m_counters[name];
+        val = std::max(val,other);
     }
-
-    inline void set_counter(std::string name, long value)
+    //! Return the counter value interpreted as a memory amount in IEC units as a string.
+    //! For that purpose the counter value is multiplied with the byte_per_element argument.
+    //! \param byte_per_element The memory amount per "counter element".
+    std::string as_memory_amount(counter_type byte_per_element) const
     {
-        assert(m_counters.count(name) == 1);
-        m_counters[name] = value;
+        return format_IEC_size(val*byte_per_element) + "B";
     }
-
-    inline void add_mem_counter(std::string name, long mem_per_element)
+    //! Cast to counter_type: Returns the counter's value as a regular integer value.
+    //! This can be used as a getter as well as for printing with std::out.
+    operator counter_type() const
     {
-        assert(m_mem_counters.count(name) == 0);
-        m_mem_counters[name] = std::make_pair(0, mem_per_element);
+        return val;
     }
-
-    inline void inc_mem_counter(std::string name)
-    {
-        assert(m_mem_counters.count(name) == 1);
-        ++m_mem_counters[name].first;
-    }
-
-    inline void inc_mem_counter(std::string name, long amount)
-    {
-        assert(m_mem_counters.count(name) == 1);
-        m_mem_counters[name].first += amount;
-    }
-
-    inline void max_mem_counter(std::string name, long value)
-    {
-        assert(m_mem_counters.count(name) == 1);
-        m_mem_counters[name].first = std::max(m_mem_counters[name].first, value);
-    }
-
-    inline void add_timer(std::string name)
-    {
-        assert(m_timers.count(name) == 0);
-        m_timers[name] = stxxl::timer(false);
-    }
-
-    inline void start_timer(std::string name)
-    {
-        assert(m_timers.count(name) == 1);
-        m_timers[name].start();
-    }
-
-    inline void stop_timer(std::string name)
-    {
-        assert(m_timers.count(name) == 1);
-        m_timers[name].stop();
-    }
-
-    void print_all() const
-    {
-        for (auto it = m_counters.begin(); it != m_counters.end(); ++it)
-            STXXL_MSG(it->first << " = " << it->second);
-
-        for (auto it = m_mem_counters.begin(); it != m_mem_counters.end(); ++it)
-            STXXL_MSG(it->first << " = " << it->second.first << " elements = " << format_IEC_size(it->second.first * it->second.second) << "B");
-
-        for (auto it = m_timers.begin(); it != m_timers.end(); ++it)
-            STXXL_MSG(it->first << " = " << it->second.seconds() << " s");
-    }
-
-protected:
-    std::unordered_map<std::string, long> m_counters;
-    std::unordered_map<std::string, std::pair<long, long> > m_mem_counters;
-    std::unordered_map<std::string, stxxl::timer> m_timers;
 };
 
-class dummy_custom_stats
+
+//! This class provides a statistical timer that can easily be
+//! deactivated using a typedef to dummy_custom_stats_timer.
+//! It's basically a wrapper for stxxl::timer.
+//!
+//! \see dummy_custom_stats_timer
+//! \see custom_stats_counter
+class custom_stats_timer
+{
+    stxxl::timer timer;
+public:
+    //! Constructor. This does not start the timer!
+    custom_stats_timer() : timer(false) { }
+    //! Starts the timer.
+    void start()
+    {
+        timer.start();
+    }
+    //! Stops the timer.
+    void stop()
+    {
+        timer.stop();
+    }
+    //! <<-operator for std::ostream. Can be used for printing with std::cout.
+    friend std::ostream& operator<<(std::ostream& os, const custom_stats_timer& o)
+    {
+        return os << o.timer.seconds() << " s";
+    }
+};
+
+//! Dummy class for custom_stats_counter. The methods do nothing.
+//! The compiler should optimize out the code.
+//!
+//! \see custom_stats_counter
+//! \see dummy_custom_stats_timer
+class dummy_custom_stats_counter
+{
+    typedef unsigned long long counter_type;
+public:
+    dummy_custom_stats_counter() {}
+    dummy_custom_stats_counter& operator+=(counter_type) {
+        return *this;
+    }
+    dummy_custom_stats_counter& operator++() {
+        return *this;
+    }
+    dummy_custom_stats_counter& operator++(int) {
+        return *this;
+    }
+    dummy_custom_stats_counter& operator=(counter_type) {
+        return *this;
+    }
+    void set_max(counter_type) {}
+    std::string as_memory_amount(counter_type) {
+        return "";
+    }
+    operator counter_type() const
+    {
+        return counter_type();
+    }
+};
+
+//! Dummy class for custom_stats_timer. The methods do nothing.
+//! The compiler should optimize out the code.
+//!
+//! \see custom_stats_timer
+//! \see dummy_custom_stats_counter
+class dummy_custom_stats_timer
 {
 public:
-    inline void add_counter(std::string) { }
-    inline void inc_counter(std::string) { }
-    inline void inc_counter(std::string, long) { }
-    inline void max_counter(std::string, long) { }
-    inline long get_counter(std::string) const { return 0; }
-    inline void set_counter(std::string, long) { }
-
-    inline void add_mem_counter(std::string, long) { }
-    inline void inc_mem_counter(std::string) { }
-    inline void inc_mem_counter(std::string, long) { }
-    inline void max_mem_counter(std::string, long) { }
-
-    inline void add_timer(std::string) { }
-    inline void start_timer(std::string) { }
-    inline void stop_timer(std::string) { }
-
-    void print_all() const { }
+    dummy_custom_stats_timer() { }
+    void start() {}
+    void stop() {}
+    friend std::ostream& operator<<(std::ostream& os, const dummy_custom_stats_timer&)
+    {
+        return os;
+    }
 };
 
 STXXL_END_NAMESPACE

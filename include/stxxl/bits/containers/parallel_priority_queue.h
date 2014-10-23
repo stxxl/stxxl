@@ -94,12 +94,9 @@ protected:
             return compare(y, x);
         }
     };
-
-    //! Record statistical data.
-    // typedef custom_stats stats_type;
     
-    //! Don't record statistical data.
-    typedef dummy_custom_stats stats_type;
+    typedef custom_stats_counter stats_counter;
+    typedef custom_stats_timer stats_timer;
 
     //! \}
 
@@ -148,9 +145,6 @@ protected:
     typedef typename std::vector<heap_type> heaps_type;
     typedef typename std::vector<external_array_type> external_arrays_type;
     typedef typename std::vector<internal_array> internal_arrays_type;
-
-    //! Logger for statistical data
-    stats_type stats;
 
     //! Limit the size of the extract buffer to an absolute value.
     //!
@@ -344,14 +338,14 @@ public:
         } else {
             internal_arrays.reserve(total_ram * num_insertion_heaps / ram_for_heaps);
         }
-
-        init_stats();
+        
     }
 
     //! Destructor.
     ~parallel_priority_queue() { }
 
 protected:
+
     //! Initializes member variables concerning the memory management.
     void init_memmanagement()
     {
@@ -407,112 +401,6 @@ protected:
                 STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
             }
         }
-    }
-
-    //! Initializes the counters and timers used for statistics.
-    //! Turn on/off with the stats_type definition.
-    void init_stats()
-    {
-        // Largest number of elements in the extract buffer at the same time
-        stats.add_mem_counter("max_extract_buffer_size", sizeof(ValueType));
-
-        // Sum of the sizes of each extract buffer refill. Used for average size.
-        stats.add_mem_counter("total_extract_buffer_size", sizeof(ValueType));
-
-        // Largest number of elements in the merge buffer when running flush_internal_arrays()
-        stats.add_mem_counter("max_merge_buffer_size", sizeof(ValueType));
-
-        // Total number of extracts
-        stats.add_counter("num_extracts");
-
-        // Number of refill_extract_buffer() calls
-        stats.add_counter("num_extract_buffer_refills");
-
-        // Number of flush_insertion_heaps() calls
-        stats.add_counter("num_insertion_heap_flushes");
-
-        // Number of flush_directly_to_hd() calls
-        stats.add_counter("num_direct_flushes");
-
-        // Number of flush_internal_arrays() calls
-        stats.add_counter("num_internal_array_flushes");
-
-        // Number of merge_external_arrays() calls
-        stats.add_counter("num_external_array_merges");
-
-        // Largest number of internal arrays at the same time
-        stats.add_counter("max_num_internal_arrays");
-
-        // Largest number of external arrays at the same time
-        stats.add_counter("max_num_external_arrays");
-
-        // Temporary number of new external arrays at the same time (which were created while the extract buffer hadn't been empty)
-        stats.add_counter("num_new_external_arrays");
-
-        // Largest number of new external arrays at the same time (which were created while the extract buffer hadn't been empty)
-        stats.add_counter("max_num_new_external_arrays");
-
-        if (c_merge_ias_into_eb) {
-            // Temporary number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
-            stats.add_counter("num_new_internal_arrays");
-
-            // Largest number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
-            stats.add_counter("max_num_new_internal_arrays");
-        }
-
-        // Total time for flush_insertion_heaps()
-        stats.add_timer("insertion_heap_flush_time");
-
-        // Total time for flush_directly_to_hd()
-        stats.add_timer("direct_flush_time");
-
-        // Total time for flush_internal_arrays()
-        stats.add_timer("internal_array_flush_time");
-
-        // Total time for merge_external_arrays()
-        stats.add_timer("external_array_merge_time");
-
-        // Total time for extract_min()
-        stats.add_timer("extract_min_time");
-
-        // Total time for refill_extract_buffer()
-        stats.add_timer("refill_extract_buffer_time");
-
-        // Total time for the merging in refill_extract_buffer()
-        // Part of refill_extract_buffer_time.
-        stats.add_timer("refill_merge_time");
-
-        // Total time for all things before merging in refill_extract_buffer()
-        // Part of refill_extract_buffer_time.
-        stats.add_timer("refill_time_before_merge");
-
-        // Total time for all things after merging in refill_extract_buffer()
-        // Part of refill_extract_buffer_time.
-        stats.add_timer("refill_time_after_merge");
-
-        // Total time of wait_for_first_block() calls in first part of
-        // refill_extract_buffer(). Part of refill_time_before_merge and refill_extract_buffer_time.
-        stats.add_timer("refill_wait_time");
-
-        // Total time for pop_heap() in extract_min().
-        // Part of extract_min_time.
-        stats.add_timer("pop_heap_time");
-
-        // Total time for merging the sorted heaps.
-        // Part of flush_insertion_heaps.
-        stats.add_timer("merge_sorted_heaps_time");
-
-        // Total time for std::upper_bound calls in refill_extract_buffer()
-        // Part of refill_extract_buffer_time and refill_time_before_merge.
-        //stats.add_timer(refill_upper_bound_time;
-
-        // Total time for std::accumulate calls in refill_extract_buffer()
-        // Part of refill_extract_buffer_time and refill_time_before_merge.
-        stats.add_timer("refill_accumulate_time");
-
-        // Total time for determining the smallest max value in refill_extract_buffer()
-        // Part of refill_extract_buffer_time and refill_time_before_merge.
-        stats.add_timer("refill_minmax_time");
     }
 
     //! \}
@@ -755,13 +643,13 @@ public:
     //! Access and remove the minimum element.
     ValueType pop()
     {
-        stats.inc_counter("num_extracts");
+        stats.num_extracts++;
 
         if (extract_buffer_empty()) {
             refill_extract_buffer();
         }
 
-        stats.start_timer("extract_min_time");
+        stats.extract_min_time.start();
 
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
         unsigned type = type_and_index.first;
@@ -775,10 +663,10 @@ public:
         {
             min = insertion_heaps[index * c_cache_line_factor][0];
 
-            stats.start_timer("pop_heap_time");
+            stats.pop_heap_time.start();
             std::pop_heap(insertion_heaps[index * c_cache_line_factor].begin(), insertion_heaps[index * c_cache_line_factor].end(), compare);
             insertion_heaps[index * c_cache_line_factor].pop_back();
-            stats.stop_timer("pop_heap_time");
+            stats.pop_heap_time.stop();
 
             insertion_size--;
 
@@ -845,7 +733,7 @@ public:
             abort();
         }
 
-        stats.stop_timer("extract_min_time");
+        stats.extract_min_time.stop();
         return min;
     }
 
@@ -855,8 +743,8 @@ public:
     //! Public for benchmark purposes.
     void merge_external_arrays()
     {
-        stats.inc_counter("num_external_array_merges");
-        stats.start_timer("external_array_merge_time");
+        stats.num_external_array_merges++;
+        stats.external_array_merge_time.start();
 
         m_minima.clear_external_arrays();
 
@@ -927,13 +815,13 @@ public:
         a.finish_write_phase();
 
         if (!extract_buffer_empty()) {
-            stats.inc_counter("num_new_external_arrays");
-            stats.max_counter("max_num_new_external_arrays", stats.get_counter("num_new_external_arrays"));
+            stats.num_new_external_arrays++;
+            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
             m_minima.add_external_array(external_arrays.size() - 1);
         }
 
-        stats.stop_timer("external_array_merge_time");
+        stats.external_array_merge_time.stop();
     }
 
     //! Print statistics.
@@ -962,7 +850,7 @@ public:
         //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(ValueType));
         //}
 
-        stats.print_all();
+        STXXL_MSG(stats);
         m_minima.print_stats();
     }
 
@@ -994,10 +882,10 @@ protected:
             return;
         }
 
-        stats.inc_counter("num_extract_buffer_refills");
-        stats.start_timer("refill_extract_buffer_time");
-        stats.start_timer("refill_time_before_merge");
-        stats.start_timer("refill_minmax_time");
+        stats.num_extract_buffer_refills++;
+        stats.refill_extract_buffer_time.start();
+        stats.refill_time_before_merge.start();
+        stats.refill_minmax_time.start();
 
         /*
          * determine maximum of each first block
@@ -1007,17 +895,17 @@ protected:
 
         // check only relevant if c_merge_ias_into_eb==true
         if (eas > 0) {
-            stats.start_timer("refill_wait_time");
+            stats.refill_wait_time.start();
             external_arrays[0].wait_for_first_block();
-            stats.stop_timer("refill_wait_time");
+            stats.refill_wait_time.stop();
             assert(external_arrays[0].size() > 0);
             min_max_value = external_arrays[0].get_current_max_element();
         }
 
         for (size_type i = 1; i < eas; ++i) {
-            stats.start_timer("refill_wait_time");
+            stats.refill_wait_time.start();
             external_arrays[i].wait_for_first_block();
-            stats.stop_timer("refill_wait_time");
+            stats.refill_wait_time.stop();
 
             ValueType max_value = external_arrays[i].get_current_max_element();
             if (inv_compare(max_value, min_max_value)) {
@@ -1025,7 +913,7 @@ protected:
             }
         }
 
-        stats.stop_timer("refill_minmax_time");
+        stats.refill_minmax_time.stop();
 
         // the number of elements in each external array that are smaller than min_max_value or equal
         // plus the number of elements in the internal arrays
@@ -1049,9 +937,9 @@ protected:
                 assert(begin != end);
 
                 // remove if parallel
-                //stats.start_timer("refill_upper_bound_time");
+                //stats.refill_upper_bound_time.start();
                 ValueType* ub = std::upper_bound(begin, end, min_max_value, inv_compare);
-                //stats.stop_timer("refill_upper_bound_time");
+                //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
@@ -1067,9 +955,9 @@ protected:
 
                 if (eas > 0) {
                     //remove if parallel
-                    //stats.start_timer("refill_upper_bound_time");
+                    //stats.refill_upper_bound_time.start();
                     ValueType* ub = std::upper_bound(begin, end, min_max_value, inv_compare);
-                    //stats.stop_timer("refill_upper_bound_time");
+                    //stats.refill_upper_bound_time.stop();
 
                     sizes[i] = std::distance(begin, ub);
                     sequences[i] = std::make_pair(begin, ub);
@@ -1094,20 +982,20 @@ protected:
             }
         }
 
-        stats.max_mem_counter("max_extract_buffer_size", output_size);
-        stats.inc_mem_counter("total_extract_buffer_size", output_size);
+        stats.max_extract_buffer_size.set_max(output_size);
+        stats.total_extract_buffer_size += output_size;
 
         assert(output_size > 0);
         extract_buffer.resize(output_size);
         buffered_size = output_size;
 
-        stats.stop_timer("refill_time_before_merge");
-        stats.start_timer("refill_merge_time");
+        stats.refill_time_before_merge.stop();
+        stats.refill_merge_time.start();
 
         stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(), extract_buffer.begin(), inv_compare, output_size);
 
-        stats.stop_timer("refill_merge_time");
-        stats.start_timer("refill_time_after_merge");
+        stats.refill_merge_time.stop();
+        stats.refill_time_after_merge.start();
 
         // remove elements
         if (c_limit_extract_buffer) {
@@ -1133,11 +1021,11 @@ protected:
             }
         }
 
-        //stats.start_timer("refill_wait_time");
+        //stats.refill_wait_time.start();
         for (size_type i = 0; i < eas; ++i) {
             external_arrays[i].wait_for_first_block();
         }
-        //stats.stop_timer("refill_wait_time");
+        //stats.refill_wait_time.stop();
 
         // remove empty arrays - important for the next round
         external_arrays.erase(std::remove_if(external_arrays.begin(), external_arrays.end(), empty_array_eraser()), external_arrays.end());
@@ -1146,7 +1034,7 @@ protected:
             ram_left += num_deleted_arrays * ram_per_external_array;
         }
 
-        stats.set_counter("num_new_external_arrays", 0);
+        stats.num_new_external_arrays = 0;
 
         if (c_merge_ias_into_eb) {
             internal_arrays.erase(std::remove_if(internal_arrays.begin(), internal_arrays.end(), empty_internal_array_eraser()), internal_arrays.end());
@@ -1154,13 +1042,13 @@ protected:
             if (num_deleted_internal_arrays > 0) {
                 ram_left += num_deleted_internal_arrays * ram_per_internal_array;
             }
-            stats.set_counter("num_new_internal_arrays", 0);
+            stats.num_new_internal_arrays = 0;
         }
 
         m_minima.update_extract_buffer();
 
-        stats.stop_timer("refill_time_after_merge");
-        stats.stop_timer("refill_extract_buffer_time");
+        stats.refill_time_after_merge.stop();
+        stats.refill_extract_buffer_time.stop();
     }
 
 
@@ -1187,8 +1075,8 @@ protected:
             }
         }
 
-        stats.inc_counter("num_insertion_heap_flushes");
-        stats.start_timer("insertion_heap_flush_time");
+        stats.num_insertion_heap_flushes++;
+        stats.insertion_heap_flush_time.start();
 
         size_type size = insertion_size;
         assert(size > 0);
@@ -1204,18 +1092,18 @@ protected:
         }
 
         if (c_merge_sorted_heaps) {
-            stats.start_timer("merge_sorted_heaps_time");
+            stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
             parallel::multiway_merge(sequences.begin(), sequences.end(), merged_array.begin(), inv_compare, size);
-            stats.stop_timer("merge_sorted_heaps_time");
+            stats.merge_sorted_heaps_time.stop();
 
             internal_arrays.emplace_back(merged_array);
             // internal array owns merged_array now.
 
             if (c_merge_ias_into_eb) {
                 if (!extract_buffer_empty()) {
-                    stats.inc_counter("num_new_internal_arrays");
-                    stats.max_counter("max_num_new_internal_arrays", stats.get_counter("num_new_internal_arrays"));
+                    stats.num_new_internal_arrays++;
+                    stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
                     m_minima.add_internal_array(internal_arrays.size() - 1);
                 }
             } else {
@@ -1237,8 +1125,8 @@ protected:
 
                     if (c_merge_ias_into_eb) {
                         if (!extract_buffer_empty()) {
-                            stats.inc_counter("num_new_internal_arrays");
-                            stats.max_counter("max_num_new_internal_arrays", stats.get_counter("num_new_internal_arrays"));
+                            stats.num_new_internal_arrays++;
+                            stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
                             m_minima.add_internal_array(internal_arrays.size() - 1);
                         }
                     } else {
@@ -1256,8 +1144,8 @@ protected:
         internal_size += size;
         insertion_size = 0;
 
-        stats.max_counter("max_num_internal_arrays", (size_type)internal_arrays.size());
-        stats.stop_timer("insertion_heap_flush_time");
+        stats.max_num_internal_arrays.set_max(internal_arrays.size());
+        stats.insertion_heap_flush_time.stop();
 
         if (ram_left < ram_per_external_array + ram_per_internal_array) {
             flush_internal_arrays();
@@ -1267,8 +1155,8 @@ protected:
     //! Flushes the internal arrays into an external array.
     inline void flush_internal_arrays()
     {
-        stats.inc_counter("num_internal_array_flushes");
-        stats.start_timer("internal_array_flush_time");
+        stats.num_internal_array_flushes++;
+        stats.internal_array_flush_time.start();
 
         m_minima.clear_internal_arrays();
 
@@ -1288,7 +1176,7 @@ protected:
 
         // TODO: write in chunks in order to safe RAM?
 
-        stats.max_mem_counter("max_merge_buffer_size", size);
+        stats.max_merge_buffer_size.set_max(size);
 
         std::vector<ValueType> write_buffer(size);
         parallel::multiway_merge(sequences.begin(), sequences.end(), write_buffer.begin(), inv_compare, size);
@@ -1304,11 +1192,11 @@ protected:
         internal_size = 0;
 
         internal_arrays.clear();
-        stats.set_counter("num_new_internal_arrays", 0);
+        stats.num_new_internal_arrays = 0;
 
         if (!extract_buffer_empty()) {
-            stats.inc_counter("num_new_external_arrays");
-            stats.max_counter("max_num_new_external_arrays", stats.get_counter("num_new_external_arrays"));
+            stats.num_new_external_arrays++;
+            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
             m_minima.add_external_array(external_arrays.size() - 1);
         }
@@ -1316,8 +1204,8 @@ protected:
         ram_left += num_arrays * ram_per_internal_array;
         ram_left -= ram_per_external_array;
 
-        stats.max_counter("max_num_external_arrays", (size_type)external_arrays.size());
-        stats.stop_timer("internal_array_flush_time");
+        stats.max_num_external_arrays.set_max(external_arrays.size());
+        stats.internal_array_flush_time.stop();
     }
 
     //! Flushes the insertion heaps into an external array.
@@ -1327,8 +1215,8 @@ protected:
             merge_external_arrays();
         }
 
-        stats.inc_counter("num_direct_flushes");
-        stats.start_timer("direct_flush_time");
+        stats.num_direct_flushes++;
+        stats.direct_flush_time.start();
 
         size_type size = insertion_size;
         std::vector<std::pair<value_iterator, value_iterator> > sequences(num_insertion_heaps);
@@ -1365,16 +1253,16 @@ protected:
         m_minima.clear_heaps();
 
         if (!extract_buffer_empty()) {
-            stats.inc_counter("num_new_external_arrays");
-            stats.max_counter("max_num_new_external_arrays", stats.get_counter("num_new_external_arrays"));
+            stats.num_new_external_arrays++;
+            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
             m_minima.add_external_array(external_arrays.size() - 1);
         }
 
         ram_left -= ram_per_external_array;
 
-        stats.max_counter("max_num_external_arrays", (size_type)external_arrays.size());
-        stats.stop_timer("direct_flush_time");
+        stats.max_num_external_arrays.set_max(external_arrays.size());
+        stats.direct_flush_time.stop();
     }
 
     //! Sorts the values from values and writes them into an external array.
@@ -1395,14 +1283,14 @@ protected:
         external_size += values.size();
 
         if (!extract_buffer_empty()) {
-            stats.inc_counter("num_new_external_arrays");
-            stats.max_counter("max_num_new_external_arrays", stats.get_counter("num_new_external_arrays"));
+            stats.num_new_external_arrays++;
+            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
             m_minima.add_external_array(external_arrays.size() - 1);
         }
 
         ram_left -= ram_per_external_array;
-        stats.max_counter("max_num_external_arrays", (size_type)external_arrays.size());
+        stats.max_num_external_arrays.set_max((size_type)external_arrays.size());
     }
 
     //! Sorts the values from values and writes them into an internal array.
@@ -1417,8 +1305,8 @@ protected:
 
         if (c_merge_ias_into_eb) {
             if (!extract_buffer_empty()) {
-                stats.inc_counter("num_new_internal_arrays");
-                stats.max_counter("max_num_new_internal_arrays", stats.get_counter("num_new_internal_arrays"));
+                stats.num_new_internal_arrays++;
+                stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
                 m_minima.add_internal_array(internal_arrays.size() - 1);
             }
         } else {
@@ -1427,7 +1315,7 @@ protected:
 
         // TODO: use real value size: ram_left -= 2*values->size()*sizeof(ValueType);
         ram_left -= ram_per_internal_array;
-        stats.max_counter("max_num_internal_arrays", (size_type)internal_arrays.size());
+        stats.max_num_internal_arrays.set_max(internal_arrays.size());
 
         // Vector is now owned by PPQ...
     }
@@ -1466,6 +1354,151 @@ protected:
             flush_array_internal(values);
         }
     }
+    
+    //! Struct of all statistical counters and timers.
+    //! Turn on/off statistics using the stats_counter and stats_timer typedefs.
+    struct stats_type
+    {
+        //! Largest number of elements in the extract buffer at the same time
+        stats_counter max_extract_buffer_size;
+        
+        //! Sum of the sizes of each extract buffer refill. Used for average size.
+        stats_counter total_extract_buffer_size;
+        
+        //! Largest number of elements in the merge buffer when running flush_internal_arrays()
+        stats_counter max_merge_buffer_size;
+
+        //! Total number of extracts
+        stats_counter num_extracts;
+
+        //! Number of refill_extract_buffer() calls
+        stats_counter num_extract_buffer_refills;
+
+        //! Number of flush_insertion_heaps() calls
+        stats_counter num_insertion_heap_flushes;
+
+        //! Number of flush_directly_to_hd() calls
+        stats_counter num_direct_flushes;
+
+        //! Number of flush_internal_arrays() calls
+        stats_counter num_internal_array_flushes;
+
+        //! Number of merge_external_arrays() calls
+        stats_counter num_external_array_merges;
+
+        //! Largest number of internal arrays at the same time
+        stats_counter max_num_internal_arrays;
+
+        //! Largest number of external arrays at the same time
+        stats_counter max_num_external_arrays;
+
+        //! Temporary number of new external arrays at the same time (which were created while the extract buffer hadn't been empty)
+        stats_counter num_new_external_arrays;
+
+        //! Largest number of new external arrays at the same time (which were created while the extract buffer hadn't been empty)
+        stats_counter max_num_new_external_arrays;
+
+        //if (c_merge_ias_into_eb) {
+            //! Temporary number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
+            stats_counter num_new_internal_arrays;
+
+            //! Largest number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
+            stats_counter max_num_new_internal_arrays;
+        //}
+
+        //! Total time for flush_insertion_heaps()
+        stats_timer insertion_heap_flush_time;
+
+        //! Total time for flush_directly_to_hd()
+        stats_timer direct_flush_time;
+
+        //! Total time for flush_internal_arrays()
+        stats_timer internal_array_flush_time;
+
+        //! Total time for merge_external_arrays()
+        stats_timer external_array_merge_time;
+
+        //! Total time for extract_min()
+        stats_timer extract_min_time;
+
+        //! Total time for refill_extract_buffer()
+        stats_timer refill_extract_buffer_time;
+
+        //! Total time for the merging in refill_extract_buffer()
+        //! Part of refill_extract_buffer_time.
+        stats_timer refill_merge_time;
+
+        //! Total time for all things before merging in refill_extract_buffer()
+        //! Part of refill_extract_buffer_time.
+        stats_timer refill_time_before_merge;
+
+        //! Total time for all things after merging in refill_extract_buffer()
+        //! Part of refill_extract_buffer_time.
+        stats_timer refill_time_after_merge;
+
+        //! Total time of wait_for_first_block() calls in first part of
+        //! refill_extract_buffer(). Part of refill_time_before_merge and refill_extract_buffer_time.
+        stats_timer refill_wait_time;
+
+        //! Total time for pop_heap() in extract_min().
+        //! Part of extract_min_time.
+        stats_timer pop_heap_time;
+
+        //! Total time for merging the sorted heaps.
+        //! Part of flush_insertion_heaps.
+        stats_timer merge_sorted_heaps_time;
+
+        //! Total time for std::upper_bound calls in refill_extract_buffer()
+        //! Part of refill_extract_buffer_time and refill_time_before_merge.
+        // stats_timer refill_upper_bound_time;
+
+        //! Total time for std::accumulate calls in refill_extract_buffer()
+        //! Part of refill_extract_buffer_time and refill_time_before_merge.
+        stats_timer refill_accumulate_time;
+
+        //! Total time for determining the smallest max value in refill_extract_buffer()
+        //! Part of refill_extract_buffer_time and refill_time_before_merge.
+        stats_timer refill_minmax_time;
+        
+        friend std::ostream& operator<<(std::ostream& os, const stats_type& o)
+        {
+            return os << "max_extract_buffer_size=" << o.max_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
+                << "total_extract_buffer_size=" << o.total_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
+                << "max_merge_buffer_size=" << o.max_merge_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
+                << "num_extracts=" << o.num_extracts << std::endl
+                << "num_extract_buffer_refills=" << o.num_extract_buffer_refills << std::endl
+                << "num_insertion_heap_flushes=" << o.num_insertion_heap_flushes << std::endl
+                << "num_direct_flushes=" << o.num_direct_flushes << std::endl
+                << "num_internal_array_flushes=" << o.num_internal_array_flushes << std::endl
+                << "num_external_array_merges=" << o.num_external_array_merges << std::endl
+                << "max_num_internal_arrays=" << o.max_num_internal_arrays << std::endl
+                << "max_num_external_arrays=" << o.max_num_external_arrays << std::endl
+                << "num_new_external_arrays=" << o.num_new_external_arrays << std::endl
+                << "max_num_new_external_arrays=" << o.max_num_new_external_arrays << std::endl
+                //if (c_merge_ias_into_eb) {
+                << "num_new_internal_arrays=" << o.num_new_internal_arrays << std::endl
+                << "max_num_new_internal_arrays=" << o.max_num_new_internal_arrays << std::endl
+                //}
+                << "insertion_heap_flush_time=" << o.insertion_heap_flush_time << std::endl
+                << "direct_flush_time=" << o.direct_flush_time << std::endl
+                << "internal_array_flush_time=" << o.internal_array_flush_time << std::endl
+                << "external_array_merge_time=" << o.external_array_merge_time << std::endl
+                << "extract_min_time=" << o.extract_min_time << std::endl
+                << "refill_extract_buffer_time=" << o.refill_extract_buffer_time << std::endl
+                << "refill_merge_time=" << o.refill_merge_time << std::endl
+                << "refill_time_before_merge=" << o.refill_time_before_merge << std::endl
+                << "refill_time_after_merge=" << o.refill_time_after_merge << std::endl
+                << "refill_wait_time=" << o.refill_wait_time << std::endl
+                << "pop_heap_time=" << o.pop_heap_time << std::endl
+                << "merge_sorted_heaps_time=" << o.merge_sorted_heaps_time << std::endl
+                // << "refill_upper_bound_time=" << o.refill_upper_bound_time << std::endl
+                << "refill_accumulate_time=" << o.refill_accumulate_time << std::endl
+                << "refill_minmax_time=" << o.refill_minmax_time << std::endl;
+        }
+    };
+    
+    stats_type stats;
+    
 };
 
 STXXL_END_NAMESPACE
