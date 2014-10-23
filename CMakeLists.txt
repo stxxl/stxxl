@@ -96,6 +96,9 @@ option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers
 
 option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
 
+# see tools/benchmarks about older TPIE benchmarks.
+option(USE_TPIE "Try to compile extra benchmarks from the 2007 S&PE paper with an old TPIE version." OFF)
+
 ### building shared and/or static libraries
 
 # by default we currently only build a static library, since we do not aim to

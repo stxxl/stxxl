@@ -18,7 +18,7 @@ stxxl_build_test(stack_benchmark)
 
 add_define(benchmark_naive_matrix "STXXL_VERBOSE_LEVEL=0")
 
-if(BUILD_TESTS)
+if(USE_TPIE AND BUILD_TESTS)
   file(GLOB TPIE_DIR_GLOB RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tpie_*")
 
   foreach(TPIE_TEST ${TPIE_DIR_GLOB})
@@ -30,7 +30,7 @@ if(BUILD_TESTS)
 
   if(EXISTS "${TPIE_DIR}/lib/libtpie.a")
 
-    message("Found compiled TPIE library at ${TPIE_DIR}")
+    message(STATUS "Found compiled TPIE library at ${TPIE_DIR}")
 
     add_library(tpie STATIC IMPORTED)
     set_property(TARGET tpie PROPERTY IMPORTED_LOCATION "${TPIE_DIR}/lib/libtpie.a")
@@ -70,6 +70,6 @@ if(BUILD_TESTS)
       target_link_libraries(berkeley_db_benchmark ${STXXL_LIBRARIES} tpie ${BERKELEYDB_LIBRARIES})
     endif()
   else()
-    message("Could not find TPIE, skipping extra benchmarks.")
+    message(SEND_ERROR "Could not find TPIE for extra benchmarks.")
   endif()
-endif(BUILD_TESTS)
+endif(USE_TPIE AND BUILD_TESTS)
