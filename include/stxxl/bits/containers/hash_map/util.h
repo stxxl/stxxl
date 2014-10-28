@@ -151,7 +151,8 @@ public:
           prefetch_(false),
           page_size_(tuning::get_instance()->prefetch_page_size),
           prefetch_pages_(tuning::get_instance()->prefetch_pages),
-          dirty_(false)
+          dirty_(false),
+          subblock_(NULL)
     {
         if (seq_begin == seq_end)
             return;
