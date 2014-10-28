@@ -162,6 +162,7 @@ STXXL library was designed to ease the access to external memory algorithms and 
 - \subpage design_queue "stxxl::queue"
 - \subpage design_deque "stxxl::deque"
 - \subpage design_map "stxxl::map"
+- \subpage design_unordered_map "stxxl::unordered_map"
 
 Beyond these, STXXL also provides a set of containers that are not part of the STL:
 
@@ -500,6 +501,14 @@ In the following we briefly describe the architecture of the STXXL B+-tree imple
 Our design allows to use different implementations for leaves and (internal) nodes. For example, leaves could be represented internally as sparse arrays \cite BDIW02 (currently, only the classic sorted array implementation is available). Leaves and nodes can have different external memory block sizes. Each leaf has links to the predecessor and successor leaves to speed up scanning. Our B+-tree is able to prefetch the neighbor leaves when scanning, obtaining a higher bandwidth by overlapping I/O and computation. The root node is always kept in the main memory and implemented as an std::map. To save I/Os, the most frequently used nodes and leaves are cached in corresponding node and leaf \a caches that are implemented in a single template class. An iterator keeps the block identifier (BID) of the external block where the pointed data element is contained, the offset of the data element in the block and a pointer to the B+-tree. In case of reorganizations of the data in external memory blocks (rebalancing, splitting, fusing blocks), all iterators pointing to the moved data have to be updated. For this purpose, the addresses of all instantiated iterators are kept in the iterator map object. The iterator map facilitates fast accounting of iterators, mapping BID and block offsets of iterators to its main memory addresses using an \a internal memory search tree. Therefore, the number of "alive" B+-tree iterators must be kept reasonably small. The parent pointers in leaves and nodes can be useful for finger search (The program can help the search tree finding an element by giving some "position close by" which was determined by an earlier search.) and insertions using a finger, however, that would require to store the whole B-tree path in the iterator data structure. This might make the iterator accounting very slow, therefore we do not maintain the parent links. The implementation can save I/Os when <tt>const_iterator</tt>s are used: no flushing of supposedly changed data is needed (e.g. when scanning or doing other read-only operations). Our implementation of B+-tree supports bulk bottom-up construction from the presorted data given by an iterator range in \f$ \mathcal{O}(n/B) \f$ I/Os.
 
 \image html btree_uml_small.png "The simplified UML class diagram of the B+-tree implementation."
+
+*/
+
+/** \page design_unordered_map Unordered Map
+
+There is currently no documentation here, see the tutorial \ref tutorial_unordered_map for some notes.
+
+The unordered_map/hash map library was created as a student project at the University of Karlsruhe. If you can read German, contact the maintainers for a copy of the student thesis.
 
 */
 
