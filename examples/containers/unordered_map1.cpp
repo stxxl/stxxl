@@ -75,7 +75,7 @@ int main()
     // efficient bulk-insert into hash map by sorting by hash keys
     std::vector<unordered_map_type::value_type> value_array;
 
-    for (size_t i = 0; i < 128; ++i)
+    for (int i = 0; i < 128; ++i)
         value_array.push_back(std::make_pair(i, (char)i));
 
     my_map.insert(value_array.begin(), value_array.end(), 8 * 1024 * 1024);
