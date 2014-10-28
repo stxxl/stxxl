@@ -1,7 +1,7 @@
 Version 1.4-dev (unreleased)
 
 * support kernel based asynchronous I/O on Linux (new file type "linuxaio"),
-  which exploits Native Command Queuing (NCQ) if available
+  which exploits Native Command Queuing (NCQ) if available.
   disable/enable with the define STXXL_FILE_LINUXAIO 0/1 via cmake
 
 * adding new disk_config entry device_id, which specifies the physical device
@@ -26,6 +26,15 @@ Version 1.4-dev (unreleased)
   complete handler instead, since otherwise a default_completion_handler
   objects is cloned for _each_io_request_! Using a NULL pointer avoids
   superfluous new/delete work on the heap.
+
+* minor changes:
+  - disable TPIE benchmarks by default, removing a warning.
+  - compilation and tests work under MinGW 64-bit with special threads.
+  - fixed compilation on 32-bit systems, everything is -Wconversion safe.
+  - adding 32-bit and 64-bit cmdline_parser::add_bytes() variants.
+  - removing all double underscores.
+  - use atomic_counted_object in class file for request reference counting.
+  - adding local/test2.cpp containing a stxxl::sorter example.
 
 Version 1.4.0 (12 December 2013)
 
