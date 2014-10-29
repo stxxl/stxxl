@@ -85,6 +85,9 @@ class timer
     }
 
 public:
+    //! boolean indicating that this class does real timing
+    static const bool is_real = true;
+
     //! initialize and optionally immediately start the timer
     inline timer(bool start_immediately = false)
         : running(false), accumulated(0), last_clock(0)
@@ -157,6 +160,9 @@ public:
 class fake_timer
 {
 public:
+    //! boolean indicating that this class does NOT do real timing
+    static const bool is_real = false;
+
     //! initialize and optionally immediately start the timer
     fake_timer(bool = false)
     { }
