@@ -1,4 +1,4 @@
-Version 1.4-dev (unreleased)
+Version 1.4.1 (29 October 2014)
 
 * support kernel based asynchronous I/O on Linux (new file type "linuxaio"),
   which exploits Native Command Queuing (NCQ) if available.
