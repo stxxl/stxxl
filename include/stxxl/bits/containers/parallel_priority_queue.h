@@ -14,18 +14,17 @@
 #define STXXL_CONTAINERS_PARALLEL_PRIORITY_QUEUE_HEADER
 
 #include <algorithm>
-#include <algorithm>
-#include <assert.h>
-#include <assert.h>
-#include <climits>
+#include <cassert>
 #include <cstdlib>
 #include <list>
-#include <stdlib.h>
 #include <utility>
 #include <vector>
 
-#include <parallel/algorithm>
-#include <parallel/numeric>
+#if STXXL_PARALLEL
+    #include <omp.h>
+    #include <parallel/algorithm>
+    #include <parallel/numeric>
+#endif
 
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/mutex.h>
@@ -98,6 +97,117 @@ protected:
     typedef custom_stats_counter stats_counter;
     typedef custom_stats_timer stats_timer;
 
+    class internal_array
+    {
+    private:
+        std::vector<value_type> m_values;
+        size_type m_min_index;
+        bool m_deleted;
+
+    public:
+        //! The value iterator type used by begin() and end()
+        //! We use pointers as iterator so internal arrays
+        //! are compatible to external arrays and can be
+        //! merged together.
+        typedef value_type* iterator;
+
+        //! Default constructor. Don't use this directy. Needed for regrowing in surrounding vector.
+        internal_array() = default;
+
+        //! Constructor which takes a value vector.
+        //! The vector should not be used outside this
+        //! class anymore!
+        internal_array(std::vector<value_type>& values)
+            : m_values(), m_min_index(0), m_deleted(false)
+        {
+            std::swap(m_values, values);
+        }
+        
+        //! Move constructor. Needed for regrowing in surrounding vector.
+        internal_array(internal_array&& o)
+            : m_values(std::move(o.m_values)),
+                m_min_index(o.m_min_index),
+                m_deleted(o.m_deleted) { }
+        
+    
+        //! Delete copy assignment for emplace_back to use the move semantics.
+        internal_array& operator=(internal_array& other) = delete;
+        
+        //! Delete copy constructor for emplace_back to use the move semantics.
+        internal_array(const internal_array& other) = delete;
+        
+        //! Move assignment.
+        internal_array& operator=(internal_array&&){
+            return *this;
+        }
+
+        //! Random access operator
+        inline value_type& operator [] (size_t i) const
+        {
+            return m_values[i];
+        }
+
+        //! Use inc_min if a value has been extracted.
+        inline void inc_min()
+        {
+            m_min_index++;
+        }
+
+        //! Use inc_min(diff) if multiple values have been extracted.
+        inline void inc_min(size_type diff)
+        {
+            m_min_index += diff;
+        }
+
+        //! The currently smallest element in the array.
+        inline const value_type & get_min() const
+        {
+            return m_values[m_min_index];
+        }
+
+        //! The index of the currently smallest element in the array.
+        inline size_type get_min_index() const
+        {
+            return m_min_index;
+        }
+
+        //! The index of the largest element in the array.
+        inline size_type get_max_index() const
+        {
+            return (m_values.size() - 1);
+        }
+
+        //! Returns if the array has run empty.
+        inline bool empty() const
+        {
+            return (m_min_index >= m_values.size());
+        }
+
+        //! Returns the current size of the array.
+        inline size_type size() const
+        {
+            return (m_values.size() - m_min_index);
+        }
+
+        //! Begin iterator
+        inline iterator begin()
+        {
+            // We use &(*()) in order to get a pointer iterator.
+            // This is allowed because values are guaranteed to be
+            // consecutive in std::vecotor.
+            return &(*(m_values.begin() + m_min_index));
+        }
+
+        //! End iterator
+        inline iterator end()
+        {
+            // We use &(*()) in order to get a pointer iterator.
+            // This is allowed because values are guaranteed to be
+            // consecutive in std::vecotor.
+            return &(*(m_values.end()));
+        }
+    };
+
     //! \}
 
 
@@ -139,8 +249,6 @@ protected:
     //! \}
 
     friend class minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> >;
-
-#include "ppq_internal_array.h"
 
     typedef typename std::vector<heap_type> heaps_type;
     typedef typename std::vector<external_array_type> external_arrays_type;
@@ -189,7 +297,7 @@ protected:
     size_type buffered_size;
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
-    size_type num_insertion_heaps;
+    unsigned num_insertion_heaps;
 
     //! Capacity of one inserion heap
     size_type insertion_heap_capacity;
@@ -301,7 +409,11 @@ public:
         internal_size(0),
         insertion_size(0),
         buffered_size(0),
-        num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : omp_get_max_threads()),
+        #if STXXL_PARALLEL
+            num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : omp_get_max_threads()),
+        #else
+            num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : 1),
+        #endif
         real_insertion_heap_size_factor(1 + 1 / num_insertion_heaps),
         total_ram((_total_ram > 0) ? _total_ram : Ram),
         ram_for_heaps(num_insertion_heaps * ((_single_heap_ram > 0) ? _single_heap_ram : c_default_single_heap_ram)),
@@ -313,10 +425,10 @@ public:
         m_minima(*this),
         m_do_flush_directly_to_hd(flush_directly_to_hd)
     {
-        srand(time(NULL));
+        srand(static_cast<unsigned>(time(NULL)));
 
         if (c_limit_extract_buffer) {
-            extract_buffer_limit = (extract_buffer_ram > 0) ? extract_buffer_ram / sizeof(ValueType) : (total_ram * c_default_extract_buffer_ram_part / sizeof(ValueType));
+            extract_buffer_limit = (extract_buffer_ram > 0) ? extract_buffer_ram / sizeof(ValueType) : static_cast<size_type>( (static_cast<double>(total_ram) * c_default_extract_buffer_ram_part / static_cast<double>(sizeof(ValueType))));
         }
 
         insertion_heap_capacity = ram_for_heaps / (num_insertion_heaps * sizeof(ValueType));
@@ -326,7 +438,7 @@ public:
         }
 
         for (unsigned i = 0; i < num_insertion_heaps; ++i) {
-            insertion_heaps[i * c_cache_line_factor].reserve(real_insertion_heap_size_factor * insertion_heap_capacity);
+            insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
         }
 
         init_memmanagement();
@@ -476,8 +588,10 @@ public:
         unsigned id;
         if (thread_num > -1) {
             id = thread_num;
+        #if STXXL_PARALLEL
         } else if (omp_get_num_threads() > 1) {
-            id = omp_get_thread_num();
+            id = omp_get_thread_num(); 
+        #endif
         } else {
             id = rand() % num_insertion_heaps;
         }
@@ -522,14 +636,21 @@ public:
         }
 
         bulk_push_begin(elements.size());
-#pragma omp parallel if (elements.size()>c_single_insert_limit)
+        #if STXXL_PARALLEL
+        #pragma omp parallel
         {
-            unsigned int thread_num = omp_get_thread_num();
-#pragma omp for
+            const unsigned thread_num = omp_get_thread_num();
+            #pragma omp parallel for
             for (size_type i = 0; i < elements.size(); ++i) {
                 bulk_push_step(elements[i], thread_num);
             }
         }
+        #else
+        const unsigned thread_num = rand() % num_insertion_heaps;
+        for (size_type i = 0; i < elements.size(); ++i) {
+            bulk_push_step(elements[i], thread_num);
+        }
+        #endif
         bulk_push_end();
     }
 
@@ -778,7 +899,9 @@ public:
             std::vector<std::pair<block_iterator, block_iterator> > sequences(eas);
             size_type output_size = 0;
 
-#pragma omp parallel for if(eas>num_insertion_heaps)
+            #if STXXL_PARALLEL
+            #pragma omp parallel for if(eas>num_insertion_heaps)
+            #endif
             for (size_type i = 0; i < eas; ++i) {
                 assert(!external_arrays[i].empty());
 
@@ -795,7 +918,13 @@ public:
             }
 
             merge_buffer.resize(output_size);
-            stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(), merge_buffer.begin(), inv_compare, output_size);
+            
+            #if STXXL_PARALLEL
+                stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
+                    merge_buffer.begin(), inv_compare, output_size);
+            #else
+                // TODO
+            #endif
 
             for (size_type i = 0; i < eas; ++i) {
                 external_arrays[i].remove_first_n_elements(sizes[i]);
@@ -818,7 +947,7 @@ public:
             stats.num_new_external_arrays++;
             stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(external_arrays.size() - 1);
+            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
         }
 
         stats.external_array_merge_time.stop();
@@ -838,7 +967,9 @@ public:
         }
 
         STXXL_VARDUMP(m_do_flush_directly_to_hd);
-        STXXL_VARDUMP(omp_get_max_threads());
+        #if STXXL_PARALLEL
+            STXXL_VARDUMP(omp_get_max_threads());
+        #endif
 
         STXXL_MEMDUMP(ram_for_heaps);
         STXXL_MEMDUMP(ram_left);
@@ -924,7 +1055,9 @@ protected:
          * calculate size and create sequences to merge
          */
 
-#pragma omp parallel for if(eas+ias>num_insertion_heaps)
+        #if STXXL_PARALLEL
+        #pragma omp parallel for if(eas+ias>num_insertion_heaps)
+        #endif
         for (size_type i = 0; i < eas + ias; ++i) {
             // check only relevant if c_merge_ias_into_eb==true
             if (i < eas) {
@@ -992,7 +1125,12 @@ protected:
         stats.refill_time_before_merge.stop();
         stats.refill_merge_time.start();
 
-        stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(), extract_buffer.begin(), inv_compare, output_size);
+        #if STXXL_PARALLEL
+            stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
+                extract_buffer.begin(), inv_compare, output_size);
+        #else
+            // TODO
+        #endif
 
         stats.refill_merge_time.stop();
         stats.refill_time_after_merge.start();
@@ -1082,7 +1220,9 @@ protected:
         assert(size > 0);
         std::vector<std::pair<value_iterator, value_iterator> > sequences(num_insertion_heaps);
 
-#pragma omp parallel for
+        #if STXXL_PARALLEL
+        #pragma omp parallel for
+        #endif
         for (unsigned i = 0; i < num_insertion_heaps; ++i) {
             // TODO: Use std::sort_heap instead? We would have to reverse the order...
             std::sort(insertion_heaps[i * c_cache_line_factor].begin(), insertion_heaps[i * c_cache_line_factor].end(), inv_compare);
@@ -1094,7 +1234,14 @@ protected:
         if (c_merge_sorted_heaps) {
             stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
-            parallel::multiway_merge(sequences.begin(), sequences.end(), merged_array.begin(), inv_compare, size);
+            
+            #if STXXL_PARALLEL
+                parallel::multiway_merge(sequences.begin(), sequences.end(),
+                    merged_array.begin(), inv_compare, size);
+            #else
+                // TODO
+            #endif
+            
             stats.merge_sorted_heaps_time.stop();
 
             internal_arrays.emplace_back(merged_array);
@@ -1104,15 +1251,15 @@ protected:
                 if (!extract_buffer_empty()) {
                     stats.num_new_internal_arrays++;
                     stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
-                    m_minima.add_internal_array(internal_arrays.size() - 1);
+                    m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
                 }
             } else {
-                m_minima.add_internal_array(internal_arrays.size() - 1);
+                m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
             }
 
             for (unsigned i = 0; i < num_insertion_heaps; ++i) {
                 insertion_heaps[i * c_cache_line_factor].clear();
-                insertion_heaps[i * c_cache_line_factor].reserve(real_insertion_heap_size_factor * insertion_heap_capacity);
+                insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
             }
             m_minima.clear_heaps();
 
@@ -1127,13 +1274,13 @@ protected:
                         if (!extract_buffer_empty()) {
                             stats.num_new_internal_arrays++;
                             stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
-                            m_minima.add_internal_array(internal_arrays.size() - 1);
+                            m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
                         }
                     } else {
-                        m_minima.add_internal_array(internal_arrays.size() - 1);
+                        m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
                     }
 
-                    insertion_heaps[i * c_cache_line_factor].reserve(real_insertion_heap_size_factor * insertion_heap_capacity);
+                    insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
                 }
             }
 
@@ -1179,7 +1326,13 @@ protected:
         stats.max_merge_buffer_size.set_max(size);
 
         std::vector<ValueType> write_buffer(size);
-        parallel::multiway_merge(sequences.begin(), sequences.end(), write_buffer.begin(), inv_compare, size);
+        
+        #if STXXL_PARALLEL
+            parallel::multiway_merge(sequences.begin(), sequences.end(),
+                write_buffer.begin(), inv_compare, size);
+        #else
+            // TODO
+        #endif
 
         // TODO: directly write to block? -> no useless mem copy. Does not work if size > block size
         for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
@@ -1198,7 +1351,7 @@ protected:
             stats.num_new_external_arrays++;
             stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(external_arrays.size() - 1);
+            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
         }
 
         ram_left += num_arrays * ram_per_internal_array;
@@ -1221,7 +1374,9 @@ protected:
         size_type size = insertion_size;
         std::vector<std::pair<value_iterator, value_iterator> > sequences(num_insertion_heaps);
 
-#pragma omp parallel for
+        #if STXXL_PARALLEL
+        #pragma omp parallel for
+        #endif
         for (unsigned i = 0; i < num_insertion_heaps; ++i) {
             // TODO std::sort_heap? We would have to reverse the order...
             std::sort(insertion_heaps[i * c_cache_line_factor].begin(), insertion_heaps[i * c_cache_line_factor].end(), inv_compare);
@@ -1233,7 +1388,13 @@ protected:
 
         // TODO: write in chunks in order to safe RAM
         std::vector<ValueType> write_buffer(size);
-        parallel::multiway_merge(sequences.begin(), sequences.end(), write_buffer.begin(), inv_compare, size);
+        
+        #if STXXL_PARALLEL
+            parallel::multiway_merge(sequences.begin(), sequences.end(),
+                write_buffer.begin(), inv_compare, size);
+        #else
+            // TODO
+        #endif
 
         // TODO: directly write to block -> no useless mem copy
         for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
@@ -1245,10 +1406,13 @@ protected:
         external_size += size;
         insertion_size = 0;
 
-//#pragma omp parallel for
+        // inefficient...
+        //#if STXXL_PARALLEL
+        //#pragma omp parallel for
+        //#endif
         for (unsigned i = 0; i < num_insertion_heaps; ++i) {
             insertion_heaps[i * c_cache_line_factor].clear();
-            insertion_heaps[i * c_cache_line_factor].reserve(real_insertion_heap_size_factor * insertion_heap_capacity);
+            insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
         }
         m_minima.clear_heaps();
 
@@ -1256,7 +1420,7 @@ protected:
             stats.num_new_external_arrays++;
             stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(external_arrays.size() - 1);
+            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
         }
 
         ram_left -= ram_per_external_array;
@@ -1269,7 +1433,11 @@ protected:
     //! \param values the vector to sort and store
     void flush_array_to_hd(std::vector<ValueType>& values)
     {
-        __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
+        #if STXXL_PARALLEL
+            __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
+        #else
+            std::sort(values.begin(), values.end(), inv_compare);
+        #endif
 
         external_arrays.emplace_back(values.size(), num_prefetchers, num_write_buffers);
         external_array_type& a = external_arrays[external_arrays.size() - 1];
@@ -1286,11 +1454,11 @@ protected:
             stats.num_new_external_arrays++;
             stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(external_arrays.size() - 1);
+            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
         }
 
         ram_left -= ram_per_external_array;
-        stats.max_num_external_arrays.set_max((size_type)external_arrays.size());
+        stats.max_num_external_arrays.set_max(external_arrays.size());
     }
 
     //! Sorts the values from values and writes them into an internal array.
@@ -1299,7 +1467,13 @@ protected:
     void flush_array_internal(std::vector<ValueType>& values)
     {
         internal_size += values.size();
-        __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
+        
+        #if STXXL_PARALLEL
+            __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
+        #else
+            std::sort(values.begin(), values.end(), inv_compare);
+        #endif
+            
         internal_arrays.emplace_back(values);
         // internal array owns values now.
 
@@ -1307,10 +1481,10 @@ protected:
             if (!extract_buffer_empty()) {
                 stats.num_new_internal_arrays++;
                 stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
-                m_minima.add_internal_array(internal_arrays.size() - 1);
+                m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
             }
         } else {
-            m_minima.add_internal_array(internal_arrays.size() - 1);
+            m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
         }
 
         // TODO: use real value size: ram_left -= 2*values->size()*sizeof(ValueType);

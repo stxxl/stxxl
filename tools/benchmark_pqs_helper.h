@@ -178,7 +178,7 @@ void PREFIX(rand_insert) (unsigned int seed)
 {
     stxxl::scoped_print_timer timer("Filling " NAME " randomly", num_elements * value_size);
     for (stxxl::uint64 i = 0; i < num_elements; i++) {
-        uint32 k = rand_r(&seed) % value_universe_size;
+        uint64 k = rand_r(&seed) % value_universe_size;
         progress("Inserting element", i, num_elements);
         CONTAINER->push(value_type(k));
     }
@@ -224,18 +224,22 @@ void PREFIX(read_check) ()
 
 void PREFIX(rand_read_check) (unsigned int seed)
 {
-    std::vector<uint32> vals;
+    std::vector<uint64> vals;
     vals.reserve(num_elements);
     {
         stxxl::scoped_print_timer timer("Filling value vector for comarison");
         for (stxxl::uint64 i = 0; i < num_elements; ++i) {
-            uint32 k = rand_r(&seed) % value_universe_size;
+            uint64 k = rand_r(&seed) % value_universe_size;
             vals.push_back(k);
         }
     }
     {
         stxxl::scoped_print_timer timer("Sorting value vector for comarison");
-        __gnu_parallel::sort(vals.begin(), vals.end());
+        #if STXXL_PARALLEL
+            __gnu_parallel::sort(vals.begin(), vals.end());
+        #else
+            std::sort(vals.begin(), vals.end());
+        #endif
     }
     {
         stxxl::scoped_print_timer timer("Reading " NAME " and check order", num_elements * value_size);
@@ -281,7 +285,7 @@ void PREFIX(rand_intermixed) (unsigned int _seed, bool filled)
                 STXXL_CHECK_EQUAL(CONTAINER->size(), num_inserts - num_deletes);
             } else {
                 progress("Inserting/deleting element", i, 2 * num_elements);
-                uint32 k = rand_r(&_seed) % value_universe_size;
+                uint64 k = rand_r(&_seed) % value_universe_size;
                 CONTAINER->push(value_type(k));
                 num_inserts++;
                 STXXL_CHECK_EQUAL(CONTAINER->size(), num_inserts - num_deletes);
@@ -355,16 +359,16 @@ void PREFIX(bulk_rand_insert) (unsigned int _seed, bool parallel = true)
             #pragma omp parallel if(parallel)
             {
                 const unsigned int thread_id = parallel ? omp_get_thread_num() : rand() % num_insertion_heaps;
-                unsigned int seed = i * _seed * thread_id;
+                unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
                 #pragma omp for
 #endif
             for (stxxl::uint64 j = 0; j < bulk_size; ++j) {
                 progress("Inserting element", i * bulk_size + j, num_elements);
                                             #if defined(PPQ)
-                uint32 k = rand_r(&seed) % value_universe_size;
+                uint64 k = rand_r(&seed) % value_universe_size;
                 CONTAINER->bulk_push_step(value_type(k), thread_id);
                                             #else
-                uint32 k = rand_r(&_seed) % value_universe_size;
+                uint64 k = rand_r(&_seed) % value_universe_size;
                 CONTAINER->push(value_type(k));
                                             #endif
             }
@@ -381,16 +385,16 @@ void PREFIX(bulk_rand_insert) (unsigned int _seed, bool parallel = true)
         #pragma omp parallel if(parallel)
         {
             const unsigned thread_id = parallel ? omp_get_thread_num() : rand() % num_insertion_heaps;
-            unsigned int seed = num_elements / bulk_size * _seed * thread_id;
+            unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
             #pragma omp for
 #endif
         for (stxxl::uint64 j = 0; j < num_elements % bulk_size; j++) {
             progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
 #if defined(PPQ)
-            uint32 k = rand_r(&seed) % value_universe_size;
+            uint64 k = rand_r(&seed) % value_universe_size;
             CONTAINER->bulk_push_step(value_type(k), thread_id);
 #else
-            uint32 k = rand_r(&_seed) % value_universe_size;
+            uint64 k = rand_r(&_seed) % value_universe_size;
             CONTAINER->push(value_type(k));
 #endif
         }
@@ -413,7 +417,7 @@ void PREFIX(bulk_rand_intermixed) (unsigned int _seed, bool filled, bool paralle
     {
         stxxl::scoped_print_timer timer(NAME ": Intermixed parallel rand bulk insert" + parallel_str + " and delete", (filled ? 3 : 2) * num_elements * value_size);
         for (uint64_t i = 0; i < (filled ? 3 : 2) * num_elements; ++i) {
-            unsigned r = rand() % ((filled ? 2 : 1) * bulk_size);
+            uint64 r = rand() % ((filled ? 2 : 1) * bulk_size);
             // probability for an extract is bulk_size times larger than for a bulk_insert.
             // when already filled with num_elements elements: probability for an extract is 2*bulk_size times larger than for a bulk_insert.
             if (num_deletes < num_inserts && num_deletes < (filled ? 2 : 1) * num_elements && (r > 0 || num_inserts >= (filled ? 2 : 1) * num_elements)) {
@@ -438,16 +442,16 @@ void PREFIX(bulk_rand_intermixed) (unsigned int _seed, bool filled, bool paralle
                 #pragma omp parallel if(parallel)
                 {
                     const unsigned int thread_num = parallel ? omp_get_thread_num() : rand() % num_insertion_heaps;
-                    unsigned int seed = thread_num * i * _seed;
+                    unsigned int seed = thread_num * static_cast<unsigned>(i) * _seed;
                     #pragma omp for
 #endif
                 for (stxxl::uint64 j = 0; j < this_bulk_size; j++) {
                     progress("Inserting / deleting element", i + j, (filled ? 3 : 2) * num_elements);
                                                     #if defined(PPQ)
-                    uint32 k = rand_r(&seed) % value_universe_size;
+                    uint64 k = rand_r(&seed) % value_universe_size;
                     CONTAINER->bulk_push_step(value_type(k), thread_num);
                                                     #else
-                    uint32 k = rand_r(&_seed) % value_universe_size;
+                    uint64 k = rand_r(&_seed) % value_universe_size;
                     CONTAINER->push(value_type(k));
                                                     #endif
                 }
@@ -476,7 +480,7 @@ void PREFIX(bulk_intermixed_check) (bool parallel = true)
     {
         stxxl::scoped_print_timer timer(NAME ": Intermixed parallel bulk insert" + parallel_str + " and delete", 2 * num_elements * value_size);
         for (uint64_t i = 0; i < 2 * num_elements; ++i) {
-            unsigned r = rand() % bulk_size;
+            uint64 r = rand() % bulk_size;
             if (num_deletes < num_inserts && num_deletes < num_elements && (r > 0 || num_inserts >= num_elements)) {
                 STXXL_CHECK(!CONTAINER->empty());
 
@@ -510,7 +514,7 @@ void PREFIX(bulk_intermixed_check) (bool parallel = true)
                     #pragma omp for
 #endif
                 for (stxxl::uint64 j = 0; j < this_bulk_size; j++) {
-                    uint32 k = num_elements - num_inserts - j;
+                    uint64 k = num_elements - num_inserts - j;
                     progress("Inserting/deleting element", i + j, 2 * num_elements);
 
 #if defined(PPQ)

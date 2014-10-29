@@ -178,7 +178,7 @@ public:
         stats.replay_time.start();
 
         int top;
-        int p = (m_tree.size() / 2) + index;
+        int p = static_cast<int>((m_tree.size() / 2) + index);
 
         if (!done) {
             top = index;
@@ -214,22 +214,22 @@ public:
         stats.double_num_slots_time.start();
 
         m_num_slots = m_num_slots << 1;
-        unsigned int old_tree_size = m_tree.size();
-        unsigned int tree_size = (m_num_slots << 1) - 1;
+        unsigned old_tree_size = static_cast<unsigned>(m_tree.size());
+        unsigned tree_size = (m_num_slots << 1) - 1;
         m_tree.resize(tree_size, -1);
 
         for (int i = old_tree_size - 1; i >= 0; --i) {
-            unsigned int old_index = i;
-            unsigned int old_level = log2(old_index + 1);
-            unsigned int new_index = old_index + (1 << old_level);
+            unsigned old_index = i;
+            unsigned old_level = static_cast<unsigned>(log2(old_index + 1));
+            unsigned new_index = old_index + (1 << old_level);
             m_tree[new_index] = m_tree[old_index];
         }
 
-        unsigned int step_size = (1 << (int)log2(old_tree_size));
-        unsigned int index = tree_size - 1;
+        unsigned step_size = (1 << (int)log2(old_tree_size));
+        unsigned index = tree_size - 1;
 
         while (step_size > 0) {
-            for (unsigned int i = 0; i < step_size; ++i) {
+            for (unsigned i = 0; i < step_size; ++i) {
                 m_tree[index] = -1;
                 --index;
             }

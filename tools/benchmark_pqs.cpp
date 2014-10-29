@@ -19,17 +19,20 @@ static const char* description =
 #include <ctime>
 #include <iomanip>
 #include <limits>
-#include <omp.h>
 #include <queue>
 
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/cmdline>
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
+
+#if STXXL_PARALLEL
+    #include <omp.h>
+    #include <stxxl/bits/containers/parallel_priority_queue.h>
+#endif
 
 using stxxl::uint32;
 using stxxl::uint64;
@@ -61,7 +64,10 @@ unsigned num_prefetchers = 1;
 unsigned num_read_blocks = 1;
 uint64 block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
 
-uint64 num_insertion_heaps = omp_get_max_threads();
+#if STXXL_PARALLEL
+unsigned num_insertion_heaps = omp_get_max_threads();
+#endif
+
 uint64 ram_write_buffers;
 uint64 bulk_size;
 
@@ -147,14 +153,14 @@ std::ostream& operator << (std::ostream& o, const value_type& obj)
 
 
 /*
- * Useful macros.
+ * Progress messages
  */
 
 static const uint64 printmod = 16 * MiB;
 static inline void progress(const char* text, uint64 i, uint64 nelements)
 {
     if ((i % printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (i * 100.0 / nelements) << " %)");
+        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i)* 100. / static_cast<double>(nelements)) << " %)");
     }
 }
 
@@ -171,8 +177,10 @@ typedef stxxl::PRIORITY_QUEUE_GENERATOR<
 typedef gen::result stxxlpq_type;
 stxxlpq_type* stxxlpq;
 
-typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
-ppq_type* ppq;
+#if STXXL_PARALLEL
+    typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
+    ppq_type* ppq;
+#endif
 
 typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
 sorter_type* stxxlsorter;
@@ -185,9 +193,12 @@ stlpq_type* stlpq;
  * Including the tests
  */
 
-#define PPQ
+
+#if STXXL_PARALLEL
+    #define PPQ
         #include "benchmark_pqs_helper.h"
-#undef PPQ
+    #undef PPQ
+#endif
 #define STXXLPQ
         #include "benchmark_pqs_helper.h"
 #undef STXXLPQ
@@ -214,16 +225,20 @@ void print_params()
     STXXL_MEMDUMP(value_size);
     STXXL_MEMDUMP(extract_buffer_ram);
     STXXL_VARDUMP(num_elements);
-    STXXL_VARDUMP(num_insertion_heaps);
+    #if STXXL_PARALLEL
+        STXXL_VARDUMP(num_insertion_heaps);
+    #endif
     STXXL_VARDUMP(num_write_buffers);
     STXXL_VARDUMP(num_prefetchers);
     STXXL_VARDUMP(num_read_blocks);
 }
 
+#if STXXL_PARALLEL
 inline void ppq_stats()
 {
     ppq->print_stats();
 }
+#endif
 
 
 /*
@@ -233,7 +248,7 @@ inline void ppq_stats()
 
 int benchmark_pqs(int argc, char* argv[])
 {
-    seed = time(NULL);
+    seed = static_cast<unsigned>(time(NULL));
 
     /*
      * Parse flags
@@ -284,7 +299,7 @@ int benchmark_pqs(int argc, char* argv[])
     unsigned int temp_universe_size = 0;
     cp.add_uint('u', "universesize", "Range for random values", temp_universe_size);
 
-    unsigned int temp_num_write_buffers = UINT_MAX;
+    unsigned int temp_num_write_buffers = std::numeric_limits<unsigned int>::max();
     cp.add_uint('w', "writebuffers", "Number of buffered blocks when writing to external memory", num_write_buffers);
 
     uint64 temp_extract_buffer_ram = 0;
@@ -293,7 +308,7 @@ int benchmark_pqs(int argc, char* argv[])
     uint64 temp_single_heap_ram = 0;
     cp.add_bytes('y', "heapram", "Size of a single insertion heap in Bytes", temp_single_heap_ram);
 
-    unsigned int temp_num_prefetchers = UINT_MAX;
+    unsigned int temp_num_prefetchers = std::numeric_limits<unsigned int>::max();
     cp.add_uint('z', "prefetchers", "Number of prefetched blocks for each external array", temp_num_prefetchers);
 
 
@@ -312,9 +327,9 @@ int benchmark_pqs(int argc, char* argv[])
         single_heap_ram = temp_single_heap_ram;
     if (temp_extract_buffer_ram > 0)
         extract_buffer_ram = temp_extract_buffer_ram;
-    if (temp_num_write_buffers < UINT_MAX)
+    if (temp_num_write_buffers < std::numeric_limits<unsigned int>::max())
         num_write_buffers = temp_num_write_buffers;
-    if (temp_num_prefetchers < UINT_MAX)
+    if (temp_num_prefetchers < std::numeric_limits<unsigned int>::max())
         num_prefetchers = temp_num_prefetchers;
 
 
@@ -322,7 +337,11 @@ int benchmark_pqs(int argc, char* argv[])
     print_params();
 
     if (do_ppq) {
-        ppq = new ppq_type(num_prefetchers, num_write_buffers, RAM, num_insertion_heaps, single_heap_ram, extract_buffer_ram, do_flush_directly);
+        #if STXXL_PARALLEL
+            ppq = new ppq_type(num_prefetchers, num_write_buffers, RAM,
+                num_insertion_heaps, single_heap_ram, extract_buffer_ram,
+                do_flush_directly);
+        #endif
     } else if (do_stxxlpq) {
         stxxlpq = new stxxlpq_type(mem_for_prefetch_pool, mem_for_write_pool);
     } else if (do_sorter) {
@@ -337,16 +356,27 @@ int benchmark_pqs(int argc, char* argv[])
 
     if (do_ppq + do_stxxlpq + do_sorter + do_stlpq + do_tbbpq == 0) {
         STXXL_MSG("Please choose a conatiner type. Use -h for help.");
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     }
+    
+    #if !STXXL_PARALLEL
+    
+        if (do_ppq) {
+            STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. Parallel priority queue cannot be used here.");
+            return EXIT_FAILURE;
+        }
+    
+    #endif
 
     if (do_dijkstra) {
         uint64 n = num_elements / value_size;
         uint64 m = 100 * n;
 
         if (do_ppq) {
-            ppq_dijkstra(n, m);
-            ppq_stats();
+            #if STXXL_PARALLEL
+                ppq_dijkstra(n, m);
+                ppq_stats();
+            #endif
         } else if (do_stxxlpq) {
             stxxlpq_dijkstra(n, m);
         } else if (do_sorter) {
@@ -357,6 +387,7 @@ int benchmark_pqs(int argc, char* argv[])
             STXXL_MSG("TBB not supported yet");
         }
     } else if (do_ppq) {
+        #if STXXL_PARALLEL
         stxxl::scoped_print_timer timer("Filling and reading Parallel PQ", (do_fill ? 4 : 2) * num_elements * value_size);
         if (do_bulk) {
             if (do_intermixed) {
@@ -404,6 +435,7 @@ int benchmark_pqs(int argc, char* argv[])
             }
         }
         ppq_stats();
+        #endif // STXXL_PARALLEL
     } else if (do_stxxlpq) {
         stxxl::scoped_print_timer timer("Filling and reading STXXL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
         if (do_bulk) {
