@@ -24,7 +24,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-/**
+/*!
  * The class index_winner_tree is a binary tournament tree. There are n=2^k so
  * called players which compete for the winning position. The winner is the
  * smallest one regarding the comparator m_less. Each player is identified with
@@ -42,7 +42,7 @@ STXXL_BEGIN_NAMESPACE
 template <typename Comparator>
 class index_winner_tree
 {
-private:
+protected:
     //! the binary tree of size 2^(k+1)-1
     std::vector<int> m_tree;
 
@@ -59,6 +59,7 @@ private:
         stats_timer replay_time;
         stats_timer double_num_slots_time;
         stats_timer remove_player_time;
+
         friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
             return os << "replay_time=" << o.replay_time << std::endl
@@ -67,18 +68,19 @@ private:
         }
     };
 
-    stats_type stats;
+    //! collection of stats from the winner_tree.
+    stats_type m_stats;
 
 public:
     /**
-     * Constructor. Reserves space, registers free slots. No games are played here!
-     * All players and slots are deactivated in the beginning.
+     * Constructor. Reserves space, registers free slots. No games are played
+     * here! All players and slots are deactivated in the beginning.
      *
-     * \param num_players	Number of fixed players. Fixed players remain at the same index forever,
-     *						even if they were deactivated in between.
+     * \param num_players Number of fixed players. Fixed players remain at the
+     * same index forever, even if they were deactivated in between.
      *
-     * \param less			The comparator. It should use two given indices, compare the corresponding
-     *						values and return the index of one with the smaller value.
+     * \param less The comparator. It should use two given indices, compare the
+     * corresponding values and return the index of one with the smaller value.
      */
     index_winner_tree(unsigned int num_players, Comparator& less)
         : m_less(less)
@@ -98,9 +100,7 @@ public:
         replay_on_change(index);
     }
 
-    /**
-     * deactivate a player and replay.
-     */
+    //! deactivate a player and replay.
     inline void deactivate_player(unsigned int index)
     {
         assert(index < m_num_slots);
@@ -108,16 +108,14 @@ public:
     }
 
     /**
-     * deactivate one player in a batch of deactivations
-     * run replay_on_deactivation() afterwards.
-     * If there are multiple consecutive removes you
-     * should run deactivate_player() for all of them first
-     * and afterwards run replay_on_deactivation() for each one
-     * of them.
+     * deactivate one player in a batch of deactivations run
+     * replay_on_deactivation() afterwards. If there are multiple consecutive
+     * removes you should run deactivate_player() for all of them first and
+     * afterwards run replay_on_deactivation() for each one of them.
      */
     inline void deactivate_player_step(unsigned int index)
     {
-        stats.remove_player_time.start();
+        m_stats.remove_player_time.start();
         assert(index < m_num_slots);
         int p = (m_tree.size() / 2) + index;
 
@@ -128,7 +126,7 @@ public:
             p /= 2;
         }
 
-        stats.remove_player_time.stop();
+        m_stats.remove_player_time.stop();
     }
 
     //! Replay after the player at index <index> has been deactivated.
@@ -164,19 +162,18 @@ public:
     }
 
     /**
-     * Replays all games the player with the given index is involved in.
-     * This corresponds to the path from leaf <index> to root.
-     * If only the value of player <index> has changed the result is
-     * a valid winner tree.
+     * Replays all games the player with the given index is involved in.  This
+     * corresponds to the path from leaf <index> to root.  If only the value of
+     * player <index> has changed the result is a valid winner tree.
      *
      * \param index	The player whose value has changed.
      *
      * \param done	Set done to true if the player has been deactivated
-     *				or removed. All games will be lost then.
+     *		        or removed. All games will be lost then.
      */
     inline void replay_on_change(unsigned int index, bool done = false)
     {
-        stats.replay_time.start();
+        m_stats.replay_time.start();
 
         int top;
         int p = static_cast<int>((m_tree.size() / 2) + index);
@@ -205,14 +202,14 @@ public:
 
         m_tree[p] = top;
 
-        stats.replay_time.stop();
+        m_stats.replay_time.stop();
     }
 
-    //! Doubles the number of slots and adapts the tree
-    //! so it's a valid winner tree again.
+    //! Doubles the number of slots and adapts the tree so it's a valid winner
+    //! tree again.
     inline void double_num_slots()
     {
-        stats.double_num_slots_time.start();
+        m_stats.double_num_slots_time.start();
 
         m_num_slots = m_num_slots << 1;
         unsigned old_tree_size = static_cast<unsigned>(m_tree.size());
@@ -238,7 +235,7 @@ public:
             step_size /= 2;
         }
 
-        stats.double_num_slots_time.stop();
+        m_stats.double_num_slots_time.stop();
     }
 
     //! Deactivate all players
@@ -259,7 +256,7 @@ public:
     //! Returns a readable representation of the winner tree as string.
     std::string to_string() const
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         int levelsize = 1;
         int j = 0;
         for (unsigned int i = 0; i < m_tree.size(); ++i) {
@@ -278,7 +275,7 @@ public:
     void print_stats() const
     {
         STXXL_VARDUMP(m_num_slots);
-        STXXL_MSG(stats);
+        STXXL_MSG(m_stats);
     }
 };
 
