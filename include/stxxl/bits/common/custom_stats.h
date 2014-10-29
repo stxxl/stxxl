@@ -21,105 +21,96 @@
 
 STXXL_BEGIN_NAMESPACE
 
-//! This class provides a statistical counter that can easily be
-//! deactivated using a typedef to dummy_custom_stats_counter.
-//! It's basically a wrapper for a unsigned long long value.
-//!
-//! \see dummy_custom_stats_counter
-//! \see custom_stats_timer
+/*!
+ * This class provides a statistical counter that can easily be deactivated
+ * using a typedef to dummy_custom_stats_counter.  It's basically a wrapper for
+ * a unsigned long long value.
+ *
+ * \see dummy_custom_stats_counter
+ * \see custom_stats_timer
+ */
 class custom_stats_counter
 {
+public:
     //! The counter type
     typedef unsigned long long counter_type;
+
+protected:
     //! The counter's value
-    counter_type val;
+    counter_type m_value;
 
 public:
     //! The constructor. Initializes the counter to 0.
-    custom_stats_counter() : val(0) { }
+    custom_stats_counter()
+        : m_value(0)
+    { }
+
     //! Increases the counter by right.
     //! \param right The corresponding integer value
     custom_stats_counter& operator += (counter_type right)
     {
-        val += right;
+        m_value += right;
         return *this;
     }
     //! Increases the counter by 1 (prefix).
     custom_stats_counter& operator ++ ()
     {
-        ++val;
+        ++m_value;
         return *this;
     }
     //! Increases the counter by 1 (postfix).
     custom_stats_counter& operator ++ (int)
     {
         custom_stats_counter* result = this;
-        ++val;
+        ++m_value;
         return *result;
     }
     //! Set the counter to other
     //! \param other The corresponding integer value
     custom_stats_counter& operator = (counter_type other)
     {
-        val = other;
+        m_value = other;
         return *this;
     }
-    //! Set the counter to other if other is larger than the current counter value.
-    //! \param other The corresponding integer value
+    /*!
+     * Set the counter to other if other is larger than the current counter
+     * value.
+     *
+     * \param other The corresponding integer value
+     */
     void set_max(counter_type other)
     {
-        val = std::max(val, other);
+        m_value = std::max(m_value, other);
     }
-    //! Return the counter value interpreted as a memory amount in IEC units as a string.
-    //! For that purpose the counter value is multiplied with the byte_per_element argument.
-    //! \param byte_per_element The memory amount per "counter element".
+    /*!
+     * Return the counter value interpreted as a memory amount in IEC units as
+     * a string.  For that purpose the counter value is multiplied with the
+     * byte_per_element argument.
+     *
+     * \param byte_per_element The memory amount per "counter element".
+     */
     std::string as_memory_amount(counter_type byte_per_element) const
     {
-        return format_IEC_size(val * byte_per_element) + "B";
+        return format_IEC_size(m_value * byte_per_element) + "B";
     }
-    //! Cast to counter_type: Returns the counter's value as a regular integer value.
-    //! This can be used as a getter as well as for printing with std::out.
+    /*!
+     * Cast to counter_type: Returns the counter's value as a regular integer
+     * value.  This can be used as a getter as well as for printing with
+     * std::out.
+     */
     operator counter_type () const
     {
-        return val;
+        return m_value;
     }
 };
 
-//! This class provides a statistical timer that can easily be
-//! deactivated using a typedef to dummy_custom_stats_timer.
-//! It's basically a wrapper for stxxl::timer.
-//!
-//! \see dummy_custom_stats_timer
-//! \see custom_stats_counter
-class custom_stats_timer
-{
-    stxxl::timer timer;
-
-public:
-    //! Constructor. This does not start the timer!
-    custom_stats_timer() : timer(false) { }
-    //! Starts the timer.
-    void start()
-    {
-        timer.start();
-    }
-    //! Stops the timer.
-    void stop()
-    {
-        timer.stop();
-    }
-    //! <<-operator for std::ostream. Can be used for printing with std::cout.
-    friend std::ostream& operator << (std::ostream& os, const custom_stats_timer& o)
-    {
-        return os << o.timer.seconds() << " s";
-    }
-};
-
-//! Dummy class for custom_stats_counter. The methods do nothing.
-//! The compiler should optimize out the code.
-//!
-//! \see custom_stats_counter
-//! \see dummy_custom_stats_timer
+/*!
+ * Dummy class for custom_stats_counter. The methods do nothing.  The compiler
+ * should optimize out the code.
+ *
+ * \see custom_stats_counter
+ * \see dummy_custom_stats_timer
+ */
 class dummy_custom_stats_counter
 {
     typedef unsigned long long counter_type;
@@ -150,23 +141,6 @@ public:
     operator counter_type () const
     {
         return counter_type();
-    }
-};
-
-//! Dummy class for custom_stats_timer. The methods do nothing.
-//! The compiler should optimize out the code.
-//!
-//! \see custom_stats_timer
-//! \see dummy_custom_stats_counter
-class dummy_custom_stats_timer
-{
-public:
-    dummy_custom_stats_timer() { }
-    void start() { }
-    void stop() { }
-    friend std::ostream& operator << (std::ostream& os, const dummy_custom_stats_timer&)
-    {
-        return os;
     }
 };
 

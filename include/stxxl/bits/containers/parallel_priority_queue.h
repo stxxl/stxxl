@@ -27,6 +27,7 @@
 #endif
 
 #include <stxxl/bits/common/custom_stats.h>
+#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/containers/ppq_external_array.h>
@@ -94,7 +95,7 @@ protected:
     };
 
     typedef custom_stats_counter stats_counter;
-    typedef custom_stats_timer stats_timer;
+    typedef timer stats_timer;
 
     class internal_array
     {

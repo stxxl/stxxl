@@ -6,7 +6,7 @@
  *  Copyright (C) 2002, 2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2008 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -61,10 +61,21 @@ timestamp()
 #endif
 }
 
+/*!
+ * Class timer is a simple stop watch timer. It uses the timestamp() function
+ * to get the current time when start() is called. Then, after some processing,
+ * the function stop() functions can be called, or seconds() and other
+ * accessors can be called directly.
+ */
 class timer
 {
+    //! boolean whether the stopwatch timer is currently running
     bool running;
+
+    //! total accumulated time in seconds.
     double accumulated;
+
+    //! last start time of the stopwatch
     double last_clock;
 
     //! return current timestamp
@@ -74,8 +85,9 @@ class timer
     }
 
 public:
+    //! initialize and optionally immediately start the timer
     inline timer(bool start_immediately = false)
-        : running(false), accumulated(0.), last_clock(0)
+        : running(false), accumulated(0), last_clock(0)
     {
         if (start_immediately) start();
     }
@@ -127,6 +139,63 @@ public:
 
         return (accumulated);
     }
+
+    //! direct <<-operator for ostream. Can be used for printing with std::cout.
+    friend std::ostream& operator << (std::ostream& os, const timer& t)
+    {
+        return os << t.seconds() << 's';
+    }
+};
+
+/*!
+ * Class fake_timer is a drop-in replacement for timer, which does
+ * nothing. Using the fake class, timers can quickly be disabled in release
+ * builds, but still be available for debugging session.
+ *
+ * \see timer
+ */
+class fake_timer
+{
+public:
+    //! initialize and optionally immediately start the timer
+    fake_timer(bool = false)
+    { }
+
+    //! start timer
+    void start()
+    { }
+
+    //! stop timer
+    void stop()
+    { }
+
+    //! return accumulated time
+    void reset()
+    { }
+
+    //! return currently accumulated time in milliseconds
+    double mseconds() const
+    {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    //! return currently accumulated time in microseconds
+    double useconds() const
+    {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    //! return currently accumulated time in seconds (as double)
+    double seconds() const
+    {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    //! direct <<-operator for ostream. Can be used for printing with std::cout.
+    friend std::ostream& operator << (std::ostream& os, const fake_timer& t)
+    {
+        return os << t.seconds() << 's';
+    }
 };
 
 /*!
@@ -143,7 +212,7 @@ protected:
     uint64 m_bytes;
 
     //! timer
-    class timer m_timer;
+    timer m_timer;
 
 public:
     //! save message and start timer

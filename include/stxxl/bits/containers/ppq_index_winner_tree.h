@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include <stxxl/bits/common/custom_stats.h>
+#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/verbose.h>
 
 STXXL_BEGIN_NAMESPACE
@@ -51,7 +52,7 @@ private:
     //! number of slots for the players (2^k)
     unsigned int m_num_slots;
 
-    typedef custom_stats_timer stats_timer;
+    typedef timer stats_timer;
 
     struct stats_type
     {
