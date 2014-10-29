@@ -33,32 +33,33 @@ class custom_stats_counter
     typedef unsigned long long counter_type;
     //! The counter's value
     counter_type val;
+
 public:
     //! The constructor. Initializes the counter to 0.
     custom_stats_counter() : val(0) { }
     //! Increases the counter by right.
     //! \param right The corresponding integer value
-    custom_stats_counter& operator+=(counter_type right)
+    custom_stats_counter& operator += (counter_type right)
     {
         val += right;
         return *this;
     }
     //! Increases the counter by 1 (prefix).
-    custom_stats_counter& operator++()
+    custom_stats_counter& operator ++ ()
     {
         ++val;
         return *this;
     }
     //! Increases the counter by 1 (postfix).
-    custom_stats_counter& operator++(int)
+    custom_stats_counter& operator ++ (int)
     {
-        custom_stats_counter * result = this;
+        custom_stats_counter* result = this;
         ++val;
         return *result;
     }
     //! Set the counter to other
     //! \param other The corresponding integer value
-    custom_stats_counter& operator=(counter_type other)
+    custom_stats_counter& operator = (counter_type other)
     {
         val = other;
         return *this;
@@ -67,23 +68,22 @@ public:
     //! \param other The corresponding integer value
     void set_max(counter_type other)
     {
-        val = std::max(val,other);
+        val = std::max(val, other);
     }
     //! Return the counter value interpreted as a memory amount in IEC units as a string.
     //! For that purpose the counter value is multiplied with the byte_per_element argument.
     //! \param byte_per_element The memory amount per "counter element".
     std::string as_memory_amount(counter_type byte_per_element) const
     {
-        return format_IEC_size(val*byte_per_element) + "B";
+        return format_IEC_size(val * byte_per_element) + "B";
     }
     //! Cast to counter_type: Returns the counter's value as a regular integer value.
     //! This can be used as a getter as well as for printing with std::out.
-    operator counter_type() const
+    operator counter_type () const
     {
         return val;
     }
 };
-
 
 //! This class provides a statistical timer that can easily be
 //! deactivated using a typedef to dummy_custom_stats_timer.
@@ -94,6 +94,7 @@ public:
 class custom_stats_timer
 {
     stxxl::timer timer;
+
 public:
     //! Constructor. This does not start the timer!
     custom_stats_timer() : timer(false) { }
@@ -108,7 +109,7 @@ public:
         timer.stop();
     }
     //! <<-operator for std::ostream. Can be used for printing with std::cout.
-    friend std::ostream& operator<<(std::ostream& os, const custom_stats_timer& o)
+    friend std::ostream& operator << (std::ostream& os, const custom_stats_timer& o)
     {
         return os << o.timer.seconds() << " s";
     }
@@ -122,25 +123,31 @@ public:
 class dummy_custom_stats_counter
 {
     typedef unsigned long long counter_type;
+
 public:
-    dummy_custom_stats_counter() {}
-    dummy_custom_stats_counter& operator+=(counter_type) {
+    dummy_custom_stats_counter() { }
+    dummy_custom_stats_counter& operator += (counter_type)
+    {
         return *this;
     }
-    dummy_custom_stats_counter& operator++() {
+    dummy_custom_stats_counter& operator ++ ()
+    {
         return *this;
     }
-    dummy_custom_stats_counter& operator++(int) {
+    dummy_custom_stats_counter& operator ++ (int)
+    {
         return *this;
     }
-    dummy_custom_stats_counter& operator=(counter_type) {
+    dummy_custom_stats_counter& operator = (counter_type)
+    {
         return *this;
     }
-    void set_max(counter_type) {}
-    std::string as_memory_amount(counter_type) {
+    void set_max(counter_type) { }
+    std::string as_memory_amount(counter_type)
+    {
         return "";
     }
-    operator counter_type() const
+    operator counter_type () const
     {
         return counter_type();
     }
@@ -155,9 +162,9 @@ class dummy_custom_stats_timer
 {
 public:
     dummy_custom_stats_timer() { }
-    void start() {}
-    void stop() {}
-    friend std::ostream& operator<<(std::ostream& os, const dummy_custom_stats_timer&)
+    void start() { }
+    void stop() { }
+    friend std::ostream& operator << (std::ostream& os, const dummy_custom_stats_timer&)
     {
         return os;
     }

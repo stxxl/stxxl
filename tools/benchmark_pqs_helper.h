@@ -54,18 +54,18 @@
 #include <vector>
 #include <utility>
 
-class PREFIX(dijkstra_graph) {
+class PREFIX (dijkstra_graph) {
 public:
     typedef uint64_t size_type;
 
-    PREFIX(dijkstra_graph) (size_type n, size_type m) :
-        n(n),
-        m(m),
-        nodes(n + 1),
-        node_visited(n, false),
-        edge_targets(m),
-        edge_lengths(m),
-        temp_edges(n)
+    PREFIX(dijkstra_graph) (size_type n, size_type m)
+        : n(n),
+          m(m),
+          nodes(n + 1),
+          node_visited(n, false),
+          edge_targets(m),
+          edge_lengths(m),
+          temp_edges(n)
     {
         unsigned int seed = 12345;
 
@@ -155,7 +155,7 @@ private:
  * The benchmarks.
  */
 
-void PREFIX(dijkstra) (stxxl::uint64 num_nodes, stxxl::uint64 num_edges)
+void PREFIX (dijkstra) (stxxl::uint64 num_nodes, stxxl::uint64 num_edges)
 {
     std::cout << "Generating Graph" << std::endl;
     PREFIX(dijkstra_graph) dg(num_nodes, num_edges);
@@ -165,7 +165,7 @@ void PREFIX(dijkstra) (stxxl::uint64 num_nodes, stxxl::uint64 num_edges)
     }
 }
 
-void PREFIX(insert) ()
+void PREFIX (insert) ()
 {
     stxxl::scoped_print_timer timer("Filling " NAME " sequentially", num_elements * value_size);
     for (stxxl::uint64 i = 0; i < num_elements; i++) {
@@ -174,7 +174,7 @@ void PREFIX(insert) ()
     }
 }
 
-void PREFIX(rand_insert) (unsigned int seed)
+void PREFIX (rand_insert) (unsigned int seed)
 {
     stxxl::scoped_print_timer timer("Filling " NAME " randomly", num_elements * value_size);
     for (stxxl::uint64 i = 0; i < num_elements; i++) {
@@ -184,7 +184,7 @@ void PREFIX(rand_insert) (unsigned int seed)
     }
 }
 
-void PREFIX(read) ()
+void PREFIX (read) ()
 {
     stxxl::scoped_print_timer timer("Reading " NAME, num_elements * value_size);
     for (stxxl::uint64 i = 0; i < num_elements; ++i) {
@@ -203,7 +203,7 @@ void PREFIX(read) ()
     }
 }
 
-void PREFIX(read_check) ()
+void PREFIX (read_check) ()
 {
     stxxl::scoped_print_timer timer("Reading " NAME " and check order", num_elements * value_size);
     for (stxxl::uint64 i = 0; i < num_elements; ++i) {
@@ -222,7 +222,7 @@ void PREFIX(read_check) ()
     }
 }
 
-void PREFIX(rand_read_check) (unsigned int seed)
+void PREFIX (rand_read_check) (unsigned int seed)
 {
     std::vector<uint64> vals;
     vals.reserve(num_elements);
@@ -236,9 +236,9 @@ void PREFIX(rand_read_check) (unsigned int seed)
     {
         stxxl::scoped_print_timer timer("Sorting value vector for comarison");
         #if STXXL_PARALLEL
-            __gnu_parallel::sort(vals.begin(), vals.end());
+        __gnu_parallel::sort(vals.begin(), vals.end());
         #else
-            std::sort(vals.begin(), vals.end());
+        std::sort(vals.begin(), vals.end());
         #endif
     }
     {
@@ -260,7 +260,7 @@ void PREFIX(rand_read_check) (unsigned int seed)
     }
 }
 
-void PREFIX(rand_intermixed) (unsigned int _seed, bool filled)
+void PREFIX (rand_intermixed) (unsigned int _seed, bool filled)
 {
     uint64 num_inserts = filled ? num_elements : 0;
     uint64 num_deletes = 0;
@@ -294,7 +294,7 @@ void PREFIX(rand_intermixed) (unsigned int _seed, bool filled)
     }
 }
 
-void PREFIX(bulk_insert) (bool parallel = true)
+void PREFIX (bulk_insert) (bool parallel = true)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 #if !defined(PPQ)
@@ -345,7 +345,7 @@ void PREFIX(bulk_insert) (bool parallel = true)
     }
 }
 
-void PREFIX(bulk_rand_insert) (unsigned int _seed, bool parallel = true)
+void PREFIX (bulk_rand_insert) (unsigned int _seed, bool parallel = true)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 #if !defined(PPQ)
@@ -406,7 +406,7 @@ void PREFIX(bulk_rand_insert) (unsigned int _seed, bool parallel = true)
     STXXL_CHECK_EQUAL(CONTAINER->size(), num_elements);
 }
 
-void PREFIX(bulk_rand_intermixed) (unsigned int _seed, bool filled, bool parallel = true)
+void PREFIX (bulk_rand_intermixed) (unsigned int _seed, bool filled, bool parallel = true)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 #if !defined(PPQ)
@@ -467,7 +467,7 @@ void PREFIX(bulk_rand_intermixed) (unsigned int _seed, bool filled, bool paralle
     }
 }
 
-void PREFIX(bulk_intermixed_check) (bool parallel = true)
+void PREFIX (bulk_intermixed_check) (bool parallel = true)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 #if !defined(PPQ)
@@ -546,7 +546,7 @@ void PREFIX(bulk_intermixed_check) (bool parallel = true)
 }
 
 #ifdef PPQ
-void PREFIX(merge_external_arrays) ()
+void PREFIX (merge_external_arrays) ()
 {
     stxxl::scoped_print_timer timer("Merging external arrays", num_elements * value_size);
     CONTAINER->merge_external_arrays();

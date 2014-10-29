@@ -163,7 +163,7 @@ STXXL_END_NAMESPACE
                          _STXXL_PRINT_FLAGS_ERROR); abort();                               \
         }                                                                                  \
     } while (0)
-    
+
 // STXXL_CHECK_EQUAL(a,b) is an assertion macro for unit tests, similar to
 // STXXL_CHECK(a==b). The difference is that STXXL_CHECK_EQUAL(a,b) also prints
 // the values of a and b. Attention: a and b must be printable with std::cout!

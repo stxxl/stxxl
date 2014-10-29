@@ -15,7 +15,7 @@
 
 #include <vector>
 #include <stack>
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 
 #include <stxxl/bits/common/custom_stats.h>
@@ -24,7 +24,7 @@
 STXXL_BEGIN_NAMESPACE
 
 /**
- * \brief index_winner_tree is a binary tournament tree. There are n=2^k so
+ * The class index_winner_tree is a binary tournament tree. There are n=2^k so
  * called players which compete for the winning position. The winner is the
  * smallest one regarding the comparator m_less. Each player is identified with
  * it's index. The comparator should use this index in order to compare the
@@ -50,7 +50,7 @@ private:
 
     //! number of slots for the players (2^k)
     unsigned int m_num_slots;
-    
+
     typedef custom_stats_timer stats_timer;
 
     struct stats_type
@@ -58,14 +58,14 @@ private:
         stats_timer replay_time;
         stats_timer double_num_slots_time;
         stats_timer remove_player_time;
-        friend std::ostream& operator<<(std::ostream& os, const stats_type& o)
+        friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
             return os << "replay_time=" << o.replay_time << std::endl
-                << "double_num_slots_time=" << o.double_num_slots_time << std::endl
-                << "remove_player_time=" << o.remove_player_time << std::endl;
+                      << "double_num_slots_time=" << o.double_num_slots_time << std::endl
+                      << "remove_player_time=" << o.remove_player_time << std::endl;
         }
     };
-    
+
     stats_type stats;
 
 public:

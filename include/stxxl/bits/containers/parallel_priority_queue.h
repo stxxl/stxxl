@@ -41,10 +41,9 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/types>
 
-
 STXXL_BEGIN_NAMESPACE
 
-//! \brief Parallelized External Memory Priority Queue Config
+//! Parallelized External Memory Priority Queue Config.
 //!
 //! \tparam ValueType            Type of the contained objects (POD with no references to internal memory).
 //!
@@ -93,7 +92,7 @@ protected:
             return compare(y, x);
         }
     };
-    
+
     typedef custom_stats_counter stats_counter;
     typedef custom_stats_timer stats_timer;
 
@@ -122,22 +121,22 @@ protected:
         {
             std::swap(m_values, values);
         }
-        
+
         //! Move constructor. Needed for regrowing in surrounding vector.
         internal_array(internal_array&& o)
             : m_values(std::move(o.m_values)),
-                m_min_index(o.m_min_index),
-                m_deleted(o.m_deleted) { }
-        
-    
+              m_min_index(o.m_min_index),
+              m_deleted(o.m_deleted) { }
+
         //! Delete copy assignment for emplace_back to use the move semantics.
-        internal_array& operator=(internal_array& other) = delete;
-        
+        internal_array& operator = (internal_array& other) = delete;
+
         //! Delete copy constructor for emplace_back to use the move semantics.
         internal_array(const internal_array& other) = delete;
-        
+
         //! Move assignment.
-        internal_array& operator=(internal_array&&){
+        internal_array& operator = (internal_array&&)
+        {
             return *this;
         }
 
@@ -209,7 +208,6 @@ protected:
     };
 
     //! \}
-
 
     //! \addtogroup ctparameters Compile-Time Parameters
     //! \{
@@ -399,36 +397,36 @@ public:
         unsigned _num_insertion_heaps = 0,
         size_type _single_heap_ram = 0,
         size_type extract_buffer_ram = 0,
-        bool flush_directly_to_hd = false) :
-        num_prefetchers((num_prefetch_buffer_blocks > 0) ? num_prefetch_buffer_blocks : c_num_prefetch_buffer_blocks),
-        num_write_buffers((num_write_buffer_blocks > 0) ? num_write_buffer_blocks : c_num_write_buffer_blocks),
-        bulk_size(0),
-        is_very_large_bulk(false),
-        extract_index(0),
-        external_size(0),
-        internal_size(0),
-        insertion_size(0),
-        buffered_size(0),
+        bool flush_directly_to_hd = false)
+        : num_prefetchers((num_prefetch_buffer_blocks > 0) ? num_prefetch_buffer_blocks : c_num_prefetch_buffer_blocks),
+          num_write_buffers((num_write_buffer_blocks > 0) ? num_write_buffer_blocks : c_num_write_buffer_blocks),
+          bulk_size(0),
+          is_very_large_bulk(false),
+          extract_index(0),
+          external_size(0),
+          internal_size(0),
+          insertion_size(0),
+          buffered_size(0),
         #if STXXL_PARALLEL
-            num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : omp_get_max_threads()),
+          num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : omp_get_max_threads()),
         #else
-            num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : 1),
+          num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : 1),
         #endif
-        real_insertion_heap_size_factor(1 + 1 / num_insertion_heaps),
-        total_ram((_total_ram > 0) ? _total_ram : Ram),
-        ram_for_heaps(num_insertion_heaps * ((_single_heap_ram > 0) ? _single_heap_ram : c_default_single_heap_ram)),
-        external_arrays(0),
-        internal_arrays(0),
-        extract_buffer(0),
-        insertion_heaps(num_insertion_heaps * c_cache_line_factor),
-        aggregated_pushes(0),
-        m_minima(*this),
-        m_do_flush_directly_to_hd(flush_directly_to_hd)
+          real_insertion_heap_size_factor(1 + 1 / num_insertion_heaps),
+          total_ram((_total_ram > 0) ? _total_ram : Ram),
+          ram_for_heaps(num_insertion_heaps * ((_single_heap_ram > 0) ? _single_heap_ram : c_default_single_heap_ram)),
+          external_arrays(0),
+          internal_arrays(0),
+          extract_buffer(0),
+          insertion_heaps(num_insertion_heaps * c_cache_line_factor),
+          aggregated_pushes(0),
+          m_minima(*this),
+          m_do_flush_directly_to_hd(flush_directly_to_hd)
     {
         srand(static_cast<unsigned>(time(NULL)));
 
         if (c_limit_extract_buffer) {
-            extract_buffer_limit = (extract_buffer_ram > 0) ? extract_buffer_ram / sizeof(ValueType) : static_cast<size_type>( (static_cast<double>(total_ram) * c_default_extract_buffer_ram_part / static_cast<double>(sizeof(ValueType))));
+            extract_buffer_limit = (extract_buffer_ram > 0) ? extract_buffer_ram / sizeof(ValueType) : static_cast<size_type>((static_cast<double>(total_ram) * c_default_extract_buffer_ram_part / static_cast<double>(sizeof(ValueType))));
         }
 
         insertion_heap_capacity = ram_for_heaps / (num_insertion_heaps * sizeof(ValueType));
@@ -450,14 +448,12 @@ public:
         } else {
             internal_arrays.reserve(total_ram * num_insertion_heaps / ram_for_heaps);
         }
-        
     }
 
     //! Destructor.
     ~parallel_priority_queue() { }
 
 protected:
-
     //! Initializes member variables concerning the memory management.
     void init_memmanagement()
     {
@@ -552,7 +548,6 @@ public:
     //! \addtogroup bulkops Bulk Operations
     //! \{
 
-
     //! Start a sequence of push operations.
     //! \param _bulk_size	Number of elements to push before the next pop.
     void bulk_push_begin(size_type _bulk_size)
@@ -590,7 +585,7 @@ public:
             id = thread_num;
         #if STXXL_PARALLEL
         } else if (omp_get_num_threads() > 1) {
-            id = omp_get_thread_num(); 
+            id = omp_get_thread_num();
         #endif
         } else {
             id = rand() % num_insertion_heaps;
@@ -623,7 +618,7 @@ public:
         }
     }
 
-    //! \brief			Insert multiple elements at one time.
+    //! Insert multiple elements at one time.
     //! \param elements	Vector containing the elements to push.
     //! Attention: elements vector may be owned by the PQ afterwards.
     //!
@@ -659,22 +654,24 @@ public:
     //! \addtogroup aggrops Aggregation Operations
     //! \{
 
-    //! \brief				Aggregate pushes. Use flush_aggregated_pushes() to finally
-    //!                      push them. extract_min is allowed is allowed
-    //!						in between the aggregation of pushes if you can assure,
-    //!                      that the extracted value is smaller than all of
-    //!						the aggregated values.
-    //! \param element		The element to push.
+    /*!
+     * Aggregate pushes. Use flush_aggregated_pushes() to finally push
+     * them. extract_min is allowed is allowed in between the aggregation of
+     * pushes if you can assure, that the extracted value is smaller than all
+     * of the aggregated values.
+     * \param element The element to push.
+     */
     void aggregate_push(const ValueType& element)
     {
         aggregated_pushes.push_back(element);
     }
 
-    //! \brief				Insert the aggregated values into the queue using push(),
-    //!                      bulk insert, or sorting, depending on the
-    //!						number of aggregated values.
-    //! \param element		The element to push.
-    //! \see                 c_single_insert_limit
+    /*!
+     * Insert the aggregated values into the queue using push(), bulk insert,
+     * or sorting, depending on the number of aggregated values.
+     * \param element	The element to push.
+     * \see  c_single_insert_limit
+     */
     void flush_aggregated_pushes()
     {
         size_type size = aggregated_pushes.size();
@@ -726,7 +723,6 @@ public:
             m_minima.update_heap(id);
         }
     }
-
 
     //! Access the minimum element.
     ValueType top()
@@ -918,12 +914,12 @@ public:
             }
 
             merge_buffer.resize(output_size);
-            
+
             #if STXXL_PARALLEL
-                stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                    merge_buffer.begin(), inv_compare, output_size);
+            stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                            merge_buffer.begin(), inv_compare, output_size);
             #else
-                // TODO
+            // TODO
             #endif
 
             for (size_type i = 0; i < eas; ++i) {
@@ -968,7 +964,7 @@ public:
 
         STXXL_VARDUMP(m_do_flush_directly_to_hd);
         #if STXXL_PARALLEL
-            STXXL_VARDUMP(omp_get_max_threads());
+        STXXL_VARDUMP(omp_get_max_threads());
         #endif
 
         STXXL_MEMDUMP(ram_for_heaps);
@@ -1126,10 +1122,10 @@ protected:
         stats.refill_merge_time.start();
 
         #if STXXL_PARALLEL
-            stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                extract_buffer.begin(), inv_compare, output_size);
+        stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                        extract_buffer.begin(), inv_compare, output_size);
         #else
-            // TODO
+        // TODO
         #endif
 
         stats.refill_merge_time.stop();
@@ -1189,7 +1185,6 @@ protected:
         stats.refill_extract_buffer_time.stop();
     }
 
-
     //! Flushes the insertions heaps into an internal array.
     inline void flush_insertion_heaps()
     {
@@ -1234,14 +1229,14 @@ protected:
         if (c_merge_sorted_heaps) {
             stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
-            
+
             #if STXXL_PARALLEL
-                parallel::multiway_merge(sequences.begin(), sequences.end(),
-                    merged_array.begin(), inv_compare, size);
+            parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                     merged_array.begin(), inv_compare, size);
             #else
-                // TODO
+            // TODO
             #endif
-            
+
             stats.merge_sorted_heaps_time.stop();
 
             internal_arrays.emplace_back(merged_array);
@@ -1326,12 +1321,12 @@ protected:
         stats.max_merge_buffer_size.set_max(size);
 
         std::vector<ValueType> write_buffer(size);
-        
+
         #if STXXL_PARALLEL
-            parallel::multiway_merge(sequences.begin(), sequences.end(),
-                write_buffer.begin(), inv_compare, size);
+        parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                 write_buffer.begin(), inv_compare, size);
         #else
-            // TODO
+        // TODO
         #endif
 
         // TODO: directly write to block? -> no useless mem copy. Does not work if size > block size
@@ -1388,12 +1383,12 @@ protected:
 
         // TODO: write in chunks in order to safe RAM
         std::vector<ValueType> write_buffer(size);
-        
+
         #if STXXL_PARALLEL
-            parallel::multiway_merge(sequences.begin(), sequences.end(),
-                write_buffer.begin(), inv_compare, size);
+        parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                 write_buffer.begin(), inv_compare, size);
         #else
-            // TODO
+        // TODO
         #endif
 
         // TODO: directly write to block -> no useless mem copy
@@ -1434,9 +1429,9 @@ protected:
     void flush_array_to_hd(std::vector<ValueType>& values)
     {
         #if STXXL_PARALLEL
-            __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
+        __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
         #else
-            std::sort(values.begin(), values.end(), inv_compare);
+        std::sort(values.begin(), values.end(), inv_compare);
         #endif
 
         external_arrays.emplace_back(values.size(), num_prefetchers, num_write_buffers);
@@ -1467,13 +1462,13 @@ protected:
     void flush_array_internal(std::vector<ValueType>& values)
     {
         internal_size += values.size();
-        
+
         #if STXXL_PARALLEL
-            __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
+        __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
         #else
-            std::sort(values.begin(), values.end(), inv_compare);
+        std::sort(values.begin(), values.end(), inv_compare);
         #endif
-            
+
         internal_arrays.emplace_back(values);
         // internal array owns values now.
 
@@ -1528,17 +1523,17 @@ protected:
             flush_array_internal(values);
         }
     }
-    
+
     //! Struct of all statistical counters and timers.
     //! Turn on/off statistics using the stats_counter and stats_timer typedefs.
     struct stats_type
     {
         //! Largest number of elements in the extract buffer at the same time
         stats_counter max_extract_buffer_size;
-        
+
         //! Sum of the sizes of each extract buffer refill. Used for average size.
         stats_counter total_extract_buffer_size;
-        
+
         //! Largest number of elements in the merge buffer when running flush_internal_arrays()
         stats_counter max_merge_buffer_size;
 
@@ -1573,11 +1568,11 @@ protected:
         stats_counter max_num_new_external_arrays;
 
         //if (c_merge_ias_into_eb) {
-            //! Temporary number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
-            stats_counter num_new_internal_arrays;
+        //! Temporary number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
+        stats_counter num_new_internal_arrays;
 
-            //! Largest number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
-            stats_counter max_num_new_internal_arrays;
+        //! Largest number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
+        stats_counter max_num_new_internal_arrays;
         //}
 
         //! Total time for flush_insertion_heaps()
@@ -1633,47 +1628,47 @@ protected:
         //! Total time for determining the smallest max value in refill_extract_buffer()
         //! Part of refill_extract_buffer_time and refill_time_before_merge.
         stats_timer refill_minmax_time;
-        
-        friend std::ostream& operator<<(std::ostream& os, const stats_type& o)
+
+        friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
             return os << "max_extract_buffer_size=" << o.max_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
-                << "total_extract_buffer_size=" << o.total_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
-                << "max_merge_buffer_size=" << o.max_merge_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
-                << "num_extracts=" << o.num_extracts << std::endl
-                << "num_extract_buffer_refills=" << o.num_extract_buffer_refills << std::endl
-                << "num_insertion_heap_flushes=" << o.num_insertion_heap_flushes << std::endl
-                << "num_direct_flushes=" << o.num_direct_flushes << std::endl
-                << "num_internal_array_flushes=" << o.num_internal_array_flushes << std::endl
-                << "num_external_array_merges=" << o.num_external_array_merges << std::endl
-                << "max_num_internal_arrays=" << o.max_num_internal_arrays << std::endl
-                << "max_num_external_arrays=" << o.max_num_external_arrays << std::endl
-                << "num_new_external_arrays=" << o.num_new_external_arrays << std::endl
-                << "max_num_new_external_arrays=" << o.max_num_new_external_arrays << std::endl
-                //if (c_merge_ias_into_eb) {
-                << "num_new_internal_arrays=" << o.num_new_internal_arrays << std::endl
-                << "max_num_new_internal_arrays=" << o.max_num_new_internal_arrays << std::endl
-                //}
-                << "insertion_heap_flush_time=" << o.insertion_heap_flush_time << std::endl
-                << "direct_flush_time=" << o.direct_flush_time << std::endl
-                << "internal_array_flush_time=" << o.internal_array_flush_time << std::endl
-                << "external_array_merge_time=" << o.external_array_merge_time << std::endl
-                << "extract_min_time=" << o.extract_min_time << std::endl
-                << "refill_extract_buffer_time=" << o.refill_extract_buffer_time << std::endl
-                << "refill_merge_time=" << o.refill_merge_time << std::endl
-                << "refill_time_before_merge=" << o.refill_time_before_merge << std::endl
-                << "refill_time_after_merge=" << o.refill_time_after_merge << std::endl
-                << "refill_wait_time=" << o.refill_wait_time << std::endl
-                << "pop_heap_time=" << o.pop_heap_time << std::endl
-                << "merge_sorted_heaps_time=" << o.merge_sorted_heaps_time << std::endl
-                // << "refill_upper_bound_time=" << o.refill_upper_bound_time << std::endl
-                << "refill_accumulate_time=" << o.refill_accumulate_time << std::endl
-                << "refill_minmax_time=" << o.refill_minmax_time << std::endl;
+                      << "total_extract_buffer_size=" << o.total_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
+                      << "max_merge_buffer_size=" << o.max_merge_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
+                      << "num_extracts=" << o.num_extracts << std::endl
+                      << "num_extract_buffer_refills=" << o.num_extract_buffer_refills << std::endl
+                      << "num_insertion_heap_flushes=" << o.num_insertion_heap_flushes << std::endl
+                      << "num_direct_flushes=" << o.num_direct_flushes << std::endl
+                      << "num_internal_array_flushes=" << o.num_internal_array_flushes << std::endl
+                      << "num_external_array_merges=" << o.num_external_array_merges << std::endl
+                      << "max_num_internal_arrays=" << o.max_num_internal_arrays << std::endl
+                      << "max_num_external_arrays=" << o.max_num_external_arrays << std::endl
+                      << "num_new_external_arrays=" << o.num_new_external_arrays << std::endl
+                      << "max_num_new_external_arrays=" << o.max_num_new_external_arrays << std::endl
+                   //if (c_merge_ias_into_eb) {
+                      << "num_new_internal_arrays=" << o.num_new_internal_arrays << std::endl
+                      << "max_num_new_internal_arrays=" << o.max_num_new_internal_arrays << std::endl
+                   //}
+                      << "insertion_heap_flush_time=" << o.insertion_heap_flush_time << std::endl
+                      << "direct_flush_time=" << o.direct_flush_time << std::endl
+                      << "internal_array_flush_time=" << o.internal_array_flush_time << std::endl
+                      << "external_array_merge_time=" << o.external_array_merge_time << std::endl
+                      << "extract_min_time=" << o.extract_min_time << std::endl
+                      << "refill_extract_buffer_time=" << o.refill_extract_buffer_time << std::endl
+                      << "refill_merge_time=" << o.refill_merge_time << std::endl
+                      << "refill_time_before_merge=" << o.refill_time_before_merge << std::endl
+                      << "refill_time_after_merge=" << o.refill_time_after_merge << std::endl
+                      << "refill_wait_time=" << o.refill_wait_time << std::endl
+                      << "pop_heap_time=" << o.pop_heap_time << std::endl
+                      << "merge_sorted_heaps_time=" << o.merge_sorted_heaps_time << std::endl
+                   // << "refill_upper_bound_time=" << o.refill_upper_bound_time << std::endl
+                      << "refill_accumulate_time=" << o.refill_accumulate_time << std::endl
+                      << "refill_minmax_time=" << o.refill_minmax_time << std::endl;
         }
     };
-    
+
     stats_type stats;
-    
 };
 
 STXXL_END_NAMESPACE
+
 #endif // !STXXL_CONTAINERS_PARALLEL_PRIORITY_QUEUE_HEADER

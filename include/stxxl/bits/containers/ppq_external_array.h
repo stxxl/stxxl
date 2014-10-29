@@ -15,7 +15,7 @@
 
 #include <utility>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 #include <iterator>
 #include <ctime>
 
@@ -118,30 +118,30 @@ private:
     size_t end_index;
 
 public:
-    //! \brief Constructs an external array
+    //! Constructs an external array
     //!
     //! \param size					The total number of elements. Cannot be changed after construction.
     //!
     //! \param _num_prefetch_blocks		Number of blocks to prefetch from hard disk
     //!
     //! \param _num_write_buffer_blocks	Size of the write buffer in number of blocks
-    external_array(size_t size, size_t _num_prefetch_blocks, size_t _num_write_buffer_blocks) :
-        m_size(size),
-        real_size(0),
-        value_size(sizeof(ValueType)),
-        num_elements_per_block((size_t)(BlockSize / value_size)),
-        num_bids((size_t) div_ceil(m_size, num_elements_per_block)),
-        num_prefetch_blocks(std::min(_num_prefetch_blocks, num_bids)),
-        num_write_buffer_blocks(std::min(_num_write_buffer_blocks, num_bids)),
-        bids(num_bids),
-        write_position(0),
-        hint_index(0),
-        current_bid_index(0),
-        write_phase(true),
-        _first_block_valid(false),
-        is_first_block(true),
-        begin_index(0),
-        end_index(0)
+    external_array(size_t size, size_t _num_prefetch_blocks, size_t _num_write_buffer_blocks)
+        : m_size(size),
+          real_size(0),
+          value_size(sizeof(ValueType)),
+          num_elements_per_block((size_t)(BlockSize / value_size)),
+          num_bids((size_t)div_ceil(m_size, num_elements_per_block)),
+          num_prefetch_blocks(std::min(_num_prefetch_blocks, num_bids)),
+          num_write_buffer_blocks(std::min(_num_write_buffer_blocks, num_bids)),
+          bids(num_bids),
+          write_position(0),
+          hint_index(0),
+          current_bid_index(0),
+          write_phase(true),
+          _first_block_valid(false),
+          is_first_block(true),
+          begin_index(0),
+          end_index(0)
     {
         assert(size > 0);
         first_block = new block_type;
@@ -157,7 +157,7 @@ public:
     external_array(const Self& other) = delete;
 
     //! Move assignment.
-    Self& operator = (Self && o)
+    Self& operator = (Self&& o)
     {
         m_size = o.m_size;
         real_size = o.real_size;
@@ -186,27 +186,27 @@ public:
     }
 
     //! Move constructor. Needed for regrowing in surrounding vector.
-    external_array(Self && o) :
-        m_size(o.m_size),
-        real_size(o.real_size),
-        value_size(o.value_size),
-        num_elements_per_block(o.num_elements_per_block),
-        num_bids(o.num_bids),
-        num_prefetch_blocks(o.num_prefetch_blocks),
-        num_write_buffer_blocks(o.num_write_buffer_blocks),
+    external_array(Self&& o)
+        : m_size(o.m_size),
+          real_size(o.real_size),
+          value_size(o.value_size),
+          num_elements_per_block(o.num_elements_per_block),
+          num_bids(o.num_bids),
+          num_prefetch_blocks(o.num_prefetch_blocks),
+          num_write_buffer_blocks(o.num_write_buffer_blocks),
 
-        bids(std::move(o.bids)),
+          bids(std::move(o.bids)),
 
-        first_block(o.first_block),
-        pool(o.pool),
-        write_position(o.write_position),
-        hint_index(o.hint_index),
-        current_bid_index(o.current_bid_index),
-        write_phase(o.write_phase),
-        _first_block_valid(o._first_block_valid),
-        is_first_block(o.is_first_block),
-        begin_index(o.begin_index),
-        end_index(o.end_index)
+          first_block(o.first_block),
+          pool(o.pool),
+          write_position(o.write_position),
+          hint_index(o.hint_index),
+          current_bid_index(o.current_bid_index),
+          write_phase(o.write_phase),
+          _first_block_valid(o._first_block_valid),
+          is_first_block(o.is_first_block),
+          begin_index(o.begin_index),
+          end_index(o.end_index)
     {
         o.first_block = nullptr;
         o.pool = nullptr;
@@ -252,7 +252,6 @@ public:
         assert(end_index - 1 >= begin_index);
         return *begin_block();
     }
-
 
     //! Returns the largest element in the first block / internal memory
     ValueType & get_current_max_element()

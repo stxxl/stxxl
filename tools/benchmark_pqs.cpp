@@ -95,22 +95,22 @@ struct value_type {
     key_type first;
     key_type second;
     char data[value_size - 2 * sizeof(key_type)];
-    value_type() :
-        first(0), second(0)
+    value_type()
+        : first(0), second(0)
     {
         #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
         memset(data, 0, sizeof(data));
         #endif
     }
-    value_type(const key_type& _key) :
-        first(_key)
+    value_type(const key_type& _key)
+        : first(_key)
     {
         #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
         memset(data, 0, sizeof(data));
         #endif
     }
-    value_type(const key_type& _key, const key_type& _data) :
-        first(_key), second(_data)
+    value_type(const key_type& _key, const key_type& _data)
+        : first(_key), second(_data)
     {
         #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
         memset(data, 0, sizeof(data));
@@ -144,13 +144,11 @@ struct value_type_cmp_greater : public std::binary_function<value_type, value_ty
     }
 };
 
-
 std::ostream& operator << (std::ostream& o, const value_type& obj)
 {
     o << obj.first;
     return o;
 }
-
 
 /*
  * Progress messages
@@ -160,26 +158,25 @@ static const uint64 printmod = 16 * MiB;
 static inline void progress(const char* text, uint64 i, uint64 nelements)
 {
     if ((i % printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i)* 100. / static_cast<double>(nelements)) << " %)");
+        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
     }
 }
-
 
 /*
  * Defining priority queues.
  */
 
 typedef stxxl::PRIORITY_QUEUE_GENERATOR<
-    value_type,
-    value_type_cmp_greater,
-    mem_for_queue,
-    _num_elements / 1024> gen;
+        value_type,
+        value_type_cmp_greater,
+        mem_for_queue,
+        _num_elements / 1024> gen;
 typedef gen::result stxxlpq_type;
 stxxlpq_type* stxxlpq;
 
 #if STXXL_PARALLEL
-    typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
-    ppq_type* ppq;
+typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
+ppq_type* ppq;
 #endif
 
 typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
@@ -188,11 +185,9 @@ sorter_type* stxxlsorter;
 typedef std::priority_queue<value_type, std::vector<value_type>, value_type_cmp_greater> stlpq_type;
 stlpq_type* stlpq;
 
-
 /*
  * Including the tests
  */
-
 
 #if STXXL_PARALLEL
     #define PPQ
@@ -208,7 +203,6 @@ stlpq_type* stlpq;
 #define STLPQ
         #include "benchmark_pqs_helper.h"
 #undef STLPQ
-
 
 /*
  * Print statistics and parameters.
@@ -226,7 +220,7 @@ void print_params()
     STXXL_MEMDUMP(extract_buffer_ram);
     STXXL_VARDUMP(num_elements);
     #if STXXL_PARALLEL
-        STXXL_VARDUMP(num_insertion_heaps);
+    STXXL_VARDUMP(num_insertion_heaps);
     #endif
     STXXL_VARDUMP(num_write_buffers);
     STXXL_VARDUMP(num_prefetchers);
@@ -240,11 +234,9 @@ inline void ppq_stats()
 }
 #endif
 
-
 /*
  * The main procedure.
  */
-
 
 int benchmark_pqs(int argc, char* argv[])
 {
@@ -311,7 +303,6 @@ int benchmark_pqs(int argc, char* argv[])
     unsigned int temp_num_prefetchers = std::numeric_limits<unsigned int>::max();
     cp.add_uint('z', "prefetchers", "Number of prefetched blocks for each external array", temp_num_prefetchers);
 
-
     if (!cp.process(argc, argv))
         return -1;
 
@@ -332,15 +323,14 @@ int benchmark_pqs(int argc, char* argv[])
     if (temp_num_prefetchers < std::numeric_limits<unsigned int>::max())
         num_prefetchers = temp_num_prefetchers;
 
-
     calculate_depending_parameters();
     print_params();
 
     if (do_ppq) {
         #if STXXL_PARALLEL
-            ppq = new ppq_type(num_prefetchers, num_write_buffers, RAM,
-                num_insertion_heaps, single_heap_ram, extract_buffer_ram,
-                do_flush_directly);
+        ppq = new ppq_type(num_prefetchers, num_write_buffers, RAM,
+                           num_insertion_heaps, single_heap_ram, extract_buffer_ram,
+                           do_flush_directly);
         #endif
     } else if (do_stxxlpq) {
         stxxlpq = new stxxlpq_type(mem_for_prefetch_pool, mem_for_write_pool);
@@ -358,14 +348,14 @@ int benchmark_pqs(int argc, char* argv[])
         STXXL_MSG("Please choose a conatiner type. Use -h for help.");
         return EXIT_FAILURE;
     }
-    
+
     #if !STXXL_PARALLEL
-    
-        if (do_ppq) {
-            STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. Parallel priority queue cannot be used here.");
-            return EXIT_FAILURE;
-        }
-    
+
+    if (do_ppq) {
+        STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. Parallel priority queue cannot be used here.");
+        return EXIT_FAILURE;
+    }
+
     #endif
 
     if (do_dijkstra) {
@@ -374,8 +364,8 @@ int benchmark_pqs(int argc, char* argv[])
 
         if (do_ppq) {
             #if STXXL_PARALLEL
-                ppq_dijkstra(n, m);
-                ppq_stats();
+            ppq_dijkstra(n, m);
+            ppq_stats();
             #endif
         } else if (do_stxxlpq) {
             stxxlpq_dijkstra(n, m);
