@@ -94,7 +94,7 @@ protected:
         }
     };
 
-    typedef custom_stats_counter stats_counter;
+    typedef custom_stats_counter<uint64> stats_counter;
     typedef timer stats_timer;
 
     class internal_array

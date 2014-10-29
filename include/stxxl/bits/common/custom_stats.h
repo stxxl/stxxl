@@ -27,17 +27,17 @@ STXXL_BEGIN_NAMESPACE
  * a unsigned long long value.
  *
  * \see dummy_custom_stats_counter
- * \see custom_stats_timer
  */
+template <typename ValueType>
 class custom_stats_counter
 {
 public:
-    //! The counter type
-    typedef unsigned long long counter_type;
+    //! The counter's value type
+    typedef ValueType value_type;
 
 protected:
     //! The counter's value
-    counter_type m_value;
+    value_type m_value;
 
 public:
     //! The constructor. Initializes the counter to 0.
@@ -47,7 +47,7 @@ public:
 
     //! Increases the counter by right.
     //! \param right The corresponding integer value
-    custom_stats_counter& operator += (counter_type right)
+    custom_stats_counter& operator += (const value_type& right)
     {
         m_value += right;
         return *this;
@@ -59,15 +59,15 @@ public:
         return *this;
     }
     //! Increases the counter by 1 (postfix).
-    custom_stats_counter& operator ++ (int)
+    custom_stats_counter operator ++ (int)
     {
-        custom_stats_counter* result = this;
+        custom_stats_counter copy = *this;
         ++m_value;
-        return *result;
+        return copy;
     }
-    //! Set the counter to other
+    //! Assignment operator
     //! \param other The corresponding integer value
-    custom_stats_counter& operator = (counter_type other)
+    custom_stats_counter& operator = (const value_type& other)
     {
         m_value = other;
         return *this;
@@ -78,7 +78,7 @@ public:
      *
      * \param other The corresponding integer value
      */
-    void set_max(counter_type other)
+    void set_max(const value_type& other)
     {
         m_value = std::max(m_value, other);
     }
@@ -89,7 +89,7 @@ public:
      *
      * \param byte_per_element The memory amount per "counter element".
      */
-    std::string as_memory_amount(counter_type byte_per_element) const
+    std::string as_memory_amount(const value_type& byte_per_element) const
     {
         return format_IEC_size(m_value * byte_per_element) + "B";
     }
@@ -98,7 +98,7 @@ public:
      * value.  This can be used as a getter as well as for printing with
      * std::out.
      */
-    operator counter_type () const
+    operator value_type () const
     {
         return m_value;
     }
@@ -109,15 +109,16 @@ public:
  * should optimize out the code.
  *
  * \see custom_stats_counter
- * \see dummy_custom_stats_timer
  */
+template <typename ValueType>
 class dummy_custom_stats_counter
 {
-    typedef unsigned long long counter_type;
+public:
+    typedef ValueType value_type;
 
 public:
     dummy_custom_stats_counter() { }
-    dummy_custom_stats_counter& operator += (counter_type)
+    dummy_custom_stats_counter& operator += (const value_type&)
     {
         return *this;
     }
@@ -129,20 +130,21 @@ public:
     {
         return *this;
     }
-    dummy_custom_stats_counter& operator = (counter_type)
+    dummy_custom_stats_counter& operator = (const value_type&)
     {
         return *this;
     }
-    void set_max(counter_type) { }
-    std::string as_memory_amount(counter_type)
+    void set_max(value_type) { }
+    std::string as_memory_amount(const value_type&)
     {
         return "";
     }
-    operator counter_type () const
+    operator value_type () const
     {
-        return counter_type();
+        return value_type();
     }
 };
 
 STXXL_END_NAMESPACE
+
 #endif // !STXXL_COMMON_CUSTOM_STATS_HEADER
