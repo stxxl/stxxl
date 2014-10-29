@@ -25,7 +25,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/misc/cmake)
 
 # prohibit in-source builds
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-  message(SEND_ERROR "In-source builds are not allowed.")
+  message(FATAL_ERROR "In-source builds are not allowed, use a separate build directory.")
 endif()
 
 # default to Debug building for single-config generators
@@ -95,6 +95,9 @@ option(NO_CXX11 "Build without C++11 flags" OFF)
 option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
 
 option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
+
+# see tools/benchmarks about older TPIE benchmarks.
+option(USE_TPIE "Try to compile extra benchmarks from the 2007 S&PE paper with an old TPIE version." OFF)
 
 ### building shared and/or static libraries
 

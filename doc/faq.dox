@@ -28,24 +28,27 @@ Please note that from STXXL 1.4.0 on, only 64-bit systems are fully supported. C
 
 The compilers marked with '*' are the maintainers' favorite choices and are most thoroughly tested.
 
-compiler              | supported options
---------------------- | --------------------------
-gcc 4.8.2             | stxxl parallel (boost) (c++0x)
-gcc 4.7.3 *           | stxxl parallel (boost) (c++0x)
-gcc 4.6.4             | stxxl parallel (boost) (c++0x)
-gcc 4.5.4             | stxxl parallel (boost) (c++0x)
-gcc 4.4.7             | stxxl parallel (boost) (c++0x)
-gcc 4.3.6             | stxxl (boost)
-gcc 4.1.2             | stxxl (boost)
-gcc 3.4.6             | stxxl (boost)
-gcc 3.3               | unsupported
-icpc 2013.5.192 *     | stxxl (boost) (c++0x)
-icpc 2011.13.367      | stxxl (boost) (c++0x)
-clang++ 3.1, 3.2, 3.3 | stxxl (boost) (c++0x)
-cygwin gcc 4.8.2      | stxxl parallel (boost) (c++0x)
-msvc 2013 12.0 *      | stxxl (boost) (c++11)
-msvc 2012 11.0        | stxxl (boost) (c++0x)
-msvc 2010 10.0        | stxxl boost required
+compiler                | supported options
+----------------------- | --------------------------
+gcc 4.9.1               | stxxl parallel (boost) (c++11)
+gcc 4.8.3 *             | stxxl parallel (boost) (c++11)
+gcc 4.7.3               | stxxl parallel (boost) (c++0x)
+gcc 4.6.4               | stxxl parallel (boost) (c++0x)
+gcc 4.5.4               | stxxl parallel (boost) (c++0x)
+gcc 4.4.7               | stxxl parallel (boost) (c++0x)
+gcc 4.3.6               | stxxl (boost)
+gcc 4.1.2               | stxxl (boost)
+gcc 3.4.6               | stxxl (boost)
+gcc 3.3                 | unsupported
+icpc 2015.0.090 *       | stxxl (boost) (c++0x)
+icpc 2013.5.192 *       | stxxl (boost) (c++0x)
+icpc 2011.13.367        | stxxl (boost) (c++0x)
+clang++ 3.2, 3.3, 3.4.2 | stxxl (boost) (c++0x)
+mingw-w64 gcc 4.8.3     | stxxl parallel (boost) (c++11)
+cygwin gcc 4.8.3        | stxxl parallel (boost) (c++11)
+msvc 2013 12.0 *        | stxxl (boost) (c++11)
+msvc 2012 11.0          | stxxl (boost) (c++0x)
+msvc 2010 10.0          | stxxl boost required
 
 - The option "parallel" uses the __gnu_parallel extensions in some parts of STXXL. For all \c gcc versions >= 4.4 the __gnu_parallel extensions are ON by default. Support for MCSTL (predecessor of __gnu_parallel) was removed in STXXL 1.4.0.
 

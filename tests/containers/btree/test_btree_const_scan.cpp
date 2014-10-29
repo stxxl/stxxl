@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/btree/test_const_scan.cpp
+ *  tests/containers/btree/test_btree_const_scan.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

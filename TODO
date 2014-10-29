@@ -6,8 +6,6 @@
   max(size_at_program_start, configured_size)
   https://sourceforge.net/forum/message.php?msg_id=4925158
 
-* integrate unordered_map branch
-
 * allocation strategies: provide a method get_num_disks()
   and don't use stxxl::config::get_instance()->disks_number() inappropriately
 
@@ -29,11 +27,6 @@
 * implement an allocator which looks at the available free space on disks
   when distributing blocks to disks, or does load-balancing depending
   on the given speed of the disks
-
-* implement new disk queuing strategy that supports NCQ,
-  which is now widely available in HDDs/SSDs;
-  probably most interesting for rather small block sizes
-  (currently begin developed in branch kernelaio)
 
 * abstract away block manager so every container can attach to a file.
 

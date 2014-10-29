@@ -56,7 +56,9 @@
    mv include/stxxl/bits/config.h.in include/stxxl/bits/config.h
    doxygen
    # optimize pngs
-   optipng -o7 doxygen-html/*.png
+   optipng -o7 doxygen-html/*.png doxygen-html/*/*.png
+   # remove hashstamp files
+   rm doxygen-html/*.md5
    # tag HTML with version and link
    sed -i "s@<li class=\"footer\">Generated@<li class=\"footer\"><a href=\"http://stxxl.sourceforge.net\">STXXL 1.4.x</a> - Generated@" doxygen-html/*.html
    tar czf stxxl-1.4.x-doxygen.tar.gz doxygen-html
@@ -67,10 +69,7 @@
 ** Upload both tarballs to sourceforge
 
 ** Update website with new versions
-
-** Let website generator create tag/master for current git repository.
-   - copy tag/master into git website repository
-   - optipng -o7 tag/1.4.x/*.png
+   - copy contents of doxygen tarball into git website repository
 
 * Post-Release Procedure
 
@@ -87,5 +86,3 @@
 * Announcements
 
 ** Post announcement messages on sourceforge "forum" and "news" sections
-
-** Post announcement on freecode.net

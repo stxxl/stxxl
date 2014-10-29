@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/btree/test_corr_insert_erase.cpp
+ *  tests/containers/btree/test_btree_insert_erase.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
