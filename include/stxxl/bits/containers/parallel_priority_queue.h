@@ -26,12 +26,12 @@
     #include <parallel/numeric>
 #endif
 
+#include <stxxl/bits/algo/winner_tree.h>
 #include <stxxl/bits/common/custom_stats.h>
-#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/containers/external_array.h>
-#include <stxxl/bits/containers/ppq_index_winner_tree.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_alloc.h>
 #include <stxxl/bits/mng/buf_ostream.h>
@@ -424,10 +424,10 @@ namespace ppq_local {
         ea_comp m_ea_comp;
 
         //! The winner trees
-        index_winner_tree<head_comp> m_head;
-        index_winner_tree<heaps_comp> m_heaps;
-        index_winner_tree<ia_comp> m_ia;
-        index_winner_tree<ea_comp> m_ea;
+        winner_tree<head_comp> m_head;
+        winner_tree<heaps_comp> m_heaps;
+        winner_tree<ia_comp> m_ia;
+        winner_tree<ea_comp> m_ea;
     };
 
 }
@@ -483,8 +483,11 @@ protected:
         }
     };
 
-    typedef custom_stats_counter<uint64> stats_counter;
-    typedef timer stats_timer;
+    //! Defines if statistics are gathered: dummy_custom_stats_counter or custom_stats_counter
+    typedef dummy_custom_stats_counter<uint64> stats_counter;
+    
+    //! Defines if statistics are gathered: fake_timer or timer
+    typedef fake_timer stats_timer;
 
     //! \}
 

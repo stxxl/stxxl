@@ -135,7 +135,7 @@ public:
         return *this;
     }
     void set_max(value_type) { }
-    std::string as_memory_amount(const value_type&)
+    std::string as_memory_amount(const value_type&) const
     {
         return "";
     }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/containers/ppq_index_winner_tree.h
+ *  include/stxxl/bits/algo/winner_tree.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,22 +10,21 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_PPQ_INDEX_WINNER_TREE_HEADER
-#define STXXL_CONTAINERS_PPQ_INDEX_WINNER_TREE_HEADER
+#ifndef STXXL_CONTAINERS_WINNER_TREE_HEADER
+#define STXXL_CONTAINERS_WINNER_TREE_HEADER
 
 #include <vector>
 #include <stack>
 #include <cassert>
 #include <cmath>
 
-#include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/verbose.h>
 
 STXXL_BEGIN_NAMESPACE
 
 /*!
- * The class index_winner_tree is a binary tournament tree. There are n=2^k so
+ * The class winner_tree is a binary tournament tree. There are n=2^k so
  * called players which compete for the winning position. The winner is the
  * smallest one regarding the comparator m_less. Each player is identified with
  * it's index. The comparator should use this index in order to compare the
@@ -40,7 +39,7 @@ STXXL_BEGIN_NAMESPACE
  * removed the slot will be marked free again.
  */
 template <typename Comparator>
-class index_winner_tree
+class winner_tree
 {
 protected:
     //! the binary tree of size 2^(k+1)-1
@@ -52,14 +51,15 @@ protected:
     //! number of slots for the players (2^k)
     unsigned int m_num_slots;
 
-    typedef timer stats_timer;
+    //! Defines if statistics are gathered: fake_timer or timer
+    typedef fake_timer stats_timer;
 
+    //! Collection of stats from the winner_tree
     struct stats_type
     {
         stats_timer replay_time;
         stats_timer double_num_slots_time;
         stats_timer remove_player_time;
-
         friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
             return os << "replay_time=" << o.replay_time << std::endl
@@ -68,7 +68,7 @@ protected:
         }
     };
 
-    //! collection of stats from the winner_tree.
+    //! Collection of stats from the winner_tree
     stats_type m_stats;
 
 public:
@@ -82,7 +82,7 @@ public:
      * \param less The comparator. It should use two given indices, compare the
      * corresponding values and return the index of one with the smaller value.
      */
-    index_winner_tree(unsigned int num_players, Comparator& less)
+    winner_tree(unsigned int num_players, Comparator& less)
         : m_less(less)
     {
         assert(num_players > 1);
@@ -281,4 +281,4 @@ public:
 
 STXXL_END_NAMESPACE
 
-#endif // !STXXL_CONTAINERS_PPQ_INDEX_WINNER_TREE_HEADER
+#endif // !STXXL_CONTAINERS_WINNER_TREE_HEADER
