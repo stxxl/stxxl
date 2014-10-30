@@ -10,12 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example containers/ppq_external_array.cpp
+//! \example containers/external_array.cpp
 //! This is an example of how to use \c stxxl::external_array
 
 #include <cstddef>
 #include <stxxl/bits/common/cmdline.h>
-#include <stxxl/bits/containers/ppq_external_array.h>
+#include <stxxl/bits/containers/external_array.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/timer>
 

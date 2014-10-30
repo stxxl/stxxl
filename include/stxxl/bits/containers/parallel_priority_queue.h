@@ -30,7 +30,7 @@
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/containers/ppq_external_array.h>
+#include <stxxl/bits/containers/external_array.h>
 #include <stxxl/bits/containers/ppq_index_winner_tree.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_alloc.h>

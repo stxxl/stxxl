@@ -13,20 +13,20 @@
 #ifndef STXXL_CONTAINERS_PPQ_EXTERNAL_ARRAY_HEADER
 #define STXXL_CONTAINERS_PPQ_EXTERNAL_ARRAY_HEADER
 
+#include <cassert>
+#include <ctime>
+#include <iterator>
 #include <utility>
 #include <vector>
-#include <cassert>
-#include <iterator>
-#include <ctime>
 
+#include <stxxl/bits/io/request_operations.h>
+#include <stxxl/bits/mng/block_alloc.h>
+#include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/mng/read_write_pool.h>
+#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/mng/block_alloc.h>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/containers/pq_helpers.h>
 
 STXXL_BEGIN_NAMESPACE
 
