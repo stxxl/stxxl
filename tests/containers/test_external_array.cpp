@@ -102,14 +102,16 @@ int run_test(size_t volume, size_t numeas, size_t numwbs) {
         
     }
     
-    return EXIT_SUCCESS;
+    for (size_t i=0; i<numeas; ++i)
+        delete eas[i];
 
+    return EXIT_SUCCESS;
 }
 
 int main(int argc, char** argv)
 {
 
-    stxxl::uint64 volume = 2L * 1024 * 1024 * 1024;
+    stxxl::uint64 volume = 512 * 1024 * 1024;
     unsigned numeas = 1;
     unsigned numwbs = 14;
 
