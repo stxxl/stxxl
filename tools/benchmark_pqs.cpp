@@ -163,27 +163,235 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
 }
 
 /*
+ * Abstract Container class with template specialized functions
+ */
+
+template <typename BackendType>
+class Container
+{
+public:
+    static std::string name();
+
+    BackendType& backend;
+
+    Container(BackendType& b)
+        : backend(b)
+    { }
+
+    value_type top_pop()
+    {
+        value_type top = backend.top();
+        backend.pop();
+        return top;
+    }
+
+    bool empty() const
+    {
+        return backend.empty();
+    }
+
+    size_t size() const
+    {
+        return backend.size();
+    }
+
+    void bulk_push_begin(size_t /* this_bulk_size */)
+    {
+        std::cout << name() << ": bulk_push_begin not supported\n";
+    }
+
+    void bulk_push_end()
+    {
+        std::cout << name() << ": bulk_push_end not supported\n";
+    }
+
+    void bulk_push_step(const value_type& v, int /* thread_num */)
+    {
+        backend.push(v);
+    }
+};
+
+// *** Specialization for STXXL PQ
+
+typedef stxxl::PRIORITY_QUEUE_GENERATOR<
+    value_type,
+    value_type_cmp_greater,
+    mem_for_queue,
+    _num_elements / 1024> stxxlpq_generator_type;
+
+typedef stxxlpq_generator_type::result stxxlpq_type;
+
+template <>
+std::string Container<stxxlpq_type>::name()
+{
+    return "STXXL PQ";
+}
+
+// *** Specialization for STXXL Parallel PQ
+
+#if STXXL_PARALLEL
+
+typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
+
+template <>
+std::string Container<ppq_type>::name()
+{
+    return "Parallel PQ";
+}
+
+template <>
+void Container<ppq_type>::bulk_push_begin(size_t this_bulk_size)
+{
+    backend.bulk_push_begin(this_bulk_size);
+}
+
+template <>
+void Container<ppq_type>::bulk_push_end()
+{
+    backend.bulk_push_end();
+}
+
+template <>
+void Container<ppq_type>::bulk_push_step(const value_type& v, int thread_num)
+{
+    backend.bulk_push_step(v, thread_num);
+}
+
+#endif
+
+// *** Specialization for STL PQ
+
+typedef std::priority_queue<value_type, std::vector<value_type>, value_type_cmp_greater> stlpq_type;
+
+template <>
+std::string Container<stlpq_type>::name()
+{
+    return "STL PQ";
+}
+
+typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
+
+// *** Specialization for STL Sorter
+
+template <>
+std::string Container<sorter_type>::name()
+{
+    return "STXXL Sorter";
+}
+
+template <>
+value_type Container<sorter_type>::top_pop()
+{
+    value_type top = *backend;
+    ++backend;
+    return top;
+}
+
+/*
+ * Benchmark Functions
+ */
+
+template <typename BackendType>
+void bulk_intermixed_check(BackendType& backend, bool parallel = true)
+{
+    Container<BackendType> c (backend);
+
+    std::string parallel_str = parallel ? " in parallel" : "";
+
+    uint64 num_inserts = 0, num_deletes = 0, num_failures = 0;
+    std::vector<bool> extracted_values(num_elements, false);
+
+    {
+        stxxl::scoped_print_timer timer(c.name() + ": Intermixed parallel bulk insert" + parallel_str + " and delete", 2 * num_elements * value_size);
+
+        for (uint64_t i = 0; i < 2 * num_elements; ++i)
+        {
+            uint64 r = rand() % bulk_size;
+
+            if (num_deletes < num_inserts && num_deletes < num_elements &&
+                (r > 0 || num_inserts >= num_elements))
+            {
+                STXXL_CHECK(!c.empty());
+
+                value_type top = c.top_pop();
+
+                if (top.first < 1 || top.first > num_elements) {
+                    std::cout << top.first << " has never been inserted." << std::endl;
+                    ++num_failures;
+                }
+                else if (extracted_values[top.first - 1]) {
+                    std::cout << top.first << " has already been extracted." << std::endl;
+                    ++num_failures;
+                }
+                else {
+                    extracted_values[top.first - 1] = true;
+                }
+
+                progress("Deleting / inserting element", i, 2 * num_elements);
+                ++num_deletes;
+                STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+            }
+            else
+            {
+                uint64 this_bulk_size = (num_inserts + bulk_size > num_elements)
+                    ? num_elements % bulk_size
+                    : bulk_size;
+
+                c.bulk_push_begin(this_bulk_size);
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+                {
+                    const unsigned int thread_num = parallel
+                        ? omp_get_thread_num()
+                        : rand() % num_insertion_heaps;
+#pragma omp for
+#else
+                    const unsigned int thread_num = 0;
+#endif
+
+                    for (stxxl::uint64 j = 0; j < this_bulk_size; j++)
+                    {
+                        uint64 k = num_elements - num_inserts - j;
+                        progress("Inserting/deleting element", i + j, 2 * num_elements);
+
+                        c.bulk_push_step(value_type(k), thread_num);
+                    }
+
+#if STXXL_PARALLEL
+                }
+#endif
+                c.bulk_push_end();
+
+                num_inserts += this_bulk_size;
+                i += this_bulk_size - 1;
+                STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+            }
+        }
+    }
+    {
+        stxxl::scoped_print_timer timer("Check if all values have been extracted");
+        for (uint64 i = 0; i < num_elements; ++i) {
+            if (!extracted_values[i]) {
+                std::cout << i + 1 << " has never been extracted." << std::endl;
+                ++num_failures;
+            }
+        }
+    }
+    std::cout << num_failures << " failures." << std::endl;
+}
+
+/*
  * Defining priority queues.
  */
 
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<
-        value_type,
-        value_type_cmp_greater,
-        mem_for_queue,
-        _num_elements / 1024> gen;
-typedef gen::result stxxlpq_type;
 stxxlpq_type* stxxlpq;
 
-#if STXXL_PARALLEL
-typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
 ppq_type* ppq;
-#endif
 
-typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
 sorter_type* stxxlsorter;
 
-typedef std::priority_queue<value_type, std::vector<value_type>, value_type_cmp_greater> stlpq_type;
 stlpq_type* stlpq;
+
 
 /*
  * Including the tests
@@ -382,7 +590,7 @@ int benchmark_pqs(int argc, char* argv[])
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    ppq_bulk_intermixed_check(do_parallel);
+                    bulk_intermixed_check(*ppq, do_parallel);
                 } else {
                     if (do_fill) {
                         ppq_bulk_rand_insert(seed, do_parallel);
@@ -431,7 +639,7 @@ int benchmark_pqs(int argc, char* argv[])
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    stxxlpq_bulk_intermixed_check();
+                    bulk_intermixed_check(*stxxlpq);
                 } else {
                     if (do_fill) {
                         stxxlpq_bulk_rand_insert(seed);
@@ -477,7 +685,7 @@ int benchmark_pqs(int argc, char* argv[])
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    stxxlsorter_bulk_intermixed_check();
+                    bulk_intermixed_check(*stxxlsorter);
                 } else {
                     if (do_fill) {
                         stxxlsorter_bulk_rand_insert(seed);
@@ -523,7 +731,7 @@ int benchmark_pqs(int argc, char* argv[])
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    stlpq_bulk_intermixed_check();
+                    bulk_intermixed_check(*stlpq);
                 } else {
                     if (do_fill) {
                         stlpq_bulk_rand_insert(seed);
