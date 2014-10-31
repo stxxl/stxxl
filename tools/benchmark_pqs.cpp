@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2014 Thomas Keh <thomas.keh@student.kit.edu>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -36,6 +37,8 @@ static const char* description =
 
 using stxxl::uint32;
 using stxxl::uint64;
+
+using stxxl::scoped_print_timer;
 
 static const uint64 KiB = 1024L;
 static const uint64 MiB = 1024L * KiB;
@@ -162,10 +165,10 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
     }
 }
 
-/*
- * Abstract Container class with template specialized functions
+/*!
+ * Abstract Container class with template specialized functions for sorter and
+ * more.
  */
-
 template <typename BackendType>
 class Container
 {
@@ -178,6 +181,19 @@ public:
         : backend(b)
     { }
 
+    //! Simple single push() operation
+    void push(const value_type& v)
+    {
+        backend.push(v);
+    }
+
+    //! Simple single pop() operation
+    void pop()
+    {
+        backend.pop();
+    }
+
+    //! Simple single top() and pop() operation.
     value_type top_pop()
     {
         value_type top = backend.top();
@@ -185,11 +201,13 @@ public:
         return top;
     }
 
+    //! Test if the container is empty.
     bool empty() const
     {
         return backend.empty();
     }
 
+    //! Return number of items still in container.
     size_t size() const
     {
         return backend.size();
@@ -280,6 +298,12 @@ std::string Container<sorter_type>::name()
 }
 
 template <>
+void Container<sorter_type>::pop()
+{
+    ++backend;
+}
+
+template <>
 value_type Container<sorter_type>::top_pop()
 {
     value_type top = *backend;
@@ -291,18 +315,347 @@ value_type Container<sorter_type>::top_pop()
  * Benchmark Functions
  */
 
-template <typename BackendType>
-void bulk_intermixed_check(BackendType& backend, bool parallel = true)
+template <typename ContainerType>
+void do_insert(ContainerType& c)
 {
-    Container<BackendType> c (backend);
+    scoped_print_timer timer("Filling " + c.name() + " sequentially",
+                             num_elements * value_size);
 
+    for (uint64 i = 0; i < num_elements; i++)
+    {
+        progress("Inserting element", i, num_elements);
+        c.push(value_type(num_elements - i));
+    }
+}
+
+template <typename ContainerType>
+void do_rand_insert(ContainerType& c, unsigned int seed)
+{
+    scoped_print_timer timer("Filling " + c.name() + " randomly",
+                             num_elements * value_size);
+
+    for (uint64 i = 0; i < num_elements; i++)
+    {
+        uint64 k = rand_r(&seed) % value_universe_size;
+        progress("Inserting element", i, num_elements);
+        c.push(value_type(k));
+    }
+}
+
+template <typename ContainerType>
+void do_read(ContainerType& c)
+{
+    scoped_print_timer timer("Reading " + c.name(),
+                             num_elements * value_size);
+
+    for (uint64 i = 0; i < num_elements; ++i)
+    {
+        STXXL_CHECK(!c.empty());
+        c.pop();
+        progress("Popped element", i, num_elements);
+    }
+}
+
+template <typename ContainerType>
+void do_read_check(ContainerType& c)
+{
+    scoped_print_timer timer("Reading " + c.name() + " and checking order",
+                             num_elements * value_size);
+
+    for (uint64 i = 0; i < num_elements; ++i)
+    {
+        STXXL_CHECK(!c.empty());
+        value_type top = c.top_pop();
+
+        STXXL_CHECK_EQUAL(top.first, i + 1);
+        progress("Popped element", i, num_elements);
+    }
+}
+
+template <typename ContainerType>
+void do_rand_read_check(ContainerType& c, unsigned int seed)
+{
+    std::vector<uint64> vals;
+    vals.reserve(num_elements);
+    {
+        scoped_print_timer timer("Filling value vector for comarison");
+
+        for (uint64 i = 0; i < num_elements; ++i)
+        {
+            uint64 k = rand_r(&seed) % value_universe_size;
+            vals.push_back(k);
+        }
+    }
+    {
+        scoped_print_timer timer("Sorting value vector for comarison");
+#if STXXL_PARALLEL
+        __gnu_parallel::sort(vals.begin(), vals.end());
+#else
+        std::sort(vals.begin(), vals.end());
+#endif
+    }
+    {
+        scoped_print_timer timer("Reading " + c.name() + " and check order",
+                                 num_elements * value_size);
+
+        for (uint64 i = 0; i < num_elements; ++i)
+        {
+            STXXL_CHECK(!c.empty());
+
+            value_type top = c.top_pop();
+
+            STXXL_CHECK_EQUAL(top.first, vals[i]);
+            progress("Popped element", i, num_elements);
+        }
+    }
+}
+
+template <typename ContainerType>
+void do_rand_intermixed(ContainerType& c, unsigned int _seed, bool filled)
+{
+    uint64 num_inserts = filled ? num_elements : 0;
+    uint64 num_deletes = 0;
+
+    scoped_print_timer timer(c.name() + ": Intermixed rand insert and delete",
+                             2 * num_elements * value_size);
+
+    for (uint64_t i = 0; i < 2 * num_elements; ++i)
+    {
+        unsigned r = rand_r(&_seed) % 2;
+
+        if (num_deletes < num_inserts &&
+            (r > 0 || num_inserts >= (filled ? 2 * num_elements : num_elements)))
+        {
+            STXXL_CHECK(!c.empty());
+
+            c.pop();
+
+            progress("Deleting / inserting element", i, 2 * num_elements);
+            ++num_deletes;
+            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+        }
+        else
+        {
+            progress("Inserting/deleting element", i, 2 * num_elements);
+
+            uint64 k = rand_r(&_seed) % value_universe_size;
+            c.push(value_type(k));
+
+            num_inserts++;
+            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+        }
+    }
+    
+}
+
+template <typename ContainerType>
+void do_bulk_insert(ContainerType& c, bool parallel = true)
+{
+    std::string parallel_str = parallel ? " in parallel" : "";
+
+    scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
+                             num_elements * value_size);
+
+    for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
+    {
+        c.bulk_push_begin(bulk_size);
+
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+        {
+            const unsigned thread_id = parallel ? omp_get_thread_num() : rand() % num_insertion_heaps;
+            #pragma omp for
+#else
+            const unsigned thread_id = 0;
+#endif
+            for (uint64 j = 0; j < bulk_size; ++j)
+            {
+                progress("Inserting element", i * bulk_size + j, num_elements);
+
+                c.bulk_push_step(value_type(num_elements - (i * bulk_size + j)), thread_id);
+            }
+
+#if STXXL_PARALLEL
+        }
+#endif
+        c.bulk_push_end();
+
+    }
+
+    c.bulk_push_begin(num_elements % bulk_size);
+
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+    {
+        const unsigned thread_id = parallel ? omp_get_thread_num() : rand() % num_insertion_heaps;
+        #pragma omp for
+#else
+        const unsigned thread_id = 0;
+#endif
+        for (uint64 j = 0; j < num_elements % bulk_size; j++)
+        {
+            progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
+
+            c.bulk_push_step(value_type(num_elements % bulk_size - j), thread_id);
+        }
+
+#if STXXL_PARALLEL
+    }
+#endif
+    c.bulk_push_end();
+}
+
+
+template <typename ContainerType>
+void do_bulk_rand_insert(ContainerType& c,
+                      unsigned int _seed, bool parallel = true)
+{
+    std::string parallel_str = parallel ? " in parallel" : "";
+
+    scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
+                             num_elements * value_size);
+
+    for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
+    {
+        c.bulk_push_begin(bulk_size);
+
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+        {
+            const unsigned int thread_id = parallel
+                ? omp_get_thread_num()
+                : rand() % num_insertion_heaps;
+
+            unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
+            #pragma omp for
+#else
+            const unsigned thread_id = 0;
+#endif
+            for (uint64 j = 0; j < bulk_size; ++j)
+            {
+                progress("Inserting element", i * bulk_size + j, num_elements);
+
+                uint64 k = rand_r(&seed) % value_universe_size;
+                c.bulk_push_step(value_type(k), thread_id);
+            }
+#if STXXL_PARALLEL
+        }
+#endif
+        c.bulk_push_end();
+    }
+
+    STXXL_CHECK_EQUAL(c.size(), num_elements - (num_elements % bulk_size));
+
+    c.bulk_push_begin(num_elements % bulk_size);
+
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+    {
+        const unsigned thread_id = parallel
+            ? omp_get_thread_num()
+            : rand() % num_insertion_heaps;
+
+        unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
+        #pragma omp for
+#else
+        const unsigned thread_id = 0;
+#endif
+        for (uint64 j = 0; j < num_elements % bulk_size; j++)
+        {
+            progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
+
+            uint64 k = rand_r(&seed) % value_universe_size;
+            c.bulk_push_step(value_type(k), thread_id);
+        }
+#if STXXL_PARALLEL
+    }
+#endif
+    c.bulk_push_end();
+
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
+}
+
+template <typename ContainerType>
+void do_bulk_rand_intermixed(ContainerType& c,
+                          unsigned int _seed, bool filled,
+                          bool parallel = true)
+{
+    std::string parallel_str = parallel ? " in parallel" : "";
+
+    uint64 num_inserts = filled ? num_elements : 0;
+    uint64 num_deletes = 0;
+
+    scoped_print_timer timer(c.name() + ": Intermixed parallel rand bulk insert" + parallel_str + " and delete",
+                             (filled ? 3 : 2) * num_elements * value_size);
+
+    for (uint64_t i = 0; i < (filled ? 3 : 2) * num_elements; ++i)
+    {
+        uint64 r = rand() % ((filled ? 2 : 1) * bulk_size);
+
+        // probability for an extract is bulk_size times larger than for a
+        // bulk_insert.  when already filled with num_elements elements:
+        // probability for an extract is 2*bulk_size times larger than for
+        // a bulk_insert.
+        if (num_deletes < num_inserts &&
+            num_deletes < (filled ? 2 : 1) * num_elements &&
+            (r > 0 || num_inserts >= (filled ? 2 : 1) * num_elements))
+        {
+            STXXL_CHECK(!c.empty());
+
+            c.top_pop();
+
+            progress("Deleting / inserting element", i, (filled ? 3 : 2) * num_elements);
+            ++num_deletes;
+            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+        }
+        else {
+            uint64 this_bulk_size =
+                (num_inserts + bulk_size > (filled ? 2 : 1) * num_elements)
+                ? num_elements % bulk_size
+                : bulk_size;
+
+            c.bulk_push_begin(this_bulk_size);
+
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+            {
+                const unsigned int thread_num = parallel ? omp_get_thread_num() : rand() % num_insertion_heaps;
+                unsigned int seed = thread_num * static_cast<unsigned>(i) * _seed;
+                #pragma omp for
+#else
+                const unsigned int thread_num = 0;
+#endif
+                for (uint64 j = 0; j < this_bulk_size; j++)
+                {
+                    progress("Inserting / deleting element",        
+                             i + j, (filled ? 3 : 2) * num_elements);
+
+                    uint64 k = rand_r(&seed) % value_universe_size;
+                    c.bulk_push_step(value_type(k), thread_num);
+                }
+#if STXXL_PARALLEL
+            }
+#endif
+            c.bulk_push_end();
+
+            num_inserts += this_bulk_size;
+            i += this_bulk_size - 1;
+            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+        }
+    }
+}
+
+template <typename ContainerType>
+void do_bulk_intermixed_check(ContainerType& c, bool parallel = true)
+{
     std::string parallel_str = parallel ? " in parallel" : "";
 
     uint64 num_inserts = 0, num_deletes = 0, num_failures = 0;
     std::vector<bool> extracted_values(num_elements, false);
 
     {
-        stxxl::scoped_print_timer timer(c.name() + ": Intermixed parallel bulk insert" + parallel_str + " and delete", 2 * num_elements * value_size);
+        scoped_print_timer timer(c.name() + ": Intermixed parallel bulk insert" + parallel_str + " and delete",
+                                 2 * num_elements * value_size);
 
         for (uint64_t i = 0; i < 2 * num_elements; ++i)
         {
@@ -344,12 +697,12 @@ void bulk_intermixed_check(BackendType& backend, bool parallel = true)
                     const unsigned int thread_num = parallel
                         ? omp_get_thread_num()
                         : rand() % num_insertion_heaps;
-#pragma omp for
+                    #pragma omp for
 #else
                     const unsigned int thread_num = 0;
 #endif
 
-                    for (stxxl::uint64 j = 0; j < this_bulk_size; j++)
+                    for (uint64 j = 0; j < this_bulk_size; j++)
                     {
                         uint64 k = num_elements - num_inserts - j;
                         progress("Inserting/deleting element", i + j, 2 * num_elements);
@@ -369,7 +722,7 @@ void bulk_intermixed_check(BackendType& backend, bool parallel = true)
         }
     }
     {
-        stxxl::scoped_print_timer timer("Check if all values have been extracted");
+        scoped_print_timer timer("Check if all values have been extracted");
         for (uint64 i = 0; i < num_elements; ++i) {
             if (!extracted_values[i]) {
                 std::cout << i + 1 << " has never been extracted." << std::endl;
@@ -381,36 +734,132 @@ void bulk_intermixed_check(BackendType& backend, bool parallel = true)
 }
 
 /*
+ * Dijkstra Graph SSP Algorithm with different PQs on a random graph.
+ */
+
+template <typename ContainerType>
+class dijkstra_graph
+{
+public:
+    typedef uint64 size_type;
+
+protected:
+    size_type n, m;
+    std::vector<size_type> nodes;
+    std::vector<bool> node_visited;
+    std::vector<size_type> edge_targets;
+    std::vector<size_type> edge_lengths;
+    std::vector<std::vector<std::pair<size_type, size_type> > > temp_edges;
+
+public:
+    //! construct a random graph for applying Dijkstra's SSP algorithm
+    dijkstra_graph(size_type n, size_type m)
+        : n(n),
+          m(m),
+          nodes(n + 1),
+          node_visited(n, false),
+          edge_targets(m),
+          edge_lengths(m),
+          temp_edges(n)
+    {
+        unsigned int seed = 12345;
+
+        for (size_type i = 0; i < m; ++i) {
+            size_type source = rand_r(&seed) % n;
+            size_type target = rand_r(&seed) % n;
+            size_type length = rand_r(&seed);
+            temp_edges[source].push_back(std::make_pair(target, length));
+        }
+
+        size_type offset = 0;
+
+        for (size_type i = 0; i < n; ++i) {
+            nodes[i] = offset;
+
+            for (size_type j = 0; j < temp_edges[i].size(); ++j) {
+                edge_targets[offset + j] = temp_edges[i][j].first;
+                edge_lengths[offset + j] = temp_edges[i][j].second;
+            }
+
+            offset += temp_edges[i].size();
+        }
+
+        nodes[n] = offset;
+        temp_edges.clear();
+    }
+
+    //! run using container c
+    void run_random_dijkstra(ContainerType& c)
+    {
+        unsigned int seed = 678910;
+        size_type source = rand_r(&seed) % n;
+        c.push(value_type(source, 0));
+
+        while (!c.empty())
+        {
+            value_type top = c.top_pop();
+
+            size_type target = top.first;
+            size_type distance = top.second;
+
+            if (node_visited[target]) {
+                continue;
+            } else {
+                node_visited[target] = true;
+            }
+
+            size_type edges_begin = nodes[target];
+            size_type edges_end = nodes[target + 1];
+
+            size_type num_edges = edges_end - edges_begin;
+            c.bulk_push_begin(num_edges);
+
+#if STXXL_PARALLEL
+            #pragma omp parallel
+            {
+                unsigned thread_num = omp_get_thread_num();
+                #pragma omp for
+#else
+                const unsigned int thread_num = 0;
+#endif
+                for (size_type i = edges_begin; i < edges_end; ++i)
+                {
+                    c.bulk_push_step(value_type(edge_targets[i], distance + edge_lengths[i]),
+                                     thread_num);
+                }
+#if STXXL_PARALLEL
+            }
+#endif
+            c.bulk_push_end();
+        }
+    }
+};
+
+template <typename ContainerType>
+void do_dijkstra(ContainerType& c, uint64 num_nodes, uint64 num_edges)
+{
+    std::cout << "Generating Graph" << std::endl;
+
+    dijkstra_graph<ContainerType> dg(num_nodes, num_edges);
+
+    scoped_print_timer timer("Running random dijkstra",
+                             num_elements * value_size);
+    dg.run_random_dijkstra(c);
+}
+
+/*
  * Defining priority queues.
  */
 
 stxxlpq_type* stxxlpq;
 
+#if STXXL_PARALLEL
 ppq_type* ppq;
+#endif
 
 sorter_type* stxxlsorter;
 
 stlpq_type* stlpq;
-
-
-/*
- * Including the tests
- */
-
-#if STXXL_PARALLEL
-    #define PPQ
-        #include "benchmark_pqs_helper.h"
-    #undef PPQ
-#endif
-#define STXXLPQ
-        #include "benchmark_pqs_helper.h"
-#undef STXXLPQ
-#define STXXLSORTER
-        #include "benchmark_pqs_helper.h"
-#undef STXXLSORTER
-#define STLPQ
-        #include "benchmark_pqs_helper.h"
-#undef STLPQ
 
 /*
  * Print statistics and parameters.
@@ -535,19 +984,20 @@ int benchmark_pqs(int argc, char* argv[])
     print_params();
 
     if (do_ppq) {
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         ppq = new ppq_type(num_prefetchers, num_write_buffers, RAM,
                            num_insertion_heaps, single_heap_ram, extract_buffer_ram,
                            do_flush_directly);
-        #endif
+#endif
     } else if (do_stxxlpq) {
         stxxlpq = new stxxlpq_type(mem_for_prefetch_pool, mem_for_write_pool);
+        
     } else if (do_sorter) {
         stxxlsorter = new sorter_type(value_type_cmp_smaller(), RAM);
     } else if (do_stlpq) {
         stlpq = new stlpq_type;
     }
-
+    
     /*
      * Run benchmarks
      */
@@ -571,208 +1021,230 @@ int benchmark_pqs(int argc, char* argv[])
         uint64 m = 100 * n;
 
         if (do_ppq) {
-            #if STXXL_PARALLEL
-            ppq_dijkstra(n, m);
+#if STXXL_PARALLEL
+            Container<ppq_type> cppq (*ppq);
+            ::do_dijkstra(cppq, n, m);
             ppq_stats();
-            #endif
+#endif
         } else if (do_stxxlpq) {
-            stxxlpq_dijkstra(n, m);
+            Container<stxxlpq_type> cstxxlpq (*stxxlpq);
+            ::do_dijkstra(cstxxlpq, n, m);
         } else if (do_sorter) {
             STXXL_MSG("Sorter not supported.");
         } else if (do_stlpq) {
-            stlpq_dijkstra(n, m);
+            Container<stlpq_type> cstlpq (*stlpq);
+            ::do_dijkstra(cstlpq, n, m);
         } else if (do_tbbpq) {
             STXXL_MSG("TBB not supported yet");
         }
-    } else if (do_ppq) {
-        #if STXXL_PARALLEL
-        stxxl::scoped_print_timer timer("Filling and reading Parallel PQ", (do_fill ? 4 : 2) * num_elements * value_size);
+    }
+    else if (do_ppq)
+    {
+#if STXXL_PARALLEL
+        Container<ppq_type> cppq (*ppq);
+
+        scoped_print_timer timer("Filling and reading Parallel PQ",
+                                 (do_fill ? 4 : 2) * num_elements * value_size);
+
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    bulk_intermixed_check(*ppq, do_parallel);
+                    do_bulk_intermixed_check(cppq, do_parallel);
                 } else {
                     if (do_fill) {
-                        ppq_bulk_rand_insert(seed, do_parallel);
+                        do_bulk_rand_insert(cppq, seed, do_parallel);
                     }
-                    ppq_bulk_rand_intermixed(seed, do_fill, do_parallel);
+                    do_bulk_rand_intermixed(cppq, seed, do_fill, do_parallel);
                 }
             } else {
                 if (do_random) {
-                    ppq_bulk_rand_insert(seed, do_parallel);
+                do_bulk_rand_insert(cppq, seed, do_parallel);
                 } else {
-                    ppq_bulk_insert(do_parallel);
+                    do_bulk_insert(cppq, do_parallel);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
-                    ppq_read_check();
+                    do_read_check(cppq);
                 } else {
-                    ppq_read();
+                    do_read(cppq);
                 }
             }
         } else {
             if (do_intermixed) {
                 if (do_fill) {
-                    ppq_rand_insert(seed);
+                    do_rand_insert(cppq, seed);
                 }
-                ppq_rand_intermixed(seed, do_fill);
+                do_rand_intermixed(cppq, seed, do_fill);
                 ppq_stats();
                 return EXIT_SUCCESS;
             }
             if (do_random) {
-                ppq_rand_insert(seed);
+                do_rand_insert(cppq, seed);
             } else {
-                ppq_insert();
+                do_insert(cppq);
             }
             if (do_random && do_check) {
-                ppq_rand_read_check(seed);
+                do_rand_read_check(cppq, seed);
             } else if (do_check) {
-                ppq_read_check();
+                do_read_check(cppq);
             } else {
-                ppq_read();
+                do_read(cppq);
             }
         }
         ppq_stats();
-        #endif // STXXL_PARALLEL
-    } else if (do_stxxlpq) {
-        stxxl::scoped_print_timer timer("Filling and reading STXXL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
+#endif // STXXL_PARALLEL
+    }
+    else if (do_stxxlpq)
+    {
+        Container<stxxlpq_type> cstxxlpq (*stxxlpq);
+
+        scoped_print_timer timer("Filling and reading STXXL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    bulk_intermixed_check(*stxxlpq);
+                    do_bulk_intermixed_check(cstxxlpq);
                 } else {
                     if (do_fill) {
-                        stxxlpq_bulk_rand_insert(seed);
+                        do_bulk_rand_insert(cstxxlpq, seed);
                     }
-                    stxxlpq_bulk_rand_intermixed(seed, do_fill);
+                    do_bulk_rand_intermixed(cstxxlpq, seed, do_fill);
                 }
             } else {
                 if (do_random) {
-                    stxxlpq_bulk_rand_insert(seed);
+                    do_bulk_rand_insert(cstxxlpq, seed);
                 } else {
-                    stxxlpq_bulk_insert();
+                    do_bulk_insert(cstxxlpq);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
-                    stxxlpq_read_check();
+                    do_read_check(cstxxlpq);
                 } else {
-                    stxxlpq_read();
+                    do_read(cstxxlpq);
                 }
             }
         } else {
             if (do_intermixed) {
                 if (do_fill) {
-                    stxxlpq_rand_insert(seed);
+                    do_rand_insert(cstxxlpq, seed);
                 }
-                stxxlpq_rand_intermixed(seed, do_fill);
+                do_rand_intermixed(cstxxlpq, seed, do_fill);
                 return EXIT_SUCCESS;
             }
             if (do_random) {
-                stxxlpq_rand_insert(seed);
+                do_rand_insert(cstxxlpq, seed);
             } else {
-                stxxlpq_insert();
+                do_insert(cstxxlpq);
             }
             if (do_random && do_check) {
-                stxxlpq_rand_read_check(seed);
+                do_rand_read_check(cstxxlpq, seed);
             } else if (do_check) {
-                stxxlpq_read_check();
+                do_read_check(cstxxlpq);
             } else {
-                stxxlpq_read();
+                do_read(cstxxlpq);
             }
         }
-    } else if (do_sorter) {
-        stxxl::scoped_print_timer timer("Filling and reading STXXL Sorter", (do_fill ? 4 : 2) * num_elements * value_size);
+    }
+    else if (do_sorter)
+    {
+        Container<sorter_type> csorter (*stxxlsorter);
+
+        scoped_print_timer timer("Filling and reading STXXL Sorter", (do_fill ? 4 : 2) * num_elements * value_size);
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    bulk_intermixed_check(*stxxlsorter);
+                    do_bulk_intermixed_check(csorter);
                 } else {
                     if (do_fill) {
-                        stxxlsorter_bulk_rand_insert(seed);
+                        do_bulk_rand_insert(csorter, seed);
                     }
-                    stxxlsorter_bulk_rand_intermixed(seed, do_fill);
+                    do_bulk_rand_intermixed(csorter, seed, do_fill);
                 }
             } else {
                 if (do_random) {
-                    stxxlsorter_bulk_rand_insert(seed);
+                    do_bulk_rand_insert(csorter, seed);
                 } else {
-                    stxxlsorter_bulk_insert();
+                    do_bulk_insert(csorter);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
-                    stxxlsorter_read_check();
+                    do_read_check(csorter);
                 } else {
-                    stxxlsorter_read();
+                    do_read(csorter);
                 }
             }
         } else {
             if (do_intermixed) {
                 if (do_fill) {
-                    stxxlsorter_rand_insert(seed);
+                    do_rand_insert(csorter, seed);
                 }
-                stxxlsorter_rand_intermixed(seed, do_fill);
+                do_rand_intermixed(csorter, seed, do_fill);
                 return EXIT_SUCCESS;
             }
             if (do_random) {
-                stxxlsorter_rand_insert(seed);
+                do_rand_insert(csorter, seed);
             } else {
-                stxxlsorter_insert();
+                do_insert(csorter);
             }
             if (do_random && do_check) {
-                stxxlsorter_rand_read_check(seed);
+                do_rand_read_check(csorter, seed);
             } else if (do_check) {
-                stxxlsorter_read_check();
+                do_read_check(csorter);
             } else {
-                stxxlsorter_read();
+                do_read(csorter);
             }
         }
-    } else if (do_stlpq) {
-        stxxl::scoped_print_timer timer("Filling and reading STL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
+    }
+    else if (do_stlpq)
+    {
+        Container<stlpq_type> cstlpq (*stlpq);
+
+        scoped_print_timer timer("Filling and reading STL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
         if (do_bulk) {
             if (do_intermixed) {
                 if (do_check) {
-                    bulk_intermixed_check(*stlpq);
+                    do_bulk_intermixed_check(cstlpq);
                 } else {
                     if (do_fill) {
-                        stlpq_bulk_rand_insert(seed);
+                        do_bulk_rand_insert(cstlpq, seed);
                     }
-                    stlpq_bulk_rand_intermixed(seed, do_fill);
+                    do_rand_intermixed(cstlpq, seed, do_fill);
                 }
             } else {
                 if (do_random) {
-                    stlpq_bulk_rand_insert(seed);
+                    do_bulk_rand_insert(cstlpq, seed);
                 } else {
-                    stlpq_bulk_insert();
+                    do_bulk_insert(cstlpq);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
-                    stlpq_read_check();
+                    do_read_check(cstlpq);
                 } else {
-                    stlpq_read();
+                    do_read(cstlpq);
                 }
             }
         } else {
             if (do_intermixed) {
                 if (do_fill) {
-                    stlpq_rand_insert(seed);
+                    do_rand_insert(cstlpq, seed);
                 }
-                stlpq_rand_intermixed(seed, do_fill);
+                do_rand_intermixed(cstlpq, seed, do_fill);
                 return EXIT_SUCCESS;
             }
             if (do_random) {
-                stlpq_rand_insert(seed);
+                do_rand_insert(cstlpq, seed);
             } else {
-                stlpq_insert();
+                do_insert(cstlpq);
             }
             if (do_random && do_check) {
-                stlpq_rand_read_check(seed);
+                do_rand_read_check(cstlpq, seed);
             } else if (do_check) {
-                stlpq_read_check();
+                do_read_check(cstlpq);
             } else {
-                stlpq_read();
+                do_read(cstlpq);
             }
         }
-    } else if (do_tbbpq) {
+    }
+    else if (do_tbbpq) {
         STXXL_MSG("TBB not supported yet");
     }
 
