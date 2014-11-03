@@ -12,6 +12,7 @@
 
 add_subdirectory(btree)
 add_subdirectory(hash_map)
+add_subdirectory(ppq)
 
 stxxl_build_test(test_deque)
 stxxl_build_test(test_ext_merger)
