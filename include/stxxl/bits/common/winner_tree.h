@@ -17,9 +17,9 @@
 #include <vector>
 #include <stack>
 #include <cassert>
-#include <cmath>
 
 #include <stxxl/bits/common/timer.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
 STXXL_BEGIN_NAMESPACE
@@ -89,7 +89,7 @@ public:
     {
         assert(num_players > 1);
 
-        m_num_slots = (1 << (int)(log2(num_players - 1) + 1));
+        m_num_slots = (1 << ilog2_ceil(num_players));
         unsigned int treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, -1);
     }
@@ -220,12 +220,12 @@ public:
 
         for (int i = old_tree_size - 1; i >= 0; --i) {
             unsigned old_index = i;
-            unsigned old_level = static_cast<unsigned>(log2(old_index + 1));
+            unsigned old_level = ilog2_floor(old_index + 1);
             unsigned new_index = old_index + (1 << old_level);
             m_tree[new_index] = m_tree[old_index];
         }
 
-        unsigned step_size = (1 << (int)log2(old_tree_size));
+        unsigned step_size = (1 << ilog2_floor(old_tree_size));
         unsigned index = tree_size - 1;
 
         while (step_size > 0) {
@@ -249,7 +249,7 @@ public:
     //! Deactivate all players and resize the tree.
     inline void resize_and_clear(unsigned num_players)
     {
-        m_num_slots = (1 << (int)(log2(num_players - 1) + 1));
+        m_num_slots = (1 << ilog2_ceil(num_players));
         unsigned int treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, -1);
         clear();
