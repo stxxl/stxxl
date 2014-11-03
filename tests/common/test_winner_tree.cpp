@@ -43,7 +43,7 @@ struct VectorCompare
 template class stxxl::winner_tree<VectorCompare>;
 
 //! Run tests for a specific number of vectors
-void test_vecs(size_t vecnum)
+void test_vecs(unsigned int vecnum)
 {
     static const bool debug = false;
 
@@ -66,7 +66,7 @@ void test_vecs(size_t vecnum)
 
         // pick random items
         for (size_t j = 0; j < inum; ++j)
-            vec[i][j] = rnd() % (vecnum * 20);
+            vec[i][j] = (unsigned int)(rnd() % (vecnum * 20));
 
         std::sort(vec[i].begin(), vec[i].end());
 
@@ -95,7 +95,7 @@ void test_vecs(size_t vecnum)
     for (size_t i = 0; i < vecnum; ++i)
     {
         if (vec[i].size())
-            wt.activate_player(i);
+            wt.activate_player((int)i);
     }
 
     if (debug) std::cout << wt.to_string();
@@ -133,7 +133,7 @@ void test_vecs(size_t vecnum)
 int main()
 {
     // run winner tree tests for 2..20 players
-    for (size_t i = 2; i <= 20; ++i)
+    for (unsigned int i = 2; i <= 20; ++i)
         test_vecs(i);
 
     return 0;

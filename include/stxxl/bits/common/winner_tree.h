@@ -119,7 +119,7 @@ public:
     {
         m_stats.remove_player_time.start();
         assert(index < m_num_slots);
-        int p = (m_tree.size() / 2) + index;
+        int p = (int)(m_tree.size() / 2) + index;
 
         // Needed for following deactivations...
         while (p >= 0 && m_tree[p] == (int)index) {
