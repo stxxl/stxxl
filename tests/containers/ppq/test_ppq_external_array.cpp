@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/test_external_array.cpp
+ *  tests/containers/ppq/test_ppq_external_array.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -19,13 +19,13 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/timer>
 
-typedef std::pair<size_t,size_t> value_type;
+typedef std::pair<size_t, size_t> value_type;
 
 static const size_t printmod = 16 * 1024 * 1024;
 static inline void progress(const char* text, size_t i, size_t nelements)
 {
     if ((i % printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i)* 100. / static_cast<double>(nelements)) << " %)");
+        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
     }
 }
 
@@ -33,61 +33,58 @@ static inline void progress(const char* text, size_t i, size_t nelements)
 //! \param volume Volume
 //! \param numeas Number of external arrays to fill in parallel
 //! \param numwbs Number of write buffer blocks for each external array.
-int run_test(size_t volume, size_t numeas, size_t numwbs) {
-    
+int run_test(size_t volume, size_t numeas, size_t numwbs)
+{
     typedef typename stxxl::ppq_local::external_array<
-        value_type,STXXL_DEFAULT_BLOCK_SIZE(value_type),stxxl::striping
-        > ea;
+            value_type, STXXL_DEFAULT_BLOCK_SIZE(value_type), stxxl::striping
+            > ea;
 
-    size_t num_elements=volume/sizeof(value_type);
-    num_elements = (num_elements/numeas)*numeas;
-    
+    size_t num_elements = volume / sizeof(value_type);
+    num_elements = (num_elements / numeas) * numeas;
+
     std::vector<ea*> eas(numeas);
-    
-    for (size_t i=0; i<numeas; ++i) {
-        eas[i] = new ea(num_elements/numeas,1,numwbs);
+
+    for (size_t i = 0; i < numeas; ++i) {
+        eas[i] = new ea(num_elements / numeas, 1, numwbs);
     }
 
-    STXXL_MSG("Insert elements 0 to "<<num_elements-1);
+    STXXL_MSG("Insert elements 0 to " << num_elements - 1);
 
     {
         stxxl::scoped_print_timer timer("Filling", volume);
-        
+
         #if STXXL_PARALLEL
         #pragma omp parallel for
         #endif
-        for (size_t j=0; j<numeas; ++j) {
-            for (size_t i=0; i<num_elements/numeas; ++i) {
-                if (numeas<2) progress("Inserting element", i+j*numeas, num_elements);
-                *(eas[j]) << std::make_pair(i,i);
+        for (size_t j = 0; j < numeas; ++j) {
+            for (size_t i = 0; i < num_elements / numeas; ++i) {
+                if (numeas < 2) progress("Inserting element", i + j * numeas, num_elements);
+                *(eas[j]) << std::make_pair(i, i);
             }
         }
-        
     }
-    
 
     {
         stxxl::scoped_print_timer timer("Finishing write phase");
-        for (unsigned j=0; j<numeas; ++j) {
+        for (unsigned j = 0; j < numeas; ++j) {
             eas[j]->finish_write_phase();
         }
     }
 
     {
         stxxl::scoped_print_timer timer("Reading and checking", volume);
-        
+
         #if STXXL_PARALLEL
         #pragma omp parallel for
         #endif
-        for (size_t j=0; j<numeas; ++j) {
-            
+        for (size_t j = 0; j < numeas; ++j) {
             size_t counter = 0;
             size_t block_counter = 0;
 
-            ea * a = eas[j];
+            ea* a = eas[j];
             while (!a->empty()) {
                 a->wait_for_first_block();
-                for (ea::iterator i=a->begin_block(); i!=a->end_block(); ++i) {
+                for (ea::iterator i = a->begin_block(); i != a->end_block(); ++i) {
                     if (i->first != counter) {
                         STXXL_ERRMSG("Read error at index " << counter << ": " << i->first << " != " << counter);
                         abort();
@@ -98,14 +95,12 @@ int run_test(size_t volume, size_t numeas, size_t numwbs) {
                 a->wait_for_first_block();
                 ++block_counter;
             }
-            
-            STXXL_CHECK_EQUAL(counter,num_elements/numeas);
-            
+
+            STXXL_CHECK_EQUAL(counter, num_elements / numeas);
         }
-        
     }
-    
-    for (size_t i=0; i<numeas; ++i)
+
+    for (size_t i = 0; i < numeas; ++i)
         delete eas[i];
 
     return EXIT_SUCCESS;
@@ -113,7 +108,6 @@ int run_test(size_t volume, size_t numeas, size_t numwbs) {
 
 int main(int argc, char** argv)
 {
-
     stxxl::uint64 volume = 512 * 1024 * 1024;
     unsigned numeas = 1;
     unsigned numwbs = 14;
@@ -132,7 +126,6 @@ int main(int argc, char** argv)
     STXXL_MEMDUMP(sizeof(value_type));
     STXXL_VARDUMP(numeas);
     STXXL_VARDUMP(numwbs);
-    
-    return run_test(volume,numeas,numwbs);
-    
+
+    return run_test(volume, numeas, numwbs);
 }

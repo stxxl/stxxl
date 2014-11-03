@@ -49,117 +49,117 @@ STXXL_BEGIN_NAMESPACE
 
 namespace ppq_local {
 
-    template<class ValueType>
-    class internal_array
+template <class ValueType>
+class internal_array
+{
+private:
+    std::vector<ValueType> m_values;
+    size_t m_min_index;
+    bool m_deleted;
+
+public:
+    //! The value iterator type used by begin() and end()
+    //! We use pointers as iterator so internal arrays
+    //! are compatible to external arrays and can be
+    //! merged together.
+    typedef ValueType* iterator;
+
+    //! Default constructor. Don't use this directy. Needed for regrowing in surrounding vector.
+    internal_array() = default;
+
+    //! Constructor which takes a value vector.
+    //! The vector should not be used outside this
+    //! class anymore!
+    internal_array(std::vector<ValueType>& values)
+        : m_values(), m_min_index(0), m_deleted(false)
     {
-    private:
-        std::vector<ValueType> m_values;
-        size_t m_min_index;
-        bool m_deleted;
+        std::swap(m_values, values);
+    }
 
-    public:
-        //! The value iterator type used by begin() and end()
-        //! We use pointers as iterator so internal arrays
-        //! are compatible to external arrays and can be
-        //! merged together.
-        typedef ValueType* iterator;
+    //! Move constructor. Needed for regrowing in surrounding vector.
+    internal_array(internal_array&& o)
+        : m_values(std::move(o.m_values)),
+          m_min_index(o.m_min_index),
+          m_deleted(o.m_deleted) { }
 
-        //! Default constructor. Don't use this directy. Needed for regrowing in surrounding vector.
-        internal_array() = default;
+    //! Delete copy assignment for emplace_back to use the move semantics.
+    internal_array& operator = (internal_array& other) = delete;
 
-        //! Constructor which takes a value vector.
-        //! The vector should not be used outside this
-        //! class anymore!
-        internal_array(std::vector<ValueType>& values)
-            : m_values(), m_min_index(0), m_deleted(false)
-        {
-            std::swap(m_values, values);
-        }
+    //! Delete copy constructor for emplace_back to use the move semantics.
+    internal_array(const internal_array& other) = delete;
 
-        //! Move constructor. Needed for regrowing in surrounding vector.
-        internal_array(internal_array&& o)
-            : m_values(std::move(o.m_values)),
-              m_min_index(o.m_min_index),
-              m_deleted(o.m_deleted) { }
+    //! Move assignment.
+    internal_array& operator = (internal_array&&)
+    {
+        return *this;
+    }
 
-        //! Delete copy assignment for emplace_back to use the move semantics.
-        internal_array& operator = (internal_array& other) = delete;
+    //! Random access operator
+    inline ValueType& operator [] (size_t i) const
+    {
+        return m_values[i];
+    }
 
-        //! Delete copy constructor for emplace_back to use the move semantics.
-        internal_array(const internal_array& other) = delete;
+    //! Use inc_min if a value has been extracted.
+    inline void inc_min()
+    {
+        m_min_index++;
+    }
 
-        //! Move assignment.
-        internal_array& operator = (internal_array&&)
-        {
-            return *this;
-        }
+    //! Use inc_min(diff) if multiple values have been extracted.
+    inline void inc_min(size_t diff)
+    {
+        m_min_index += diff;
+    }
 
-        //! Random access operator
-        inline ValueType& operator [] (size_t i) const
-        {
-            return m_values[i];
-        }
+    //! The currently smallest element in the array.
+    inline const ValueType & get_min() const
+    {
+        return m_values[m_min_index];
+    }
 
-        //! Use inc_min if a value has been extracted.
-        inline void inc_min()
-        {
-            m_min_index++;
-        }
+    //! The index of the currently smallest element in the array.
+    inline size_t get_min_index() const
+    {
+        return m_min_index;
+    }
 
-        //! Use inc_min(diff) if multiple values have been extracted.
-        inline void inc_min(size_t diff)
-        {
-            m_min_index += diff;
-        }
+    //! The index of the largest element in the array.
+    inline size_t get_max_index() const
+    {
+        return (m_values.size() - 1);
+    }
 
-        //! The currently smallest element in the array.
-        inline const ValueType& get_min() const
-        {
-            return m_values[m_min_index];
-        }
+    //! Returns if the array has run empty.
+    inline bool empty() const
+    {
+        return (m_min_index >= m_values.size());
+    }
 
-        //! The index of the currently smallest element in the array.
-        inline size_t get_min_index() const
-        {
-            return m_min_index;
-        }
+    //! Returns the current size of the array.
+    inline size_t size() const
+    {
+        return (m_values.size() - m_min_index);
+    }
 
-        //! The index of the largest element in the array.
-        inline size_t get_max_index() const
-        {
-            return (m_values.size() - 1);
-        }
+    //! Begin iterator
+    inline iterator begin()
+    {
+        // We use &(*()) in order to get a pointer iterator.
+        // This is allowed because values are guaranteed to be
+        // consecutive in std::vecotor.
+        return &(*(m_values.begin() + m_min_index));
+    }
 
-        //! Returns if the array has run empty.
-        inline bool empty() const
-        {
-            return (m_min_index >= m_values.size());
-        }
-
-        //! Returns the current size of the array.
-        inline size_t size() const
-        {
-            return (m_values.size() - m_min_index);
-        }
-
-        //! Begin iterator
-        inline iterator begin()
-        {
-            // We use &(*()) in order to get a pointer iterator.
-            // This is allowed because values are guaranteed to be
-            // consecutive in std::vecotor.
-            return &(*(m_values.begin() + m_min_index));
-        }
-
-        //! End iterator
-        inline iterator end()
-        {
-            // We use &(*()) in order to get a pointer iterator.
-            // This is allowed because values are guaranteed to be
-            // consecutive in std::vecotor.
-            return &(*(m_values.end()));
-        }
-    };
+    //! End iterator
+    inline iterator end()
+    {
+        // We use &(*()) in order to get a pointer iterator.
+        // This is allowed because values are guaranteed to be
+        // consecutive in std::vecotor.
+        return &(*(m_values.end()));
+    }
+};
 
 //! External array stores a sorted sequence of values on the hard disk and
 //!		allows random access to the first block (containing the smallest values).
@@ -355,7 +355,7 @@ public:
             bm->delete_blocks(bids.begin(), bids.end());
             delete first_block;
             delete pool;
-        } // else: the array has been moved.
+        }   // else: the array has been moved.
     }
 
     //! Returns the current size
@@ -570,278 +570,277 @@ private:
     }
 };
 
-    template <class Parent>
-    class minima_tree
-    {
-        typedef minima_tree<Parent> Self;
-        typedef typename Parent::inv_compare_type compare_type;
-        typedef typename Parent::value_type value_type;
-        typedef typename Parent::heaps_type heaps_type;
-        typedef typename Parent::internal_arrays_type ias_type;
-        typedef typename Parent::external_arrays_type eas_type;
+template <class Parent>
+class minima_tree
+{
+    typedef minima_tree<Parent> Self;
+    typedef typename Parent::inv_compare_type compare_type;
+    typedef typename Parent::value_type value_type;
+    typedef typename Parent::heaps_type heaps_type;
+    typedef typename Parent::internal_arrays_type ias_type;
+    typedef typename Parent::external_arrays_type eas_type;
 
-        static const unsigned initial_ia_size = 2;
-        static const unsigned initial_ea_size = 2;
+    static const unsigned initial_ia_size = 2;
+    static const unsigned initial_ea_size = 2;
 
-    public:
-        enum Types {
-            HEAP = 0,
-            EB = 1,
-            IA = 2,
-            EA = 3,
-            ERROR = 4
-        };
-
-        minima_tree(Parent& parent)
-            : m_parent(parent),
-              m_compare(),
-
-              m_cache_line_factor(m_parent.c_cache_line_factor),
-
-              m_head_comp(*this, parent.insertion_heaps, parent.internal_arrays, parent.external_arrays, m_compare, m_cache_line_factor),
-              m_heaps_comp(parent.insertion_heaps, m_compare, m_cache_line_factor),
-              m_ia_comp(parent.internal_arrays, m_compare),
-              m_ea_comp(parent.external_arrays, m_compare),
-
-              m_head(4, m_head_comp),
-              m_heaps(m_parent.num_insertion_heaps, m_heaps_comp),
-              m_ia(initial_ia_size, m_ia_comp),
-              m_ea(initial_ea_size, m_ea_comp) { }
-
-        std::pair<unsigned, unsigned> top()
-        {
-            unsigned type = m_head.top();
-            switch (type)
-            {
-            case HEAP: return std::make_pair(HEAP, m_heaps.top());
-                break;
-            case EB: return std::make_pair(EB, 0);
-                break;
-            case IA: return std::make_pair(IA, m_ia.top());
-                break;
-            case EA: return std::make_pair(EA, m_ea.top());
-                break;
-            default: return std::make_pair(ERROR, 0);
-            }
-        }
-
-        void update_heap(unsigned index)
-        {
-            m_heaps.notify_change(index);
-            m_head.notify_change(HEAP);
-        }
-
-        void update_extract_buffer()
-        {
-            m_head.notify_change(EB);
-        }
-
-        void update_internal_array(unsigned index)
-        {
-            m_ia.notify_change(index);
-            m_head.notify_change(IA);
-        }
-
-        void update_external_array(unsigned index)
-        {
-            m_ea.notify_change(index);
-            m_head.notify_change(EA);
-        }
-
-        void add_internal_array(unsigned index)
-        {
-            m_ia.activate_player(index);
-            m_head.notify_change(IA);
-        }
-
-        void add_external_array(unsigned index)
-        {
-            m_ea.activate_player(index);
-            m_head.notify_change(EA);
-        }
-
-        void deactivate_heap(unsigned index)
-        {
-            m_heaps.deactivate_player(index);
-            if (!m_heaps.empty()) {
-                m_head.notify_change(HEAP);
-            } else {
-                m_head.deactivate_player(HEAP);
-            }
-        }
-
-        void deactivate_extract_buffer()
-        {
-            m_head.deactivate_player(EB);
-        }
-
-        void deactivate_internal_array(unsigned index)
-        {
-            m_ia.deactivate_player(index);
-            if (!m_ia.empty()) {
-                m_head.notify_change(IA);
-            } else {
-                m_head.deactivate_player(IA);
-            }
-        }
-
-        void deactivate_external_array(unsigned index)
-        {
-            m_ea.deactivate_player(index);
-            if (!m_ea.empty()) {
-                m_head.notify_change(EA);
-            } else {
-                m_head.deactivate_player(EA);
-            }
-        }
-
-        void clear_heaps()
-        {
-            m_heaps.clear();
-            m_head.deactivate_player(HEAP);
-        }
-
-        void clear_internal_arrays()
-        {
-            m_ia.resize_and_clear(initial_ia_size);
-            m_head.deactivate_player(IA);
-        }
-
-        void clear_external_arrays()
-        {
-            m_ea.resize_and_clear(initial_ea_size);
-            m_head.deactivate_player(EA);
-        }
-
-        //! Returns a readable representation of the winner tree as string.
-        std::string to_string() const
-        {
-            std::stringstream ss;
-            ss << "Head:" << std::endl << m_head.to_string() << std::endl;
-            ss << "Heaps:" << std::endl << m_heaps.to_string() << std::endl;
-            ss << "IA:" << std::endl << m_ia.to_string() << std::endl;
-            ss << "EA:" << std::endl << m_ea.to_string() << std::endl;
-            return ss.str();
-        }
-
-        //! Prints statistical data.
-        void print_stats() const
-        {
-            STXXL_MSG("Head winner tree stats:");
-            m_head.print_stats();
-            STXXL_MSG("Heaps winner tree stats:");
-            m_heaps.print_stats();
-            STXXL_MSG("IA winner tree stats:");
-            m_ia.print_stats();
-            STXXL_MSG("EA winner tree stats:");
-            m_ea.print_stats();
-        }
-
-    private:
-        //! Comparator for the head winner tree.
-        //! It accesses all relevant data structures from the priority queue.
-        struct head_comp {
-            Self& m_parent;
-            heaps_type& m_heaps;
-            ias_type& m_ias;
-            eas_type& m_eas;
-            compare_type& m_compare;
-            unsigned m_cache_line_factor;
-
-            head_comp(Self& parent, heaps_type& heaps, ias_type& ias, eas_type& eas, compare_type& compare, unsigned cache_line_factor)
-                : m_parent(parent),
-                  m_heaps(heaps),
-                  m_ias(ias),
-                  m_eas(eas),
-                  m_compare(compare),
-                  m_cache_line_factor(cache_line_factor) { }
-
-            bool operator () (const int a, const int b) const
-            {
-                value_type val_a;
-                switch (a) {
-                case HEAP: val_a = m_heaps[m_parent.m_heaps.top() * m_cache_line_factor][0];
-                    break;
-                case EB: val_a = m_parent.m_parent.extract_buffer[m_parent.m_parent.extract_index];
-                    break;
-                case IA: val_a = m_ias[m_parent.m_ia.top()].get_min();
-                    break;
-                case EA: val_a = m_eas[m_parent.m_ea.top()].get_min_element();
-                    break;
-                }
-                value_type val_b;
-                switch (b) {
-                case HEAP: val_b = m_heaps[m_parent.m_heaps.top() * m_cache_line_factor][0];
-                    break;
-                case EB: val_b = m_parent.m_parent.extract_buffer[m_parent.m_parent.extract_index];
-                    break;
-                case IA: val_b = m_ias[m_parent.m_ia.top()].get_min();
-                    break;
-                case EA: val_b = m_eas[m_parent.m_ea.top()].get_min_element();
-                    break;
-                }
-                return m_compare(val_a, val_b);
-            }
-        };
-
-        //! Comparator for the insertion heaps winner tree.
-        struct heaps_comp {
-            heaps_type& m_heaps;
-            compare_type& m_compare;
-            unsigned m_cache_line_factor;
-            heaps_comp(heaps_type& heaps, compare_type& compare, unsigned cache_line_factor)
-                : m_heaps(heaps), m_compare(compare), m_cache_line_factor(cache_line_factor) { }
-            bool operator () (const int a, const int b) const
-            {
-                return m_compare(m_heaps[a * m_cache_line_factor][0], m_heaps[b * m_cache_line_factor][0]);
-            }
-        };
-
-        //! Comparator for the internal arrays winner tree.
-        struct ia_comp {
-            ias_type& m_ias;
-            compare_type& m_compare;
-            ia_comp(ias_type& ias, compare_type& compare)
-                : m_ias(ias), m_compare(compare) { }
-            bool operator () (const int a, const int b) const
-            {
-                return m_compare(m_ias[a].get_min(), m_ias[b].get_min());
-            }
-        };
-
-        //! Comparator for the external arrays winner tree.
-        struct ea_comp {
-            eas_type& m_eas;
-            compare_type& m_compare;
-            ea_comp(eas_type& eas, compare_type& compare)
-                : m_eas(eas), m_compare(compare) { }
-            bool operator () (const int a, const int b) const
-            {
-                return m_compare(m_eas[a].get_min_element(), m_eas[b].get_min_element());
-            }
-        };
-
-        //! The priority queue
-        Parent& m_parent;
-
-        //! value_type comparator
-        compare_type m_compare;
-
-        unsigned m_cache_line_factor;
-
-        //! Comperator instances
-        head_comp m_head_comp;
-        heaps_comp m_heaps_comp;
-        ia_comp m_ia_comp;
-        ea_comp m_ea_comp;
-
-        //! The winner trees
-        winner_tree<head_comp> m_head;
-        winner_tree<heaps_comp> m_heaps;
-        winner_tree<ia_comp> m_ia;
-        winner_tree<ea_comp> m_ea;
+public:
+    enum Types {
+        HEAP = 0,
+        EB = 1,
+        IA = 2,
+        EA = 3,
+        ERROR = 4
     };
 
+    minima_tree(Parent& parent)
+        : m_parent(parent),
+          m_compare(),
+
+          m_cache_line_factor(m_parent.c_cache_line_factor),
+
+          m_head_comp(*this, parent.insertion_heaps, parent.internal_arrays, parent.external_arrays, m_compare, m_cache_line_factor),
+          m_heaps_comp(parent.insertion_heaps, m_compare, m_cache_line_factor),
+          m_ia_comp(parent.internal_arrays, m_compare),
+          m_ea_comp(parent.external_arrays, m_compare),
+
+          m_head(4, m_head_comp),
+          m_heaps(m_parent.num_insertion_heaps, m_heaps_comp),
+          m_ia(initial_ia_size, m_ia_comp),
+          m_ea(initial_ea_size, m_ea_comp) { }
+
+    std::pair<unsigned, unsigned> top()
+    {
+        unsigned type = m_head.top();
+        switch (type)
+        {
+        case HEAP: return std::make_pair(HEAP, m_heaps.top());
+            break;
+        case EB: return std::make_pair(EB, 0);
+            break;
+        case IA: return std::make_pair(IA, m_ia.top());
+            break;
+        case EA: return std::make_pair(EA, m_ea.top());
+            break;
+        default: return std::make_pair(ERROR, 0);
+        }
+    }
+
+    void update_heap(unsigned index)
+    {
+        m_heaps.notify_change(index);
+        m_head.notify_change(HEAP);
+    }
+
+    void update_extract_buffer()
+    {
+        m_head.notify_change(EB);
+    }
+
+    void update_internal_array(unsigned index)
+    {
+        m_ia.notify_change(index);
+        m_head.notify_change(IA);
+    }
+
+    void update_external_array(unsigned index)
+    {
+        m_ea.notify_change(index);
+        m_head.notify_change(EA);
+    }
+
+    void add_internal_array(unsigned index)
+    {
+        m_ia.activate_player(index);
+        m_head.notify_change(IA);
+    }
+
+    void add_external_array(unsigned index)
+    {
+        m_ea.activate_player(index);
+        m_head.notify_change(EA);
+    }
+
+    void deactivate_heap(unsigned index)
+    {
+        m_heaps.deactivate_player(index);
+        if (!m_heaps.empty()) {
+            m_head.notify_change(HEAP);
+        } else {
+            m_head.deactivate_player(HEAP);
+        }
+    }
+
+    void deactivate_extract_buffer()
+    {
+        m_head.deactivate_player(EB);
+    }
+
+    void deactivate_internal_array(unsigned index)
+    {
+        m_ia.deactivate_player(index);
+        if (!m_ia.empty()) {
+            m_head.notify_change(IA);
+        } else {
+            m_head.deactivate_player(IA);
+        }
+    }
+
+    void deactivate_external_array(unsigned index)
+    {
+        m_ea.deactivate_player(index);
+        if (!m_ea.empty()) {
+            m_head.notify_change(EA);
+        } else {
+            m_head.deactivate_player(EA);
+        }
+    }
+
+    void clear_heaps()
+    {
+        m_heaps.clear();
+        m_head.deactivate_player(HEAP);
+    }
+
+    void clear_internal_arrays()
+    {
+        m_ia.resize_and_clear(initial_ia_size);
+        m_head.deactivate_player(IA);
+    }
+
+    void clear_external_arrays()
+    {
+        m_ea.resize_and_clear(initial_ea_size);
+        m_head.deactivate_player(EA);
+    }
+
+    //! Returns a readable representation of the winner tree as string.
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << "Head:" << std::endl << m_head.to_string() << std::endl;
+        ss << "Heaps:" << std::endl << m_heaps.to_string() << std::endl;
+        ss << "IA:" << std::endl << m_ia.to_string() << std::endl;
+        ss << "EA:" << std::endl << m_ea.to_string() << std::endl;
+        return ss.str();
+    }
+
+    //! Prints statistical data.
+    void print_stats() const
+    {
+        STXXL_MSG("Head winner tree stats:");
+        m_head.print_stats();
+        STXXL_MSG("Heaps winner tree stats:");
+        m_heaps.print_stats();
+        STXXL_MSG("IA winner tree stats:");
+        m_ia.print_stats();
+        STXXL_MSG("EA winner tree stats:");
+        m_ea.print_stats();
+    }
+
+private:
+    //! Comparator for the head winner tree.
+    //! It accesses all relevant data structures from the priority queue.
+    struct head_comp {
+        Self& m_parent;
+        heaps_type& m_heaps;
+        ias_type& m_ias;
+        eas_type& m_eas;
+        compare_type& m_compare;
+        unsigned m_cache_line_factor;
+
+        head_comp(Self& parent, heaps_type& heaps, ias_type& ias, eas_type& eas, compare_type& compare, unsigned cache_line_factor)
+            : m_parent(parent),
+              m_heaps(heaps),
+              m_ias(ias),
+              m_eas(eas),
+              m_compare(compare),
+              m_cache_line_factor(cache_line_factor) { }
+
+        bool operator () (const int a, const int b) const
+        {
+            value_type val_a;
+            switch (a) {
+            case HEAP: val_a = m_heaps[m_parent.m_heaps.top() * m_cache_line_factor][0];
+                break;
+            case EB: val_a = m_parent.m_parent.extract_buffer[m_parent.m_parent.extract_index];
+                break;
+            case IA: val_a = m_ias[m_parent.m_ia.top()].get_min();
+                break;
+            case EA: val_a = m_eas[m_parent.m_ea.top()].get_min_element();
+                break;
+            }
+            value_type val_b;
+            switch (b) {
+            case HEAP: val_b = m_heaps[m_parent.m_heaps.top() * m_cache_line_factor][0];
+                break;
+            case EB: val_b = m_parent.m_parent.extract_buffer[m_parent.m_parent.extract_index];
+                break;
+            case IA: val_b = m_ias[m_parent.m_ia.top()].get_min();
+                break;
+            case EA: val_b = m_eas[m_parent.m_ea.top()].get_min_element();
+                break;
+            }
+            return m_compare(val_a, val_b);
+        }
+    };
+
+    //! Comparator for the insertion heaps winner tree.
+    struct heaps_comp {
+        heaps_type& m_heaps;
+        compare_type& m_compare;
+        unsigned m_cache_line_factor;
+        heaps_comp(heaps_type& heaps, compare_type& compare, unsigned cache_line_factor)
+            : m_heaps(heaps), m_compare(compare), m_cache_line_factor(cache_line_factor) { }
+        bool operator () (const int a, const int b) const
+        {
+            return m_compare(m_heaps[a * m_cache_line_factor][0], m_heaps[b * m_cache_line_factor][0]);
+        }
+    };
+
+    //! Comparator for the internal arrays winner tree.
+    struct ia_comp {
+        ias_type& m_ias;
+        compare_type& m_compare;
+        ia_comp(ias_type& ias, compare_type& compare)
+            : m_ias(ias), m_compare(compare) { }
+        bool operator () (const int a, const int b) const
+        {
+            return m_compare(m_ias[a].get_min(), m_ias[b].get_min());
+        }
+    };
+
+    //! Comparator for the external arrays winner tree.
+    struct ea_comp {
+        eas_type& m_eas;
+        compare_type& m_compare;
+        ea_comp(eas_type& eas, compare_type& compare)
+            : m_eas(eas), m_compare(compare) { }
+        bool operator () (const int a, const int b) const
+        {
+            return m_compare(m_eas[a].get_min_element(), m_eas[b].get_min_element());
+        }
+    };
+
+    //! The priority queue
+    Parent& m_parent;
+
+    //! value_type comparator
+    compare_type m_compare;
+
+    unsigned m_cache_line_factor;
+
+    //! Comperator instances
+    head_comp m_head_comp;
+    heaps_comp m_heaps_comp;
+    ia_comp m_ia_comp;
+    ea_comp m_ea_comp;
+
+    //! The winner trees
+    winner_tree<head_comp> m_head;
+    winner_tree<heaps_comp> m_heaps;
+    winner_tree<ia_comp> m_ia;
+    winner_tree<ea_comp> m_ea;
+};
 }
 
 //! Parallelized External Memory Priority Queue Config.
@@ -868,7 +867,6 @@ template <
     >
 class parallel_priority_queue : private noncopyable
 {
-
     //! \addtogroup types Types
     //! \{
 
@@ -897,7 +895,7 @@ protected:
 
     //! Defines if statistics are gathered: dummy_custom_stats_counter or custom_stats_counter
     typedef dummy_custom_stats_counter<uint64> stats_counter;
-    
+
     //! Defines if statistics are gathered: fake_timer or timer
     typedef fake_timer stats_timer;
 
@@ -942,7 +940,7 @@ protected:
 
     typedef typename std::vector<heap_type> heaps_type;
     typedef typename std::vector<external_array_type> external_arrays_type;
-    typedef typename std::vector< ppq_local::internal_array<ValueType> > internal_arrays_type;
+    typedef typename std::vector<ppq_local::internal_array<ValueType> > internal_arrays_type;
     typedef ppq_local::minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> > minima_type;
     friend class ppq_local::minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> >;
 

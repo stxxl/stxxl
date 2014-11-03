@@ -22,13 +22,13 @@ struct VectorCompare
     //! number of vectors in comparator
     size_t m_vecnum;
     //! vector of pointers to player streams
-    const std::vector< std::vector<unsigned int> >& m_vec;
+    const std::vector<std::vector<unsigned int> >& m_vec;
 
     //! currently top indices
     std::vector<unsigned int> m_vecp;
 
     VectorCompare(size_t vecnum,
-                  const std::vector< std::vector<unsigned int> >& vec)
+                  const std::vector<std::vector<unsigned int> >& vec)
         : m_vecnum(vecnum), m_vec(vec), m_vecp(vecnum, 0)
     { }
 
@@ -52,7 +52,7 @@ void test_vecs(size_t vecnum)
     // construct many vectors of sorted random numbers
 
     stxxl::random_number32 rnd;
-    std::vector< std::vector<unsigned int> > vec (vecnum);
+    std::vector<std::vector<unsigned int> > vec(vecnum);
 
     size_t totalsize = 0;
     std::vector<unsigned int> output, correct;
