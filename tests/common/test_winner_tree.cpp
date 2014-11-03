@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/algo/winner_tree.h>
+#include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/random>
 

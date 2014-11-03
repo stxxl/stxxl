@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/algo/winner_tree.h
+ *  include/stxxl/bits/common/winner_tree.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_ALGO_WINNER_TREE_HEADER
-#define STXXL_ALGO_WINNER_TREE_HEADER
+#ifndef STXXL_COMMON_WINNER_TREE_HEADER
+#define STXXL_COMMON_WINNER_TREE_HEADER
 
 #include <vector>
 #include <stack>
@@ -283,4 +283,4 @@ public:
 
 STXXL_END_NAMESPACE
 
-#endif // !STXXL_ALGO_WINNER_TREE_HEADER
+#endif // !STXXL_COMMON_WINNER_TREE_HEADER

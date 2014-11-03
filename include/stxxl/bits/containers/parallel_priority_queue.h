@@ -26,7 +26,7 @@
     #include <parallel/numeric>
 #endif
 
-#include <stxxl/bits/algo/winner_tree.h>
+#include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
