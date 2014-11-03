@@ -4,14 +4,15 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2014 Thomas Keh <thomas.keh@student.kit.edu>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_WINNER_TREE_HEADER
-#define STXXL_CONTAINERS_WINNER_TREE_HEADER
+#ifndef STXXL_ALGO_WINNER_TREE_HEADER
+#define STXXL_ALGO_WINNER_TREE_HEADER
 
 #include <vector>
 #include <stack>
@@ -60,6 +61,7 @@ protected:
         stats_timer replay_time;
         stats_timer double_num_slots_time;
         stats_timer remove_player_time;
+
         friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
             return os << "replay_time=" << o.replay_time << std::endl
@@ -281,4 +283,4 @@ public:
 
 STXXL_END_NAMESPACE
 
-#endif // !STXXL_CONTAINERS_WINNER_TREE_HEADER
+#endif // !STXXL_ALGO_WINNER_TREE_HEADER
