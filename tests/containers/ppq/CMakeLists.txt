@@ -11,5 +11,7 @@
 ############################################################################
 
 stxxl_build_test(test_ppq)
+stxxl_build_test(test_ppq_external_array)
 
 stxxl_test(test_ppq)
+stxxl_test(test_ppq_external_array)

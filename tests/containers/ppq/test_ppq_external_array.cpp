@@ -15,7 +15,7 @@
 
 #include <cstddef>
 #include <stxxl/bits/common/cmdline.h>
-#include <stxxl/bits/containers/external_array.h>
+#include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/timer>
 
@@ -35,7 +35,10 @@ static inline void progress(const char* text, size_t i, size_t nelements)
 //! \param numwbs Number of write buffer blocks for each external array.
 int run_test(size_t volume, size_t numeas, size_t numwbs) {
     
-    typedef typename stxxl::external_array<value_type,STXXL_DEFAULT_BLOCK_SIZE(value_type),stxxl::striping> ea;
+    typedef typename stxxl::ppq_local::external_array<
+        value_type,STXXL_DEFAULT_BLOCK_SIZE(value_type),stxxl::striping
+        > ea;
+
     size_t num_elements=volume/sizeof(value_type);
     num_elements = (num_elements/numeas)*numeas;
     
