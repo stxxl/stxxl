@@ -49,29 +49,36 @@ STXXL_BEGIN_NAMESPACE
 
 namespace ppq_local {
 
+/*!
+ * Internal arrays store a sorted sequence of values in RAM, which will be
+ * merged together into the deletion buffer, when it needs to be
+ * refilled. Internal arrays are constructed from the insertions heaps when
+ * they overflow.
+ */
 template <class ValueType>
 class internal_array
 {
 private:
+    //! Contains the items of the sorted sequence.
     std::vector<ValueType> m_values;
+
+    //! Index of the current head
     size_t m_min_index;
-    bool m_deleted;
 
 public:
-    //! The value iterator type used by begin() and end()
-    //! We use pointers as iterator so internal arrays
-    //! are compatible to external arrays and can be
-    //! merged together.
+    //! The value iterator type used by begin() and end(). We use pointers as
+    //! iterator so internal arrays are compatible to external arrays and can
+    //! be merged together.
     typedef ValueType* iterator;
 
-    //! Default constructor. Don't use this directy. Needed for regrowing in surrounding vector.
+    //! Default constructor. Don't use this directy. Needed for regrowing in
+    //! surrounding vector.
     internal_array() = default;
 
-    //! Constructor which takes a value vector.
-    //! The vector should not be used outside this
-    //! class anymore!
+    //! Constructor which takes a value vector. The vector should not be used
+    //! outside this class anymore!
     internal_array(std::vector<ValueType>& values)
-        : m_values(), m_min_index(0), m_deleted(false)
+        : m_values(), m_min_index(0)
     {
         std::swap(m_values, values);
     }
@@ -79,8 +86,8 @@ public:
     //! Move constructor. Needed for regrowing in surrounding vector.
     internal_array(internal_array&& o)
         : m_values(std::move(o.m_values)),
-          m_min_index(o.m_min_index),
-          m_deleted(o.m_deleted) { }
+          m_min_index(o.m_min_index)
+    { }
 
     //! Delete copy assignment for emplace_back to use the move semantics.
     internal_array& operator = (internal_array& other) = delete;
@@ -145,40 +152,43 @@ public:
     //! Begin iterator
     inline iterator begin()
     {
-        // We use &(*()) in order to get a pointer iterator.
-        // This is allowed because values are guaranteed to be
-        // consecutive in std::vecotor.
+        // We use &(*()) in order to get a pointer iterator. This is allowed
+        // because values are guaranteed to be consecutive in std::vecotor.
         return &(*(m_values.begin() + m_min_index));
     }
 
     //! End iterator
     inline iterator end()
     {
-        // We use &(*()) in order to get a pointer iterator.
-        // This is allowed because values are guaranteed to be
-        // consecutive in std::vecotor.
+        // We use &(*()) in order to get a pointer iterator. This is allowed
+        // because values are guaranteed to be consecutive in std::vecotor.
         return &(*(m_values.end()));
     }
 };
 
-//! External array stores a sorted sequence of values on the hard disk and
-//!		allows random access to the first block (containing the smallest values).
-//!		The class uses buffering and prefetching in order to improve the performance.
-//!
-//! \tparam ValueType           Type of the contained objects (POD with no references to internal memory).
-//!
-//! \tparam BlockSize		External block size. Default = STXXL_DEFAULT_BLOCK_SIZE(ValueType).
-//!
-//! \tparam AllocStrategy	Allocation strategy for the external memory. Default = STXXL_DEFAULT_ALLOC_STRATEGY.
+/*!
+ * External array stores a sorted sequence of values on the hard disk and
+ * allows access to the first block (containing the smallest values).  The
+ * class uses buffering and prefetching in order to improve the performance.
+ *
+ * \tparam ValueType Type of the contained objects (POD with no references to
+ * internal memory).
+ *
+ * \tparam BlockSize External block size. Default =
+ * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
+ *
+ * \tparam AllocStrategy Allocation strategy for the external memory. Default =
+ * STXXL_DEFAULT_ALLOC_STRATEGY.
+ */
 template <
     class ValueType,
     unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
     >
-class external_array // : private noncopyable
+class external_array
 {
 public:
-    typedef external_array<ValueType, BlockSize, AllocStrategy> Self;
+    typedef external_array<ValueType, BlockSize, AllocStrategy> self_type;
     typedef std::vector<BID<BlockSize> > bid_vector;
     typedef typed_block<BlockSize, ValueType> block_type;
     typedef ValueType* iterator;
@@ -221,27 +231,32 @@ private:
     //! Prefetch and write buffer pool
     pool_type* pool;
 
-    //! The read_request can be used to wait until the block has been completely fetched.
+    //! The read_request can be used to wait until the block has been
+    //! completely fetched.
     request_ptr read_request;
 
-    //! The write position in the block currently being filled. Used by the <<-operator.
+    //! The write position in the block currently being filled. Used by the
+    //! <<-operator.
     size_t write_position;
 
     //! Index of the next block to be prefetched.
     size_t hint_index;
 
-    /* Write phase: Index of the external block where the current block will be stored in when it's filled.
-     * Read phase: Index of the external block which will be fetched next.
+    /* Write phase: Index of the external block where the current block will be
+     * stored in when it's filled. Read phase: Index of the external block
+     * which will be fetched next.
      */
     size_t current_bid_index;
 
     //! True means write phase, false means read phase.
     bool write_phase;
 
-    //! The first block is valid if wait_for_first_block() has already been called.
+    //! The first block is valid if wait_for_first_block() has already been
+    //! called.
     bool _first_block_valid;
 
-    //! Indicates if first_block is actually the first block of all which has never been written to external memory.
+    //! Indicates if first_block is actually the first block of all which has
+    //! never been written to external memory.
     bool is_first_block;
 
     //! boundaries of first block
@@ -249,14 +264,19 @@ private:
     size_t end_index;
 
 public:
-    //! Constructs an external array
-    //!
-    //! \param size					The total number of elements. Cannot be changed after construction.
-    //!
-    //! \param _num_prefetch_blocks		Number of blocks to prefetch from hard disk
-    //!
-    //! \param _num_write_buffer_blocks	Size of the write buffer in number of blocks
-    external_array(size_t size, size_t _num_prefetch_blocks, size_t _num_write_buffer_blocks)
+    /*!
+     * Constructs an external array
+     *
+     * \param size The total number of elements. Cannot be changed after
+     * construction.
+     *
+     * \param _num_prefetch_blocks Number of blocks to prefetch from hard disk
+     *
+     * \param _num_write_buffer_blocks Size of the write buffer in number of
+     * blocks
+     */
+    external_array(size_t size, size_t _num_prefetch_blocks,
+                   size_t _num_write_buffer_blocks)
         : m_size(size),
           real_size(0),
           value_size(sizeof(ValueType)),
@@ -282,13 +302,13 @@ public:
     }
 
     //! Delete copy assignment for emplace_back to use the move semantics.
-    Self& operator = (const Self& other) = delete;
+    self_type& operator = (const self_type& other) = delete;
 
     //! Delete copy constructor for emplace_back to use the move semantics.
-    external_array(const Self& other) = delete;
+    external_array(const self_type& other) = delete;
 
     //! Move assignment.
-    Self& operator = (Self&& o)
+    self_type& operator = (self_type&& o)
     {
         m_size = o.m_size;
         real_size = o.real_size;
@@ -317,7 +337,7 @@ public:
     }
 
     //! Move constructor. Needed for regrowing in surrounding vector.
-    external_array(Self&& o)
+    external_array(self_type&& o)
         : m_size(o.m_size),
           real_size(o.real_size),
           value_size(o.value_size),
@@ -343,7 +363,8 @@ public:
         o.pool = nullptr;
     }
 
-    //! Default constructor. Don't use this directy. Needed for regrowing in surrounding vector.
+    //! Default constructor. Don't use this directy. Needed for regrowing in
+    //! surrounding vector.
     external_array() = default;
 
     //! Destructor
@@ -351,7 +372,8 @@ public:
     {
         block_manager* bm = block_manager::get_instance();
         if (pool != NULL) {
-            // This could also be done step by step in remove_first_...() in future.
+            // This could also be done step by step in remove_first_...() in
+            // future.
             bm->delete_blocks(bids.begin(), bids.end());
             delete first_block;
             delete pool;
@@ -430,11 +452,12 @@ public:
         first_block->elem[write_position++] = record;
     }
 
-    //! Finish write phase. Afterwards the values can be extracted from bottom up (ascending order).
+    //! Finish write phase. Afterwards the values can be extracted from bottom
+    //! up (ascending order).
     void finish_write_phase()
     {
-        // Idea for the future: If we write the block with the smallest values in the end,
-        // we don't need to write it into EM.
+        // Idea for the future: If we write the block with the smallest values
+        // in the end, we don't need to write it into EM.
 
         assert(m_size == real_size);
 
@@ -474,9 +497,9 @@ public:
         }
     }
 
-    //! Removes the first <n> elements from the array (first block).
-    //! Loads the next block if the current one has run empty.
-    //! Make shure there are at least <n> elements left in the first block.
+    //! Removes the first <n> elements from the array (first block).  Loads the
+    //! next block if the current one has run empty.  Make shure there are at
+    //! least <n> elements left in the first block.
     void remove_first_n_elements(size_t n)
     {
         assert(_first_block_valid);
@@ -501,7 +524,8 @@ public:
         }
     }
 
-    //! Has to be called before using begin_block() and end_block() in order to set _first_block_valid.
+    //! Has to be called before using begin_block() and end_block() in order to
+    //! set _first_block_valid.
     void wait_for_first_block()
     {
         assert(!write_phase);
@@ -573,7 +597,7 @@ private:
 template <class Parent>
 class minima_tree
 {
-    typedef minima_tree<Parent> Self;
+    typedef minima_tree<Parent> self_type;
     typedef typename Parent::inv_compare_type compare_type;
     typedef typename Parent::value_type value_type;
     typedef typename Parent::heaps_type heaps_type;
@@ -738,17 +762,19 @@ public:
     }
 
 private:
-    //! Comparator for the head winner tree.
-    //! It accesses all relevant data structures from the priority queue.
+    //! Comparator for the head winner tree.  It accesses all relevant data
+    //! structures from the priority queue.
     struct head_comp {
-        Self& m_parent;
+        self_type& m_parent;
         heaps_type& m_heaps;
         ias_type& m_ias;
         eas_type& m_eas;
         compare_type& m_compare;
         unsigned m_cache_line_factor;
 
-        head_comp(Self& parent, heaps_type& heaps, ias_type& ias, eas_type& eas, compare_type& compare, unsigned cache_line_factor)
+        head_comp(self_type& parent, heaps_type& heaps,
+                  ias_type& ias, eas_type& eas,
+                  compare_type& compare, unsigned cache_line_factor)
             : m_parent(parent),
               m_heaps(heaps),
               m_ias(ias),
@@ -843,20 +869,28 @@ private:
 };
 }
 
-//! Parallelized External Memory Priority Queue Config.
-//!
-//! \tparam ValueType            Type of the contained objects (POD with no references to internal memory).
-//!
-//! \tparam CompareType		The comparator type used to determine whether one element is smaller than another element.
-//!
-//! \tparam Ram				Maximum memory consumption by the queue. Can be overwritten by the constructor. Default = 8 GiB.
-//!
-//! \tparam MaxItems			Maximum number of elements the queue contains at one time. Default = 0 = unlimited.
-//!                                                      This is no hard limit and only used for optimization. Can be overwritten by the constructor.
-//!
-//! \tparam BlockSize		External block size. Default = STXXL_DEFAULT_BLOCK_SIZE(ValueType).
-//!
-//! \tparam AllocStrategy	Allocation strategy for the external memory. Default = STXXL_DEFAULT_ALLOC_STRATEGY.
+/*!
+ * Parallelized External Memory Priority Queue Config.
+ *
+ * \tparam ValueType Type of the contained objects (POD with no references to
+ * internal memory).
+ *
+ * \tparam CompareType The comparator type used to determine whether one
+ * element is smaller than another element.
+ *
+ * \tparam Ram Maximum memory consumption by the queue. Can be overwritten by
+ * the constructor. Default = 8 GiB.
+ *
+ * \tparam MaxItems Maximum number of elements the queue contains at one
+ * time. Default = 0 = unlimited. This is no hard limit and only used for
+ * optimization. Can be overwritten by the constructor.
+ *
+ * \tparam BlockSize External block size. Default =
+ * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
+ *
+ * \tparam AllocStrategy Allocation strategy for the external memory. Default =
+ * STXXL_DEFAULT_ALLOC_STRATEGY.
+ */
 template <
     class ValueType,
     class CompareType,
@@ -893,7 +927,8 @@ protected:
         }
     };
 
-    //! Defines if statistics are gathered: dummy_custom_stats_counter or custom_stats_counter
+    //! Defines if statistics are gathered: dummy_custom_stats_counter or
+    //! custom_stats_counter
     typedef dummy_custom_stats_counter<uint64> stats_counter;
 
     //! Defines if statistics are gathered: fake_timer or timer
@@ -915,25 +950,29 @@ protected:
     //! Default number of prefetch blocks per external array.
     static const unsigned c_num_prefetch_buffer_blocks = 1;
 
-    //! Default number of write buffer block for a new external array being filled.
+    //! Default number of write buffer block for a new external array being
+    //! filled.
     static const unsigned c_num_write_buffer_blocks = 14;
 
-    //! Defines for how much external arrays memory should be reserved in the constructor.
+    //! Defines for how much external arrays memory should be reserved in the
+    //! constructor.
     static const unsigned c_num_reserved_external_arrays = 10;
 
-    //! Size of a single insertion heap in Byte, if not defined otherwise in the constructor
+    //! Size of a single insertion heap in Byte, if not defined otherwise in
+    //! the constructor
     static const size_type c_default_single_heap_ram = 1L * 1024L * 1024L; // 10 MiB
 
     //! Default limit of the extract buffer ram consumption as share of total ram
     constexpr static double c_default_extract_buffer_ram_part = 0.05;
 
-    //! Leave out (c_cache_line_factor-1) slots between the heaps in the insertion_heaps vector each.
-    //! This ensures that the heap vectors (meaning: the begin and end pointers) are in different cache lines
-    //! and therefore this improves the multicore performance.
+    //! Leave out (c_cache_line_factor-1) slots between the heaps in the
+    //! insertion_heaps vector each.  This ensures that the heap vectors
+    //! (meaning: the begin and end pointers) are in different cache lines and
+    //! therefore this improves the multicore performance.
     static const unsigned c_cache_line_factor = 128;
 
-    //! Number of elements to reserve space for in the dummy insertion heap entries.
-    //! @see c_cache_line_factor
+    //! Number of elements to reserve space for in the dummy insertion heap
+    //! entries.  @see c_cache_line_factor
     static const unsigned c_cache_line_space = 128;
 
     //! \}
@@ -944,18 +983,24 @@ protected:
     typedef ppq_local::minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> > minima_type;
     friend class ppq_local::minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> >;
 
-    //! Limit the size of the extract buffer to an absolute value.
-    //!
-    //! The actual size can be set using the _extract_buffer_ram parameter of the constructor. If this parameter is not set,
-    //! the value is calculated by (total_ram*c_default_extract_buffer_ram_part)
-    //!
-    //! If c_limit_extract_buffer==false, the memory consumption of the extract buffer is only limited by the number of
-    //! external and internal arrays. This is considered in memory management using the ram_per_external_array and
-    //! ram_per_internal_array values. Attention: Each internal
-    //! array reserves space for the extract buffer in the size of all heaps together.
+    /*!
+     * Limit the size of the extract buffer to an absolute value.
+     *
+     * The actual size can be set using the _extract_buffer_ram parameter of
+     * the constructor. If this parameter is not set, the value is calculated
+     * by (total_ram*c_default_extract_buffer_ram_part)
+     *
+     * If c_limit_extract_buffer==false, the memory consumption of the extract
+     * buffer is only limited by the number of external and internal
+     * arrays. This is considered in memory management using the
+     * ram_per_external_array and ram_per_internal_array values. Attention:
+     * Each internal array reserves space for the extract buffer in the size of
+     * all heaps together.
+     */
     static const bool c_limit_extract_buffer = true;
 
-    //! For bulks of size up to c_single_insert_limit sequential single insert is faster than bulk_push.
+    //! For bulks of size up to c_single_insert_limit sequential single insert
+    //! is faster than bulk_push.
     static const unsigned c_single_insert_limit = 100;
 
     //! Number of prefetch blocks per external array
@@ -967,8 +1012,8 @@ protected:
     //! The size of the bulk currently being inserted
     size_type bulk_size;
 
-    //! If the bulk currently being insered is very lare, this boolean is set and
-    //! bulk_push_steps just accumulate the elements for eventual sorting.
+    //! If the bulk currently being insered is very lare, this boolean is set
+    //! and bulk_push_steps just accumulate the elements for eventual sorting.
     bool is_very_large_bulk;
 
     //! Index of the currently smallest element in the extract buffer
@@ -992,8 +1037,9 @@ protected:
     //! Capacity of one inserion heap
     size_type insertion_heap_capacity;
 
-    //! Using this parameter you can reserve more space for the insertion heaps than visible to the algorithm.
-    //! This avoids memory allocation if the data is not distributed evenly among the heaps.
+    //! Using this parameter you can reserve more space for the insertion heaps
+    //! than visible to the algorithm.  This avoids memory allocation if the
+    //! data is not distributed evenly among the heaps.
     double real_insertion_heap_size_factor;
 
     //! Total amount of internal memory
@@ -1009,10 +1055,12 @@ protected:
     //! Free memory in bytes
     size_type ram_left;
 
-    //! Amount of internal memory an external array needs during it's lifetime in bytes
+    //! Amount of internal memory an external array needs during it's lifetime
+    //! in bytes
     size_type ram_per_external_array;
 
-    //! Amount of internal memory an internal array needs during it's lifetime in bytes
+    //! Amount of internal memory an internal array needs during it's lifetime
+    //! in bytes
     size_type ram_per_internal_array;
 
     /*
@@ -1025,7 +1073,8 @@ protected:
     //! The sorted arrays in internal memory
     internal_arrays_type internal_arrays;
 
-    //! The buffer where external (and internal) arrays are merged into for extracting
+    //! The buffer where external (and internal) arrays are merged into for
+    //! extracting
     std::vector<ValueType> extract_buffer;
 
     //! The heaps where new elements are usually inserted into
@@ -1064,22 +1113,31 @@ public:
     //! \addtogroup init Initialization
     //! \{
 
-    //! Constructor.
-    //!
-    //! \param num_prefetch_buffer_blocks    Number of prefetch blocks per external array. Default = c_num_prefetch_buffer_blocks
-    //!
-    //! \param num_write_buffer_blocks	    Number of write buffer blocks for a new external array being filled. 0 = Default = c_num_write_buffer_blocks
-    //!
-    //! \param _total_ram			        Maximum RAM usage. 0 = Default = Use the template value Ram.
-    //!
-    //! \param _num_insertion_heaps	        Number of insertion heaps. 0 = Determine by omp_get_max_threads(). Default = Determine by omp_get_max_threads().
-    //!
-    //! \param _single_heap_ram		        Memory usage for a single insertion heap. 0 = Default = c_single_heap_ram.
-    //!
-    //! \param extract_buffer_ram		    Memory usage for the extract buffer. Only relevant if c_limit_extract_buffer==true.
-    //!                                         0 = Default = total_ram * c_default_extract_buffer_ram_part.
-    //!
-    //! \param flush_directly_to_hd         Do not flush into internal arrays when there is RAM left but flush directly into an external array.
+    /*!
+     * Constructor.
+     *
+     * \param num_prefetch_buffer_blocks Number of prefetch blocks per external
+     * array. Default = c_num_prefetch_buffer_blocks
+     *
+     * \param num_write_buffer_blocks Number of write buffer blocks for a new
+     * external array being filled. 0 = Default = c_num_write_buffer_blocks
+     *
+     * \param _total_ram Maximum RAM usage. 0 = Default = Use the template
+     * value Ram.
+     *
+     * \param _num_insertion_heaps Number of insertion heaps. 0 = Determine by
+     * omp_get_max_threads(). Default = Determine by omp_get_max_threads().
+     *
+     * \param _single_heap_ram Memory usage for a single insertion heap. 0 =
+     * Default = c_single_heap_ram.
+     *
+     * \param extract_buffer_ram Memory usage for the extract buffer. Only
+     * relevant if c_limit_extract_buffer==true. 0 = Default = total_ram *
+     * c_default_extract_buffer_ram_part.
+     *
+     * \param flush_directly_to_hd Do not flush into internal arrays when there
+     * is RAM left but flush directly into an external array.
+     */
     parallel_priority_queue(
         unsigned num_prefetch_buffer_blocks = 0,
         unsigned num_write_buffer_blocks = 0,
@@ -1238,8 +1296,10 @@ public:
     //! \addtogroup bulkops Bulk Operations
     //! \{
 
-    //! Start a sequence of push operations.
-    //! \param _bulk_size	Number of elements to push before the next pop.
+    /*!
+     * Start a sequence of push operations.
+     * \param _bulk_size Number of elements to push before the next pop.
+     */
     void bulk_push_begin(size_type _bulk_size)
     {
         bulk_size = _bulk_size;
@@ -1257,10 +1317,12 @@ public:
         }
     }
 
-    //! Push an element inside a sequence of pushes.
-    //! Run bulk_push_begin() before using this method.
-    //!
-    //! \param element		The element to push.
+    /*!
+     * Push an element inside a sequence of pushes.
+     * Run bulk_push_begin() before using this method.
+     *
+     * \param element The element to push.
+     */
     void bulk_push_step(const ValueType& element, const int thread_num = -1)
     {
         assert(bulk_size > 0);
@@ -1284,13 +1346,16 @@ public:
         // TODO: check if full? Alternative: real_insertion_heap_size_factor
         insertion_heaps[id * c_cache_line_factor].push_back(element);
         std::push_heap(insertion_heaps[id * c_cache_line_factor].begin(), insertion_heaps[id * c_cache_line_factor].end(), compare);
-        // The following would avoid problems if the bulk size specified in bulk_push_begin is not correct.
+        // The following would avoid problems if the bulk size specified in
+        // bulk_push_begin is not correct.
         // insertion_size += bulk_size; must then be removed from bulk_push_end().
         //__sync_fetch_and_add(&insertion_size, 1);
     }
 
-    //! Ends a sequence of push operations. Run bulk_push_begin()
-    //! and some bulk_push_step() before this.
+    /*!
+     * Ends a sequence of push operations. Run bulk_push_begin() and some
+     * bulk_push_step() before this.
+     */
     void bulk_push_end()
     {
         if (is_very_large_bulk) {
@@ -1308,10 +1373,11 @@ public:
         }
     }
 
-    //! Insert multiple elements at one time.
-    //! \param elements	Vector containing the elements to push.
-    //! Attention: elements vector may be owned by the PQ afterwards.
-    //!
+    /*!
+     * Insert multiple elements at one time.
+     * \param elements Vector containing the elements to push.
+     * Attention: elements vector may be owned by the PQ afterwards.
+     */
     void bulk_push(std::vector<ValueType>& elements)
     {
         size_type heap_capacity = num_insertion_heaps * insertion_heap_capacity;
@@ -1542,8 +1608,10 @@ public:
 
     //! \}
 
-    //! Merges all external arrays into one external array.
-    //! Public for benchmark purposes.
+    /*!
+     * Merges all external arrays into one external array.  Public for
+     * benchmark purposes.
+     */
     void merge_external_arrays()
     {
         stats.num_external_array_merges++;
@@ -2142,9 +2210,12 @@ protected:
         stats.max_num_external_arrays.set_max(external_arrays.size());
     }
 
-    //! Sorts the values from values and writes them into an internal array.
-    //! Don't use the value vector afterwards!
-    //! \param values the vector to sort and store
+    /*!
+     * Sorts the values from values and writes them into an internal array.
+     * Don't use the value vector afterwards!
+     *
+     * \param values the vector to sort and store
+     */
     void flush_array_internal(std::vector<ValueType>& values)
     {
         internal_size += values.size();
@@ -2175,9 +2246,13 @@ protected:
         // Vector is now owned by PPQ...
     }
 
-    //! Lets the priority queue decide if flush_array_to_hd() or flush_array_internal() should be called.
-    //! Don't use the value vector afterwards!
-    //! \param values the vector to sort and store
+    /*!
+     * Lets the priority queue decide if flush_array_to_hd() or
+     * flush_array_internal() should be called.  Don't use the value vector
+     * afterwards!
+     *
+     * \param values the vector to sort and store
+     */
     void flush_array(std::vector<ValueType>& values)
     {
         size_type size = values.size();
@@ -2210,17 +2285,19 @@ protected:
         }
     }
 
-    //! Struct of all statistical counters and timers.
-    //! Turn on/off statistics using the stats_counter and stats_timer typedefs.
+    //! Struct of all statistical counters and timers.  Turn on/off statistics
+    //! using the stats_counter and stats_timer typedefs.
     struct stats_type
     {
         //! Largest number of elements in the extract buffer at the same time
         stats_counter max_extract_buffer_size;
 
-        //! Sum of the sizes of each extract buffer refill. Used for average size.
+        //! Sum of the sizes of each extract buffer refill. Used for average
+        //! size.
         stats_counter total_extract_buffer_size;
 
-        //! Largest number of elements in the merge buffer when running flush_internal_arrays()
+        //! Largest number of elements in the merge buffer when running
+        //! flush_internal_arrays()
         stats_counter max_merge_buffer_size;
 
         //! Total number of extracts
@@ -2247,18 +2324,24 @@ protected:
         //! Largest number of external arrays at the same time
         stats_counter max_num_external_arrays;
 
-        //! Temporary number of new external arrays at the same time (which were created while the extract buffer hadn't been empty)
+        //! Temporary number of new external arrays at the same time (which
+        //! were created while the extract buffer hadn't been empty)
         stats_counter num_new_external_arrays;
 
-        //! Largest number of new external arrays at the same time (which were created while the extract buffer hadn't been empty)
+        //! Largest number of new external arrays at the same time (which were
+        //! created while the extract buffer hadn't been empty)
         stats_counter max_num_new_external_arrays;
 
         //if (c_merge_ias_into_eb) {
-        //! Temporary number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
+
+        //! Temporary number of new internal arrays at the same time (which
+        //! were created while the extract buffer hadn't been empty)
         stats_counter num_new_internal_arrays;
 
-        //! Largest number of new internal arrays at the same time (which were created while the extract buffer hadn't been empty)
+        //! Largest number of new internal arrays at the same time (which were
+        //! created while the extract buffer hadn't been empty)
         stats_counter max_num_new_internal_arrays;
+
         //}
 
         //! Total time for flush_insertion_heaps()
@@ -2292,7 +2375,8 @@ protected:
         stats_timer refill_time_after_merge;
 
         //! Total time of wait_for_first_block() calls in first part of
-        //! refill_extract_buffer(). Part of refill_time_before_merge and refill_extract_buffer_time.
+        //! refill_extract_buffer(). Part of refill_time_before_merge and
+        //! refill_extract_buffer_time.
         stats_timer refill_wait_time;
 
         //! Total time for pop_heap() in extract_min().
