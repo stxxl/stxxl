@@ -159,7 +159,8 @@ protected:
             if (sscanf(argv[0], "%d", &m_dest) == 1) {
                 --argc, ++argv;
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }
@@ -190,7 +191,8 @@ protected:
             if (sscanf(argv[0], "%u", &m_dest) == 1) {
                 --argc, ++argv;
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }
@@ -223,7 +225,8 @@ protected:
                 (uint64)(m_dest = (uint32)dest) == dest) {
                 --argc, ++argv;
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }
@@ -254,7 +257,8 @@ protected:
             if (parse_SI_IEC_size(argv[0], m_dest)) {
                 --argc, ++argv;
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }

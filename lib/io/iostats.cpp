@@ -265,7 +265,8 @@ void stats::wait_started(wait_op_type wait_op)
             t_wait_read += double(acc_wait_read) * diff;
             p_begin_wait_read = now;
             p_wait_read += (acc_wait_read++) ? diff : 0.0;
-        } else /* if (wait_op == WAIT_OP_WRITE) */ {
+        }
+        else /* if (wait_op == WAIT_OP_WRITE) */ {
             // wait_any() is only used from write_pool and buffered_writer, so account WAIT_OP_ANY for WAIT_OP_WRITE, too
             diff = now - p_begin_wait_write;
             t_wait_write += double(acc_wait_write) * diff;
@@ -291,7 +292,8 @@ void stats::wait_finished(wait_op_type wait_op)
             t_wait_read += double(acc_wait_read) * diff;
             p_begin_wait_read = now;
             p_wait_read += (acc_wait_read--) ? diff : 0.0;
-        } else /* if (wait_op == WAIT_OP_WRITE) */ {
+        }
+        else /* if (wait_op == WAIT_OP_WRITE) */ {
             double diff = now - p_begin_wait_write;
             t_wait_write += double(acc_wait_write) * diff;
             p_begin_wait_write = now;

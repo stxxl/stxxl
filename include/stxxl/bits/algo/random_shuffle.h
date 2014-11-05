@@ -306,7 +306,8 @@ void random_shuffle(
 
             // free memory
             delete[] temp_array;
-        } else {
+        }
+        else {
             STXXL_VERBOSE1("random_shuffle: recursion");
             // copy bucket into temp. stxxl::vector
             temp_vector = new temp_vector_type(size);

@@ -689,7 +689,8 @@ public:
         m_heaps.deactivate_player(index);
         if (!m_heaps.empty()) {
             m_head.notify_change(HEAP);
-        } else {
+        }
+        else {
             m_head.deactivate_player(HEAP);
         }
     }
@@ -704,7 +705,8 @@ public:
         m_ia.deactivate_player(index);
         if (!m_ia.empty()) {
             m_head.notify_change(IA);
-        } else {
+        }
+        else {
             m_head.deactivate_player(IA);
         }
     }
@@ -714,7 +716,8 @@ public:
         m_ea.deactivate_player(index);
         if (!m_ea.empty()) {
             m_head.notify_change(EA);
-        } else {
+        }
+        else {
             m_head.deactivate_player(EA);
         }
     }
@@ -867,7 +870,8 @@ protected:
     winner_tree<ia_comp> m_ia;
     winner_tree<ea_comp> m_ea;
 };
-}
+
+} // namespace ppq_local
 
 /*!
  * Parallelized External Memory Priority Queue Config.
@@ -1193,7 +1197,8 @@ public:
 
         if (c_merge_sorted_heaps) {
             internal_arrays.reserve(total_ram / ram_for_heaps);
-        } else {
+        }
+        else {
             internal_arrays.reserve(total_ram * num_insertion_heaps / ram_for_heaps);
         }
     }
@@ -1214,7 +1219,8 @@ protected:
         if (c_merge_sorted_heaps) {
             // all heaps become one internal array
             ram_per_internal_array = ram_for_heaps;
-        } else {
+        }
+        else {
             // each heap becomes one internal array
             ram_per_internal_array = ram_for_heaps / num_insertion_heaps;
         }
@@ -1222,7 +1228,8 @@ protected:
         if (c_limit_extract_buffer) {
             // ram for the extract buffer
             ram_left -= extract_buffer_limit * sizeof(ValueType);
-        } else {
+        }
+        else {
             // each: part of the (maximum) ram for the extract buffer
 
             ram_per_external_array += BlockSize;
@@ -1231,7 +1238,8 @@ protected:
                 // we have to reserve space in the size of the whole array: very inefficient!
                 if (c_merge_sorted_heaps) {
                     ram_per_internal_array += ram_for_heaps;
-                } else {
+                }
+                else {
                     ram_per_internal_array += ram_for_heaps / num_insertion_heaps;
                 }
             }
@@ -1246,14 +1254,17 @@ protected:
             if (ram_left < 2 * ram_per_external_array) {
                 STXXL_ERRMSG("Insufficent memory.");
                 exit(EXIT_FAILURE);
-            } else if (ram_left < 4 * ram_per_external_array) {
+            }
+            else if (ram_left < 4 * ram_per_external_array) {
                 STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
             }
-        } else {
+        }
+        else {
             if (ram_left < 2 * ram_per_external_array + ram_per_internal_array) {
                 STXXL_ERRMSG("Insufficent memory.");
                 exit(EXIT_FAILURE);
-            } else if (ram_left < 4 * ram_per_external_array + 2 * ram_per_internal_array) {
+            }
+            else if (ram_left < 4 * ram_per_external_array + 2 * ram_per_internal_array) {
                 STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
             }
         }
@@ -1311,7 +1322,8 @@ public:
         if (_bulk_size + insertion_size > heap_capacity) {
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
-            } else {
+            }
+            else {
                 flush_insertion_heaps();
             }
         }
@@ -1336,10 +1348,12 @@ public:
         if (thread_num > -1) {
             id = thread_num;
         #if STXXL_PARALLEL
-        } else if (omp_get_num_threads() > 1) {
+        }
+        else if (omp_get_num_threads() > 1) {
             id = omp_get_thread_num();
         #endif
-        } else {
+        }
+        else {
             id = rand() % num_insertion_heaps;
         }
 
@@ -1436,9 +1450,11 @@ public:
 
         if (ram_internal > ram_for_heaps / 2) {
             flush_array(aggregated_pushes);
-        } else if ((aggregated_pushes.size() > c_single_insert_limit) && (aggregated_pushes.size() < heap_capacity)) {
+        }
+        else if ((aggregated_pushes.size() > c_single_insert_limit) && (aggregated_pushes.size() < heap_capacity)) {
             bulk_push(aggregated_pushes);
-        } else {
+        }
+        else {
             for (value_iterator i = aggregated_pushes.begin(); i != aggregated_pushes.end(); ++i) {
                 push(*i);
             }
@@ -1461,7 +1477,8 @@ public:
         if (insertion_heaps[id * c_cache_line_factor].size() >= insertion_heap_capacity) {
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
-            } else {
+            }
+            else {
                 flush_insertion_heaps();
             }
         }
@@ -1541,7 +1558,8 @@ public:
 
             if (!insertion_heaps[index * c_cache_line_factor].empty()) {
                 m_minima.update_heap(index);
-            } else {
+            }
+            else {
                 m_minima.deactivate_heap(index);
             }
 
@@ -1556,7 +1574,8 @@ public:
 
             if (!extract_buffer_empty()) {
                 m_minima.update_extract_buffer();
-            } else {
+            }
+            else {
                 m_minima.deactivate_extract_buffer();
             }
 
@@ -1570,7 +1589,8 @@ public:
 
             if (!(internal_arrays[index].empty())) {
                 m_minima.update_internal_array(index);
-            } else {
+            }
+            else {
                 // internal array has run empty
                 m_minima.deactivate_internal_array(index);
                 ram_left += ram_per_internal_array;
@@ -1589,7 +1609,8 @@ public:
 
             if (!external_arrays[index].empty()) {
                 m_minima.update_external_array(index);
-            } else {
+            }
+            else {
                 // external array has run empty
                 m_minima.deactivate_external_array(index);
                 ram_left += ram_per_external_array;
@@ -1753,7 +1774,8 @@ protected:
             m_minima.clear_internal_arrays();
             internal_arrays.erase(std::remove_if(internal_arrays.begin(), internal_arrays.end(), empty_internal_array_eraser()), internal_arrays.end());
             ias = internal_arrays.size();
-        } else {
+        }
+        else {
             ias = 0;
         }
 
@@ -1826,7 +1848,8 @@ protected:
 
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
-            } else {
+            }
+            else {
                 // else part only relevant if c_merge_ias_into_eb==true
 
                 size_type j = i - eas;
@@ -1844,7 +1867,8 @@ protected:
 
                     sizes[i] = std::distance(begin, ub);
                     sequences[i] = std::make_pair(begin, ub);
-                } else {
+                }
+                else {
                     //there is no min_max_value
                     sizes[i] = std::distance(begin, end);
                     sequences[i] = std::make_pair(begin, end);
@@ -1894,14 +1918,16 @@ protected:
                     external_arrays[i].remove_first_n_elements(sizes[i] - dist);
                     assert(external_size >= sizes[i] - dist);
                     external_size -= sizes[i] - dist;
-                } else {
+                }
+                else {
                     size_type j = i - eas;
                     internal_arrays[j].inc_min(sizes[i] - dist);
                     assert(internal_size >= sizes[i] - dist);
                     internal_size -= sizes[i] - dist;
                 }
             }
-        } else {
+        }
+        else {
             for (size_type i = 0; i < eas; ++i) {
                 external_arrays[i].remove_first_n_elements(sizes[i]);
                 assert(external_size >= sizes[i]);
@@ -1946,7 +1972,8 @@ protected:
 
         if (c_merge_sorted_heaps) {
             ram_needed = ram_per_internal_array;
-        } else {
+        }
+        else {
             ram_needed = num_insertion_heaps * ram_per_internal_array;
         }
 
@@ -1957,7 +1984,8 @@ protected:
                 if (ram_left < ram_needed) {
                     merge_external_arrays();
                 }
-            } else {
+            }
+            else {
                 merge_external_arrays();
             }
         }
@@ -2002,7 +2030,8 @@ protected:
                     stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
                     m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
                 }
-            } else {
+            }
+            else {
                 m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
             }
 
@@ -2013,7 +2042,8 @@ protected:
             m_minima.clear_heaps();
 
             ram_left -= ram_per_internal_array;
-        } else {
+        }
+        else {
             for (unsigned i = 0; i < num_insertion_heaps; ++i) {
                 if (insertion_heaps[i * c_cache_line_factor].size() > 0) {
                     internal_arrays.emplace_back(insertion_heaps[i * c_cache_line_factor]);
@@ -2025,7 +2055,8 @@ protected:
                             stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
                             m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
                         }
-                    } else {
+                    }
+                    else {
                         m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
                     }
 
@@ -2235,7 +2266,8 @@ protected:
                 stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
                 m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
             }
-        } else {
+        }
+        else {
             m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
         }
 
@@ -2280,7 +2312,8 @@ protected:
 
         if (m_do_flush_directly_to_hd) {
             flush_array_to_hd(values);
-        } else {
+        }
+        else {
             flush_array_internal(values);
         }
     }

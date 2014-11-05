@@ -127,7 +127,6 @@ int main(int argc, char* argv[])
                 STXXL_CHECK(xxlmap.empty());
             }
         }
-
         // *********************************************************
         // The size function will be called
         // *********************************************************
@@ -138,7 +137,6 @@ int main(int argc, char* argv[])
 
             STXXL_CHECK(size1 == size2);
         }
-
         // *********************************************************
         // The erase range function will be called
         // *********************************************************
@@ -162,7 +160,6 @@ int main(int argc, char* argv[])
             STXXL_CHECK(xxlmap.lower_bound(key1) == xxlmap.end() ||
                         xxlmap.lower_bound(key1) == xxlmap.upper_bound(key2));
         }
-
         // *********************************************************
         // The erase a key function will be called
         // *********************************************************
@@ -176,7 +173,6 @@ int main(int argc, char* argv[])
             STXXL_CHECK(stxxl::not_there(stdmap, key));
             STXXL_CHECK(stxxl::not_there(xxlmap, key));
         }
-
         // *********************************************************
         // The erase function will be called
         // *********************************************************
@@ -198,7 +194,6 @@ int main(int argc, char* argv[])
             STXXL_CHECK(stxxl::not_there(stdmap, key));
             STXXL_CHECK(stxxl::not_there(xxlmap, key));
         }
-
         // *********************************************************
         // The insert function will be called
         // *********************************************************
@@ -211,7 +206,6 @@ int main(int argc, char* argv[])
             STXXL_CHECK(stxxl::there(stdmap, key, 2 * key));
             STXXL_CHECK(stxxl::there(xxlmap, key, 2 * key));
         }
-
         // *********************************************************
         // The bulk insert function will be called
         // *********************************************************
@@ -238,7 +232,6 @@ int main(int argc, char* argv[])
             for (unsigned i = lower; i < upper; i++)
                 STXXL_CHECK(stxxl::there(xxlmap, i, 2 * i));
         }
-
         // *********************************************************
         // The lower_bound function will be called
         // *********************************************************
@@ -264,7 +257,6 @@ int main(int argc, char* argv[])
                 key1++;
             }
         }
-
         // *********************************************************
         // The upper_bound function will be called
         // *********************************************************
@@ -290,7 +282,6 @@ int main(int argc, char* argv[])
                 key1++;
             }
         }
-
         // *********************************************************
         // The find function will be called
         // *********************************************************
@@ -316,7 +307,6 @@ int main(int argc, char* argv[])
                 key1++;
             }
         }
-
         // *********************************************************
         // The iterate functions will be called
         // *********************************************************

@@ -46,14 +46,16 @@ void disk_allocator::deallocation_error(
     STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
     if (pred == free_space.end()) {
         STXXL_ERRMSG("pred==free_space.end()");
-    } else {
+    }
+    else {
         if (pred == free_space.begin())
             STXXL_ERRMSG("pred==free_space.begin()");
         STXXL_ERRMSG("pred: begin=" << pred->first << " size=" << pred->second);
     }
     if (succ == free_space.end()) {
         STXXL_ERRMSG("succ==free_space.end()");
-    } else {
+    }
+    else {
         if (succ == free_space.begin())
             STXXL_ERRMSG("succ==free_space.begin()");
         STXXL_ERRMSG("succ: begin=" << succ->first << " size=" << succ->second);

@@ -105,14 +105,16 @@ void wbtl_file::discard(offset_type offset, offset_type size)
     if (physical == address_mapping.end()) {
         // could be OK if the block was never written ...
         //STXXL_ERRMSG("discard: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
-    } else {
+    }
+    else {
         offset_type physical_offset = physical->second;
         address_mapping.erase(physical);
         _add_free_region(physical_offset, size);
         place_map::iterator reverse = reverse_mapping.find(physical_offset);
         if (reverse == reverse_mapping.end()) {
             STXXL_ERRMSG("discard: reverse mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
-        } else {
+        }
+        else {
             assert(offset == (reverse->second).first);
             reverse_mapping.erase(reverse);
         }
@@ -205,7 +207,8 @@ void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
             STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
             //STXXL_THROW_ERRNO(io_error, "wbtl_read of unmapped memory");
             physical_offset = 0xffffffff;
-        } else {
+        }
+        else {
             physical_offset = physical->second;
         }
     }

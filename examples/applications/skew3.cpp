@@ -327,7 +327,8 @@ public:
             quad_type curr = *A;
             if (!quad_eq(prev, curr)) {
                 ++lexname;
-            } else {
+            }
+            else {
                 if (!A.empty() && curr.second != offset_type(0)) {
                     unique = false;
                 }
@@ -1052,7 +1053,8 @@ public:
                     if (tmp.first < mod2_pos) {
                         if (tmp.first + special < mod2_pos) // else: special sentinel tuple is dropped
                             isa1_pair.push(tmp);            // sorter #1
-                    } else {
+                    }
+                    else {
                         isa2_pair.push(tmp);                // sorter #2
                     }
                     ++isa_pairs;

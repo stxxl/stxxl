@@ -640,7 +640,8 @@ public:
                         min_last = *(seqs[i].second - 1);
 
                     STXXL_VERBOSE1("front block of seq " << i << ": front=" << *(seqs[i].first) << " back=" << *(seqs[i].second - 1) << " len=" << seq_i_size);
-                } else {
+                }
+                else {
                     STXXL_VERBOSE1("front block of seq " << i << ": empty");
                 }
             }

@@ -101,7 +101,8 @@ inline void check_sort_settings()
         if (__gnu_parallel::_Settings::get().sort_algorithm != __gnu_parallel::MWMS) {
             if (omp_get_max_threads() <= 2) {
                 did_warn = true;  // no problem with at most 2 threads, no need to check again
-            } else if (!omp_get_nested()) {
+            }
+            else if (!omp_get_nested()) {
                 STXXL_ERRMSG("Inefficient settings detected. To get full potential from your CPU it is recommended to set OMP_NESTED=TRUE in the environment.");
                 did_warn = true;
             }

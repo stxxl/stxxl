@@ -94,7 +94,8 @@ void merge3_iterator(
                 goto s021;
             }
         }
-    } else {
+    }
+    else {
         if (cmp(*source2, *source1)) {
             if (cmp(*source2, *source0)) {
                 goto s102;
@@ -102,7 +103,8 @@ void merge3_iterator(
             else {
                 goto s120;
             }
-        } else {
+        }
+        else {
             goto s210;
         }
     }

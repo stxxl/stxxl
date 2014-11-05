@@ -182,7 +182,8 @@ public:
 
         if (!done) {
             top = index;
-        } else {
+        }
+        else {
             top = -1;
         }
 

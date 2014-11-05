@@ -387,7 +387,6 @@ public:
 
                 return &((*block)[i_subblock]);
             }
-
             // wrong subblock in cache
             else
             {

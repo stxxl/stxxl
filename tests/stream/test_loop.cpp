@@ -207,7 +207,8 @@ struct shuffle
         if (even) {
             ++input;
             apply_shuffle();
-        } else {
+        }
+        else {
             current = next;
         }
         return *this;

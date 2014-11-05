@@ -816,7 +816,8 @@ public:
 
             if (node_visited[target]) {
                 continue;
-            } else {
+            }
+            else {
                 node_visited[target] = true;
             }
 
@@ -1002,11 +1003,14 @@ int benchmark_pqs(int argc, char* argv[])
                            num_insertion_heaps, single_heap_ram, extract_buffer_ram,
                            do_flush_directly);
 #endif
-    } else if (do_stxxlpq) {
+    }
+    else if (do_stxxlpq) {
         stxxlpq = new stxxlpq_type(mem_for_prefetch_pool, mem_for_write_pool);
-    } else if (do_sorter) {
+    }
+    else if (do_sorter) {
         stxxlsorter = new sorter_type(value_type_cmp_smaller(), RAM);
-    } else if (do_stlpq) {
+    }
+    else if (do_stlpq) {
         stlpq = new stlpq_type;
     }
 
@@ -1038,15 +1042,19 @@ int benchmark_pqs(int argc, char* argv[])
             ::do_dijkstra(cppq, n, m);
             ppq_stats();
 #endif
-        } else if (do_stxxlpq) {
+        }
+        else if (do_stxxlpq) {
             Container<stxxlpq_type> cstxxlpq(*stxxlpq);
             ::do_dijkstra(cstxxlpq, n, m);
-        } else if (do_sorter) {
+        }
+        else if (do_sorter) {
             STXXL_MSG("Sorter not supported.");
-        } else if (do_stlpq) {
+        }
+        else if (do_stlpq) {
             Container<stlpq_type> cstlpq(*stlpq);
             ::do_dijkstra(cstlpq, n, m);
-        } else if (do_tbbpq) {
+        }
+        else if (do_tbbpq) {
             STXXL_MSG("TBB not supported yet");
         }
     }
@@ -1062,26 +1070,31 @@ int benchmark_pqs(int argc, char* argv[])
             if (do_intermixed) {
                 if (do_check) {
                     do_bulk_intermixed_check(cppq, do_parallel);
-                } else {
+                }
+                else {
                     if (do_fill) {
                         do_bulk_rand_insert(cppq, seed, do_parallel);
                     }
                     do_bulk_rand_intermixed(cppq, seed, do_fill, do_parallel);
                 }
-            } else {
+            }
+            else {
                 if (do_random) {
                     do_bulk_rand_insert(cppq, seed, do_parallel);
-                } else {
+                }
+                else {
                     do_bulk_insert(cppq, do_parallel);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
                     do_read_check(cppq);
-                } else {
+                }
+                else {
                     do_read(cppq);
                 }
             }
-        } else {
+        }
+        else {
             if (do_intermixed) {
                 if (do_fill) {
                     do_rand_insert(cppq, seed);
@@ -1092,14 +1105,17 @@ int benchmark_pqs(int argc, char* argv[])
             }
             if (do_random) {
                 do_rand_insert(cppq, seed);
-            } else {
+            }
+            else {
                 do_insert(cppq);
             }
             if (do_random && do_check) {
                 do_rand_read_check(cppq, seed);
-            } else if (do_check) {
+            }
+            else if (do_check) {
                 do_read_check(cppq);
-            } else {
+            }
+            else {
                 do_read(cppq);
             }
         }
@@ -1115,26 +1131,31 @@ int benchmark_pqs(int argc, char* argv[])
             if (do_intermixed) {
                 if (do_check) {
                     do_bulk_intermixed_check(cstxxlpq);
-                } else {
+                }
+                else {
                     if (do_fill) {
                         do_bulk_rand_insert(cstxxlpq, seed);
                     }
                     do_bulk_rand_intermixed(cstxxlpq, seed, do_fill);
                 }
-            } else {
+            }
+            else {
                 if (do_random) {
                     do_bulk_rand_insert(cstxxlpq, seed);
-                } else {
+                }
+                else {
                     do_bulk_insert(cstxxlpq);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
                     do_read_check(cstxxlpq);
-                } else {
+                }
+                else {
                     do_read(cstxxlpq);
                 }
             }
-        } else {
+        }
+        else {
             if (do_intermixed) {
                 if (do_fill) {
                     do_rand_insert(cstxxlpq, seed);
@@ -1144,14 +1165,17 @@ int benchmark_pqs(int argc, char* argv[])
             }
             if (do_random) {
                 do_rand_insert(cstxxlpq, seed);
-            } else {
+            }
+            else {
                 do_insert(cstxxlpq);
             }
             if (do_random && do_check) {
                 do_rand_read_check(cstxxlpq, seed);
-            } else if (do_check) {
+            }
+            else if (do_check) {
                 do_read_check(cstxxlpq);
-            } else {
+            }
+            else {
                 do_read(cstxxlpq);
             }
         }
@@ -1165,26 +1189,31 @@ int benchmark_pqs(int argc, char* argv[])
             if (do_intermixed) {
                 if (do_check) {
                     do_bulk_intermixed_check(csorter);
-                } else {
+                }
+                else {
                     if (do_fill) {
                         do_bulk_rand_insert(csorter, seed);
                     }
                     do_bulk_rand_intermixed(csorter, seed, do_fill);
                 }
-            } else {
+            }
+            else {
                 if (do_random) {
                     do_bulk_rand_insert(csorter, seed);
-                } else {
+                }
+                else {
                     do_bulk_insert(csorter);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
                     do_read_check(csorter);
-                } else {
+                }
+                else {
                     do_read(csorter);
                 }
             }
-        } else {
+        }
+        else {
             if (do_intermixed) {
                 if (do_fill) {
                     do_rand_insert(csorter, seed);
@@ -1194,14 +1223,17 @@ int benchmark_pqs(int argc, char* argv[])
             }
             if (do_random) {
                 do_rand_insert(csorter, seed);
-            } else {
+            }
+            else {
                 do_insert(csorter);
             }
             if (do_random && do_check) {
                 do_rand_read_check(csorter, seed);
-            } else if (do_check) {
+            }
+            else if (do_check) {
                 do_read_check(csorter);
-            } else {
+            }
+            else {
                 do_read(csorter);
             }
         }
@@ -1215,26 +1247,31 @@ int benchmark_pqs(int argc, char* argv[])
             if (do_intermixed) {
                 if (do_check) {
                     do_bulk_intermixed_check(cstlpq);
-                } else {
+                }
+                else {
                     if (do_fill) {
                         do_bulk_rand_insert(cstlpq, seed);
                     }
                     do_rand_intermixed(cstlpq, seed, do_fill);
                 }
-            } else {
+            }
+            else {
                 if (do_random) {
                     do_bulk_rand_insert(cstlpq, seed);
-                } else {
+                }
+                else {
                     do_bulk_insert(cstlpq);
                 }
                 if (do_check) {
                     STXXL_CHECK(!do_random);
                     do_read_check(cstlpq);
-                } else {
+                }
+                else {
                     do_read(cstlpq);
                 }
             }
-        } else {
+        }
+        else {
             if (do_intermixed) {
                 if (do_fill) {
                     do_rand_insert(cstlpq, seed);
@@ -1244,14 +1281,17 @@ int benchmark_pqs(int argc, char* argv[])
             }
             if (do_random) {
                 do_rand_insert(cstlpq, seed);
-            } else {
+            }
+            else {
                 do_insert(cstlpq);
             }
             if (do_random && do_check) {
                 do_rand_read_check(cstlpq, seed);
-            } else if (do_check) {
+            }
+            else if (do_check) {
                 do_read_check(cstlpq);
-            } else {
+            }
+            else {
                 do_read(cstlpq);
             }
         }

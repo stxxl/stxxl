@@ -66,7 +66,8 @@ public:
 
         if (res == 0 || res == EBUSY) {
             STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
-        } else {
+        }
+        else {
             STXXL_THROW_ERRNO2(resource_error, "pthread_mutex_trylock() failed", res);
         }
 

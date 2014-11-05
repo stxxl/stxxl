@@ -330,7 +330,6 @@ public:
                 iterator(this, i_bucket, node,
                          0, src_internal, false, value.first), old_deleted);
         }
-
         // search external memory ...
         else
         {

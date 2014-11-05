@@ -161,7 +161,8 @@ int main()
             loser.insert_segment(seq5, 4 * B);
             loser.insert_segment(seq6, 4 * B);
             loser.insert_segment(seq7, 4 * B);
-        } else {
+        }
+        else {
             delete[] seq5;
             delete[] seq6;
             delete[] seq7;
