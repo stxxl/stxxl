@@ -999,7 +999,8 @@ int benchmark_pqs(int argc, char* argv[])
 
     if (do_ppq) {
 #if STXXL_PARALLEL
-        ppq = new ppq_type(num_prefetchers, num_write_buffers, RAM,
+        ppq = new ppq_type(value_type_cmp_greater(),
+                           RAM, num_prefetchers, num_write_buffers,
                            num_insertion_heaps, single_heap_ram, extract_buffer_ram,
                            do_flush_directly);
 #endif

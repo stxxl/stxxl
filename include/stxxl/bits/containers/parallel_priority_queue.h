@@ -601,12 +601,12 @@ protected:
  * structures. These three sources, plus the deletion buffer are combined using
  * a "head" inner tree containing only up to four item.
  */
-template <class Parent>
+template <class ParentType>
 class minima_tree
 {
 public:
-    typedef Parent parent_type;
-    typedef minima_tree<Parent> self_type;
+    typedef ParentType parent_type;
+    typedef minima_tree<ParentType> self_type;
 
     typedef typename parent_type::inv_compare_type compare_type;
     typedef typename parent_type::value_type value_type;
@@ -626,12 +626,12 @@ protected:
         heaps_type& m_heaps;
         ias_type& m_ias;
         eas_type& m_eas;
-        compare_type& m_compare;
+        const compare_type& m_compare;
         unsigned m_cache_line_factor;
 
         head_comp(self_type& parent, heaps_type& heaps,
                   ias_type& ias, eas_type& eas,
-                  compare_type& compare, unsigned cache_line_factor)
+                  const compare_type& compare, unsigned cache_line_factor)
             : m_parent(parent),
               m_heaps(heaps),
               m_ias(ias),
@@ -668,10 +668,10 @@ protected:
     struct heaps_comp
     {
         heaps_type& m_heaps;
-        compare_type& m_compare;
+        const compare_type& m_compare;
         unsigned m_cache_line_factor;
 
-        heaps_comp(heaps_type& heaps, compare_type& compare,
+        heaps_comp(heaps_type& heaps, const compare_type& compare,
                    unsigned cache_line_factor)
             : m_heaps(heaps), m_compare(compare),
               m_cache_line_factor(cache_line_factor)
@@ -692,9 +692,9 @@ protected:
     struct ia_comp
     {
         ias_type& m_ias;
-        compare_type& m_compare;
+        const compare_type& m_compare;
 
-        ia_comp(ias_type& ias, compare_type& compare)
+        ia_comp(ias_type& ias, const compare_type& compare)
             : m_ias(ias), m_compare(compare)
         { }
 
@@ -708,9 +708,9 @@ protected:
     struct ea_comp
     {
         eas_type& m_eas;
-        compare_type& m_compare;
+        const compare_type& m_compare;
 
-        ea_comp(eas_type& eas, compare_type& compare)
+        ea_comp(eas_type& eas, const compare_type& compare)
             : m_eas(eas), m_compare(compare)
         { }
 
@@ -726,7 +726,7 @@ protected:
     parent_type& m_parent;
 
     //! value_type comparator
-    compare_type m_compare;
+    const compare_type& m_compare;
 
     unsigned m_cache_line_factor;
 
@@ -755,7 +755,7 @@ public:
     //! Construct the tree of minima sources.
     minima_tree(parent_type& parent)
         : m_parent(parent),
-          m_compare(),
+          m_compare(parent.m_inv_compare),
           m_cache_line_factor(m_parent.c_cache_line_factor),
           // construct comparators
           m_head_comp(*this, parent.m_insertion_heaps,
@@ -939,7 +939,7 @@ public:
  */
 template <
     class ValueType,
-    class CompareType,
+    class CompareType = std::less<ValueType>,
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY,
     uint64 BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     uint64 DefaultMemSize = 1* 1024L* 1024L* 1024L,
@@ -982,13 +982,18 @@ protected:
                                     block_size, DefaultMemSize, MaxItems> > minima_type;
     //! allow minima tree access to internal data structures
     friend class ppq_local::minima_tree<
-        parallel_priority_queue<ValueType, CompareType, AllocStrategy,
+        parallel_priority_queue<ValueType, compare_type, alloc_strategy,
                                 block_size, DefaultMemSize, MaxItems> >;
 
     //! Inverse comparison functor
     struct inv_compare_type
     {
-        CompareType compare;
+        const compare_type& compare;
+
+        inv_compare_type(const compare_type& c)
+            : compare(c)
+        { }
+
         bool operator () (const value_type& x, const value_type& y) const
         {
             return compare(y, x);
@@ -996,7 +1001,7 @@ protected:
     };
 
     //! <-Comparator for ValueType
-    CompareType m_compare;
+    compare_type m_compare;
 
     //! >-Comparator for ValueType
     inv_compare_type m_inv_compare;
@@ -1191,14 +1196,16 @@ public:
     /*!
      * Constructor.
      *
+     * \param compare Comparator for priority queue, which is a Max-PQ.
+     *
+     * \param total_ram Maximum RAM usage. 0 = Default = Use the template
+     * value Ram.
+     *
      * \param num_prefetch_buffer_blocks Number of prefetch blocks per external
      * array. Default = c_num_prefetch_buffer_blocks
      *
      * \param num_write_buffer_blocks Number of write buffer blocks for a new
      * external array being filled. 0 = Default = c_num_write_buffer_blocks
-     *
-     * \param total_ram Maximum RAM usage. 0 = Default = Use the template
-     * value Ram.
      *
      * \param num_insertion_heaps Number of insertion heaps. 0 = Determine by
      * omp_get_max_threads(). Default = Determine by omp_get_max_threads().
@@ -1214,14 +1221,17 @@ public:
      * is RAM left but flush directly into an external array.
      */
     parallel_priority_queue(
+        const compare_type& compare = compare_type(),
+        size_type total_ram = DefaultMemSize,
         unsigned_type num_prefetch_buffer_blocks = c_num_prefetch_buffer_blocks,
         unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
-        size_type total_ram = DefaultMemSize,
         unsigned_type num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
         size_type extract_buffer_ram = 0,
         bool flush_directly_to_hd = false)
-        : m_num_prefetchers(num_prefetch_buffer_blocks),
+        : m_compare(compare),
+          m_inv_compare(m_compare),
+          m_num_prefetchers(num_prefetch_buffer_blocks),
           m_num_write_buffers(num_write_buffer_blocks),
 #if STXXL_PARALLEL
           m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : omp_get_max_threads()),
@@ -1239,10 +1249,6 @@ public:
           m_internal_size(0),
           m_external_size(0),
           m_insertion_heaps(m_num_insertion_heaps * c_cache_line_factor),
-          m_extract_buffer(0),
-          m_internal_arrays(0),
-          m_external_arrays(0),
-          m_aggregated_pushes(0),
           m_minima(*this),
           m_do_flush_directly_to_hd(flush_directly_to_hd)
     {
