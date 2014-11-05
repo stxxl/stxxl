@@ -646,7 +646,9 @@ protected:
             case HEAP:
                 return m_heaps[m_parent.m_heaps.top() * m_cache_line_factor][0];
             case EB:
-                return m_parent.m_parent.extract_buffer[m_parent.m_parent.extract_index];
+                return m_parent.m_parent.m_extract_buffer[
+                    m_parent.m_parent.m_extract_buffer_index
+                ];
             case IA:
                 return m_ias[m_parent.m_ia.top()].get_min();
             case EA:
@@ -756,17 +758,18 @@ public:
           m_compare(),
           m_cache_line_factor(m_parent.c_cache_line_factor),
           // construct comparators
-          m_head_comp(*this, parent.insertion_heaps,
-                      parent.internal_arrays, parent.external_arrays,
+          m_head_comp(*this, parent.m_insertion_heaps,
+                      parent.m_internal_arrays, parent.m_external_arrays,
                       m_compare, m_cache_line_factor),
-          m_heaps_comp(parent.insertion_heaps, m_compare, m_cache_line_factor),
-          m_ia_comp(parent.internal_arrays, m_compare),
-          m_ea_comp(parent.external_arrays, m_compare),
+          m_heaps_comp(parent.m_insertion_heaps, m_compare, m_cache_line_factor),
+          m_ia_comp(parent.m_internal_arrays, m_compare),
+          m_ea_comp(parent.m_external_arrays, m_compare),
           // construct header winner tree
           m_head(4, m_head_comp),
-          m_heaps(m_parent.num_insertion_heaps, m_heaps_comp),
+          m_heaps(m_parent.m_num_insertion_heaps, m_heaps_comp),
           m_ia(initial_ia_size, m_ia_comp),
-          m_ea(initial_ea_size, m_ea_comp) { }
+          m_ea(initial_ea_size, m_ea_comp)
+    { }
 
     //! Return smallest items of head winner tree.
     std::pair<unsigned, unsigned> top()
@@ -921,8 +924,8 @@ public:
  * \tparam CompareType The comparator type used to determine whether one
  * element is smaller than another element.
  *
- * \tparam Ram Maximum memory consumption by the queue. Can be overwritten by
- * the constructor. Default = 8 GiB.
+ * \tparam DefaultMemSize Maximum memory consumption by the queue. Can be
+ * overwritten by the constructor. Default = 1 GiB.
  *
  * \tparam MaxItems Maximum number of elements the queue contains at one
  * time. Default = 0 = unlimited. This is no hard limit and only used for
@@ -938,37 +941,65 @@ template <
     class ValueType,
     class CompareType,
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY,
-    stxxl::uint64 BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    stxxl::uint64 Ram = 8* 1024L* 1024L* 1024L,
-    stxxl::uint64 MaxItems = 0
+    uint64 BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    uint64 DefaultMemSize = 1* 1024L* 1024L* 1024L,
+    uint64 MaxItems = 0
     >
 class parallel_priority_queue : private noncopyable
 {
-    //! \addtogroup types Types
+    //! \name Types
     //! \{
 
 public:
     typedef ValueType value_type;
     typedef CompareType compare_type;
-    typedef stxxl::uint64 size_type;
+    typedef AllocStrategy alloc_strategy;
+    static const uint64 block_size = BlockSize;
+    typedef uint64 size_type;
 
 protected:
-    typedef typed_block<BlockSize, ValueType> block_type;
-    typedef std::vector<BID<BlockSize> > bid_vector;
+    typedef typed_block<block_size, ValueType> block_type;
+    typedef std::vector<BID<block_size> > bid_vector;
     typedef bid_vector bids_container_type;
-    typedef ppq_local::external_array<ValueType, BlockSize, AllocStrategy> external_array_type;
+    typedef ppq_local::internal_array<ValueType> internal_array_type;
+    typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
     typedef typename std::vector<ValueType>::iterator extract_iterator;
     typedef typename std::vector<ValueType>::iterator value_iterator;
     typedef typename block_type::iterator block_iterator;
+
+    //! type of insertion heap itself
     typedef std::vector<ValueType> heap_type;
 
-    struct inv_compare_type {
+    //! type of insertion heaps array
+    typedef typename std::vector<heap_type> heaps_type;
+    //! type of internal arrays vector
+    typedef typename std::vector<internal_array_type> internal_arrays_type;
+    //! type of external arrays vector
+    typedef typename std::vector<external_array_type> external_arrays_type;
+    //! type of minima tree combining the structures
+    typedef ppq_local::minima_tree<
+            parallel_priority_queue<value_type, compare_type, alloc_strategy,
+                                    block_size, DefaultMemSize, MaxItems> > minima_type;
+    //! allow minima tree access to internal data structures
+    friend class ppq_local::minima_tree<
+        parallel_priority_queue<ValueType, CompareType, AllocStrategy,
+                                block_size, DefaultMemSize, MaxItems> >;
+
+    //! Inverse comparison functor
+    struct inv_compare_type
+    {
         CompareType compare;
         bool operator () (const value_type& x, const value_type& y) const
         {
             return compare(y, x);
         }
     };
+
+    //! <-Comparator for ValueType
+    CompareType m_compare;
+
+    //! >-Comparator for ValueType
+    inv_compare_type m_inv_compare;
 
     //! Defines if statistics are gathered: dummy_custom_stats_counter or
     //! custom_stats_counter
@@ -979,7 +1010,7 @@ protected:
 
     //! \}
 
-    //! \addtogroup ctparameters Compile-Time Parameters
+    //! \name Compile-Time Parameters
     //! \{
 
     //! Merge sorted heaps when flushing into an internal array.
@@ -1002,10 +1033,11 @@ protected:
     static const unsigned c_num_reserved_external_arrays = 10;
 
     //! Size of a single insertion heap in Byte, if not defined otherwise in
-    //! the constructor
-    static const size_type c_default_single_heap_ram = 1L * 1024L * 1024L; // 10 MiB
+    //! the constructor. Default: 1 MiB
+    static const size_type c_default_single_heap_ram = 1L * 1024L * 1024L;
 
-    //! Default limit of the extract buffer ram consumption as share of total ram
+    //! Default limit of the extract buffer ram consumption as share of total
+    //! ram
     constexpr static double c_default_extract_buffer_ram_part = 0.05;
 
     //! Leave out (c_cache_line_factor-1) slots between the heaps in the
@@ -1018,20 +1050,12 @@ protected:
     //! entries.  @see c_cache_line_factor
     static const unsigned c_cache_line_space = 128;
 
-    //! \}
-
-    typedef typename std::vector<heap_type> heaps_type;
-    typedef typename std::vector<external_array_type> external_arrays_type;
-    typedef typename std::vector<ppq_local::internal_array<ValueType> > internal_arrays_type;
-    typedef ppq_local::minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> > minima_type;
-    friend class ppq_local::minima_tree<parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize, Ram, MaxItems> >;
-
     /*!
      * Limit the size of the extract buffer to an absolute value.
      *
-     * The actual size can be set using the _extract_buffer_ram parameter of
-     * the constructor. If this parameter is not set, the value is calculated
-     * by (total_ram*c_default_extract_buffer_ram_part)
+     * The actual size can be set using the extract_buffer_ram parameter of the
+     * constructor. If this parameter is not set, the value is calculated by
+     * (total_ram*c_default_extract_buffer_ram_part)
      *
      * If c_limit_extract_buffer==false, the memory consumption of the extract
      * buffer is only limited by the number of external and internal
@@ -1046,114 +1070,122 @@ protected:
     //! is faster than bulk_push.
     static const unsigned c_single_insert_limit = 100;
 
+    //! \}
+
+    //! \name Parameters and Sizes for Memory Allocation Policy
+
     //! Number of prefetch blocks per external array
-    unsigned num_prefetchers;
+    const unsigned m_num_prefetchers;
 
     //! Number of write buffer blocks for a new external array being filled
-    unsigned num_write_buffers;
-
-    //! The size of the bulk currently being inserted
-    size_type bulk_size;
-
-    //! If the bulk currently being insered is very lare, this boolean is set
-    //! and bulk_push_steps just accumulate the elements for eventual sorting.
-    bool is_very_large_bulk;
-
-    //! Index of the currently smallest element in the extract buffer
-    size_type extract_index;
-
-    //! Number of elements in the external arrays
-    size_type external_size;
-
-    //! Number of elements in the internal arrays
-    size_type internal_size;
-
-    //! Number of elements int the insertion heaps
-    size_type insertion_size;
-
-    //! Number of elements in the extract buffer
-    size_type buffered_size;
+    const unsigned m_num_write_buffers;
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
-    unsigned num_insertion_heaps;
+    const unsigned m_num_insertion_heaps;
 
     //! Capacity of one inserion heap
-    size_type insertion_heap_capacity;
+    size_type m_insertion_heap_capacity;
 
     //! Using this parameter you can reserve more space for the insertion heaps
     //! than visible to the algorithm.  This avoids memory allocation if the
     //! data is not distributed evenly among the heaps.
-    double real_insertion_heap_size_factor;
+    const double m_real_insertion_heap_size_factor;
 
     //! Total amount of internal memory
-    size_type total_ram;
+    const size_type m_mem_total;
 
     //! Maximum size of extract buffer in number of elements
     //! Only relevant if c_limit_extract_buffer==true
-    size_type extract_buffer_limit;
+    size_type m_extract_buffer_limit;
 
     //! Size of all insertion heaps together in bytes
-    size_type ram_for_heaps;
+    const size_type m_mem_for_heaps;
 
     //! Free memory in bytes
-    size_type ram_left;
+    size_type m_mem_left;
 
     //! Amount of internal memory an external array needs during it's lifetime
     //! in bytes
-    size_type ram_per_external_array;
+    size_type m_mem_per_external_array;
 
     //! Amount of internal memory an internal array needs during it's lifetime
     //! in bytes
-    size_type ram_per_internal_array;
+    size_type m_mem_per_internal_array;
 
-    /*
-     * Data.
-     */
+    //! \}
 
-    //! The sorted arrays in external memory
-    std::vector<external_array_type> external_arrays;
+    //! The size of the bulk currently being inserted
+    size_type m_current_bulk_size;
 
-    //! The sorted arrays in internal memory
-    internal_arrays_type internal_arrays;
+    //! If the bulk currently being inserted is very large, this boolean is set
+    //! and bulk_push_steps just accumulate the elements for eventual sorting.
+    bool m_is_very_large_bulk;
 
-    //! The buffer where external (and internal) arrays are merged into for
-    //! extracting
-    std::vector<ValueType> extract_buffer;
+    //! Index of the currently smallest element in the extract buffer
+    size_type m_extract_buffer_index;
+
+    //! \name Number of elements currently in the data structures
+    //! \{
+
+    //! Number of elements int the insertion heaps
+    size_type m_heaps_size;
+
+    //! Number of elements in the extract buffer
+    size_type m_extract_buffer_size;
+
+    //! Number of elements in the internal arrays
+    size_type m_internal_size;
+
+    //! Number of elements in the external arrays
+    size_type m_external_size;
+
+    //! \}
+
+    //! \name Data Holding Structures
+    //! \{
 
     //! The heaps where new elements are usually inserted into
-    std::vector<heap_type> insertion_heaps;
+    std::vector<heap_type> m_insertion_heaps;
+
+    //! The extract buffer where external (and internal) arrays are merged into
+    //! for extracting
+    std::vector<ValueType> m_extract_buffer;
+
+    //! The sorted arrays in internal memory
+    internal_arrays_type m_internal_arrays;
+
+    //! The sorted arrays in external memory
+    std::vector<external_array_type> m_external_arrays;
 
     //! The aggregated pushes. They cannot be extracted yet.
-    std::vector<ValueType> aggregated_pushes;
+    std::vector<ValueType> m_aggregated_pushes;
 
-    //! <-Comparator for ValueType
-    CompareType compare;
+    //! The winner tree containing the smallest values of all sources
+    //! where the globally smallest element could come from.
+    minima_type m_minima;
 
-    //! >-Comparator for ValueType
-    inv_compare_type inv_compare;
+    //! \}
 
     /*
      * Helper class needed to remove empty external arrays.
      */
 
     //! Unary operator which returns true if the external array has run empty.
-    struct empty_array_eraser {
-        bool operator () (external_array_type& a) const { return a.empty(); }
+    struct empty_external_array_eraser {
+        bool operator () (external_array_type& a) const
+        { return a.empty(); }
     };
 
     //! Unary operator which returns true if the internal array has run empty.
     struct empty_internal_array_eraser {
-        bool operator () (ppq_local::internal_array<ValueType>& a) const { return a.empty(); }
+        bool operator () (internal_array_type& a) const
+        { return a.empty(); }
     };
-
-    //! The winner tree containing the smallest values of all sources
-    //! where the globally smallest element could come from.
-    minima_type m_minima;
 
     const bool m_do_flush_directly_to_hd;
 
 public:
-    //! \addtogroup init Initialization
+    //! \name Initialization
     //! \{
 
     /*!
@@ -1165,13 +1197,13 @@ public:
      * \param num_write_buffer_blocks Number of write buffer blocks for a new
      * external array being filled. 0 = Default = c_num_write_buffer_blocks
      *
-     * \param _total_ram Maximum RAM usage. 0 = Default = Use the template
+     * \param total_ram Maximum RAM usage. 0 = Default = Use the template
      * value Ram.
      *
-     * \param _num_insertion_heaps Number of insertion heaps. 0 = Determine by
+     * \param num_insertion_heaps Number of insertion heaps. 0 = Determine by
      * omp_get_max_threads(). Default = Determine by omp_get_max_threads().
      *
-     * \param _single_heap_ram Memory usage for a single insertion heap. 0 =
+     * \param single_heap_ram Memory usage for a single insertion heap. 0 =
      * Default = c_single_heap_ram.
      *
      * \param extract_buffer_ram Memory usage for the extract buffer. Only
@@ -1182,128 +1214,131 @@ public:
      * is RAM left but flush directly into an external array.
      */
     parallel_priority_queue(
-        unsigned num_prefetch_buffer_blocks = 0,
-        unsigned num_write_buffer_blocks = 0,
-        size_type _total_ram = 0,
-        unsigned _num_insertion_heaps = 0,
-        size_type _single_heap_ram = 0,
+        unsigned_type num_prefetch_buffer_blocks = c_num_prefetch_buffer_blocks,
+        unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
+        size_type total_ram = DefaultMemSize,
+        unsigned_type num_insertion_heaps = 0,
+        size_type single_heap_ram = c_default_single_heap_ram,
         size_type extract_buffer_ram = 0,
         bool flush_directly_to_hd = false)
-        : num_prefetchers((num_prefetch_buffer_blocks > 0) ? num_prefetch_buffer_blocks : c_num_prefetch_buffer_blocks),
-          num_write_buffers((num_write_buffer_blocks > 0) ? num_write_buffer_blocks : c_num_write_buffer_blocks),
-          bulk_size(0),
-          is_very_large_bulk(false),
-          extract_index(0),
-          external_size(0),
-          internal_size(0),
-          insertion_size(0),
-          buffered_size(0),
-        #if STXXL_PARALLEL
-          num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : omp_get_max_threads()),
-        #else
-          num_insertion_heaps((_num_insertion_heaps > 0) ? _num_insertion_heaps : 1),
-        #endif
-          real_insertion_heap_size_factor(1 + 1 / num_insertion_heaps),
-          total_ram((_total_ram > 0) ? _total_ram : Ram),
-          ram_for_heaps(num_insertion_heaps * ((_single_heap_ram > 0) ? _single_heap_ram : c_default_single_heap_ram)),
-          external_arrays(0),
-          internal_arrays(0),
-          extract_buffer(0),
-          insertion_heaps(num_insertion_heaps * c_cache_line_factor),
-          aggregated_pushes(0),
+        : m_num_prefetchers(num_prefetch_buffer_blocks),
+          m_num_write_buffers(num_write_buffer_blocks),
+#if STXXL_PARALLEL
+          m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : omp_get_max_threads()),
+#else
+          m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : 1),
+#endif
+          m_real_insertion_heap_size_factor(1 + 1 / m_num_insertion_heaps),
+          m_mem_total(total_ram),
+          m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
+          m_current_bulk_size(0),
+          m_is_very_large_bulk(false),
+          m_extract_buffer_index(0),
+          m_heaps_size(0),
+          m_extract_buffer_size(0),
+          m_internal_size(0),
+          m_external_size(0),
+          m_insertion_heaps(m_num_insertion_heaps * c_cache_line_factor),
+          m_extract_buffer(0),
+          m_internal_arrays(0),
+          m_external_arrays(0),
+          m_aggregated_pushes(0),
           m_minima(*this),
           m_do_flush_directly_to_hd(flush_directly_to_hd)
     {
         srand(static_cast<unsigned>(time(NULL)));
 
         if (c_limit_extract_buffer) {
-            extract_buffer_limit = (extract_buffer_ram > 0) ? extract_buffer_ram / sizeof(ValueType) : static_cast<size_type>((static_cast<double>(total_ram) * c_default_extract_buffer_ram_part / static_cast<double>(sizeof(ValueType))));
+            m_extract_buffer_limit = (extract_buffer_ram > 0)
+                                     ? extract_buffer_ram / sizeof(ValueType)
+                                     : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(ValueType)));
         }
 
-        insertion_heap_capacity = ram_for_heaps / (num_insertion_heaps * sizeof(ValueType));
+        m_insertion_heap_capacity = m_mem_for_heaps / (m_num_insertion_heaps * sizeof(ValueType));
 
-        for (unsigned i = 0; i < num_insertion_heaps * c_cache_line_factor; ++i) {
-            insertion_heaps[i].reserve(c_cache_line_space);
-        }
+        for (size_t i = 0; i < m_num_insertion_heaps * c_cache_line_factor; ++i)
+            m_insertion_heaps[i].reserve(c_cache_line_space);
 
-        for (unsigned i = 0; i < num_insertion_heaps; ++i) {
-            insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
+        for (size_t i = 0; i < m_num_insertion_heaps; ++i) {
+            m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
         }
 
         init_memmanagement();
 
-        external_arrays.reserve(c_num_reserved_external_arrays);
+        m_external_arrays.reserve(c_num_reserved_external_arrays);
 
         if (c_merge_sorted_heaps) {
-            internal_arrays.reserve(total_ram / ram_for_heaps);
+            m_internal_arrays.reserve(m_mem_total / m_mem_for_heaps);
         }
         else {
-            internal_arrays.reserve(total_ram * num_insertion_heaps / ram_for_heaps);
+            m_internal_arrays.reserve(m_mem_total * m_num_insertion_heaps / m_mem_for_heaps);
         }
     }
 
     //! Destructor.
-    ~parallel_priority_queue() { }
+    ~parallel_priority_queue()
+    { }
 
 protected:
     //! Initializes member variables concerning the memory management.
     void init_memmanagement()
     {
         // total_ram - ram for the heaps - ram for the heap merger - ram for the external array write buffer -
-        ram_left = total_ram - 2 * ram_for_heaps - num_write_buffers * BlockSize;
+        m_mem_left = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size;
 
         // prefetch blocks + first block of array
-        ram_per_external_array = (num_prefetchers + 1) * BlockSize;
+        m_mem_per_external_array = (m_num_prefetchers + 1) * block_size;
 
         if (c_merge_sorted_heaps) {
             // all heaps become one internal array
-            ram_per_internal_array = ram_for_heaps;
+            m_mem_per_internal_array = m_mem_for_heaps;
         }
         else {
             // each heap becomes one internal array
-            ram_per_internal_array = ram_for_heaps / num_insertion_heaps;
+            m_mem_per_internal_array = m_mem_for_heaps / m_num_insertion_heaps;
         }
 
         if (c_limit_extract_buffer) {
             // ram for the extract buffer
-            ram_left -= extract_buffer_limit * sizeof(ValueType);
+            m_mem_left -= m_extract_buffer_limit * sizeof(ValueType);
         }
         else {
             // each: part of the (maximum) ram for the extract buffer
 
-            ram_per_external_array += BlockSize;
+            m_mem_per_external_array += block_size;
 
             if (c_merge_ias_into_eb) {
-                // we have to reserve space in the size of the whole array: very inefficient!
+                // we have to reserve space in the size of the whole array:
+                // very inefficient!
                 if (c_merge_sorted_heaps) {
-                    ram_per_internal_array += ram_for_heaps;
+                    m_mem_per_internal_array += m_mem_for_heaps;
                 }
                 else {
-                    ram_per_internal_array += ram_for_heaps / num_insertion_heaps;
+                    m_mem_per_internal_array += m_mem_for_heaps / m_num_insertion_heaps;
                 }
             }
         }
 
         if (c_merge_sorted_heaps) {
             // part of the ram for the merge buffer
-            ram_left -= ram_for_heaps;
+            m_mem_left -= m_mem_for_heaps;
         }
 
         if (m_do_flush_directly_to_hd) {
-            if (ram_left < 2 * ram_per_external_array) {
+            if (m_mem_left < 2 * m_mem_per_external_array) {
                 STXXL_ERRMSG("Insufficent memory.");
                 exit(EXIT_FAILURE);
             }
-            else if (ram_left < 4 * ram_per_external_array) {
+            else if (m_mem_left < 4 * m_mem_per_external_array) {
                 STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
             }
         }
         else {
-            if (ram_left < 2 * ram_per_external_array + ram_per_internal_array) {
+            if (m_mem_left < 2 * m_mem_per_external_array + m_mem_per_internal_array) {
                 STXXL_ERRMSG("Insufficent memory.");
                 exit(EXIT_FAILURE);
             }
-            else if (ram_left < 4 * ram_per_external_array + 2 * ram_per_internal_array) {
+            else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_per_internal_array) {
                 STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
             }
         }
@@ -1311,14 +1346,14 @@ protected:
 
     //! \}
 
-    //! \addtogroup properties Properties
+    //! \name Properties
     //! \{
 
 public:
     //! The number of elements in the queue.
     inline size_type size() const
     {
-        return insertion_size + internal_size + external_size + buffered_size;
+        return m_heaps_size + m_internal_size + m_external_size + m_extract_buffer_size;
     }
 
     //! Returns if the queue is empty.
@@ -1330,35 +1365,35 @@ public:
     //! The memory consumption in Bytes.
     inline size_type memory_consumption() const
     {
-        return (total_ram - ram_left);
+        return (m_mem_total - m_mem_left);
     }
 
 protected:
     //! Returns if the extract buffer is empty.
     inline bool extract_buffer_empty() const
     {
-        return (buffered_size == 0);
+        return (m_extract_buffer_size == 0);
     }
 
     //! \}
 
 public:
-    //! \addtogroup bulkops Bulk Operations
+    //! \name Bulk Operations
     //! \{
 
     /*!
      * Start a sequence of push operations.
-     * \param _bulk_size Number of elements to push before the next pop.
+     * \param bulk_size Number of elements to push before the next pop.
      */
-    void bulk_push_begin(size_type _bulk_size)
+    void bulk_push_begin(size_type bulk_size)
     {
-        bulk_size = _bulk_size;
-        size_type heap_capacity = num_insertion_heaps * insertion_heap_capacity;
-        if (_bulk_size > heap_capacity) {
-            is_very_large_bulk = true;
+        m_current_bulk_size = bulk_size;
+        size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
+        if (bulk_size > heap_capacity) {
+            m_is_very_large_bulk = true;
             return;
         }
-        if (_bulk_size + insertion_size > heap_capacity) {
+        if (bulk_size + m_heaps_size > heap_capacity) {
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
             }
@@ -1373,32 +1408,30 @@ public:
      * Run bulk_push_begin() before using this method.
      *
      * \param element The element to push.
+     * \param thread_num The id of the insertion heap / thread id to use.
      */
     void bulk_push_step(const ValueType& element, const int thread_num = -1)
     {
-        assert(bulk_size > 0);
+        assert(m_current_bulk_size > 0);
 
-        if (is_very_large_bulk) {
+        if (m_is_very_large_bulk) {
             aggregate_push(element);
             return;
         }
 
         unsigned id;
-        if (thread_num > -1) {
+        if (thread_num > -1)
             id = thread_num;
-        #if STXXL_PARALLEL
-        }
-        else if (omp_get_num_threads() > 1) {
+#if STXXL_PARALLEL
+        else if (omp_get_num_threads() > 1)
             id = omp_get_thread_num();
-        #endif
-        }
-        else {
-            id = rand() % num_insertion_heaps;
-        }
+#endif
+        else
+            id = rand() % m_num_insertion_heaps;
 
         // TODO: check if full? Alternative: real_insertion_heap_size_factor
-        insertion_heaps[id * c_cache_line_factor].push_back(element);
-        std::push_heap(insertion_heaps[id * c_cache_line_factor].begin(), insertion_heaps[id * c_cache_line_factor].end(), compare);
+        m_insertion_heaps[id * c_cache_line_factor].push_back(element);
+        std::push_heap(m_insertion_heaps[id * c_cache_line_factor].begin(), m_insertion_heaps[id * c_cache_line_factor].end(), m_compare);
         // The following would avoid problems if the bulk size specified in
         // bulk_push_begin is not correct.
         // insertion_size += bulk_size; must then be removed from bulk_push_end().
@@ -1411,16 +1444,16 @@ public:
      */
     void bulk_push_end()
     {
-        if (is_very_large_bulk) {
+        if (m_is_very_large_bulk) {
             flush_aggregated_pushes();
-            is_very_large_bulk = false;
+            m_is_very_large_bulk = false;
             return;
         }
 
-        insertion_size += bulk_size;
-        bulk_size = 0;
-        for (unsigned i = 0; i < num_insertion_heaps; ++i) {
-            if (!insertion_heaps[i * c_cache_line_factor].empty()) {
+        m_heaps_size += m_current_bulk_size;
+        m_current_bulk_size = 0;
+        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
+            if (!m_insertion_heaps[i * c_cache_line_factor].empty()) {
                 m_minima.update_heap(i);
             }
         }
@@ -1433,14 +1466,14 @@ public:
      */
     void bulk_push(std::vector<ValueType>& elements)
     {
-        size_type heap_capacity = num_insertion_heaps * insertion_heap_capacity;
+        size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
         if (elements.size() > heap_capacity / 2) {
             flush_array(elements);
             return;
         }
 
         bulk_push_begin(elements.size());
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         #pragma omp parallel
         {
             const unsigned thread_num = omp_get_thread_num();
@@ -1449,18 +1482,18 @@ public:
                 bulk_push_step(elements[i], thread_num);
             }
         }
-        #else
-        const unsigned thread_num = rand() % num_insertion_heaps;
+#else
+        const unsigned thread_num = rand() % m_num_insertion_heaps;
         for (size_type i = 0; i < elements.size(); ++i) {
             bulk_push_step(elements[i], thread_num);
         }
-        #endif
+#endif
         bulk_push_end();
     }
 
     //! \}
 
-    //! \addtogroup aggrops Aggregation Operations
+    //! \name Aggregation Operations
     //! \{
 
     /*!
@@ -1472,48 +1505,46 @@ public:
      */
     void aggregate_push(const ValueType& element)
     {
-        aggregated_pushes.push_back(element);
+        m_aggregated_pushes.push_back(element);
     }
 
     /*!
      * Insert the aggregated values into the queue using push(), bulk insert,
      * or sorting, depending on the number of aggregated values.
-     * \param element	The element to push.
-     * \see  c_single_insert_limit
      */
     void flush_aggregated_pushes()
     {
-        size_type size = aggregated_pushes.size();
+        size_type size = m_aggregated_pushes.size();
         size_type ram_internal = 2 * size * sizeof(ValueType); // ram for the sorted array + part of the ram for the merge buffer
-        size_type heap_capacity = num_insertion_heaps * insertion_heap_capacity;
+        size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
 
-        if (ram_internal > ram_for_heaps / 2) {
-            flush_array(aggregated_pushes);
+        if (ram_internal > m_mem_for_heaps / 2) {
+            flush_array(m_aggregated_pushes);
         }
-        else if ((aggregated_pushes.size() > c_single_insert_limit) && (aggregated_pushes.size() < heap_capacity)) {
-            bulk_push(aggregated_pushes);
+        else if ((m_aggregated_pushes.size() > c_single_insert_limit) && (m_aggregated_pushes.size() < heap_capacity)) {
+            bulk_push(m_aggregated_pushes);
         }
         else {
-            for (value_iterator i = aggregated_pushes.begin(); i != aggregated_pushes.end(); ++i) {
+            for (value_iterator i = m_aggregated_pushes.begin(); i != m_aggregated_pushes.end(); ++i) {
                 push(*i);
             }
         }
 
-        aggregated_pushes.clear();
+        m_aggregated_pushes.clear();
     }
 
     //! \}
 
-    //! \addtogroup stdops std::priority_queue complient operations
+    //! \name std::priority_queue compliant operations
     //! \{
 
     //! Insert new element
     //! \param element the element to insert.
     void push(const ValueType& element)
     {
-        unsigned id = rand() % num_insertion_heaps;
+        unsigned id = rand() % m_num_insertion_heaps;
 
-        if (insertion_heaps[id * c_cache_line_factor].size() >= insertion_heap_capacity) {
+        if (m_insertion_heaps[id * c_cache_line_factor].size() >= m_insertion_heap_capacity) {
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
             }
@@ -1523,15 +1554,15 @@ public:
         }
 
         ValueType old_min;
-        if (insertion_heaps[id * c_cache_line_factor].size() > 0) {
-            old_min = insertion_heaps[id * c_cache_line_factor][0];
+        if (m_insertion_heaps[id * c_cache_line_factor].size() > 0) {
+            old_min = m_insertion_heaps[id * c_cache_line_factor][0];
         }
 
-        insertion_heaps[id * c_cache_line_factor].push_back(element);
-        std::push_heap(insertion_heaps[id * c_cache_line_factor].begin(), insertion_heaps[id * c_cache_line_factor].end(), compare);
-        ++insertion_size;
+        m_insertion_heaps[id * c_cache_line_factor].push_back(element);
+        std::push_heap(m_insertion_heaps[id * c_cache_line_factor].begin(), m_insertion_heaps[id * c_cache_line_factor].end(), m_compare);
+        ++m_heaps_size;
 
-        if (insertion_heaps[id * c_cache_line_factor].size() == 1 || inv_compare(insertion_heaps[id * c_cache_line_factor][0], old_min)) {
+        if (m_insertion_heaps[id * c_cache_line_factor].size() == 1 || m_inv_compare(m_insertion_heaps[id * c_cache_line_factor][0], old_min)) {
             m_minima.update_heap(id);
         }
     }
@@ -1551,14 +1582,14 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
-            return insertion_heaps[index * c_cache_line_factor][0];
+            return m_insertion_heaps[index * c_cache_line_factor][0];
         case minima_type::EB:
-            return extract_buffer[extract_index];
+            return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
-            return internal_arrays[index].get_min();
+            return m_internal_arrays[index].get_min();
         case minima_type::EA:
             // wait_for_first_block() already done by comparator....
-            return external_arrays[index].get_min_element();
+            return m_external_arrays[index].get_min_element();
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -1568,13 +1599,13 @@ public:
     //! Access and remove the minimum element.
     ValueType pop()
     {
-        stats.num_extracts++;
+        m_stats.num_extracts++;
 
         if (extract_buffer_empty()) {
             refill_extract_buffer();
         }
 
-        stats.extract_min_time.start();
+        m_stats.extract_min_time.start();
 
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
         unsigned type = type_and_index.first;
@@ -1586,16 +1617,16 @@ public:
         switch (type) {
         case minima_type::HEAP:
         {
-            min = insertion_heaps[index * c_cache_line_factor][0];
+            min = m_insertion_heaps[index * c_cache_line_factor][0];
 
-            stats.pop_heap_time.start();
-            std::pop_heap(insertion_heaps[index * c_cache_line_factor].begin(), insertion_heaps[index * c_cache_line_factor].end(), compare);
-            insertion_heaps[index * c_cache_line_factor].pop_back();
-            stats.pop_heap_time.stop();
+            m_stats.pop_heap_time.start();
+            std::pop_heap(m_insertion_heaps[index * c_cache_line_factor].begin(), m_insertion_heaps[index * c_cache_line_factor].end(), m_compare);
+            m_insertion_heaps[index * c_cache_line_factor].pop_back();
+            m_stats.pop_heap_time.stop();
 
-            insertion_size--;
+            m_heaps_size--;
 
-            if (!insertion_heaps[index * c_cache_line_factor].empty()) {
+            if (!m_insertion_heaps[index * c_cache_line_factor].empty()) {
                 m_minima.update_heap(index);
             }
             else {
@@ -1606,10 +1637,10 @@ public:
         }
         case minima_type::EB:
         {
-            min = extract_buffer[extract_index];
-            ++extract_index;
-            assert(buffered_size > 0);
-            --buffered_size;
+            min = m_extract_buffer[m_extract_buffer_index];
+            ++m_extract_buffer_index;
+            assert(m_extract_buffer_size > 0);
+            --m_extract_buffer_size;
 
             if (!extract_buffer_empty()) {
                 m_minima.update_extract_buffer();
@@ -1622,17 +1653,17 @@ public:
         }
         case minima_type::IA:
         {
-            min = internal_arrays[index].get_min();
-            internal_arrays[index].inc_min();
-            internal_size--;
+            min = m_internal_arrays[index].get_min();
+            m_internal_arrays[index].inc_min();
+            m_internal_size--;
 
-            if (!(internal_arrays[index].empty())) {
+            if (!(m_internal_arrays[index].empty())) {
                 m_minima.update_internal_array(index);
             }
             else {
                 // internal array has run empty
                 m_minima.deactivate_internal_array(index);
-                ram_left += ram_per_internal_array;
+                m_mem_left += m_mem_per_internal_array;
             }
 
             break;
@@ -1640,19 +1671,19 @@ public:
         case minima_type::EA:
         {
             // wait_for_first_block() already done by comparator...
-            min = external_arrays[index].get_min_element();
-            assert(external_size > 0);
-            --external_size;
-            external_arrays[index].remove_first_n_elements(1);
-            external_arrays[index].wait_for_first_block();
+            min = m_external_arrays[index].get_min_element();
+            assert(m_external_size > 0);
+            --m_external_size;
+            m_external_arrays[index].remove_first_n_elements(1);
+            m_external_arrays[index].wait_for_first_block();
 
-            if (!external_arrays[index].empty()) {
+            if (!m_external_arrays[index].empty()) {
                 m_minima.update_external_array(index);
             }
             else {
                 // external array has run empty
                 m_minima.deactivate_external_array(index);
-                ram_left += ram_per_external_array;
+                m_mem_left += m_mem_per_external_array;
             }
 
             break;
@@ -1662,7 +1693,7 @@ public:
             abort();
         }
 
-        stats.extract_min_time.stop();
+        m_stats.extract_min_time.stop();
         return min;
     }
 
@@ -1674,33 +1705,33 @@ public:
      */
     void merge_external_arrays()
     {
-        stats.num_external_array_merges++;
-        stats.external_array_merge_time.start();
+        m_stats.num_external_array_merges++;
+        m_stats.external_array_merge_time.start();
 
         m_minima.clear_external_arrays();
 
         // clean up external arrays that have been deleted in extract_min!
-        external_arrays.erase(std::remove_if(external_arrays.begin(), external_arrays.end(), empty_array_eraser()), external_arrays.end());
+        m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
 
-        size_type total_size = external_size;
+        size_type total_size = m_external_size;
         assert(total_size > 0);
 
-        external_arrays.emplace_back(total_size, num_prefetchers, num_write_buffers);
-        external_array_type& a = external_arrays[external_arrays.size() - 1];
+        m_external_arrays.emplace_back(total_size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
         std::vector<ValueType> merge_buffer;
 
-        ram_left += (external_arrays.size() - 1) * ram_per_external_array;
+        m_mem_left += (m_external_arrays.size() - 1) * m_mem_per_external_array;
 
-        while (external_arrays.size() > 0) {
-            size_type eas = external_arrays.size();
+        while (m_external_arrays.size() > 0) {
+            size_type eas = m_external_arrays.size();
 
-            external_arrays[0].wait_for_first_block();
-            ValueType min_max_value = external_arrays[0].get_current_max_element();
+            m_external_arrays[0].wait_for_first_block();
+            ValueType min_max_value = m_external_arrays[0].get_current_max_element();
 
             for (size_type i = 1; i < eas; ++i) {
-                external_arrays[i].wait_for_first_block();
-                ValueType max_value = external_arrays[i].get_current_max_element();
-                if (inv_compare(max_value, min_max_value)) {
+                m_external_arrays[i].wait_for_first_block();
+                ValueType max_value = m_external_arrays[i].get_current_max_element();
+                if (m_inv_compare(max_value, min_max_value)) {
                     min_max_value = max_value;
                 }
             }
@@ -1709,19 +1740,19 @@ public:
             std::vector<std::pair<block_iterator, block_iterator> > sequences(eas);
             size_type output_size = 0;
 
-            #if STXXL_PARALLEL
-            #pragma omp parallel for if(eas > num_insertion_heaps)
-            #endif
+#if STXXL_PARALLEL
+            #pragma omp parallel for if(eas > m_num_insertion_heaps)
+#endif
             for (size_type i = 0; i < eas; ++i) {
-                assert(!external_arrays[i].empty());
+                assert(!m_external_arrays[i].empty());
 
-                external_arrays[i].wait_for_first_block();
-                block_iterator begin = external_arrays[i].begin_block();
-                block_iterator end = external_arrays[i].end_block();
+                m_external_arrays[i].wait_for_first_block();
+                block_iterator begin = m_external_arrays[i].begin_block();
+                block_iterator end = m_external_arrays[i].end_block();
 
                 assert(begin != end);
 
-                block_iterator ub = std::upper_bound(begin, end, min_max_value, inv_compare);
+                block_iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 sizes[i] = ub - begin;
 #pragma omp atomic
                 output_size += ub - begin;
@@ -1730,15 +1761,15 @@ public:
 
             merge_buffer.resize(output_size);
 
-            #if STXXL_PARALLEL
-            stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                            merge_buffer.begin(), inv_compare, output_size);
-            #else
+#if STXXL_PARALLEL
+            parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                     merge_buffer.begin(), m_inv_compare, output_size);
+#else
             // TODO
-            #endif
+#endif
 
             for (size_type i = 0; i < eas; ++i) {
-                external_arrays[i].remove_first_n_elements(sizes[i]);
+                m_external_arrays[i].remove_first_n_elements(sizes[i]);
             }
 
             for (value_iterator i = merge_buffer.begin(); i != merge_buffer.end(); ++i) {
@@ -1746,22 +1777,22 @@ public:
             }
 
             for (size_type i = 0; i < eas; ++i) {
-                external_arrays[i].wait_for_first_block();
+                m_external_arrays[i].wait_for_first_block();
             }
 
-            external_arrays.erase(std::remove_if(external_arrays.begin(), external_arrays.end(), empty_array_eraser()), external_arrays.end());
+            m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
         }
 
         a.finish_write_phase();
 
         if (!extract_buffer_empty()) {
-            stats.num_new_external_arrays++;
-            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
+            m_stats.num_new_external_arrays++;
+            m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
+            m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        stats.external_array_merge_time.stop();
+        m_stats.external_array_merge_time.stop();
     }
 
     //! Print statistics.
@@ -1773,26 +1804,26 @@ public:
         STXXL_VARDUMP(c_single_insert_limit);
 
         if (c_limit_extract_buffer) {
-            STXXL_VARDUMP(extract_buffer_limit);
-            STXXL_MEMDUMP(extract_buffer_limit * sizeof(ValueType));
+            STXXL_VARDUMP(m_extract_buffer_limit);
+            STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(ValueType));
         }
 
         STXXL_VARDUMP(m_do_flush_directly_to_hd);
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         STXXL_VARDUMP(omp_get_max_threads());
-        #endif
+#endif
 
-        STXXL_MEMDUMP(ram_for_heaps);
-        STXXL_MEMDUMP(ram_left);
-        STXXL_MEMDUMP(ram_per_external_array);
-        STXXL_MEMDUMP(ram_per_internal_array);
+        STXXL_MEMDUMP(m_mem_for_heaps);
+        STXXL_MEMDUMP(m_mem_left);
+        STXXL_MEMDUMP(m_mem_per_external_array);
+        STXXL_MEMDUMP(m_mem_per_internal_array);
 
         //if (num_extract_buffer_refills > 0) {
         //    STXXL_VARDUMP(total_extract_buffer_size / num_extract_buffer_refills);
         //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(ValueType));
         //}
 
-        STXXL_MSG(stats);
+        STXXL_MSG(m_stats);
         m_minima.print_stats();
     }
 
@@ -1801,34 +1832,34 @@ protected:
     inline void refill_extract_buffer()
     {
         assert(extract_buffer_empty());
-        assert(buffered_size == 0);
-        extract_index = 0;
+        assert(m_extract_buffer_size == 0);
+        m_extract_buffer_index = 0;
 
         m_minima.clear_external_arrays();
-        external_arrays.erase(std::remove_if(external_arrays.begin(), external_arrays.end(), empty_array_eraser()), external_arrays.end());
-        size_type eas = external_arrays.size();
+        m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        size_type eas = m_external_arrays.size();
 
         size_type ias;
 
         if (c_merge_ias_into_eb) {
             m_minima.clear_internal_arrays();
-            internal_arrays.erase(std::remove_if(internal_arrays.begin(), internal_arrays.end(), empty_internal_array_eraser()), internal_arrays.end());
-            ias = internal_arrays.size();
+            m_internal_arrays.erase(std::remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+            ias = m_internal_arrays.size();
         }
         else {
             ias = 0;
         }
 
         if (eas == 0 && ias == 0) {
-            extract_buffer.resize(0);
+            m_extract_buffer.resize(0);
             m_minima.deactivate_extract_buffer();
             return;
         }
 
-        stats.num_extract_buffer_refills++;
-        stats.refill_extract_buffer_time.start();
-        stats.refill_time_before_merge.start();
-        stats.refill_minmax_time.start();
+        m_stats.num_extract_buffer_refills++;
+        m_stats.refill_extract_buffer_time.start();
+        m_stats.refill_time_before_merge.start();
+        m_stats.refill_minmax_time.start();
 
         /*
          * determine maximum of each first block
@@ -1838,25 +1869,25 @@ protected:
 
         // check only relevant if c_merge_ias_into_eb==true
         if (eas > 0) {
-            stats.refill_wait_time.start();
-            external_arrays[0].wait_for_first_block();
-            stats.refill_wait_time.stop();
-            assert(external_arrays[0].size() > 0);
-            min_max_value = external_arrays[0].get_current_max_element();
+            m_stats.refill_wait_time.start();
+            m_external_arrays[0].wait_for_first_block();
+            m_stats.refill_wait_time.stop();
+            assert(m_external_arrays[0].size() > 0);
+            min_max_value = m_external_arrays[0].get_current_max_element();
         }
 
         for (size_type i = 1; i < eas; ++i) {
-            stats.refill_wait_time.start();
-            external_arrays[i].wait_for_first_block();
-            stats.refill_wait_time.stop();
+            m_stats.refill_wait_time.start();
+            m_external_arrays[i].wait_for_first_block();
+            m_stats.refill_wait_time.stop();
 
-            ValueType max_value = external_arrays[i].get_current_max_element();
-            if (inv_compare(max_value, min_max_value)) {
+            ValueType max_value = m_external_arrays[i].get_current_max_element();
+            if (m_inv_compare(max_value, min_max_value)) {
                 min_max_value = max_value;
             }
         }
 
-        stats.refill_minmax_time.stop();
+        m_stats.refill_minmax_time.stop();
 
         // the number of elements in each external array that are smaller than min_max_value or equal
         // plus the number of elements in the internal arrays
@@ -1867,23 +1898,23 @@ protected:
          * calculate size and create sequences to merge
          */
 
-        #if STXXL_PARALLEL
-        #pragma omp parallel for if(eas+ias>num_insertion_heaps)
-        #endif
+#if STXXL_PARALLEL
+        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+#endif
         for (size_type i = 0; i < eas + ias; ++i) {
             // check only relevant if c_merge_ias_into_eb==true
             if (i < eas) {
-                assert(!external_arrays[i].empty());
+                assert(!m_external_arrays[i].empty());
 
-                assert(external_arrays[i].first_block_valid());
-                ValueType* begin = external_arrays[i].begin_block();
-                ValueType* end = external_arrays[i].end_block();
+                assert(m_external_arrays[i].first_block_valid());
+                ValueType* begin = m_external_arrays[i].begin_block();
+                ValueType* end = m_external_arrays[i].end_block();
 
                 assert(begin != end);
 
                 // remove if parallel
                 //stats.refill_upper_bound_time.start();
-                ValueType* ub = std::upper_bound(begin, end, min_max_value, inv_compare);
+                ValueType* ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
@@ -1893,16 +1924,16 @@ protected:
                 // else part only relevant if c_merge_ias_into_eb==true
 
                 size_type j = i - eas;
-                assert(!(internal_arrays[j].empty()));
+                assert(!(m_internal_arrays[j].empty()));
 
-                ValueType* begin = internal_arrays[j].begin();
-                ValueType* end = internal_arrays[j].end();
+                ValueType* begin = m_internal_arrays[j].begin();
+                ValueType* end = m_internal_arrays[j].end();
                 assert(begin != end);
 
                 if (eas > 0) {
                     //remove if parallel
                     //stats.refill_upper_bound_time.start();
-                    ValueType* ub = std::upper_bound(begin, end, min_max_value, inv_compare);
+                    ValueType* ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                     //stats.refill_upper_bound_time.stop();
 
                     sizes[i] = std::distance(begin, ub);
@@ -1916,7 +1947,7 @@ protected:
 
                 if (!c_limit_extract_buffer) { // otherwise see below...
                     // remove elements
-                    internal_arrays[j].inc_min(sizes[i]);
+                    m_internal_arrays[j].inc_min(sizes[i]);
                 }
             }
         }
@@ -1924,30 +1955,30 @@ protected:
         size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
 
         if (c_limit_extract_buffer) {
-            if (output_size > extract_buffer_limit) {
-                output_size = extract_buffer_limit;
+            if (output_size > m_extract_buffer_limit) {
+                output_size = m_extract_buffer_limit;
             }
         }
 
-        stats.max_extract_buffer_size.set_max(output_size);
-        stats.total_extract_buffer_size += output_size;
+        m_stats.max_extract_buffer_size.set_max(output_size);
+        m_stats.total_extract_buffer_size += output_size;
 
         assert(output_size > 0);
-        extract_buffer.resize(output_size);
-        buffered_size = output_size;
+        m_extract_buffer.resize(output_size);
+        m_extract_buffer_size = output_size;
 
-        stats.refill_time_before_merge.stop();
-        stats.refill_merge_time.start();
+        m_stats.refill_time_before_merge.stop();
+        m_stats.refill_merge_time.start();
 
-        #if STXXL_PARALLEL
-        stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                        extract_buffer.begin(), inv_compare, output_size);
-        #else
+#if STXXL_PARALLEL
+        parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                 m_extract_buffer.begin(), m_inv_compare, output_size);
+#else
         // TODO
-        #endif
+#endif
 
-        stats.refill_merge_time.stop();
-        stats.refill_time_after_merge.start();
+        m_stats.refill_merge_time.stop();
+        m_stats.refill_time_after_merge.start();
 
         // remove elements
         if (c_limit_extract_buffer) {
@@ -1955,54 +1986,54 @@ protected:
                 // dist represents the number of elements that haven't been merged
                 size_type dist = std::distance(sequences[i].first, sequences[i].second);
                 if (i < eas) {
-                    external_arrays[i].remove_first_n_elements(sizes[i] - dist);
-                    assert(external_size >= sizes[i] - dist);
-                    external_size -= sizes[i] - dist;
+                    m_external_arrays[i].remove_first_n_elements(sizes[i] - dist);
+                    assert(m_external_size >= sizes[i] - dist);
+                    m_external_size -= sizes[i] - dist;
                 }
                 else {
                     size_type j = i - eas;
-                    internal_arrays[j].inc_min(sizes[i] - dist);
-                    assert(internal_size >= sizes[i] - dist);
-                    internal_size -= sizes[i] - dist;
+                    m_internal_arrays[j].inc_min(sizes[i] - dist);
+                    assert(m_internal_size >= sizes[i] - dist);
+                    m_internal_size -= sizes[i] - dist;
                 }
             }
         }
         else {
             for (size_type i = 0; i < eas; ++i) {
-                external_arrays[i].remove_first_n_elements(sizes[i]);
-                assert(external_size >= sizes[i]);
-                external_size -= sizes[i];
+                m_external_arrays[i].remove_first_n_elements(sizes[i]);
+                assert(m_external_size >= sizes[i]);
+                m_external_size -= sizes[i];
             }
         }
 
         //stats.refill_wait_time.start();
         for (size_type i = 0; i < eas; ++i) {
-            external_arrays[i].wait_for_first_block();
+            m_external_arrays[i].wait_for_first_block();
         }
         //stats.refill_wait_time.stop();
 
         // remove empty arrays - important for the next round
-        external_arrays.erase(std::remove_if(external_arrays.begin(), external_arrays.end(), empty_array_eraser()), external_arrays.end());
-        size_type num_deleted_arrays = eas - external_arrays.size();
+        m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        size_type num_deleted_arrays = eas - m_external_arrays.size();
         if (num_deleted_arrays > 0) {
-            ram_left += num_deleted_arrays * ram_per_external_array;
+            m_mem_left += num_deleted_arrays * m_mem_per_external_array;
         }
 
-        stats.num_new_external_arrays = 0;
+        m_stats.num_new_external_arrays = 0;
 
         if (c_merge_ias_into_eb) {
-            internal_arrays.erase(std::remove_if(internal_arrays.begin(), internal_arrays.end(), empty_internal_array_eraser()), internal_arrays.end());
-            size_type num_deleted_internal_arrays = ias - internal_arrays.size();
+            m_internal_arrays.erase(std::remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+            size_type num_deleted_internal_arrays = ias - m_internal_arrays.size();
             if (num_deleted_internal_arrays > 0) {
-                ram_left += num_deleted_internal_arrays * ram_per_internal_array;
+                m_mem_left += num_deleted_internal_arrays * m_mem_per_internal_array;
             }
-            stats.num_new_internal_arrays = 0;
+            m_stats.num_new_internal_arrays = 0;
         }
 
         m_minima.update_extract_buffer();
 
-        stats.refill_time_after_merge.stop();
-        stats.refill_extract_buffer_time.stop();
+        m_stats.refill_time_after_merge.stop();
+        m_stats.refill_extract_buffer_time.stop();
     }
 
     //! Flushes the insertions heaps into an internal array.
@@ -2011,17 +2042,17 @@ protected:
         size_type ram_needed;
 
         if (c_merge_sorted_heaps) {
-            ram_needed = ram_per_internal_array;
+            ram_needed = m_mem_per_internal_array;
         }
         else {
-            ram_needed = num_insertion_heaps * ram_per_internal_array;
+            ram_needed = m_num_insertion_heaps * m_mem_per_internal_array;
         }
 
-        if (ram_left < ram_needed) {
-            if (internal_size > 0) {
+        if (m_mem_left < ram_needed) {
+            if (m_internal_size > 0) {
                 flush_internal_arrays();
                 // still not enough?
-                if (ram_left < ram_needed) {
+                if (m_mem_left < ram_needed) {
                     merge_external_arrays();
                 }
             }
@@ -2030,91 +2061,91 @@ protected:
             }
         }
 
-        stats.num_insertion_heap_flushes++;
-        stats.insertion_heap_flush_time.start();
+        m_stats.num_insertion_heap_flushes++;
+        m_stats.insertion_heap_flush_time.start();
 
-        size_type size = insertion_size;
+        size_type size = m_heaps_size;
         assert(size > 0);
-        std::vector<std::pair<value_iterator, value_iterator> > sequences(num_insertion_heaps);
+        std::vector<std::pair<value_iterator, value_iterator> > sequences(m_num_insertion_heaps);
 
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         #pragma omp parallel for
-        #endif
-        for (unsigned i = 0; i < num_insertion_heaps; ++i) {
+#endif
+        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
             // TODO: Use std::sort_heap instead? We would have to reverse the order...
-            std::sort(insertion_heaps[i * c_cache_line_factor].begin(), insertion_heaps[i * c_cache_line_factor].end(), inv_compare);
+            std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end(), m_inv_compare);
             if (c_merge_sorted_heaps) {
-                sequences[i] = std::make_pair(insertion_heaps[i * c_cache_line_factor].begin(), insertion_heaps[i * c_cache_line_factor].end());
+                sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end());
             }
         }
 
         if (c_merge_sorted_heaps) {
-            stats.merge_sorted_heaps_time.start();
+            m_stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
 
-            #if STXXL_PARALLEL
+#if STXXL_PARALLEL
             parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                     merged_array.begin(), inv_compare, size);
-            #else
+                                     merged_array.begin(), m_inv_compare, size);
+#else
             // TODO
-            #endif
+#endif
 
-            stats.merge_sorted_heaps_time.stop();
+            m_stats.merge_sorted_heaps_time.stop();
 
-            internal_arrays.emplace_back(merged_array);
+            m_internal_arrays.emplace_back(merged_array);
             // internal array owns merged_array now.
 
             if (c_merge_ias_into_eb) {
                 if (!extract_buffer_empty()) {
-                    stats.num_new_internal_arrays++;
-                    stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
-                    m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
+                    m_stats.num_new_internal_arrays++;
+                    m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
+                    m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
                 }
             }
             else {
-                m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
+                m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
             }
 
-            for (unsigned i = 0; i < num_insertion_heaps; ++i) {
-                insertion_heaps[i * c_cache_line_factor].clear();
-                insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
+            for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
+                m_insertion_heaps[i * c_cache_line_factor].clear();
+                m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
             }
             m_minima.clear_heaps();
 
-            ram_left -= ram_per_internal_array;
+            m_mem_left -= m_mem_per_internal_array;
         }
         else {
-            for (unsigned i = 0; i < num_insertion_heaps; ++i) {
-                if (insertion_heaps[i * c_cache_line_factor].size() > 0) {
-                    internal_arrays.emplace_back(insertion_heaps[i * c_cache_line_factor]);
+            for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
+                if (m_insertion_heaps[i * c_cache_line_factor].size() > 0) {
+                    m_internal_arrays.emplace_back(m_insertion_heaps[i * c_cache_line_factor]);
                     // insertion_heaps[i*c_cache_line_factor] is empty now.
 
                     if (c_merge_ias_into_eb) {
                         if (!extract_buffer_empty()) {
-                            stats.num_new_internal_arrays++;
-                            stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
-                            m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
+                            m_stats.num_new_internal_arrays++;
+                            m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
+                            m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
                         }
                     }
                     else {
-                        m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
+                        m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
                     }
 
-                    insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
+                    m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
                 }
             }
 
             m_minima.clear_heaps();
-            ram_left -= num_insertion_heaps * ram_per_internal_array;
+            m_mem_left -= m_num_insertion_heaps * m_mem_per_internal_array;
         }
 
-        internal_size += size;
-        insertion_size = 0;
+        m_internal_size += size;
+        m_heaps_size = 0;
 
-        stats.max_num_internal_arrays.set_max(internal_arrays.size());
-        stats.insertion_heap_flush_time.stop();
+        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
+        m_stats.insertion_heap_flush_time.stop();
 
-        if (ram_left < ram_per_external_array + ram_per_internal_array) {
+        if (m_mem_left < m_mem_per_external_array + m_mem_per_internal_array) {
             flush_internal_arrays();
         }
     }
@@ -2122,37 +2153,37 @@ protected:
     //! Flushes the internal arrays into an external array.
     inline void flush_internal_arrays()
     {
-        stats.num_internal_array_flushes++;
-        stats.internal_array_flush_time.start();
+        m_stats.num_internal_array_flushes++;
+        m_stats.internal_array_flush_time.start();
 
         m_minima.clear_internal_arrays();
 
         // clean up internal arrays that have been deleted in extract_min!
-        internal_arrays.erase(std::remove_if(internal_arrays.begin(), internal_arrays.end(), empty_internal_array_eraser()), internal_arrays.end());
+        m_internal_arrays.erase(std::remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
 
-        size_type num_arrays = internal_arrays.size();
-        size_type size = internal_size;
+        size_type num_arrays = m_internal_arrays.size();
+        size_type size = m_internal_size;
         std::vector<std::pair<ValueType*, ValueType*> > sequences(num_arrays);
 
         for (unsigned i = 0; i < num_arrays; ++i) {
-            sequences[i] = std::make_pair(internal_arrays[i].begin(), internal_arrays[i].end());
+            sequences[i] = std::make_pair(m_internal_arrays[i].begin(), m_internal_arrays[i].end());
         }
 
-        external_arrays.emplace_back(size, num_prefetchers, num_write_buffers);
-        external_array_type& a = external_arrays[external_arrays.size() - 1];
+        m_external_arrays.emplace_back(size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         // TODO: write in chunks in order to safe RAM?
 
-        stats.max_merge_buffer_size.set_max(size);
+        m_stats.max_merge_buffer_size.set_max(size);
 
         std::vector<ValueType> write_buffer(size);
 
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 write_buffer.begin(), inv_compare, size);
-        #else
+                                 write_buffer.begin(), m_inv_compare, size);
+#else
         // TODO
-        #endif
+#endif
 
         // TODO: directly write to block? -> no useless mem copy. Does not work if size > block size
         for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
@@ -2161,60 +2192,60 @@ protected:
 
         a.finish_write_phase();
 
-        external_size += size;
-        internal_size = 0;
+        m_external_size += size;
+        m_internal_size = 0;
 
-        internal_arrays.clear();
-        stats.num_new_internal_arrays = 0;
+        m_internal_arrays.clear();
+        m_stats.num_new_internal_arrays = 0;
 
         if (!extract_buffer_empty()) {
-            stats.num_new_external_arrays++;
-            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
+            m_stats.num_new_external_arrays++;
+            m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
+            m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        ram_left += num_arrays * ram_per_internal_array;
-        ram_left -= ram_per_external_array;
+        m_mem_left += num_arrays * m_mem_per_internal_array;
+        m_mem_left -= m_mem_per_external_array;
 
-        stats.max_num_external_arrays.set_max(external_arrays.size());
-        stats.internal_array_flush_time.stop();
+        m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
+        m_stats.internal_array_flush_time.stop();
     }
 
     //! Flushes the insertion heaps into an external array.
     void flush_directly_to_hd()
     {
-        if (ram_left < ram_per_external_array) {
+        if (m_mem_left < m_mem_per_external_array) {
             merge_external_arrays();
         }
 
-        stats.num_direct_flushes++;
-        stats.direct_flush_time.start();
+        m_stats.num_direct_flushes++;
+        m_stats.direct_flush_time.start();
 
-        size_type size = insertion_size;
-        std::vector<std::pair<value_iterator, value_iterator> > sequences(num_insertion_heaps);
+        size_type size = m_heaps_size;
+        std::vector<std::pair<value_iterator, value_iterator> > sequences(m_num_insertion_heaps);
 
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         #pragma omp parallel for
-        #endif
-        for (unsigned i = 0; i < num_insertion_heaps; ++i) {
+#endif
+        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
             // TODO std::sort_heap? We would have to reverse the order...
-            std::sort(insertion_heaps[i * c_cache_line_factor].begin(), insertion_heaps[i * c_cache_line_factor].end(), inv_compare);
-            sequences[i] = std::make_pair(insertion_heaps[i * c_cache_line_factor].begin(), insertion_heaps[i * c_cache_line_factor].end());
+            std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end(), m_inv_compare);
+            sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end());
         }
 
-        external_arrays.emplace_back(size, num_prefetchers, num_write_buffers);
-        external_array_type& a = external_arrays[external_arrays.size() - 1];
+        m_external_arrays.emplace_back(size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         // TODO: write in chunks in order to safe RAM
         std::vector<ValueType> write_buffer(size);
 
-        #if STXXL_PARALLEL
+#if STXXL_PARALLEL
         parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 write_buffer.begin(), inv_compare, size);
-        #else
+                                 write_buffer.begin(), m_inv_compare, size);
+#else
         // TODO
-        #endif
+#endif
 
         // TODO: directly write to block -> no useless mem copy
         for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
@@ -2223,44 +2254,44 @@ protected:
 
         a.finish_write_phase();
 
-        external_size += size;
-        insertion_size = 0;
+        m_external_size += size;
+        m_heaps_size = 0;
 
         // inefficient...
         //#if STXXL_PARALLEL
         //#pragma omp parallel for
         //#endif
-        for (unsigned i = 0; i < num_insertion_heaps; ++i) {
-            insertion_heaps[i * c_cache_line_factor].clear();
-            insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(real_insertion_heap_size_factor * static_cast<double>(insertion_heap_capacity)));
+        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
+            m_insertion_heaps[i * c_cache_line_factor].clear();
+            m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
         }
         m_minima.clear_heaps();
 
         if (!extract_buffer_empty()) {
-            stats.num_new_external_arrays++;
-            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
+            m_stats.num_new_external_arrays++;
+            m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
+            m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        ram_left -= ram_per_external_array;
+        m_mem_left -= m_mem_per_external_array;
 
-        stats.max_num_external_arrays.set_max(external_arrays.size());
-        stats.direct_flush_time.stop();
+        m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
+        m_stats.direct_flush_time.stop();
     }
 
     //! Sorts the values from values and writes them into an external array.
     //! \param values the vector to sort and store
     void flush_array_to_hd(std::vector<ValueType>& values)
     {
-        #if STXXL_PARALLEL
-        __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
-        #else
-        std::sort(values.begin(), values.end(), inv_compare);
-        #endif
+#if STXXL_PARALLEL
+        __gnu_parallel::sort(values.begin(), values.end(), m_inv_compare);
+#else
+        std::sort(values.begin(), values.end(), m_inv_compare);
+#endif
 
-        external_arrays.emplace_back(values.size(), num_prefetchers, num_write_buffers);
-        external_array_type& a = external_arrays[external_arrays.size() - 1];
+        m_external_arrays.emplace_back(values.size(), m_num_prefetchers, m_num_write_buffers);
+        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
             a << *i;
@@ -2268,17 +2299,17 @@ protected:
 
         a.finish_write_phase();
 
-        external_size += values.size();
+        m_external_size += values.size();
 
         if (!extract_buffer_empty()) {
-            stats.num_new_external_arrays++;
-            stats.max_num_new_external_arrays.set_max(stats.num_new_external_arrays);
+            m_stats.num_new_external_arrays++;
+            m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
             a.wait_for_first_block();
-            m_minima.add_external_array(static_cast<unsigned>(external_arrays.size()) - 1);
+            m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        ram_left -= ram_per_external_array;
-        stats.max_num_external_arrays.set_max(external_arrays.size());
+        m_mem_left -= m_mem_per_external_array;
+        m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
     }
 
     /*!
@@ -2289,31 +2320,31 @@ protected:
      */
     void flush_array_internal(std::vector<ValueType>& values)
     {
-        internal_size += values.size();
+        m_internal_size += values.size();
 
-        #if STXXL_PARALLEL
-        __gnu_parallel::sort(values.begin(), values.end(), inv_compare);
-        #else
-        std::sort(values.begin(), values.end(), inv_compare);
-        #endif
+#if STXXL_PARALLEL
+        __gnu_parallel::sort(values.begin(), values.end(), m_inv_compare);
+#else
+        std::sort(values.begin(), values.end(), m_inv_compare);
+#endif
 
-        internal_arrays.emplace_back(values);
+        m_internal_arrays.emplace_back(values);
         // internal array owns values now.
 
         if (c_merge_ias_into_eb) {
             if (!extract_buffer_empty()) {
-                stats.num_new_internal_arrays++;
-                stats.max_num_new_internal_arrays.set_max(stats.num_new_internal_arrays);
-                m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
+                m_stats.num_new_internal_arrays++;
+                m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
+                m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
             }
         }
         else {
-            m_minima.add_internal_array(static_cast<unsigned>(internal_arrays.size()) - 1);
+            m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
         }
 
         // TODO: use real value size: ram_left -= 2*values->size()*sizeof(ValueType);
-        ram_left -= ram_per_internal_array;
-        stats.max_num_internal_arrays.set_max(internal_arrays.size());
+        m_mem_left -= m_mem_per_internal_array;
+        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
 
         // Vector is now owned by PPQ...
     }
@@ -2330,19 +2361,19 @@ protected:
         size_type size = values.size();
         size_type ram_internal = 2 * size * sizeof(ValueType); // ram for the sorted array + part of the ram for the merge buffer
 
-        size_type ram_for_all_internal_arrays = total_ram - 2 * ram_for_heaps - num_write_buffers * BlockSize - external_arrays.size() * ram_per_external_array;
+        size_type ram_for_all_internal_arrays = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size - m_external_arrays.size() * m_mem_per_external_array;
 
         if (ram_internal > ram_for_all_internal_arrays) {
             flush_array_to_hd(values);
             return;
         }
 
-        if (ram_left < ram_internal) {
+        if (m_mem_left < ram_internal) {
             flush_internal_arrays();
         }
 
-        if (ram_left < ram_internal) {
-            if (ram_left < ram_per_external_array) {
+        if (m_mem_left < ram_internal) {
+            if (m_mem_left < m_mem_per_external_array) {
                 merge_external_arrays();
             }
 
@@ -2509,7 +2540,7 @@ protected:
         }
     };
 
-    stats_type stats;
+    stats_type m_stats;
 };
 
 STXXL_END_NAMESPACE
