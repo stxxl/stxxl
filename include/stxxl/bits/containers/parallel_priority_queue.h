@@ -1671,7 +1671,7 @@ public:
             size_type output_size = 0;
 
             #if STXXL_PARALLEL
-            #pragma omp parallel for if(eas>num_insertion_heaps)
+            #pragma omp parallel for if(eas > num_insertion_heaps)
             #endif
             for (size_type i = 0; i < eas; ++i) {
                 assert(!external_arrays[i].empty());
@@ -1684,7 +1684,8 @@ public:
 
                 block_iterator ub = std::upper_bound(begin, end, min_max_value, inv_compare);
                 sizes[i] = ub - begin;
-                __sync_fetch_and_add(&output_size, ub - begin);
+#pragma omp atomic
+                output_size += ub - begin;
                 sequences[i] = std::make_pair(begin, ub);
             }
 
