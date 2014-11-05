@@ -58,7 +58,7 @@ namespace ppq_local {
 template <class ValueType>
 class internal_array
 {
-private:
+protected:
     //! Contains the items of the sorted sequence.
     std::vector<ValueType> m_values;
 
@@ -182,7 +182,7 @@ public:
  */
 template <
     class ValueType,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    unsigned_type BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
     >
 class external_array
@@ -197,71 +197,71 @@ public:
     typedef typename block_type::iterator block_iterator;
     typedef read_write_pool<block_type> pool_type;
 
-private:
+protected:
     //! Allocation strategy for new blocks
-    AllocStrategy alloc_strategy;
+    AllocStrategy m_alloc_strategy;
 
-    //! The total number of elements. Cannot be changed after construction.
-    size_t m_size;
+    //! The total capacity of the external array. Cannot be changed after
+    //! construction.
+    size_t m_capacity;
 
     //! The total number of elements minus the number of extracted values
-    size_t real_size;
-
-    //! The size of one value in bytes
-    size_t value_size;
+    size_t m_size;
 
     //! The number of elements fitting into one block
-    size_t num_elements_per_block;
+    static const unsigned_type num_elements_per_block = BlockSize / sizeof(ValueType);
 
     //! Number of blocks in external memory
-    size_t num_bids;
+    size_t m_num_bids;
 
-    //! Number of blocks to prefetch from HD
-    size_t num_prefetch_blocks;
+    //! Number of blocks to prefetch from EM
+    size_t m_num_prefetch_blocks;
 
     //! Size of the write buffer in number of blocks
-    size_t num_write_buffer_blocks;
+    size_t m_num_write_buffer_blocks;
 
     //! The IDs of each block in external memory
-    bid_vector bids;
+    bid_vector m_bids;
 
     //! The block with the currently smallest elements
-    block_type* first_block;
+    block_type* m_first_block;
 
     //! Prefetch and write buffer pool
-    pool_type* pool;
+    pool_type* m_pool;
 
     //! The read_request can be used to wait until the block has been
     //! completely fetched.
-    request_ptr read_request;
+    request_ptr m_read_request;
 
     //! The write position in the block currently being filled. Used by the
     //! <<-operator.
-    size_t write_position;
+    size_t m_write_position;
 
     //! Index of the next block to be prefetched.
-    size_t hint_index;
+    size_t m_hint_index;
 
     /* Write phase: Index of the external block where the current block will be
      * stored in when it's filled. Read phase: Index of the external block
      * which will be fetched next.
      */
-    size_t current_bid_index;
+    size_t m_current_bid_index;
 
     //! True means write phase, false means read phase.
-    bool write_phase;
+    bool m_write_phase;
 
     //! The first block is valid if wait_for_first_block() has already been
     //! called.
-    bool _first_block_valid;
+    bool m_first_block_valid;
 
     //! Indicates if first_block is actually the first block of all which has
     //! never been written to external memory.
-    bool is_first_block;
+    bool m_is_first_block;
 
-    //! boundaries of first block
-    size_t begin_index;
-    size_t end_index;
+    //! boundaries inside the first block
+    size_t m_begin_index;
+
+    //! boundaries inside the first block
+    size_t m_end_index;
 
 public:
     /*!
@@ -270,35 +270,35 @@ public:
      * \param size The total number of elements. Cannot be changed after
      * construction.
      *
-     * \param _num_prefetch_blocks Number of blocks to prefetch from hard disk
+     * \param num_prefetch_blocks Number of blocks to prefetch from hard disk
      *
-     * \param _num_write_buffer_blocks Size of the write buffer in number of
+     * \param num_write_buffer_blocks Size of the write buffer in number of
      * blocks
      */
-    external_array(size_t size, size_t _num_prefetch_blocks,
-                   size_t _num_write_buffer_blocks)
-        : m_size(size),
-          real_size(0),
-          value_size(sizeof(ValueType)),
-          num_elements_per_block((size_t)(BlockSize / value_size)),
-          num_bids((size_t)div_ceil(m_size, num_elements_per_block)),
-          num_prefetch_blocks(std::min(_num_prefetch_blocks, num_bids)),
-          num_write_buffer_blocks(std::min(_num_write_buffer_blocks, num_bids)),
-          bids(num_bids),
-          write_position(0),
-          hint_index(0),
-          current_bid_index(0),
-          write_phase(true),
-          _first_block_valid(false),
-          is_first_block(true),
-          begin_index(0),
-          end_index(0)
+    external_array(size_t size, size_t num_prefetch_blocks,
+                   size_t num_write_buffer_blocks)
+        : m_capacity(size),
+          m_size(0),
+          m_num_bids((size_t)div_ceil(m_capacity, num_elements_per_block)),
+          m_num_prefetch_blocks(std::min(num_prefetch_blocks, m_num_bids)),
+          m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_bids)),
+          m_bids(m_num_bids),
+          m_first_block(new block_type),
+          m_pool(new pool_type(0, m_num_write_buffer_blocks)),
+          m_write_position(0),
+          m_hint_index(0),
+          m_current_bid_index(0),
+          m_write_phase(true),
+          m_first_block_valid(false),
+          m_is_first_block(true),
+          m_begin_index(0),
+          m_end_index(0)
     {
         assert(size > 0);
-        first_block = new block_type;
-        pool = new pool_type(0, num_write_buffer_blocks);
+
+        // allocate blocks in EM.
         block_manager* bm = block_manager::get_instance();
-        bm->new_blocks(alloc_strategy, bids.begin(), bids.end());
+        bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end());
     }
 
     //! Delete copy assignment for emplace_back to use the move semantics.
@@ -310,57 +310,53 @@ public:
     //! Move assignment.
     self_type& operator = (self_type&& o)
     {
+        m_capacity = o.m_capacity;
         m_size = o.m_size;
-        real_size = o.real_size;
-        value_size = o.value_size;
-        num_elements_per_block = o.num_elements_per_block;
-        num_bids = o.num_bids;
-        num_prefetch_blocks = o.num_prefetch_blocks;
-        num_write_buffer_blocks = o.num_write_buffer_blocks;
+        m_num_bids = o.m_num_bids;
+        m_num_prefetch_blocks = o.m_num_prefetch_blocks;
+        m_num_write_buffer_blocks = o.m_num_write_buffer_blocks;
 
-        bids = std::move(o.bids);
+        m_bids = std::move(o.m_bids);
 
-        first_block = o.first_block;
-        pool = o.pool;
-        write_position = o.write_position;
-        hint_index = o.hint_index;
-        current_bid_index = o.current_bid_index;
-        write_phase = o.write_phase;
-        _first_block_valid = o._first_block_valid;
-        is_first_block = o.is_first_block;
-        begin_index = o.begin_index;
-        end_index = o.end_index;
+        m_first_block = o.m_first_block;
+        m_pool = o.m_pool;
+        m_write_position = o.m_write_position;
+        m_hint_index = o.m_hint_index;
+        m_current_bid_index = o.m_current_bid_index;
+        m_write_phase = o.m_write_phase;
+        m_first_block_valid = o.m_first_block_valid;
+        m_is_first_block = o.m_is_first_block;
+        m_begin_index = o.m_begin_index;
+        m_end_index = o.m_end_index;
 
-        o.first_block = nullptr;
-        o.pool = nullptr;
+        o.m_first_block = nullptr;
+        o.m_pool = nullptr;
         return *this;
     }
 
     //! Move constructor. Needed for regrowing in surrounding vector.
     external_array(self_type&& o)
-        : m_size(o.m_size),
-          real_size(o.real_size),
-          value_size(o.value_size),
-          num_elements_per_block(o.num_elements_per_block),
-          num_bids(o.num_bids),
-          num_prefetch_blocks(o.num_prefetch_blocks),
-          num_write_buffer_blocks(o.num_write_buffer_blocks),
+        : m_capacity(o.m_capacity),
+          m_size(o.m_size),
+          m_num_bids(o.m_num_bids),
+          m_num_prefetch_blocks(o.m_num_prefetch_blocks),
+          m_num_write_buffer_blocks(o.m_num_write_buffer_blocks),
 
-          bids(std::move(o.bids)),
+          m_bids(std::move(o.m_bids)),
 
-          first_block(o.first_block),
-          pool(o.pool),
-          write_position(o.write_position),
-          hint_index(o.hint_index),
-          current_bid_index(o.current_bid_index),
-          write_phase(o.write_phase),
-          _first_block_valid(o._first_block_valid),
-          is_first_block(o.is_first_block),
-          begin_index(o.begin_index),
-          end_index(o.end_index)
+          m_first_block(o.m_first_block),
+          m_pool(o.m_pool),
+          m_write_position(o.m_write_position),
+          m_hint_index(o.m_hint_index),
+          m_current_bid_index(o.m_current_bid_index),
+          m_write_phase(o.m_write_phase),
+          m_first_block_valid(o.m_first_block_valid),
+          m_is_first_block(o.m_is_first_block),
+          m_begin_index(o.m_begin_index),
+          m_end_index(o.m_end_index)
     {
-        o.first_block = nullptr;
-        o.pool = nullptr;
+        o.m_first_block = nullptr;
+        o.m_pool = nullptr;
     }
 
     //! Default constructor. Don't use this directy. Needed for regrowing in
@@ -371,85 +367,85 @@ public:
     ~external_array()
     {
         block_manager* bm = block_manager::get_instance();
-        if (pool != NULL) {
+        if (m_pool != NULL) {
             // This could also be done step by step in remove_first_...() in
             // future.
-            bm->delete_blocks(bids.begin(), bids.end());
-            delete first_block;
-            delete pool;
+            bm->delete_blocks(m_bids.begin(), m_bids.end());
+            delete m_first_block;
+            delete m_pool;
         }   // else: the array has been moved.
     }
 
     //! Returns the current size
     size_t size() const
     {
-        return real_size;
+        return m_size;
     }
 
     //! Returns if the array is empty
     bool empty() const
     {
-        return (real_size == 0);
+        return (m_size == 0);
     }
 
     //! Returns if one can safely access elements from the first block.
     bool first_block_valid() const
     {
-        return _first_block_valid;
+        return m_first_block_valid;
     }
 
     //! Returns the smallest element in the array
-    ValueType & get_min_element()
+    const ValueType & get_min_element() const
     {
-        assert(_first_block_valid);
-        assert(end_index - 1 >= begin_index);
+        assert(m_first_block_valid);
+        assert(m_end_index - 1 >= m_begin_index);
         return *begin_block();
     }
 
     //! Returns the largest element in the first block / internal memory
-    ValueType & get_current_max_element()
+    const ValueType & get_current_max_element() const
     {
-        assert(_first_block_valid);
-        assert(end_index - 1 >= begin_index);
+        assert(m_first_block_valid);
+        assert(m_end_index - 1 >= m_begin_index);
         block_iterator i = end_block();
         return *(--i);
     }
 
     //! Begin iterator of the first block
-    iterator begin_block()
+    iterator begin_block() const
     {
-        assert(_first_block_valid);
-        return first_block->begin() + begin_index;
+        assert(m_first_block_valid);
+        return m_first_block->begin() + m_begin_index;
     }
 
     //! End iterator of the first block
-    iterator end_block()
+    iterator end_block() const
     {
-        assert(_first_block_valid);
-        return first_block->begin() + end_index;
+        assert(m_first_block_valid);
+        return m_first_block->begin() + m_end_index;
     }
 
     //! Random access operator for the first block
-    ValueType& operator [] (size_t i)
+    const ValueType& operator [] (size_t i) const
     {
-        assert(i >= begin_index);
-        assert(i < end_index);
-        return first_block->elem[i];
+        assert(i >= m_begin_index);
+        assert(i < m_end_index);
+        return m_first_block->elem[i];
     }
 
     //! Pushes <record> at the end of the array
     void operator << (const ValueType& record)
     {
-        assert(write_phase);
-        assert(real_size < m_size);
-        ++real_size;
+        assert(m_write_phase);
+        assert(m_size < m_capacity);
+        ++m_size;
 
-        if (UNLIKELY(write_position >= block_type::size)) {
-            write_position = 0;
+        if (UNLIKELY(m_write_position >= block_type::size)) {
+            m_write_position = 0;
             write_out();
         }
 
-        first_block->elem[write_position++] = record;
+        m_first_block->elem[m_write_position++] = record;
     }
 
     //! Finish write phase. Afterwards the values can be extracted from bottom
@@ -459,24 +455,23 @@ public:
         // Idea for the future: If we write the block with the smallest values
         // in the end, we don't need to write it into EM.
 
-        assert(m_size == real_size);
+        assert(m_capacity == m_size);
 
-        if (write_position > 0) {
+        if (m_write_position > 0) {
             // This works only if the <<-operator has been used.
             write_out();
         }
 
-        pool->resize_write(0);
-        pool->resize_prefetch(num_prefetch_blocks);
-        write_phase = false;
+        m_pool->resize_write(0);
+        m_pool->resize_prefetch(m_num_prefetch_blocks);
+        m_write_phase = false;
 
-        current_bid_index = 0;
-        begin_index = 0;
-        end_index = write_position;
+        m_current_bid_index = 0;
+        m_begin_index = 0;
+        m_end_index = m_write_position;
 
-        for (size_t i = 0; i < num_prefetch_blocks; ++i) {
+        for (size_t i = 0; i < m_num_prefetch_blocks; ++i)
             hint();
-        }
 
         load_next_block();
     }
@@ -484,16 +479,16 @@ public:
     //! Removes the first block and loads the next one if there's any
     void remove_first_block()
     {
-        assert(_first_block_valid);
+        assert(m_first_block_valid);
 
         if (has_next_block()) {
-            real_size -= num_elements_per_block;
+            m_size -= num_elements_per_block;
             load_next_block();
-        } else {
-            real_size = 0;
-            begin_index = 0;
-            end_index = 0;
-            _first_block_valid = true;
+        }
+        else {
+            m_size = 0;
+            m_begin_index = m_end_index = 0;
+            m_first_block_valid = true;
         }
     }
 
@@ -502,24 +497,26 @@ public:
     //! least <n> elements left in the first block.
     void remove_first_n_elements(size_t n)
     {
-        assert(_first_block_valid);
+        assert(m_first_block_valid);
 
-        if (begin_index + n < end_index) {
-            real_size -= n;
-            begin_index += n;
-        } else {
-            assert(begin_index + n == end_index);
+        if (m_begin_index + n < m_end_index) {
+            m_size -= n;
+            m_begin_index += n;
+        }
+        else {
+            assert(m_begin_index + n == m_end_index);
 
             if (has_next_block()) {
-                assert(real_size >= n);
-                real_size -= n;
+                assert(m_size >= n);
+                m_size -= n;
                 load_next_block();
-            } else {
-                real_size -= n;
-                assert(real_size == 0);
-                begin_index = 0;
-                end_index = 0;
-                _first_block_valid = true;
+            }
+            else {
+                m_size -= n;
+                assert(m_size == 0);
+                m_begin_index = 0;
+                m_end_index = 0;
+                m_first_block_valid = true;
             }
         }
     }
@@ -528,69 +525,72 @@ public:
     //! set _first_block_valid.
     void wait_for_first_block()
     {
-        assert(!write_phase);
+        assert(!m_write_phase);
 
-        if (_first_block_valid)
+        if (m_first_block_valid)
             return;
 
-        if (read_request) {
-            read_request->wait();
-        }
+        if (m_read_request)
+            m_read_request->wait();
 
-        _first_block_valid = true;
+        m_first_block_valid = true;
     }
 
-private:
+protected:
     //! Write the current block into external memory
     void write_out()
     {
-        assert(write_phase);
-        pool->write(first_block, bids[current_bid_index++]);
-        first_block = pool->steal();
+        assert(m_write_phase);
+        m_pool->write(m_first_block, m_bids[m_current_bid_index++]);
+        m_first_block = m_pool->steal();
     }
 
     //! Gives the prefetcher a hint for the next block to prefetch
     void hint()
     {
-        if (hint_index < num_bids) {
-            pool->hint(bids[hint_index]);
+        if (m_hint_index < m_num_bids) {
+            m_pool->hint(m_bids[m_hint_index]);
         }
-        ++hint_index;
+        ++m_hint_index;
     }
 
     //! Fetches the next block from the hard disk and calls hint() afterwards.
     void load_next_block()
     {
-        _first_block_valid = false;
+        m_first_block_valid = false;
 
-        if (!is_first_block) {
-            ++current_bid_index;
-        } else {
-            is_first_block = false;
+        if (!m_is_first_block) {
+            ++m_current_bid_index;
+        }
+        else {
+            m_is_first_block = false;
         }
 
-        read_request = pool->read(first_block, bids[current_bid_index]);
+        m_read_request = m_pool->read(m_first_block, m_bids[m_current_bid_index]);
         hint();
 
-        begin_index = 0;
+        m_begin_index = 0;
         if (is_last_block()) {
-            end_index = real_size % num_elements_per_block;
-            end_index = (end_index == 0 ? num_elements_per_block : end_index);
-        } else {
-            end_index = num_elements_per_block;
+            m_end_index = m_size % num_elements_per_block;
+            m_end_index = (m_end_index == 0 ? num_elements_per_block : m_end_index);
+        }
+        else {
+            m_end_index = num_elements_per_block;
         }
     }
 
     //! Returns if there is a next block on hard disk.
     bool has_next_block() const
     {
-        return ((is_first_block && num_bids > 0) || (current_bid_index + 1 < num_bids));
+        return ((m_is_first_block && m_num_bids > 0) ||
+                (m_current_bid_index + 1 < m_num_bids));
     }
 
     //! Returns if the current block is the last one.
     bool is_last_block() const
     {
-        return ((current_bid_index == num_bids - 1) || (m_size < num_elements_per_block));
+        return ((m_current_bid_index == m_num_bids - 1) ||
+                (m_capacity < num_elements_per_block));
     }
 };
 
@@ -761,7 +761,7 @@ public:
         m_ea.print_stats();
     }
 
-private:
+protected:
     //! Comparator for the head winner tree.  It accesses all relevant data
     //! structures from the priority queue.
     struct head_comp {
