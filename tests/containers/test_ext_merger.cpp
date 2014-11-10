@@ -56,10 +56,10 @@ my_type * make_sequence(dummy_merger& dummy, int l)
 
 // forced instantiation
 template class stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5>;
-template class stxxl::priority_queue_local::loser_tree<my_type, my_cmp, 8>;
+template class stxxl::priority_queue_local::int_merger<my_type, my_cmp, 8>;
 
 using stxxl::priority_queue_local::ext_merger;
-using stxxl::priority_queue_local::loser_tree;
+using stxxl::priority_queue_local::int_merger;
 
 int main()
 {
@@ -80,7 +80,7 @@ int main()
     merger.multi_merge(output.begin(), output.end());
     STXXL_CHECK(stxxl::is_sorted(output.begin(), output.end()));
 
-    loser_tree<my_type, my_cmp, 8> loser;
+    int_merger<my_type, my_cmp, 8> loser;
     my_type* seq1 = make_sequence(dummy, 1024);
     cnt = 20;
     my_type* seq2 = make_sequence(dummy, 1024);

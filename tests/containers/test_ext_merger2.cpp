@@ -132,8 +132,8 @@ int main()
         merger.multi_merge(output.begin(), output.begin());
     } // ext_merger test
 
-    if (1) { // loser_tree test
-        stxxl::priority_queue_local::loser_tree<my_type, my_cmp, 8> loser;
+    if (1) { // int_merger test
+        stxxl::priority_queue_local::int_merger<my_type, my_cmp, 8> merger;
         dummy(1, 0);
         my_type* seq0 = make_sequence(dummy, 2 * B);
         dummy(2, 0);
@@ -151,17 +151,18 @@ int main()
         dummy(2 * B, 2);
         my_type* seq7 = make_sequence(dummy, 4 * B);
 
-        loser.init();
-        loser.insert_segment(seq0, 2 * B);
-        loser.insert_segment(seq1, 2 * B);
-        loser.insert_segment(seq2, 4 * B);
-        loser.insert_segment(seq3, 4 * B);
-        loser.insert_segment(seq4, 4 * B);
+        merger.init();
+        merger.insert_segment(seq0, 2 * B);
+        merger.insert_segment(seq1, 2 * B);
+        merger.insert_segment(seq2, 4 * B);
+        merger.insert_segment(seq3, 4 * B);
+        merger.insert_segment(seq4, 4 * B);
         if (0) {
-            loser.insert_segment(seq5, 4 * B);
-            loser.insert_segment(seq6, 4 * B);
-            loser.insert_segment(seq7, 4 * B);
-        } else {
+            merger.insert_segment(seq5, 4 * B);
+            merger.insert_segment(seq6, 4 * B);
+            merger.insert_segment(seq7, 4 * B);
+        }
+        else {
             delete[] seq5;
             delete[] seq6;
             delete[] seq7;
@@ -170,24 +171,24 @@ int main()
         my_type* out = new my_type[2 * B];
 
         // zero length merge
-        loser.multi_merge(out, out);
-        loser.multi_merge(out, out);
-        loser.multi_merge(out, out);
+        merger.multi_merge(out, out);
+        merger.multi_merge(out, out);
+        merger.multi_merge(out, out);
 
-        while (loser.size() > 0) {
-            stxxl::uint64 l = std::min<stxxl::uint64>(loser.size(), B + B / 2 + 1);
-            loser.multi_merge(out, out + l);
+        while (merger.size() > 0) {
+            stxxl::uint64 l = std::min<stxxl::uint64>(merger.size(), B + B / 2 + 1);
+            merger.multi_merge(out, out + l);
             STXXL_CHECK(stxxl::is_sorted(out, out + l));
             STXXL_MSG("merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")");
         }
 
         // zero length merge on empty data structure
-        loser.multi_merge(out, out);
-        loser.multi_merge(out, out);
-        loser.multi_merge(out, out);
+        merger.multi_merge(out, out);
+        merger.multi_merge(out, out);
+        merger.multi_merge(out, out);
 
         delete[] out;
-    } // loser_tree test
+    } // int_merger test
 }
 
 // vim: et:ts=4:sw=4

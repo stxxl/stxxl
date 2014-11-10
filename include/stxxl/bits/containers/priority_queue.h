@@ -22,8 +22,8 @@
 
 #include <stxxl/bits/containers/pq_helpers.h>
 #include <stxxl/bits/containers/pq_mergers.h>
+#include <stxxl/bits/containers/pq_int_merger.h>
 #include <stxxl/bits/containers/pq_ext_merger.h>
-#include <stxxl/bits/containers/pq_losertree.h>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -81,8 +81,8 @@ void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity,
     a.swap(b);
 }
 template <class ValueType, class CompareType, unsigned KNKMAX>
-void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX>& a,
-          stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX>& b)
+void swap(stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX>& a,
+          stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX>& b)
 {
     a.swap(b);
 }
@@ -126,7 +126,7 @@ protected:
     typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
         insert_heap_type;
 
-    typedef priority_queue_local::loser_tree<
+    typedef priority_queue_local::int_merger<
             value_type,
             comparator_type,
             IntKMAX> int_merger_type;
