@@ -261,7 +261,7 @@ protected:
     };
 #endif //STXXL_PQ_EXTERNAL_LOSER_TREE
 
-    size_type size_;          // total number of elements stored
+    size_type m_size;          // total number of elements stored
     unsigned_type log_k;      // log of current tree size
     unsigned_type k;          // invariant (k == 1 << log_k), always a power of 2
     // only entries 0 .. arity-1 may hold actual sequences, the other
@@ -288,13 +288,13 @@ protected:
 
 public:
     ext_merger()
-        : size_(0), log_k(0), k(1), pool(0)
+        : m_size(0), log_k(0), k(1), pool(0)
     {
         init();
     }
 
     ext_merger(pool_type* pool_)
-        : size_(0), log_k(0), k(1),
+        : m_size(0), log_k(0), k(1),
           pool(pool_)
     {
         init();
@@ -537,7 +537,7 @@ private:
     {
         std::swap(cmp, obj.cmp);
         std::swap(free_segments, obj.free_segments);
-        std::swap(size_, obj.size_);
+        std::swap(m_size, obj.m_size);
         std::swap(log_k, obj.log_k);
         std::swap(k, obj.k);
         swap_1D_arrays(entry, obj.entry, arity_bound);
@@ -570,7 +570,7 @@ public:
             return;
 
         assert(k > 0);
-        assert(length <= (int_type)size_);
+        assert(length <= (int_type)m_size);
 
         //This is the place to make statistics about external multi_merge calls.
 
@@ -677,7 +677,7 @@ public:
             begin = parallel::multiway_merge(seqs.begin(), seqs.end(), begin, inv_cmp, output_size); //sequence iterators are progressed appropriately
 
             rest -= output_size;
-            size_ -= output_size;
+            m_size -= output_size;
 
             for (unsigned_type i = 0; i < seqs.size(); ++i)
             {
@@ -826,7 +826,7 @@ public:
             break;
         }
 
-        size_ -= length;
+        m_size -= length;
 #endif
 
         // compact tree if it got considerably smaller
@@ -1027,7 +1027,7 @@ public:
 
             insert_segment(bids, first_block, first_size, free_slot);
 
-            size_ += segment_size;
+            m_size += segment_size;
 
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
             // propagate new information up the tree
@@ -1045,7 +1045,7 @@ public:
         }
     }
 
-    size_type size() const { return size_; }
+    size_type size() const { return m_size; }
 
 protected:
     /*!

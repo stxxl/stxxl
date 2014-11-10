@@ -40,7 +40,6 @@ class int_merger : private noncopyable
 public:
     typedef ValueType value_type;
     typedef CompareType comparator_type;
-    typedef value_type Element;
     enum { max_arity = MaxArity };
 
 private:
@@ -56,11 +55,11 @@ private:
     // stack of free segment indices
     internal_bounded_stack<unsigned_type, MaxArity> free_slots;
 
-    unsigned_type size_;     // total number of elements stored
+    unsigned_type m_size;     // total number of elements stored
     unsigned_type logK;      // log of current tree size
     unsigned_type k;         // invariant (k == 1 << logK), always a power of two
 
-    Element sentinel;        // target of free segment pointers
+    value_type sentinel;        // target of free segment pointers
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
     // upper levels of loser trees
@@ -71,38 +70,38 @@ private:
     // leaf information
     // note that Knuth uses indices k..k-1
     // while we use 0..k-1
-    Element* current[MaxArity];               // pointer to current element
-    Element* current_end[MaxArity];           // pointer to end of block for current element
-    Element* segment[MaxArity];               // start of Segments
+    value_type* current[MaxArity];               // pointer to current element
+    value_type* current_end[MaxArity];           // pointer to end of block for current element
+    value_type* segment[MaxArity];               // start of Segments
     unsigned_type segment_size[MaxArity];     // just to count the internal memory consumption, in bytes
 
     unsigned_type mem_cons_;
 
     // private member functions
     unsigned_type initWinner(unsigned_type root);
-    void update_on_insert(unsigned_type node, const Element& newKey, unsigned_type newIndex,
-                          Element* winnerKey, unsigned_type* winnerIndex, unsigned_type* mask);
+    void update_on_insert(unsigned_type node, const value_type& newKey, unsigned_type newIndex,
+                          value_type* winnerKey, unsigned_type* winnerIndex, unsigned_type* mask);
     void deallocate_segment(unsigned_type slot);
     void doubleK();
     void compactTree();
     void rebuildLoserTree();
     bool is_segment_empty(unsigned_type slot);
-    void multi_merge_k(Element* target, unsigned_type length);
+    void multi_merge_k(value_type* target, unsigned_type length);
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
     template <int LogK>
-    void multi_merge_f(Element* target, unsigned_type length)
+    void multi_merge_f(value_type* target, unsigned_type length)
     {
         //Entry *currentPos;
-        //Element currentKey;
+        //value_type currentKey;
         //int currentIndex; // leaf pointed to by current entry
-        Element* done = target + length;
+        value_type* done = target + length;
         Entry* regEntry = entry;
-        Element** regStates = current;
+        value_type** regStates = current;
         unsigned_type winnerIndex = regEntry[0].index;
-        Element winnerKey = regEntry[0].key;
-        Element* winnerPos;
-        //Element sup = sentinel; // supremum
+        value_type winnerKey = regEntry[0].key;
+        value_type* winnerPos;
+        //value_type sup = sentinel; // supremum
 
         assert(logK >= LogK);
         while (target != done)
@@ -128,7 +127,7 @@ private:
 #define TreeStep(L)                                                                                               \
     if (1 << LogK >= 1 << L) {                                                                                    \
         Entry* pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> ((LogK - L + 1 >= 0) ? (LogK - L + 1) : 0)); \
-        Element key ## L = pos ## L->key;                                                                         \
+        value_type key ## L = pos ## L->key;                                                                         \
         if (cmp(winnerKey, key ## L)) {                                                                           \
             unsigned_type index ## L = pos ## L->index;                                                           \
             pos ## L->key = winnerKey;                                                                            \
@@ -155,25 +154,62 @@ private:
 #endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
 public:
-    bool is_sentinel(const Element& a)
+    bool is_sentinel(const value_type& a)
     {
         return !(cmp(cmp.min_value(), a));
     }
-    bool not_sentinel(const Element& a)
+    bool not_sentinel(const value_type& a)
     {
         return cmp(cmp.min_value(), a);
     }
 
 public:
-    int_merger();
-    ~int_merger();
-    void init();
+    int_merger()
+        : m_size(0), logK(0), k(1), mem_cons_(0)
+    {
+        free_slots.push(0);
+        segment[0] = NULL;
+        current[0] = &sentinel;
+        current_end[0] = &sentinel;
+
+        // entry and sentinel are initialized by init since they need the value
+        // of supremum
+        init();
+    }
+
+    void init()
+    {
+        // verify strict weak ordering
+        assert(!cmp(cmp.min_value(), cmp.min_value()));
+
+        sentinel = cmp.min_value();
+        rebuildLoserTree();
+#if STXXL_PQ_INTERNAL_LOSER_TREE
+        assert(current[entry[0].index] == &sentinel);
+#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
+    }
+
+    ~int_merger()
+    {
+        STXXL_VERBOSE1("int_merger::~int_merger()");
+        for (unsigned_type i = 0; i < k; ++i)
+        {
+            if (segment[i])
+            {
+                STXXL_VERBOSE2("int_merger::~int_merger() deleting segment " << i);
+                delete[] segment[i];
+                mem_cons_ -= segment_size[i];
+            }
+        }
+        // check whether we have not lost any memory
+        assert(mem_cons_ == 0);
+    }
 
     void swap(int_merger& obj)
     {
         std::swap(cmp, obj.cmp);
         std::swap(free_slots, obj.free_slots);
-        std::swap(size_, obj.size_);
+        std::swap(m_size, obj.m_size);
         std::swap(logK, obj.logK);
         std::swap(k, obj.k);
         std::swap(sentinel, obj.sentinel);
@@ -187,11 +223,11 @@ public:
         std::swap(mem_cons_, obj.mem_cons_);
     }
 
-    void multi_merge(Element* begin, Element* end)
+    void multi_merge(value_type* begin, value_type* end)
     {
         multi_merge(begin, end - begin);
     }
-    void multi_merge(Element*, unsigned_type length);
+    void multi_merge(value_type*, unsigned_type length);
 
     unsigned_type mem_cons() const { return mem_cons_; }
 
@@ -201,35 +237,12 @@ public:
     }
 
     //! insert segment beginning at target
-    void insert_segment(Element * target, unsigned_type length);
+    void insert_segment(value_type * target, unsigned_type length);
 
-    unsigned_type size() const { return size_; }
+    unsigned_type size() const { return m_size; }
 };
 
 ///////////////////////// LoserTree ///////////////////////////////////
-template <class ValueType, class CompareType, unsigned MaxArity>
-int_merger<ValueType, CompareType, MaxArity>::int_merger()
-    : size_(0), logK(0), k(1), mem_cons_(0)
-{
-    free_slots.push(0);
-    segment[0] = NULL;
-    current[0] = &sentinel;
-    current_end[0] = &sentinel;
-    // entry and sentinel are initialized by init
-    // since they need the value of supremum
-    init();
-}
-
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::init()
-{
-    assert(!cmp(cmp.min_value(), cmp.min_value()));     // verify strict weak ordering
-    sentinel = cmp.min_value();
-    rebuildLoserTree();
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-    assert(current[entry[0].index] == &sentinel);
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
-}
 
 // rebuild loser tree information from the values in current
 template <class ValueType, class CompareType, unsigned MaxArity>
@@ -258,8 +271,8 @@ unsigned_type int_merger<ValueType, CompareType, MaxArity>::initWinner(unsigned_
     } else {
         unsigned_type left = initWinner(2 * root);
         unsigned_type right = initWinner(2 * root + 1);
-        Element lk = *(current[left]);
-        Element rk = *(current[right]);
+        value_type lk = *(current[left]);
+        value_type rk = *(current[right]);
         if (!(cmp(lk, rk))) {     // right subtree loses
             entry[root].index = right;
             entry[root].key = rk;
@@ -280,9 +293,9 @@ unsigned_type int_merger<ValueType, CompareType, MaxArity>::initWinner(unsigned_
 template <class ValueType, class CompareType, unsigned MaxArity>
 void int_merger<ValueType, CompareType, MaxArity>::update_on_insert(
     unsigned_type node,
-    const Element& newKey,
+    const value_type& newKey,
     unsigned_type newIndex,
-    Element* winnerKey,
+    value_type* winnerKey,
     unsigned_type* winnerIndex,            // old winner
     unsigned_type* mask)                   // 1 << (ceil(log KNK) - dist-from-root)
 {
@@ -297,7 +310,7 @@ void int_merger<ValueType, CompareType, MaxArity>::update_on_insert(
         }
     } else {
         update_on_insert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
-        Element loserKey = entry[node].key;
+        value_type loserKey = entry[node].key;
         unsigned_type loserIndex = entry[node].index;
         if ((*winnerIndex & *mask) != (newIndex & *mask)) {     // different subtrees
             if (cmp(loserKey, newKey)) {                        // newKey will have influence here
@@ -413,7 +426,7 @@ void int_merger<ValueType, CompareType, MaxArity>::compactTree()
 // require: is_space_available() == 1
 template <class ValueType, class CompareType, unsigned MaxArity>
 void int_merger<ValueType, CompareType, MaxArity>::
-insert_segment(Element* target, unsigned_type length)
+insert_segment(value_type* target, unsigned_type length)
 {
     STXXL_VERBOSE2("int_merger::insert_segment(" << target << "," << length << ")");
     //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
@@ -438,11 +451,11 @@ insert_segment(Element* target, unsigned_type length)
         current_end[index] = target + length;
         segment_size[index] = (length + 1) * sizeof(value_type);
         mem_cons_ += (length + 1) * sizeof(value_type);
-        size_ += length;
+        m_size += length;
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
         // propagate new information up the tree
-        Element dummyKey;
+        value_type dummyKey;
         unsigned_type dummyIndex;
         unsigned_type dummyMask;
         update_on_insert((index + k) >> 1, *target, index,
@@ -455,23 +468,6 @@ insert_segment(Element* target, unsigned_type length)
         // clogging up the tree
         delete[] target;
     }
-}
-
-template <class ValueType, class CompareType, unsigned MaxArity>
-int_merger<ValueType, CompareType, MaxArity>::~int_merger()
-{
-    STXXL_VERBOSE1("int_merger::~int_merger()");
-    for (unsigned_type i = 0; i < k; ++i)
-    {
-        if (segment[i])
-        {
-            STXXL_VERBOSE2("int_merger::~int_merger() deleting segment " << i);
-            delete[] segment[i];
-            mem_cons_ -= segment_size[i];
-        }
-    }
-    // check whether we have not lost any memory
-    assert(mem_cons_ == 0);
 }
 
 // free an empty segment .
@@ -502,7 +498,7 @@ deallocate_segment(unsigned_type slot)
 // - segments are ended by sentinels
 template <class ValueType, class CompareType, unsigned MaxArity>
 void int_merger<ValueType, CompareType, MaxArity>::
-multi_merge(Element* target, unsigned_type length)
+multi_merge(value_type* target, unsigned_type length)
 {
     STXXL_VERBOSE3("int_merger::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
 
@@ -510,7 +506,7 @@ multi_merge(Element* target, unsigned_type length)
         return;
 
     assert(k > 0);
-    assert(length <= size_);
+    assert(length <= m_size);
 
     //This is the place to make statistics about internal multi_merge calls.
 
@@ -524,7 +520,7 @@ multi_merge(Element* target, unsigned_type length)
         assert(entry[0].index == 0);
 #endif      //STXXL_PQ_INTERNAL_LOSER_TREE
         assert(free_slots.empty());
-        memcpy(target, current[0], length * sizeof(Element));
+        memcpy(target, current[0], length * sizeof(value_type));
         //std::copy(current[0], current[0] + length, target);
         current[0] += length;
 #if STXXL_PQ_INTERNAL_LOSER_TREE
@@ -538,7 +534,7 @@ multi_merge(Element* target, unsigned_type length)
         assert(k == 2);
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         {
-            std::pair<Element*, Element*> seqs[2] =
+            std::pair<value_type*, value_type*> seqs[2] =
             {
                 std::make_pair(current[0], current_end[0]),
                 std::make_pair(current[1], current_end[1])
@@ -562,7 +558,7 @@ multi_merge(Element* target, unsigned_type length)
         assert(k == 4);
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         {
-            std::pair<Element*, Element*> seqs[4] =
+            std::pair<value_type*, value_type*> seqs[4] =
             {
                 std::make_pair(current[0], current_end[0]),
                 std::make_pair(current[1], current_end[1]),
@@ -617,7 +613,7 @@ multi_merge(Element* target, unsigned_type length)
     default:
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         {
-            std::vector<std::pair<Element*, Element*> > seqs;
+            std::vector<std::pair<value_type*, value_type*> > seqs;
             std::vector<int_type> orig_seq_index;
             for (unsigned int i = 0; i < k; ++i)
             {
@@ -649,7 +645,7 @@ multi_merge(Element* target, unsigned_type length)
         break;
     }
 
-    size_ -= length;
+    m_size -= length;
 
     // compact tree if it got considerably smaller
     {
@@ -687,16 +683,16 @@ is_segment_empty(unsigned_type slot)
 // multi-merge for arbitrary K
 template <class ValueType, class CompareType, unsigned MaxArity>
 void int_merger<ValueType, CompareType, MaxArity>::
-multi_merge_k(Element* target, unsigned_type length)
+multi_merge_k(value_type* target, unsigned_type length)
 {
     Entry* currentPos;
-    Element currentKey;
+    value_type currentKey;
     unsigned_type currentIndex;     // leaf pointed to by current entry
     unsigned_type kReg = k;
-    Element* done = target + length;
+    value_type* done = target + length;
     unsigned_type winnerIndex = entry[0].index;
-    Element winnerKey = entry[0].key;
-    Element* winnerPos;
+    value_type winnerKey = entry[0].key;
+    value_type* winnerPos;
 
     while (target != done)
     {
