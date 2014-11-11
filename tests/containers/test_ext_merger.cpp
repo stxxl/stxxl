@@ -90,7 +90,6 @@ int main()
     cnt = -100;
     my_type* seq4 = make_sequence(dummy, 1024);
     my_type* out = new my_type[4 * 1024];
-    loser.init();
     loser.append_array(seq1, 1024);
     loser.append_array(seq2, 1024);
     loser.append_array(seq3, 1024);

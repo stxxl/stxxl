@@ -152,7 +152,6 @@ int main()
         dummy(2 * B, 2);
         my_type* seq7 = make_sequence(dummy, 4 * B);
 
-        merger.init();
         merger.append_array(seq0, 2 * B);
         merger.append_array(seq1, 2 * B);
         merger.append_array(seq2, 4 * B);

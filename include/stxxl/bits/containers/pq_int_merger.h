@@ -52,8 +52,6 @@ protected:
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
     comparator_type cmp;
-    // stack of free segment indices
-    internal_bounded_stack<unsigned_type, MaxArity> free_slots;
 
     unsigned_type m_size;     // total number of elements stored
     unsigned_type logK;      // log of current tree size
@@ -79,7 +77,23 @@ protected:
 
     // private member functions
     unsigned_type init_winner(unsigned_type root);
-    void deallocate_segment(unsigned_type slot);
+
+    //! free an empty segment .
+    void free_array(unsigned_type slot)
+    {
+        // reroute current pointer to some empty sentinel segment
+        // with a sentinel key
+        STXXL_VERBOSE2("int_arrays::free_array() deleting array " <<
+                       slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
+        current[slot] = &sentinel;
+        current_end[slot] = &sentinel;
+
+        // free memory
+        delete[] segment[slot];
+        segment[slot] = NULL;
+        mem_cons_ -= segment_size[slot];
+    }
+
     void rebuild_loser_tree();
 
     //! is this array invalid: empty and prefixed with sentinel?
@@ -132,26 +146,17 @@ public:
     int_arrays()
         : m_size(0), logK(0), k(1), mem_cons_(0)
     {
-        free_slots.push(0);
         segment[0] = NULL;
         current[0] = &sentinel;
         current_end[0] = &sentinel;
 
         // entry and sentinel are initialized by init since they need the value
         // of supremum
-        init();
-    }
 
-    void init()
-    {
         // verify strict weak ordering
         assert(!cmp(cmp.min_value(), cmp.min_value()));
 
         sentinel = cmp.min_value();
-        rebuild_loser_tree();
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        assert(current[entry[0].index] == &sentinel);
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
     }
 
     ~int_arrays()
@@ -173,7 +178,6 @@ public:
     void swap(int_arrays& obj)
     {
         std::swap(cmp, obj.cmp);
-        std::swap(free_slots, obj.free_slots);
         std::swap(m_size, obj.m_size);
         std::swap(logK, obj.logK);
         std::swap(k, obj.k);
@@ -190,11 +194,6 @@ public:
 
 public:
     unsigned_type mem_cons() const { return mem_cons_; }
-
-    bool is_space_available() const     // for new segment
-    {
-        return (k < MaxArity) || !free_slots.empty();
-    }
 
     //! insert array to merger at index, takes ownership of the array.
     //! requires: is_space_available() == 1
@@ -259,27 +258,6 @@ unsigned_type int_arrays<ValueType, CompareType, MaxArity>::init_winner(unsigned
 
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
-// free an empty segment .
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::
-deallocate_segment(unsigned_type slot)
-{
-    // reroute current pointer to some empty sentinel segment
-    // with a sentinel key
-    STXXL_VERBOSE2("int_arrays::deallocate_segment() deleting segment " <<
-                   slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
-    current[slot] = &sentinel;
-    current_end[slot] = &sentinel;
-
-    // free memory
-    delete[] segment[slot];
-    segment[slot] = NULL;
-    mem_cons_ -= segment_size[slot];
-
-    // push on the stack of free segment indices
-    free_slots.push(slot);
-}
-
 template <class ValueType, class CompareType, unsigned MaxArity>
 class int_merger : public loser_tree<
     int_arrays<ValueType, CompareType, MaxArity>,
@@ -343,9 +321,13 @@ public:
 #endif // STXXL_PQ_INTERNAL_LOSER_TREE
     }
 
-    void deallocate_segment(unsigned_type slot)
+    void free_array(unsigned_type slot)
     {
-        return super_type::deallocate_segment(slot);
+        // free array in array list
+        super_type::free_array(slot);
+
+        // free player in loser tree
+        tree_type::free_player(slot);
     }
 
     // delete the length smallest elements and write them to target
@@ -391,7 +373,7 @@ public:
 #endif      //STXXL_PQ_INTERNAL_LOSER_TREE
 
             if (is_array_empty(0) && is_array_allocated(0))
-                deallocate_segment(0);
+                free_array(0);
 
             break;
         case 1:
@@ -412,10 +394,10 @@ public:
             this->rebuild_loser_tree();
 #endif
             if (is_array_empty(0) && is_array_allocated(0))
-                deallocate_segment(0);
+                free_array(0);
 
             if (is_array_empty(1) && is_array_allocated(1))
-                deallocate_segment(1);
+                free_array(1);
 
             break;
         case 2:
@@ -444,16 +426,16 @@ public:
             this->rebuild_loser_tree();
 #endif
             if (is_array_empty(0) && is_array_allocated(0))
-                deallocate_segment(0);
+                free_array(0);
 
             if (is_array_empty(1) && is_array_allocated(1))
-                deallocate_segment(1);
+                free_array(1);
 
             if (is_array_empty(2) && is_array_allocated(2))
-                deallocate_segment(2);
+                free_array(2);
 
             if (is_array_empty(3) && is_array_allocated(3))
-                deallocate_segment(3);
+                free_array(3);
 
             break;
 #if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
@@ -501,7 +483,7 @@ public:
                 if (is_array_empty(i) && is_array_allocated(i))
                 {
                     STXXL_VERBOSE3("deallocated " << i);
-                    deallocate_segment(i);
+                    free_array(i);
                 }
             }
         }

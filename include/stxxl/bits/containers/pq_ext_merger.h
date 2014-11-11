@@ -268,9 +268,6 @@ protected:
     // entries arity .. arity_bound-1 are sentinels to make the size of the tree
     // a power of 2 always
 
-    // stack of empty segment indices
-    internal_bounded_stack<unsigned_type, arity> free_slots;
-
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
     // upper levels of loser trees
     // entry[0] contains the winner info
@@ -353,14 +350,6 @@ protected:
 
             states[i].make_inf();
         }
-
-        assert(k == 1);
-        free_slots.push(0); //total state: one free sequence
-
-        rebuild_loser_tree();
-#if STXXL_PQ_EXTERNAL_LOSER_TREE
-        assert(is_sentinel(*states[entry[0].index]));
-#endif      //STXXL_PQ_EXTERNAL_LOSER_TREE
     }
 
     // rebuild loser tree information from the values in current
@@ -470,7 +459,6 @@ protected:
     void swap(ext_arrays& obj)
     {
         std::swap(cmp, obj.cmp);
-        std::swap(free_slots, obj.free_slots);
         std::swap(m_size, obj.m_size);
         std::swap(logK, obj.logK);
         std::swap(k, obj.k);
@@ -488,10 +476,6 @@ public:
     }
 
 public:
-    bool is_space_available() const // for new segment
-    {
-        return k < arity || !free_slots.empty();
-    }
 
     size_type size() const { return m_size; }
 
@@ -524,15 +508,12 @@ protected:
     }
 
     // free an empty segment .
-    void deallocate_segment(unsigned_type slot)
+    void free_array(unsigned_type slot)
     {
-        STXXL_VERBOSE1("ext_arrays::deallocate_segment() deleting segment " << slot << " allocated=" << int(is_array_allocated(slot)));
+        STXXL_VERBOSE1("ext_arrays::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot)));
         assert(is_array_allocated(slot));
         states[slot].allocated = false;
         states[slot].make_inf();
-
-        // push on the stack of free segment indices
-        free_slots.push(slot);
     }
 
     //! is this segment empty ?
@@ -657,9 +638,13 @@ public:
 #endif // STXXL_PQ_EXTERNAL_LOSER_TREE
     }
 
-    void deallocate_segment(unsigned_type slot)
+    void free_array(unsigned_type slot)
     {
-        return super_type::deallocate_segment(slot);
+        // free array in array list
+        super_type::free_array(slot);
+
+        // free player in loser tree
+        tree_type::free_player(slot);
     }
 
     // delete the (length = end-begin) smallest elements and write them to [begin..end)
@@ -866,7 +851,7 @@ public:
             if (is_array_empty(seg))
             {
                 STXXL_VERBOSE1("deallocated " << seg);
-                deallocate_segment(seg);
+                free_array(seg);
             }
         }
 
@@ -891,7 +876,7 @@ public:
             entry[0].key = **states;
 
             if (is_array_empty(0))
-                deallocate_segment(0);
+                free_array(0);
 
             break;
         case 1:
@@ -900,10 +885,10 @@ public:
             this->rebuild_loser_tree();
 
             if (is_array_empty(0) && is_array_allocated(0))
-                deallocate_segment(0);
+                free_array(0);
 
             if (is_array_empty(1) && is_array_allocated(1))
-                deallocate_segment(1);
+                free_array(1);
 
             break;
         case 2:
@@ -915,16 +900,16 @@ public:
             this->rebuild_loser_tree();
 
             if (is_array_empty(0) && is_array_allocated(0))
-                deallocate_segment(0);
+                free_array(0);
 
             if (is_array_empty(1) && is_array_allocated(1))
-                deallocate_segment(1);
+                free_array(1);
 
             if (is_array_empty(2) && is_array_allocated(2))
-                deallocate_segment(2);
+                free_array(2);
 
             if (is_array_empty(3) && is_array_allocated(3))
-                deallocate_segment(3);
+                free_array(3);
 
             break;
         case  3: this->template multi_merge_f<3>(begin, end);

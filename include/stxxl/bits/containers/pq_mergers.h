@@ -46,6 +46,9 @@ public:
     typedef typename super_type::SequenceType SequenceType;
     typedef typename super_type::Entry Entry;
 
+    //! stack of free player indices
+    internal_bounded_stack<unsigned_type, arity> free_slots;
+
     bool is_array_empty(unsigned_type slot) const
     {
         return super_type::is_array_empty(slot);
@@ -56,11 +59,24 @@ public:
         return super_type::is_array_allocated(slot);
     }
 
+    loser_tree()
+        : super_type()
+    {
+        assert(this->k == 1);
+
+        // initial state: one empty player slot
+        free_slots.push(0);
+
+        this->rebuild_loser_tree();
+
+#if STXXL_PQ_INTERNAL_LOSER_TREE
+        assert(is_array_empty(0) && !is_array_allocated(0));
+#endif // STXXL_PQ_INTERNAL_LOSER_TREE
+    }
+
     //! Allocate a free slot for a new player.
     unsigned_type new_player()
     {
-        internal_bounded_stack<unsigned_type, Arity>& free_slots = this->free_slots;
-
         // get a free slot
         if (free_slots.empty()) {
             // tree is too small, attempt to enlarge
@@ -72,6 +88,19 @@ public:
         free_slots.pop();
 
         return index;
+    }
+
+    //! Free a finished player's slot
+    void free_player(unsigned_type slot)
+    {
+        // push on the stack of free segment indices
+        free_slots.push(slot);
+    }
+
+    //! Whether there is still space for new array
+    bool is_space_available() const
+    {
+        return (this->k < arity) || !free_slots.empty();
     }
 
     /*!
@@ -259,8 +288,10 @@ public:
             winner_key = *(states[winner_index]);
 
             // remove winner segment if empty now
-            if (is_sentinel(winner_key)) //
-                super_type::deallocate_segment(winner_index);
+            if (is_sentinel(winner_key)) {
+                this->free_array(winner_index);
+                this->free_player(winner_index);
+            }
 
             // go up the entry-tree
             for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
@@ -301,8 +332,10 @@ public:
             winner_key = *(reg_states[winner_index]);
 
             // remove winner segment if empty now
-            if (is_sentinel(winner_key))
-                this->deallocate_segment(winner_index);
+            if (is_sentinel(winner_key)) {
+                this->free_array(winner_index);
+                this->free_player(winner_index);
+            }
 
             // update loser tree
 #define TreeStep(L)                                                     \
@@ -332,6 +365,11 @@ public:
         }
         reg_entry[0].index = winner_index;
         reg_entry[0].key = winner_key;
+    }
+
+    void swap(loser_tree& obj)
+    {
+        std::swap(free_slots, obj.free_slots);
     }
 };
 
