@@ -80,7 +80,7 @@ protected:
     // private member functions
     unsigned_type initWinner(unsigned_type root);
     void update_on_insert(unsigned_type node, const value_type& newKey, unsigned_type newIndex,
-                          value_type* winnerKey, unsigned_type* winnerIndex, unsigned_type* mask);
+                          value_type* winner_key, unsigned_type* winner_index, unsigned_type* mask);
     void deallocate_segment(unsigned_type slot);
     void doubleK();
     void compactTree();
@@ -92,48 +92,48 @@ protected:
     template <int LogK>
     void multi_merge_f(value_type* target, unsigned_type length)
     {
-        //Entry *currentPos;
-        //value_type currentKey;
-        //int currentIndex; // leaf pointed to by current entry
+        //Entry *current_pos;
+        //value_type current_key;
+        //int current_index; // leaf pointed to by current entry
         value_type* done = target + length;
         Entry* regEntry = entry;
         value_type** regStates = current;
-        unsigned_type winnerIndex = regEntry[0].index;
-        value_type winnerKey = regEntry[0].key;
+        unsigned_type winner_index = regEntry[0].index;
+        value_type winner_key = regEntry[0].key;
         value_type* winnerPos;
         //value_type sup = sentinel; // supremum
 
         assert(logK >= LogK);
         while (target != done)
         {
-            winnerPos = regStates[winnerIndex];
+            winnerPos = regStates[winner_index];
 
             // write result
-            *target = winnerKey;
+            *target = winner_key;
 
             // advance winner segment
             ++winnerPos;
-            regStates[winnerIndex] = winnerPos;
-            winnerKey = *winnerPos;
+            regStates[winner_index] = winnerPos;
+            winner_key = *winnerPos;
 
             // remove winner segment if empty now
-            if (is_sentinel(winnerKey))
+            if (is_sentinel(winner_key))
             {
-                deallocate_segment(winnerIndex);
+                deallocate_segment(winner_index);
             }
             ++target;
 
             // update loser tree
 #define TreeStep(L)                                                                                               \
     if (1 << LogK >= 1 << L) {                                                                                    \
-        Entry* pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> ((LogK - L + 1 >= 0) ? (LogK - L + 1) : 0)); \
+        Entry* pos ## L = regEntry + ((winner_index + (1 << LogK)) >> ((LogK - L + 1 >= 0) ? (LogK - L + 1) : 0)); \
         value_type key ## L = pos ## L->key;                                                                         \
-        if (cmp(winnerKey, key ## L)) {                                                                           \
+        if (cmp(winner_key, key ## L)) {                                                                           \
             unsigned_type index ## L = pos ## L->index;                                                           \
-            pos ## L->key = winnerKey;                                                                            \
-            pos ## L->index = winnerIndex;                                                                        \
-            winnerKey = key ## L;                                                                                 \
-            winnerIndex = index ## L;                                                                             \
+            pos ## L->key = winner_key;                                                                            \
+            pos ## L->index = winner_index;                                                                        \
+            winner_key = key ## L;                                                                                 \
+            winner_index = index ## L;                                                                             \
         }                                                                                                         \
     }
             TreeStep(10);
@@ -148,8 +148,8 @@ protected:
             TreeStep(1);
 #undef TreeStep
         }
-        regEntry[0].index = winnerIndex;
-        regEntry[0].key = winnerKey;
+        regEntry[0].index = winner_index;
+        regEntry[0].key = winner_key;
     }
 #endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
@@ -161,6 +161,13 @@ public:
     bool not_sentinel(const value_type& a) const
     {
         return cmp(cmp.min_value(), a);
+    }
+
+    typedef value_type* SequenceType;
+
+    SequenceType* get_sequences()
+    {
+        return current;
     }
 
 public:
@@ -290,40 +297,42 @@ void int_arrays<ValueType, CompareType, MaxArity>::update_on_insert(
     unsigned_type node,
     const value_type& newKey,
     unsigned_type newIndex,
-    value_type* winnerKey,
-    unsigned_type* winnerIndex,            // old winner
+    value_type* winner_key,
+    unsigned_type* winner_index,            // old winner
     unsigned_type* mask)                   // 1 << (ceil(log KNK) - dist-from-root)
 {
     if (node == 0) {                       // winner part of root
         *mask = (unsigned_type)(1) << (logK - 1);
-        *winnerKey = entry[0].key;
-        *winnerIndex = entry[0].index;
+        *winner_key = entry[0].key;
+        *winner_index = entry[0].index;
         if (cmp(entry[node].key, newKey))
         {
             entry[node].key = newKey;
             entry[node].index = newIndex;
         }
-    } else {
-        update_on_insert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
+    }
+    else {
+        update_on_insert(node >> 1, newKey, newIndex, winner_key, winner_index, mask);
         value_type loserKey = entry[node].key;
         unsigned_type loserIndex = entry[node].index;
-        if ((*winnerIndex & *mask) != (newIndex & *mask)) {     // different subtrees
+        if ((*winner_index & *mask) != (newIndex & *mask)) {     // different subtrees
             if (cmp(loserKey, newKey)) {                        // newKey will have influence here
-                if (cmp(*winnerKey, newKey)) {                  // old winner loses here
-                    entry[node].key = *winnerKey;
-                    entry[node].index = *winnerIndex;
-                } else {                                        // new entry loses here
+                if (cmp(*winner_key, newKey)) {                  // old winner loses here
+                    entry[node].key = *winner_key;
+                    entry[node].index = *winner_index;
+                }
+                else {                                          // new entry loses here
                     entry[node].key = newKey;
                     entry[node].index = newIndex;
                 }
             }
-            *winnerKey = loserKey;
-            *winnerIndex = loserIndex;
+            *winner_key = loserKey;
+            *winner_index = loserIndex;
         }
         // note that nothing needs to be done if
         // the winner came from the same subtree
-        // a) newKey <= winnerKey => even more reason for the other tree to lose
-        // b) newKey >  winnerKey => the old winner will beat the new
+        // a) newKey <= winner_key => even more reason for the other tree to lose
+        // b) newKey >  winner_key => the old winner will beat the new
         //                           entry further down the tree
         // also the same old winner is handed down the tree
 
@@ -494,57 +503,6 @@ is_segment_empty(unsigned_type slot) const
     return (is_sentinel(*(current[slot])) && (current[slot] != &sentinel));
 }
 
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-// multi-merge for arbitrary K
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::
-multi_merge_k(value_type* target, unsigned_type length)
-{
-    Entry* currentPos;
-    value_type currentKey;
-    unsigned_type currentIndex;     // leaf pointed to by current entry
-    unsigned_type kReg = k;
-    value_type* done = target + length;
-    unsigned_type winnerIndex = entry[0].index;
-    value_type winnerKey = entry[0].key;
-    value_type* winnerPos;
-
-    while (target != done)
-    {
-        winnerPos = current[winnerIndex];
-
-        // write result
-        *target = winnerKey;
-
-        // advance winner segment
-        ++winnerPos;
-        current[winnerIndex] = winnerPos;
-        winnerKey = *winnerPos;
-
-        // remove winner segment if empty now
-        if (is_sentinel(winnerKey))     //
-            deallocate_segment(winnerIndex);
-
-        // go up the entry-tree
-        for (unsigned_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1) {
-            currentPos = entry + i;
-            currentKey = currentPos->key;
-            if (cmp(winnerKey, currentKey)) {
-                currentIndex = currentPos->index;
-                currentPos->key = winnerKey;
-                currentPos->index = winnerIndex;
-                winnerKey = currentKey;
-                winnerIndex = currentIndex;
-            }
-        }
-
-        ++target;
-    }
-    entry[0].index = winnerIndex;
-    entry[0].key = winnerKey;
-}
-#endif // STXXL_PQ_INTERNAL_LOSER_TREE
-
 template <class ValueType, class CompareType, unsigned MaxArity>
 class int_merger : public loser_tree<
     int_arrays<ValueType, CompareType, MaxArity>,
@@ -583,9 +541,9 @@ public:
         unsigned_type& logK = this->logK;
         unsigned_type& m_size = this->m_size;
         CompareType& cmp = this->cmp;
+        typename super_type::Entry* entry = this->entry;
         internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
         value_type** current = this->current;
-        value_type** current_end = this->current_end;
 
         STXXL_VERBOSE3("int_arrays::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
 
@@ -632,7 +590,7 @@ public:
             }
 #else
             merge_iterator(current[0], current[1], target, length, cmp);
-            rebuildLoserTree();
+            this->rebuildLoserTree();
 #endif
             if (is_segment_empty(0))
                 deallocate_segment(0);
@@ -664,7 +622,7 @@ public:
             else
                 merge4_iterator(current[0], current[1], current[2], current[3], target, length, cmp);
 
-            rebuildLoserTree();
+            this->rebuildLoserTree();
 #endif
             if (is_segment_empty(0))
                 deallocate_segment(0);
@@ -680,21 +638,21 @@ public:
 
             break;
 #if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
-        case  3: multi_merge_f<3>(target, length);
+        case  3: this->template multi_merge_f<3>(target, length);
             break;
-        case  4: multi_merge_f<4>(target, length);
+        case  4: this->template multi_merge_f<4>(target, length);
             break;
-        case  5: multi_merge_f<5>(target, length);
+        case  5: this->template multi_merge_f<5>(target, length);
             break;
-        case  6: multi_merge_f<6>(target, length);
+        case  6: this->template multi_merge_f<6>(target, length);
             break;
-        case  7: multi_merge_f<7>(target, length);
+        case  7: this->template multi_merge_f<7>(target, length);
             break;
-        case  8: multi_merge_f<8>(target, length);
+        case  8: this->template multi_merge_f<8>(target, length);
             break;
-        case  9: multi_merge_f<9>(target, length);
+        case  9: this->template multi_merge_f<9>(target, length);
             break;
-        case 10: multi_merge_f<10>(target, length);
+        case 10: this->template multi_merge_f<10>(target, length);
             break;
 #endif
         default:
@@ -727,7 +685,7 @@ public:
                 }
         }
 #else
-        multi_merge_k(target, length);
+        multi_merge_k(target, target + length);
 #endif
         break;
         }

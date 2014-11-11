@@ -32,6 +32,56 @@ template <class ArraysType, class CompareType, unsigned MaxArity>
 class loser_tree : public ArraysType
 {
 public:
+    typedef ArraysType super_type;
+
+    typedef typename super_type::value_type value_type;
+
+#if STXXL_PQ_EXTERNAL_LOSER_TREE
+    // multi-merge for arbitrary K
+    template <class OutputIterator>
+    void multi_merge_k(OutputIterator begin, OutputIterator end)
+    {
+        typename super_type::SequenceType* states = this->get_sequences();
+        typename super_type::Entry* current_pos;
+        value_type current_key;
+        unsigned_type current_index; // leaf pointed to by current entry
+        unsigned_type kReg = this->k;
+        unsigned_type winner_index = this->entry[0].index;
+        value_type winner_key = this->entry[0].key;
+
+        while (begin != end)
+        {
+            // write result
+            *begin++ = *(states[winner_index]);
+
+            // advance winner segment
+            ++(states[winner_index]);
+
+            winner_key = *(states[winner_index]);
+
+            // remove winner segment if empty now
+            if (is_sentinel(winner_key)) //
+                super_type::deallocate_segment(winner_index);
+
+            // go up the entry-tree
+            for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
+            {
+                current_pos = this->entry + i;
+                current_key = current_pos->key;
+                if (cmp(winner_key, current_key))
+                {
+                    current_index = current_pos->index;
+                    current_pos->key = winner_key;
+                    current_pos->index = winner_index;
+                    winner_key = current_key;
+                    winner_index = current_index;
+                }
+            }
+        }
+        this->entry[0].index = winner_index;
+        this->entry[0].key = winner_key;
+    }
+#endif  //STXXL_PQ_EXTERNAL_LOSER_TREE
 
 };
 

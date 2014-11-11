@@ -308,6 +308,13 @@ public:
         pool = pool_;
     }
 
+    typedef sequence_state SequenceType;
+
+    SequenceType* get_sequences()
+    {
+        return states;
+    }
+
 protected:
     void init()
     {
@@ -546,56 +553,8 @@ public:
         return (STXXL_MIN<unsigned_type>(arity + 1, arity_bound) * block_type::raw_size);
     }
 
-private:
+protected:
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
-    // multi-merge for arbitrary K
-    template <class OutputIterator>
-    void multi_merge_k(OutputIterator begin, OutputIterator end)
-    {
-        Entry* current_pos;
-        value_type current_key;
-        unsigned_type current_index; // leaf pointed to by current entry
-        unsigned_type kReg = k;
-        OutputIterator done = end;
-        OutputIterator target = begin;
-        unsigned_type winner_index = entry[0].index;
-        value_type winner_key = entry[0].key;
-
-        while (target != done)
-        {
-            // write result
-            *target = *(states[winner_index]);
-
-            // advance winner segment
-            ++(states[winner_index]);
-
-            winner_key = *(states[winner_index]);
-
-            // remove winner segment if empty now
-            if (is_sentinel(winner_key)) //
-                deallocate_segment(winner_index);
-
-            // go up the entry-tree
-            for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
-            {
-                current_pos = entry + i;
-                current_key = current_pos->key;
-                if (cmp(winner_key, current_key))
-                {
-                    current_index = current_pos->index;
-                    current_pos->key = winner_key;
-                    current_pos->index = winner_index;
-                    winner_key = current_key;
-                    winner_index = current_index;
-                }
-            }
-
-            ++target;
-        }
-        entry[0].index = winner_index;
-        entry[0].key = winner_key;
-    }
-
     template <class OutputIterator, int LogK>
     void multi_merge_f(OutputIterator begin, OutputIterator end)
     {
@@ -819,6 +778,11 @@ public:
         return super_type::is_segment_empty(slot);
     }
 
+    bool is_segment_allocated(unsigned_type slot) const
+    {
+        return super_type::is_segment_allocated(slot);
+    }
+
     void deallocate_segment(unsigned_type slot)
     {
         return super_type::deallocate_segment(slot);
@@ -833,7 +797,10 @@ public:
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
         unsigned_type& k = this->k;
+        unsigned_type& log_k = this->log_k;
         unsigned_type& m_size = this->m_size;
+        CompareType& cmp = this->cmp;
+        typename super_type::Entry* entry = this->entry;
         typename super_type::sequence_state* states = this->states;
         typename super_type::pool_type* pool = this->pool;
         internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
@@ -1056,7 +1023,7 @@ public:
         case 1:
             assert(k == 2);
             merge_iterator(states[0], states[1], begin, length, cmp);
-            rebuild_loser_tree();
+            this->rebuild_loser_tree();
             if (is_segment_empty(0) && is_segment_allocated(0))
                 deallocate_segment(0);
 
@@ -1070,7 +1037,7 @@ public:
                 merge3_iterator(states[0], states[1], states[2], begin, length, cmp);
             else
                 merge4_iterator(states[0], states[1], states[2], states[3], begin, length, cmp);
-            rebuild_loser_tree();
+            this->rebuild_loser_tree();
             if (is_segment_empty(0) && is_segment_allocated(0))
                 deallocate_segment(0);
 
@@ -1084,21 +1051,21 @@ public:
                 deallocate_segment(3);
 
             break;
-        case  3: multi_merge_f<OutputIterator, 3>(begin, end);
+        case  3: this->template multi_merge_f<OutputIterator, 3>(begin, end);
             break;
-        case  4: multi_merge_f<OutputIterator, 4>(begin, end);
+        case  4: this->template multi_merge_f<OutputIterator, 4>(begin, end);
             break;
-        case  5: multi_merge_f<OutputIterator, 5>(begin, end);
+        case  5: this->template multi_merge_f<OutputIterator, 5>(begin, end);
             break;
-        case  6: multi_merge_f<OutputIterator, 6>(begin, end);
+        case  6: this->template multi_merge_f<OutputIterator, 6>(begin, end);
             break;
-        case  7: multi_merge_f<OutputIterator, 7>(begin, end);
+        case  7: this->template multi_merge_f<OutputIterator, 7>(begin, end);
             break;
-        case  8: multi_merge_f<OutputIterator, 8>(begin, end);
+        case  8: this->template multi_merge_f<OutputIterator, 8>(begin, end);
             break;
-        case  9: multi_merge_f<OutputIterator, 9>(begin, end);
+        case  9: this->template multi_merge_f<OutputIterator, 9>(begin, end);
             break;
-        case 10: multi_merge_f<OutputIterator, 10>(begin, end);
+        case 10: this->template multi_merge_f<OutputIterator, 10>(begin, end);
             break;
         default: multi_merge_k(begin, end);
             break;
