@@ -33,12 +33,23 @@ class loser_tree : public ArraysType
 {
 public:
     typedef ArraysType super_type;
+    typedef CompareType comparator_type;
+    enum { max_arity = MaxArity };
 
     typedef typename super_type::value_type value_type;
 
     typedef typename super_type::SequenceType SequenceType;
     typedef typename super_type::Entry Entry;
 
+    bool is_array_empty(unsigned_type slot) const
+    {
+        return super_type::is_array_empty(slot);
+    }
+
+    bool is_array_allocated(unsigned_type slot) const
+    {
+        return super_type::is_array_allocated(slot);
+    }
 
     //! Allocate a free slot for a new player.
     unsigned_type new_player()
@@ -124,6 +135,67 @@ public:
         unsigned_type dummyIndex, dummyMask;
         update_on_insert(node, newKey, newIndex,
                          &dummyKey, &dummyIndex, &dummyMask);
+    }
+
+    //! compact nonempty segments in the left half of the tree
+    void compact_tree()
+    {
+        unsigned_type& k = this->k;
+        unsigned_type& logK = this->logK;
+        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
+
+        STXXL_VERBOSE3("compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        assert(logK > 0);
+
+        // compact all nonempty segments to the left
+        unsigned_type last_empty = 0;
+        for (unsigned_type pos = 0; pos < k; pos++)
+        {
+            if (!is_array_empty(pos))
+            {
+                assert(is_array_allocated(pos));
+                if (pos != last_empty)
+                {
+                    assert(!is_array_allocated(last_empty));
+                    this->swap_arrays(last_empty, pos);
+                }
+                ++last_empty;
+            }
+            /*
+              else
+              {
+              if(segment[pos])
+              {
+              STXXL_VERBOSE2("int_arrays::compact_tree() deleting segment "<<pos<<
+              " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
+              delete [] segment[pos];
+              segment[pos] = 0;
+              mem_cons_ -= segment_size[pos];
+              }
+              }*/
+        }
+
+        // half degree as often as possible
+        while ((k > 1) && last_empty <= (k / 2))
+        {
+            k /= 2;
+            logK--;
+        }
+
+        // overwrite garbage and compact the stack of free segment indices
+        free_slots.clear(); // none free
+        for ( ; last_empty < k; last_empty++)
+        {
+            assert(!is_array_allocated(last_empty));
+            this->make_array_sentinel(last_empty);
+            if (last_empty < max_arity)
+                free_slots.push(last_empty);
+        }
+
+        STXXL_VERBOSE3("compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+
+        // recompute loser tree information
+        this->rebuild_loser_tree();
     }
 
     // multi-merge for arbitrary K

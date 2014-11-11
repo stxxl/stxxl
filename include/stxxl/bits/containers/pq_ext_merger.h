@@ -315,6 +315,16 @@ public:
         return states;
     }
 
+    void swap_arrays(unsigned_type a, unsigned_type b)
+    {
+        states[a].swap(states[b]);
+    }
+
+    void make_array_sentinel(unsigned_type a)
+    {
+        states[a].make_inf();
+    }
+
 protected:
     void init()
     {
@@ -480,53 +490,6 @@ protected:
         STXXL_VERBOSE1("ext_arrays::double_k (after)  k=" << k << " logK=" << logK << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
         assert(!free_slots.empty());
         assert(k <= arity_bound);
-
-        // recompute loser tree information
-        rebuild_loser_tree();
-    }
-
-    // compact nonempty segments in the left half of the tree
-    void compact_tree()
-    {
-        STXXL_VERBOSE1("ext_arrays::compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
-        assert(logK > 0);
-
-        // compact all nonempty segments to the left
-
-        unsigned_type last_empty = 0;
-        for (unsigned_type pos = 0; pos < k; pos++)
-        {
-            if (!is_array_empty(pos))
-            {
-                assert(is_array_allocated(pos));
-                if (pos != last_empty)
-                {
-                    assert(!is_array_allocated(last_empty));
-                    states[last_empty].swap(states[pos]);
-                }
-                ++last_empty;
-            }
-        }
-
-        // half degree as often as possible
-        while (k > 1 && last_empty <= (k / 2))
-        {
-            k /= 2;
-            logK--;
-        }
-
-        // overwrite garbage and compact the stack of free segment indices
-        free_slots.clear(); // none free
-        for ( ; last_empty < k; last_empty++)
-        {
-            assert(!is_array_allocated(last_empty));
-            states[last_empty].make_inf();
-            if (last_empty < arity)
-                free_slots.push(last_empty);
-        }
-
-        STXXL_VERBOSE1("ext_arrays::compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
-        assert(k > 0);
 
         // recompute loser tree information
         rebuild_loser_tree();

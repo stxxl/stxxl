@@ -81,7 +81,6 @@ protected:
     unsigned_type init_winner(unsigned_type root);
     void deallocate_segment(unsigned_type slot);
     void double_k();
-    void compact_tree();
     void rebuild_loser_tree();
 
     //! is this array invalid: empty and prefixed with sentinel?
@@ -95,6 +94,20 @@ protected:
     bool is_array_allocated(unsigned_type slot) const
     {
         return current[slot] != &sentinel;
+    }
+
+    void swap_arrays(unsigned_type a, unsigned_type b)
+    {
+        std::swap(current[a], current[b]);
+        std::swap(current_end[a], current_end[b]);
+        std::swap(segment[a], segment[b]);
+        std::swap(segment_size[a], segment_size[b]);
+    }
+
+    void make_array_sentinel(unsigned_type a)
+    {
+        current[a] = &sentinel;
+        current_end[a] = &sentinel;
     }
 
 public:
@@ -270,60 +283,6 @@ void int_arrays<ValueType, CompareType, MaxArity>::double_k()
 
     STXXL_VERBOSE3("int_arrays::double_k (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(!free_slots.empty());
-
-    // recompute loser tree information
-    rebuild_loser_tree();
-}
-
-// compact nonempty segments in the left half of the tree
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::compact_tree()
-{
-    STXXL_VERBOSE3("int_arrays::compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
-    assert(logK > 0);
-
-    // compact all nonempty segments to the left
-    unsigned_type last_empty = 0;
-    for (unsigned_type pos = 0; pos < k; pos++)
-    {
-        if (not_sentinel(*(current[pos])))
-        {
-            segment_size[last_empty] = segment_size[pos];
-            current[last_empty] = current[pos];
-            current_end[last_empty] = current_end[pos];
-            segment[last_empty] = segment[pos];
-            ++last_empty;
-        }     /*
-                else
-                {
-                if(segment[pos])
-                {
-                STXXL_VERBOSE2("int_arrays::compact_tree() deleting segment "<<pos<<
-                                        " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
-                delete [] segment[pos];
-                segment[pos] = 0;
-                mem_cons_ -= segment_size[pos];
-                }
-                }*/
-    }
-
-    // half degree as often as possible
-    while ((k > 1) && ((k / 2) >= last_empty))
-    {
-        k /= 2;
-        logK--;
-    }
-
-    // overwrite garbage and compact the stack of free segment indices
-    free_slots.clear();     // none free
-    for ( ; last_empty < k; last_empty++)
-    {
-        current[last_empty] = &sentinel;
-        current_end[last_empty] = &sentinel;
-        free_slots.push(last_empty);
-    }
-
-    STXXL_VERBOSE3("int_arrays::compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
 
     // recompute loser tree information
     rebuild_loser_tree();
