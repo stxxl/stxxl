@@ -35,7 +35,7 @@ namespace priority_queue_local {
  * \param  MaxArity  maximum arity of loser tree, has to be a power of two
  */
 template <class ValueType, class CompareType, unsigned MaxArity>
-class int_merger : private noncopyable
+class int_arrays : private noncopyable
 {
 public:
     typedef ValueType value_type;
@@ -164,7 +164,7 @@ public:
     }
 
 public:
-    int_merger()
+    int_arrays()
         : m_size(0), logK(0), k(1), mem_cons_(0)
     {
         free_slots.push(0);
@@ -189,14 +189,14 @@ public:
 #endif  //STXXL_PQ_INTERNAL_LOSER_TREE
     }
 
-    ~int_merger()
+    ~int_arrays()
     {
-        STXXL_VERBOSE1("int_merger::~int_merger()");
+        STXXL_VERBOSE1("int_arrays::~int_arrays()");
         for (unsigned_type i = 0; i < k; ++i)
         {
             if (segment[i])
             {
-                STXXL_VERBOSE2("int_merger::~int_merger() deleting segment " << i);
+                STXXL_VERBOSE2("int_arrays::~int_arrays() deleting segment " << i);
                 delete[] segment[i];
                 mem_cons_ -= segment_size[i];
             }
@@ -205,7 +205,7 @@ public:
         assert(mem_cons_ == 0);
     }
 
-    void swap(int_merger& obj)
+    void swap(int_arrays& obj)
     {
         std::swap(cmp, obj.cmp);
         std::swap(free_slots, obj.free_slots);
@@ -246,7 +246,7 @@ public:
 
 // rebuild loser tree information from the values in current
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::rebuildLoserTree()
+void int_arrays<ValueType, CompareType, MaxArity>::rebuildLoserTree()
 {
 #if STXXL_PQ_INTERNAL_LOSER_TREE
     // MaxArity needs to be a power of two
@@ -264,7 +264,7 @@ void int_merger<ValueType, CompareType, MaxArity>::rebuildLoserTree()
 // initialize entry[root].index and the subtree rooted there
 // return winner index
 template <class ValueType, class CompareType, unsigned MaxArity>
-unsigned_type int_merger<ValueType, CompareType, MaxArity>::initWinner(unsigned_type root)
+unsigned_type int_arrays<ValueType, CompareType, MaxArity>::initWinner(unsigned_type root)
 {
     if (root >= k) {     // leaf reached
         return root - k;
@@ -291,7 +291,7 @@ unsigned_type int_merger<ValueType, CompareType, MaxArity>::initWinner(unsigned_
 // update each node on the path to the root top down.
 // This is implemented recursively
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::update_on_insert(
+void int_arrays<ValueType, CompareType, MaxArity>::update_on_insert(
     unsigned_type node,
     const value_type& newKey,
     unsigned_type newIndex,
@@ -339,9 +339,9 @@ void int_merger<ValueType, CompareType, MaxArity>::update_on_insert(
 
 // make the tree two times as wide
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::doubleK()
+void int_arrays<ValueType, CompareType, MaxArity>::doubleK()
 {
-    STXXL_VERBOSE3("int_merger::doubleK (before) k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("int_arrays::doubleK (before) k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(k > 0);
     assert(k < MaxArity);
     assert(free_slots.empty());                          // stack was free (probably not needed)
@@ -360,7 +360,7 @@ void int_merger<ValueType, CompareType, MaxArity>::doubleK()
     k *= 2;
     logK++;
 
-    STXXL_VERBOSE3("int_merger::doubleK (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("int_arrays::doubleK (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(!free_slots.empty());
 
     // recompute loser tree information
@@ -369,9 +369,9 @@ void int_merger<ValueType, CompareType, MaxArity>::doubleK()
 
 // compact nonempty segments in the left half of the tree
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::compactTree()
+void int_arrays<ValueType, CompareType, MaxArity>::compactTree()
 {
-    STXXL_VERBOSE3("int_merger::compactTree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("int_arrays::compactTree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
     assert(logK > 0);
 
     // compact all nonempty segments to the left
@@ -391,7 +391,7 @@ void int_merger<ValueType, CompareType, MaxArity>::compactTree()
                 {
                 if(segment[pos])
                 {
-                STXXL_VERBOSE2("int_merger::compactTree() deleting segment "<<pos<<
+                STXXL_VERBOSE2("int_arrays::compactTree() deleting segment "<<pos<<
                                         " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
                 delete [] segment[pos];
                 segment[pos] = 0;
@@ -416,7 +416,7 @@ void int_merger<ValueType, CompareType, MaxArity>::compactTree()
         free_slots.push(last_empty);
     }
 
-    STXXL_VERBOSE3("int_merger::compactTree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("int_arrays::compactTree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
 
     // recompute loser tree information
     rebuildLoserTree();
@@ -425,10 +425,10 @@ void int_merger<ValueType, CompareType, MaxArity>::compactTree()
 // insert segment beginning at target
 // require: is_space_available() == 1
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::
+void int_arrays<ValueType, CompareType, MaxArity>::
 insert_segment(value_type* target, unsigned_type length)
 {
-    STXXL_VERBOSE2("int_merger::insert_segment(" << target << "," << length << ")");
+    STXXL_VERBOSE2("int_arrays::insert_segment(" << target << "," << length << ")");
     //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
 
     if (length > 0)
@@ -472,12 +472,12 @@ insert_segment(value_type* target, unsigned_type length)
 
 // free an empty segment .
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::
+void int_arrays<ValueType, CompareType, MaxArity>::
 deallocate_segment(unsigned_type slot)
 {
     // reroute current pointer to some empty sentinel segment
     // with a sentinel key
-    STXXL_VERBOSE2("int_merger::deallocate_segment() deleting segment " <<
+    STXXL_VERBOSE2("int_arrays::deallocate_segment() deleting segment " <<
                    slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
     current[slot] = &sentinel;
     current_end[slot] = &sentinel;
@@ -497,10 +497,10 @@ deallocate_segment(unsigned_type slot)
 // - there are at least length elements
 // - segments are ended by sentinels
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::
+void int_arrays<ValueType, CompareType, MaxArity>::
 multi_merge(value_type* target, unsigned_type length)
 {
-    STXXL_VERBOSE3("int_merger::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
+    STXXL_VERBOSE3("int_arrays::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
 
     if (length == 0)
         return;
@@ -656,7 +656,7 @@ multi_merge(value_type* target, unsigned_type length)
         // because we have special mergers for k \in {1, 2, 4}
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_segment_empty(3)
-        STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
+        STXXL_VERBOSE3("int_arrays  compact? k=" << k << " #used=" << num_segments_used
                                                  << " <= #trigger=" << num_segments_trigger << " ==> "
                                                  << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
                                                  << " || "
@@ -673,7 +673,7 @@ multi_merge(value_type* target, unsigned_type length)
 
 // is this segment empty and does not point to sentinel yet?
 template <class ValueType, class CompareType, unsigned MaxArity>
-inline bool int_merger<ValueType, CompareType, MaxArity>::
+inline bool int_arrays<ValueType, CompareType, MaxArity>::
 is_segment_empty(unsigned_type slot)
 {
     return (is_sentinel(*(current[slot])) && (current[slot] != &sentinel));
@@ -682,7 +682,7 @@ is_segment_empty(unsigned_type slot)
 #if STXXL_PQ_INTERNAL_LOSER_TREE
 // multi-merge for arbitrary K
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_merger<ValueType, CompareType, MaxArity>::
+void int_arrays<ValueType, CompareType, MaxArity>::
 multi_merge_k(value_type* target, unsigned_type length)
 {
     Entry* currentPos;
@@ -729,6 +729,14 @@ multi_merge_k(value_type* target, unsigned_type length)
     entry[0].key = winnerKey;
 }
 #endif // STXXL_PQ_INTERNAL_LOSER_TREE
+
+template <class ValueType, class CompareType, unsigned MaxArity>
+class int_merger : public loser_tree<
+    int_arrays<ValueType, CompareType, MaxArity>,
+    CompareType, MaxArity
+    >
+{
+};
 
 } // namespace priority_queue_local
 

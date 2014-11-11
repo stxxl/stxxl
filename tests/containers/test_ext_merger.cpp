@@ -68,7 +68,8 @@ int main()
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);
 
-    ext_merger<block_type, my_cmp, 5> merger(&pool);
+    ext_merger<block_type, my_cmp, 5> merger;
+    merger.set_pool(&pool);
     merger.insert_segment(dummy, 1024 * 3);
     cnt = 20;
     merger.insert_segment(dummy, 1024 * 4);

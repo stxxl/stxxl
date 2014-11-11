@@ -96,7 +96,8 @@ int main()
 
     if (1) { // ext_merger test
         stxxl::read_write_pool<block_type> pool(1, 2);
-        stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger(&pool);
+        stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger;
+        merger.set_pool(&pool);
         dummy(1, 0);
         merger.insert_segment(dummy, B * 2);
         dummy(2, 0);

@@ -28,6 +28,13 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local {
 
+template <class ArraysType, class CompareType, unsigned MaxArity>
+class loser_tree : public ArraysType
+{
+public:
+
+};
+
 /////////////////////////////////////////////////////////////////////
 // auxiliary functions
 

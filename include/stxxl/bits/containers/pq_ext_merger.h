@@ -124,7 +124,7 @@ template <class BlockType,
           class Cmp,
           unsigned Arity,
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
-class ext_merger : private noncopyable
+class ext_arrays : private noncopyable
 {
 public:
     typedef stxxl::uint64 size_type;
@@ -157,7 +157,7 @@ protected:
         unsigned_type current;      //current index in current block
         std::list<bid_type>* bids;  //list of blocks forming this sequence
         comparator_type cmp;
-        ext_merger* merger;
+        ext_arrays* merger;
         bool allocated;
 
         //! \returns current element
@@ -174,7 +174,7 @@ protected:
 
         ~sequence_state()
         {
-            STXXL_VERBOSE2("ext_merger sequence_state::~sequence_state()");
+            STXXL_VERBOSE2("ext_arrays sequence_state::~sequence_state()");
             if (bids != NULL)
             {
                 block_manager* bm = block_manager::get_instance();
@@ -220,25 +220,25 @@ protected:
 
             if (current == block->size)
             {
-                STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
+                STXXL_VERBOSE2("ext_arrays sequence_state operator++ crossing block border ");
                 // go to the next block
                 assert(bids != NULL);
                 if (bids->empty()) // if there is no next block
                 {
-                    STXXL_VERBOSE2("ext_merger sequence_state operator++ it was the last block in the sequence ");
+                    STXXL_VERBOSE2("ext_arrays sequence_state operator++ it was the last block in the sequence ");
                     delete bids;
                     bids = NULL;
                     make_inf();
                 }
                 else
                 {
-                    STXXL_VERBOSE2("ext_merger sequence_state operator++ there is another block ");
+                    STXXL_VERBOSE2("ext_arrays sequence_state operator++ there is another block ");
                     bid_type bid = bids->front();
                     bids->pop_front();
                     merger->pool->hint(bid);
                     if (!(bids->empty()))
                     {
-                        STXXL_VERBOSE2("ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next");
+                        STXXL_VERBOSE2("ext_arrays sequence_state operator++ more blocks exist in a sequence, hinting the next");
                         merger->pool->hint(bids->front());
                     }
                     merger->pool->read(block, bid)->wait();
@@ -269,7 +269,7 @@ protected:
     // a power of 2 always
 
     // stack of empty segment indices
-    internal_bounded_stack<unsigned_type, arity> free_segments;
+    internal_bounded_stack<unsigned_type, arity> free_slots;
 
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
     // upper levels of loser trees
@@ -287,22 +287,15 @@ protected:
     block_type* sentinel_block;
 
 public:
-    ext_merger()
-        : m_size(0), log_k(0), k(1), pool(0)
+    ext_arrays() // TODO: pass pool as parameter
+        : m_size(0), log_k(0), k(1), pool(NULL)
     {
         init();
     }
 
-    ext_merger(pool_type* pool_)
-        : m_size(0), log_k(0), k(1),
-          pool(pool_)
+    virtual ~ext_arrays()
     {
-        init();
-    }
-
-    virtual ~ext_merger()
-    {
-        STXXL_VERBOSE1("ext_merger::~ext_merger()");
+        STXXL_VERBOSE1("ext_arrays::~ext_arrays()");
         for (unsigned_type i = 0; i < arity; ++i)
         {
             delete states[i].block;
@@ -318,7 +311,7 @@ public:
 private:
     void init()
     {
-        STXXL_VERBOSE2("ext_merger::init()");
+        STXXL_VERBOSE2("ext_arrays::init()");
         assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
         sentinel_block = NULL;
@@ -329,7 +322,7 @@ private:
                 (*sentinel_block)[i] = cmp.min_value();
             if (arity + 1 == arity_bound) {
                 // same memory consumption, but smaller merge width, better use arity = arity_bound
-                STXXL_ERRMSG("inefficient PQ parameters for ext_merger: arity + 1 == arity_bound");
+                STXXL_ERRMSG("inefficient PQ parameters for ext_arrays: arity + 1 == arity_bound");
             }
         }
 
@@ -345,7 +338,7 @@ private:
         }
 
         assert(k == 1);
-        free_segments.push(0); //total state: one free sequence
+        free_slots.push(0); //total state: one free sequence
 
         rebuild_loser_tree();
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
@@ -459,10 +452,10 @@ private:
     // make the tree two times as wide
     void double_k()
     {
-        STXXL_VERBOSE1("ext_merger::double_k (before) k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_segments.size());
+        STXXL_VERBOSE1("ext_arrays::double_k (before) k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
-        assert(free_segments.empty());                 // stack was free (probably not needed)
+        assert(free_slots.empty());                 // stack was free (probably not needed)
 
         // make all new entries free
         // and push them on the free stack
@@ -470,15 +463,15 @@ private:
         {
             states[i].make_inf();
             if (i < arity)
-                free_segments.push(i);
+                free_slots.push(i);
         }
 
         // double the size
         k *= 2;
         log_k++;
 
-        STXXL_VERBOSE1("ext_merger::double_k (after)  k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_segments.size());
-        assert(!free_segments.empty());
+        STXXL_VERBOSE1("ext_arrays::double_k (after)  k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
+        assert(!free_slots.empty());
         assert(k <= arity_bound);
 
         // recompute loser tree information
@@ -488,7 +481,7 @@ private:
     // compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        STXXL_VERBOSE1("ext_merger::compact_tree (before) k=" << k << " log_k=" << log_k << " #free=" << free_segments.size());
+        STXXL_VERBOSE1("ext_arrays::compact_tree (before) k=" << k << " log_k=" << log_k << " #free=" << free_slots.size());
         assert(log_k > 0);
 
         // compact all nonempty segments to the left
@@ -516,16 +509,16 @@ private:
         }
 
         // overwrite garbage and compact the stack of free segment indices
-        free_segments.clear(); // none free
+        free_slots.clear(); // none free
         for ( ; target < k; target++)
         {
             assert(!is_segment_allocated(target));
             states[target].make_inf();
             if (target < arity)
-                free_segments.push(target);
+                free_slots.push(target);
         }
 
-        STXXL_VERBOSE1("ext_merger::compact_tree (after)  k=" << k << " log_k=" << log_k << " #free=" << free_segments.size());
+        STXXL_VERBOSE1("ext_arrays::compact_tree (after)  k=" << k << " log_k=" << log_k << " #free=" << free_slots.size());
         assert(k > 0);
 
         // recompute loser tree information
@@ -533,10 +526,10 @@ private:
     }
 
 #if 0
-    void swap(ext_merger& obj)
+    void swap(ext_arrays& obj)
     {
         std::swap(cmp, obj.cmp);
-        std::swap(free_segments, obj.free_segments);
+        std::swap(free_slots, obj.free_slots);
         std::swap(m_size, obj.m_size);
         std::swap(log_k, obj.log_k);
         std::swap(k, obj.k);
@@ -563,7 +556,7 @@ public:
     {
         int_type length = end - begin;
 
-        STXXL_VERBOSE1("ext_merger::multi_merge from " << k << " sequence(s),"
+        STXXL_VERBOSE1("ext_arrays::multi_merge from " << k << " sequence(s),"
                        " length = " << length);
 
         if (length == 0)
@@ -692,7 +685,7 @@ public:
                     assert(state.current == state.block->size);
                     if (state.bids == NULL || state.bids->empty()) // if there is no next block
                     {
-                        STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
+                        STXXL_VERBOSE1("seq " << i << ": ext_arrays::multi_merge(...) it was the last block in the sequence ");
                         state.make_inf();
                     }
                     else
@@ -700,13 +693,13 @@ public:
 #if STXXL_CHECK_ORDER_IN_SORTS
                         last_elem = *(seqs[i].second - 1);
 #endif
-                        STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) there is another block ");
+                        STXXL_VERBOSE1("seq " << i << ": ext_arrays::multi_merge(...) there is another block ");
                         bid_type bid = state.bids->front();
                         state.bids->pop_front();
                         pool->hint(bid);
                         if (!(state.bids->empty()))
                         {
-                            STXXL_VERBOSE2("seq " << i << ": ext_merger::multi_merge(...) more blocks exist, hinting the next");
+                            STXXL_VERBOSE2("seq " << i << ": ext_arrays::multi_merge(...) more blocks exist, hinting the next");
                             pool->hint(state.bids->front());
                         }
                         pool->read(state.block, bid)->wait();
@@ -764,7 +757,7 @@ public:
         case 0:
             assert(k == 1);
             assert(entry[0].index == 0);
-            assert(free_segments.empty());
+            assert(free_slots.empty());
             //memcpy(target, states[0], length * sizeof(value_type));
             //std::copy(states[0],states[0]+length,target);
             for (int_type i = 0; i < length; ++i, ++(states[0]), ++begin)
@@ -831,21 +824,21 @@ public:
 
         // compact tree if it got considerably smaller
         {
-            const unsigned_type num_segments_used = std::min<unsigned_type>(arity, k) - free_segments.size();
+            const unsigned_type num_segments_used = std::min<unsigned_type>(arity, k) - free_slots.size();
             const unsigned_type num_segments_trigger = k - (3 * k / 5);
             // using k/2 would be worst case inefficient (for large k)
             // for k \in {2, 4, 8} the trigger is k/2 which is good
             // because we have special mergers for k \in {1, 2, 4}
             // there is also a special 3-way-merger, that will be
             // triggered if k == 4 && is_segment_empty(3)
-            STXXL_VERBOSE3("ext_merger  compact? k=" << k << " #used=" << num_segments_used
+            STXXL_VERBOSE3("ext_arrays  compact? k=" << k << " #used=" << num_segments_used
                                                      << " <= #trigger=" << num_segments_trigger << " ==> "
                                                      << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
                                                      << " || "
-                                                     << ((k == 4 && !free_segments.empty() && !is_segment_empty(3)) ? "yes" : "no ")
-                                                     << " #free=" << free_segments.size());
+                                                     << ((k == 4 && !free_slots.empty() && !is_segment_empty(3)) ? "yes" : "no ")
+                                                     << " #free=" << free_slots.size());
             if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
-                          (k == 4 && !free_segments.empty() && !is_segment_empty(3))))
+                          (k == 4 && !free_slots.empty() && !is_segment_empty(3))))
             {
                 compact_tree();
             }
@@ -962,7 +955,7 @@ private:
 public:
     bool is_space_available() const // for new segment
     {
-        return k < arity || !free_segments.empty();
+        return k < arity || !free_slots.empty();
     }
 
     // insert segment beginning at target
@@ -970,27 +963,27 @@ public:
     template <class Merger>
     void insert_segment(Merger& another_merger, size_type segment_size)
     {
-        STXXL_VERBOSE1("ext_merger::insert_segment(merger,...)" << this);
+        STXXL_VERBOSE1("ext_arrays::insert_segment(merger,...)" << this);
 
         if (segment_size > 0)
         {
             // get a free slot
-            if (free_segments.empty())
+            if (free_slots.empty())
             {       // tree is too small
                 double_k();
             }
-            assert(!free_segments.empty());
-            unsigned_type free_slot = free_segments.top();
-            free_segments.pop();
+            assert(!free_slots.empty());
+            unsigned_type free_slot = free_slots.top();
+            free_slots.pop();
 
             // link new segment
             assert(segment_size);
             unsigned_type nblocks = (unsigned_type)(segment_size / block_type::size);
             //assert(nblocks); // at least one block
-            STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks);
+            STXXL_VERBOSE1("ext_arrays::insert_segment nblocks=" << nblocks);
             if (nblocks == 0)
             {
-                STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " <<
+                STXXL_VERBOSE1("ext_arrays::insert_segment(merger,...) WARNING: inserting a segment with " <<
                                nblocks << " blocks");
                 STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
             }
@@ -1057,7 +1050,7 @@ protected:
     void insert_segment(std::list<bid_type>* bidlist, block_type* first_block,
                         unsigned_type first_size, unsigned_type slot)
     {
-        STXXL_VERBOSE1("ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist->size() << " " << slot);
+        STXXL_VERBOSE1("ext_arrays::insert_segment(bidlist,...) " << this << " " << bidlist->size() << " " << slot);
         assert(!is_segment_allocated(slot));
         assert(first_size > 0);
 
@@ -1078,13 +1071,13 @@ protected:
     // free an empty segment .
     void deallocate_segment(unsigned_type slot)
     {
-        STXXL_VERBOSE1("ext_merger::deallocate_segment() deleting segment " << slot << " allocated=" << int(is_segment_allocated(slot)));
+        STXXL_VERBOSE1("ext_arrays::deallocate_segment() deleting segment " << slot << " allocated=" << int(is_segment_allocated(slot)));
         assert(is_segment_allocated(slot));
         states[slot].allocated = false;
         states[slot].make_inf();
 
         // push on the stack of free segment indices
-        free_segments.push(slot);
+        free_slots.push(slot);
     }
 
     // is this segment empty ?
@@ -1099,7 +1092,16 @@ protected:
     {
         return states[slot].allocated;
     }
-};  // class ext_merger
+};  // class ext_arrays
+
+template <class BlockType, class CompareType, unsigned MaxArity,
+          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+class ext_merger : public loser_tree<
+    ext_arrays<BlockType, CompareType, MaxArity, AllocStr>,
+    CompareType, MaxArity
+    >
+{
+};
 
 } // namespace priority_queue_local
 
