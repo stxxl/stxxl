@@ -105,7 +105,7 @@ protected:
 
     void make_array_sentinel(unsigned_type slot)
     {
-        assert(is_array_empty(slot));
+        assert(current[slot] == NULL || is_array_empty(slot));
         current[slot] = &sentinel;
         current_end[slot] = &sentinel;
         segment[slot] = NULL;

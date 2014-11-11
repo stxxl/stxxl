@@ -28,13 +28,18 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local {
 
-template <class ArraysType, class CompareType, unsigned MaxArity>
+/*!
+ * \param Arity  maximum arity of merger, does not need to be a power of 2
+ */
+template <class ArraysType, class CompareType, unsigned Arity>
 class loser_tree : public ArraysType
 {
 public:
     typedef ArraysType super_type;
     typedef CompareType comparator_type;
-    enum { max_arity = MaxArity };
+
+    // arity_bound / 2  <  arity  <=  arity_bound
+    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
     typedef typename super_type::value_type value_type;
 
@@ -54,7 +59,7 @@ public:
     //! Allocate a free slot for a new player.
     unsigned_type new_player()
     {
-        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
+        internal_bounded_stack<unsigned_type, Arity>& free_slots = this->free_slots;
 
         // get a free slot
         if (free_slots.empty()) {
@@ -142,11 +147,11 @@ public:
     {
         unsigned_type& k = this->k;
         unsigned_type& logK = this->logK;
-        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
+        internal_bounded_stack<unsigned_type, Arity>& free_slots = this->free_slots;
 
-        STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
-        assert(k < max_arity);
+        assert(k < arity);
         assert(free_slots.empty());                 // stack was free (probably not needed)
 
         // make all new entries free
@@ -154,7 +159,7 @@ public:
         for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
         {
             this->make_array_sentinel(i);
-            if (i < max_arity)
+            if (i < arity)
                 free_slots.push(i);
         }
 
@@ -162,7 +167,7 @@ public:
         k *= 2;
         logK++;
 
-        STXXL_VERBOSE1("double_k (after)  k=" << k << " logK=" << logK << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        STXXL_VERBOSE1("double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(!free_slots.empty());
         assert(k <= max_arity);
 
@@ -175,7 +180,7 @@ public:
     {
         unsigned_type& k = this->k;
         unsigned_type& logK = this->logK;
-        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
+        internal_bounded_stack<unsigned_type, Arity>& free_slots = this->free_slots;
 
         STXXL_VERBOSE3("compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
         assert(logK > 0);
@@ -221,7 +226,7 @@ public:
         {
             assert(!is_array_allocated(last_empty));
             this->make_array_sentinel(last_empty);
-            if (last_empty < max_arity)
+            if (last_empty < arity)
                 free_slots.push(last_empty);
         }
 
