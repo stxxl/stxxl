@@ -48,7 +48,7 @@ public:
         // get a free slot
         if (free_slots.empty()) {
             // tree is too small, attempt to enlarge
-            this->doubleK();
+            this->double_k();
         }
 
         assert(!free_slots.empty());
@@ -86,7 +86,8 @@ public:
                 entry[node].index = newIndex;
             }
         }
-        else {
+        else
+        {
             update_on_insert(node >> 1, newKey, newIndex, winner_key, winner_index, mask);
             value_type loserKey = entry[node].key;
             unsigned_type loserIndex = entry[node].index;

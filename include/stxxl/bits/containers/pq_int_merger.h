@@ -80,7 +80,7 @@ protected:
     // private member functions
     unsigned_type initWinner(unsigned_type root);
     void deallocate_segment(unsigned_type slot);
-    void doubleK();
+    void double_k();
     void compactTree();
     void rebuildLoserTree();
     bool is_segment_empty(unsigned_type slot) const;
@@ -234,9 +234,9 @@ unsigned_type int_arrays<ValueType, CompareType, MaxArity>::initWinner(unsigned_
 
 // make the tree two times as wide
 template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::doubleK()
+void int_arrays<ValueType, CompareType, MaxArity>::double_k()
 {
-    STXXL_VERBOSE3("int_arrays::doubleK (before) k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("int_arrays::double_k (before) k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(k > 0);
     assert(k < MaxArity);
     assert(free_slots.empty());                          // stack was free (probably not needed)
@@ -255,7 +255,7 @@ void int_arrays<ValueType, CompareType, MaxArity>::doubleK()
     k *= 2;
     logK++;
 
-    STXXL_VERBOSE3("int_arrays::doubleK (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
+    STXXL_VERBOSE3("int_arrays::double_k (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
     assert(!free_slots.empty());
 
     // recompute loser tree information

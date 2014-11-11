@@ -685,7 +685,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
         STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
         ext_merger_type* overflow_merger = new ext_merger_type;
         overflow_merger->set_pool(pool);
-        overflow_merger->insert_segment(*ext_mergers[extLevel], segmentSize);
+        overflow_merger->append_merger(*ext_mergers[extLevel], segmentSize);
         std::swap(ext_mergers[extLevel], overflow_merger);
         delete overflow_merger;
         finalLevel = level;
@@ -712,13 +712,13 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
             {
                 const unsigned_type segmentSize = int_mergers[num_int_groups - 1].size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into first level external: " << level << " " << segmentSize);
-                ext_mergers[0]->insert_segment(int_mergers[num_int_groups - 1], segmentSize);
+                ext_mergers[0]->append_merger(int_mergers[num_int_groups - 1], segmentSize);
             }
             else // from external to external tree
             {
                 const size_type segmentSize = ext_mergers[level - num_int_groups]->size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into second level external: " << level << " " << segmentSize);
-                ext_mergers[level - num_int_groups + 1]->insert_segment(*ext_mergers[level - num_int_groups], segmentSize);
+                ext_mergers[level - num_int_groups + 1]->append_merger(*ext_mergers[level - num_int_groups], segmentSize);
             }
         }
     }

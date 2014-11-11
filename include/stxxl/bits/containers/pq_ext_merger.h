@@ -262,8 +262,8 @@ protected:
 #endif //STXXL_PQ_EXTERNAL_LOSER_TREE
 
     size_type m_size;          // total number of elements stored
-    unsigned_type log_k;      // log of current tree size
-    unsigned_type k;          // invariant (k == 1 << log_k), always a power of 2
+    unsigned_type logK;      // log of current tree size
+    unsigned_type k;          // invariant (k == 1 << logK), always a power of 2
     // only entries 0 .. arity-1 may hold actual sequences, the other
     // entries arity .. arity_bound-1 are sentinels to make the size of the tree
     // a power of 2 always
@@ -288,7 +288,7 @@ protected:
 
 public:
     ext_arrays() // TODO: pass pool as parameter
-        : m_size(0), log_k(0), k(1), pool(NULL)
+        : m_size(0), logK(0), k(1), pool(NULL)
     {
         init();
     }
@@ -412,7 +412,7 @@ protected:
     {
         if (node == 0)
         {                                    // winner part of root
-            *mask = unsigned_type(1) << (log_k - 1);
+            *mask = unsigned_type(1) << (logK - 1);
             *winner_key = entry[0].key;
             *winner_index = entry[0].index;
             if (cmp(entry[node].key, new_key))
@@ -459,7 +459,7 @@ protected:
     // make the tree two times as wide
     void double_k()
     {
-        STXXL_VERBOSE1("ext_arrays::double_k (before) k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
+        STXXL_VERBOSE1("ext_arrays::double_k (before) k=" << k << " logK=" << logK << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
         assert(free_slots.empty());                 // stack was free (probably not needed)
@@ -475,9 +475,9 @@ protected:
 
         // double the size
         k *= 2;
-        log_k++;
+        logK++;
 
-        STXXL_VERBOSE1("ext_arrays::double_k (after)  k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
+        STXXL_VERBOSE1("ext_arrays::double_k (after)  k=" << k << " logK=" << logK << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
         assert(!free_slots.empty());
         assert(k <= arity_bound);
 
@@ -488,8 +488,8 @@ protected:
     // compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        STXXL_VERBOSE1("ext_arrays::compact_tree (before) k=" << k << " log_k=" << log_k << " #free=" << free_slots.size());
-        assert(log_k > 0);
+        STXXL_VERBOSE1("ext_arrays::compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        assert(logK > 0);
 
         // compact all nonempty segments to the left
 
@@ -512,7 +512,7 @@ protected:
         while (k > 1 && target <= (k / 2))
         {
             k /= 2;
-            log_k--;
+            logK--;
         }
 
         // overwrite garbage and compact the stack of free segment indices
@@ -525,7 +525,7 @@ protected:
                 free_slots.push(target);
         }
 
-        STXXL_VERBOSE1("ext_arrays::compact_tree (after)  k=" << k << " log_k=" << log_k << " #free=" << free_slots.size());
+        STXXL_VERBOSE1("ext_arrays::compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
         assert(k > 0);
 
         // recompute loser tree information
@@ -538,7 +538,7 @@ protected:
         std::swap(cmp, obj.cmp);
         std::swap(free_slots, obj.free_slots);
         std::swap(m_size, obj.m_size);
-        std::swap(log_k, obj.log_k);
+        std::swap(logK, obj.logK);
         std::swap(k, obj.k);
         swap_1D_arrays(entry, obj.entry, arity_bound);
         swap_1D_arrays(states, obj.states, arity_bound);
@@ -557,86 +557,6 @@ public:
     bool is_space_available() const // for new segment
     {
         return k < arity || !free_slots.empty();
-    }
-
-    // insert segment beginning at target
-    // require: is_space_available() == 1
-    template <class Merger>
-    void insert_segment(Merger& another_merger, size_type segment_size)
-    {
-        STXXL_VERBOSE1("ext_arrays::insert_segment(merger,...)" << this);
-
-        if (segment_size > 0)
-        {
-            // get a free slot
-            if (free_slots.empty())
-            {       // tree is too small
-                double_k();
-            }
-            assert(!free_slots.empty());
-            unsigned_type free_slot = free_slots.top();
-            free_slots.pop();
-
-            // link new segment
-            assert(segment_size);
-            unsigned_type nblocks = (unsigned_type)(segment_size / block_type::size);
-            //assert(nblocks); // at least one block
-            STXXL_VERBOSE1("ext_arrays::insert_segment nblocks=" << nblocks);
-            if (nblocks == 0)
-            {
-                STXXL_VERBOSE1("ext_arrays::insert_segment(merger,...) WARNING: inserting a segment with " <<
-                               nblocks << " blocks");
-                STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
-            }
-            unsigned_type first_size = (unsigned_type)(segment_size % block_type::size);
-            if (first_size == 0)
-            {
-                first_size = block_type::size;
-                --nblocks;
-            }
-            block_manager* bm = block_manager::get_instance();
-            std::list<bid_type>* bids = new std::list<bid_type>(nblocks);
-            bm->new_blocks(alloc_strategy(), bids->begin(), bids->end());
-            block_type* first_block = new block_type;
-
-            another_merger.multi_merge(
-                first_block->begin() + (block_type::size - first_size),
-                first_block->end());
-
-            STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
-            assert(!cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
-
-            assert(pool->size_write() > 0);
-
-            for (typename std::list<bid_type>::iterator curbid = bids->begin(); curbid != bids->end(); ++curbid)
-            {
-                block_type* b = pool->steal();
-                another_merger.multi_merge(b->begin(), b->end());
-                STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
-                STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
-                assert(!cmp(*(b->begin()), *(b->end() - 1)));
-                pool->write(b, *curbid);
-                STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
-            }
-
-            insert_segment(bids, first_block, first_size, free_slot);
-
-            m_size += segment_size;
-
-#if STXXL_PQ_EXTERNAL_LOSER_TREE
-            // propagate new information up the tree
-            value_type dummyKey;
-            unsigned_type dummyIndex;
-            unsigned_type dummyMask;
-            update_on_insert((free_slot + k) >> 1, *(states[free_slot]), free_slot,
-                             &dummyKey, &dummyIndex, &dummyMask);
-#endif          //STXXL_PQ_EXTERNAL_LOSER_TREE
-        }
-        else
-        {
-            // deallocate memory ?
-            STXXL_VERBOSE1("Merged segment with zero size.");
-        }
     }
 
     size_type size() const { return m_size; }
@@ -703,16 +623,23 @@ class ext_merger : public loser_tree<
     >
 {
 public:
+
     typedef BlockType block_type;
     typedef CompareType Cmp;
+    typedef AllocStr alloc_strategy;
 
-    typedef ext_arrays<BlockType, CompareType, MaxArity, AllocStr> ArraysType;
-    typedef loser_tree<ArraysType, CompareType, MaxArity> super_type;
+    typedef ext_arrays<BlockType, CompareType, MaxArity, AllocStr> arrays_type;
+    typedef loser_tree<arrays_type, CompareType, MaxArity> super_type;
+
+    typedef loser_tree<arrays_type, CompareType, MaxArity> tree_type;
+
+    typedef stxxl::uint64 size_type;
 
     typedef typename block_type::bid_type bid_type;
 
     typedef typename super_type::value_type value_type;
     typedef typename super_type::sequence_state sequence_state;
+    typedef typename super_type::pool_type pool_type;
 
     bool is_segment_empty(unsigned_type slot) const
     {
@@ -722,6 +649,77 @@ public:
     bool is_segment_allocated(unsigned_type slot) const
     {
         return super_type::is_segment_allocated(slot);
+    }
+
+    //! Merge all items from another merger and insert the resulting external
+    //! array into the merger. Requires: is_space_available() == 1
+    template <class Merger>
+    void append_merger(Merger& another_merger, size_type segment_size)
+    {
+        STXXL_VERBOSE1("ext_merger::append_merger(merger,...)" << this);
+
+        if (segment_size == 0)
+        {
+            // deallocate memory ?
+            STXXL_VERBOSE1("Merged segment with zero size.");
+            return;
+        }
+
+        // allocate a new player slot
+        int index = tree_type::new_player();
+
+        // construct new sorted array from merger
+        assert(segment_size);
+        unsigned_type nblocks = (unsigned_type)(segment_size / block_type::size);
+        //assert(nblocks); // at least one block
+        STXXL_VERBOSE1("ext_arrays::insert_segment nblocks=" << nblocks);
+        if (nblocks == 0)
+        {
+            STXXL_VERBOSE1("ext_arrays::insert_segment(merger,...) WARNING: inserting a segment with " <<
+                           nblocks << " blocks");
+            STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
+        }
+        unsigned_type first_size = (unsigned_type)(segment_size % block_type::size);
+        if (first_size == 0)
+        {
+            first_size = block_type::size;
+            --nblocks;
+        }
+
+        // allocate blocks
+        block_manager* bm = block_manager::get_instance();
+        std::list<bid_type>* bids = new std::list<bid_type>(nblocks);
+        bm->new_blocks(alloc_strategy(), bids->begin(), bids->end());
+        block_type* first_block = new block_type;
+
+        another_merger.multi_merge(
+            first_block->begin() + (block_type::size - first_size),
+            first_block->end());
+
+        STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
+        assert(!cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
+
+        pool_type* pool = this->pool;
+        assert(pool->size_write() > 0);
+
+        for (typename std::list<bid_type>::iterator curbid = bids->begin(); curbid != bids->end(); ++curbid)
+        {
+            block_type* b = pool->steal();
+            another_merger.multi_merge(b->begin(), b->end());
+            STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
+            STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
+            assert(!cmp(*(b->begin()), *(b->end() - 1)));
+            pool->write(b, *curbid);
+            STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
+        }
+
+        insert_segment(bids, first_block, first_size, index);
+
+        this->m_size += segment_size;
+
+#if STXXL_PQ_EXTERNAL_LOSER_TREE
+        tree_type::update_on_insert((index + this->k) >> 1, *(this->states[index]), index);
+#endif // STXXL_PQ_EXTERNAL_LOSER_TREE
     }
 
     void deallocate_segment(unsigned_type slot)
@@ -738,7 +736,7 @@ public:
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
         unsigned_type& k = this->k;
-        unsigned_type& log_k = this->log_k;
+        unsigned_type& logK = this->logK;
         unsigned_type& m_size = this->m_size;
         CompareType& cmp = this->cmp;
         typename super_type::Entry* entry = this->entry;
@@ -946,7 +944,7 @@ public:
                 pool->hint(states[i].bids->front());
         }
 
-        switch (log_k) {
+        switch (logK) {
         case 0:
             assert(k == 1);
             assert(entry[0].index == 0);

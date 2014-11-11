@@ -99,15 +99,15 @@ int main()
         stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger;
         merger.set_pool(&pool);
         dummy(1, 0);
-        merger.insert_segment(dummy, B * 2);
+        merger.append_merger(dummy, B * 2);
         dummy(2, 0);
-        merger.insert_segment(dummy, B * 2);
+        merger.append_merger(dummy, B * 2);
         dummy(B, 1);
-        merger.insert_segment(dummy, B * 4);
+        merger.append_merger(dummy, B * 4);
         dummy(B, 2);
-        merger.insert_segment(dummy, B * 4);
+        merger.append_merger(dummy, B * 4);
         dummy(B, 4);
-        merger.insert_segment(dummy, B * 4);
+        merger.append_merger(dummy, B * 4);
 
         std::vector<my_type> output(B * 3);
 

@@ -70,14 +70,14 @@ int main()
 
     ext_merger<block_type, my_cmp, 5> merger;
     merger.set_pool(&pool);
-    merger.insert_segment(dummy, 1024 * 3);
+    merger.append_merger(dummy, 1024 * 3);
     cnt = 20;
-    merger.insert_segment(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
     cnt = 10;
-    merger.insert_segment(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
     cnt = -100;
-    merger.insert_segment(dummy, 1024 * 4);
-    merger.insert_segment(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
     STXXL_CHECK(stxxl::is_sorted(output.begin(), output.end()));
 
