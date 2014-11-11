@@ -253,26 +253,12 @@ protected:
         }
     };
 
-#if STXXL_PQ_EXTERNAL_LOSER_TREE
-    struct Entry
-    {
-        value_type key;       // key of loser element (winner for 0)
-        unsigned_type index;  // the number of the losing segment
-    };
-#endif //STXXL_PQ_EXTERNAL_LOSER_TREE
-
     size_type m_size;          // total number of elements stored
     unsigned_type logK;      // log of current tree size
     unsigned_type k;          // invariant (k == 1 << logK), always a power of 2
     // only entries 0 .. arity-1 may hold actual sequences, the other
     // entries arity .. arity_bound-1 are sentinels to make the size of the tree
     // a power of 2 always
-
-#if STXXL_PQ_EXTERNAL_LOSER_TREE
-    // upper levels of loser trees
-    // entry[0] contains the winner info
-    Entry entry[arity_bound];
-#endif  //STXXL_PQ_EXTERNAL_LOSER_TREE
 
     // leaf information
     // note that Knuth uses indices k..k-1
@@ -359,7 +345,6 @@ protected:
         std::swap(m_size, obj.m_size);
         std::swap(logK, obj.logK);
         std::swap(k, obj.k);
-        swap_1D_arrays(entry, obj.entry, arity_bound);
         swap_1D_arrays(states, obj.states, arity_bound);
 
         // std::swap(pool,obj.pool);

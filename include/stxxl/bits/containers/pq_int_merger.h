@@ -43,14 +43,6 @@ public:
     enum { max_arity = MaxArity };
 
 protected:
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-    struct Entry
-    {
-        value_type key;          // Key of Loser element (winner for 0)
-        unsigned_type index;     // number of losing segment
-    };
-#endif //STXXL_PQ_INTERNAL_LOSER_TREE
-
     comparator_type cmp;
 
     unsigned_type m_size;     // total number of elements stored
@@ -58,12 +50,6 @@ protected:
     unsigned_type k;         // invariant (k == 1 << logK), always a power of two
 
     value_type sentinel;        // target of free segment pointers
-
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-    // upper levels of loser trees
-    // entry[0] contains the winner info
-    Entry entry[MaxArity];
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
     // leaf information
     // note that Knuth uses indices k..k-1
@@ -117,7 +103,6 @@ protected:
 
     void make_array_sentinel(unsigned_type slot)
     {
-        assert(current[slot] == NULL || is_array_empty(slot));
         current[slot] = &sentinel;
         current_end[slot] = &sentinel;
         segment[slot] = NULL;
@@ -180,9 +165,6 @@ public:
         std::swap(logK, obj.logK);
         std::swap(k, obj.k);
         std::swap(sentinel, obj.sentinel);
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        swap_1D_arrays(entry, obj.entry, MaxArity);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
         swap_1D_arrays(current, obj.current, MaxArity);
         swap_1D_arrays(current_end, obj.current_end, MaxArity);
         swap_1D_arrays(segment, obj.segment, MaxArity);

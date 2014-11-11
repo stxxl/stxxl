@@ -42,9 +42,17 @@ public:
     enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
     typedef typename super_type::value_type value_type;
-
     typedef typename super_type::SequenceType SequenceType;
-    typedef typename super_type::Entry Entry;
+
+    struct Entry
+    {
+        value_type key;          // Key of Loser element (winner for 0)
+        unsigned_type index;     // number of losing segment
+    };
+
+    // upper levels of loser trees
+    // entry[0] contains the winner info
+    struct Entry entry[max_arity];
 
     //! stack of free player indices
     internal_bounded_stack<unsigned_type, arity> free_slots;
@@ -106,7 +114,6 @@ public:
     //! rebuild loser tree information from the values in current
     void rebuild_loser_tree()
     {
-        typename super_type::Entry* entry = this->entry;
         SequenceType* states = this->get_sequences();
 
         unsigned_type winner = init_winner(1);
@@ -121,7 +128,6 @@ public:
     // return winner index
     unsigned_type init_winner(unsigned_type root)
     {
-        typename super_type::Entry* entry = this->entry;
         SequenceType* states = this->get_sequences();
         unsigned_type& k = this->k;
 
@@ -166,8 +172,6 @@ public:
                           unsigned_type* mask)           // 1 << (ceil(log KNK) - dist-from-root)
     {
         unsigned_type& logK = this->logK;
-        CompareType& cmp = this->cmp;
-        typename super_type::Entry* entry = this->entry;
 
         if (node == 0)
         {
@@ -187,12 +191,15 @@ public:
             value_type loserKey = entry[node].key;
             unsigned_type loserIndex = entry[node].index;
             if ((*winner_index & *mask) != (newIndex & *mask)) {     // different subtrees
-                if (cmp(loserKey, newKey)) {                        // newKey will have influence here
-                    if (cmp(*winner_key, newKey)) {                  // old winner loses here
+                // newKey will have influence here
+                if (cmp(loserKey, newKey)) {
+                    if (cmp(*winner_key, newKey)) {
+                        // old winner loses here
                         entry[node].key = *winner_key;
                         entry[node].index = *winner_index;
                     }
-                    else {                                          // new entry loses here
+                    else {
+                        // new entry loses here
                         entry[node].key = newKey;
                         entry[node].index = newIndex;
                     }
@@ -324,8 +331,8 @@ public:
         value_type current_key;
         unsigned_type current_index; // leaf pointed to by current entry
         unsigned_type kReg = this->k;
-        unsigned_type winner_index = this->entry[0].index;
-        value_type winner_key = this->entry[0].key;
+        unsigned_type winner_index = entry[0].index;
+        value_type winner_key = entry[0].key;
 
         while (begin != end)
         {
@@ -346,7 +353,7 @@ public:
             // go up the entry-tree
             for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
             {
-                current_pos = this->entry + i;
+                current_pos = entry + i;
                 current_key = current_pos->key;
                 if (cmp(winner_key, current_key))
                 {
@@ -358,17 +365,16 @@ public:
                 }
             }
         }
-        this->entry[0].index = winner_index;
-        this->entry[0].key = winner_key;
+        entry[0].index = winner_index;
+        entry[0].key = winner_key;
     }
 
     template <int LogK, typename OutputIterator>
     void multi_merge_f(OutputIterator begin, OutputIterator end)
     {
         SequenceType* reg_states = this->get_sequences();
-        Entry* reg_entry = this->entry;
-        unsigned_type winner_index = reg_entry[0].index;
-        value_type winner_key = reg_entry[0].key;
+        unsigned_type winner_index = entry[0].index;
+        value_type winner_key = entry[0].key;
 
         // TODO: reinsert assert(log_k >= LogK);
         while (begin != end)
@@ -391,7 +397,7 @@ public:
 #define TreeStep(L)                                                     \
     if (1 << LogK >= 1 << L) {                                          \
         int pos_shift = ((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0; \
-        Entry* pos = reg_entry + ((winner_index + (1 << LogK)) >> pos_shift); \
+        Entry* pos = entry + ((winner_index + (1 << LogK)) >> pos_shift); \
         value_type key = pos->key;                              \
         if (cmp(winner_key, key)) {                             \
             unsigned_type index = pos->index;                   \
@@ -413,13 +419,14 @@ public:
             TreeStep(1);
 #undef TreeStep
         }
-        reg_entry[0].index = winner_index;
-        reg_entry[0].key = winner_key;
+        entry[0].index = winner_index;
+        entry[0].key = winner_key;
     }
 
     void swap(loser_tree& obj)
     {
         std::swap(free_slots, obj.free_slots);
+        swap_1D_arrays(entry, obj.entry, max_arity);
     }
 };
 
