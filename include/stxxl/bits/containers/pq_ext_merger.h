@@ -122,10 +122,9 @@ public:
  */
 template <class BlockType, class CompareType, unsigned Arity,
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
-class ext_arrays : private noncopyable
+class ext_arrays : public arrays_base<typename BlockType::value_type, CompareType>
 {
 public:
-    typedef stxxl::uint64 size_type;
     typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
     typedef typename block_type::value_type value_type;
@@ -133,22 +132,12 @@ public:
     typedef AllocStr alloc_strategy;
     typedef read_write_pool<block_type> pool_type;
 
+    typedef arrays_base<value_type, CompareType> super_type;
+
     // max_arity / 2  <  arity  <=  max_arity
     enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
 protected:
-    //! the comparator object
-    compare_type cmp;
-
-    bool is_sentinel(const value_type& a) const
-    {
-        return !(cmp(cmp.min_value(), a)); // a <= cmp.min_value()
-    }
-
-    bool not_sentinel(const value_type& a) const
-    {
-        return cmp(cmp.min_value(), a); // a > cmp.min_value()
-    }
 
     struct sequence_state : private noncopyable
     {
@@ -252,18 +241,6 @@ protected:
         }
     };
 
-    //! current tree size, invariant (k == 1 << logK), always a power of two
-    unsigned_type k;
-    //! log of current tree size
-    unsigned_type logK;
-
-    //! total number of elements stored
-    size_type m_size;
-
-    // only entries 0 .. arity-1 may hold actual sequences, the other
-    // entries arity .. max_arity-1 are sentinels to make the size of the tree
-    // a power of 2 always
-
     // leaf information.  note that Knuth uses indices k..k-1, while we use
     // 0..k-1
 
@@ -276,7 +253,7 @@ protected:
 
 public:
     ext_arrays() // TODO: pass pool as parameter
-        : k(1), logK(0), m_size(0), pool(NULL)
+        : super_type(), pool(NULL)
     {
         init();
     }
@@ -317,14 +294,13 @@ protected:
     void init()
     {
         STXXL_VERBOSE2("ext_arrays::init()");
-        assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
         sentinel_block = NULL;
         if (arity < max_arity)
         {
             sentinel_block = new block_type;
             for (unsigned_type i = 0; i < block_type::size; ++i)
-                (*sentinel_block)[i] = cmp.min_value();
+                (*sentinel_block)[i] = this->cmp.min_value();
             if (arity + 1 == max_arity) {
                 // same memory consumption, but smaller merge width, better use arity = max_arity
                 STXXL_ERRMSG("inefficient PQ parameters for ext_arrays: arity + 1 == max_arity");
@@ -361,10 +337,6 @@ public:
     {
         return (STXXL_MIN<unsigned_type>(arity + 1, max_arity) * block_type::raw_size);
     }
-
-public:
-
-    size_type size() const { return m_size; }
 
 protected:
     /*!

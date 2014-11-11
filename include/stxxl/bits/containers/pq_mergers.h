@@ -28,6 +28,54 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local {
 
+template <typename ValueType, typename CompareType>
+class arrays_base : private noncopyable
+{
+protected:
+    //! comparator object type
+    typedef CompareType compare_type;
+
+    typedef ValueType value_type;
+
+    //! the comparator object
+    compare_type cmp;
+
+    //! current tree size, invariant (k == 1 << logK), always a power of two
+    unsigned_type k;
+    //! log of current tree size
+    unsigned_type logK;
+
+    //! total number of elements stored
+    external_size_type m_size;
+
+    // only entries 0 .. arity-1 may hold actual sequences, the other
+    // entries arity .. max_arity-1 are sentinels to make the size of the tree
+    // a power of 2 always
+
+    arrays_base()
+        : k(1), logK(0), m_size(0)
+    {
+        // verify strict weak ordering
+        assert(!cmp(cmp.min_value(), cmp.min_value()));
+    }
+
+public:
+    bool is_sentinel(const value_type& a) const
+    {
+        return !(cmp(cmp.min_value(), a)); // a <= cmp.min_value()
+    }
+
+    bool not_sentinel(const value_type& a) const
+    {
+        return cmp(cmp.min_value(), a); // a > cmp.min_value()
+    }
+
+    external_size_type size() const
+    {
+        return m_size;
+    }
+};
+
 /*!
  * \param Arity  maximum arity of merger, does not need to be a power of 2
  */

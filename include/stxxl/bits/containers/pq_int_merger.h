@@ -35,25 +35,15 @@ namespace priority_queue_local {
  * \param  MaxArity  maximum arity of loser tree, has to be a power of two
  */
 template <class ValueType, class CompareType, unsigned MaxArity>
-class int_arrays : private noncopyable
+class int_arrays : public arrays_base<ValueType, CompareType>
 {
 public:
     typedef ValueType value_type;
-    typedef CompareType compare_type;
     enum { max_arity = MaxArity };
 
+    typedef arrays_base<ValueType, CompareType> super_type;
+
 protected:
-    //! the comparator object
-    compare_type cmp;
-
-    //! current tree size, invariant (k == 1 << logK), always a power of two
-    unsigned_type k;
-    //! log of current tree size
-    unsigned_type logK;
-
-    //! total number of elements stored
-    unsigned_type m_size;
-
     //! target of free segment pointers
     value_type sentinel;
 
@@ -116,16 +106,7 @@ protected:
     }
 
 public:
-    bool is_sentinel(const value_type& a) const
-    {
-        return !(cmp(cmp.min_value(), a));
-    }
-    bool not_sentinel(const value_type& a) const
-    {
-        return cmp(cmp.min_value(), a);
-    }
-
-    typedef value_type* SequenceType;
+   typedef value_type* SequenceType;
 
     SequenceType* get_sequences()
     {
@@ -134,7 +115,7 @@ public:
 
 public:
     int_arrays()
-        : k(1), logK(0), m_size(0), mem_cons_(0)
+        : super_type(), mem_cons_(0)
     {
         segment[0] = NULL;
         current[0] = &sentinel;
@@ -143,16 +124,13 @@ public:
         // entry and sentinel are initialized by init since they need the value
         // of supremum
 
-        // verify strict weak ordering
-        assert(!cmp(cmp.min_value(), cmp.min_value()));
-
-        sentinel = cmp.min_value();
+        sentinel = this->cmp.min_value();
     }
 
     ~int_arrays()
     {
         STXXL_VERBOSE1("int_arrays::~int_arrays()");
-        for (unsigned_type i = 0; i < k; ++i)
+        for (unsigned_type i = 0; i < this->k; ++i)
         {
             if (segment[i])
             {
@@ -167,10 +145,7 @@ public:
 
     void swap(int_arrays& obj)
     {
-        std::swap(cmp, obj.cmp);
-        std::swap(k, obj.k);
-        std::swap(logK, obj.logK);
-        std::swap(m_size, obj.m_size);
+        super_type::swap(obj);
         std::swap(sentinel, obj.sentinel);
         swap_1D_arrays(current, obj.current, MaxArity);
         swap_1D_arrays(current_end, obj.current_end, MaxArity);
@@ -193,10 +168,8 @@ public:
         current_end[index] = target + length;
         segment_size[index] = (length + 1) * sizeof(value_type);
         mem_cons_ += (length + 1) * sizeof(value_type);
-        m_size += length;
+        this->m_size += length;
     }
-
-    unsigned_type size() const { return m_size; }
 };
 
 template <class ValueType, class CompareType, unsigned MaxArity>
