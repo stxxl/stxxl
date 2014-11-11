@@ -94,8 +94,6 @@ protected:
         mem_cons_ -= segment_size[slot];
     }
 
-    void rebuild_loser_tree();
-
     //! is this array invalid: empty and prefixed with sentinel?
     bool is_array_empty(unsigned_type slot) const
     {
@@ -211,52 +209,6 @@ public:
 
     unsigned_type size() const { return m_size; }
 };
-
-///////////////////////// LoserTree ///////////////////////////////////
-
-// rebuild loser tree information from the values in current
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::rebuild_loser_tree()
-{
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-    // MaxArity needs to be a power of two
-    assert(LOG2<MaxArity>::floor == LOG2<MaxArity>::ceil);
-    unsigned_type winner = init_winner(1);
-    entry[0].index = winner;
-    entry[0].key = *(current[winner]);
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
-}
-
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-// given any values in the leaves this
-// routing recomputes upper levels of the tree
-// from scratch in linear time
-// initialize entry[root].index and the subtree rooted there
-// return winner index
-template <class ValueType, class CompareType, unsigned MaxArity>
-unsigned_type int_arrays<ValueType, CompareType, MaxArity>::init_winner(unsigned_type root)
-{
-    if (root >= k) {     // leaf reached
-        return root - k;
-    }
-    else {
-        unsigned_type left = init_winner(2 * root);
-        unsigned_type right = init_winner(2 * root + 1);
-        value_type lk = *(current[left]);
-        value_type rk = *(current[right]);
-        if (!(cmp(lk, rk))) {     // right subtree loses
-            entry[root].index = right;
-            entry[root].key = rk;
-            return left;
-        } else {
-            entry[root].index = left;
-            entry[root].key = lk;
-            return right;
-        }
-    }
-}
-
-#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
 template <class ValueType, class CompareType, unsigned MaxArity>
 class int_merger : public loser_tree<

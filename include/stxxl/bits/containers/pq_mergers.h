@@ -67,7 +67,7 @@ public:
         // initial state: one empty player slot
         free_slots.push(0);
 
-        this->rebuild_loser_tree();
+        rebuild_loser_tree();
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
         assert(is_array_empty(0) && !is_array_allocated(0));
@@ -101,6 +101,56 @@ public:
     bool is_space_available() const
     {
         return (this->k < arity) || !free_slots.empty();
+    }
+
+    //! rebuild loser tree information from the values in current
+    void rebuild_loser_tree()
+    {
+        typename super_type::Entry* entry = this->entry;
+        SequenceType* states = this->get_sequences();
+
+        unsigned_type winner = init_winner(1);
+        entry[0].index = winner;
+        entry[0].key = *(states[winner]);
+    }
+
+    // given any values in the leaves this
+    // routing recomputes upper levels of the tree
+    // from scratch in linear time
+    // initialize entry[root].index and the subtree rooted there
+    // return winner index
+    unsigned_type init_winner(unsigned_type root)
+    {
+        typename super_type::Entry* entry = this->entry;
+        SequenceType* states = this->get_sequences();
+        unsigned_type& k = this->k;
+
+        if (root >= k || root >= max_arity)
+        {       // leaf reached
+            return root - k;
+        }
+        else
+        {
+            unsigned_type left = init_winner(2 * root);
+            unsigned_type right = init_winner(2 * root + 1);
+            value_type lk = *(states[left]);
+            value_type rk = *(states[right]);
+            assert(root < max_arity);
+
+            if (!(cmp(lk, rk)))
+            {
+                // right subtree looses
+                entry[root].index = right;
+                entry[root].key = rk;
+                return left;
+            }
+            else
+            {
+                entry[root].index = left;
+                entry[root].key = lk;
+                return right;
+            }
+        }
     }
 
     /*!
@@ -201,7 +251,7 @@ public:
         assert(k <= max_arity);
 
         // recompute loser tree information
-        this->rebuild_loser_tree();
+        rebuild_loser_tree();
     }
 
     //! compact nonempty segments in the left half of the tree
@@ -262,7 +312,7 @@ public:
         STXXL_VERBOSE3("compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
 
         // recompute loser tree information
-        this->rebuild_loser_tree();
+        rebuild_loser_tree();
     }
 
     // multi-merge for arbitrary K
