@@ -466,35 +466,6 @@ protected:
     }
 #endif //STXXL_PQ_EXTERNAL_LOSER_TREE
 
-    // make the tree two times as wide
-    void double_k()
-    {
-        STXXL_VERBOSE1("ext_arrays::double_k (before) k=" << k << " logK=" << logK << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
-        assert(k > 0);
-        assert(k < arity);
-        assert(free_slots.empty());                 // stack was free (probably not needed)
-
-        // make all new entries free
-        // and push them on the free stack
-        for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
-        {
-            states[i].make_inf();
-            if (i < arity)
-                free_slots.push(i);
-        }
-
-        // double the size
-        k *= 2;
-        logK++;
-
-        STXXL_VERBOSE1("ext_arrays::double_k (after)  k=" << k << " logK=" << logK << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_slots.size());
-        assert(!free_slots.empty());
-        assert(k <= arity_bound);
-
-        // recompute loser tree information
-        rebuild_loser_tree();
-    }
-
 #if 0
     void swap(ext_arrays& obj)
     {

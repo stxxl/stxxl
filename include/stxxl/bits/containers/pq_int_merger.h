@@ -80,7 +80,6 @@ protected:
     // private member functions
     unsigned_type init_winner(unsigned_type root);
     void deallocate_segment(unsigned_type slot);
-    void double_k();
     void rebuild_loser_tree();
 
     //! is this array invalid: empty and prefixed with sentinel?
@@ -104,10 +103,12 @@ protected:
         std::swap(segment_size[a], segment_size[b]);
     }
 
-    void make_array_sentinel(unsigned_type a)
+    void make_array_sentinel(unsigned_type slot)
     {
-        current[a] = &sentinel;
-        current_end[a] = &sentinel;
+        assert(is_array_empty(slot));
+        current[slot] = &sentinel;
+        current_end[slot] = &sentinel;
+        segment[slot] = NULL;
     }
 
 public:
@@ -257,36 +258,6 @@ unsigned_type int_arrays<ValueType, CompareType, MaxArity>::init_winner(unsigned
 }
 
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
-
-// make the tree two times as wide
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::double_k()
-{
-    STXXL_VERBOSE3("int_arrays::double_k (before) k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
-    assert(k > 0);
-    assert(k < MaxArity);
-    assert(free_slots.empty());                          // stack was free (probably not needed)
-
-    // make all new entries free
-    // and push them on the free stack
-    for (unsigned_type i = 2 * k - 1; i >= k; i--)       // backwards
-    {
-        current[i] = &sentinel;
-        current_end[i] = &sentinel;
-        segment[i] = NULL;
-        free_slots.push(i);
-    }
-
-    // double the size
-    k *= 2;
-    logK++;
-
-    STXXL_VERBOSE3("int_arrays::double_k (after)  k=" << k << " logK=" << logK << " MaxArity=" << MaxArity << " #free=" << free_slots.size());
-    assert(!free_slots.empty());
-
-    // recompute loser tree information
-    rebuild_loser_tree();
-}
 
 // free an empty segment .
 template <class ValueType, class CompareType, unsigned MaxArity>
