@@ -120,9 +120,7 @@ public:
  * External merger, based on the loser tree data structure.
  * \param Arity_  maximum arity of merger, does not need to be a power of 2
  */
-template <class BlockType,
-          class Cmp,
-          unsigned Arity,
+template <class BlockType, class CompareType, unsigned Arity,
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
 class ext_arrays : private noncopyable
 {
@@ -131,15 +129,16 @@ public:
     typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
     typedef typename block_type::value_type value_type;
-    typedef Cmp comparator_type;
+    typedef CompareType compare_type;
     typedef AllocStr alloc_strategy;
     typedef read_write_pool<block_type> pool_type;
 
-    // arity_bound / 2  <  arity  <=  arity_bound
-    enum { arity = Arity, arity_bound = 1UL << (LOG2<Arity>::ceil) };
+    // max_arity / 2  <  arity  <=  max_arity
+    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
 protected:
-    comparator_type cmp;
+    //! the comparator object
+    compare_type cmp;
 
     bool is_sentinel(const value_type& a) const
     {
@@ -156,7 +155,7 @@ protected:
         block_type* block;          //current block
         unsigned_type current;      //current index in current block
         std::list<bid_type>* bids;  //list of blocks forming this sequence
-        comparator_type cmp;
+        compare_type cmp;
         ext_arrays* merger;
         bool allocated;
 
@@ -253,17 +252,23 @@ protected:
         }
     };
 
-    size_type m_size;          // total number of elements stored
-    unsigned_type logK;      // log of current tree size
-    unsigned_type k;          // invariant (k == 1 << logK), always a power of 2
+    //! current tree size, invariant (k == 1 << logK), always a power of two
+    unsigned_type k;
+    //! log of current tree size
+    unsigned_type logK;
+
+    //! total number of elements stored
+    size_type m_size;
+
     // only entries 0 .. arity-1 may hold actual sequences, the other
-    // entries arity .. arity_bound-1 are sentinels to make the size of the tree
+    // entries arity .. max_arity-1 are sentinels to make the size of the tree
     // a power of 2 always
 
-    // leaf information
-    // note that Knuth uses indices k..k-1
-    // while we use 0..k-1
-    sequence_state states[arity_bound]; // sequence including current position, dereference gives current element
+    // leaf information.  note that Knuth uses indices k..k-1, while we use
+    // 0..k-1
+
+    //! sequence including current position, dereference gives current element
+    sequence_state states[max_arity];
 
     pool_type* pool;
 
@@ -271,7 +276,7 @@ protected:
 
 public:
     ext_arrays() // TODO: pass pool as parameter
-        : m_size(0), logK(0), k(1), pool(NULL)
+        : k(1), logK(0), m_size(0), pool(NULL)
     {
         init();
     }
@@ -315,18 +320,18 @@ protected:
         assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
         sentinel_block = NULL;
-        if (arity < arity_bound)
+        if (arity < max_arity)
         {
             sentinel_block = new block_type;
             for (unsigned_type i = 0; i < block_type::size; ++i)
                 (*sentinel_block)[i] = cmp.min_value();
-            if (arity + 1 == arity_bound) {
-                // same memory consumption, but smaller merge width, better use arity = arity_bound
-                STXXL_ERRMSG("inefficient PQ parameters for ext_arrays: arity + 1 == arity_bound");
+            if (arity + 1 == max_arity) {
+                // same memory consumption, but smaller merge width, better use arity = max_arity
+                STXXL_ERRMSG("inefficient PQ parameters for ext_arrays: arity + 1 == max_arity");
             }
         }
 
-        for (unsigned_type i = 0; i < arity_bound; ++i)
+        for (unsigned_type i = 0; i < max_arity; ++i)
         {
             states[i].merger = this;
             if (i < arity)
@@ -342,10 +347,10 @@ protected:
     void swap(ext_arrays& obj)
     {
         std::swap(cmp, obj.cmp);
-        std::swap(m_size, obj.m_size);
-        std::swap(logK, obj.logK);
         std::swap(k, obj.k);
-        swap_1D_arrays(states, obj.states, arity_bound);
+        std::swap(logK, obj.logK);
+        std::swap(m_size, obj.m_size);
+        swap_1D_arrays(states, obj.states, max_arity);
 
         // std::swap(pool,obj.pool);
     }
@@ -354,7 +359,7 @@ protected:
 public:
     unsigned_type mem_cons() const // only rough estimation
     {
-        return (STXXL_MIN<unsigned_type>(arity + 1, arity_bound) * block_type::raw_size);
+        return (STXXL_MIN<unsigned_type>(arity + 1, max_arity) * block_type::raw_size);
     }
 
 public:
@@ -423,7 +428,6 @@ class ext_merger : public loser_tree<
 public:
 
     typedef BlockType block_type;
-    typedef CompareType Cmp;
     typedef AllocStr alloc_strategy;
 
     typedef ext_arrays<BlockType, CompareType, MaxArity, AllocStr> arrays_type;

@@ -39,30 +39,37 @@ class int_arrays : private noncopyable
 {
 public:
     typedef ValueType value_type;
-    typedef CompareType comparator_type;
+    typedef CompareType compare_type;
     enum { max_arity = MaxArity };
 
 protected:
-    comparator_type cmp;
+    //! the comparator object
+    compare_type cmp;
 
-    unsigned_type m_size;     // total number of elements stored
-    unsigned_type logK;      // log of current tree size
-    unsigned_type k;         // invariant (k == 1 << logK), always a power of two
+    //! current tree size, invariant (k == 1 << logK), always a power of two
+    unsigned_type k;
+    //! log of current tree size
+    unsigned_type logK;
 
-    value_type sentinel;        // target of free segment pointers
+    //! total number of elements stored
+    unsigned_type m_size;
 
-    // leaf information
-    // note that Knuth uses indices k..k-1
-    // while we use 0..k-1
-    value_type* current[MaxArity];               // pointer to current element
-    value_type* current_end[MaxArity];           // pointer to end of block for current element
-    value_type* segment[MaxArity];               // start of Segments
-    unsigned_type segment_size[MaxArity];     // just to count the internal memory consumption, in bytes
+    //! target of free segment pointers
+    value_type sentinel;
+
+    // leaf information.  note that Knuth uses indices k..k-1, while we use
+    // 0..k-1
+
+    //! pointer to current element
+    value_type* current[MaxArity];
+    //! pointer to end of block for current element
+    value_type* current_end[MaxArity];
+    //! start of Segments
+    value_type* segment[MaxArity];
+    //! just to count the internal memory consumption, in bytes
+    unsigned_type segment_size[MaxArity];
 
     unsigned_type mem_cons_;
-
-    // private member functions
-    unsigned_type init_winner(unsigned_type root);
 
     //! free an empty segment .
     void free_array(unsigned_type slot)
@@ -127,7 +134,7 @@ public:
 
 public:
     int_arrays()
-        : m_size(0), logK(0), k(1), mem_cons_(0)
+        : k(1), logK(0), m_size(0), mem_cons_(0)
     {
         segment[0] = NULL;
         current[0] = &sentinel;
@@ -161,9 +168,9 @@ public:
     void swap(int_arrays& obj)
     {
         std::swap(cmp, obj.cmp);
-        std::swap(m_size, obj.m_size);
-        std::swap(logK, obj.logK);
         std::swap(k, obj.k);
+        std::swap(logK, obj.logK);
+        std::swap(m_size, obj.m_size);
         std::swap(sentinel, obj.sentinel);
         swap_1D_arrays(current, obj.current, MaxArity);
         swap_1D_arrays(current_end, obj.current_end, MaxArity);
