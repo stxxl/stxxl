@@ -39,7 +39,92 @@ public:
     typedef typename super_type::SequenceType SequenceType;
     typedef typename super_type::Entry Entry;
 
-#if STXXL_PQ_EXTERNAL_LOSER_TREE
+
+    //! Allocate a free slot for a new player.
+    unsigned_type new_player()
+    {
+        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
+
+        // get a free slot
+        if (free_slots.empty()) {
+            // tree is too small, attempt to enlarge
+            this->doubleK();
+        }
+
+        assert(!free_slots.empty());
+        unsigned_type index = free_slots.top();
+        free_slots.pop();
+
+        return index;
+    }
+
+    /*!
+     * Update loser tree on insert or decrement of player index first go up the
+     * tree all the way to the root hand down old winner for the respective
+     * subtree based on new value, and old winner and loser update each node on
+     * the path to the root top down.  This is implemented recursively
+     */
+    void update_on_insert(unsigned_type node,
+                          const value_type& newKey, unsigned_type newIndex,
+                          value_type* winner_key,
+                          unsigned_type* winner_index,   // old winner
+                          unsigned_type* mask)           // 1 << (ceil(log KNK) - dist-from-root)
+    {
+        unsigned_type& logK = this->logK;
+        CompareType& cmp = this->cmp;
+        typename super_type::Entry* entry = this->entry;
+
+        if (node == 0)
+        {
+            // winner part of root
+            *mask = (unsigned_type)(1) << (logK - 1);
+            *winner_key = entry[0].key;
+            *winner_index = entry[0].index;
+            if (cmp(entry[node].key, newKey))
+            {
+                entry[node].key = newKey;
+                entry[node].index = newIndex;
+            }
+        }
+        else {
+            update_on_insert(node >> 1, newKey, newIndex, winner_key, winner_index, mask);
+            value_type loserKey = entry[node].key;
+            unsigned_type loserIndex = entry[node].index;
+            if ((*winner_index & *mask) != (newIndex & *mask)) {     // different subtrees
+                if (cmp(loserKey, newKey)) {                        // newKey will have influence here
+                    if (cmp(*winner_key, newKey)) {                  // old winner loses here
+                        entry[node].key = *winner_key;
+                        entry[node].index = *winner_index;
+                    }
+                    else {                                          // new entry loses here
+                        entry[node].key = newKey;
+                        entry[node].index = newIndex;
+                    }
+                }
+                *winner_key = loserKey;
+                *winner_index = loserIndex;
+            }
+            // note that nothing needs to be done if the winner came from the
+            // same subtree
+            // a) newKey <= winner_key => even more reason for the other tree to lose
+            // b) newKey >  winner_key => the old winner will beat the new
+            //                           entry further down the tree
+            // also the same old winner is handed down the tree
+
+            *mask >>= 1;     // next level
+        }
+    }
+
+    //! Initial call to recursive update_on_insert
+    void update_on_insert(unsigned_type node,
+                          const value_type& newKey, unsigned_type newIndex)
+    {
+        value_type dummyKey;
+        unsigned_type dummyIndex, dummyMask;
+        update_on_insert(node, newKey, newIndex,
+                         &dummyKey, &dummyIndex, &dummyMask);
+    }
+
     // multi-merge for arbitrary K
     template <class OutputIterator>
     void multi_merge_k(OutputIterator begin, OutputIterator end)
@@ -137,8 +222,6 @@ public:
         reg_entry[0].index = winner_index;
         reg_entry[0].key = winner_key;
     }
-#endif  //STXXL_PQ_EXTERNAL_LOSER_TREE
-
 };
 
 /////////////////////////////////////////////////////////////////////

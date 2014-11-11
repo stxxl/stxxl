@@ -79,8 +79,6 @@ protected:
 
     // private member functions
     unsigned_type initWinner(unsigned_type root);
-    void update_on_insert(unsigned_type node, const value_type& newKey, unsigned_type newIndex,
-                          value_type* winner_key, unsigned_type* winner_index, unsigned_type* mask);
     void deallocate_segment(unsigned_type slot);
     void doubleK();
     void compactTree();
@@ -172,8 +170,19 @@ public:
         return (k < MaxArity) || !free_slots.empty();
     }
 
-    //! insert segment beginning at target
-    void insert_segment(value_type * target, unsigned_type length);
+    //! insert array to merger at index, takes ownership of the array.
+    //! requires: is_space_available() == 1
+    void insert_array(unsigned_type index, value_type* target, unsigned_type length)
+    {
+        assert(current[index] == &sentinel);
+
+        // link new segment
+        current[index] = segment[index] = target;
+        current_end[index] = target + length;
+        segment_size[index] = (length + 1) * sizeof(value_type);
+        mem_cons_ += (length + 1) * sizeof(value_type);
+        m_size += length;
+    }
 
     unsigned_type size() const { return m_size; }
 };
@@ -221,58 +230,6 @@ unsigned_type int_arrays<ValueType, CompareType, MaxArity>::initWinner(unsigned_
     }
 }
 
-// first go up the tree all the way to the root
-// hand down old winner for the respective subtree
-// based on new value, and old winner and loser
-// update each node on the path to the root top down.
-// This is implemented recursively
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::update_on_insert(
-    unsigned_type node,
-    const value_type& newKey,
-    unsigned_type newIndex,
-    value_type* winner_key,
-    unsigned_type* winner_index,            // old winner
-    unsigned_type* mask)                   // 1 << (ceil(log KNK) - dist-from-root)
-{
-    if (node == 0) {                       // winner part of root
-        *mask = (unsigned_type)(1) << (logK - 1);
-        *winner_key = entry[0].key;
-        *winner_index = entry[0].index;
-        if (cmp(entry[node].key, newKey))
-        {
-            entry[node].key = newKey;
-            entry[node].index = newIndex;
-        }
-    }
-    else {
-        update_on_insert(node >> 1, newKey, newIndex, winner_key, winner_index, mask);
-        value_type loserKey = entry[node].key;
-        unsigned_type loserIndex = entry[node].index;
-        if ((*winner_index & *mask) != (newIndex & *mask)) {     // different subtrees
-            if (cmp(loserKey, newKey)) {                        // newKey will have influence here
-                if (cmp(*winner_key, newKey)) {                  // old winner loses here
-                    entry[node].key = *winner_key;
-                    entry[node].index = *winner_index;
-                }
-                else {                                          // new entry loses here
-                    entry[node].key = newKey;
-                    entry[node].index = newIndex;
-                }
-            }
-            *winner_key = loserKey;
-            *winner_index = loserIndex;
-        }
-        // note that nothing needs to be done if
-        // the winner came from the same subtree
-        // a) newKey <= winner_key => even more reason for the other tree to lose
-        // b) newKey >  winner_key => the old winner will beat the new
-        //                           entry further down the tree
-        // also the same old winner is handed down the tree
-
-        *mask >>= 1;     // next level
-    }
-}
 #endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
 // make the tree two times as wide
@@ -360,54 +317,6 @@ void int_arrays<ValueType, CompareType, MaxArity>::compactTree()
     rebuildLoserTree();
 }
 
-// insert segment beginning at target
-// require: is_space_available() == 1
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::
-insert_segment(value_type* target, unsigned_type length)
-{
-    STXXL_VERBOSE2("int_arrays::insert_segment(" << target << "," << length << ")");
-    //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
-
-    if (length > 0)
-    {
-        assert(not_sentinel(target[0]));
-        assert(not_sentinel(target[length - 1]));
-        assert(is_sentinel(target[length]));
-
-        // get a free slot
-        if (free_slots.empty())
-        {       // tree is too small
-            doubleK();
-        }
-        assert(!free_slots.empty());
-        unsigned_type index = free_slots.top();
-        free_slots.pop();
-
-        // link new segment
-        current[index] = segment[index] = target;
-        current_end[index] = target + length;
-        segment_size[index] = (length + 1) * sizeof(value_type);
-        mem_cons_ += (length + 1) * sizeof(value_type);
-        m_size += length;
-
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        // propagate new information up the tree
-        value_type dummyKey;
-        unsigned_type dummyIndex;
-        unsigned_type dummyMask;
-        update_on_insert((index + k) >> 1, *target, index,
-                         &dummyKey, &dummyIndex, &dummyMask);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
-    } else {
-        // immediately deallocate
-        // this is not only an optimization
-        // but also needed to keep free segments from
-        // clogging up the tree
-        delete[] target;
-    }
-}
-
 // free an empty segment .
 template <class ValueType, class CompareType, unsigned MaxArity>
 void int_arrays<ValueType, CompareType, MaxArity>::
@@ -449,6 +358,9 @@ public:
     typedef int_arrays<ValueType, CompareType, MaxArity> ArraysType;
     typedef loser_tree<ArraysType, CompareType, MaxArity> super_type;
 
+    typedef loser_tree<ArraysType, CompareType, MaxArity> tree_type;
+    typedef ArraysType arrays_type;
+
     void multi_merge(value_type* begin, value_type* end)
     {
         multi_merge(begin, end - begin);
@@ -457,6 +369,39 @@ public:
     bool is_segment_empty(unsigned_type slot) const
     {
         return super_type::is_segment_empty(slot);
+    }
+
+    //! append array to merger, takes ownership of the array.
+    //! requires: is_space_available() == 1
+    void append_array(value_type* target, unsigned_type length)
+    {
+        unsigned_type& k = this->k;
+
+        STXXL_VERBOSE2("int_arrays::insert_segment(" << target << "," << length << ")");
+        //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
+
+        if (length == 0)
+        {
+            // immediately deallocate this is not only an optimization but also
+            // needed to keep free segments from clogging up the tree
+            delete[] target;
+            return;
+        }
+
+        assert(not_sentinel(target[0]));
+        assert(not_sentinel(target[length - 1]));
+        assert(is_sentinel(target[length]));
+
+        // allocate a new player slot
+        int index = tree_type::new_player();
+
+        // insert array into internal memory array list
+        insert_array(index, target, length);
+
+#if STXXL_PQ_INTERNAL_LOSER_TREE
+        // propagate new information up the tree
+        tree_type::update_on_insert((index + k) >> 1, *target, index);
+#endif // STXXL_PQ_INTERNAL_LOSER_TREE
     }
 
     void deallocate_segment(unsigned_type slot)

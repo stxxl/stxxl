@@ -704,7 +704,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
             // for queues where size << #inserts
             // it might make sense to stay in this level if
             // segmentSize < alpha * KNN * k^level for some alpha < 1
-            int_mergers[level + 1].insert_segment(newSegment, segmentSize);
+            int_mergers[level + 1].append_array(newSegment, segmentSize);
         }
         else
         {
@@ -781,7 +781,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
     // and insert it
     unsigned_type freeLevel = make_space_available(0);
     assert(freeLevel == 0 || int_mergers[0].size() == 0);
-    int_mergers[0].insert_segment(newSegment, N);
+    int_mergers[0].append_array(newSegment, N);
 
     // get rid of invalid level 2 buffers
     // by inserting them into tree 0 (which is almost empty in this case)
@@ -794,7 +794,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
 
             newSegment = new value_type[current_group_buffer_size(i) + 1]; // with sentinel
             std::copy(group_buffer_current_mins[i], group_buffer_current_mins[i] + current_group_buffer_size(i) + 1, newSegment);
-            int_mergers[0].insert_segment(newSegment, current_group_buffer_size(i));
+            int_mergers[0].append_array(newSegment, current_group_buffer_size(i));
             group_buffer_current_mins[i] = group_buffers[i] + N;           // empty
         }
     }

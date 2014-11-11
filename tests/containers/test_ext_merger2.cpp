@@ -153,15 +153,15 @@ int main()
         my_type* seq7 = make_sequence(dummy, 4 * B);
 
         merger.init();
-        merger.insert_segment(seq0, 2 * B);
-        merger.insert_segment(seq1, 2 * B);
-        merger.insert_segment(seq2, 4 * B);
-        merger.insert_segment(seq3, 4 * B);
-        merger.insert_segment(seq4, 4 * B);
+        merger.append_array(seq0, 2 * B);
+        merger.append_array(seq1, 2 * B);
+        merger.append_array(seq2, 4 * B);
+        merger.append_array(seq3, 4 * B);
+        merger.append_array(seq4, 4 * B);
         if (0) {
-            merger.insert_segment(seq5, 4 * B);
-            merger.insert_segment(seq6, 4 * B);
-            merger.insert_segment(seq7, 4 * B);
+            merger.append_array(seq5, 4 * B);
+            merger.append_array(seq6, 4 * B);
+            merger.append_array(seq7, 4 * B);
         }
         else {
             delete[] seq5;

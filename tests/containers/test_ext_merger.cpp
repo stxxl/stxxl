@@ -91,10 +91,10 @@ int main()
     my_type* seq4 = make_sequence(dummy, 1024);
     my_type* out = new my_type[4 * 1024];
     loser.init();
-    loser.insert_segment(seq1, 1024);
-    loser.insert_segment(seq2, 1024);
-    loser.insert_segment(seq3, 1024);
-    loser.insert_segment(seq4, 1024);
+    loser.append_array(seq1, 1024);
+    loser.append_array(seq2, 1024);
+    loser.append_array(seq3, 1024);
+    loser.append_array(seq4, 1024);
 
     loser.multi_merge(out, out + 1024);
     STXXL_CHECK(stxxl::is_sorted(out, out + 1024));
