@@ -493,23 +493,23 @@ protected:
 
         // compact all nonempty segments to the left
 
-        unsigned_type target = 0;
-        for (unsigned_type from = 0; from < k; from++)
+        unsigned_type last_empty = 0;
+        for (unsigned_type pos = 0; pos < k; pos++)
         {
-            if (!is_segment_empty(from))
+            if (!is_array_empty(pos))
             {
-                assert(is_segment_allocated(from));
-                if (from != target)
+                assert(is_array_allocated(pos));
+                if (pos != last_empty)
                 {
-                    assert(!is_segment_allocated(target));
-                    states[target].swap(states[from]);
+                    assert(!is_array_allocated(last_empty));
+                    states[last_empty].swap(states[pos]);
                 }
-                ++target;
+                ++last_empty;
             }
         }
 
         // half degree as often as possible
-        while (k > 1 && target <= (k / 2))
+        while (k > 1 && last_empty <= (k / 2))
         {
             k /= 2;
             logK--;
@@ -517,12 +517,12 @@ protected:
 
         // overwrite garbage and compact the stack of free segment indices
         free_slots.clear(); // none free
-        for ( ; target < k; target++)
+        for ( ; last_empty < k; last_empty++)
         {
-            assert(!is_segment_allocated(target));
-            states[target].make_inf();
-            if (target < arity)
-                free_slots.push(target);
+            assert(!is_array_allocated(last_empty));
+            states[last_empty].make_inf();
+            if (last_empty < arity)
+                free_slots.push(last_empty);
         }
 
         STXXL_VERBOSE1("ext_arrays::compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
@@ -572,7 +572,7 @@ protected:
                         unsigned_type first_size, unsigned_type slot)
     {
         STXXL_VERBOSE1("ext_arrays::insert_segment(bidlist,...) " << this << " " << bidlist->size() << " " << slot);
-        assert(!is_segment_allocated(slot));
+        assert(!is_array_allocated(slot));
         assert(first_size > 0);
 
         sequence_state& new_sequence = states[slot];
@@ -586,14 +586,14 @@ protected:
             delete bidlist;
         }
         new_sequence.allocated = true;
-        assert(is_segment_allocated(slot));
+        assert(is_array_allocated(slot));
     }
 
     // free an empty segment .
     void deallocate_segment(unsigned_type slot)
     {
-        STXXL_VERBOSE1("ext_arrays::deallocate_segment() deleting segment " << slot << " allocated=" << int(is_segment_allocated(slot)));
-        assert(is_segment_allocated(slot));
+        STXXL_VERBOSE1("ext_arrays::deallocate_segment() deleting segment " << slot << " allocated=" << int(is_array_allocated(slot)));
+        assert(is_array_allocated(slot));
         states[slot].allocated = false;
         states[slot].make_inf();
 
@@ -601,18 +601,19 @@ protected:
         free_slots.push(slot);
     }
 
-    // is this segment empty ?
-    bool is_segment_empty(unsigned_type slot) const
+    //! is this segment empty ?
+    bool is_array_empty(unsigned_type slot) const
     {
         return is_sentinel(*(states[slot]));
     }
 
-    // Is this segment allocated? Otherwise it's empty,
-    // already on the stack of free segment indices and can be reused.
-    bool is_segment_allocated(unsigned_type slot) const
+    //! Is this segment allocated? Otherwise it's empty, already on the stack
+    //! of free segment indices and can be reused.
+    bool is_array_allocated(unsigned_type slot) const
     {
         return states[slot].allocated;
     }
+
 };  // class ext_arrays
 
 template <class BlockType, class CompareType, unsigned MaxArity,
@@ -641,14 +642,14 @@ public:
     typedef typename super_type::sequence_state sequence_state;
     typedef typename super_type::pool_type pool_type;
 
-    bool is_segment_empty(unsigned_type slot) const
+    bool is_array_empty(unsigned_type slot) const
     {
-        return super_type::is_segment_empty(slot);
+        return super_type::is_array_empty(slot);
     }
 
-    bool is_segment_allocated(unsigned_type slot) const
+    bool is_array_allocated(unsigned_type slot) const
     {
-        return super_type::is_segment_allocated(slot);
+        return super_type::is_array_allocated(slot);
     }
 
     //! Merge all items from another merger and insert the resulting external
@@ -928,7 +929,7 @@ public:
         for (unsigned_type i = 0; i < seqs.size(); ++i)
         {
             unsigned_type seg = orig_seq_index[i];
-            if (is_segment_empty(seg))
+            if (is_array_empty(seg))
             {
                 STXXL_VERBOSE1("deallocated " << seg);
                 deallocate_segment(seg);
@@ -953,9 +954,9 @@ public:
             //std::copy(states[0],states[0]+length,target);
             for (int_type i = 0; i < length; ++i, ++(states[0]), ++begin)
                 *begin = *(states[0]);
-
             entry[0].key = **states;
-            if (is_segment_empty(0))
+
+            if (is_array_empty(0))
                 deallocate_segment(0);
 
             break;
@@ -963,30 +964,32 @@ public:
             assert(k == 2);
             merge_iterator(states[0], states[1], begin, length, cmp);
             this->rebuild_loser_tree();
-            if (is_segment_empty(0) && is_segment_allocated(0))
+
+            if (is_array_empty(0) && is_array_allocated(0))
                 deallocate_segment(0);
 
-            if (is_segment_empty(1) && is_segment_allocated(1))
+            if (is_array_empty(1) && is_array_allocated(1))
                 deallocate_segment(1);
 
             break;
         case 2:
             assert(k == 4);
-            if (is_segment_empty(3))
+            if (is_array_empty(3))
                 merge3_iterator(states[0], states[1], states[2], begin, length, cmp);
             else
                 merge4_iterator(states[0], states[1], states[2], states[3], begin, length, cmp);
             this->rebuild_loser_tree();
-            if (is_segment_empty(0) && is_segment_allocated(0))
+
+            if (is_array_empty(0) && is_array_allocated(0))
                 deallocate_segment(0);
 
-            if (is_segment_empty(1) && is_segment_allocated(1))
+            if (is_array_empty(1) && is_array_allocated(1))
                 deallocate_segment(1);
 
-            if (is_segment_empty(2) && is_segment_allocated(2))
+            if (is_array_empty(2) && is_array_allocated(2))
                 deallocate_segment(2);
 
-            if (is_segment_empty(3) && is_segment_allocated(3))
+            if (is_array_empty(3) && is_array_allocated(3))
                 deallocate_segment(3);
 
             break;
@@ -1021,15 +1024,15 @@ public:
             // for k \in {2, 4, 8} the trigger is k/2 which is good
             // because we have special mergers for k \in {1, 2, 4}
             // there is also a special 3-way-merger, that will be
-            // triggered if k == 4 && is_segment_empty(3)
+            // triggered if k == 4 && is_array_empty(3)
             STXXL_VERBOSE3("ext_arrays  compact? k=" << k << " #used=" << num_segments_used
                                                      << " <= #trigger=" << num_segments_trigger << " ==> "
                                                      << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
                                                      << " || "
-                                                     << ((k == 4 && !free_slots.empty() && !is_segment_empty(3)) ? "yes" : "no ")
+                                                     << ((k == 4 && !free_slots.empty() && !is_array_empty(3)) ? "yes" : "no ")
                                                      << " #free=" << free_slots.size());
             if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
-                          (k == 4 && !free_slots.empty() && !is_segment_empty(3))))
+                          (k == 4 && !free_slots.empty() && !is_array_empty(3))))
             {
                 this->compact_tree();
             }
