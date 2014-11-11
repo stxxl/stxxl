@@ -553,65 +553,6 @@ public:
         return (STXXL_MIN<unsigned_type>(arity + 1, arity_bound) * block_type::raw_size);
     }
 
-protected:
-#if STXXL_PQ_EXTERNAL_LOSER_TREE
-    template <class OutputIterator, int LogK>
-    void multi_merge_f(OutputIterator begin, OutputIterator end)
-    {
-        OutputIterator done = end;
-        OutputIterator target = begin;
-        unsigned_type winner_index = entry[0].index;
-        Entry* reg_entry = entry;
-        sequence_state* reg_states = states;
-        value_type winner_key = entry[0].key;
-
-        assert(log_k >= LogK);
-        while (target != done)
-        {
-            // write result
-            *target = *(reg_states[winner_index]);
-
-            // advance winner segment
-            ++(reg_states[winner_index]);
-
-            winner_key = *(reg_states[winner_index]);
-
-            // remove winner segment if empty now
-            if (is_sentinel(winner_key))
-                deallocate_segment(winner_index);
-
-            ++target;
-
-            // update loser tree
-#define TreeStep(L)                                                                                                          \
-    if (1 << LogK >= 1 << L) {                                                                                               \
-        Entry* pos ## L = reg_entry + ((winner_index + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
-        value_type key ## L = pos ## L->key;                                                                                 \
-        if (cmp(winner_key, key ## L)) {                                                                                     \
-            unsigned_type index ## L = pos ## L->index;                                                                      \
-            pos ## L->key = winner_key;                                                                                      \
-            pos ## L->index = winner_index;                                                                                  \
-            winner_key = key ## L;                                                                                           \
-            winner_index = index ## L;                                                                                       \
-        }                                                                                                                    \
-    }
-            TreeStep(10);
-            TreeStep(9);
-            TreeStep(8);
-            TreeStep(7);
-            TreeStep(6);
-            TreeStep(5);
-            TreeStep(4);
-            TreeStep(3);
-            TreeStep(2);
-            TreeStep(1);
-#undef TreeStep
-        }
-        reg_entry[0].index = winner_index;
-        reg_entry[0].key = winner_key;
-    }
-#endif  //STXXL_PQ_EXTERNAL_LOSER_TREE
-
 public:
     bool is_space_available() const // for new segment
     {
@@ -1051,21 +992,21 @@ public:
                 deallocate_segment(3);
 
             break;
-        case  3: this->template multi_merge_f<OutputIterator, 3>(begin, end);
+        case  3: this->template multi_merge_f<3>(begin, end);
             break;
-        case  4: this->template multi_merge_f<OutputIterator, 4>(begin, end);
+        case  4: this->template multi_merge_f<4>(begin, end);
             break;
-        case  5: this->template multi_merge_f<OutputIterator, 5>(begin, end);
+        case  5: this->template multi_merge_f<5>(begin, end);
             break;
-        case  6: this->template multi_merge_f<OutputIterator, 6>(begin, end);
+        case  6: this->template multi_merge_f<6>(begin, end);
             break;
-        case  7: this->template multi_merge_f<OutputIterator, 7>(begin, end);
+        case  7: this->template multi_merge_f<7>(begin, end);
             break;
-        case  8: this->template multi_merge_f<OutputIterator, 8>(begin, end);
+        case  8: this->template multi_merge_f<8>(begin, end);
             break;
-        case  9: this->template multi_merge_f<OutputIterator, 9>(begin, end);
+        case  9: this->template multi_merge_f<9>(begin, end);
             break;
-        case 10: this->template multi_merge_f<OutputIterator, 10>(begin, end);
+        case 10: this->template multi_merge_f<10>(begin, end);
             break;
         default: multi_merge_k(begin, end);
             break;

@@ -36,13 +36,16 @@ public:
 
     typedef typename super_type::value_type value_type;
 
+    typedef typename super_type::SequenceType SequenceType;
+    typedef typename super_type::Entry Entry;
+
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
     // multi-merge for arbitrary K
     template <class OutputIterator>
     void multi_merge_k(OutputIterator begin, OutputIterator end)
     {
-        typename super_type::SequenceType* states = this->get_sequences();
-        typename super_type::Entry* current_pos;
+        SequenceType* states = this->get_sequences();
+        Entry* current_pos;
         value_type current_key;
         unsigned_type current_index; // leaf pointed to by current entry
         unsigned_type kReg = this->k;
@@ -80,6 +83,58 @@ public:
         }
         this->entry[0].index = winner_index;
         this->entry[0].key = winner_key;
+    }
+
+    template <int LogK, typename OutputIterator>
+    void multi_merge_f(OutputIterator begin, OutputIterator end)
+    {
+        SequenceType* reg_states = this->get_sequences();
+        Entry* reg_entry = this->entry;
+        unsigned_type winner_index = reg_entry[0].index;
+        value_type winner_key = reg_entry[0].key;
+
+        // TODO: reinsert assert(log_k >= LogK);
+        while (begin != end)
+        {
+            // write result
+            *begin++ = *(reg_states[winner_index]);
+
+            // advance winner segment
+            ++(reg_states[winner_index]);
+
+            winner_key = *(reg_states[winner_index]);
+
+            // remove winner segment if empty now
+            if (is_sentinel(winner_key))
+                this->deallocate_segment(winner_index);
+
+            // update loser tree
+#define TreeStep(L)                                                                                                          \
+    if (1 << LogK >= 1 << L) {                                                                                               \
+        Entry* pos ## L = reg_entry + ((winner_index + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
+        value_type key ## L = pos ## L->key;                                                                                 \
+        if (cmp(winner_key, key ## L)) {                                                                                     \
+            unsigned_type index ## L = pos ## L->index;                                                                      \
+            pos ## L->key = winner_key;                                                                                      \
+            pos ## L->index = winner_index;                                                                                  \
+            winner_key = key ## L;                                                                                           \
+            winner_index = index ## L;                                                                                       \
+        }                                                                                                                    \
+    }
+            TreeStep(10);
+            TreeStep(9);
+            TreeStep(8);
+            TreeStep(7);
+            TreeStep(6);
+            TreeStep(5);
+            TreeStep(4);
+            TreeStep(3);
+            TreeStep(2);
+            TreeStep(1);
+#undef TreeStep
+        }
+        reg_entry[0].index = winner_index;
+        reg_entry[0].key = winner_key;
     }
 #endif  //STXXL_PQ_EXTERNAL_LOSER_TREE
 

@@ -86,72 +86,6 @@ protected:
     void compactTree();
     void rebuildLoserTree();
     bool is_segment_empty(unsigned_type slot) const;
-    void multi_merge_k(value_type* target, unsigned_type length);
-
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-    template <int LogK>
-    void multi_merge_f(value_type* target, unsigned_type length)
-    {
-        //Entry *current_pos;
-        //value_type current_key;
-        //int current_index; // leaf pointed to by current entry
-        value_type* done = target + length;
-        Entry* regEntry = entry;
-        value_type** regStates = current;
-        unsigned_type winner_index = regEntry[0].index;
-        value_type winner_key = regEntry[0].key;
-        value_type* winnerPos;
-        //value_type sup = sentinel; // supremum
-
-        assert(logK >= LogK);
-        while (target != done)
-        {
-            winnerPos = regStates[winner_index];
-
-            // write result
-            *target = winner_key;
-
-            // advance winner segment
-            ++winnerPos;
-            regStates[winner_index] = winnerPos;
-            winner_key = *winnerPos;
-
-            // remove winner segment if empty now
-            if (is_sentinel(winner_key))
-            {
-                deallocate_segment(winner_index);
-            }
-            ++target;
-
-            // update loser tree
-#define TreeStep(L)                                                                                               \
-    if (1 << LogK >= 1 << L) {                                                                                    \
-        Entry* pos ## L = regEntry + ((winner_index + (1 << LogK)) >> ((LogK - L + 1 >= 0) ? (LogK - L + 1) : 0)); \
-        value_type key ## L = pos ## L->key;                                                                         \
-        if (cmp(winner_key, key ## L)) {                                                                           \
-            unsigned_type index ## L = pos ## L->index;                                                           \
-            pos ## L->key = winner_key;                                                                            \
-            pos ## L->index = winner_index;                                                                        \
-            winner_key = key ## L;                                                                                 \
-            winner_index = index ## L;                                                                             \
-        }                                                                                                         \
-    }
-            TreeStep(10);
-            TreeStep(9);
-            TreeStep(8);
-            TreeStep(7);
-            TreeStep(6);
-            TreeStep(5);
-            TreeStep(4);
-            TreeStep(3);
-            TreeStep(2);
-            TreeStep(1);
-#undef TreeStep
-        }
-        regEntry[0].index = winner_index;
-        regEntry[0].key = winner_key;
-    }
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
 public:
     bool is_sentinel(const value_type& a) const
@@ -638,21 +572,21 @@ public:
 
             break;
 #if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
-        case  3: this->template multi_merge_f<3>(target, length);
+        case  3: this->template multi_merge_f<3>(target, target + length);
             break;
-        case  4: this->template multi_merge_f<4>(target, length);
+        case  4: this->template multi_merge_f<4>(target, target + length);
             break;
-        case  5: this->template multi_merge_f<5>(target, length);
+        case  5: this->template multi_merge_f<5>(target, target + length);
             break;
-        case  6: this->template multi_merge_f<6>(target, length);
+        case  6: this->template multi_merge_f<6>(target, target + length);
             break;
-        case  7: this->template multi_merge_f<7>(target, length);
+        case  7: this->template multi_merge_f<7>(target, target + length);
             break;
-        case  8: this->template multi_merge_f<8>(target, length);
+        case  8: this->template multi_merge_f<8>(target, target + length);
             break;
-        case  9: this->template multi_merge_f<9>(target, length);
+        case  9: this->template multi_merge_f<9>(target, target + length);
             break;
-        case 10: this->template multi_merge_f<10>(target, length);
+        case 10: this->template multi_merge_f<10>(target, target + length);
             break;
 #endif
         default:
