@@ -109,17 +109,18 @@ public:
                 this->deallocate_segment(winner_index);
 
             // update loser tree
-#define TreeStep(L)                                                                                                          \
-    if (1 << LogK >= 1 << L) {                                                                                               \
-        Entry* pos ## L = reg_entry + ((winner_index + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
-        value_type key ## L = pos ## L->key;                                                                                 \
-        if (cmp(winner_key, key ## L)) {                                                                                     \
-            unsigned_type index ## L = pos ## L->index;                                                                      \
-            pos ## L->key = winner_key;                                                                                      \
-            pos ## L->index = winner_index;                                                                                  \
-            winner_key = key ## L;                                                                                           \
-            winner_index = index ## L;                                                                                       \
-        }                                                                                                                    \
+#define TreeStep(L)                                                     \
+    if (1 << LogK >= 1 << L) {                                          \
+        int pos_shift = ((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0; \
+        Entry* pos = reg_entry + ((winner_index + (1 << LogK)) >> pos_shift); \
+        value_type key = pos->key;                              \
+        if (cmp(winner_key, key)) {                             \
+            unsigned_type index = pos->index;                   \
+            pos->key = winner_key;                              \
+            pos->index = winner_index;                          \
+            winner_key = key;                                   \
+            winner_index = index;                               \
+        }                                                       \
     }
             TreeStep(10);
             TreeStep(9);
