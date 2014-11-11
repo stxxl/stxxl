@@ -42,7 +42,7 @@ public:
     typedef CompareType comparator_type;
     enum { max_arity = MaxArity };
 
-private:
+protected:
 #if STXXL_PQ_INTERNAL_LOSER_TREE
     struct Entry
     {
@@ -85,7 +85,7 @@ private:
     void doubleK();
     void compactTree();
     void rebuildLoserTree();
-    bool is_segment_empty(unsigned_type slot);
+    bool is_segment_empty(unsigned_type slot) const;
     void multi_merge_k(value_type* target, unsigned_type length);
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
@@ -154,11 +154,11 @@ private:
 #endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
 public:
-    bool is_sentinel(const value_type& a)
+    bool is_sentinel(const value_type& a) const
     {
         return !(cmp(cmp.min_value(), a));
     }
-    bool not_sentinel(const value_type& a)
+    bool not_sentinel(const value_type& a) const
     {
         return cmp(cmp.min_value(), a);
     }
@@ -223,12 +223,7 @@ public:
         std::swap(mem_cons_, obj.mem_cons_);
     }
 
-    void multi_merge(value_type* begin, value_type* end)
-    {
-        multi_merge(begin, end - begin);
-    }
-    void multi_merge(value_type*, unsigned_type length);
-
+public:
     unsigned_type mem_cons() const { return mem_cons_; }
 
     bool is_space_available() const     // for new segment
@@ -491,190 +486,10 @@ deallocate_segment(unsigned_type slot)
     free_slots.push(slot);
 }
 
-// delete the length smallest elements and write them to target
-// empty segments are deallocated
-// require:
-// - there are at least length elements
-// - segments are ended by sentinels
-template <class ValueType, class CompareType, unsigned MaxArity>
-void int_arrays<ValueType, CompareType, MaxArity>::
-multi_merge(value_type* target, unsigned_type length)
-{
-    STXXL_VERBOSE3("int_arrays::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
-
-    if (length == 0)
-        return;
-
-    assert(k > 0);
-    assert(length <= m_size);
-
-    //This is the place to make statistics about internal multi_merge calls.
-
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-    priority_queue_local::invert_order<CompareType, value_type, value_type> inv_cmp(cmp);
-#endif
-    switch (logK) {
-    case 0:
-        assert(k == 1);
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        assert(entry[0].index == 0);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
-        assert(free_slots.empty());
-        memcpy(target, current[0], length * sizeof(value_type));
-        //std::copy(current[0], current[0] + length, target);
-        current[0] += length;
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        entry[0].key = **current;
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
-        if (is_segment_empty(0))
-            deallocate_segment(0);
-
-        break;
-    case 1:
-        assert(k == 2);
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-        {
-            std::pair<value_type*, value_type*> seqs[2] =
-            {
-                std::make_pair(current[0], current_end[0]),
-                std::make_pair(current[1], current_end[1])
-            };
-            parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
-            current[0] = seqs[0].first;
-            current[1] = seqs[1].first;
-        }
-#else
-        merge_iterator(current[0], current[1], target, length, cmp);
-        rebuildLoserTree();
-#endif
-        if (is_segment_empty(0))
-            deallocate_segment(0);
-
-        if (is_segment_empty(1))
-            deallocate_segment(1);
-
-        break;
-    case 2:
-        assert(k == 4);
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-        {
-            std::pair<value_type*, value_type*> seqs[4] =
-            {
-                std::make_pair(current[0], current_end[0]),
-                std::make_pair(current[1], current_end[1]),
-                std::make_pair(current[2], current_end[2]),
-                std::make_pair(current[3], current_end[3])
-            };
-            parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
-            current[0] = seqs[0].first;
-            current[1] = seqs[1].first;
-            current[2] = seqs[2].first;
-            current[3] = seqs[3].first;
-        }
-#else
-        if (is_segment_empty(3))
-            merge3_iterator(current[0], current[1], current[2], target, length, cmp);
-        else
-            merge4_iterator(current[0], current[1], current[2], current[3], target, length, cmp);
-
-        rebuildLoserTree();
-#endif
-        if (is_segment_empty(0))
-            deallocate_segment(0);
-
-        if (is_segment_empty(1))
-            deallocate_segment(1);
-
-        if (is_segment_empty(2))
-            deallocate_segment(2);
-
-        if (is_segment_empty(3))
-            deallocate_segment(3);
-
-        break;
-#if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
-    case  3: multi_merge_f<3>(target, length);
-        break;
-    case  4: multi_merge_f<4>(target, length);
-        break;
-    case  5: multi_merge_f<5>(target, length);
-        break;
-    case  6: multi_merge_f<6>(target, length);
-        break;
-    case  7: multi_merge_f<7>(target, length);
-        break;
-    case  8: multi_merge_f<8>(target, length);
-        break;
-    case  9: multi_merge_f<9>(target, length);
-        break;
-    case 10: multi_merge_f<10>(target, length);
-        break;
-#endif
-    default:
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-        {
-            std::vector<std::pair<value_type*, value_type*> > seqs;
-            std::vector<int_type> orig_seq_index;
-            for (unsigned int i = 0; i < k; ++i)
-            {
-                if (current[i] != current_end[i] && !is_sentinel(*current[i]))
-                {
-                    seqs.push_back(std::make_pair(current[i], current_end[i]));
-                    orig_seq_index.push_back(i);
-                }
-            }
-
-            parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
-
-            for (unsigned int i = 0; i < seqs.size(); ++i)
-            {
-                int_type seg = orig_seq_index[i];
-                current[seg] = seqs[i].first;
-            }
-
-            for (unsigned int i = 0; i < k; ++i)
-                if (is_segment_empty(i))
-                {
-                    STXXL_VERBOSE3("deallocated " << i);
-                    deallocate_segment(i);
-                }
-        }
-#else
-        multi_merge_k(target, length);
-#endif
-        break;
-    }
-
-    m_size -= length;
-
-    // compact tree if it got considerably smaller
-    {
-        const unsigned_type num_segments_used = k - free_slots.size();
-        const unsigned_type num_segments_trigger = k - (3 * k / 5);
-        // using k/2 would be worst case inefficient (for large k)
-        // for k \in {2, 4, 8} the trigger is k/2 which is good
-        // because we have special mergers for k \in {1, 2, 4}
-        // there is also a special 3-way-merger, that will be
-        // triggered if k == 4 && is_segment_empty(3)
-        STXXL_VERBOSE3("int_arrays  compact? k=" << k << " #used=" << num_segments_used
-                                                 << " <= #trigger=" << num_segments_trigger << " ==> "
-                                                 << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                                                 << " || "
-                                                 << ((k == 4 && !free_slots.empty() && !is_segment_empty(3)) ? "yes" : "no ")
-                                                 << " #free=" << free_slots.size());
-        if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
-                      (k == 4 && !free_slots.empty() && !is_segment_empty(3))))
-        {
-            compactTree();
-        }
-    }
-    //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
-}
-
 // is this segment empty and does not point to sentinel yet?
 template <class ValueType, class CompareType, unsigned MaxArity>
 inline bool int_arrays<ValueType, CompareType, MaxArity>::
-is_segment_empty(unsigned_type slot)
+is_segment_empty(unsigned_type slot) const
 {
     return (is_sentinel(*(current[slot])) && (current[slot] != &sentinel));
 }
@@ -736,6 +551,212 @@ class int_merger : public loser_tree<
     CompareType, MaxArity
     >
 {
+public:
+    typedef ValueType value_type;
+
+    typedef int_arrays<ValueType, CompareType, MaxArity> ArraysType;
+    typedef loser_tree<ArraysType, CompareType, MaxArity> super_type;
+
+    void multi_merge(value_type* begin, value_type* end)
+    {
+        multi_merge(begin, end - begin);
+    }
+
+    bool is_segment_empty(unsigned_type slot) const
+    {
+        return super_type::is_segment_empty(slot);
+    }
+
+    void deallocate_segment(unsigned_type slot)
+    {
+        return super_type::deallocate_segment(slot);
+    }
+
+    // delete the length smallest elements and write them to target
+    // empty segments are deallocated
+    // require:
+    // - there are at least length elements
+    // - segments are ended by sentinels
+    void multi_merge(value_type* target, unsigned_type length)
+    {
+        unsigned_type& k = this->k;
+        unsigned_type& logK = this->logK;
+        unsigned_type& m_size = this->m_size;
+        CompareType& cmp = this->cmp;
+        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
+        value_type** current = this->current;
+        value_type** current_end = this->current_end;
+
+        STXXL_VERBOSE3("int_arrays::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
+
+        if (length == 0)
+            return;
+
+        assert(k > 0);
+        assert(length <= m_size);
+
+        //This is the place to make statistics about internal multi_merge calls.
+
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+        invert_order<CompareType, value_type, value_type> inv_cmp(cmp);
+#endif
+        switch (logK) {
+        case 0:
+            assert(k == 1);
+#if STXXL_PQ_INTERNAL_LOSER_TREE
+            assert(entry[0].index == 0);
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+            assert(free_slots.empty());
+            memcpy(target, current[0], length * sizeof(value_type));
+            //std::copy(current[0], current[0] + length, target);
+            current[0] += length;
+#if STXXL_PQ_INTERNAL_LOSER_TREE
+            entry[0].key = **current;
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+            if (is_segment_empty(0))
+                deallocate_segment(0);
+
+            break;
+        case 1:
+            assert(k == 2);
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+            {
+                std::pair<value_type*, value_type*> seqs[2] =
+                    {
+                        std::make_pair(current[0], current_end[0]),
+                        std::make_pair(current[1], current_end[1])
+                    };
+                parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+                current[0] = seqs[0].first;
+                current[1] = seqs[1].first;
+            }
+#else
+            merge_iterator(current[0], current[1], target, length, cmp);
+            rebuildLoserTree();
+#endif
+            if (is_segment_empty(0))
+                deallocate_segment(0);
+
+            if (is_segment_empty(1))
+                deallocate_segment(1);
+
+            break;
+        case 2:
+            assert(k == 4);
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+            {
+                std::pair<value_type*, value_type*> seqs[4] =
+                    {
+                        std::make_pair(current[0], current_end[0]),
+                        std::make_pair(current[1], current_end[1]),
+                        std::make_pair(current[2], current_end[2]),
+                        std::make_pair(current[3], current_end[3])
+                    };
+                parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+                current[0] = seqs[0].first;
+                current[1] = seqs[1].first;
+                current[2] = seqs[2].first;
+                current[3] = seqs[3].first;
+            }
+#else
+            if (is_segment_empty(3))
+                merge3_iterator(current[0], current[1], current[2], target, length, cmp);
+            else
+                merge4_iterator(current[0], current[1], current[2], current[3], target, length, cmp);
+
+            rebuildLoserTree();
+#endif
+            if (is_segment_empty(0))
+                deallocate_segment(0);
+
+            if (is_segment_empty(1))
+                deallocate_segment(1);
+
+            if (is_segment_empty(2))
+                deallocate_segment(2);
+
+            if (is_segment_empty(3))
+                deallocate_segment(3);
+
+            break;
+#if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
+        case  3: multi_merge_f<3>(target, length);
+            break;
+        case  4: multi_merge_f<4>(target, length);
+            break;
+        case  5: multi_merge_f<5>(target, length);
+            break;
+        case  6: multi_merge_f<6>(target, length);
+            break;
+        case  7: multi_merge_f<7>(target, length);
+            break;
+        case  8: multi_merge_f<8>(target, length);
+            break;
+        case  9: multi_merge_f<9>(target, length);
+            break;
+        case 10: multi_merge_f<10>(target, length);
+            break;
+#endif
+        default:
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+        {
+            std::vector<std::pair<value_type*, value_type*> > seqs;
+            std::vector<int_type> orig_seq_index;
+            for (unsigned int i = 0; i < k; ++i)
+            {
+                if (current[i] != current_end[i] && !is_sentinel(*current[i]))
+                {
+                    seqs.push_back(std::make_pair(current[i], current_end[i]));
+                    orig_seq_index.push_back(i);
+                }
+            }
+
+            parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
+
+            for (unsigned int i = 0; i < seqs.size(); ++i)
+            {
+                int_type seg = orig_seq_index[i];
+                current[seg] = seqs[i].first;
+            }
+
+            for (unsigned int i = 0; i < k; ++i)
+                if (is_segment_empty(i))
+                {
+                    STXXL_VERBOSE3("deallocated " << i);
+                    deallocate_segment(i);
+                }
+        }
+#else
+        multi_merge_k(target, length);
+#endif
+        break;
+        }
+
+        m_size -= length;
+
+        // compact tree if it got considerably smaller
+        {
+            const unsigned_type num_segments_used = k - free_slots.size();
+            const unsigned_type num_segments_trigger = k - (3 * k / 5);
+            // using k/2 would be worst case inefficient (for large k)
+            // for k \in {2, 4, 8} the trigger is k/2 which is good
+            // because we have special mergers for k \in {1, 2, 4}
+            // there is also a special 3-way-merger, that will be
+            // triggered if k == 4 && is_segment_empty(3)
+            STXXL_VERBOSE3("int_arrays  compact? k=" << k << " #used=" << num_segments_used
+                           << " <= #trigger=" << num_segments_trigger << " ==> "
+                           << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                           << " || "
+                           << ((k == 4 && !free_slots.empty() && !is_segment_empty(3)) ? "yes" : "no ")
+                           << " #free=" << free_slots.size());
+            if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
+                          (k == 4 && !free_slots.empty() && !is_segment_empty(3))))
+            {
+                this->compactTree();
+            }
+        }
+        //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
+    }
 };
 
 } // namespace priority_queue_local

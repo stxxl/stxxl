@@ -479,7 +479,7 @@ priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
         // fill remaining space from group
         if (group < num_int_groups)
             int_mergers[group].multi_merge(target + left_elements,
-                                           (unsigned_type)length);
+                                           target + left_elements + length);
         else
             ext_mergers[group - num_int_groups]->multi_merge(
                 target + left_elements,
@@ -698,7 +698,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
         {
             unsigned_type segmentSize = int_mergers[level].size();
             value_type* newSegment = new value_type[segmentSize + 1];
-            int_mergers[level].multi_merge(newSegment, segmentSize);     // empty this level
+            int_mergers[level].multi_merge(newSegment, newSegment+segmentSize);     // empty this level
 
             newSegment[segmentSize] = delete_buffer[delete_buffer_size]; // sentinel
             // for queues where size << #inserts
