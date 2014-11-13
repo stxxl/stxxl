@@ -572,9 +572,9 @@ void priority_queue<ConfigType>::refill_delete_buffer()
             group_buffer_current_mins[1] = seqs[1].first;
         }
 #else
-        priority_queue_local::merge_iterator(
-            group_buffer_current_mins[0],
-            group_buffer_current_mins[1], delete_buffer_current_min, length, cmp);
+        priority_queue_local::merge2_iterator(
+            group_buffer_current_mins[0], group_buffer_current_mins[1],
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp);
 #endif
         break;
     case 3:
@@ -596,7 +596,8 @@ void priority_queue<ConfigType>::refill_delete_buffer()
         priority_queue_local::merge3_iterator(
             group_buffer_current_mins[0],
             group_buffer_current_mins[1],
-            group_buffer_current_mins[2], delete_buffer_current_min, length, cmp);
+            group_buffer_current_mins[2],
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp);
 #endif
         break;
     case 4:
@@ -621,7 +622,8 @@ void priority_queue<ConfigType>::refill_delete_buffer()
             group_buffer_current_mins[0],
             group_buffer_current_mins[1],
             group_buffer_current_mins[2],
-            group_buffer_current_mins[3], delete_buffer_current_min, length, cmp); //side effect free
+            group_buffer_current_mins[3],
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp); //side effect free
 #endif
         break;
     default:
@@ -766,17 +768,22 @@ void priority_queue<ConfigType>::empty_insert_heap()
     // refill delete_buffer
     // (using more complicated code it could be made somewhat fuller
     // in certain circumstances)
-    priority_queue_local::merge_iterator(pos, newPos, delete_buffer_current_min, sz1, cmp);
+    priority_queue_local::merge2_iterator(
+        pos, newPos,
+        delete_buffer_current_min, delete_buffer_current_min + sz1, cmp);
 
     // refill group_buffers[0]
     // (as above we might want to take the opportunity
     // to make group_buffers[0] fuller)
-    priority_queue_local::merge_iterator(pos, newPos, group_buffer_current_mins[0], sz2, cmp);
+    priority_queue_local::merge2_iterator(
+        pos, newPos,
+        group_buffer_current_mins[0], group_buffer_current_mins[0] + sz2, cmp);
 
     // merge the rest to the new segment
     // note that merge exactly trips into the footsteps
     // of itself
-    priority_queue_local::merge_iterator(pos, newPos, newSegment, (unsigned_type)N, cmp);
+    priority_queue_local::merge2_iterator(pos, newPos,
+                                          newSegment, newSegment + N, cmp);
 
     // and insert it
     unsigned_type freeLevel = make_space_available(0);

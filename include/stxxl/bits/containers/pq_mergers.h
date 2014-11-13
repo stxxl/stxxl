@@ -28,7 +28,7 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local {
 
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // auxiliary functions
 
 // merge length elements from the two sentinel terminated input
@@ -37,18 +37,14 @@ namespace priority_queue_local {
 // require: at least length nonsentinel elements available in source0, source1
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-template <class InputIterator, class OutputIterator,
-          class CompareType, typename SizeType>
-void merge_iterator(
+template <class InputIterator, class OutputIterator, class CompareType>
+void merge2_iterator(
     InputIterator& source0,
     InputIterator& source1,
-    OutputIterator target,
-    SizeType length,
+    OutputIterator target, OutputIterator end,
     CompareType& cmp)
 {
-    OutputIterator done = target + length;
-
-    while (target != done)
+    while (target != end)
     {
         if (cmp(*source0, *source1))
         {
@@ -71,17 +67,14 @@ void merge_iterator(
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
 template <class InputIterator, class OutputIterator,
-          class CompareType, typename SizeType>
+          class CompareType>
 void merge3_iterator(
     InputIterator& source0,
     InputIterator& source1,
     InputIterator& source2,
-    OutputIterator target,
-    SizeType length,
+    OutputIterator target, OutputIterator end,
     CompareType& cmp)
 {
-    OutputIterator done = target + length;
-
     if (cmp(*source1, *source0)) {
         if (cmp(*source2, *source1)) {
             goto s012;
@@ -111,7 +104,7 @@ void merge3_iterator(
 
 #define Merge3Case(a, b, c)              \
     s ## a ## b ## c :                   \
-    if (target == done)                  \
+    if (target == end)                   \
         return;                          \
     *target = *source ## a;              \
     ++target;                            \
@@ -141,16 +134,15 @@ void merge3_iterator(
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
 template <class InputIterator, class OutputIterator,
-          class CompareType, typename SizeType>
+          class CompareType>
 void merge4_iterator(
     InputIterator& source0,
     InputIterator& source1,
     InputIterator& source2,
     InputIterator& source3,
-    OutputIterator target, SizeType length, CompareType& cmp)
+    OutputIterator target, OutputIterator end,
+    CompareType& cmp)
 {
-    OutputIterator done = target + length;
-
 #define StartMerge4(a, b, c, d)               \
     if ((!cmp(*source ## a, *source ## b)) && \
         (!cmp(*source ## b, *source ## c)) && \
@@ -194,7 +186,7 @@ void merge4_iterator(
 
 #define Merge4Case(a, b, c, d)               \
     s ## a ## b ## c ## d :                  \
-    if (target == done)                      \
+    if (target == end)                       \
         return;                              \
     *target = *source ## a;                  \
     ++target;                                \
@@ -685,8 +677,8 @@ public:
         }
         case 1:
             assert(k == 2);
-            merge_iterator(arrays.get_array(0), arrays.get_array(1),
-                           begin, length, cmp);
+            merge2_iterator(arrays.get_array(0), arrays.get_array(1),
+                            begin, end, cmp);
             rebuild_loser_tree();
 
             if (arrays.is_array_empty(0) && arrays.is_array_allocated(0))
@@ -701,11 +693,11 @@ public:
             if (arrays.is_array_empty(3))
                 merge3_iterator(arrays.get_array(0), arrays.get_array(1),
                                 arrays.get_array(2),
-                                begin, length, cmp);
+                                begin, end, cmp);
             else
                 merge4_iterator(arrays.get_array(0), arrays.get_array(1),
                                 arrays.get_array(2), arrays.get_array(3),
-                                begin, length, cmp);
+                                begin, end, cmp);
 
             rebuild_loser_tree();
 
