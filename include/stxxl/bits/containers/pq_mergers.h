@@ -452,14 +452,16 @@ public:
             assert(k == 1);
             assert(entry[0].index == 0);
             assert(free_slots.empty());
-            //memcpy(target, states[0], length * sizeof(value_type));
-            //std::copy(states[0],states[0]+length,target);
+
+            // in int_merger:
+            // memcpy(target, states[0], length * sizeof(value_type));
+
             sequence_type& seq = arrays.get_array(0);
             for (int_type i = 0; i < length; ++i, ++seq, ++begin)
                 *begin = *seq;
             entry[0].key = *seq;
 
-            if (arrays.is_array_empty(0))
+            if (arrays.is_array_empty(0) && arrays.is_array_allocated(0))
                 arrays.free_array(0);
 
             break;
@@ -480,7 +482,8 @@ public:
         case 2:
             assert(k == 4);
             if (arrays.is_array_empty(3))
-                merge3_iterator(arrays.get_array(0), arrays.get_array(1), arrays.get_array(2),
+                merge3_iterator(arrays.get_array(0), arrays.get_array(1),
+                                arrays.get_array(2),
                                 begin, length, cmp);
             else
                 merge4_iterator(arrays.get_array(0), arrays.get_array(1),

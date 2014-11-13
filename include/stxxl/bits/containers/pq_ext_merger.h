@@ -515,10 +515,8 @@ public:
 
         m_size += segment_size;
 
-#if STXXL_PQ_INTERNAL_LOSER_TREE
         // propagate new information up the tree
         tree.update_on_insert((index + tree.k) >> 1, *(states[index]), index);
-#endif
     }
 
     // delete the (length = end-begin) smallest elements and write them to [begin..end)
@@ -531,7 +529,7 @@ public:
     {
         assert(begin + m_size >= end);
 
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL && 0
         unsigned_type& k = tree.k;
         compare_type& cmp = tree.cmp;
 

@@ -131,6 +131,12 @@ public:
         tree.free_player(slot);
     }
 
+    //! Hint (prefetch) first non-internal (actually second) block of each
+    //! sequence. No-operation for internal arrays.
+    void prefetch_arrays()
+    {
+    }
+
     //! \}
 
 public:
@@ -220,10 +226,8 @@ public:
         mem_cons_ += (length + 1) * sizeof(value_type);
         m_size += length;
 
-#if STXXL_PQ_INTERNAL_LOSER_TREE
         // propagate new information up the tree
         tree.update_on_insert((index + tree.k) >> 1, *target, index);
-#endif
     }
 
     //! Return the number of items in the arrays
@@ -232,24 +236,22 @@ public:
         return m_size;
     }
 
+    //! extract the (length = end - begin) smallest elements and write them to
+    //! [begin..end) empty segments are deallocated. Requires: there are at
+    //! least length elements and segments are ended by sentinels.
     void multi_merge(value_type* begin, value_type* end)
     {
-        multi_merge(begin, end - begin);
+        tree.multi_merge(begin, end);
+        m_size -= end - begin;
     }
 
-    // delete the length smallest elements and write them to target
-    // empty segments are deallocated
-    // require:
-    // - there are at least length elements
-    // - segments are ended by sentinels
-    void multi_merge(value_type* target, unsigned_type length)
+#if 0
+    void multi_merge_parallel(value_type* target, unsigned_type length)
     {
         unsigned_type& k = tree.k;
         unsigned_type& logK = tree.logK;
         CompareType& cmp = tree.cmp;
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        typename tree_type::Entry* entry = tree.entry;
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+
         internal_bounded_stack<unsigned_type, MaxArity>& free_slots = tree.free_slots;
 
         STXXL_VERBOSE3("int_merger::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
@@ -262,22 +264,14 @@ public:
 
         //This is the place to make statistics about internal multi_merge calls.
 
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         invert_order<CompareType, value_type, value_type> inv_cmp(cmp);
-#endif
         switch (logK) {
         case 0:
             assert(k == 1);
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-            assert(entry[0].index == 0);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
             assert(free_slots.empty());
             memcpy(target, current[0], length * sizeof(value_type));
             //std::copy(current[0], current[0] + length, target);
             current[0] += length;
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-            entry[0].key = **current;
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
 
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
@@ -285,7 +279,6 @@ public:
             break;
         case 1:
             assert(k == 2);
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
             {
                 std::pair<value_type*, value_type*> seqs[2] =
                     {
@@ -296,10 +289,7 @@ public:
                 current[0] = seqs[0].first;
                 current[1] = seqs[1].first;
             }
-#else
-            merge_iterator(current[0], current[1], target, length, cmp);
-            tree.rebuild_loser_tree();
-#endif
+
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
 
@@ -309,7 +299,6 @@ public:
             break;
         case 2:
             assert(k == 4);
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
             {
                 std::pair<value_type*, value_type*> seqs[4] =
                     {
@@ -324,14 +313,7 @@ public:
                 current[2] = seqs[2].first;
                 current[3] = seqs[3].first;
             }
-#else
-            if (is_array_empty(3))
-                merge3_iterator(current[0], current[1], current[2], target, length, cmp);
-            else
-                merge4_iterator(current[0], current[1], current[2], current[3], target, length, cmp);
 
-            tree.rebuild_loser_tree();
-#endif
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
 
@@ -345,26 +327,7 @@ public:
                 free_array(3);
 
             break;
-#if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
-        case  3: tree.template multi_merge_f<3>(target, target + length);
-            break;
-        case  4: tree.template multi_merge_f<4>(target, target + length);
-            break;
-        case  5: tree.template multi_merge_f<5>(target, target + length);
-            break;
-        case  6: tree.template multi_merge_f<6>(target, target + length);
-            break;
-        case  7: tree.template multi_merge_f<7>(target, target + length);
-            break;
-        case  8: tree.template multi_merge_f<8>(target, target + length);
-            break;
-        case  9: tree.template multi_merge_f<9>(target, target + length);
-            break;
-        case 10: tree.template multi_merge_f<10>(target, target + length);
-            break;
-#endif
         default:
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         {
             std::vector<std::pair<value_type*, value_type*> > seqs;
             std::vector<int_type> orig_seq_index;
@@ -394,9 +357,6 @@ public:
                 }
             }
         }
-#else
-        tree.multi_merge_k(target, target + length);
-#endif
         break;
         }
 
@@ -425,6 +385,7 @@ public:
             }
         }
     }
+#endif
 };
 
 } // namespace priority_queue_local
