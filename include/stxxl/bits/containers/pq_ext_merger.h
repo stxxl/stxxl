@@ -17,6 +17,7 @@
 #define STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 
 #include <stxxl/bits/containers/pq_mergers.h>
+#include <deque>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -49,6 +50,8 @@ public:
     typedef typename block_type::bid_type bid_type;
     typedef typename block_type::value_type value_type;
 
+    typedef typename std::deque<bid_type> bid_container_type;
+
     typedef read_write_pool<block_type> pool_type;
 
     //! our type
@@ -65,9 +68,9 @@ public:
 public:
     struct sequence_state : private noncopyable
     {
-        block_type* block;          //current block
-        unsigned_type current;      //current index in current block
-        std::list<bid_type>* bids;  //list of blocks forming this sequence
+        block_type* block;          //!< current block
+        unsigned_type current;      //!< current index in current block
+        bid_container_type bids;    //!< list of blocks forming this sequence
         compare_type cmp;
         ext_merger* merger;
         bool allocated;
@@ -80,19 +83,16 @@ public:
 
         sequence_state()
             : block(NULL), current(0),
-              bids(NULL), merger(NULL),
+              merger(NULL),
               allocated(false)
         { }
 
         ~sequence_state()
         {
             STXXL_VERBOSE2("ext_merger sequence_state::~sequence_state()");
-            if (bids != NULL)
-            {
-                block_manager* bm = block_manager::get_instance();
-                bm->delete_blocks(bids->begin(), bids->end());
-                delete bids;
-            }
+
+            block_manager* bm = block_manager::get_instance();
+            bm->delete_blocks(bids.begin(), bids.end());
         }
 
         void make_inf()
@@ -134,29 +134,29 @@ public:
             {
                 STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
                 // go to the next block
-                assert(bids != NULL);
-                if (bids->empty()) // if there is no next block
+                if (bids.empty()) // if there is no next block
                 {
                     STXXL_VERBOSE2("ext_merger sequence_state operator++ it was the last block in the sequence ");
-                    delete bids;
-                    bids = NULL;
+                    // swap memory area and delete other object.
+                    bid_container_type to_delete;
+                    std::swap(to_delete, bids);
                     make_inf();
                 }
                 else
                 {
                     STXXL_VERBOSE2("ext_merger sequence_state operator++ there is another block ");
-                    bid_type bid = bids->front();
-                    bids->pop_front();
+                    bid_type bid = bids.front();
+                    bids.pop_front();
                     merger->pool->hint(bid);
-                    if (!(bids->empty()))
+                    if (!(bids.empty()))
                     {
                         STXXL_VERBOSE2("ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next");
-                        merger->pool->hint(bids->front());
+                        merger->pool->hint(bids.front());
                     }
                     merger->pool->read(block, bid)->wait();
                     STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
-                    if (!(bids->empty()))
-                        merger->pool->hint(bids->front());  // re-hint, reading might have made a block free
+                    if (!(bids.empty()))
+                        merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
                     block_manager::get_instance()->delete_block(bid);
                     current = 0;
                 }
@@ -263,8 +263,8 @@ public:
     {
         for (unsigned_type i = 0; i < tree.k; ++i)
         {
-            if (states[i].bids != NULL && !states[i].bids->empty())
-                pool->hint(states[i].bids->front());
+            if (!states[i].bids.empty())
+                pool->hint(states[i].bids.front());
         }
     }
 
@@ -342,10 +342,10 @@ public:
       \param first_size number of elements in the first block
       \param slot slot to insert into
     */
-    void insert_segment(std::list<bid_type>* bidlist, block_type* first_block,
+    void insert_segment(bid_container_type& bidlist, block_type* first_block,
                         unsigned_type first_size, unsigned_type slot)
     {
-        STXXL_VERBOSE1("ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist->size() << " " << slot);
+        STXXL_VERBOSE1("ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist.size() << " " << slot);
         assert(!is_array_allocated(slot));
         assert(first_size > 0);
 
@@ -354,11 +354,6 @@ public:
         std::swap(new_sequence.block, first_block);
         delete first_block;
         std::swap(new_sequence.bids, bidlist);
-        if (bidlist) // the old list
-        {
-            assert(bidlist->empty());
-            delete bidlist;
-        }
         new_sequence.allocated = true;
         assert(is_array_allocated(slot));
     }
@@ -402,8 +397,8 @@ public:
 
         // allocate blocks
         block_manager* bm = block_manager::get_instance();
-        std::list<bid_type>* bids = new std::list<bid_type>(nblocks);
-        bm->new_blocks(alloc_strategy(), bids->begin(), bids->end());
+        bid_container_type bids(nblocks);
+        bm->new_blocks(alloc_strategy(), bids.begin(), bids.end());
         block_type* first_block = new block_type;
 
         another_merger.multi_merge(
@@ -415,7 +410,7 @@ public:
 
         assert(pool->size_write() > 0);
 
-        for (typename std::list<bid_type>::iterator curbid = bids->begin(); curbid != bids->end(); ++curbid)
+        for (typename bid_container_type::iterator curbid = bids.begin(); curbid != bids.end(); ++curbid)
         {
             block_type* b = pool->steal();
             another_merger.multi_merge(b->begin(), b->end());
@@ -504,8 +499,8 @@ protected:
 #endif
 
             // Hint first non-internal (actually second) block of this sequence.
-            if (states[i].bids != NULL && !states[i].bids->empty())
-                pool->hint(states[i].bids->front());
+            if (!states[i].bids.empty())
+                pool->hint(states[i].bids.front());
         }
 
         assert(seqs.size() > 0);
@@ -590,7 +585,7 @@ protected:
                     // has run empty?
 
                     assert(state.current == state.block->size);
-                    if (state.bids == NULL || state.bids->empty())
+                    if (state.bids.empty())
                     {
                         // if there is no next block
                         STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
@@ -602,18 +597,18 @@ protected:
                         last_elem = *(seqs[i].second - 1);
 #endif
                         STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) there is another block ");
-                        bid_type bid = state.bids->front();
-                        state.bids->pop_front();
+                        bid_type bid = state.bids.front();
+                        state.bids.pop_front();
                         pool->hint(bid);
-                        if (!(state.bids->empty()))
+                        if (!(state.bids.empty()))
                         {
                             STXXL_VERBOSE2("seq " << i << ": ext_merger::multi_merge(...) more blocks exist, hinting the next");
-                            pool->hint(state.bids->front());
+                            pool->hint(state.bids.front());
                         }
                         pool->read(state.block, bid)->wait();
                         STXXL_VERBOSE1("seq " << i << ": first element of read block " << bid << " " << *(state.block->begin()) << " cached in " << state.block);
-                        if (!(state.bids->empty()))
-                            pool->hint(state.bids->front());  // re-hint, reading might have made a block free
+                        if (!(state.bids.empty()))
+                            pool->hint(state.bids.front());  // re-hint, reading might have made a block free
                         state.current = 0;
                         seqs[i] = std::make_pair(state.block->begin() + state.current, state.block->end());
                         block_manager::get_instance()->delete_block(bid);
