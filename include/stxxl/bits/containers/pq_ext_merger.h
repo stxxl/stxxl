@@ -363,8 +363,6 @@ public:
     template <class Merger>
     void append_merger(Merger& another_merger, external_size_type segment_size)
     {
-        const compare_type& cmp = tree.cmp;
-
         STXXL_VERBOSE1("ext_merger::append_merger(merger,...)" << this);
 
         if (segment_size == 0)
@@ -406,7 +404,7 @@ public:
             first_block->end());
 
         STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
-        assert(!cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
+        assert(!tree.cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
 
         assert(pool->size_write() > 0);
 
@@ -416,7 +414,7 @@ public:
             another_merger.multi_merge(b->begin(), b->end());
             STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
             STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
-            assert(!cmp(*(b->begin()), *(b->end() - 1)));
+            assert(!tree.cmp(*(b->begin()), *(b->end() - 1)));
             pool->write(b, *curbid);
             STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
         }
@@ -457,7 +455,6 @@ protected:
     void multi_merge_parallel(OutputIterator begin, OutputIterator end)
     {
         const unsigned_type& k = tree.k;
-        compare_type& cmp = tree.cmp;
 
         if (begin == end)
             return;
@@ -469,7 +466,7 @@ protected:
         std::vector<sequence> seqs;
         std::vector<unsigned_type> orig_seq_index;
 
-        invert_order<compare_type, value_type, value_type> inv_cmp(cmp);
+        invert_order<compare_type, value_type, value_type> inv_cmp(tree.cmp);
 
         for (unsigned_type i = 0; i < k; ++i) //initialize sequences
         {
@@ -515,7 +512,7 @@ protected:
         while (rest > 0)
         {
             // minimum of the sequences' last elements
-            value_type min_last = cmp.min_value();
+            value_type min_last = tree.cmp.min_value();
 
             diff_type total_size = 0;
 
