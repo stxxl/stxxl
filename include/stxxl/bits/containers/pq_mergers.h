@@ -463,7 +463,7 @@ public:
         STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
-        assert(free_slots.empty()); // stack was free (probably not needed)
+        assert(free_slots.empty());                    // stack was free (probably not needed)
 
         // make all new entries free and push them on the free stack
         for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
@@ -553,11 +553,11 @@ public:
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_array_atsentinel(3)
         STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
-                       << " <= #trigger=" << num_segments_trigger << " ==> "
-                       << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                       << " || "
-                       << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
-                       << " #free=" << free_slots.size());
+                                                 << " <= #trigger=" << num_segments_trigger << " ==> "
+                                                 << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                                                 << " || "
+                                                 << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+                                                 << " #free=" << free_slots.size());
         if (k > 1 &&
             ((num_segments_used <= num_segments_trigger) ||
              (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
@@ -631,18 +631,18 @@ public:
                 arrays.free_array(winner_index);
 
             // update loser tree
-#define TreeStep(L)                                                     \
-    if (1 << LogK >= 1 << L) {                                          \
+#define TreeStep(L)                                                        \
+    if (1 << LogK >= 1 << L) {                                             \
         int pos_shift = ((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0; \
-        Entry* pos = entry + ((winner_index + (1 << LogK)) >> pos_shift); \
-        value_type key = pos->key;                              \
-        if (cmp(winner_key, key)) {                             \
-            unsigned_type index = pos->index;                   \
-            pos->key = winner_key;                              \
-            pos->index = winner_index;                          \
-            winner_key = key;                                   \
-            winner_index = index;                               \
-        }                                                       \
+        Entry* pos = entry + ((winner_index + (1 << LogK)) >> pos_shift);  \
+        value_type key = pos->key;                                         \
+        if (cmp(winner_key, key)) {                                        \
+            unsigned_type index = pos->index;                              \
+            pos->key = winner_key;                                         \
+            pos->index = winner_index;                                     \
+            winner_key = key;                                              \
+            winner_index = index;                                          \
+        }                                                                  \
     }
             TreeStep(10);
             TreeStep(9);
@@ -862,8 +862,7 @@ public:
     void update_on_insert(unsigned_type /* node */,
                           const value_type& /* newKey */,
                           unsigned_type /* newIndex */)
-    {
-    }
+    { }
 
     //! make the tree twice as wide
     void double_k()
@@ -871,7 +870,7 @@ public:
         STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
-        assert(free_slots.empty()); // stack was free (probably not needed)
+        assert(free_slots.empty());                    // stack was free (probably not needed)
 
         // make all new entries free and push them on the free stack
         for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
@@ -955,11 +954,11 @@ public:
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_array_atsentinel(3)
         STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
-                       << " <= #trigger=" << num_segments_trigger << " ==> "
-                       << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                       << " || "
-                       << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
-                       << " #free=" << free_slots.size());
+                                                 << " <= #trigger=" << num_segments_trigger << " ==> "
+                                                 << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                                                 << " || "
+                                                 << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+                                                 << " #free=" << free_slots.size());
         if (k > 1 &&
             ((num_segments_used <= num_segments_trigger) ||
              (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))

@@ -63,7 +63,6 @@ public:
 #endif
 
 public:
-
     struct sequence_state : private noncopyable
     {
         block_type* block;          //current block
@@ -170,7 +169,6 @@ public:
     typedef sequence_state sequence_type;
 
 protected:
-
     //! loser tree instance
     tree_type tree;
 
@@ -230,7 +228,7 @@ public:
     }
 
     //! Return the item sequence of the given slot
-    sequence_type& get_array(unsigned_type slot)
+    sequence_type & get_array(unsigned_type slot)
     {
         return states[slot];
     }
@@ -448,13 +446,14 @@ public:
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         multi_merge_parallel(begin, end);
-#else // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         tree.multi_merge(begin, end);
         m_size -= end - begin;
 #endif
     }
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+
 protected:
     //! extract the (length = end - begin) smallest elements using parallel
     //! multiway_merge.
@@ -655,7 +654,7 @@ protected:
 
         tree.maybe_compact();
     }
-#endif // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#endif  // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 }; // class ext_merger
 
 } // namespace priority_queue_local

@@ -95,7 +95,7 @@ public:
     }
 
     //! Return the item sequence of the given slot
-    sequence_type& get_array(unsigned_type slot)
+    sequence_type & get_array(unsigned_type slot)
     {
         return current[slot];
     }
@@ -139,8 +139,7 @@ public:
     //! Hint (prefetch) first non-internal (actually second) block of each
     //! sequence. No-operation for internal arrays.
     void prefetch_arrays()
-    {
-    }
+    { }
 
     //! \}
 
@@ -258,6 +257,7 @@ public:
     }
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+
 protected:
     //! extract the (length = end - begin) smallest elements using parallel
     //! multiway_merge.
@@ -293,10 +293,10 @@ protected:
             assert(k == 2);
 
             std::pair<value_type*, value_type*> seqs[2] =
-                {
-                    std::make_pair(current[0], current_end[0]),
-                    std::make_pair(current[1], current_end[1])
-                };
+            {
+                std::make_pair(current[0], current_end[0]),
+                std::make_pair(current[1], current_end[1])
+            };
 
             parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
 
@@ -315,12 +315,12 @@ protected:
             assert(k == 4);
 
             std::pair<value_type*, value_type*> seqs[4] =
-                {
-                    std::make_pair(current[0], current_end[0]),
-                    std::make_pair(current[1], current_end[1]),
-                    std::make_pair(current[2], current_end[2]),
-                    std::make_pair(current[3], current_end[3])
-                };
+            {
+                std::make_pair(current[0], current_end[0]),
+                std::make_pair(current[1], current_end[1]),
+                std::make_pair(current[2], current_end[2]),
+                std::make_pair(current[3], current_end[3])
+            };
 
             parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
 
@@ -378,7 +378,7 @@ protected:
 
         tree.maybe_compact();
     }
-#endif // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#endif  // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 };
 
 } // namespace priority_queue_local

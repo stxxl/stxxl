@@ -696,13 +696,13 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
     {
         finalLevel = make_space_available(level + 1);
 
-        if (level < num_int_groups - 1)                                  // from internal to internal tree
+        if (level < num_int_groups - 1)                                           // from internal to internal tree
         {
             unsigned_type segmentSize = int_mergers[level].size();
             value_type* newSegment = new value_type[segmentSize + 1];
-            int_mergers[level].multi_merge(newSegment, newSegment+segmentSize);     // empty this level
+            int_mergers[level].multi_merge(newSegment, newSegment + segmentSize); // empty this level
 
-            newSegment[segmentSize] = delete_buffer[delete_buffer_size]; // sentinel
+            newSegment[segmentSize] = delete_buffer[delete_buffer_size];          // sentinel
             // for queues where size << #inserts
             // it might make sense to stay in this level if
             // segmentSize < alpha * KNN * k^level for some alpha < 1
