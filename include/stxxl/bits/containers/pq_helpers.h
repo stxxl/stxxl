@@ -251,6 +251,94 @@ public:
     }
 };
 
+template <typename Iterator>
+class short_sequence : public std::pair<Iterator, Iterator>
+{
+    typedef std::pair<Iterator, Iterator> pair;
+
+public:
+    typedef Iterator iterator;
+    typedef const iterator const_iterator;
+    typedef typename std::iterator_traits<iterator>::value_type value_type;
+    typedef typename std::iterator_traits<iterator>::difference_type size_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef unsigned_type origin_type;
+
+private:
+    origin_type m_origin;
+
+public:
+    short_sequence(Iterator first, Iterator last, origin_type origin)
+        : pair(first, last), m_origin(origin)
+    { }
+
+    iterator begin()
+    {
+        return this->first;
+    }
+
+    const_iterator begin() const
+    {
+        return this->first;
+    }
+
+    const_iterator cbegin() const
+    {
+        return begin();
+    }
+
+    iterator end()
+    {
+        return this->second;
+    }
+
+    const_iterator end() const
+    {
+        return this->second;
+    }
+
+    const_iterator cend() const
+    {
+        return end();
+    }
+
+    reference front()
+    {
+        return *begin();
+    }
+
+    const_reference front() const
+    {
+        return *begin();
+    }
+
+    reference back()
+    {
+        return *(end() - 1);
+    }
+
+    const_reference back() const
+    {
+        return *(end() - 1);
+    }
+
+    size_type size() const
+    {
+        return end() - begin();
+    }
+
+    bool empty() const
+    {
+        return size() == 0;
+    }
+
+    origin_type origin() const
+    {
+        return m_origin;
+    }
+};
+
 } // namespace priority_queue_local
 
 //! \}
