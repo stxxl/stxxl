@@ -424,7 +424,6 @@ public:
                 tree.compact_tree();
             }
         }
-        //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
     }
 };
 

@@ -330,7 +330,7 @@ public:
         states[a].make_inf();
     }
 
-    // free an empty segment .
+    //! free an empty segment.
     void free_array(unsigned_type slot)
     {
         STXXL_VERBOSE1("ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot)));
@@ -340,6 +340,17 @@ public:
 
         // free player in loser tree
         tree.free_player(slot);
+    }
+
+    //! Hint (prefetch) first non-internal (actually second) block of each
+    //! sequence.
+    void prefetch_arrays()
+    {
+        for (unsigned_type i = 0; i < tree.k; ++i)
+        {
+            if (states[i].bids != NULL && !states[i].bids->empty())
+                pool->hint(states[i].bids->front());
+        }
     }
 
     //! \}
@@ -518,23 +529,12 @@ public:
     template <class OutputIterator>
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
-        unsigned_type& k = tree.k;
-        const compare_type& cmp = tree.cmp;
-
-        int_type length = end - begin;
-
-        STXXL_VERBOSE1("ext_merger::multi_merge from " << k << " sequence(s),"
-                       " length = " << length);
-
-        if (length == 0)
-            return;
-
-        assert(k > 0);
-        assert(length <= (int_type)m_size);
-
-        //This is the place to make statistics about external multi_merge calls.
+        assert(begin + m_size >= end);
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+        unsigned_type& k = tree.k;
+        compare_type& cmp = tree.cmp;
+
         typedef stxxl::int64 diff_type;
 
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
@@ -571,7 +571,7 @@ public:
             }
 #endif
 
-            //Hint first non-internal (actually second) block of this sequence.
+            // Hint first non-internal (actually second) block of this sequence.
             if (states[i].bids != NULL && !states[i].bids->empty())
                 pool->hint(states[i].bids->front());
         }
@@ -582,11 +582,14 @@ public:
         value_type last_elem;
 #endif
 
-        diff_type rest = length;                     //elements still to merge for this output block
+        // elements still to merge for this output block
+        diff_type rest = end - begin;
 
         while (rest > 0)
         {
-            value_type min_last = cmp.min_value();   // minimum of the sequences' last elements
+            // minimum of the sequences' last elements
+            value_type min_last = cmp.min_value();
+
             diff_type total_size = 0;
 
             for (unsigned_type i = 0; i < seqs.size(); ++i)
@@ -626,7 +629,8 @@ public:
                 less_equal_than_min_last += (position - seqs[i].first);
             }
 
-            diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);  // at most rest elements
+            // at most rest elements
+            diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);
 
             STXXL_VERBOSE1("output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")");
 
@@ -634,7 +638,9 @@ public:
 
             //main call
 
-            begin = parallel::multiway_merge(seqs.begin(), seqs.end(), begin, inv_cmp, output_size); //sequence iterators are progressed appropriately
+            // sequence iterators are progressed appropriately:
+            begin = parallel::multiway_merge(seqs.begin(), seqs.end(),
+                                             begin, inv_cmp, output_size);
 
             rest -= output_size;
             m_size -= output_size;
@@ -647,11 +653,14 @@ public:
 
                 assert(seqs[i].first <= seqs[i].second);
 
-                if (seqs[i].first == seqs[i].second)               //has run empty
+                if (seqs[i].first == seqs[i].second)
                 {
+                    // has run empty?
+
                     assert(state.current == state.block->size);
-                    if (state.bids == NULL || state.bids->empty()) // if there is no next block
+                    if (state.bids == NULL || state.bids->empty())
                     {
+                        // if there is no next block
                         STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
                         state.make_inf();
                     }
@@ -710,111 +719,12 @@ public:
                 free_array(seg);
             }
         }
-
-#else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-        unsigned_type& logK = tree.logK;
-        typename tree_type::Entry* entry = tree.entry;
-
-        //Hint first non-internal (actually second) block of each sequence.
-        for (unsigned_type i = 0; i < k; ++i)
-        {
-            if (states[i].bids != NULL && !states[i].bids->empty())
-                pool->hint(states[i].bids->front());
-        }
-
-        switch (logK) {
-        case 0:
-            assert(k == 1);
-            assert(entry[0].index == 0);
-            assert(tree.free_slots.empty());
-            //memcpy(target, states[0], length * sizeof(value_type));
-            //std::copy(states[0],states[0]+length,target);
-            for (int_type i = 0; i < length; ++i, ++(states[0]), ++begin)
-                *begin = *(states[0]);
-            entry[0].key = **states;
-
-            if (is_array_empty(0))
-                free_array(0);
-
-            break;
-        case 1:
-            assert(k == 2);
-            merge_iterator(states[0], states[1], begin, length, cmp);
-            tree.rebuild_loser_tree();
-
-            if (is_array_empty(0) && is_array_allocated(0))
-                free_array(0);
-
-            if (is_array_empty(1) && is_array_allocated(1))
-                free_array(1);
-
-            break;
-        case 2:
-            assert(k == 4);
-            if (is_array_empty(3))
-                merge3_iterator(states[0], states[1], states[2], begin, length, cmp);
-            else
-                merge4_iterator(states[0], states[1], states[2], states[3], begin, length, cmp);
-            tree.rebuild_loser_tree();
-
-            if (is_array_empty(0) && is_array_allocated(0))
-                free_array(0);
-
-            if (is_array_empty(1) && is_array_allocated(1))
-                free_array(1);
-
-            if (is_array_empty(2) && is_array_allocated(2))
-                free_array(2);
-
-            if (is_array_empty(3) && is_array_allocated(3))
-                free_array(3);
-
-            break;
-        case  3: tree.template multi_merge_f<3>(begin, end);
-            break;
-        case  4: tree.template multi_merge_f<4>(begin, end);
-            break;
-        case  5: tree.template multi_merge_f<5>(begin, end);
-            break;
-        case  6: tree.template multi_merge_f<6>(begin, end);
-            break;
-        case  7: tree.template multi_merge_f<7>(begin, end);
-            break;
-        case  8: tree.template multi_merge_f<8>(begin, end);
-            break;
-        case  9: tree.template multi_merge_f<9>(begin, end);
-            break;
-        case 10: tree.template multi_merge_f<10>(begin, end);
-            break;
-        default: tree.multi_merge_k(begin, end);
-            break;
-        }
-
-        m_size -= length;
+#else // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+        tree.multi_merge(begin, end);
+        m_size -= end - begin;
 #endif
-
-        // compact tree if it got considerably smaller
-        {
-            const unsigned_type num_segments_used = std::min<unsigned_type>(max_arity, k) - tree.free_slots.size();
-            const unsigned_type num_segments_trigger = k - (3 * k / 5);
-            // using k/2 would be worst case inefficient (for large k)
-            // for k \in {2, 4, 8} the trigger is k/2 which is good
-            // because we have special mergers for k \in {1, 2, 4}
-            // there is also a special 3-way-merger, that will be
-            // triggered if k == 4 && is_array_empty(3)
-            STXXL_VERBOSE3("ext_merger  compact? k=" << k << " #used=" << num_segments_used
-                                                     << " <= #trigger=" << num_segments_trigger << " ==> "
-                                                     << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                                                     << " || "
-                                                     << ((k == 4 && !tree.free_slots.empty() && !is_array_empty(3)) ? "yes" : "no ")
-                                                     << " #free=" << tree.free_slots.size());
-            if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
-                          (k == 4 && !tree.free_slots.empty() && !is_array_empty(3))))
-            {
-                tree.compact_tree();
-            }
-        }
     }
+
 }; // class ext_merger
 
 } // namespace priority_queue_local

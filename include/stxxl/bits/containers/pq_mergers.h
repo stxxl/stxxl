@@ -428,6 +428,127 @@ public:
         entry[0].key = winner_key;
     }
 
+    //! extract the (length = end - begin) smallest elements and write them to
+    //! [begin..end) empty segments are deallocated. Requires: there are at
+    //! least length elements and segments are ended by sentinels.
+    template <class OutputIterator>
+    void multi_merge(OutputIterator begin, OutputIterator end)
+    {
+        int_type length = end - begin;
+
+        STXXL_VERBOSE3("multi_merge(length=" << length << ") from sequences k=" << k);
+
+        if (begin == end)
+            return;
+
+        assert(k > 0);
+
+        // This is the place to make statistics about external multi_merge calls.
+
+        arrays.prefetch_arrays();
+
+        switch (logK) {
+        case 0: {
+            assert(k == 1);
+            assert(entry[0].index == 0);
+            assert(free_slots.empty());
+            //memcpy(target, states[0], length * sizeof(value_type));
+            //std::copy(states[0],states[0]+length,target);
+            sequence_type& seq = arrays.get_array(0);
+            for (int_type i = 0; i < length; ++i, ++seq, ++begin)
+                *begin = *seq;
+            entry[0].key = *seq;
+
+            if (arrays.is_array_empty(0))
+                arrays.free_array(0);
+
+            break;
+        }
+        case 1:
+            assert(k == 2);
+            merge_iterator(arrays.get_array(0), arrays.get_array(1),
+                           begin, length, cmp);
+            rebuild_loser_tree();
+
+            if (arrays.is_array_empty(0) && arrays.is_array_allocated(0))
+                arrays.free_array(0);
+
+            if (arrays.is_array_empty(1) && arrays.is_array_allocated(1))
+                arrays.free_array(1);
+
+            break;
+        case 2:
+            assert(k == 4);
+            if (arrays.is_array_empty(3))
+                merge3_iterator(arrays.get_array(0), arrays.get_array(1), arrays.get_array(2),
+                                begin, length, cmp);
+            else
+                merge4_iterator(arrays.get_array(0), arrays.get_array(1),
+                                arrays.get_array(2), arrays.get_array(3),
+                                begin, length, cmp);
+
+            rebuild_loser_tree();
+
+            if (arrays.is_array_empty(0) && arrays.is_array_allocated(0))
+                arrays.free_array(0);
+
+            if (arrays.is_array_empty(1) && arrays.is_array_allocated(1))
+                arrays.free_array(1);
+
+            if (arrays.is_array_empty(2) && arrays.is_array_allocated(2))
+                arrays.free_array(2);
+
+            if (arrays.is_array_empty(3) && arrays.is_array_allocated(3))
+                arrays.free_array(3);
+
+            break;
+        case  3: multi_merge_f<3>(begin, end);
+            break;
+        case  4: multi_merge_f<4>(begin, end);
+            break;
+        case  5: multi_merge_f<5>(begin, end);
+            break;
+        case  6: multi_merge_f<6>(begin, end);
+            break;
+        case  7: multi_merge_f<7>(begin, end);
+            break;
+        case  8: multi_merge_f<8>(begin, end);
+            break;
+        case  9: multi_merge_f<9>(begin, end);
+            break;
+        case 10: multi_merge_f<10>(begin, end);
+            break;
+        default: multi_merge_k(begin, end);
+            break;
+        }
+
+        // compact tree if it got considerably smaller
+        {
+            const unsigned_type num_segments_used = k - free_slots.size();
+            const unsigned_type num_segments_trigger = k - (3 * k / 5);
+            // using k/2 would be worst case inefficient (for large k) for k
+            // \in {2, 4, 8} the trigger is k/2 which is good because we have
+            // special mergers for k \in {1, 2, 4} there is also a special
+            // 3-way-merger, that will be triggered if k == 4 &&
+            // is_array_empty(3)
+            STXXL_VERBOSE3("multi_merge - compact? k="
+                           << k << " #used=" << num_segments_used
+                           << " <= #trigger=" << num_segments_trigger << " ==> "
+                           << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                           << " || "
+                           << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+                           << " #free=" << free_slots.size());
+
+            if (k > 1 &&
+                ((num_segments_used <= num_segments_trigger) ||
+                 (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
+            {
+                compact_tree();
+            }
+        }
+        //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
+    }
+
     void swap(loser_tree& obj)
     {
         std::swap(free_slots, obj.free_slots);
