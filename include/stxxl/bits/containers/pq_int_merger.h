@@ -193,8 +193,6 @@ public:
     //! requires: is_space_available() == 1
     void append_array(value_type* target, unsigned_type length)
     {
-        unsigned_type& k = tree.k;
-
         STXXL_VERBOSE2("int_merger::insert_segment(" << target << "," << length << ")");
         //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
 
@@ -222,8 +220,10 @@ public:
         mem_cons_ += (length + 1) * sizeof(value_type);
         m_size += length;
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         // propagate new information up the tree
-        tree.update_on_insert((index + k) >> 1, *target, index);
+        tree.update_on_insert((index + tree.k) >> 1, *target, index);
+#endif
     }
 
     //! Return the number of items in the arrays
@@ -247,7 +247,9 @@ public:
         unsigned_type& k = tree.k;
         unsigned_type& logK = tree.logK;
         CompareType& cmp = tree.cmp;
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         typename tree_type::Entry* entry = tree.entry;
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
         internal_bounded_stack<unsigned_type, MaxArity>& free_slots = tree.free_slots;
 
         STXXL_VERBOSE3("int_merger::multi_merge(target=" << target << ", len=" << length << ") k=" << k);

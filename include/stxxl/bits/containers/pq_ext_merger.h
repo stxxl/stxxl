@@ -504,7 +504,10 @@ public:
 
         m_size += segment_size;
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
+        // propagate new information up the tree
         tree.update_on_insert((index + tree.k) >> 1, *(states[index]), index);
+#endif
     }
 
     // delete the (length = end-begin) smallest elements and write them to [begin..end)
@@ -516,9 +519,7 @@ public:
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
         unsigned_type& k = tree.k;
-        unsigned_type& logK = tree.logK;
         const compare_type& cmp = tree.cmp;
-        typename tree_type::Entry* entry = tree.entry;
 
         int_type length = end - begin;
 
@@ -541,8 +542,7 @@ public:
         std::vector<sequence> seqs;
         std::vector<unsigned_type> orig_seq_index;
 
-        Cmp cmp;
-        invert_order<Cmp, value_type, value_type> inv_cmp(cmp);
+        invert_order<compare_type, value_type, value_type> inv_cmp(cmp);
 
         for (unsigned_type i = 0; i < k; ++i) //initialize sequences
         {
@@ -712,6 +712,8 @@ public:
         }
 
 #else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+        unsigned_type& logK = tree.logK;
+        typename tree_type::Entry* entry = tree.entry;
 
         //Hint first non-internal (actually second) block of each sequence.
         for (unsigned_type i = 0; i < k; ++i)
