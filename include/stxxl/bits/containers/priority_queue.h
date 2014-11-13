@@ -362,7 +362,7 @@ template <class ConfigType>
 inline void priority_queue<ConfigType>::push(const value_type& obj)
 {
     //STXXL_VERBOSE3("priority_queue::push("<< obj <<")");
-    assert(int_mergers->not_sentinel(obj));
+    assert(!int_mergers->is_sentinel(obj));
     if (insert_heap.size() == N + 1)
         empty_insert_heap();
 

@@ -28,106 +28,85 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local {
 
-template <typename ValueType, typename CompareType>
-class arrays_base : private noncopyable
+//////////////////////////////////////////////////////////////////////
+// The data structure from Knuth, "Sorting and Searching", Section 5.4.1
+/*!
+ * Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
+ * \param  MaxArity  maximum arity of loser tree, has to be a power of two
+ */
+
+/*!
+ * \param Arity  maximum arity of merger, does not need to be a power of 2
+ */
+template <class ArraysType, class CompareType, unsigned Arity>
+class loser_tree : private noncopyable
 {
-protected:
+public:
+    //! type of arrays container linked with loser tree
+    typedef ArraysType arrays_type;
     //! comparator object type
     typedef CompareType compare_type;
 
-    typedef ValueType value_type;
+    // arity_bound / 2  <  arity  <=  arity_bound
+    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
+    //! type of values stored in the arrays container
+    typedef typename arrays_type::value_type value_type;
+    //! type of the ordered sequences in the arrays container
+    typedef typename arrays_type::sequence_type sequence_type;
+
+public:
     //! the comparator object
     compare_type cmp;
+
+    //! reference to the linked arrays
+    arrays_type& arrays;
 
     //! current tree size, invariant (k == 1 << logK), always a power of two
     unsigned_type k;
     //! log of current tree size
     unsigned_type logK;
 
-    //! total number of elements stored
-    external_size_type m_size;
-
     // only entries 0 .. arity-1 may hold actual sequences, the other
     // entries arity .. max_arity-1 are sentinels to make the size of the tree
     // a power of 2 always
 
-    arrays_base()
-        : k(1), logK(0), m_size(0)
-    {
-        // verify strict weak ordering
-        assert(!cmp(cmp.min_value(), cmp.min_value()));
-    }
-
 public:
-    bool is_sentinel(const value_type& a) const
-    {
-        return !(cmp(cmp.min_value(), a)); // a <= cmp.min_value()
-    }
-
-    bool not_sentinel(const value_type& a) const
-    {
-        return cmp(cmp.min_value(), a); // a > cmp.min_value()
-    }
-
-    external_size_type size() const
-    {
-        return m_size;
-    }
-};
-
-/*!
- * \param Arity  maximum arity of merger, does not need to be a power of 2
- */
-template <class ArraysType, class CompareType, unsigned Arity>
-class loser_tree : public ArraysType
-{
-public:
-    typedef ArraysType super_type;
-    typedef CompareType comparator_type;
-
-    // arity_bound / 2  <  arity  <=  arity_bound
-    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
-
-    typedef typename super_type::value_type value_type;
-    typedef typename super_type::SequenceType SequenceType;
-
+    //! type of nodes in the loser tree
     struct Entry
     {
-        value_type key;          // Key of Loser element (winner for 0)
-        unsigned_type index;     // number of losing segment
+        value_type key;          //!< Key of Loser element (winner for 0)
+        unsigned_type index;     //!< number of losing segment
     };
 
-    // upper levels of loser trees
-    // entry[0] contains the winner info
+    //! levels of loser tree: entry[0] contains the winner info
     struct Entry entry[max_arity];
 
     //! stack of free player indices
     internal_bounded_stack<unsigned_type, arity> free_slots;
 
-    bool is_array_empty(unsigned_type slot) const
+public:
+    loser_tree(const compare_type& c, arrays_type& a)
+        : cmp(c), arrays(a), k(1), logK(0)
     {
-        return super_type::is_array_empty(slot);
+        // verify strict weak ordering
+        assert(!cmp(cmp.min_value(), cmp.min_value()));
     }
 
-    bool is_array_allocated(unsigned_type slot) const
+    void initialize()
     {
-        return super_type::is_array_allocated(slot);
-    }
-
-    loser_tree()
-        : super_type()
-    {
-        assert(this->k == 1);
-
         // initial state: one empty player slot
         free_slots.push(0);
 
         rebuild_loser_tree();
 
-#if STXXL_PQ_INTERNAL_LOSER_TREE
-        assert(is_array_empty(0) && !is_array_allocated(0));
-#endif // STXXL_PQ_INTERNAL_LOSER_TREE
+        assert(arrays.is_array_empty(0) && !arrays.is_array_allocated(0));
+    }
+
+    //! True if a is the sentinel value
+    bool is_sentinel(const value_type& a) const
+    {
+        return !(cmp(cmp.min_value(), a)); // a <= cmp.min_value()
     }
 
     //! Allocate a free slot for a new player.
@@ -156,17 +135,15 @@ public:
     //! Whether there is still space for new array
     bool is_space_available() const
     {
-        return (this->k < arity) || !free_slots.empty();
+        return (k < arity) || !free_slots.empty();
     }
 
     //! rebuild loser tree information from the values in current
     void rebuild_loser_tree()
     {
-        SequenceType* states = this->get_sequences();
-
         unsigned_type winner = init_winner(1);
         entry[0].index = winner;
-        entry[0].key = *(states[winner]);
+        entry[0].key = *arrays.get_array(winner);
     }
 
     // given any values in the leaves this
@@ -176,9 +153,6 @@ public:
     // return winner index
     unsigned_type init_winner(unsigned_type root)
     {
-        SequenceType* states = this->get_sequences();
-        unsigned_type& k = this->k;
-
         if (root >= k || root >= max_arity)
         {       // leaf reached
             return root - k;
@@ -187,8 +161,8 @@ public:
         {
             unsigned_type left = init_winner(2 * root);
             unsigned_type right = init_winner(2 * root + 1);
-            value_type lk = *(states[left]);
-            value_type rk = *(states[right]);
+            value_type lk = *arrays.get_array(left);
+            value_type rk = *arrays.get_array(right);
             assert(root < max_arity);
 
             if (!(cmp(lk, rk)))
@@ -219,8 +193,6 @@ public:
                           unsigned_type* winner_index,   // old winner
                           unsigned_type* mask)           // 1 << (ceil(log KNK) - dist-from-root)
     {
-        unsigned_type& logK = this->logK;
-
         if (node == 0)
         {
             // winner part of root
@@ -279,10 +251,6 @@ public:
     //! make the tree twice as wide
     void double_k()
     {
-        unsigned_type& k = this->k;
-        unsigned_type& logK = this->logK;
-        internal_bounded_stack<unsigned_type, Arity>& free_slots = this->free_slots;
-
         STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
@@ -292,7 +260,7 @@ public:
         // and push them on the free stack
         for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
         {
-            this->make_array_sentinel(i);
+            arrays.make_array_sentinel(i);
             if (i < arity)
                 free_slots.push(i);
         }
@@ -312,10 +280,6 @@ public:
     //! compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        unsigned_type& k = this->k;
-        unsigned_type& logK = this->logK;
-        internal_bounded_stack<unsigned_type, Arity>& free_slots = this->free_slots;
-
         STXXL_VERBOSE3("compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
         assert(logK > 0);
 
@@ -323,13 +287,13 @@ public:
         unsigned_type last_empty = 0;
         for (unsigned_type pos = 0; pos < k; pos++)
         {
-            if (!is_array_empty(pos))
+            if (!arrays.is_array_empty(pos))
             {
-                assert(is_array_allocated(pos));
+                assert(arrays.is_array_allocated(pos));
                 if (pos != last_empty)
                 {
-                    assert(!is_array_allocated(last_empty));
-                    this->swap_arrays(last_empty, pos);
+                    assert(!arrays.is_array_allocated(last_empty));
+                    arrays.swap_arrays(last_empty, pos);
                 }
                 ++last_empty;
             }
@@ -358,8 +322,8 @@ public:
         free_slots.clear(); // none free
         for ( ; last_empty < k; last_empty++)
         {
-            assert(!is_array_allocated(last_empty));
-            this->make_array_sentinel(last_empty);
+            assert(!arrays.is_array_allocated(last_empty));
+            arrays.make_array_sentinel(last_empty);
             if (last_empty < arity)
                 free_slots.push(last_empty);
         }
@@ -374,32 +338,28 @@ public:
     template <class OutputIterator>
     void multi_merge_k(OutputIterator begin, OutputIterator end)
     {
-        SequenceType* states = this->get_sequences();
         Entry* current_pos;
         value_type current_key;
         unsigned_type current_index; // leaf pointed to by current entry
-        unsigned_type kReg = this->k;
         unsigned_type winner_index = entry[0].index;
         value_type winner_key = entry[0].key;
 
         while (begin != end)
         {
             // write result
-            *begin++ = *(states[winner_index]);
+            *begin++ = *arrays.get_array(winner_index);
 
             // advance winner segment
-            ++(states[winner_index]);
+            ++(arrays.get_array(winner_index));
 
-            winner_key = *(states[winner_index]);
+            winner_key = *arrays.get_array(winner_index);
 
             // remove winner segment if empty now
-            if (is_sentinel(winner_key)) {
-                this->free_array(winner_index);
-                this->free_player(winner_index);
-            }
+            if (is_sentinel(winner_key))
+                arrays.free_array(winner_index);
 
             // go up the entry-tree
-            for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
+            for (unsigned_type i = (winner_index + k) >> 1; i > 0; i >>= 1)
             {
                 current_pos = entry + i;
                 current_key = current_pos->key;
@@ -420,7 +380,6 @@ public:
     template <int LogK, typename OutputIterator>
     void multi_merge_f(OutputIterator begin, OutputIterator end)
     {
-        SequenceType* reg_states = this->get_sequences();
         unsigned_type winner_index = entry[0].index;
         value_type winner_key = entry[0].key;
 
@@ -428,18 +387,16 @@ public:
         while (begin != end)
         {
             // write result
-            *begin++ = *(reg_states[winner_index]);
+            *begin++ = *arrays.get_array(winner_index);
 
             // advance winner segment
-            ++(reg_states[winner_index]);
+            ++(arrays.get_array(winner_index));
 
-            winner_key = *(reg_states[winner_index]);
+            winner_key = *arrays.get_array(winner_index);
 
             // remove winner segment if empty now
-            if (is_sentinel(winner_key)) {
-                this->free_array(winner_index);
-                this->free_player(winner_index);
-            }
+            if (is_sentinel(winner_key))
+                arrays.free_array(winner_index);
 
             // update loser tree
 #define TreeStep(L)                                                     \

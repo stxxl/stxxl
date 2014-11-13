@@ -28,22 +28,30 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local {
 
-//////////////////////////////////////////////////////////////////////
-// The data structure from Knuth, "Sorting and Searching", Section 5.4.1
-/*!
- * Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
- * \param  MaxArity  maximum arity of loser tree, has to be a power of two
- */
 template <class ValueType, class CompareType, unsigned MaxArity>
-class int_arrays : public arrays_base<ValueType, CompareType>
+class int_merger : private noncopyable
 {
 public:
+    //! type of values in merger
     typedef ValueType value_type;
+    //! comparator object type
+    typedef CompareType compare_type;
+
     enum { max_arity = MaxArity };
 
-    typedef arrays_base<ValueType, CompareType> super_type;
+    //! our type
+    typedef int_merger<ValueType, CompareType, MaxArity> self_type;
+
+    //! type of embedded loser tree
+    typedef loser_tree<self_type, CompareType, MaxArity> tree_type;
+
+    //! type of sequences in which the values are stored: memory arrays
+    typedef value_type* sequence_type;
 
 protected:
+    //! loser tree instance
+    tree_type tree;
+
     //! target of free segment pointers
     value_type sentinel;
 
@@ -61,26 +69,17 @@ protected:
 
     unsigned_type mem_cons_;
 
-    //! free an empty segment .
-    void free_array(unsigned_type slot)
-    {
-        // reroute current pointer to some empty sentinel segment
-        // with a sentinel key
-        STXXL_VERBOSE2("int_arrays::free_array() deleting array " <<
-                       slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
-        current[slot] = &sentinel;
-        current_end[slot] = &sentinel;
+    //! total number of elements stored
+    external_size_type m_size;
 
-        // free memory
-        delete[] segment[slot];
-        segment[slot] = NULL;
-        mem_cons_ -= segment_size[slot];
-    }
+public:
+    //! \name Interface for loser_tree
+    //! \{
 
-    //! is this array invalid: empty and prefixed with sentinel?
+    //! is this array invalid? here: empty and prefixed with sentinel?
     bool is_array_empty(unsigned_type slot) const
     {
-        return is_sentinel(*(current[slot]));
+        return tree.is_sentinel(*(current[slot]));
     }
 
     //! is this array's backing memory still allocated or does the current
@@ -90,6 +89,13 @@ protected:
         return current[slot] != &sentinel;
     }
 
+    //! Return the item sequence of the given slot
+    sequence_type& get_array(unsigned_type slot)
+    {
+        return current[slot];
+    }
+
+    //! Swap contents of arrays a and b
     void swap_arrays(unsigned_type a, unsigned_type b)
     {
         std::swap(current[a], current[b]);
@@ -98,6 +104,7 @@ protected:
         std::swap(segment_size[a], segment_size[b]);
     }
 
+    //! Set a usually empty array to the sentinel
     void make_array_sentinel(unsigned_type slot)
     {
         current[slot] = &sentinel;
@@ -105,17 +112,33 @@ protected:
         segment[slot] = NULL;
     }
 
-public:
-   typedef value_type* SequenceType;
-
-    SequenceType* get_sequences()
+    //! free an empty segment .
+    void free_array(unsigned_type slot)
     {
-        return current;
+        // reroute current pointer to some empty sentinel segment
+        // with a sentinel key
+        STXXL_VERBOSE2("int_merger::free_array() deleting array " <<
+                       slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
+        current[slot] = &sentinel;
+        current_end[slot] = &sentinel;
+
+        // free memory
+        delete[] segment[slot];
+        segment[slot] = NULL;
+        mem_cons_ -= segment_size[slot];
+
+        // free player in loser tree
+        tree.free_player(slot);
     }
 
+    //! \}
+
 public:
-    int_arrays()
-        : super_type(), mem_cons_(0)
+    int_merger(const compare_type& c = compare_type())
+        : tree(c, *this),
+          sentinel(c.min_value()),
+          mem_cons_(0),
+          m_size(0)
     {
         segment[0] = NULL;
         current[0] = &sentinel;
@@ -123,18 +146,17 @@ public:
 
         // entry and sentinel are initialized by init since they need the value
         // of supremum
-
-        sentinel = this->cmp.min_value();
+        tree.initialize();
     }
 
-    ~int_arrays()
+    ~int_merger()
     {
-        STXXL_VERBOSE1("int_arrays::~int_arrays()");
-        for (unsigned_type i = 0; i < this->k; ++i)
+        STXXL_VERBOSE1("int_merger::~int_merger()");
+        for (unsigned_type i = 0; i < tree.k; ++i)
         {
             if (segment[i])
             {
-                STXXL_VERBOSE2("int_arrays::~int_arrays() deleting segment " << i);
+                STXXL_VERBOSE2("int_merger::~int_merger() deleting segment " << i);
                 delete[] segment[i];
                 mem_cons_ -= segment_size[i];
             }
@@ -143,9 +165,8 @@ public:
         assert(mem_cons_ == 0);
     }
 
-    void swap(int_arrays& obj)
+    void swap(int_merger& obj)
     {
-        super_type::swap(obj);
         std::swap(sentinel, obj.sentinel);
         swap_1D_arrays(current, obj.current, MaxArity);
         swap_1D_arrays(current_end, obj.current_end, MaxArity);
@@ -154,61 +175,27 @@ public:
         std::swap(mem_cons_, obj.mem_cons_);
     }
 
-public:
     unsigned_type mem_cons() const { return mem_cons_; }
 
-    //! insert array to merger at index, takes ownership of the array.
-    //! requires: is_space_available() == 1
-    void insert_array(unsigned_type index, value_type* target, unsigned_type length)
+    //! Whether there is still space for new array
+    bool is_space_available() const
     {
-        assert(current[index] == &sentinel);
-
-        // link new segment
-        current[index] = segment[index] = target;
-        current_end[index] = target + length;
-        segment_size[index] = (length + 1) * sizeof(value_type);
-        mem_cons_ += (length + 1) * sizeof(value_type);
-        this->m_size += length;
-    }
-};
-
-template <class ValueType, class CompareType, unsigned MaxArity>
-class int_merger : public loser_tree<
-    int_arrays<ValueType, CompareType, MaxArity>,
-    CompareType, MaxArity
-    >
-{
-public:
-    typedef ValueType value_type;
-
-    typedef int_arrays<ValueType, CompareType, MaxArity> ArraysType;
-    typedef loser_tree<ArraysType, CompareType, MaxArity> super_type;
-
-    typedef loser_tree<ArraysType, CompareType, MaxArity> tree_type;
-    typedef ArraysType arrays_type;
-
-    void multi_merge(value_type* begin, value_type* end)
-    {
-        multi_merge(begin, end - begin);
+        return tree.is_space_available();
     }
 
-    bool is_array_empty(unsigned_type slot) const
+    //! True if a is the sentinel value
+    bool is_sentinel(const value_type& a) const
     {
-        return super_type::is_array_empty(slot);
-    }
-
-    bool is_array_allocated(unsigned_type slot) const
-    {
-        return super_type::is_array_allocated(slot);
+        return tree.is_sentinel(a);
     }
 
     //! append array to merger, takes ownership of the array.
     //! requires: is_space_available() == 1
     void append_array(value_type* target, unsigned_type length)
     {
-        unsigned_type& k = this->k;
+        unsigned_type& k = tree.k;
 
-        STXXL_VERBOSE2("int_arrays::insert_segment(" << target << "," << length << ")");
+        STXXL_VERBOSE2("int_merger::insert_segment(" << target << "," << length << ")");
         //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
 
         if (length == 0)
@@ -219,29 +206,35 @@ public:
             return;
         }
 
-        assert(not_sentinel(target[0]));
-        assert(not_sentinel(target[length - 1]));
-        assert(is_sentinel(target[length]));
+        assert(!tree.is_sentinel(target[0]));
+        assert(!tree.is_sentinel(target[length - 1]));
+        assert(tree.is_sentinel(target[length]));
 
         // allocate a new player slot
-        int index = tree_type::new_player();
+        unsigned_type index = tree.new_player();
 
-        // insert array into internal memory array list
-        insert_array(index, target, length);
+        assert(current[index] == &sentinel);
 
-#if STXXL_PQ_INTERNAL_LOSER_TREE
+        // link new segment
+        current[index] = segment[index] = target;
+        current_end[index] = target + length;
+        segment_size[index] = (length + 1) * sizeof(value_type);
+        mem_cons_ += (length + 1) * sizeof(value_type);
+        m_size += length;
+
         // propagate new information up the tree
-        tree_type::update_on_insert((index + k) >> 1, *target, index);
-#endif // STXXL_PQ_INTERNAL_LOSER_TREE
+        tree.update_on_insert((index + k) >> 1, *target, index);
     }
 
-    void free_array(unsigned_type slot)
+    //! Return the number of items in the arrays
+    external_size_type size() const
     {
-        // free array in array list
-        super_type::free_array(slot);
+        return m_size;
+    }
 
-        // free player in loser tree
-        tree_type::free_player(slot);
+    void multi_merge(value_type* begin, value_type* end)
+    {
+        multi_merge(begin, end - begin);
     }
 
     // delete the length smallest elements and write them to target
@@ -251,15 +244,13 @@ public:
     // - segments are ended by sentinels
     void multi_merge(value_type* target, unsigned_type length)
     {
-        unsigned_type& k = this->k;
-        unsigned_type& logK = this->logK;
-        unsigned_type& m_size = this->m_size;
-        CompareType& cmp = this->cmp;
-        typename super_type::Entry* entry = this->entry;
-        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = this->free_slots;
-        value_type** current = this->current;
+        unsigned_type& k = tree.k;
+        unsigned_type& logK = tree.logK;
+        CompareType& cmp = tree.cmp;
+        typename tree_type::Entry* entry = tree.entry;
+        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = tree.free_slots;
 
-        STXXL_VERBOSE3("int_arrays::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
+        STXXL_VERBOSE3("int_merger::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
 
         if (length == 0)
             return;
@@ -305,7 +296,7 @@ public:
             }
 #else
             merge_iterator(current[0], current[1], target, length, cmp);
-            this->rebuild_loser_tree();
+            tree.rebuild_loser_tree();
 #endif
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
@@ -337,7 +328,7 @@ public:
             else
                 merge4_iterator(current[0], current[1], current[2], current[3], target, length, cmp);
 
-            this->rebuild_loser_tree();
+            tree.rebuild_loser_tree();
 #endif
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
@@ -353,21 +344,21 @@ public:
 
             break;
 #if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
-        case  3: this->template multi_merge_f<3>(target, target + length);
+        case  3: tree.template multi_merge_f<3>(target, target + length);
             break;
-        case  4: this->template multi_merge_f<4>(target, target + length);
+        case  4: tree.template multi_merge_f<4>(target, target + length);
             break;
-        case  5: this->template multi_merge_f<5>(target, target + length);
+        case  5: tree.template multi_merge_f<5>(target, target + length);
             break;
-        case  6: this->template multi_merge_f<6>(target, target + length);
+        case  6: tree.template multi_merge_f<6>(target, target + length);
             break;
-        case  7: this->template multi_merge_f<7>(target, target + length);
+        case  7: tree.template multi_merge_f<7>(target, target + length);
             break;
-        case  8: this->template multi_merge_f<8>(target, target + length);
+        case  8: tree.template multi_merge_f<8>(target, target + length);
             break;
-        case  9: this->template multi_merge_f<9>(target, target + length);
+        case  9: tree.template multi_merge_f<9>(target, target + length);
             break;
-        case 10: this->template multi_merge_f<10>(target, target + length);
+        case 10: tree.template multi_merge_f<10>(target, target + length);
             break;
 #endif
         default:
@@ -402,7 +393,7 @@ public:
             }
         }
 #else
-        multi_merge_k(target, target + length);
+        tree.multi_merge_k(target, target + length);
 #endif
         break;
         }
@@ -418,7 +409,7 @@ public:
             // because we have special mergers for k \in {1, 2, 4}
             // there is also a special 3-way-merger, that will be
             // triggered if k == 4 && is_array_atsentinel(3)
-            STXXL_VERBOSE3("int_arrays  compact? k=" << k << " #used=" << num_segments_used
+            STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
                            << " <= #trigger=" << num_segments_trigger << " ==> "
                            << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
                            << " || "
@@ -428,7 +419,7 @@ public:
                 ((num_segments_used <= num_segments_trigger) ||
                  (k == 4 && !free_slots.empty() && !is_array_empty(3))))
             {
-                this->compact_tree();
+                tree.compact_tree();
             }
         }
         //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
