@@ -142,8 +142,13 @@ public:
     //! our type
     typedef ext_merger<BlockType, CompareType, Arity, AllocStr> self_type;
 
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+    //! type of embedded adapter to parallel multiway_merge
+    typedef parallel_merger_adapter<self_type, CompareType, Arity> tree_type;
+#else
     //! type of embedded loser tree
     typedef loser_tree<self_type, CompareType, Arity> tree_type;
+#endif
 
 public:
 
@@ -529,9 +534,27 @@ public:
     {
         assert(begin + m_size >= end);
 
-#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL && 0
-        unsigned_type& k = tree.k;
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+        multi_merge_parallel(begin, end);
+#else // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+        tree.multi_merge(begin, end);
+        m_size -= end - begin;
+#endif
+    }
+
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+protected:
+    //! extract the (length = end - begin) smallest elements using parallel
+    //! multiway_merge.
+
+    template <class OutputIterator>
+    void multi_merge_parallel(OutputIterator begin, OutputIterator end)
+    {
+        const unsigned_type& k = tree.k;
         compare_type& cmp = tree.cmp;
+
+        if (begin == end)
+            return;
 
         typedef stxxl::int64 diff_type;
 
@@ -717,12 +740,10 @@ public:
                 free_array(seg);
             }
         }
-#else // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-        tree.multi_merge(begin, end);
-        m_size -= end - begin;
-#endif
-    }
 
+        tree.maybe_compact();
+    }
+#endif // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 }; // class ext_merger
 
 } // namespace priority_queue_local

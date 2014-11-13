@@ -42,8 +42,13 @@ public:
     //! our type
     typedef int_merger<ValueType, CompareType, MaxArity> self_type;
 
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+    //! type of embedded adapter to parallel multiway_merge
+    typedef parallel_merger_adapter<self_type, CompareType, MaxArity> tree_type;
+#else
     //! type of embedded loser tree
     typedef loser_tree<self_type, CompareType, MaxArity> tree_type;
+#endif
 
     //! type of sequences in which the values are stored: memory arrays
     typedef value_type* sequence_type;
@@ -241,54 +246,62 @@ public:
     //! least length elements and segments are ended by sentinels.
     void multi_merge(value_type* begin, value_type* end)
     {
+        assert(begin + m_size >= end);
+
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+        multi_merge_parallel(begin, end - begin);
+#else
         tree.multi_merge(begin, end);
+#endif
+
         m_size -= end - begin;
     }
 
-#if 0
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+protected:
+    //! extract the (length = end - begin) smallest elements using parallel
+    //! multiway_merge.
     void multi_merge_parallel(value_type* target, unsigned_type length)
     {
-        unsigned_type& k = tree.k;
-        unsigned_type& logK = tree.logK;
-        CompareType& cmp = tree.cmp;
+        const unsigned_type& k = tree.k;
+        const unsigned_type& logK = tree.logK;
+        compare_type& cmp = tree.cmp;
 
-        internal_bounded_stack<unsigned_type, MaxArity>& free_slots = tree.free_slots;
-
-        STXXL_VERBOSE3("int_merger::multi_merge(target=" << target << ", len=" << length << ") k=" << k);
+        STXXL_VERBOSE3("int_merger::multi_merge_parallel(target=" << target << ", len=" << length << ") k=" << k);
 
         if (length == 0)
             return;
 
         assert(k > 0);
-        assert(length <= m_size);
 
         //This is the place to make statistics about internal multi_merge calls.
 
         invert_order<CompareType, value_type, value_type> inv_cmp(cmp);
         switch (logK) {
-        case 0:
+        case 0: {
             assert(k == 1);
-            assert(free_slots.empty());
+
             memcpy(target, current[0], length * sizeof(value_type));
-            //std::copy(current[0], current[0] + length, target);
             current[0] += length;
 
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
 
             break;
-        case 1:
+        }
+        case 1: {
             assert(k == 2);
-            {
-                std::pair<value_type*, value_type*> seqs[2] =
-                    {
-                        std::make_pair(current[0], current_end[0]),
-                        std::make_pair(current[1], current_end[1])
-                    };
-                parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
-                current[0] = seqs[0].first;
-                current[1] = seqs[1].first;
-            }
+
+            std::pair<value_type*, value_type*> seqs[2] =
+                {
+                    std::make_pair(current[0], current_end[0]),
+                    std::make_pair(current[1], current_end[1])
+                };
+
+            parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+
+            current[0] = seqs[0].first;
+            current[1] = seqs[1].first;
 
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
@@ -297,22 +310,24 @@ public:
                 free_array(1);
 
             break;
-        case 2:
+        }
+        case 2: {
             assert(k == 4);
-            {
-                std::pair<value_type*, value_type*> seqs[4] =
-                    {
-                        std::make_pair(current[0], current_end[0]),
-                        std::make_pair(current[1], current_end[1]),
-                        std::make_pair(current[2], current_end[2]),
-                        std::make_pair(current[3], current_end[3])
-                    };
-                parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
-                current[0] = seqs[0].first;
-                current[1] = seqs[1].first;
-                current[2] = seqs[2].first;
-                current[3] = seqs[3].first;
-            }
+
+            std::pair<value_type*, value_type*> seqs[4] =
+                {
+                    std::make_pair(current[0], current_end[0]),
+                    std::make_pair(current[1], current_end[1]),
+                    std::make_pair(current[2], current_end[2]),
+                    std::make_pair(current[3], current_end[3])
+                };
+
+            parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+
+            current[0] = seqs[0].first;
+            current[1] = seqs[1].first;
+            current[2] = seqs[2].first;
+            current[3] = seqs[3].first;
 
             if (is_array_empty(0) && is_array_allocated(0))
                 free_array(0);
@@ -327,8 +342,8 @@ public:
                 free_array(3);
 
             break;
-        default:
-        {
+        }
+        default: {
             std::vector<std::pair<value_type*, value_type*> > seqs;
             std::vector<int_type> orig_seq_index;
             for (unsigned int i = 0; i < k; ++i)
@@ -340,7 +355,8 @@ public:
                 }
             }
 
-            parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
+            parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(),
+                                              target, inv_cmp, length);
 
             for (unsigned int i = 0; i < seqs.size(); ++i)
             {
@@ -356,36 +372,13 @@ public:
                     free_array(i);
                 }
             }
+            break;
         }
-        break;
         }
 
-        m_size -= length;
-
-        // compact tree if it got considerably smaller
-        {
-            const unsigned_type num_segments_used = k - free_slots.size();
-            const unsigned_type num_segments_trigger = k - (3 * k / 5);
-            // using k/2 would be worst case inefficient (for large k)
-            // for k \in {2, 4, 8} the trigger is k/2 which is good
-            // because we have special mergers for k \in {1, 2, 4}
-            // there is also a special 3-way-merger, that will be
-            // triggered if k == 4 && is_array_atsentinel(3)
-            STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
-                           << " <= #trigger=" << num_segments_trigger << " ==> "
-                           << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                           << " || "
-                           << ((k == 4 && !free_slots.empty() && !is_array_empty(3)) ? "yes" : "no ")
-                           << " #free=" << free_slots.size());
-            if (k > 1 &&
-                ((num_segments_used <= num_segments_trigger) ||
-                 (k == 4 && !free_slots.empty() && !is_array_empty(3))))
-            {
-                tree.compact_tree();
-            }
-        }
+        tree.maybe_compact();
     }
-#endif
+#endif // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 };
 
 } // namespace priority_queue_local

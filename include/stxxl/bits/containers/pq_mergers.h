@@ -240,9 +240,9 @@ void merge4_iterator(
 #undef Merge4Case
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Loser tree data structure from Knuth, "Sorting and Searching", Section 5.4.1
+
 /*!
  * Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
  * \tparam Arity  maximum arity of merger, does not need to be a power of 2
@@ -268,9 +268,6 @@ public:
     //! the comparator object
     compare_type cmp;
 
-    //! reference to the linked arrays
-    arrays_type& arrays;
-
     //! current tree size, invariant (k == 1 << logK), always a power of two
     unsigned_type k;
     //! log of current tree size
@@ -280,7 +277,10 @@ public:
     // entries arity .. max_arity-1 are sentinels to make the size of the tree
     // a power of 2 always
 
-public:
+protected:
+    //! reference to the linked arrays
+    arrays_type& arrays;
+
     //! type of nodes in the loser tree
     struct Entry
     {
@@ -296,7 +296,7 @@ public:
 
 public:
     loser_tree(const compare_type& c, arrays_type& a)
-        : cmp(c), arrays(a), k(1), logK(0)
+        : cmp(c), k(1), logK(0), arrays(a)
     {
         // verify strict weak ordering
         assert(!cmp(cmp.min_value(), cmp.min_value()));
@@ -463,10 +463,9 @@ public:
         STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
-        assert(free_slots.empty());                 // stack was free (probably not needed)
+        assert(free_slots.empty()); // stack was free (probably not needed)
 
-        // make all new entries free
-        // and push them on the free stack
+        // make all new entries free and push them on the free stack
         for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
         {
             arrays.make_array_sentinel(i);
@@ -543,7 +542,31 @@ public:
         rebuild_loser_tree();
     }
 
-    // multi-merge for arbitrary K
+    //! compact tree if it got considerably smaller
+    void maybe_compact()
+    {
+        const unsigned_type num_segments_used = k - free_slots.size();
+        const unsigned_type num_segments_trigger = k - (3 * k / 5);
+        // using k/2 would be worst case inefficient (for large k)
+        // for k \in {2, 4, 8} the trigger is k/2 which is good
+        // because we have special mergers for k \in {1, 2, 4}
+        // there is also a special 3-way-merger, that will be
+        // triggered if k == 4 && is_array_atsentinel(3)
+        STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
+                       << " <= #trigger=" << num_segments_trigger << " ==> "
+                       << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                       << " || "
+                       << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+                       << " #free=" << free_slots.size());
+        if (k > 1 &&
+            ((num_segments_used <= num_segments_trigger) ||
+             (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
+        {
+            compact_tree();
+        }
+    }
+
+    //! multi-merge for arbitrary K
     template <class OutputIterator>
     void multi_merge_k(OutputIterator begin, OutputIterator end)
     {
@@ -734,30 +757,8 @@ public:
             break;
         }
 
-        // compact tree if it got considerably smaller
-        {
-            const unsigned_type num_segments_used = k - free_slots.size();
-            const unsigned_type num_segments_trigger = k - (3 * k / 5);
-            // using k/2 would be worst case inefficient (for large k) for k
-            // \in {2, 4, 8} the trigger is k/2 which is good because we have
-            // special mergers for k \in {1, 2, 4} there is also a special
-            // 3-way-merger, that will be triggered if k == 4 &&
-            // is_array_empty(3)
-            STXXL_VERBOSE3("multi_merge - compact? k="
-                           << k << " #used=" << num_segments_used
-                           << " <= #trigger=" << num_segments_trigger << " ==> "
-                           << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                           << " || "
-                           << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
-                           << " #free=" << free_slots.size());
+        maybe_compact();
 
-            if (k > 1 &&
-                ((num_segments_used <= num_segments_trigger) ||
-                 (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
-            {
-                compact_tree();
-            }
-        }
         //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
     }
 
@@ -767,6 +768,212 @@ public:
         swap_1D_arrays(entry, obj.entry, max_arity);
     }
 };
+
+#if STXXL_PARALLEL && (STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL || STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
+/*!
+ * Adapter from loser_tree to parallel merger
+ * __gnu_parallel::multiway_merge. This class holds most attributes of
+ * loser_tree, except for the tree itself: it thus basically only manages an
+ * array of sequence.
+ * \tparam Arity  maximum arity of merger, does not need to be a power of 2
+ */
+template <class ArraysType, class CompareType, unsigned Arity>
+class parallel_merger_adapter : private noncopyable
+{
+public:
+    //! type of arrays container linked with loser tree
+    typedef ArraysType arrays_type;
+    //! comparator object type
+    typedef CompareType compare_type;
+
+    // arity_bound / 2  <  arity  <=  arity_bound
+    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
+
+    //! type of values stored in the arrays container
+    typedef typename arrays_type::value_type value_type;
+    //! type of the ordered sequences in the arrays container
+    typedef typename arrays_type::sequence_type sequence_type;
+
+public:
+    //! the comparator object
+    compare_type cmp;
+
+    //! current tree size, invariant (k == 1 << logK), always a power of two
+    unsigned_type k;
+    //! log of current tree size
+    unsigned_type logK;
+
+protected:
+    //! reference to the linked arrays
+    arrays_type& arrays;
+
+    //! stack of free player indices
+    internal_bounded_stack<unsigned_type, arity> free_slots;
+
+public:
+    parallel_merger_adapter(const compare_type& c, arrays_type& a)
+        : cmp(c), k(1), logK(0), arrays(a)
+    {
+        // verify strict weak ordering
+        assert(!cmp(cmp.min_value(), cmp.min_value()));
+    }
+
+    void initialize()
+    {
+        // initial state: one empty player slot
+        free_slots.push(0);
+    }
+
+    //! True if a is the sentinel value
+    bool is_sentinel(const value_type& a) const
+    {
+        return !(cmp(cmp.min_value(), a)); // a <= cmp.min_value()
+    }
+
+    //! Allocate a free slot for a new player.
+    unsigned_type new_player()
+    {
+        // get a free slot
+        if (free_slots.empty()) {
+            // tree is too small, attempt to enlarge
+            double_k();
+        }
+
+        assert(!free_slots.empty());
+        unsigned_type index = free_slots.top();
+        free_slots.pop();
+
+        return index;
+    }
+
+    //! Free a finished player's slot
+    void free_player(unsigned_type slot)
+    {
+        free_slots.push(slot);
+    }
+
+    //! Whether there is still space for new array
+    bool is_space_available() const
+    {
+        return (k < arity) || !free_slots.empty();
+    }
+
+    //! Initial call to recursive update_on_insert
+    void update_on_insert(unsigned_type /* node */,
+                          const value_type& /* newKey */,
+                          unsigned_type /* newIndex */)
+    {
+    }
+
+    //! make the tree twice as wide
+    void double_k()
+    {
+        STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        assert(k > 0);
+        assert(k < arity);
+        assert(free_slots.empty()); // stack was free (probably not needed)
+
+        // make all new entries free and push them on the free stack
+        for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
+        {
+            arrays.make_array_sentinel(i);
+            if (i < arity)
+                free_slots.push(i);
+        }
+
+        // double the size
+        k *= 2;
+        logK++;
+
+        STXXL_VERBOSE1("double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        assert(!free_slots.empty());
+        assert(k <= max_arity);
+    }
+
+    //! compact nonempty segments in the left half of the tree
+    void compact_tree()
+    {
+        STXXL_VERBOSE3("compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        assert(logK > 0);
+
+        // compact all nonempty segments to the left
+        unsigned_type last_empty = 0;
+        for (unsigned_type pos = 0; pos < k; pos++)
+        {
+            if (!arrays.is_array_empty(pos))
+            {
+                assert(arrays.is_array_allocated(pos));
+                if (pos != last_empty)
+                {
+                    assert(!arrays.is_array_allocated(last_empty));
+                    arrays.swap_arrays(last_empty, pos);
+                }
+                ++last_empty;
+            }
+            /*
+              else
+              {
+              if(segment[pos])
+              {
+              STXXL_VERBOSE2("int_arrays::compact_tree() deleting segment "<<pos<<
+              " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
+              delete [] segment[pos];
+              segment[pos] = 0;
+              mem_cons_ -= segment_size[pos];
+              }
+              }*/
+        }
+
+        // half degree as often as possible
+        while ((k > 1) && last_empty <= (k / 2))
+        {
+            k /= 2;
+            logK--;
+        }
+
+        // overwrite garbage and compact the stack of free segment indices
+        free_slots.clear(); // none free
+        for ( ; last_empty < k; last_empty++)
+        {
+            assert(!arrays.is_array_allocated(last_empty));
+            arrays.make_array_sentinel(last_empty);
+            if (last_empty < arity)
+                free_slots.push(last_empty);
+        }
+
+        STXXL_VERBOSE3("compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+    }
+
+    //! compact tree if it got considerably smaller
+    void maybe_compact()
+    {
+        const unsigned_type num_segments_used = k - free_slots.size();
+        const unsigned_type num_segments_trigger = k - (3 * k / 5);
+        // using k/2 would be worst case inefficient (for large k)
+        // for k \in {2, 4, 8} the trigger is k/2 which is good
+        // because we have special mergers for k \in {1, 2, 4}
+        // there is also a special 3-way-merger, that will be
+        // triggered if k == 4 && is_array_atsentinel(3)
+        STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
+                       << " <= #trigger=" << num_segments_trigger << " ==> "
+                       << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                       << " || "
+                       << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+                       << " #free=" << free_slots.size());
+        if (k > 1 &&
+            ((num_segments_used <= num_segments_trigger) ||
+             (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
+        {
+            compact_tree();
+        }
+    }
+
+    void swap(parallel_merger_adapter& obj)
+    {
+        std::swap(free_slots, obj.free_slots);
+    }
+};
+#endif // STXXL_PARALLEL && (STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL || STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
 
 } // namespace priority_queue_local
 
