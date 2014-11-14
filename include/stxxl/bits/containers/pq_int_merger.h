@@ -53,6 +53,9 @@ public:
     //! type of sequences in which the values are stored: memory arrays
     typedef value_type* sequence_type;
 
+    //! size type of total number of item in merger
+    typedef internal_size_type size_type;
+
 protected:
     //! loser tree instance
     tree_type tree;
@@ -75,7 +78,7 @@ protected:
     unsigned_type mem_cons_;
 
     //! total number of elements stored
-    external_size_type m_size;
+    size_type m_size;
 
 public:
     //! \name Interface for loser_tree
@@ -235,7 +238,7 @@ public:
     }
 
     //! Return the number of items in the arrays
-    external_size_type size() const
+    size_type size() const
     {
         return m_size;
     }

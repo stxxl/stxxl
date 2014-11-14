@@ -65,6 +65,9 @@ public:
     typedef loser_tree<self_type, CompareType, Arity> tree_type;
 #endif
 
+    //! size type of total number of item in merger
+    typedef external_size_type size_type;
+
 public:
     struct sequence_state : private noncopyable
     {
@@ -182,7 +185,7 @@ protected:
     block_type* sentinel_block;
 
     //! total number of elements stored
-    external_size_type m_size;
+    size_type m_size;
 
 public:
     ext_merger(const compare_type& c = compare_type()) // TODO: pass pool as parameter
@@ -331,7 +334,7 @@ public:
     }
 
     //! Return the number of items in the arrays
-    external_size_type size() const
+    size_type size() const
     {
         return m_size;
     }
@@ -361,7 +364,7 @@ public:
     //! Merge all items from another merger and insert the resulting external
     //! array into the merger. Requires: is_space_available() == 1
     template <class Merger>
-    void append_merger(Merger& another_merger, external_size_type segment_size)
+    void append_merger(Merger& another_merger, size_type segment_size)
     {
         STXXL_VERBOSE1("ext_merger::append_merger(merger,...)" << this);
 
@@ -435,7 +438,7 @@ public:
     template <class OutputIterator>
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
-        assert(begin + m_size >= end);
+        assert((size_type)(end - begin) <= m_size);
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         multi_merge_parallel(begin, end);
