@@ -22,8 +22,8 @@
 
 #include <stxxl/bits/containers/pq_helpers.h>
 #include <stxxl/bits/containers/pq_mergers.h>
+#include <stxxl/bits/containers/pq_int_merger.h>
 #include <stxxl/bits/containers/pq_ext_merger.h>
-#include <stxxl/bits/containers/pq_losertree.h>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -81,8 +81,8 @@ void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity,
     a.swap(b);
 }
 template <class ValueType, class CompareType, unsigned KNKMAX>
-void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX>& a,
-          stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX>& b)
+void swap(stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX>& a,
+          stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX>& b)
 {
     a.swap(b);
 }
@@ -126,7 +126,7 @@ protected:
     typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
         insert_heap_type;
 
-    typedef priority_queue_local::loser_tree<
+    typedef priority_queue_local::int_merger<
             value_type,
             comparator_type,
             IntKMAX> int_merger_type;
@@ -362,7 +362,7 @@ template <class ConfigType>
 inline void priority_queue<ConfigType>::push(const value_type& obj)
 {
     //STXXL_VERBOSE3("priority_queue::push("<< obj <<")");
-    assert(int_mergers->not_sentinel(obj));
+    assert(!int_mergers->is_sentinel(obj));
     if (insert_heap.size() == N + 1)
         empty_insert_heap();
 
@@ -479,7 +479,7 @@ priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
         // fill remaining space from group
         if (group < num_int_groups)
             int_mergers[group].multi_merge(target + left_elements,
-                                           (unsigned_type)length);
+                                           target + left_elements + length);
         else
             ext_mergers[group - num_int_groups]->multi_merge(
                 target + left_elements,
@@ -572,9 +572,9 @@ void priority_queue<ConfigType>::refill_delete_buffer()
             group_buffer_current_mins[1] = seqs[1].first;
         }
 #else
-        priority_queue_local::merge_iterator(
-            group_buffer_current_mins[0],
-            group_buffer_current_mins[1], delete_buffer_current_min, length, cmp);
+        priority_queue_local::merge2_iterator(
+            group_buffer_current_mins[0], group_buffer_current_mins[1],
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp);
 #endif
         break;
     case 3:
@@ -596,7 +596,8 @@ void priority_queue<ConfigType>::refill_delete_buffer()
         priority_queue_local::merge3_iterator(
             group_buffer_current_mins[0],
             group_buffer_current_mins[1],
-            group_buffer_current_mins[2], delete_buffer_current_min, length, cmp);
+            group_buffer_current_mins[2],
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp);
 #endif
         break;
     case 4:
@@ -621,7 +622,8 @@ void priority_queue<ConfigType>::refill_delete_buffer()
             group_buffer_current_mins[0],
             group_buffer_current_mins[1],
             group_buffer_current_mins[2],
-            group_buffer_current_mins[3], delete_buffer_current_min, length, cmp); //side effect free
+            group_buffer_current_mins[3],
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp); //side effect free
 #endif
         break;
     default:
@@ -685,7 +687,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
         STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
         ext_merger_type* overflow_merger = new ext_merger_type;
         overflow_merger->set_pool(pool);
-        overflow_merger->insert_segment(*ext_mergers[extLevel], segmentSize);
+        overflow_merger->append_merger(*ext_mergers[extLevel], segmentSize);
         std::swap(ext_mergers[extLevel], overflow_merger);
         delete overflow_merger;
         finalLevel = level;
@@ -694,17 +696,17 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
     {
         finalLevel = make_space_available(level + 1);
 
-        if (level < num_int_groups - 1)                                  // from internal to internal tree
+        if (level < num_int_groups - 1)                                           // from internal to internal tree
         {
             unsigned_type segmentSize = int_mergers[level].size();
             value_type* newSegment = new value_type[segmentSize + 1];
-            int_mergers[level].multi_merge(newSegment, segmentSize);     // empty this level
+            int_mergers[level].multi_merge(newSegment, newSegment + segmentSize); // empty this level
 
-            newSegment[segmentSize] = delete_buffer[delete_buffer_size]; // sentinel
+            newSegment[segmentSize] = delete_buffer[delete_buffer_size];          // sentinel
             // for queues where size << #inserts
             // it might make sense to stay in this level if
             // segmentSize < alpha * KNN * k^level for some alpha < 1
-            int_mergers[level + 1].insert_segment(newSegment, segmentSize);
+            int_mergers[level + 1].append_array(newSegment, segmentSize);
         }
         else
         {
@@ -712,13 +714,13 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
             {
                 const unsigned_type segmentSize = int_mergers[num_int_groups - 1].size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into first level external: " << level << " " << segmentSize);
-                ext_mergers[0]->insert_segment(int_mergers[num_int_groups - 1], segmentSize);
+                ext_mergers[0]->append_merger(int_mergers[num_int_groups - 1], segmentSize);
             }
             else // from external to external tree
             {
                 const size_type segmentSize = ext_mergers[level - num_int_groups]->size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into second level external: " << level << " " << segmentSize);
-                ext_mergers[level - num_int_groups + 1]->insert_segment(*ext_mergers[level - num_int_groups], segmentSize);
+                ext_mergers[level - num_int_groups + 1]->append_merger(*ext_mergers[level - num_int_groups], segmentSize);
             }
         }
     }
@@ -766,22 +768,27 @@ void priority_queue<ConfigType>::empty_insert_heap()
     // refill delete_buffer
     // (using more complicated code it could be made somewhat fuller
     // in certain circumstances)
-    priority_queue_local::merge_iterator(pos, newPos, delete_buffer_current_min, sz1, cmp);
+    priority_queue_local::merge2_iterator(
+        pos, newPos,
+        delete_buffer_current_min, delete_buffer_current_min + sz1, cmp);
 
     // refill group_buffers[0]
     // (as above we might want to take the opportunity
     // to make group_buffers[0] fuller)
-    priority_queue_local::merge_iterator(pos, newPos, group_buffer_current_mins[0], sz2, cmp);
+    priority_queue_local::merge2_iterator(
+        pos, newPos,
+        group_buffer_current_mins[0], group_buffer_current_mins[0] + sz2, cmp);
 
     // merge the rest to the new segment
     // note that merge exactly trips into the footsteps
     // of itself
-    priority_queue_local::merge_iterator(pos, newPos, newSegment, (unsigned_type)N, cmp);
+    priority_queue_local::merge2_iterator(pos, newPos,
+                                          newSegment, newSegment + N, cmp);
 
     // and insert it
     unsigned_type freeLevel = make_space_available(0);
     assert(freeLevel == 0 || int_mergers[0].size() == 0);
-    int_mergers[0].insert_segment(newSegment, N);
+    int_mergers[0].append_array(newSegment, N);
 
     // get rid of invalid level 2 buffers
     // by inserting them into tree 0 (which is almost empty in this case)
@@ -794,7 +801,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
 
             newSegment = new value_type[current_group_buffer_size(i) + 1]; // with sentinel
             std::copy(group_buffer_current_mins[i], group_buffer_current_mins[i] + current_group_buffer_size(i) + 1, newSegment);
-            int_mergers[0].insert_segment(newSegment, current_group_buffer_size(i));
+            int_mergers[0].append_array(newSegment, current_group_buffer_size(i));
             group_buffer_current_mins[i] = group_buffers[i] + N;           // empty
         }
     }

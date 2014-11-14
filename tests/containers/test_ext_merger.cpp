@@ -56,10 +56,10 @@ my_type * make_sequence(dummy_merger& dummy, int l)
 
 // forced instantiation
 template class stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5>;
-template class stxxl::priority_queue_local::loser_tree<my_type, my_cmp, 8>;
+template class stxxl::priority_queue_local::int_merger<my_type, my_cmp, 8>;
 
 using stxxl::priority_queue_local::ext_merger;
-using stxxl::priority_queue_local::loser_tree;
+using stxxl::priority_queue_local::int_merger;
 
 int main()
 {
@@ -68,19 +68,20 @@ int main()
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);
 
-    ext_merger<block_type, my_cmp, 5> merger(&pool);
-    merger.insert_segment(dummy, 1024 * 3);
+    ext_merger<block_type, my_cmp, 5> merger;
+    merger.set_pool(&pool);
+    merger.append_merger(dummy, 1024 * 3);
     cnt = 20;
-    merger.insert_segment(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
     cnt = 10;
-    merger.insert_segment(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
     cnt = -100;
-    merger.insert_segment(dummy, 1024 * 4);
-    merger.insert_segment(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
+    merger.append_merger(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
     STXXL_CHECK(stxxl::is_sorted(output.begin(), output.end()));
 
-    loser_tree<my_type, my_cmp, 8> loser;
+    int_merger<my_type, my_cmp, 8> loser;
     my_type* seq1 = make_sequence(dummy, 1024);
     cnt = 20;
     my_type* seq2 = make_sequence(dummy, 1024);
@@ -89,11 +90,10 @@ int main()
     cnt = -100;
     my_type* seq4 = make_sequence(dummy, 1024);
     my_type* out = new my_type[4 * 1024];
-    loser.init();
-    loser.insert_segment(seq1, 1024);
-    loser.insert_segment(seq2, 1024);
-    loser.insert_segment(seq3, 1024);
-    loser.insert_segment(seq4, 1024);
+    loser.append_array(seq1, 1024);
+    loser.append_array(seq2, 1024);
+    loser.append_array(seq3, 1024);
+    loser.append_array(seq4, 1024);
 
     loser.multi_merge(out, out + 1024);
     STXXL_CHECK(stxxl::is_sorted(out, out + 1024));
