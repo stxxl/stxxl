@@ -73,32 +73,20 @@ public:
 
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
-    internal_array() = default;
+    internal_array() : m_values(0), m_min_index(0) { }
 
-    //! Constructor which takes a value vector. The vector should not be used
-    //! outside this class anymore!
+    //! Constructor which takes a value vector. The value vector is empty afterwards.
     internal_array(std::vector<ValueType>& values)
         : m_values(), m_min_index(0)
     {
         std::swap(m_values, values);
     }
-
-    //! Move constructor. Needed for regrowing in surrounding vector.
-    internal_array(internal_array&& o)
-        : m_values(std::move(o.m_values)),
-          m_min_index(o.m_min_index)
-    { }
-
-    //! Delete copy assignment for emplace_back to use the move semantics.
-    internal_array& operator = (internal_array& other) = delete;
-
-    //! Delete copy constructor for emplace_back to use the move semantics.
-    internal_array(const internal_array& other) = delete;
-
-    //! Move assignment.
-    internal_array& operator = (internal_array&&)
+    
+    //! Swap internal_array with another one.
+    void swap(internal_array<ValueType>& o)
     {
-        return *this;
+        std::swap(m_values, o.m_values);
+        std::swap(m_min_index, o.m_min_index);
     }
 
     //! Random access operator
@@ -165,6 +153,26 @@ public:
         return &(*(m_values.end()));
     }
 };
+
+} // end namespace ppq_local
+STXXL_END_NAMESPACE
+
+namespace std {
+
+template <class ValueType>
+void swap(stxxl::ppq_local::internal_array<ValueType>& a,
+          stxxl::ppq_local::internal_array<ValueType>& b)
+{
+    a.swap(b);
+}
+
+} // end namespace std
+
+// swap_vector MUST be included after the swap spezialization but before parallel_priority_queue class!
+#include <stxxl/bits/common/swap_vector.h>
+
+STXXL_BEGIN_NAMESPACE
+namespace ppq_local {
 
 /*!
  * External array stores a sorted sequence of values on the hard disk and
@@ -973,7 +981,7 @@ protected:
     //! type of insertion heaps array
     typedef typename std::vector<heap_type> heaps_type;
     //! type of internal arrays vector
-    typedef typename std::vector<internal_array_type> internal_arrays_type;
+    typedef typename stxxl::swap_vector<internal_array_type> internal_arrays_type;
     //! type of external arrays vector
     typedef typename std::vector<external_array_type> external_arrays_type;
     //! type of minima tree combining the structures
@@ -2098,8 +2106,9 @@ protected:
 
             m_stats.merge_sorted_heaps_time.stop();
 
-            m_internal_arrays.emplace_back(merged_array);
-            // internal array owns merged_array now.
+            stxxl::ppq_local::internal_array<ValueType> temp_array(merged_array);
+            m_internal_arrays.swap_back(temp_array);
+            // merged_array is empty now.
 
             if (c_merge_ias_into_eb) {
                 if (!extract_buffer_empty()) {
@@ -2123,7 +2132,8 @@ protected:
         else {
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
                 if (m_insertion_heaps[i * c_cache_line_factor].size() > 0) {
-                    m_internal_arrays.emplace_back(m_insertion_heaps[i * c_cache_line_factor]);
+                    stxxl::ppq_local::internal_array<ValueType> temp_array(m_insertion_heaps[i * c_cache_line_factor]);
+                    m_internal_arrays.swap_back(temp_array);
                     // insertion_heaps[i*c_cache_line_factor] is empty now.
 
                     if (c_merge_ias_into_eb) {
@@ -2334,8 +2344,9 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        m_internal_arrays.emplace_back(values);
-        // internal array owns values now.
+        stxxl::ppq_local::internal_array<ValueType> temp_array(values);
+        m_internal_arrays.swap_back(temp_array);
+        // values is now empty.
 
         if (c_merge_ias_into_eb) {
             if (!extract_buffer_empty()) {
