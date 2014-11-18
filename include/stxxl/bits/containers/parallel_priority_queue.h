@@ -56,7 +56,7 @@ namespace ppq_local {
  * they overflow.
  */
 template <class ValueType>
-class internal_array
+class internal_array : private noncopyable
 {
 protected:
     //! Contains the items of the sorted sequence.
@@ -73,7 +73,7 @@ public:
 
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
-    internal_array() : m_values(0), m_min_index(0) { }
+    internal_array() { }
 
     //! Constructor which takes a value vector. The value vector is empty afterwards.
     internal_array(std::vector<ValueType>& values)
@@ -83,7 +83,7 @@ public:
     }
     
     //! Swap internal_array with another one.
-    void swap(internal_array<ValueType>& o)
+    void swap(internal_array& o)
     {
         std::swap(m_values, o.m_values);
         std::swap(m_min_index, o.m_min_index);
@@ -154,26 +154,6 @@ public:
     }
 };
 
-} // end namespace ppq_local
-STXXL_END_NAMESPACE
-
-namespace std {
-
-template <class ValueType>
-void swap(stxxl::ppq_local::internal_array<ValueType>& a,
-          stxxl::ppq_local::internal_array<ValueType>& b)
-{
-    a.swap(b);
-}
-
-} // end namespace std
-
-// swap_vector MUST be included after the swap spezialization but before parallel_priority_queue class!
-#include <stxxl/bits/common/swap_vector.h>
-
-STXXL_BEGIN_NAMESPACE
-namespace ppq_local {
-
 /*!
  * External array stores a sorted sequence of values on the hard disk and
  * allows access to the first block (containing the smallest values).  The
@@ -193,7 +173,7 @@ template <
     unsigned_type BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
     >
-class external_array
+class external_array : private noncopyable
 {
 public:
     typedef external_array<ValueType, BlockSize, AllocStrategy> self_type;
@@ -309,67 +289,32 @@ public:
         bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end());
     }
 
-    //! Delete copy assignment for emplace_back to use the move semantics.
-    self_type& operator = (const self_type& other) = delete;
-
-    //! Delete copy constructor for emplace_back to use the move semantics.
-    external_array(const self_type& other) = delete;
-
-    //! Move assignment.
-    self_type& operator = (self_type&& o)
-    {
-        m_capacity = o.m_capacity;
-        m_size = o.m_size;
-        m_num_bids = o.m_num_bids;
-        m_num_prefetch_blocks = o.m_num_prefetch_blocks;
-        m_num_write_buffer_blocks = o.m_num_write_buffer_blocks;
-
-        m_bids = std::move(o.m_bids);
-
-        m_first_block = o.m_first_block;
-        m_pool = o.m_pool;
-        m_write_position = o.m_write_position;
-        m_hint_index = o.m_hint_index;
-        m_current_bid_index = o.m_current_bid_index;
-        m_write_phase = o.m_write_phase;
-        m_first_block_valid = o.m_first_block_valid;
-        m_is_first_block = o.m_is_first_block;
-        m_begin_index = o.m_begin_index;
-        m_end_index = o.m_end_index;
-
-        o.m_first_block = nullptr;
-        o.m_pool = nullptr;
-        return *this;
-    }
-
-    //! Move constructor. Needed for regrowing in surrounding vector.
-    external_array(self_type&& o)
-        : m_capacity(o.m_capacity),
-          m_size(o.m_size),
-          m_num_bids(o.m_num_bids),
-          m_num_prefetch_blocks(o.m_num_prefetch_blocks),
-          m_num_write_buffer_blocks(o.m_num_write_buffer_blocks),
-
-          m_bids(std::move(o.m_bids)),
-
-          m_first_block(o.m_first_block),
-          m_pool(o.m_pool),
-          m_write_position(o.m_write_position),
-          m_hint_index(o.m_hint_index),
-          m_current_bid_index(o.m_current_bid_index),
-          m_write_phase(o.m_write_phase),
-          m_first_block_valid(o.m_first_block_valid),
-          m_is_first_block(o.m_is_first_block),
-          m_begin_index(o.m_begin_index),
-          m_end_index(o.m_end_index)
-    {
-        o.m_first_block = nullptr;
-        o.m_pool = nullptr;
-    }
-
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
-    external_array() = default;
+    external_array() { }
+    
+    //! Swap internal_array with another one.
+    void swap(external_array& o)
+    {
+        std::swap(m_alloc_strategy, o.m_alloc_strategy);
+        std::swap(m_capacity, o.m_capacity);
+        std::swap(m_size, o.m_size);
+        std::swap(m_num_bids, o.m_num_bids);
+        std::swap(m_num_prefetch_blocks, o.m_num_prefetch_blocks);
+        std::swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
+        std::swap(m_bids, o.m_bids);
+        std::swap(m_first_block, o.m_first_block);
+        std::swap(m_pool, o.m_pool);
+        std::swap(m_read_request, o.m_read_request);
+        std::swap(m_write_position, o.m_write_position);
+        std::swap(m_hint_index, o.m_hint_index);
+        std::swap(m_current_bid_index, o.m_current_bid_index);
+        std::swap(m_write_phase, o.m_write_phase);
+        std::swap(m_first_block_valid, o.m_first_block_valid);
+        std::swap(m_is_first_block, o.m_is_first_block);
+        std::swap(m_begin_index, o.m_begin_index);
+        std::swap(m_end_index, o.m_end_index);
+    }
 
     //! Destructor
     ~external_array()
@@ -601,6 +546,37 @@ protected:
                 (m_capacity < num_elements_per_block));
     }
 };
+
+} // end namespace ppq_local
+STXXL_END_NAMESPACE
+
+namespace std {
+
+template <class ValueType>
+void swap(stxxl::ppq_local::internal_array<ValueType>& a,
+          stxxl::ppq_local::internal_array<ValueType>& b)
+{
+    a.swap(b);
+}
+
+template <
+    class ValueType,
+    stxxl::unsigned_type BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
+    >
+void swap(stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>& a,
+          stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>& b)
+{
+    a.swap(b);
+}
+
+} // end namespace std
+
+// swap_vector MUST be included after the swap spezialization but before parallel_priority_queue class!
+#include <stxxl/bits/common/swap_vector.h>
+
+STXXL_BEGIN_NAMESPACE
+namespace ppq_local {
 
 /*!
  * The minima_tree contains minima from all sources inside the PPQ. It contains
@@ -983,7 +959,7 @@ protected:
     //! type of internal arrays vector
     typedef typename stxxl::swap_vector<internal_array_type> internal_arrays_type;
     //! type of external arrays vector
-    typedef typename std::vector<external_array_type> external_arrays_type;
+    typedef typename stxxl::swap_vector<external_array_type> external_arrays_type;
     //! type of minima tree combining the structures
     typedef ppq_local::minima_tree<
             parallel_priority_queue<value_type, compare_type, alloc_strategy,
@@ -1168,7 +1144,7 @@ protected:
     internal_arrays_type m_internal_arrays;
 
     //! The sorted arrays in external memory
-    std::vector<external_array_type> m_external_arrays;
+    external_arrays_type m_external_arrays;
 
     //! The aggregated pushes. They cannot be extracted yet.
     std::vector<ValueType> m_aggregated_pushes;
@@ -1725,12 +1701,14 @@ public:
         m_minima.clear_external_arrays();
 
         // clean up external arrays that have been deleted in extract_min!
-        m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
 
         size_type total_size = m_external_size;
         assert(total_size > 0);
 
-        m_external_arrays.emplace_back(total_size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type temp_array(total_size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(temp_array);
+
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
         std::vector<ValueType> merge_buffer;
 
@@ -1794,7 +1772,7 @@ public:
                 m_external_arrays[i].wait_for_first_block();
             }
 
-            m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+            m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
         }
 
         a.finish_write_phase();
@@ -1850,14 +1828,14 @@ protected:
         m_extract_buffer_index = 0;
 
         m_minima.clear_external_arrays();
-        m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
         size_type eas = m_external_arrays.size();
 
         size_type ias;
 
         if (c_merge_ias_into_eb) {
             m_minima.clear_internal_arrays();
-            m_internal_arrays.erase(std::remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+            m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
             ias = m_internal_arrays.size();
         }
         else {
@@ -2027,7 +2005,7 @@ protected:
         //stats.refill_wait_time.stop();
 
         // remove empty arrays - important for the next round
-        m_external_arrays.erase(std::remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
         size_type num_deleted_arrays = eas - m_external_arrays.size();
         if (num_deleted_arrays > 0) {
             m_mem_left += num_deleted_arrays * m_mem_per_external_array;
@@ -2036,7 +2014,7 @@ protected:
         m_stats.num_new_external_arrays = 0;
 
         if (c_merge_ias_into_eb) {
-            m_internal_arrays.erase(std::remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+            m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
             size_type num_deleted_internal_arrays = ias - m_internal_arrays.size();
             if (num_deleted_internal_arrays > 0) {
                 m_mem_left += num_deleted_internal_arrays * m_mem_per_internal_array;
@@ -2106,7 +2084,7 @@ protected:
 
             m_stats.merge_sorted_heaps_time.stop();
 
-            stxxl::ppq_local::internal_array<ValueType> temp_array(merged_array);
+            internal_array_type temp_array(merged_array);
             m_internal_arrays.swap_back(temp_array);
             // merged_array is empty now.
 
@@ -2132,7 +2110,7 @@ protected:
         else {
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
                 if (m_insertion_heaps[i * c_cache_line_factor].size() > 0) {
-                    stxxl::ppq_local::internal_array<ValueType> temp_array(m_insertion_heaps[i * c_cache_line_factor]);
+                    internal_array_type temp_array(m_insertion_heaps[i * c_cache_line_factor]);
                     m_internal_arrays.swap_back(temp_array);
                     // insertion_heaps[i*c_cache_line_factor] is empty now.
 
@@ -2175,7 +2153,7 @@ protected:
         m_minima.clear_internal_arrays();
 
         // clean up internal arrays that have been deleted in extract_min!
-        m_internal_arrays.erase(std::remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+        m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
 
         size_type num_arrays = m_internal_arrays.size();
         size_type size = m_internal_size;
@@ -2185,7 +2163,8 @@ protected:
             sequences[i] = std::make_pair(m_internal_arrays[i].begin(), m_internal_arrays[i].end());
         }
 
-        m_external_arrays.emplace_back(size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(temp_array);
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         // TODO: write in chunks in order to safe RAM?
@@ -2249,8 +2228,9 @@ protected:
             std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end(), m_inv_compare);
             sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end());
         }
-
-        m_external_arrays.emplace_back(size, m_num_prefetchers, m_num_write_buffers);
+        
+        external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(temp_array);
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         // TODO: write in chunks in order to safe RAM
@@ -2306,7 +2286,8 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        m_external_arrays.emplace_back(values.size(), m_num_prefetchers, m_num_write_buffers);
+        external_array_type temp_array(values.size(), m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(temp_array);
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
@@ -2344,7 +2325,7 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        stxxl::ppq_local::internal_array<ValueType> temp_array(values);
+        internal_array_type temp_array(values);
         m_internal_arrays.swap_back(temp_array);
         // values is now empty.
 
