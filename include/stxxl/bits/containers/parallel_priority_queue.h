@@ -561,30 +561,11 @@ void swap(stxxl::ppq_local::internal_array<ValueType>& a,
 
 template <
     class ValueType,
-    stxxl::unsigned_type BlockSize, // C++11: = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    class AllocStrategy // C++11: = STXXL_DEFAULT_ALLOC_STRATEGY
+    stxxl::unsigned_type BlockSize,
+    class AllocStrategy
     >
 void swap(stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>& a,
           stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>& b)
-{
-    a.swap(b);
-}
-
-// for C++98 compatibility:
-template <
-    class ValueType,
-    stxxl::unsigned_type BlockSize
-    >
-void swap(stxxl::ppq_local::external_array<ValueType, BlockSize>& a,
-          stxxl::ppq_local::external_array<ValueType, BlockSize>& b)
-{
-    a.swap(b);
-}
-
-// for C++98 compatibility:
-template <class ValueType>
-void swap(stxxl::ppq_local::external_array<ValueType>& a,
-          stxxl::ppq_local::external_array<ValueType>& b)
 {
     a.swap(b);
 }
