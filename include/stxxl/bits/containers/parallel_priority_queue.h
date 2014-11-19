@@ -291,7 +291,9 @@ public:
 
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
-    external_array() { }
+    external_array()
+        : m_pool(NULL)
+    { }
     
     //! Swap internal_array with another one.
     void swap(external_array& o)
