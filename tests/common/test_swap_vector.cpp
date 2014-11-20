@@ -62,7 +62,7 @@ struct test_eraser
 {
     bool operator () (const Test& t) const
     {
-        return (t.get_i()==-1||t.get_i()==8);
+        return (t.get_i() == -1 || t.get_i() == 8);
     }
 };
 
@@ -104,19 +104,19 @@ int main()
     for (unsigned i = 0; i < vec.size(); ++i) {
         STXXL_CHECK_EQUAL(vec[i].get_i(), expected_vals[i]);
     }
-    
+
     // std::remove_if would fail because it makes use of copy assignment.
     // We test stxxl's swap_remove_if implementation instead.
     // STL: vec.erase(std::remove_if(vec.begin(), vec.end(), test_eraser()), vec.end());
     vec.erase(stxxl::swap_remove_if(vec.begin(), vec.end(), test_eraser()), vec.end());
-    
+
     // Check the values.
     int expected_vals2[10] = { 1, 2, 3, 5, 6, 7, 9 };
     STXXL_CHECK_EQUAL(vec.size(), 7);
     for (unsigned i = 0; i < vec.size(); ++i) {
         STXXL_CHECK_EQUAL(vec[i].get_i(), expected_vals2[i]);
     }
-    
+
     // Clear the vector.
     vec.clear();
     STXXL_CHECK(vec.empty());

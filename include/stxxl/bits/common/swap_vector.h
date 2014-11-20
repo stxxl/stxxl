@@ -228,7 +228,7 @@ public:
  *
  * The function is compatible to std::remove_if, but uses std::swap instead of copy-assignment
  * (resp. move-assignment in C++11).
- * 
+ *
  * Important: A template spezialization for std::swap(ValueType&,ValueType&) must be provided. Make shure the swap
  * implementation is located above these lines.
  */
@@ -236,11 +236,11 @@ template <class ForwardIterator, class UnaryPredicate>
 ForwardIterator swap_remove_if(ForwardIterator first, ForwardIterator last, UnaryPredicate pred)
 {
     ForwardIterator result = first;
-    while (first!=last)
+    while (first != last)
     {
         if (!pred(*first))
         {
-            std::swap(*first,*result);
+            std::swap(*first, *result);
             ++result;
         }
         ++first;

@@ -81,7 +81,7 @@ public:
     {
         std::swap(m_values, values);
     }
-    
+
     //! Swap internal_array with another one.
     void swap(internal_array& o)
     {
@@ -294,7 +294,7 @@ public:
     external_array()
         : m_pool(NULL)
     { }
-    
+
     //! Swap internal_array with another one.
     void swap(external_array& o)
     {
@@ -549,7 +549,8 @@ protected:
     }
 };
 
-} // end namespace ppq_local
+} // namespace ppq_local
+
 STXXL_END_NAMESPACE
 
 namespace std {
@@ -571,13 +572,13 @@ void swap(stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>&
 {
     a.swap(b);
 }
-
 } // end namespace std
 
 // swap_vector MUST be included after the swap spezialization but before parallel_priority_queue class!
 #include <stxxl/bits/common/swap_vector.h>
 
 STXXL_BEGIN_NAMESPACE
+
 namespace ppq_local {
 
 /*!
@@ -2247,7 +2248,7 @@ protected:
             std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end(), m_inv_compare);
             sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end());
         }
-        
+
         external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
         m_external_arrays.swap_back(temp_array);
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
@@ -2569,8 +2570,8 @@ template <
     uint64 DefaultMemSize,
     uint64 MaxItems
     >
-const double parallel_priority_queue<ValueType,CompareType,AllocStrategy,BlockSize,
-    DefaultMemSize,MaxItems>::c_default_extract_buffer_ram_part = 0.05;
+const double parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize,
+                                     DefaultMemSize, MaxItems>::c_default_extract_buffer_ram_part = 0.05;
 
 STXXL_END_NAMESPACE
 
