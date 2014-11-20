@@ -1112,7 +1112,7 @@ protected:
     size_type m_current_bulk_size;
 
     //! If the bulk currently being inserted is very large, this boolean is set
-    //! and bulk_push_steps just accumulate the elements for eventual sorting.
+    //! and bulk_push just accumulate the elements for eventual sorting.
     bool m_is_very_large_bulk;
 
     //! Index of the currently smallest element in the extract buffer
@@ -1378,12 +1378,15 @@ public:
 
     /*!
      * Start a sequence of push operations.
-     * \param bulk_size Number of elements to push before the next pop.
+     * \param bulk_size Approximate number of elements to push before the next pop.
      */
     void bulk_push_begin(size_type bulk_size)
     {
         m_current_bulk_size = bulk_size;
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
+
+        // if bulk_size is larger than all heaps: use simple aggregation arrays
+        // instead and sort afterwards.
         if (bulk_size > heap_capacity) {
             m_is_very_large_bulk = true;
             return;
@@ -1403,9 +1406,9 @@ public:
      * Run bulk_push_begin() before using this method.
      *
      * \param element The element to push.
-     * \param thread_num The id of the insertion heap / thread id to use.
+     * \param heap_num The id of the insertion heap to use (usually the thread id).
      */
-    void bulk_push_step(const ValueType& element, const int thread_num = -1)
+    void bulk_push(const ValueType& element, const int heap_num)
     {
         assert(m_current_bulk_size > 0);
 
@@ -1414,19 +1417,13 @@ public:
             return;
         }
 
-        unsigned id;
-        if (thread_num > -1)
-            id = thread_num;
-#if STXXL_PARALLEL
-        else if (omp_get_num_threads() > 1)
-            id = omp_get_thread_num();
-#endif
-        else
-            id = rand() % m_num_insertion_heaps;
-
         // TODO: check if full? Alternative: real_insertion_heap_size_factor
-        m_insertion_heaps[id * c_cache_line_factor].push_back(element);
-        std::push_heap(m_insertion_heaps[id * c_cache_line_factor].begin(), m_insertion_heaps[id * c_cache_line_factor].end(), m_compare);
+        m_insertion_heaps[heap_num * c_cache_line_factor].push_back(element);
+
+        std::push_heap(m_insertion_heaps[heap_num * c_cache_line_factor].begin(),
+                       m_insertion_heaps[heap_num * c_cache_line_factor].end(),
+                       m_compare);
+
         // The following would avoid problems if the bulk size specified in
         // bulk_push_begin is not correct.
         // insertion_size += bulk_size; must then be removed from bulk_push_end().
@@ -1434,8 +1431,25 @@ public:
     }
 
     /*!
+     * Push an element inside a bulk sequence of pushes.  Run bulk_push_begin()
+     * before using this method. This function uses the insertion heap id =
+     * omp_get_thread_num().
+     *
+     * \param element The element to push.
+     */
+    void bulk_push(const ValueType& element)
+    {
+#if STXXL_PARALLEL
+        return bulk_push(element, omp_get_num_threads());
+#else
+        int id = rand() % m_num_insertion_heaps;
+        return bulk_push(element, id);
+#endif
+    }
+
+    /*!
      * Ends a sequence of push operations. Run bulk_push_begin() and some
-     * bulk_push_step() before this.
+     * bulk_push() before this.
      */
     void bulk_push_end()
     {
@@ -1455,11 +1469,11 @@ public:
     }
 
     /*!
-     * Insert multiple elements at one time.
+     * Insert a vector of elements at one time.
      * \param elements Vector containing the elements to push.
      * Attention: elements vector may be owned by the PQ afterwards.
      */
-    void bulk_push(std::vector<ValueType>& elements)
+    void bulk_push_vector(std::vector<ValueType>& elements)
     {
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
         if (elements.size() > heap_capacity / 2) {
@@ -1474,13 +1488,13 @@ public:
             const unsigned thread_num = omp_get_thread_num();
             #pragma omp parallel for
             for (size_type i = 0; i < elements.size(); ++i) {
-                bulk_push_step(elements[i], thread_num);
+                bulk_push(elements[i], thread_num);
             }
         }
 #else
         const unsigned thread_num = rand() % m_num_insertion_heaps;
         for (size_type i = 0; i < elements.size(); ++i) {
-            bulk_push_step(elements[i], thread_num);
+            bulk_push(elements[i], thread_num);
         }
 #endif
         bulk_push_end();
@@ -1517,7 +1531,7 @@ public:
             flush_array(m_aggregated_pushes);
         }
         else if ((m_aggregated_pushes.size() > c_single_insert_limit) && (m_aggregated_pushes.size() < heap_capacity)) {
-            bulk_push(m_aggregated_pushes);
+            bulk_push_vector(m_aggregated_pushes);
         }
         else {
             for (value_iterator i = m_aggregated_pushes.begin(); i != m_aggregated_pushes.end(); ++i) {

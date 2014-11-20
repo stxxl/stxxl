@@ -224,7 +224,7 @@ public:
         std::cout << name() << ": bulk_push_end not supported\n";
     }
 
-    void bulk_push_step(const value_type& v, int /* thread_num */)
+    void bulk_push(const value_type& v, int /* thread_num */)
     {
         backend.push(v);
     }
@@ -271,9 +271,9 @@ void Container<ppq_type>::bulk_push_end()
 }
 
 template <>
-void Container<ppq_type>::bulk_push_step(const value_type& v, int thread_num)
+void Container<ppq_type>::bulk_push(const value_type& v, int thread_num)
 {
-    backend.bulk_push_step(v, thread_num);
+    backend.bulk_push(v, thread_num);
 }
 
 #endif
@@ -477,7 +477,7 @@ void do_bulk_insert(ContainerType& c, bool parallel = true)
             {
                 progress("Inserting element", i * bulk_size + j, num_elements);
 
-                c.bulk_push_step(value_type(num_elements - (i * bulk_size + j)), thread_id);
+                c.bulk_push(value_type(num_elements - (i * bulk_size + j)), thread_id);
             }
         }
 
@@ -503,7 +503,7 @@ void do_bulk_insert(ContainerType& c, bool parallel = true)
         {
             progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
 
-            c.bulk_push_step(value_type(num_elements % bulk_size - j), thread_id);
+            c.bulk_push(value_type(num_elements % bulk_size - j), thread_id);
         }
     }
 
@@ -543,7 +543,7 @@ void do_bulk_rand_insert(ContainerType& c,
                 progress("Inserting element", i * bulk_size + j, num_elements);
 
                 uint64 k = rand_r(&seed) % value_universe_size;
-                c.bulk_push_step(value_type(k), thread_id);
+                c.bulk_push(value_type(k), thread_id);
             }
         }
 
@@ -573,7 +573,7 @@ void do_bulk_rand_insert(ContainerType& c,
             progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
 
             uint64 k = rand_r(&seed) % value_universe_size;
-            c.bulk_push_step(value_type(k), thread_id);
+            c.bulk_push(value_type(k), thread_id);
         }
     }
 
@@ -644,7 +644,7 @@ void do_bulk_rand_intermixed(ContainerType& c,
                              i + j, (filled ? 3 : 2) * num_elements);
 
                     uint64 k = rand_r(&seed) % value_universe_size;
-                    c.bulk_push_step(value_type(k), thread_num);
+                    c.bulk_push(value_type(k), thread_num);
                 }
             }
 
@@ -721,7 +721,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel = true)
                         uint64 k = num_elements - num_inserts - j;
                         progress("Inserting/deleting element", i + j, 2 * num_elements);
 
-                        c.bulk_push_step(value_type(k), thread_num);
+                        c.bulk_push(value_type(k), thread_num);
                     }
                 }
 
@@ -839,8 +839,8 @@ public:
 #endif
                 for (size_type i = edges_begin; i < edges_end; ++i)
                 {
-                    c.bulk_push_step(value_type(edge_targets[i], distance + edge_lengths[i]),
-                                     thread_num);
+                    c.bulk_push(value_type(edge_targets[i], distance + edge_lengths[i]),
+                                thread_num);
                 }
             }
 
