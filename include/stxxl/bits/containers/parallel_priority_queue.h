@@ -1379,7 +1379,7 @@ public:
 
     /*!
      * Start a sequence of push operations.
-     * \param bulk_size Approximate number of elements to push before the next pop.
+     * \param bulk_size Exact number of elements to push before the next pop.
      */
     void bulk_push_begin(size_type bulk_size)
     {
@@ -1432,7 +1432,7 @@ public:
     }
 
     /*!
-     * Push an element inside a bulk sequence of pushes.  Run bulk_push_begin()
+     * Push an element inside a bulk sequence of pushes. Run bulk_push_begin()
      * before using this method. This function uses the insertion heap id =
      * omp_get_thread_num().
      *
@@ -1441,7 +1441,7 @@ public:
     void bulk_push(const ValueType& element)
     {
 #if STXXL_PARALLEL
-        return bulk_push(element, omp_get_num_threads());
+        return bulk_push(element, omp_get_thread_num());
 #else
         int id = rand() % m_num_insertion_heaps;
         return bulk_push(element, id);
