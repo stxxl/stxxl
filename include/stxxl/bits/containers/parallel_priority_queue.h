@@ -597,7 +597,7 @@ public:
 
     typedef typename parent_type::inv_compare_type compare_type;
     typedef typename parent_type::value_type value_type;
-    typedef typename parent_type::heaps_type heaps_type;
+    typedef typename parent_type::proc_vector_type proc_vector_type;
     typedef typename parent_type::internal_arrays_type ias_type;
     typedef typename parent_type::external_arrays_type eas_type;
 
@@ -610,28 +610,26 @@ protected:
     struct head_comp
     {
         self_type& m_parent;
-        heaps_type& m_heaps;
+        proc_vector_type& m_proc;
         ias_type& m_ias;
         eas_type& m_eas;
         const compare_type& m_compare;
-        unsigned m_cache_line_factor;
 
-        head_comp(self_type& parent, heaps_type& heaps,
+        head_comp(self_type& parent, proc_vector_type& proc,
                   ias_type& ias, eas_type& eas,
-                  const compare_type& compare, unsigned cache_line_factor)
+                  const compare_type& compare)
             : m_parent(parent),
-              m_heaps(heaps),
+              m_proc(proc),
               m_ias(ias),
               m_eas(eas),
-              m_compare(compare),
-              m_cache_line_factor(cache_line_factor)
+              m_compare(compare)
         { }
 
         const value_type & get_value(int input) const
         {
             switch (input) {
             case HEAP:
-                return m_heaps[m_parent.m_heaps.top() * m_cache_line_factor][0];
+                return m_proc[m_parent.m_heaps.top()].insertion_heap[0];
             case EB:
                 return m_parent.m_parent.m_extract_buffer[
                     m_parent.m_parent.m_extract_buffer_index
@@ -654,19 +652,16 @@ protected:
     //! Comparator for the insertion heaps winner tree.
     struct heaps_comp
     {
-        heaps_type& m_heaps;
+        proc_vector_type& m_proc;
         const compare_type& m_compare;
-        unsigned m_cache_line_factor;
 
-        heaps_comp(heaps_type& heaps, const compare_type& compare,
-                   unsigned cache_line_factor)
-            : m_heaps(heaps), m_compare(compare),
-              m_cache_line_factor(cache_line_factor)
+        heaps_comp(proc_vector_type& proc, const compare_type& compare)
+            : m_proc(proc), m_compare(compare)
         { }
 
         const value_type & get_value(int index) const
         {
-            return m_heaps[index * m_cache_line_factor][0];
+            return m_proc[index].insertion_heap[0];
         }
 
         bool operator () (const int a, const int b) const
@@ -715,8 +710,6 @@ protected:
     //! value_type comparator
     const compare_type& m_compare;
 
-    unsigned m_cache_line_factor;
-
     //! Comperator instances
     head_comp m_head_comp;
     heaps_comp m_heaps_comp;
@@ -743,12 +736,11 @@ public:
     minima_tree(parent_type& parent)
         : m_parent(parent),
           m_compare(parent.m_inv_compare),
-          m_cache_line_factor(m_parent.c_cache_line_factor),
           // construct comparators
-          m_head_comp(*this, parent.m_insertion_heaps,
+          m_head_comp(*this, parent.m_proc,
                       parent.m_internal_arrays, parent.m_external_arrays,
-                      m_compare, m_cache_line_factor),
-          m_heaps_comp(parent.m_insertion_heaps, m_compare, m_cache_line_factor),
+                      m_compare),
+          m_heaps_comp(parent.m_proc, m_compare),
           m_ia_comp(parent.m_internal_arrays, m_compare),
           m_ea_comp(parent.m_external_arrays, m_compare),
           // construct header winner tree
@@ -957,8 +949,6 @@ protected:
     //! type of insertion heap itself
     typedef std::vector<ValueType> heap_type;
 
-    //! type of insertion heaps array
-    typedef typename std::vector<heap_type> heaps_type;
     //! type of internal arrays vector
     typedef typename stxxl::swap_vector<internal_array_type> internal_arrays_type;
     //! type of external arrays vector
@@ -1035,16 +1025,6 @@ protected:
     // It's located in global scope instead.
     static const double c_default_extract_buffer_ram_part;
 
-    //! Leave out (c_cache_line_factor-1) slots between the heaps in the
-    //! insertion_heaps vector each.  This ensures that the heap vectors
-    //! (meaning: the begin and end pointers) are in different cache lines and
-    //! therefore this improves the multicore performance.
-    static const unsigned c_cache_line_factor = 128;
-
-    //! Number of elements to reserve space for in the dummy insertion heap
-    //! entries.  @see c_cache_line_factor
-    static const unsigned c_cache_line_space = 128;
-
     /*!
      * Limit the size of the extract buffer to an absolute value.
      *
@@ -1084,7 +1064,10 @@ protected:
     //! Using this parameter you can reserve more space for the insertion heaps
     //! than visible to the algorithm.  This avoids memory allocation if the
     //! data is not distributed evenly among the heaps.
-    const double m_real_insertion_heap_size_factor;
+    const double m_insertion_heap_reserve_factor;
+
+    //! Size to reserve in each insertion heap: capacity times reserve_factor
+    size_type m_insertion_heap_reserve;
 
     //! Total amount of internal memory
     const size_type m_mem_total;
@@ -1139,8 +1122,20 @@ protected:
     //! \name Data Holding Structures
     //! \{
 
-    //! The heaps where new elements are usually inserted into
-    std::vector<heap_type> m_insertion_heaps;
+    //! A struct containing the local insertion heap and other information
+    //! _local_ to a processor.
+    struct ProcessorData
+    {
+        //! The heaps where new elements are usually inserted into
+        heap_type insertion_heap;
+
+        //! alignment should avoid cache thrashing between processors
+    } __attribute__ ((aligned (64)));
+
+    typedef std::vector<ProcessorData> proc_vector_type;
+
+    //! Array of processor local data structures, including the insertion heaps.
+    proc_vector_type m_proc;
 
     //! The extract buffer where external (and internal) arrays are merged into
     //! for extracting
@@ -1228,7 +1223,7 @@ public:
 #else
           m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : 1),
 #endif
-          m_real_insertion_heap_size_factor(1 + 1 / m_num_insertion_heaps),
+          m_insertion_heap_reserve_factor(1 + 1 / m_num_insertion_heaps),
           m_mem_total(total_ram),
           m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
           m_current_bulk_size(0),
@@ -1238,7 +1233,7 @@ public:
           m_extract_buffer_size(0),
           m_internal_size(0),
           m_external_size(0),
-          m_insertion_heaps(m_num_insertion_heaps * c_cache_line_factor),
+          m_proc(m_num_insertion_heaps),
           m_minima(*this),
           m_do_flush_directly_to_hd(flush_directly_to_hd)
     {
@@ -1252,12 +1247,13 @@ public:
 
         m_insertion_heap_capacity = m_mem_for_heaps / (m_num_insertion_heaps * sizeof(ValueType));
 
-        for (size_t i = 0; i < m_num_insertion_heaps * c_cache_line_factor; ++i)
-            m_insertion_heaps[i].reserve(c_cache_line_space);
+        // calculate size to reserve for each insertion heap
+        m_insertion_heap_reserve =
+            (size_type)((double)(m_insertion_heap_capacity) *
+                        m_insertion_heap_reserve_factor);
 
-        for (size_t i = 0; i < m_num_insertion_heaps; ++i) {
-            m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
-        }
+        for (size_t i = 0; i < m_num_insertion_heaps; ++i)
+            m_proc[i].insertion_heap.reserve(m_insertion_heap_reserve);
 
         init_memmanagement();
 
@@ -1407,9 +1403,9 @@ public:
      * Run bulk_push_begin() before using this method.
      *
      * \param element The element to push.
-     * \param heap_num The id of the insertion heap to use (usually the thread id).
+     * \param pe The id of the insertion heap to use (usually the thread id).
      */
-    void bulk_push(const ValueType& element, const int heap_num)
+    void bulk_push(const ValueType& element, const int pe)
     {
         assert(m_current_bulk_size > 0);
 
@@ -1418,11 +1414,10 @@ public:
             return;
         }
 
-        // TODO: check if full? Alternative: real_insertion_heap_size_factor
-        m_insertion_heaps[heap_num * c_cache_line_factor].push_back(element);
+        m_proc[pe].insertion_heap.push_back(element);
 
-        std::push_heap(m_insertion_heaps[heap_num * c_cache_line_factor].begin(),
-                       m_insertion_heaps[heap_num * c_cache_line_factor].end(),
+        std::push_heap(m_proc[pe].insertion_heap.begin(),
+                       m_proc[pe].insertion_heap.end(),
                        m_compare);
 
         // The following would avoid problems if the bulk size specified in
@@ -1462,9 +1457,9 @@ public:
 
         m_heaps_size += m_current_bulk_size;
         m_current_bulk_size = 0;
-        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
-            if (!m_insertion_heaps[i * c_cache_line_factor].empty()) {
-                m_minima.update_heap(i);
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p) {
+            if (!m_proc[p].insertion_heap.empty()) {
+                m_minima.update_heap(p);
             }
         }
     }
@@ -1554,7 +1549,7 @@ public:
     {
         unsigned id = rand() % m_num_insertion_heaps;
 
-        if (m_insertion_heaps[id * c_cache_line_factor].size() >= m_insertion_heap_capacity) {
+        if (m_proc[id].insertion_heap.size() >= m_insertion_heap_capacity) {
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
             }
@@ -1563,16 +1558,18 @@ public:
             }
         }
 
+        heap_type& insheap = m_proc[id].insertion_heap;
+
         ValueType old_min;
-        if (m_insertion_heaps[id * c_cache_line_factor].size() > 0) {
-            old_min = m_insertion_heaps[id * c_cache_line_factor][0];
+        if (insheap.size() > 0) {
+            old_min = insheap[0];
         }
 
-        m_insertion_heaps[id * c_cache_line_factor].push_back(element);
-        std::push_heap(m_insertion_heaps[id * c_cache_line_factor].begin(), m_insertion_heaps[id * c_cache_line_factor].end(), m_compare);
+        insheap.push_back(element);
+        std::push_heap(insheap.begin(), insheap.end(), m_compare);
         ++m_heaps_size;
 
-        if (m_insertion_heaps[id * c_cache_line_factor].size() == 1 || m_inv_compare(m_insertion_heaps[id * c_cache_line_factor][0], old_min)) {
+        if (insheap.size() == 1 || m_inv_compare(insheap[0], old_min)) {
             m_minima.update_heap(id);
         }
     }
@@ -1592,7 +1589,7 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
-            return m_insertion_heaps[index * c_cache_line_factor][0];
+            return m_proc[index].insertion_heap[0];
         case minima_type::EB:
             return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
@@ -1627,16 +1624,18 @@ public:
         switch (type) {
         case minima_type::HEAP:
         {
-            min = m_insertion_heaps[index * c_cache_line_factor][0];
+            heap_type& insheap = m_proc[index].insertion_heap;
+
+            min = insheap[0];
 
             m_stats.pop_heap_time.start();
-            std::pop_heap(m_insertion_heaps[index * c_cache_line_factor].begin(), m_insertion_heaps[index * c_cache_line_factor].end(), m_compare);
-            m_insertion_heaps[index * c_cache_line_factor].pop_back();
+            std::pop_heap(insheap.begin(), insheap.end(), m_compare);
+            insheap.pop_back();
             m_stats.pop_heap_time.stop();
 
             m_heaps_size--;
 
-            if (!m_insertion_heaps[index * c_cache_line_factor].empty()) {
+            if (!insheap.empty()) {
                 m_minima.update_heap(index);
             }
             else {
@@ -2086,13 +2085,12 @@ protected:
 #endif
         for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
         {
-            std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(),
-                      m_insertion_heaps[i * c_cache_line_factor].end(),
-                      m_inv_compare);
+            heap_type& insheap = m_proc[i].insertion_heap;
+
+            std::sort(insheap.begin(), insheap.end(), m_inv_compare);
 
             if (c_merge_sorted_heaps)
-                sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(),
-                                              m_insertion_heaps[i * c_cache_line_factor].end());
+                sequences[i] = std::make_pair(insheap.begin(), insheap.end());
         }
 
         if (c_merge_sorted_heaps)
@@ -2124,9 +2122,10 @@ protected:
                 m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
             }
 
-            for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
-                m_insertion_heaps[i * c_cache_line_factor].clear();
-                m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
+            for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+            {
+                m_proc[i].insertion_heap.clear();
+                m_proc[i].insertion_heap.reserve(m_insertion_heap_reserve);
             }
             m_minima.clear_heaps();
 
@@ -2136,11 +2135,13 @@ protected:
         {
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
-                if (m_insertion_heaps[i * c_cache_line_factor].size() > 0)
+                heap_type& insheap = m_proc[i].insertion_heap;
+
+                if (insheap.size() > 0)
                 {
-                    internal_array_type temp_array(m_insertion_heaps[i * c_cache_line_factor]);
+                    internal_array_type temp_array(insheap);
                     m_internal_arrays.swap_back(temp_array);
-                    // insertion_heaps[i*c_cache_line_factor] is empty now.
+                    // insheap is empty now. TODO-tb: nope, it was copied?
 
                     if (c_merge_ias_into_eb) {
                         if (!extract_buffer_empty()) {
@@ -2153,8 +2154,8 @@ protected:
                         m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
                     }
 
-                    m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
-                }
+                    insheap.reserve(m_insertion_heap_reserve);
+                 }
             }
 
             m_minima.clear_heaps();
@@ -2252,10 +2253,12 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
+        for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+        {
+            heap_type& insheap = m_proc[i].insertion_heap;
             // TODO std::sort_heap? We would have to reverse the order...
-            std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end(), m_inv_compare);
-            sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end());
+            std::sort(insheap.begin(), insheap.end(), m_inv_compare);
+            sequences[i] = std::make_pair(insheap.begin(), insheap.end());
         }
 
         external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
@@ -2287,8 +2290,8 @@ protected:
         //#pragma omp parallel for
         //#endif
         for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
-            m_insertion_heaps[i * c_cache_line_factor].clear();
-            m_insertion_heaps[i * c_cache_line_factor].reserve(static_cast<size_type>(m_real_insertion_heap_size_factor * static_cast<double>(m_insertion_heap_capacity)));
+            m_proc[i].insertion_heap.clear();
+            m_proc[i].insertion_heap.reserve(m_insertion_heap_reserve);
         }
         m_minima.clear_heaps();
 
