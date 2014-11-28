@@ -2060,13 +2060,14 @@ protected:
             ram_needed = m_num_insertion_heaps * m_mem_per_internal_array;
         }
 
+        // test that enough RAM is available for merged internal array:
+        // otherwise flush the existing internal arrays out to disk.
         if (m_mem_left < ram_needed) {
             if (m_internal_size > 0) {
                 flush_internal_arrays();
                 // still not enough?
-                if (m_mem_left < ram_needed) {
+                if (m_mem_left < ram_needed)
                     merge_external_arrays();
-                }
             }
             else {
                 merge_external_arrays();
@@ -2083,15 +2084,19 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
-            // TODO: Use std::sort_heap instead? We would have to reverse the order...
-            std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end(), m_inv_compare);
-            if (c_merge_sorted_heaps) {
-                sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(), m_insertion_heaps[i * c_cache_line_factor].end());
-            }
+        for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+        {
+            std::sort(m_insertion_heaps[i * c_cache_line_factor].begin(),
+                      m_insertion_heaps[i * c_cache_line_factor].end(),
+                      m_inv_compare);
+
+            if (c_merge_sorted_heaps)
+                sequences[i] = std::make_pair(m_insertion_heaps[i * c_cache_line_factor].begin(),
+                                              m_insertion_heaps[i * c_cache_line_factor].end());
         }
 
-        if (c_merge_sorted_heaps) {
+        if (c_merge_sorted_heaps)
+        {
             m_stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
 
@@ -2127,9 +2132,12 @@ protected:
 
             m_mem_left -= m_mem_per_internal_array;
         }
-        else {
-            for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
-                if (m_insertion_heaps[i * c_cache_line_factor].size() > 0) {
+        else
+        {
+            for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+            {
+                if (m_insertion_heaps[i * c_cache_line_factor].size() > 0)
+                {
                     internal_array_type temp_array(m_insertion_heaps[i * c_cache_line_factor]);
                     m_internal_arrays.swap_back(temp_array);
                     // insertion_heaps[i*c_cache_line_factor] is empty now.
@@ -2173,7 +2181,8 @@ protected:
         m_minima.clear_internal_arrays();
 
         // clean up internal arrays that have been deleted in extract_min!
-        m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+        m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(),
+                                                      empty_internal_array_eraser()), m_internal_arrays.end());
 
         size_type num_arrays = m_internal_arrays.size();
         size_type size = m_internal_size;
