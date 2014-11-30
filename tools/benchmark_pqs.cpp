@@ -228,6 +228,11 @@ public:
     {
         backend.push(v);
     }
+
+    //! Output additional stats
+    void print_stats()
+    {
+    }
 };
 
 // *** Specialization for STXXL PQ
@@ -274,6 +279,12 @@ template <>
 void Container<ppq_type>::bulk_push(const value_type& v, int thread_num)
 {
     backend.bulk_push(v, thread_num);
+}
+
+template <>
+void Container<ppq_type>::print_stats()
+{
+    backend.print_stats();
 }
 
 #endif
@@ -449,7 +460,7 @@ void do_rand_intermixed(ContainerType& c, unsigned int _seed, bool filled)
 }
 
 template <typename ContainerType>
-void do_bulk_insert(ContainerType& c, bool parallel = true)
+void do_bulk_insert(ContainerType& c, bool parallel)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 
@@ -512,7 +523,7 @@ void do_bulk_insert(ContainerType& c, bool parallel = true)
 
 template <typename ContainerType>
 void do_bulk_rand_insert(ContainerType& c,
-                         unsigned int _seed, bool parallel = true)
+                         unsigned int _seed, bool parallel)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 
@@ -585,7 +596,7 @@ void do_bulk_rand_insert(ContainerType& c,
 template <typename ContainerType>
 void do_bulk_rand_intermixed(ContainerType& c,
                              unsigned int _seed, bool filled,
-                             bool parallel = true)
+                             bool parallel)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 
@@ -658,7 +669,7 @@ void do_bulk_rand_intermixed(ContainerType& c,
 }
 
 template <typename ContainerType>
-void do_bulk_intermixed_check(ContainerType& c, bool parallel = true)
+void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 
@@ -898,12 +909,78 @@ void print_params()
     STXXL_VARDUMP(num_read_blocks);
 }
 
-#if STXXL_PARALLEL
-inline void ppq_stats()
+/*
+ * Run the selected benchmark procedure.
+ */
+
+bool do_random = false;
+bool do_check = false;
+bool do_bulk = false;
+bool do_intermixed = false;
+bool do_parallel = false;
+bool do_fill = false;
+
+template <typename ContainerType>
+void run_benchmark(ContainerType& c)
 {
-    ppq->print_stats();
+    scoped_print_timer timer("Running selected benchmarks on " + c.name(),
+                             (do_fill ? 4 : 2) * num_elements * value_size);
+
+    if (do_bulk) {
+        if (do_intermixed) {
+            if (do_check) {
+                do_bulk_intermixed_check(c, do_parallel);
+            }
+            else {
+                if (do_fill) {
+                    do_bulk_rand_insert(c, seed, do_parallel);
+                }
+                do_bulk_rand_intermixed(c, seed, do_fill, do_parallel);
+            }
+        }
+        else {
+            if (do_random) {
+                do_bulk_rand_insert(c, seed, do_parallel);
+            }
+            else {
+                do_bulk_insert(c, do_parallel);
+            }
+            if (do_check) {
+                STXXL_CHECK(!do_random);
+                do_read_check(c);
+            }
+            else {
+                do_read(c);
+            }
+        }
+    }
+    else {
+        if (do_intermixed) {
+            if (do_fill) {
+                do_rand_insert(c, seed);
+            }
+            do_rand_intermixed(c, seed, do_fill);
+            c.print_stats();
+            return;
+        }
+        if (do_random) {
+            do_rand_insert(c, seed);
+        }
+        else {
+            do_insert(c);
+        }
+        if (do_random && do_check) {
+            do_rand_read_check(c, seed);
+        }
+        else if (do_check) {
+            do_read_check(c);
+        }
+        else {
+            do_read(c);
+        }
+    }
+    c.print_stats();
 }
-#endif
 
 /*
  * The main procedure.
@@ -922,13 +999,7 @@ int benchmark_pqs(int argc, char* argv[])
     bool do_sorter = false;
     bool do_stlpq = false;
 
-    bool do_random = false;
-    bool do_check = false;
-    bool do_bulk = false;
-    bool do_intermixed = false;
     bool do_dijkstra = false;
-    bool do_fill = false;
-    bool do_parallel = false;
     bool do_flush_directly = false;
 
     stxxl::cmdline_parser cp;
@@ -1022,14 +1093,12 @@ int benchmark_pqs(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    #if !STXXL_PARALLEL
-
+#if !STXXL_PARALLEL
     if (do_ppq) {
         STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. Parallel priority queue cannot be used here.");
         return EXIT_FAILURE;
     }
-
-    #endif
+#endif
 
     if (do_dijkstra) {
         uint64 n = num_elements / value_size;
@@ -1039,7 +1108,7 @@ int benchmark_pqs(int argc, char* argv[])
 #if STXXL_PARALLEL
             Container<ppq_type> cppq(*ppq);
             ::do_dijkstra(cppq, n, m);
-            ppq_stats();
+            cppq.print_stats();
 #endif
         }
         else if (do_stxxlpq) {
@@ -1058,239 +1127,23 @@ int benchmark_pqs(int argc, char* argv[])
     {
 #if STXXL_PARALLEL
         Container<ppq_type> cppq(*ppq);
-
-        scoped_print_timer timer("Filling and reading Parallel PQ",
-                                 (do_fill ? 4 : 2) * num_elements * value_size);
-
-        if (do_bulk) {
-            if (do_intermixed) {
-                if (do_check) {
-                    do_bulk_intermixed_check(cppq, do_parallel);
-                }
-                else {
-                    if (do_fill) {
-                        do_bulk_rand_insert(cppq, seed, do_parallel);
-                    }
-                    do_bulk_rand_intermixed(cppq, seed, do_fill, do_parallel);
-                }
-            }
-            else {
-                if (do_random) {
-                    do_bulk_rand_insert(cppq, seed, do_parallel);
-                }
-                else {
-                    do_bulk_insert(cppq, do_parallel);
-                }
-                if (do_check) {
-                    STXXL_CHECK(!do_random);
-                    do_read_check(cppq);
-                }
-                else {
-                    do_read(cppq);
-                }
-            }
-        }
-        else {
-            if (do_intermixed) {
-                if (do_fill) {
-                    do_rand_insert(cppq, seed);
-                }
-                do_rand_intermixed(cppq, seed, do_fill);
-                ppq_stats();
-                return EXIT_SUCCESS;
-            }
-            if (do_random) {
-                do_rand_insert(cppq, seed);
-            }
-            else {
-                do_insert(cppq);
-            }
-            if (do_random && do_check) {
-                do_rand_read_check(cppq, seed);
-            }
-            else if (do_check) {
-                do_read_check(cppq);
-            }
-            else {
-                do_read(cppq);
-            }
-        }
-        ppq_stats();
+        run_benchmark(cppq);
 #endif  // STXXL_PARALLEL
     }
     else if (do_stxxlpq)
     {
         Container<stxxlpq_type> cstxxlpq(*stxxlpq);
-
-        scoped_print_timer timer("Filling and reading STXXL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
-        if (do_bulk) {
-            if (do_intermixed) {
-                if (do_check) {
-                    do_bulk_intermixed_check(cstxxlpq);
-                }
-                else {
-                    if (do_fill) {
-                        do_bulk_rand_insert(cstxxlpq, seed);
-                    }
-                    do_bulk_rand_intermixed(cstxxlpq, seed, do_fill);
-                }
-            }
-            else {
-                if (do_random) {
-                    do_bulk_rand_insert(cstxxlpq, seed);
-                }
-                else {
-                    do_bulk_insert(cstxxlpq);
-                }
-                if (do_check) {
-                    STXXL_CHECK(!do_random);
-                    do_read_check(cstxxlpq);
-                }
-                else {
-                    do_read(cstxxlpq);
-                }
-            }
-        }
-        else {
-            if (do_intermixed) {
-                if (do_fill) {
-                    do_rand_insert(cstxxlpq, seed);
-                }
-                do_rand_intermixed(cstxxlpq, seed, do_fill);
-                return EXIT_SUCCESS;
-            }
-            if (do_random) {
-                do_rand_insert(cstxxlpq, seed);
-            }
-            else {
-                do_insert(cstxxlpq);
-            }
-            if (do_random && do_check) {
-                do_rand_read_check(cstxxlpq, seed);
-            }
-            else if (do_check) {
-                do_read_check(cstxxlpq);
-            }
-            else {
-                do_read(cstxxlpq);
-            }
-        }
+        run_benchmark(cstxxlpq);
     }
     else if (do_sorter)
     {
         Container<sorter_type> csorter(*stxxlsorter);
-
-        scoped_print_timer timer("Filling and reading STXXL Sorter", (do_fill ? 4 : 2) * num_elements * value_size);
-        if (do_bulk) {
-            if (do_intermixed) {
-                if (do_check) {
-                    do_bulk_intermixed_check(csorter);
-                }
-                else {
-                    if (do_fill) {
-                        do_bulk_rand_insert(csorter, seed);
-                    }
-                    do_bulk_rand_intermixed(csorter, seed, do_fill);
-                }
-            }
-            else {
-                if (do_random) {
-                    do_bulk_rand_insert(csorter, seed);
-                }
-                else {
-                    do_bulk_insert(csorter);
-                }
-                if (do_check) {
-                    STXXL_CHECK(!do_random);
-                    do_read_check(csorter);
-                }
-                else {
-                    do_read(csorter);
-                }
-            }
-        }
-        else {
-            if (do_intermixed) {
-                if (do_fill) {
-                    do_rand_insert(csorter, seed);
-                }
-                do_rand_intermixed(csorter, seed, do_fill);
-                return EXIT_SUCCESS;
-            }
-            if (do_random) {
-                do_rand_insert(csorter, seed);
-            }
-            else {
-                do_insert(csorter);
-            }
-            if (do_random && do_check) {
-                do_rand_read_check(csorter, seed);
-            }
-            else if (do_check) {
-                do_read_check(csorter);
-            }
-            else {
-                do_read(csorter);
-            }
-        }
+        run_benchmark(csorter);
     }
     else if (do_stlpq)
     {
         Container<stlpq_type> cstlpq(*stlpq);
-
-        scoped_print_timer timer("Filling and reading STL PQ", (do_fill ? 4 : 2) * num_elements * value_size);
-        if (do_bulk) {
-            if (do_intermixed) {
-                if (do_check) {
-                    do_bulk_intermixed_check(cstlpq);
-                }
-                else {
-                    if (do_fill) {
-                        do_bulk_rand_insert(cstlpq, seed);
-                    }
-                    do_rand_intermixed(cstlpq, seed, do_fill);
-                }
-            }
-            else {
-                if (do_random) {
-                    do_bulk_rand_insert(cstlpq, seed);
-                }
-                else {
-                    do_bulk_insert(cstlpq);
-                }
-                if (do_check) {
-                    STXXL_CHECK(!do_random);
-                    do_read_check(cstlpq);
-                }
-                else {
-                    do_read(cstlpq);
-                }
-            }
-        }
-        else {
-            if (do_intermixed) {
-                if (do_fill) {
-                    do_rand_insert(cstlpq, seed);
-                }
-                do_rand_intermixed(cstlpq, seed, do_fill);
-                return EXIT_SUCCESS;
-            }
-            if (do_random) {
-                do_rand_insert(cstlpq, seed);
-            }
-            else {
-                do_insert(cstlpq);
-            }
-            if (do_random && do_check) {
-                do_rand_read_check(cstlpq, seed);
-            }
-            else if (do_check) {
-                do_read_check(cstlpq);
-            }
-            else {
-                do_read(cstlpq);
-            }
-        }
+        run_benchmark(cstlpq);
     }
 
     return EXIT_SUCCESS;
