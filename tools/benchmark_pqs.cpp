@@ -921,7 +921,6 @@ int benchmark_pqs(int argc, char* argv[])
     bool do_stxxlpq = false;
     bool do_sorter = false;
     bool do_stlpq = false;
-    bool do_tbbpq = false;
 
     bool do_random = false;
     bool do_check = false;
@@ -939,7 +938,6 @@ int benchmark_pqs(int argc, char* argv[])
     cp.add_flag('o', "stxxl", "Benchmark stxxl priority queue", do_stxxlpq);
     cp.add_flag('s', "sorter", "Benchmark stxxl::sorter", do_sorter);
     cp.add_flag('l', "stl", "Benchmark std::priority_queue", do_stlpq);
-    cp.add_flag('t', "tbb", "Benchmark tbb::parallel_priority_queue", do_tbbpq);
 
     cp.add_flag('d', "dijkstra", "Run dijkstra benchmark", do_dijkstra);
     cp.add_flag('r', "random", "Use random insert", do_random);
@@ -1019,7 +1017,7 @@ int benchmark_pqs(int argc, char* argv[])
      * Run benchmarks
      */
 
-    if (do_ppq + do_stxxlpq + do_sorter + do_stlpq + do_tbbpq == 0) {
+    if (do_ppq + do_stxxlpq + do_sorter + do_stlpq == 0) {
         STXXL_MSG("Please choose a conatiner type. Use -h for help.");
         return EXIT_FAILURE;
     }
@@ -1054,9 +1052,6 @@ int benchmark_pqs(int argc, char* argv[])
         else if (do_stlpq) {
             Container<stlpq_type> cstlpq(*stlpq);
             ::do_dijkstra(cstlpq, n, m);
-        }
-        else if (do_tbbpq) {
-            STXXL_MSG("TBB not supported yet");
         }
     }
     else if (do_ppq)
@@ -1296,9 +1291,6 @@ int benchmark_pqs(int argc, char* argv[])
                 do_read(cstlpq);
             }
         }
-    }
-    else if (do_tbbpq) {
-        STXXL_MSG("TBB not supported yet");
     }
 
     return EXIT_SUCCESS;
