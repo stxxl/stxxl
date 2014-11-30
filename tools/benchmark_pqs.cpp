@@ -918,13 +918,14 @@ bool do_check = false;
 bool do_bulk = false;
 bool do_intermixed = false;
 bool do_parallel = false;
-bool do_fill = false;
+bool do_prefill = false;
+bool do_no_read = false;
 
 template <typename ContainerType>
 void run_benchmark(ContainerType& c)
 {
     scoped_print_timer timer("Running selected benchmarks on " + c.name(),
-                             (do_fill ? 4 : 2) * num_elements * value_size);
+                             (do_prefill ? 4 : 2) * num_elements * value_size);
 
     if (do_bulk) {
         if (do_intermixed) {
@@ -932,10 +933,10 @@ void run_benchmark(ContainerType& c)
                 do_bulk_intermixed_check(c, do_parallel);
             }
             else {
-                if (do_fill) {
+                if (do_prefill) {
                     do_bulk_rand_insert(c, seed, do_parallel);
                 }
-                do_bulk_rand_intermixed(c, seed, do_fill, do_parallel);
+                do_bulk_rand_intermixed(c, seed, do_prefill, do_parallel);
             }
         }
         else {
@@ -949,34 +950,34 @@ void run_benchmark(ContainerType& c)
                 STXXL_CHECK(!do_random);
                 do_read_check(c);
             }
-            else {
+            else if (!do_no_read) {
                 do_read(c);
             }
         }
     }
     else {
         if (do_intermixed) {
-            if (do_fill) {
+            if (do_prefill) {
                 do_rand_insert(c, seed);
             }
-            do_rand_intermixed(c, seed, do_fill);
-            c.print_stats();
-            return;
-        }
-        if (do_random) {
-            do_rand_insert(c, seed);
+            do_rand_intermixed(c, seed, do_prefill);
         }
         else {
-            do_insert(c);
-        }
-        if (do_random && do_check) {
-            do_rand_read_check(c, seed);
-        }
-        else if (do_check) {
-            do_read_check(c);
-        }
-        else {
-            do_read(c);
+            if (do_random) {
+                do_rand_insert(c, seed);
+            }
+            else {
+                do_insert(c);
+            }
+            if (do_random && do_check) {
+                do_rand_read_check(c, seed);
+            }
+            else if (do_check) {
+                do_read_check(c);
+            }
+            else if (!do_no_read) {
+                do_read(c);
+            }
         }
     }
     c.print_stats();
@@ -1016,8 +1017,10 @@ int benchmark_pqs(int argc, char* argv[])
     cp.add_flag('c', "check", "Check results", do_check);
     cp.add_flag('b', "bulk", "Use bulk insert", do_bulk);
     cp.add_flag('i', "intermixed", "Intermixed insert/delete", do_intermixed);
-    cp.add_flag('f', "fill", "Fill queue before starting intermixed insert/delete (only with -i and without -r and -c together)", do_fill);
-    cp.add_flag('a', "flushtohd", "Flush insertion heaps directly into external memory", do_flush_directly);
+
+    cp.add_flag(0, "prefill", "Prefill queue before starting intermixed insert/delete (only with -i and without -r and -c together)", do_prefill);
+    cp.add_flag(0, "flushtohd", "Flush insertion heaps directly into external memory", do_flush_directly);
+    cp.add_flag(0, "no-read", "Do not read items from queue after insert", do_no_read);
 
     uint64 temp_volume = 0;
     cp.add_bytes('v', "volume", "Amount of data to insert in Bytes (not recommended for STXXL PQ)", temp_volume);
