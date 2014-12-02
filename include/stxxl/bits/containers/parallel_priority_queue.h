@@ -75,7 +75,8 @@ public:
     //! surrounding vector.
     internal_array() { }
 
-    //! Constructor which takes a value vector. The value vector is empty afterwards.
+    //! Constructor which takes a value vector. The value vector is empty
+    //! afterwards.
     internal_array(std::vector<ValueType>& values)
         : m_values(), m_min_index(0)
     {
@@ -1587,7 +1588,9 @@ public:
                 flush_directly_to_hd();
             }
             else {
-                flush_insertion_heaps();
+                //flush_insertion_heaps();
+                //std::cerr << "flushing heap " << id << "\n";
+                flush_insertion_heap(id);
             }
         }
 
@@ -2084,6 +2087,82 @@ protected:
         m_stats.refill_extract_buffer_time.stop();
     }
 
+    //! Flushes the insertions heap id into an internal array.
+    inline void flush_insertion_heap(unsigned_type id)
+    {
+        size_type ram_needed;
+
+        if (c_merge_sorted_heaps) {
+            ram_needed = m_mem_per_internal_array;
+        }
+        else {
+            ram_needed = m_num_insertion_heaps * m_mem_per_internal_array;
+        }
+
+        // test that enough RAM is available for merged internal array:
+        // otherwise flush the existing internal arrays out to disk.
+        if (m_mem_left < ram_needed) {
+            if (m_internal_size > 0) {
+                flush_internal_arrays();
+                // still not enough?
+                if (m_mem_left < ram_needed)
+                    merge_external_arrays();
+            }
+            else {
+                merge_external_arrays();
+            }
+        }
+
+        m_stats.num_insertion_heap_flushes++;
+        m_stats.insertion_heap_flush_time.start();
+
+        heap_type& insheap = m_proc[id].insertion_heap;
+        size_t size = insheap.size();
+
+        std::sort(insheap.begin(), insheap.end(), m_inv_compare);
+
+        if (size > 0)
+        {
+            internal_array_type temp_array(insheap);
+            m_internal_arrays.swap_back(temp_array);
+            // insheap is empty now, insheap vector was swapped into temp_array.
+
+            if (c_merge_ias_into_eb) {
+                if (!extract_buffer_empty()) {
+                    m_stats.num_new_internal_arrays++;
+                    m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
+                    m_minima.add_internal_array(
+                        static_cast<unsigned>(m_internal_arrays.size()) - 1
+                        );
+                }
+            }
+            else {
+                m_minima.add_internal_array(
+                    static_cast<unsigned>(m_internal_arrays.size()) - 1
+                    );
+            }
+
+            // reserve new insertion heap
+            insheap.reserve(m_insertion_heap_reserve);
+
+            // update item counts
+            m_heaps_size -= size;
+            m_internal_size += size;
+
+            // invalidate player in minima tree
+            m_minima.deactivate_heap(id);
+        }
+
+        m_mem_left -= m_num_insertion_heaps * m_mem_per_internal_array;
+
+        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
+        m_stats.insertion_heap_flush_time.stop();
+
+        if (m_mem_left < m_mem_per_external_array + m_mem_per_internal_array) {
+            flush_internal_arrays();
+        }
+    }
+
     //! Flushes the insertions heaps into an internal array.
     inline void flush_insertion_heaps()
     {
@@ -2178,7 +2257,7 @@ protected:
                 {
                     internal_array_type temp_array(insheap);
                     m_internal_arrays.swap_back(temp_array);
-                    // insheap is empty now. TODO-tb: nope, it was copied?
+                    // insheap is empty now, insheap vector was swapped into temp_array.
 
                     if (c_merge_ias_into_eb) {
                         if (!extract_buffer_empty()) {
