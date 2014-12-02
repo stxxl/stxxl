@@ -1093,7 +1093,7 @@ protected:
     //! \}
 
     //! The size of the bulk currently being inserted
-    size_type m_current_bulk_size;
+    size_type m_bulk_size;
 
     //! If the bulk currently being inserted is very large, this boolean is set
     //! and bulk_push just accumulate the elements for eventual sorting.
@@ -1226,7 +1226,7 @@ public:
           m_insertion_heap_reserve_factor(1 + 1 / m_num_insertion_heaps),
           m_mem_total(total_ram),
           m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
-          m_current_bulk_size(0),
+          m_bulk_size(0),
           m_is_very_large_bulk(false),
           m_extract_buffer_index(0),
           m_heaps_size(0),
@@ -1379,7 +1379,7 @@ public:
      */
     void bulk_push_begin(size_type bulk_size)
     {
-        m_current_bulk_size = bulk_size;
+        m_bulk_size = bulk_size;
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
 
         // if bulk_size is larger than all heaps: use simple aggregation arrays
@@ -1407,7 +1407,7 @@ public:
      */
     void bulk_push(const ValueType& element, const int pe)
     {
-        assert(m_current_bulk_size > 0);
+        assert(m_bulk_size > 0);
 
         if (m_is_very_large_bulk) {
             aggregate_push(element);
@@ -1455,8 +1455,8 @@ public:
             return;
         }
 
-        m_heaps_size += m_current_bulk_size;
-        m_current_bulk_size = 0;
+        m_heaps_size += m_bulk_size;
+        m_bulk_size = 0;
         for (unsigned p = 0; p < m_num_insertion_heaps; ++p) {
             if (!m_proc[p].insertion_heap.empty()) {
                 m_minima.update_heap(p);
