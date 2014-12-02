@@ -231,8 +231,7 @@ public:
 
     //! Output additional stats
     void print_stats()
-    {
-    }
+    { }
 };
 
 // *** Specialization for STXXL PQ

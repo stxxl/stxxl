@@ -1130,7 +1130,7 @@ protected:
         heap_type insertion_heap;
 
         //! alignment should avoid cache thrashing between processors
-    } __attribute__ ((aligned (64)));
+    } __attribute__ ((aligned(64)));
 
     typedef std::vector<ProcessorData> proc_vector_type;
 
@@ -1173,6 +1173,36 @@ protected:
     };
 
     const bool m_do_flush_directly_to_hd;
+
+    /*!
+     * SiftUp a new element from the last position in the heap, reestablishing
+     * the heap invariant. This is identical to std::push_heap, except that it
+     * returns the last element modified by siftUp. Thus we can identify if the
+     * minimum may have changed.
+     */
+    template <typename RandomAccessIterator, typename HeapCompareType>
+    static inline unsigned_type
+    push_heap(RandomAccessIterator first, RandomAccessIterator last,
+              HeapCompareType comp)
+    {
+        typedef typename std::iterator_traits<RandomAccessIterator>::value_type
+            value_type;
+
+        value_type value = _GLIBCXX_MOVE(*(last - 1));
+
+        unsigned_type index = (last - first) - 1;
+        unsigned_type parent = (index - 1) / 2;
+
+        while (index > 0 && comp(*(first + parent), value))
+        {
+            *(first + index) = _GLIBCXX_MOVE(*(first + parent));
+            index = parent;
+            parent = (index - 1) / 2;
+        }
+        *(first + index) = _GLIBCXX_MOVE(value);
+
+        return index;
+    }
 
 public:
     //! \name Initialization
@@ -1543,13 +1573,16 @@ public:
     //! \name std::priority_queue compliant operations
     //! \{
 
-    //! Insert new element
-    //! \param element the element to insert.
-    void push(const ValueType& element)
+    /*!
+     * Insert new element
+     * \param element the element to insert.
+     * \param id number of insertion heap to insert item into
+     */
+    void push(const ValueType& element, unsigned id)
     {
-        unsigned id = rand() % m_num_insertion_heaps;
+        heap_type& insheap = m_proc[id].insertion_heap;
 
-        if (m_proc[id].insertion_heap.size() >= m_insertion_heap_capacity) {
+        if (insheap.size() >= m_insertion_heap_capacity) {
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
             }
@@ -1558,20 +1591,24 @@ public:
             }
         }
 
-        heap_type& insheap = m_proc[id].insertion_heap;
-
-        ValueType old_min;
-        if (insheap.size() > 0) {
-            old_min = insheap[0];
-        }
-
+        // push item to end of heap and siftUp
         insheap.push_back(element);
-        std::push_heap(insheap.begin(), insheap.end(), m_compare);
+        unsigned_type index = push_heap(insheap.begin(), insheap.end(),
+                                        m_compare);
         ++m_heaps_size;
 
-        if (insheap.size() == 1 || m_inv_compare(insheap[0], old_min)) {
+        if (insheap.size() == 1 || index == 0)
             m_minima.update_heap(id);
-        }
+    }
+
+    /*!
+     * Insert new element into a randomly selected insertion heap.
+     * \param element the element to insert.
+     */
+    void push(const ValueType& element)
+    {
+        unsigned id = rand() % m_num_insertion_heaps;
+        return push(element, id);
     }
 
     //! Access the minimum element.
@@ -2155,7 +2192,7 @@ protected:
                     }
 
                     insheap.reserve(m_insertion_heap_reserve);
-                 }
+                }
             }
 
             m_minima.clear_heaps();
