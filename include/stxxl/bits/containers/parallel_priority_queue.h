@@ -1093,9 +1093,6 @@ protected:
 
     //! \}
 
-    //! The size of the bulk currently being inserted
-    size_type m_bulk_size;
-
     //! If the bulk currently being inserted is very large, this boolean is set
     //! and bulk_push just accumulate the elements for eventual sorting.
     bool m_is_very_large_bulk;
@@ -1129,6 +1126,10 @@ protected:
     {
         //! The heaps where new elements are usually inserted into
         heap_type insertion_heap;
+
+        //! The number of items inserted into the insheap during bulk parallel
+        //! access.
+        size_type heap_add_size;
 
         //! alignment should avoid cache thrashing between processors
     } __attribute__ ((aligned(64)));
@@ -1257,7 +1258,6 @@ public:
           m_insertion_heap_reserve_factor(1 + 1 / m_num_insertion_heaps),
           m_mem_total(total_ram),
           m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
-          m_bulk_size(0),
           m_is_very_large_bulk(false),
           m_extract_buffer_index(0),
           m_heaps_size(0),
@@ -1410,12 +1410,11 @@ public:
      */
     void bulk_push_begin(size_type bulk_size)
     {
-        m_bulk_size = bulk_size;
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
 
         // if bulk_size is larger than all heaps: use simple aggregation arrays
         // instead and sort afterwards.
-        if (bulk_size > heap_capacity) {
+        if (bulk_size > heap_capacity && 0) {
             m_is_very_large_bulk = true;
             return;
         }
@@ -1423,10 +1422,12 @@ public:
             if (m_do_flush_directly_to_hd) {
                 flush_directly_to_hd();
             }
-            else {
-                flush_insertion_heaps();
+            else if (m_heaps_size > 0) {
+                //flush_insertion_heaps();
             }
         }
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            m_proc[p].heap_add_size = 0;
     }
 
     /*!
@@ -1434,27 +1435,29 @@ public:
      * Run bulk_push_begin() before using this method.
      *
      * \param element The element to push.
-     * \param pe The id of the insertion heap to use (usually the thread id).
+     * \param p The id of the insertion heap to use (usually the thread id).
      */
-    void bulk_push(const ValueType& element, const int pe)
+    void bulk_push(const ValueType& element, const int p)
     {
-        assert(m_bulk_size > 0);
-
-        if (m_is_very_large_bulk) {
+        if (m_is_very_large_bulk && 0) {
             aggregate_push(element);
             return;
         }
 
-        m_proc[pe].insertion_heap.push_back(element);
+        heap_type& insheap = m_proc[p].insertion_heap;
 
-        std::push_heap(m_proc[pe].insertion_heap.begin(),
-                       m_proc[pe].insertion_heap.end(),
-                       m_compare);
+        if (insheap.size() >= m_insertion_heap_capacity) {
+#pragma omp atomic
+            m_heaps_size += m_proc[p].heap_add_size;
 
-        // The following would avoid problems if the bulk size specified in
-        // bulk_push_begin is not correct.
-        // insertion_size += bulk_size; must then be removed from bulk_push_end().
-        //__sync_fetch_and_add(&insertion_size, 1);
+            m_proc[p].heap_add_size = 0;
+            flush_insertion_heap(p);
+        }
+
+        insheap.push_back(element);
+        std::push_heap(insheap.begin(), insheap.end(), m_compare);
+
+        m_proc[p].heap_add_size++;
     }
 
     /*!
@@ -1486,9 +1489,10 @@ public:
             return;
         }
 
-        m_heaps_size += m_bulk_size;
-        m_bulk_size = 0;
-        for (unsigned p = 0; p < m_num_insertion_heaps; ++p) {
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+        {
+            m_heaps_size += m_proc[p].heap_add_size;
+
             if (!m_proc[p].insertion_heap.empty()) {
                 m_minima.update_heap(p);
             }
@@ -1588,9 +1592,7 @@ public:
                 flush_directly_to_hd();
             }
             else {
-                //flush_insertion_heaps();
-                //std::cerr << "flushing heap " << id << "\n";
-                flush_insertion_heap(id);
+                flush_insertion_heaps();
             }
         }
 
@@ -2090,6 +2092,8 @@ protected:
     //! Flushes the insertions heap id into an internal array.
     inline void flush_insertion_heap(unsigned_type id)
     {
+        if (m_proc[id].insertion_heap.size() == 0) return;
+
         size_type ram_needed;
 
         if (c_merge_sorted_heaps) {
@@ -2102,26 +2106,31 @@ protected:
         // test that enough RAM is available for merged internal array:
         // otherwise flush the existing internal arrays out to disk.
         if (m_mem_left < ram_needed) {
-            if (m_internal_size > 0) {
-                flush_internal_arrays();
-                // still not enough?
-                if (m_mem_left < ram_needed)
+            #pragma omp critical
+            {
+                if (m_internal_size > 0) {
+                    flush_internal_arrays();
+                    // still not enough?
+                    if (m_mem_left < ram_needed)
+                        merge_external_arrays();
+                }
+                else {
                     merge_external_arrays();
-            }
-            else {
-                merge_external_arrays();
+                }
             }
         }
 
+        // TODO: stats are messed up when done in parallel
         m_stats.num_insertion_heap_flushes++;
         m_stats.insertion_heap_flush_time.start();
 
         heap_type& insheap = m_proc[id].insertion_heap;
         size_t size = insheap.size();
 
+        // sort locally, independent of others
         std::sort(insheap.begin(), insheap.end(), m_inv_compare);
 
-        if (size > 0)
+        #pragma omp critical
         {
             internal_array_type temp_array(insheap);
             m_internal_arrays.swap_back(temp_array);
@@ -2159,6 +2168,7 @@ protected:
         m_stats.insertion_heap_flush_time.stop();
 
         if (m_mem_left < m_mem_per_external_array + m_mem_per_internal_array) {
+#pragma omp critical
             flush_internal_arrays();
         }
     }
