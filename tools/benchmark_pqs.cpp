@@ -362,6 +362,7 @@ void do_read(ContainerType& c)
     for (uint64 i = 0; i < num_elements; ++i)
     {
         STXXL_CHECK(!c.empty());
+        STXXL_CHECK_EQUAL(c.size(), num_elements - i);
         c.pop();
         progress("Popped element", i, num_elements);
     }
@@ -376,6 +377,8 @@ void do_read_check(ContainerType& c)
     for (uint64 i = 0; i < num_elements; ++i)
     {
         STXXL_CHECK(!c.empty());
+        STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+
         value_type top = c.top_pop();
 
         STXXL_CHECK_EQUAL(top.first, i + 1);
