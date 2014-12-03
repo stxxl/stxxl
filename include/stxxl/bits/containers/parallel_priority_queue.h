@@ -1412,20 +1412,25 @@ public:
     {
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
 
-        // if bulk_size is larger than all heaps: use simple aggregation arrays
-        // instead and sort afterwards.
+        // if bulk_size is large: use simple aggregation instead of keeping the
+        // heap property and sort everything afterwards.
         if (bulk_size > heap_capacity && 0) {
             m_is_very_large_bulk = true;
-            return;
         }
-        if (bulk_size + m_heaps_size > heap_capacity) {
-            if (m_do_flush_directly_to_hd) {
-                flush_directly_to_hd();
-            }
-            else if (m_heaps_size > 0) {
-                //flush_insertion_heaps();
+        else {
+            m_is_very_large_bulk = false;
+
+            if (bulk_size + m_heaps_size > heap_capacity) {
+                if (m_do_flush_directly_to_hd) {
+                    flush_directly_to_hd();
+                }
+                else if (m_heaps_size > 0) {
+                    //flush_insertion_heaps();
+                }
             }
         }
+
+        // zero bulk insertion counters
         for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             m_proc[p].heap_add_size = 0;
     }
@@ -1439,23 +1444,53 @@ public:
      */
     void bulk_push(const ValueType& element, const int p)
     {
-        if (m_is_very_large_bulk && 0) {
-            aggregate_push(element);
-            return;
-        }
-
         heap_type& insheap = m_proc[p].insertion_heap;
 
-        if (insheap.size() >= m_insertion_heap_capacity) {
+        if (!m_is_very_large_bulk && 0)
+        {
+            // if small bulk: if heap is full -> sort locally and put into
+            // internal array list. insert items and keep heap invariant.
+            if (insheap.size() >= m_insertion_heap_capacity) {
 #pragma omp atomic
-            m_heaps_size += m_proc[p].heap_add_size;
+                m_heaps_size += m_proc[p].heap_add_size;
 
-            m_proc[p].heap_add_size = 0;
-            flush_insertion_heap(p);
+                m_proc[p].heap_add_size = 0;
+                flush_insertion_heap(p);
+            }
+
+            // put item onto heap and siftUp
+            insheap.push_back(element);
+            std::push_heap(insheap.begin(), insheap.end(), m_compare);
         }
+        else if (!m_is_very_large_bulk && 1)
+        {
+            // if small bulk: if heap is full -> sort locally and put into
+            // internal array list. insert items but DO NOT keep heap
+            // invariant.
+            if (insheap.size() >= m_insertion_heap_capacity) {
+#pragma omp atomic
+                m_heaps_size += m_proc[p].heap_add_size;
 
-        insheap.push_back(element);
-        std::push_heap(insheap.begin(), insheap.end(), m_compare);
+                m_proc[p].heap_add_size = 0;
+                flush_insertion_heap(p);
+            }
+
+            // put item onto heap and DO NOT siftUp
+            insheap.push_back(element);
+        }
+        else // m_is_very_large_bulk
+        {
+            if (insheap.size() >= 2 * 1024 * 1024) {
+#pragma omp atomic
+                m_heaps_size += m_proc[p].heap_add_size;
+
+                m_proc[p].heap_add_size = 0;
+                flush_insertion_heap(p);
+            }
+
+            // put onto insertion heap but do not keep heap property
+            insheap.push_back(element);
+        }
 
         m_proc[p].heap_add_size++;
     }
@@ -1483,20 +1518,76 @@ public:
      */
     void bulk_push_end()
     {
-        if (m_is_very_large_bulk) {
-            flush_aggregated_pushes();
-            m_is_very_large_bulk = false;
-            return;
-        }
-
-        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+        if (!m_is_very_large_bulk && 0)
         {
-            m_heaps_size += m_proc[p].heap_add_size;
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                m_heaps_size += m_proc[p].heap_add_size;
 
-            if (!m_proc[p].insertion_heap.empty()) {
-                m_minima.update_heap(p);
+                if (!m_proc[p].insertion_heap.empty())
+                    m_minima.update_heap(p);
             }
         }
+        else if (!m_is_very_large_bulk && 1)
+        {
+#pragma omp parallel for
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                // reestablish heap property: siftUp only those items pushed
+                for (unsigned_type index = m_proc[p].heap_add_size; index != 0; ) {
+                    std::push_heap(m_proc[p].insertion_heap.begin(),
+                                   m_proc[p].insertion_heap.end() - (--index),
+                                   m_compare);
+                }
+
+#pragma omp atomic
+                m_heaps_size += m_proc[p].heap_add_size;
+            }
+
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                if (!m_proc[p].insertion_heap.empty())
+                    m_minima.update_heap(p);
+            }
+        }
+        else // m_is_very_large_bulk
+        {
+#pragma omp parallel for
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                if (m_proc[p].insertion_heap.size() >= m_insertion_heap_capacity) {
+                    // flush out overfull insertion heap arrays
+#pragma omp atomic
+                    m_heaps_size += m_proc[p].heap_add_size;
+
+                    m_proc[p].heap_add_size = 0;
+                    flush_insertion_heap(p);
+                }
+                else {
+                    // reestablish heap property: siftUp only those items pushed
+                    for (unsigned_type index = m_proc[p].heap_add_size; index != 0; ) {
+                        std::push_heap(m_proc[p].insertion_heap.begin(),
+                                       m_proc[p].insertion_heap.end() - (--index),
+                                       m_compare);
+                    }
+
+#pragma omp atomic
+                    m_heaps_size += m_proc[p].heap_add_size;
+                    m_proc[p].heap_add_size = 0;
+                }
+            }
+
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                if (!m_proc[p].insertion_heap.empty())
+                    m_minima.update_heap(p);
+            }
+        }
+
+        // TODO: this is really expensive, remove it before release.
+        assert(std::is_heap(m_proc[p].insertion_heap.begin(),
+                            m_proc[p].insertion_heap.end(),
+                            m_compare));
     }
 
     /*!
@@ -2155,6 +2246,7 @@ protected:
             insheap.reserve(m_insertion_heap_reserve);
 
             // update item counts
+#pragma omp atomic
             m_heaps_size -= size;
             m_internal_size += size;
 

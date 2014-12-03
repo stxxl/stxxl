@@ -359,6 +359,8 @@ void do_read(ContainerType& c)
     scoped_print_timer timer("Reading " + c.name(),
                              num_elements * value_size);
 
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
+
     for (uint64 i = 0; i < num_elements; ++i)
     {
         STXXL_CHECK(!c.empty());
@@ -373,6 +375,8 @@ void do_read_check(ContainerType& c)
 {
     scoped_print_timer timer("Reading " + c.name() + " and checking order",
                              num_elements * value_size);
+
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
 
     for (uint64 i = 0; i < num_elements; ++i)
     {
