@@ -1007,7 +1007,6 @@ int benchmark_pqs(int argc, char* argv[])
     bool do_stlpq = false;
 
     bool do_dijkstra = false;
-    bool do_flush_directly = false;
 
     stxxl::cmdline_parser cp;
     cp.set_description(description);
@@ -1025,7 +1024,6 @@ int benchmark_pqs(int argc, char* argv[])
     cp.add_flag('i', "intermixed", "Intermixed insert/delete", do_intermixed);
 
     cp.add_flag(0, "prefill", "Prefill queue before starting intermixed insert/delete (only with -i and without -r and -c together)", do_prefill);
-    cp.add_flag(0, "flushtohd", "Flush insertion heaps directly into external memory", do_flush_directly);
     cp.add_flag(0, "no-read", "Do not read items from queue after insert", do_no_read);
 
     uint64 temp_volume = 0;
@@ -1079,8 +1077,7 @@ int benchmark_pqs(int argc, char* argv[])
 #if STXXL_PARALLEL
         ppq = new ppq_type(value_type_cmp_greater(),
                            RAM, num_prefetchers, num_write_buffers,
-                           num_insertion_heaps, single_heap_ram, extract_buffer_ram,
-                           do_flush_directly);
+                           num_insertion_heaps, single_heap_ram, extract_buffer_ram);
 #endif
     }
     else if (do_stxxlpq) {

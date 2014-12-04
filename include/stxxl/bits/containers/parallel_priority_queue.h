@@ -1174,8 +1174,6 @@ protected:
         { return a.empty(); }
     };
 
-    const bool m_do_flush_directly_to_hd;
-
     /*!
      * SiftUp a new element from the last position in the heap, reestablishing
      * the heap invariant. This is identical to std::push_heap, except that it
@@ -1233,9 +1231,6 @@ public:
      * \param extract_buffer_ram Memory usage for the extract buffer. Only
      * relevant if c_limit_extract_buffer==true. 0 = Default = total_ram *
      * c_default_extract_buffer_ram_part.
-     *
-     * \param flush_directly_to_hd Do not flush into internal arrays when there
-     * is RAM left but flush directly into an external array.
      */
     parallel_priority_queue(
         const compare_type& compare = compare_type(),
@@ -1244,8 +1239,7 @@ public:
         unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
         unsigned_type num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
-        size_type extract_buffer_ram = 0,
-        bool flush_directly_to_hd = false)
+        size_type extract_buffer_ram = 0)
         : m_compare(compare),
           m_inv_compare(m_compare),
           m_num_prefetchers(num_prefetch_buffer_blocks),
@@ -1265,8 +1259,7 @@ public:
           m_internal_size(0),
           m_external_size(0),
           m_proc(m_num_insertion_heaps),
-          m_minima(*this),
-          m_do_flush_directly_to_hd(flush_directly_to_hd)
+          m_minima(*this)
     {
         srand(static_cast<unsigned>(time(NULL)));
 
@@ -1347,23 +1340,12 @@ protected:
             m_mem_left -= m_mem_for_heaps;
         }
 
-        if (m_do_flush_directly_to_hd) {
-            if (m_mem_left < 2 * m_mem_per_external_array) {
-                STXXL_ERRMSG("Insufficent memory.");
-                exit(EXIT_FAILURE);
-            }
-            else if (m_mem_left < 4 * m_mem_per_external_array) {
-                STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
-            }
+        if (m_mem_left < 2 * m_mem_per_external_array + m_mem_per_internal_array) {
+            STXXL_ERRMSG("Insufficent memory.");
+            exit(EXIT_FAILURE);
         }
-        else {
-            if (m_mem_left < 2 * m_mem_per_external_array + m_mem_per_internal_array) {
-                STXXL_ERRMSG("Insufficent memory.");
-                exit(EXIT_FAILURE);
-            }
-            else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_per_internal_array) {
-                STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
-            }
+        else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_per_internal_array) {
+            STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
         }
     }
 
@@ -1421,10 +1403,7 @@ public:
             m_is_very_large_bulk = false;
 
             if (bulk_size + m_heaps_size > heap_capacity) {
-                if (m_do_flush_directly_to_hd) {
-                    flush_directly_to_hd();
-                }
-                else if (m_heaps_size > 0) {
+                if (m_heaps_size > 0) {
                     //flush_insertion_heaps();
                 }
             }
@@ -1679,12 +1658,7 @@ public:
         heap_type& insheap = m_proc[id].insertion_heap;
 
         if (insheap.size() >= m_insertion_heap_capacity) {
-            if (m_do_flush_directly_to_hd) {
-                flush_directly_to_hd();
-            }
-            else {
-                flush_insertion_heaps();
-            }
+            flush_insertion_heaps();
         }
 
         // push item to end of heap and siftUp
@@ -1952,7 +1926,6 @@ public:
             STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(ValueType));
         }
 
-        STXXL_VARDUMP(m_do_flush_directly_to_hd);
 #if STXXL_PARALLEL
         STXXL_VARDUMP(omp_get_max_threads());
 #endif
@@ -2629,12 +2602,7 @@ protected:
             return;
         }
 
-        if (m_do_flush_directly_to_hd) {
-            flush_array_to_hd(values);
-        }
-        else {
-            flush_array_internal(values);
-        }
+        flush_array_internal(values);
     }
 
     //! Struct of all statistical counters and timers.  Turn on/off statistics
