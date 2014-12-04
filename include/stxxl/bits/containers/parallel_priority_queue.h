@@ -138,6 +138,12 @@ public:
         return (m_values.size() - m_min_index);
     }
 
+    //! Return the amount of internal memory used by the array
+    inline size_t capacity() const
+    {
+        return m_values.capacity();
+    }
+
     //! Begin iterator
     inline iterator begin()
     {
@@ -1349,6 +1355,64 @@ protected:
         }
     }
 
+    //! Assert many invariants of the data structures.
+    void check_invariants()
+    {
+        size_type mem_used = 0;
+
+        mem_used += 2 * m_mem_for_heaps - m_num_write_buffers * block_size;
+
+        // test the processor local data structures
+
+        size_type heaps_size = 0;
+
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+        {
+            // check that each insertion heap is a heap
+
+            // TODO: remove soon, because this is very expensive
+            STXXL_CHECK(1 || std::is_heap(m_proc[p].insertion_heap.begin(),
+                                          m_proc[p].insertion_heap.end(),
+                                          m_compare));
+
+            STXXL_CHECK(m_proc[p].insertion_heap.capacity() <= m_insertion_heap_capacity);
+
+            heaps_size += m_proc[p].insertion_heap.size();
+            mem_used += m_proc[p].insertion_heap.size();
+        }
+
+        STXXL_CHECK(m_heaps_size == heaps_size);
+
+        // count number of items and memory size of internal arrays
+
+        size_type internal_size = 0;
+        size_type internal_memory = 0;
+
+        for (typename internal_arrays_type::iterator ia = m_internal_arrays.begin();
+             ia != m_internal_arrays.end(); ++ia)
+        {
+            internal_size += ia->size();
+            internal_memory += ia->capacity();
+        }
+
+        STXXL_CHECK(m_internal_size == internal_size);
+        mem_used += internal_size;
+
+        // count number of items in external arrays
+
+        size_type external_size = 0;
+
+        for (typename external_arrays_type::iterator ea = m_external_arrays.begin();
+             ea != m_external_arrays.end(); ++ea)
+        {
+            external_size += ea->size();
+        }
+
+        STXXL_CHECK(m_external_size == external_size);
+
+        // TODO: calculate mem_used so that == mem_total - mem_left
+    }
+
     //! \}
 
     //! \name Properties
@@ -1564,9 +1628,7 @@ public:
         }
 
         // TODO: this is really expensive, remove it before release.
-        assert(std::is_heap(m_proc[p].insertion_heap.begin(),
-                            m_proc[p].insertion_heap.end(),
-                            m_compare));
+        check_invariants();
     }
 
     /*!
