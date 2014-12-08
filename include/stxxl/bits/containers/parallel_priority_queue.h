@@ -47,6 +47,9 @@
 
 STXXL_BEGIN_NAMESPACE
 
+#define STXXL_VERBOSE1_PPQ(msg) STXXL_MSG("ppq[" << static_cast<const void*>(this) << "]::" << msg)
+#define STXXL_VERBOSE2_PPQ(msg) STXXL_VERBOSE1("ppq[" << static_cast<const void*>(this) << "]::" << msg)
+
 namespace ppq_local {
 
 /*!
@@ -139,9 +142,9 @@ public:
     }
 
     //! Return the amount of internal memory used by the array
-    inline size_t capacity() const
+    inline size_t int_memory() const
     {
-        return m_values.capacity();
+        return m_values.capacity() * sizeof(ValueType);
     }
 
     //! Begin iterator
@@ -1066,15 +1069,13 @@ protected:
     const unsigned m_num_insertion_heaps;
 
     //! Capacity of one inserion heap
-    size_type m_insertion_heap_capacity;
+    const unsigned m_insertion_heap_capacity;
 
-    //! Using this parameter you can reserve more space for the insertion heaps
-    //! than visible to the algorithm.  This avoids memory allocation if the
-    //! data is not distributed evenly among the heaps.
-    const double m_insertion_heap_reserve_factor;
-
-    //! Size to reserve in each insertion heap: capacity times reserve_factor
-    size_type m_insertion_heap_reserve;
+    //! Return size of insertion heap reservation in bytes
+    size_type insertion_heap_int_memory() const
+    {
+        return m_insertion_heap_capacity * sizeof(value_type);
+    }
 
     //! Total amount of internal memory
     const size_type m_mem_total;
@@ -1092,10 +1093,6 @@ protected:
     //! Amount of internal memory an external array needs during it's lifetime
     //! in bytes
     size_type m_mem_per_external_array;
-
-    //! Amount of internal memory an internal array needs during it's lifetime
-    //! in bytes
-    size_type m_mem_per_internal_array;
 
     //! \}
 
@@ -1165,7 +1162,7 @@ protected:
     //! \}
 
     /*
-     * Helper class needed to remove empty external arrays.
+     * Helper function to remove empty internal/external arrays.
      */
 
     //! Unary operator which returns true if the external array has run empty.
@@ -1179,6 +1176,25 @@ protected:
         bool operator () (internal_array_type& a) const
         { return a.empty(); }
     };
+
+    //! Clean up empty internal arrays, free their memory and capacity
+    void cleanup_internal_arrays()
+    {
+        typename internal_arrays_type::iterator swapend =
+            stxxl::swap_remove_if(m_internal_arrays.begin(),
+                                  m_internal_arrays.end(),
+                                  empty_internal_array_eraser());
+
+        size_type size_removed = 0;
+
+        for (typename internal_arrays_type::iterator i = swapend;
+             i != m_internal_arrays.end(); ++i)
+        {
+            m_mem_left += i->int_memory();
+        }
+
+        m_internal_arrays.erase(swapend, m_internal_arrays.end());
+    }
 
     /*!
      * SiftUp a new element from the last position in the heap, reestablishing
@@ -1255,7 +1271,7 @@ public:
 #else
           m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : 1),
 #endif
-          m_insertion_heap_reserve_factor(1 + 1 / m_num_insertion_heaps),
+          m_insertion_heap_capacity(single_heap_ram / sizeof(ValueType)),
           m_mem_total(total_ram),
           m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
           m_is_very_large_bulk(false),
@@ -1275,17 +1291,16 @@ public:
                                      : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(ValueType)));
         }
 
-        m_insertion_heap_capacity = m_mem_for_heaps / (m_num_insertion_heaps * sizeof(ValueType));
-
-        // calculate size to reserve for each insertion heap
-        m_insertion_heap_reserve =
-            (size_type)((double)(m_insertion_heap_capacity) *
-                        m_insertion_heap_reserve_factor);
+        init_memmanagement();
 
         for (size_t i = 0; i < m_num_insertion_heaps; ++i)
-            m_proc[i].insertion_heap.reserve(m_insertion_heap_reserve);
+        {
+            m_proc[i].insertion_heap.reserve(m_insertion_heap_capacity);
+            assert(m_proc[i].insertion_heap.capacity() * sizeof(value_type)
+                   == insertion_heap_int_memory());
+        }
 
-        init_memmanagement();
+        m_mem_left -= m_num_insertion_heaps * insertion_heap_int_memory();
 
         m_external_arrays.reserve(c_num_reserved_external_arrays);
 
@@ -1295,6 +1310,8 @@ public:
         else {
             m_internal_arrays.reserve(m_mem_total * m_num_insertion_heaps / m_mem_for_heaps);
         }
+
+        check_invariants();
     }
 
     //! Destructor.
@@ -1311,46 +1328,26 @@ protected:
         // prefetch blocks + first block of array
         m_mem_per_external_array = (m_num_prefetchers + 1) * block_size;
 
-        if (c_merge_sorted_heaps) {
-            // all heaps become one internal array
-            m_mem_per_internal_array = m_mem_for_heaps;
-        }
-        else {
-            // each heap becomes one internal array
-            m_mem_per_internal_array = m_mem_for_heaps / m_num_insertion_heaps;
-        }
-
         if (c_limit_extract_buffer) {
             // ram for the extract buffer
-            m_mem_left -= m_extract_buffer_limit * sizeof(ValueType);
+            //TODO m_mem_left -= m_extract_buffer_limit * sizeof(ValueType);
         }
         else {
             // each: part of the (maximum) ram for the extract buffer
-
             m_mem_per_external_array += block_size;
-
-            if (c_merge_ias_into_eb) {
-                // we have to reserve space in the size of the whole array:
-                // very inefficient!
-                if (c_merge_sorted_heaps) {
-                    m_mem_per_internal_array += m_mem_for_heaps;
-                }
-                else {
-                    m_mem_per_internal_array += m_mem_for_heaps / m_num_insertion_heaps;
-                }
-            }
         }
 
         if (c_merge_sorted_heaps) {
             // part of the ram for the merge buffer
-            m_mem_left -= m_mem_for_heaps;
+            //TODO m_mem_left -= m_mem_for_heaps;
         }
 
-        if (m_mem_left < 2 * m_mem_per_external_array + m_mem_per_internal_array) {
-            STXXL_ERRMSG("Insufficent memory.");
+        if (m_mem_left < 2 * m_mem_per_external_array + m_mem_for_heaps) {
+            STXXL_ERRMSG("Insufficent memory: " << m_mem_for_heaps << " < "
+                         << 2 * m_mem_per_external_array + m_mem_for_heaps);
             exit(EXIT_FAILURE);
         }
-        else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_per_internal_array) {
+        else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_for_heaps) {
             STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
         }
     }
@@ -1360,7 +1357,7 @@ protected:
     {
         size_type mem_used = 0;
 
-        mem_used += 2 * m_mem_for_heaps - m_num_write_buffers * block_size;
+        mem_used += 2 * m_mem_for_heaps + m_num_write_buffers * block_size;
 
         // test the processor local data structures
 
@@ -1378,39 +1375,44 @@ protected:
             STXXL_CHECK(m_proc[p].insertion_heap.capacity() <= m_insertion_heap_capacity);
 
             heaps_size += m_proc[p].insertion_heap.size();
-            mem_used += m_proc[p].insertion_heap.size();
+            mem_used += m_proc[p].insertion_heap.capacity() * sizeof(value_type);
         }
 
         STXXL_CHECK(m_heaps_size == heaps_size);
 
         // count number of items and memory size of internal arrays
 
-        size_type internal_size = 0;
-        size_type internal_memory = 0;
+        size_type ia_size = 0;
+        size_type ia_memory = 0;
 
         for (typename internal_arrays_type::iterator ia = m_internal_arrays.begin();
              ia != m_internal_arrays.end(); ++ia)
         {
-            internal_size += ia->size();
-            internal_memory += ia->capacity();
+            ia_size += ia->size();
+            ia_memory += ia->int_memory();
         }
 
-        STXXL_CHECK(m_internal_size == internal_size);
-        mem_used += internal_size;
+        STXXL_CHECK(m_internal_size == ia_size);
+        mem_used += ia_memory;
 
         // count number of items in external arrays
 
-        size_type external_size = 0;
+        size_type ea_size = 0;
+        size_type ea_memory = 0;
 
         for (typename external_arrays_type::iterator ea = m_external_arrays.begin();
              ea != m_external_arrays.end(); ++ea)
         {
-            external_size += ea->size();
+            ea_size += ea->size();
+            ea_memory += m_mem_per_external_array;
         }
 
-        STXXL_CHECK(m_external_size == external_size);
+        STXXL_CHECK(m_external_size == ea_size);
+        mem_used += ea_memory;
 
-        // TODO: calculate mem_used so that == mem_total - mem_left
+        // calculate mem_used so that == mem_total - mem_left
+
+        STXXL_CHECK_EQUAL(memory_consumption(), mem_used);
     }
 
     //! \}
@@ -1434,6 +1436,7 @@ public:
     //! The memory consumption in Bytes.
     inline size_type memory_consumption() const
     {
+        assert(m_mem_total >= m_mem_left);
         return (m_mem_total - m_mem_left);
     }
 
@@ -1501,6 +1504,8 @@ public:
                 flush_insertion_heap(p);
             }
 
+            assert(insheap.size() < insheap.capacity());
+
             // put item onto heap and siftUp
             insheap.push_back(element);
             std::push_heap(insheap.begin(), insheap.end(), m_compare);
@@ -1518,6 +1523,8 @@ public:
                 flush_insertion_heap(p);
             }
 
+            assert(insheap.size() < insheap.capacity());
+
             // put item onto heap and DO NOT siftUp
             insheap.push_back(element);
         }
@@ -1530,6 +1537,8 @@ public:
                 m_proc[p].heap_add_size = 0;
                 flush_insertion_heap(p);
             }
+
+            assert(insheap.size() < insheap.capacity());
 
             // put onto insertion heap but do not keep heap property
             insheap.push_back(element);
@@ -1627,7 +1636,6 @@ public:
             }
         }
 
-        // TODO: this is really expensive, remove it before release.
         check_invariants();
     }
 
@@ -1804,12 +1812,10 @@ public:
 
             m_heaps_size--;
 
-            if (!insheap.empty()) {
+            if (!insheap.empty())
                 m_minima.update_heap(index);
-            }
-            else {
+            else
                 m_minima.deactivate_heap(index);
-            }
 
             break;
         }
@@ -1820,12 +1826,10 @@ public:
             assert(m_extract_buffer_size > 0);
             --m_extract_buffer_size;
 
-            if (!extract_buffer_empty()) {
+            if (!extract_buffer_empty())
                 m_minima.update_extract_buffer();
-            }
-            else {
+            else
                 m_minima.deactivate_extract_buffer();
-            }
 
             break;
         }
@@ -1835,14 +1839,11 @@ public:
             m_internal_arrays[index].inc_min();
             m_internal_size--;
 
-            if (!(m_internal_arrays[index].empty())) {
+            if (!(m_internal_arrays[index].empty()))
                 m_minima.update_internal_array(index);
-            }
-            else {
+            else
                 // internal array has run empty
                 m_minima.deactivate_internal_array(index);
-                m_mem_left += m_mem_per_internal_array;
-            }
 
             break;
         }
@@ -1855,14 +1856,11 @@ public:
             m_external_arrays[index].remove_first_n_elements(1);
             m_external_arrays[index].wait_for_first_block();
 
-            if (!m_external_arrays[index].empty()) {
+            if (!m_external_arrays[index].empty())
                 m_minima.update_external_array(index);
-            }
-            else {
+            else
                 // external array has run empty
                 m_minima.deactivate_external_array(index);
-                m_mem_left += m_mem_per_external_array;
-            }
 
             break;
         }
@@ -1872,6 +1870,8 @@ public:
         }
 
         m_stats.extract_min_time.stop();
+        check_invariants();
+
         return min;
     }
 
@@ -1973,6 +1973,8 @@ public:
         }
 
         m_stats.external_array_merge_time.stop();
+
+        check_invariants();
     }
 
     //! Print statistics.
@@ -1995,7 +1997,6 @@ public:
         STXXL_MEMDUMP(m_mem_for_heaps);
         STXXL_MEMDUMP(m_mem_left);
         STXXL_MEMDUMP(m_mem_per_external_array);
-        STXXL_MEMDUMP(m_mem_per_internal_array);
 
         //if (num_extract_buffer_refills > 0) {
         //    STXXL_VARDUMP(total_extract_buffer_size / num_extract_buffer_refills);
@@ -2010,6 +2011,10 @@ protected:
     //! Refills the extract buffer from the external arrays.
     inline void refill_extract_buffer()
     {
+        STXXL_VERBOSE1_PPQ("refilling extract buffer");
+
+        check_invariants();
+
         assert(extract_buffer_empty());
         assert(m_extract_buffer_size == 0);
         m_extract_buffer_index = 0;
@@ -2022,7 +2027,7 @@ protected:
 
         if (c_merge_ias_into_eb) {
             m_minima.clear_internal_arrays();
-            m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
+            cleanup_internal_arrays();
             ias = m_internal_arrays.size();
         }
         else {
@@ -2196,69 +2201,60 @@ protected:
         size_type num_deleted_arrays = eas - m_external_arrays.size();
         if (num_deleted_arrays > 0) {
             m_mem_left += num_deleted_arrays * m_mem_per_external_array;
+            std::cerr << "test1\n";
         }
 
         m_stats.num_new_external_arrays = 0;
 
-        if (c_merge_ias_into_eb) {
-            m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(), empty_internal_array_eraser()), m_internal_arrays.end());
-            size_type num_deleted_internal_arrays = ias - m_internal_arrays.size();
-            if (num_deleted_internal_arrays > 0) {
-                m_mem_left += num_deleted_internal_arrays * m_mem_per_internal_array;
-            }
-            m_stats.num_new_internal_arrays = 0;
-        }
+        if (c_merge_ias_into_eb)
+            cleanup_internal_arrays();
 
         m_minima.update_extract_buffer();
 
         m_stats.refill_time_after_merge.stop();
         m_stats.refill_extract_buffer_time.stop();
+
+        check_invariants();
     }
 
     //! Flushes the insertions heap id into an internal array.
     inline void flush_insertion_heap(unsigned_type id)
     {
-        if (m_proc[id].insertion_heap.size() == 0) return;
+        assert(m_proc[id].insertion_heap.size() != 0);
 
-        size_type ram_needed;
+        heap_type& insheap = m_proc[id].insertion_heap;
+        size_t size = insheap.size();
 
-        if (c_merge_sorted_heaps) {
-            ram_needed = m_mem_per_internal_array;
-        }
-        else {
-            ram_needed = m_num_insertion_heaps * m_mem_per_internal_array;
-        }
+        STXXL_VERBOSE1_PPQ("Flushing insertion heap array id=" << id
+                           << " size=" << insheap.size()
+                           << " capacity=" << insheap.capacity()
+                           << " int_memory=" << insheap.capacity() * sizeof(value_type)
+                           << " mem_left=" << m_mem_left);
 
-        // test that enough RAM is available for merged internal array:
-        // otherwise flush the existing internal arrays out to disk.
-        if (m_mem_left < ram_needed) {
-            #pragma omp critical
-            {
+        m_stats.num_insertion_heap_flushes++;
+        stats_timer flush_time(true); // separate timer due to parallel sorting
+
+        // sort locally, independent of others
+        std::sort(insheap.begin(), insheap.end(), m_inv_compare);
+
+#pragma omp critical
+        {
+            // test that enough RAM is available for merged internal array:
+            // otherwise flush the existing internal arrays out to disk.
+            if (m_mem_left < insertion_heap_int_memory()) {
                 if (m_internal_size > 0) {
                     flush_internal_arrays();
                     // still not enough?
-                    if (m_mem_left < ram_needed)
+                    if (m_mem_left < insertion_heap_int_memory())
                         merge_external_arrays();
                 }
                 else {
                     merge_external_arrays();
                 }
             }
-        }
 
-        // TODO: stats are messed up when done in parallel
-        m_stats.num_insertion_heap_flushes++;
-        m_stats.insertion_heap_flush_time.start();
-
-        heap_type& insheap = m_proc[id].insertion_heap;
-        size_t size = insheap.size();
-
-        // sort locally, independent of others
-        std::sort(insheap.begin(), insheap.end(), m_inv_compare);
-
-        #pragma omp critical
-        {
             internal_array_type temp_array(insheap);
+            assert(temp_array.int_memory() == size * sizeof(value_type));
             m_internal_arrays.swap_back(temp_array);
             // insheap is empty now, insheap vector was swapped into temp_array.
 
@@ -2278,7 +2274,12 @@ protected:
             }
 
             // reserve new insertion heap
-            insheap.reserve(m_insertion_heap_reserve);
+            insheap.reserve(m_insertion_heap_capacity);
+            assert(insheap.capacity() * sizeof(value_type)
+                   == insertion_heap_int_memory());
+
+#pragma omp atomic
+            m_mem_left -= insertion_heap_int_memory();
 
             // update item counts
 #pragma omp atomic
@@ -2289,15 +2290,8 @@ protected:
             m_minima.deactivate_heap(id);
         }
 
-        m_mem_left -= m_num_insertion_heaps * m_mem_per_internal_array;
-
         m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
-        m_stats.insertion_heap_flush_time.stop();
-
-        if (m_mem_left < m_mem_per_external_array + m_mem_per_internal_array) {
-#pragma omp critical
-            flush_internal_arrays();
-        }
+        m_stats.insertion_heap_flush_time += flush_time;
     }
 
     //! Flushes the insertions heaps into an internal array.
@@ -2306,10 +2300,10 @@ protected:
         size_type ram_needed;
 
         if (c_merge_sorted_heaps) {
-            ram_needed = m_mem_per_internal_array;
+            ram_needed = m_mem_for_heaps;
         }
         else {
-            ram_needed = m_num_insertion_heaps * m_mem_per_internal_array;
+            ram_needed = insertion_heap_int_memory();
         }
 
         // test that enough RAM is available for merged internal array:
@@ -2330,6 +2324,7 @@ protected:
         m_stats.insertion_heap_flush_time.start();
 
         size_type size = m_heaps_size;
+        size_type int_memory = 0;
         assert(size > 0);
         std::vector<std::pair<value_iterator, value_iterator> > sequences(m_num_insertion_heaps);
 
@@ -2344,9 +2339,11 @@ protected:
 
             if (c_merge_sorted_heaps)
                 sequences[i] = std::make_pair(insheap.begin(), insheap.end());
+
+            int_memory += insheap.capacity();
         }
 
-        if (c_merge_sorted_heaps)
+        if (c_merge_sorted_heaps&&0)
         {
             m_stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
@@ -2361,6 +2358,7 @@ protected:
             m_stats.merge_sorted_heaps_time.stop();
 
             internal_array_type temp_array(merged_array);
+            assert(temp_array.int_memory() == size * sizeof(value_type));
             m_internal_arrays.swap_back(temp_array);
             // merged_array is empty now.
 
@@ -2378,21 +2376,23 @@ protected:
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
                 m_proc[i].insertion_heap.clear();
-                m_proc[i].insertion_heap.reserve(m_insertion_heap_reserve);
+                m_proc[i].insertion_heap.reserve(m_insertion_heap_capacity);
             }
             m_minima.clear_heaps();
 
-            m_mem_left -= m_mem_per_internal_array;
+            m_mem_left -= size * sizeof(value_type);
         }
         else
         {
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
                 heap_type& insheap = m_proc[i].insertion_heap;
+                size_type insheap_capacity = insheap.capacity() * sizeof(value_type);
 
                 if (insheap.size() > 0)
                 {
                     internal_array_type temp_array(insheap);
+                    assert(temp_array.int_memory() == insheap_capacity);
                     m_internal_arrays.swap_back(temp_array);
                     // insheap is empty now, insheap vector was swapped into temp_array.
 
@@ -2407,12 +2407,13 @@ protected:
                         m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
                     }
 
-                    insheap.reserve(m_insertion_heap_reserve);
+                    insheap.reserve(m_insertion_heap_capacity);
                 }
             }
 
             m_minima.clear_heaps();
-            m_mem_left -= m_num_insertion_heaps * m_mem_per_internal_array;
+
+            m_mem_left -= m_num_insertion_heaps * insertion_heap_int_memory();
         }
 
         m_internal_size += size;
@@ -2421,29 +2422,33 @@ protected:
         m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
         m_stats.insertion_heap_flush_time.stop();
 
-        if (m_mem_left < m_mem_per_external_array + m_mem_per_internal_array) {
-            flush_internal_arrays();
-        }
+        check_invariants();
     }
 
     //! Flushes the internal arrays into an external array.
     inline void flush_internal_arrays()
     {
+        STXXL_VERBOSE1_PPQ("Flushing internal arrays into external memory");
+
         m_stats.num_internal_array_flushes++;
         m_stats.internal_array_flush_time.start();
 
         m_minima.clear_internal_arrays();
 
         // clean up internal arrays that have been deleted in extract_min!
-        m_internal_arrays.erase(stxxl::swap_remove_if(m_internal_arrays.begin(), m_internal_arrays.end(),
-                                                      empty_internal_array_eraser()), m_internal_arrays.end());
+        cleanup_internal_arrays();
 
         size_type num_arrays = m_internal_arrays.size();
         size_type size = m_internal_size;
+        size_type int_memory = 0;
         std::vector<std::pair<ValueType*, ValueType*> > sequences(num_arrays);
 
-        for (unsigned i = 0; i < num_arrays; ++i) {
-            sequences[i] = std::make_pair(m_internal_arrays[i].begin(), m_internal_arrays[i].end());
+        for (unsigned i = 0; i < num_arrays; ++i)
+        {
+            sequences[i] = std::make_pair(m_internal_arrays[i].begin(),
+                                          m_internal_arrays[i].end());
+
+            int_memory += m_internal_arrays[i].int_memory();
         }
 
         external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
@@ -2470,8 +2475,8 @@ protected:
 
         a.finish_write_phase();
 
-        m_external_size += size;
         m_internal_size = 0;
+        m_external_size += size;
 
         m_internal_arrays.clear();
         m_stats.num_new_internal_arrays = 0;
@@ -2483,7 +2488,7 @@ protected:
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        m_mem_left += num_arrays * m_mem_per_internal_array;
+        m_mem_left += int_memory;
         m_mem_left -= m_mem_per_external_array;
 
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
@@ -2544,7 +2549,7 @@ protected:
         //#endif
         for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
             m_proc[i].insertion_heap.clear();
-            m_proc[i].insertion_heap.reserve(m_insertion_heap_reserve);
+            m_proc[i].insertion_heap.reserve(m_insertion_heap_capacity);
         }
         m_minima.clear_heaps();
 
@@ -2555,10 +2560,13 @@ protected:
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        m_mem_left -= m_mem_per_external_array;
+        //TODO m_mem_left -= m_mem_per_external_array;
+        STXXL_CHECK(0);
 
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.direct_flush_time.stop();
+
+        check_invariants();
     }
 
     //! Sorts the values from values and writes them into an external array.
@@ -2590,8 +2598,12 @@ protected:
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
-        m_mem_left -= m_mem_per_external_array;
+        //TODO m_mem_left -= m_mem_per_external_array;
+        STXXL_CHECK(0);
+
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
+
+        check_invariants();
     }
 
     /*!
@@ -2626,7 +2638,9 @@ protected:
         }
 
         // TODO: use real value size: ram_left -= 2*values->size()*sizeof(ValueType);
-        m_mem_left -= m_mem_per_internal_array;
+        //TODO m_mem_left -= m_mem_per_internal_array;
+        STXXL_CHECK(0);
+
         m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
 
         // Vector is now owned by PPQ...

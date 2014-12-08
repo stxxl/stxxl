@@ -66,7 +66,7 @@ typedef stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
         STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
-        128* 1024L* 1024L                    /* RamSize */
+        256* 1024L* 1024L                    /* RamSize */
         > ppq_type;
 
 int main()
