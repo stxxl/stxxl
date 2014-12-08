@@ -152,6 +152,30 @@ public:
         assert(i < m_size);
         return *(begin() + i);
     }
+    //! Return reference to first element.
+    reference front()
+    {
+        assert(m_size > 0);
+        return *(m_array);
+    }
+    //! Return constant reference to first element.
+    const_reference front() const
+    {
+        assert(m_size > 0);
+        return *(m_array);
+    }
+    //! Return reference to last element.
+    reference back()
+    {
+        assert(m_size > 0);
+        return *(m_array + m_size - 1);
+    }
+    //! Return reference to last element.
+    const_reference back() const
+    {
+        assert(m_size > 0);
+        return *(m_array + m_size - 1);
+    }
     //! Resize the underlaying array to contain at least newsize items.
     void reserve(size_type newsize)
     {
