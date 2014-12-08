@@ -143,6 +143,16 @@ public:
         return (accumulated);
     }
 
+    //! accumulate elapsed time from another timer
+    inline timer& operator += (const timer& tm)
+    {
+#if STXXL_PARALLEL
+#pragma omp atomic
+#endif
+        accumulated += tm.seconds();
+        return *this;
+    }
+
     //! direct <<-operator for ostream. Can be used for printing with std::cout.
     friend std::ostream& operator << (std::ostream& os, const timer& t)
     {
@@ -195,6 +205,12 @@ public:
     double seconds() const
     {
         return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    //! accumulate elapsed time from another timer
+    inline fake_timer& operator += (const fake_timer&)
+    {
+        return *this;
     }
 
     //! direct <<-operator for ostream. Can be used for printing with std::cout.
