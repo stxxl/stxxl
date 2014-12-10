@@ -134,7 +134,7 @@ public:
 
     /*!
      * Add data to the %queue.
-     * @param  x  Data to be added.
+     * \param  x  Data to be added.
      *
      * This is a typical %queue operation.
      * The time complexity of the operation depends on the underlying
@@ -166,7 +166,7 @@ public:
         --current_size;
     }
 
-    //! Sort all contained elements, write result to @c target.
+    //! Sort all contained elements, write result to \c target.
     void sort_to(value_type* target)
     {
         check_sort_settings();

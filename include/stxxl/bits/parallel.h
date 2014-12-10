@@ -139,12 +139,12 @@ namespace parallel {
 #if STXXL_PARALLEL
 
 /*! Multi-way merging dispatcher.
- * @param seqs_begin Begin iterator of iterator pair input sequence.
- * @param seqs_end End iterator of iterator pair input sequence.
- * @param target Begin iterator out output sequence.
- * @param comp Comparator.
- * @param length Maximum length to merge.
- * @return End iterator of output sequence.
+ * \param seqs_begin Begin iterator of iterator pair input sequence.
+ * \param seqs_end End iterator of iterator pair input sequence.
+ * \param target Begin iterator out output sequence.
+ * \param comp Comparator.
+ * \param length Maximum length to merge.
+ * \return End iterator of output sequence.
  */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3, typename DiffType, typename Comparator>
@@ -165,13 +165,13 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
 }
 
 /*! Multi-way merging front-end.
- * @param seqs_begin Begin iterator of iterator pair input sequence.
- * @param seqs_end End iterator of iterator pair input sequence.
- * @param target Begin iterator out output sequence.
- * @param comp Comparator.
- * @param length Maximum length to merge.
- * @return End iterator of output sequence.
- * @pre For each @c i, @c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element.
+ * \param seqs_begin Begin iterator of iterator pair input sequence.
+ * \param seqs_end End iterator of iterator pair input sequence.
+ * \param target Begin iterator out output sequence.
+ * \param comp Comparator.
+ * \param length Maximum length to merge.
+ * \return End iterator of output sequence.
+ * \pre For each \c i, \c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element.
  */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3, typename DiffType, typename Comparator>

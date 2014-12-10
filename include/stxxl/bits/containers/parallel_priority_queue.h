@@ -1343,8 +1343,8 @@ protected:
         }
 
         if (m_mem_left < 2 * m_mem_per_external_array + m_mem_for_heaps) {
-            STXXL_ERRMSG("Insufficent memory: " << m_mem_for_heaps << " < "
-                         << 2 * m_mem_per_external_array + m_mem_for_heaps);
+            STXXL_ERRMSG("Insufficent memory: " << m_mem_for_heaps << " < " <<
+                         2 * m_mem_per_external_array + m_mem_for_heaps);
             exit(EXIT_FAILURE);
         }
         else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_for_heaps) {
@@ -2225,11 +2225,12 @@ protected:
         heap_type& insheap = m_proc[id].insertion_heap;
         size_t size = insheap.size();
 
-        STXXL_VERBOSE1_PPQ("Flushing insertion heap array id=" << id
-                           << " size=" << insheap.size()
-                           << " capacity=" << insheap.capacity()
-                           << " int_memory=" << insheap.capacity() * sizeof(value_type)
-                           << " mem_left=" << m_mem_left);
+        STXXL_VERBOSE1_PPQ(
+            "Flushing insertion heap array id=" << id <<
+            " size=" << insheap.size() <<
+            " capacity=" << insheap.capacity() <<
+            " int_memory=" << insheap.capacity() * sizeof(value_type) <<
+            " mem_left=" << m_mem_left);
 
         m_stats.num_insertion_heap_flushes++;
         stats_timer flush_time(true); // separate timer due to parallel sorting
@@ -2343,7 +2344,7 @@ protected:
             int_memory += insheap.capacity();
         }
 
-        if (c_merge_sorted_heaps&&0)
+        if (c_merge_sorted_heaps && 0)
         {
             m_stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);

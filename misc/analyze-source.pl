@@ -175,6 +175,17 @@ sub process_cpp {
         }
     }
 
+    # check for @-style doxygen commands
+    {
+        foreach my $ln (@data)
+        {
+            if ($ln =~ m!\@(param|tparam|return|result|c|i)\s!) {
+                print("found \@-style doxygen command in $path\n");
+                system("emacsclient -n $path") if $launch_emacs;
+            }
+        }
+    }
+
     # check for double underscores
     {
         foreach my $ln (@data)

@@ -58,8 +58,8 @@ typedef external_size_type size_type;
  * ideas of Kaerkkaeinen und Burghardt, originally implemented in STXXL by Jens
  * Mehnert (2004), reimplemented using triples by Timo Bingmann (2012).
  *
- * @param InputT is the original text, from which the suffix array was build
- * @param InputSA is the suffix array from InputT
+ * \param InputT is the original text, from which the suffix array was build
+ * \param InputSA is the suffix array from InputT
  *
  * Note: ISA := The inverse of SA
  */
@@ -201,7 +201,7 @@ bool sacheck_vectors(InputT& inputT, InputSA& inputSA)
  *         c) merge mod0-quints, mod1-quads and mod2-quints (-> merge_sa class)
  * Step 3: a) return Suffix Array of T
  *
- * @param offset_type later suffix array data type
+ * \param offset_type later suffix array data type
  */
 template <typename offset_type>
 class skew
@@ -397,9 +397,9 @@ public:
      * i. Since we need at least one unique endcaracter, we free the first
      * characters i.e. we map (t_i) -> (i,t_i,t_{i+1},t_{i+2})
      *
-     * @param Input holds all characters t_i from input string t
-     * @param alphabet_type
-     * @param add_alphabet
+     * \param Input holds all characters t_i from input string t
+     * \param alphabet_type
+     * \param add_alphabet
      */
     template <class Input, typename alphabet_type, const int add_alphabet = 0>
     class make_quads
@@ -545,9 +545,9 @@ public:
      *  comparison-based merging.  More precisely: compare characters(out of
      *  text t) and ranks(out of ISA12) of the following constellation:
      *  Input constellation:
-     *  @param Mod0 5-tuple (quint): <i, t_i, t_{i+1}, ISA12[i+1], ISA12[i+2]>
-     *  @param Mod1 4-tuple (quad): <i, ISA12[i], t_i, ISA12[i+1]>
-     *  @param Mod2 5-tuple (quint): <i, ISA[i], t_i, t_{i+1}, ISA12[i+1]>
+     *  \param Mod0 5-tuple (quint): <i, t_i, t_{i+1}, ISA12[i+1], ISA12[i+2]>
+     *  \param Mod1 4-tuple (quad): <i, ISA12[i], t_i, ISA12[i+1]>
+     *  \param Mod2 5-tuple (quint): <i, ISA[i], t_i, t_{i+1}, ISA12[i+1]>
      */
     template <class Mod0, class Mod1, class Mod2>
     class merge_sa
@@ -720,9 +720,9 @@ public:
     /**
      * Sort mod0-quints / mod1-quads / mod2-quints and run merge_sa class to
      * merge them together.
-     * @param S input string pipe type.
-     * @param Mod1 mod1 tuples input pipe type.
-     * @param Mod2 mod2 tuples input pipe type.
+     * \param S input string pipe type.
+     * \param Mod1 mod1 tuples input pipe type.
+     * \param Mod2 mod2 tuples input pipe type.
      */
     template <class S, class Mod1, class Mod2>
     class build_sa
@@ -943,7 +943,7 @@ public:
     };
 
     /** The skew algorithm.
-     *  @param Input type of the input pipe. */
+     *  \param Input type of the input pipe. */
     template <class Input>
     class algorithm
     {
