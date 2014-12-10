@@ -25,20 +25,24 @@ STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-/** Split a sequence into parts of almost equal size.
+/*!
+ * Split a sequence into parts of almost equal size.
  *
- *  The resulting sequence s of length p+1 contains the splitting positions when
- *  splitting the range [0,n) into parts of almost equal size (plus minus 1).
- *  The first entry is 0, the last one n. There may result empty parts.
- *  \param n Number of elements
- *  \param p Number of parts
- *  \param s Splitters
- *  \returns End of splitter sequence, i. e. \c s+p+1 */
+ * The resulting sequence s of length p+1 contains the splitting positions when
+ * splitting the range [0,n) into parts of almost equal size (plus minus 1).
+ * The first entry is 0, the last one n. There may result empty parts.
+ *
+ * \param n Number of elements
+ * \param p Number of parts
+ * \param s Splitters
+ * \returns End of splitter sequence, i. e. \c s+p+1
+ */
 template <typename DiffType, typename DiffTypeOutputIterator>
-DiffTypeOutputIterator equally_split(DiffType n, thread_index_t p, DiffTypeOutputIterator s)
+DiffTypeOutputIterator equally_split(DiffType n, thread_index_t p,
+                                     DiffTypeOutputIterator s)
 {
     DiffType chunk_length = n / p, split = n % p, start = 0;
-    for (int i = 0; i < p; i++)
+    for (thread_index_t i = 0; i < p; i++)
     {
         *s++ = start;
         start += ((DiffType)i < split) ? (chunk_length + 1) : chunk_length;

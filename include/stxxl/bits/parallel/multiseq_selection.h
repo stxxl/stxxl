@@ -32,7 +32,7 @@ STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-/** Compare a pair of types lexcigraphically, ascending. */
+//! Compare a pair of types lexcigraphically, ascending.
 template <typename T1, typename T2, typename Comparator>
 class lexicographic
 {
@@ -42,7 +42,8 @@ private:
 public:
     lexicographic(Comparator& _comp) : comp(_comp) { }
 
-    inline bool operator () (const std::pair<T1, T2>& p1, const std::pair<T1, T2>& p2)
+    inline bool operator () (const std::pair<T1, T2>& p1,
+                             const std::pair<T1, T2>& p2)
     {
         if (comp(p1.first, p2.first))
             return true;
@@ -50,13 +51,13 @@ public:
         if (comp(p2.first, p1.first))
             return false;
 
-        //firsts are equal
+        // firsts are equal
 
         return p1.second < p2.second;
     }
 };
 
-/** Compare a pair of types lexcigraphically, descending. */
+//! Compare a pair of types lexcigraphically, descending.
 template <typename T1, typename T2, typename Comparator>
 class lexicographic_rev
 {
@@ -66,7 +67,8 @@ private:
 public:
     lexicographic_rev(Comparator& _comp) : comp(_comp) { }
 
-    inline bool operator () (const std::pair<T1, T2>& p1, const std::pair<T1, T2>& p2)
+    inline bool operator () (const std::pair<T1, T2>& p1,
+                             const std::pair<T1, T2>& p2)
     {
         if (comp(p2.first, p1.first))
             return true;
@@ -74,21 +76,29 @@ public:
         if (comp(p1.first, p2.first))
             return false;
 
-        //firsts are equal
+        // firsts are equal
 
         return p2.second < p1.second;
     }
 };
 
-/** Splits several sorted sequences at a certain global rank, resulting in a splitting point for each sequence.
- *  The sequences are passed via a sequence of random-access iterator pairs, none of the sequences may be empty.
- *  If there are several equal elements across the split, the ones on the left side will be chosen from sequences with smaller number.
- *  \param begin_seqs Begin of the sequence of iterator pairs.
- *  \param end_seqs End of the sequence of iterator pairs.
- *  \param rank The global rank to partition at.
- *  \param begin_offsets A random-access sequence begin where the result will be stored in. Each element of the sequence is an iterator that points to the first element on the greater part of the respective sequence.
- *  \param comp The ordering functor, defaults to std::less<T>. */
-template <typename RanSeqs, typename RankType, typename RankIterator, typename Comparator>
+/*!
+ * Splits several sorted sequences at a certain global rank, resulting in a
+ * splitting point for each sequence.  The sequences are passed via a sequence
+ * of random-access iterator pairs, none of the sequences may be empty.  If
+ * there are several equal elements across the split, the ones on the left side
+ * will be chosen from sequences with smaller number.
+ *
+ * \param begin_seqs Begin of the sequence of iterator pairs.
+ * \param end_seqs End of the sequence of iterator pairs.
+ * \param rank The global rank to partition at.
+ * \param begin_offsets A random-access sequence begin where the result will be
+ * stored in. Each element of the sequence is an iterator that points to the
+ * first element on the greater part of the respective sequence.
+ * \param comp The ordering functor, defaults to std::less<T>.
+ */
+template <typename RanSeqs, typename RankType, typename RankIterator,
+          typename Comparator>
 void multiseq_partition(
     RanSeqs begin_seqs, RanSeqs end_seqs,
     RankType rank,
@@ -106,7 +116,8 @@ void multiseq_partition(
     lexicographic<T, int, Comparator> lcomp(comp);
     lexicographic_rev<T, int, Comparator> lrcomp(comp);
 
-    DiffType m = std::distance(begin_seqs, end_seqs), N = 0, nmax, n, r;        //number of sequences, number of elements in total (possibly including padding)
+    // number of sequences, number of elements in total (possibly including padding)
+    DiffType m = std::distance(begin_seqs, end_seqs), N = 0, nmax, n, r;
 
     for (int i = 0; i < m; i++)
         N += std::distance(begin_seqs[i].first, begin_seqs[i].second);
@@ -114,7 +125,7 @@ void multiseq_partition(
     if (rank == N)
     {
         for (int i = 0; i < m; i++)
-            begin_offsets[i] = begin_seqs[i].second;                    //very end
+            begin_offsets[i] = begin_seqs[i].second;              //very end
         //return m - 1;
     }
 
@@ -131,9 +142,11 @@ void multiseq_partition(
     }
 
     r = log2(nmax) + 1;
-    l = (1ULL << r) - 1; //pad all lists to this length, at least as long as any ns[i], equliaty iff nmax = 2^k - 1
+    // pad all lists to this length, at least as long as any ns[i], equliaty
+    // iff nmax = 2^k - 1
+    l = (1ULL << r) - 1;
 
-    N = l * m;           //from now on, including padding
+    N = l * m;           // from now on, including padding
 
     for (int i = 0; i < m; i++)
     {
@@ -297,7 +310,6 @@ void multiseq_partition(
         }
     }
 
-    int seq = 0;
     for (int i = 0; i < m; i++)
         begin_offsets[i] = S(i) + a[i];
 

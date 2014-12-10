@@ -28,9 +28,12 @@ STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-/** Calculates the rounded-down logrithm of \c n for base 2.
- *  \param n Argument.
- *  \return Returns 0 for argument 0. */
+/*!
+ * Calculates the rounded-down logrithm of \c n for base 2.
+ *
+ * \param n Argument.
+ * \return Returns 0 for argument 0.
+ */
 template <typename Size>
 inline Size log2(Size n)
 {
@@ -42,7 +45,8 @@ inline Size log2(Size n)
 
 /** Same functionality as std::partial_sum(). */
 template <typename InputIterator, typename OutputIterator>
-OutputIterator partial_sum(InputIterator begin, InputIterator end, OutputIterator result)
+OutputIterator partial_sum(InputIterator begin, InputIterator end,
+                           OutputIterator result)
 {
     typedef typename std::iterator_traits<OutputIterator>::value_type ValueType;
 
@@ -59,8 +63,10 @@ OutputIterator partial_sum(InputIterator begin, InputIterator end, OutputIterato
 }
 
 /** Same functionality as std::partial_sum(). */
-template <typename InputIterator, typename OutputIterator, typename BinaryOperation>
-OutputIterator partial_sum(InputIterator begin, InputIterator end, OutputIterator result, BinaryOperation binary_op)
+template <typename InputIterator, typename OutputIterator,
+          typename BinaryOperation>
+OutputIterator partial_sum(InputIterator begin, InputIterator end,
+                           OutputIterator result, BinaryOperation binary_op)
 {
     typedef typename std::iterator_traits<InputIterator>::value_type ValueType;
 
@@ -76,7 +82,10 @@ OutputIterator partial_sum(InputIterator begin, InputIterator end, OutputIterato
     return ++result;
 }
 
-/** Alternative to std::not2, typedefs first_argument_type and second_argument_type not needed. */
+/*!
+ * Alternative to std::not2, typedefs first_argument_type and
+ * second_argument_type not needed.
+ */
 template <class Predicate, typename first_argument_type, typename second_argument_type>
 class binary_negate /*: public std::binary_function<first_argument_type, second_argument_type, bool>*/
 {
@@ -87,34 +96,43 @@ public:
     explicit
     binary_negate(const Predicate& _pred) : pred(_pred) { }
 
-    bool operator () (const first_argument_type& x, const second_argument_type& y) const
+    bool operator () (const first_argument_type& x,
+                      const second_argument_type& y) const
     {
         return !pred(x, y);
     }
 };
 
-/** Encode two integers into one mcstl::lcas_t.
- *  \param a First integer, to be encoded in the most-significant \c lcas_t_bits/2 bits.
- *  \param b Second integer, to be encoded in the least-significant \c lcas_t_bits/2 bits.
- *  \return mcstl::lcas_t value encoding \c a and \c b.
- *  \see decode2 */
-inline lcas_t encode2(int a, int b)     //must all be non-negative, actually
+/*!
+ * Encode two integers into one mcstl::lcas_t.
+ *
+ * \param a First integer, to be encoded in the most-significant \c lcas_t_bits/2 bits.
+ * \param b Second integer, to be encoded in the least-significant \c lcas_t_bits/2 bits.
+ * \return mcstl::lcas_t value encoding \c a and \c b.
+ * \see decode2
+ */
+static inline lcas_t encode2(int a, int b) // must all be non-negative, actually
 {
     return (((lcas_t)a) << (lcas_t_bits / 2)) | (((lcas_t)b) << 0);
 }
 
-/** Decode two integers from one mcstl::lcas_t.
- *  \param x mcstl::lcas_t to decode integers from.
- *  \param a First integer, to be decoded from the most-significant \c lcas_t_bits/2 bits of \c x.
- *  \param b Second integer, to be encoded in the least-significant \c lcas_t_bits/2 bits of \c x.
- *  \see encode2 */
-inline void decode2(lcas_t x, int& a, int& b)
+/*!
+ * Decode two integers from one mcstl::lcas_t.
+ *
+ * \param x mcstl::lcas_t to decode integers from.
+ * \param a First integer, to be decoded from the most-significant \c lcas_t_bits/2 bits of \c x.
+ * \param b Second integer, to be encoded in the least-significant \c lcas_t_bits/2 bits of \c x.
+ * \see encode2
+ */
+static inline void decode2(lcas_t x, int& a, int& b)
 {
     a = (int)((x >> (lcas_t_bits / 2)) & lcas_t_mask);
     b = (int)((x >> 0) & lcas_t_mask);
 }
 
-/** Constructs predicate for equality from strict weak ordering predicate */
+/*!
+ * Constructs predicate for equality from strict weak ordering predicate
+ */
 template <class Comparator, typename T1, typename T2>
 class equal_from_less : public std::binary_function<T1, T2, bool>
 {
@@ -126,17 +144,21 @@ public:
 
     bool operator () (const T1& a, const T2& b)
     {
-        return !comp(a, b) && !comp(b, a);              //FIXEM: wrong in general (T1 != T2)
+        //FIXME: wrong in general (T1 != T2)
+        return !comp(a, b) && !comp(b, a);
     }
 };
 
 template <typename T, typename DiffType>
 class pseudo_sequence;
 
-/** Iterator associated with mcstl::pseudo_sequence.
- *  If features the usual random-access iterator functionality.
- *  \param T Sequence value type.
- *  \param DiffType Sequence difference type. */
+/*!
+ * Iterator associated with mcstl::pseudo_sequence.  If features the usual
+ * random-access iterator functionality.
+ *
+ * \param T Sequence value type.
+ * \param DiffType Sequence difference type.
+ */
 template <typename T, typename DiffType>
 class pseudo_sequence_iterator
 {
@@ -191,10 +213,13 @@ public:
     }
 };
 
-/** Sequence that conceptually consists of multiple copies of the same element.
- *  The copies are not stored explicitly, of course.
- *  \param T Sequence value type.
- *  \param DiffType Sequence difference type. */
+/*!
+ * Sequence that conceptually consists of multiple copies of the same element.
+ * The copies are not stored explicitly, of course.
+ *
+ * \param T Sequence value type.
+ * \param DiffType Sequence difference type.
+ */
 template <typename T, typename DiffType>
 class pseudo_sequence
 {
@@ -232,13 +257,18 @@ class void_functor
     { }
 };
 
-/** Compute the median of three referenced elements, according to \c comp.
- *  \param a First iterator.
- *  \param b Second iterator.
- *  \param c Third iterator.
- *  \param comp Comparator. */
+/*!
+ * Compute the median of three referenced elements, according to \c comp.
+ *
+ * \param a First iterator.
+ * \param b Second iterator.
+ * \param c Third iterator.
+ * \param comp Comparator.
+ */
 template <typename RandomAccessIterator, typename Comparator>
-RandomAccessIterator median_of_three_iterators(RandomAccessIterator a, RandomAccessIterator b, RandomAccessIterator c, Comparator& comp)
+RandomAccessIterator
+median_of_three_iterators(RandomAccessIterator a, RandomAccessIterator b,
+                          RandomAccessIterator c, Comparator& comp)
 {
     if (comp(*a, *b))
         if (comp(*b, *c))

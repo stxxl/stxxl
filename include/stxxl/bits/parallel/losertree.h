@@ -27,8 +27,6 @@ STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-#if MCSTL_LOSER_TREE_EXPLICIT
-
 /** Guarded loser tree, copying the whole element into the tree structure.
  *
  *  Guarding is done explicitly through two flags per element, inf and sup
@@ -184,10 +182,6 @@ public:
     }
 };
 
-#endif
-
-#if MCSTL_LOSER_TREE
-
 /** Guarded loser tree, either copying the whole element into the tree structure, or looking up the element via the index.
  *
  *  Guarding is done explicitly through one flag sup per element, inf is not needed due to a better initialization routine.
@@ -223,10 +217,10 @@ public:
         delete[] losers;
     }
 
-    void print()
+    void print(std::ostream& os)
     {
         for (unsigned int i = 0; i < (k * 2); i++)
-            printf("%d    %d from %d,  %d\n", i, losers[i].key, losers[i].source, losers[i].sup);
+            os << i << "    " << losers[i].key << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
     inline int get_min_source()
@@ -349,10 +343,6 @@ public:
     }
 };
 
-#endif
-
-#if MCSTL_LOSER_TREE_REFERENCE
-
 /** Guarded loser tree, either copying the whole element into the tree structure, or looking up the element via the index.
  *
  *  Guarding is done explicitly through one flag sup per element, inf is not needed due to a better initialization routine.
@@ -375,16 +365,16 @@ private:
     {
         bool sup;
         int source;
-                #ifdef COPY
+#ifdef COPY
         T key;
-                #endif
+#endif
     };
 
     unsigned int ik, k, offset;
     Loser* losers;
-        #ifndef COPY
+#ifndef COPY
     T* keys;
-        #endif
+#endif
     Comparator comp;
 
 public:
@@ -394,9 +384,9 @@ public:
         k = 1 << (log2(ik - 1) + 1);            //next greater power of 2
         offset = k;
         losers = new Loser[k * 2];
-                #ifndef COPY
+#ifndef COPY
         keys = new T[ik];
-                #endif
+#endif
         for (unsigned int i = ik - 1; i < k; i++)
             losers[i + k].sup = true;
     }
@@ -404,15 +394,15 @@ public:
     inline ~LoserTreeReference()
     {
         delete[] losers;
-                #ifndef COPY
+#ifndef COPY
         delete[] keys;
-                #endif
+#endif
     }
 
-    void print()
+    void print(std::ostream& os)
     {
         for (unsigned int i = 0; i < (k * 2); i++)
-            printf("%d    %d from %d,  %d\n", i, KEY(i), losers[i].source, losers[i].sup);
+            os << i << "    " << KEY(i) << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
     inline int get_min_source()
@@ -458,7 +448,7 @@ public:
         losers[0] = losers[init_winner(1)];
     }
 
-    inline void delete_min_insert(T key, bool sup)
+    inline void delete_min_insert(T /* key */, bool sup)
     {
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -469,17 +459,17 @@ public:
             {                   //the other one is smaller
                 std::swap(losers[pos].sup, sup);
                 std::swap(losers[pos].source, source);
-                                #ifdef COPY
+#ifdef COPY
                 std::swap(KEY(pos), KEY_SOURCE(source));
-                                #endif
+#endif
             }
         }
 
         losers[0].sup = sup;
         losers[0].source = source;
-                #ifdef COPY
+#ifdef COPY
         KEY(0) = KEY_SOURCE(source);
-                #endif
+#endif
     }
 
     inline void insert_start_stable(T key, int source, bool sup)
@@ -516,7 +506,7 @@ public:
         losers[0] = losers[init_winner_stable(1)];
     }
 
-    inline void delete_min_insert_stable(T key, bool sup)
+    inline void delete_min_insert_stable(T /* key */, bool sup)
     {
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -529,25 +519,21 @@ public:
             {                   //the other one is smaller
                 std::swap(losers[pos].sup, sup);
                 std::swap(losers[pos].source, source);
-                                #ifdef COPY
+#ifdef COPY
                 std::swap(KEY(pos), KEY_SOURCE(source));
-                                #endif
+#endif
             }
         }
 
         losers[0].sup = sup;
         losers[0].source = source;
-                #ifdef COPY
+#ifdef COPY
         KEY(0) = KEY_SOURCE(source);
-                #endif
+#endif
     }
 };
 #undef KEY
 #undef KEY_SOURCE
-
-#endif
-
-#if MCSTL_LOSER_TREE_POINTER
 
 /** Guarded loser tree, either copying the whole element into the tree structure, or looking up the element via the index.
  *  Guarding is done explicitly through one flag sup per element, inf is not needed due to a better initialization routine.
@@ -584,10 +570,10 @@ public:
         delete[] losers;
     }
 
-    void print()
+    void print(std::ostream& os)
     {
         for (unsigned int i = 0; i < (k * 2); i++)
-            printf("%d    %d from %d,  %d\n", i, losers[i].keyp, losers[i].source, losers[i].sup);
+            os << i << "    " << losers[i].keyp << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
     inline int get_min_source()
@@ -712,10 +698,6 @@ public:
     }
 };
 
-#endif
-
-#if MCSTL_LOSER_TREE_UNGUARDED
-
 /** Unguarded loser tree, copying the whole element into the tree structure.
  *
  *  No guarding is done, therefore not a single input sequence must run empty.
@@ -764,10 +746,10 @@ public:
         delete[] mapping;
     }
 
-    void print()
+    void print(std::ostream& os)
     {
         for (unsigned int i = 0; i < k + ik; i++)
-            printf("%d    %d from %d\n", i, losers[i].key, losers[i].source);
+            os << i << "    " << losers[i].key << " from " << losers[i].source << "\n";
     }
 
     inline int get_min_source()
@@ -853,10 +835,6 @@ public:
     }
 };
 
-#endif
-
-#if MCSTL_LOSER_TREE_POINTER_UNGUARDED
-
 /** Unguarded loser tree, keeping only pointers to the elements in the tree structure.
  *
  *  No guarding is done, therefore not a single input sequence must run empty.
@@ -905,10 +883,10 @@ public:
         delete[] mapping;
     }
 
-    void print()
+    void print(std::ostream& os)
     {
         for (unsigned int i = 0; i < k + ik; i++)
-            printf("%d    %d from %d\n", i, *losers[i].keyp, losers[i].source);
+            os << i << "    " << *losers[i].keyp << " from " << losers[i].source << "\n";
     }
 
     inline int get_min_source()
@@ -995,8 +973,6 @@ public:
         losers[0].keyp = keyp;
     }
 };
-
-#endif
 
 } // namespace parallel
 
