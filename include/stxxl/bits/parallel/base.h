@@ -1,25 +1,32 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/base.h
+ *
+ *  Sequential helper functions.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_base.h
- *  @brief Sequential helper functions. */
+#ifndef STXXL_PARALLEL_BASE_HEADER
+#define STXXL_PARALLEL_BASE_HEADER
 
-#ifndef _MCSTL_BASE_H
-#define _MCSTL_BASE_H 1
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/parallel/features.h>
+#include <stxxl/bits/parallel/types.h>
 
-#include <bits/mcstl_features.h>
 #include <functional>
-#include <bits/mcstl_basic_iterator.h>
-#include <mcstl.h>
+#include <iterator>
 
-namespace mcstl
-{
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 /** @brief Calculates the rounded-down logrithm of @c n for base 2.
  *  @param n Argument.
@@ -273,6 +280,8 @@ struct less : std::binary_function<T1, T2, bool>
 	}
 };
 
-}	//namespace mcstl
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_BASE_HEADER

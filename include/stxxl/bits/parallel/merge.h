@@ -1,23 +1,29 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/merge.h
+ *
+ *  Parallel implementation of std::merge().
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_merge.h
- *  @brief Parallel implementation of std::merge(). */
+#ifndef STXXL_PARALLEL_MERGE_HEADER
+#define STXXL_PARALLEL_MERGE_HEADER
 
-#ifndef _MCSTL_MERGE_H
-#define _MCSTL_MERGE_H 1
+#include <stxxl/bits/namespace.h>
+#include <iterator>
+#include <cassert>
 
-#include <bits/mcstl_basic_iterator.h>
-#include <mod_stl/stl_algo.h>
+STXXL_BEGIN_NAMESPACE
 
-namespace mcstl
-{
+namespace parallel {
 
 /** @brief Merge routine being able to merge only the @c max_length smallest elements.
  *
@@ -190,6 +196,8 @@ parallel_merge_advance(	RandomAccessIterator1& begin1, RandomAccessIterator1 end
 	return target_end;
 }
 
-}	//namespace mcstl
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_MERGE_HEADER

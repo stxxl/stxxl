@@ -1,26 +1,31 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/losertree.h
+ *
+ *  Many generic loser tree variants.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_losertree.h
- *  @brief Many generic loser tree variants. */
+#ifndef STXXL_PARALLEL_LOSERTREE_HEADER
+#define STXXL_PARALLEL_LOSERTREE_HEADER
 
-#ifndef _MCSTL_LOSERTREE_H
-#define _MCSTL_LOSERTREE_H
-
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/parallel/base.h>
+#include <stxxl/bits/parallel/features.h>
 #include <functional>
 
-#include <mod_stl/stl_algobase.h>
-#include <bits/mcstl_features.h>
-#include <bits/mcstl_base.h>
+STXXL_BEGIN_NAMESPACE
 
-namespace mcstl
-{
+namespace parallel {
 
 #if MCSTL_LOSER_TREE_EXPLICIT
 
@@ -995,6 +1000,8 @@ public:
 
 #endif
 
-}	//namespace mcstl
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_LOSERTREE_HEADER

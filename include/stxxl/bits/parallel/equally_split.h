@@ -1,20 +1,29 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/equally_split.h
+ *
+ *  Function to split a sequence into parts of almost equal size.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_equally_split.h
- *  @brief Function to split a sequence into parts of almost equal size. */
+#ifndef STXXL_PARALLEL_EQUALLY_SPLIT_HEADER
+#define STXXL_PARALLEL_EQUALLY_SPLIT_HEADER
 
-#ifndef _MCSTL_EQUALLY_SPLIT_H
-#define _MCSTL_EQUALLY_SPLIT_H 1
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/parallel/base.h>
+#include <stxxl/bits/parallel/types.h>
 
-namespace mcstl
-{
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 /** @brief Split a sequence into parts of almost equal size.
  * 
@@ -39,6 +48,8 @@ DiffTypeOutputIterator equally_split(DiffType n, thread_index_t p, DiffTypeOutpu
 	return s;
 }
 
-}
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_EQUALLY_SPLIT_HEADER

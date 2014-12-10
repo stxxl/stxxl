@@ -1,19 +1,28 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
-
-/** @file mcstl_features.h
- *  @brief Defines on whether to include algorithm variants. 
+ *  include/stxxl/bits/parallel/features.h
  *
- *  Less variants reduce executable size and compile time. */
+ *  Defines on whether to include algorithm variants.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-#ifndef _MCSTL_FEATURES_H
-#define _MCSTL_FEATURES_H 1
+#ifndef STXXL_PARALLEL_FEATURES_HEADER
+#define STXXL_PARALLEL_FEATURES_HEADER
+
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/parallel/compiletime_settings.h>
+
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 #ifndef MCSTL_MERGESORT
 /** @def MCSTL_MERGESORT 
@@ -134,5 +143,8 @@
 #define MCSTL_TREE_FULL_COPY 1
 #endif
 
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_FEATURES_HEADER

@@ -1,16 +1,28 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/multiway_merge.h
+ *
+ *  Defines on options concerning debugging and performance, at compile-time.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_compiletime_settings.h
- *  @brief Defines on options concerning debugging and performance, at compile-time. */
+#ifndef STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
+#define STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 
+#include <stxxl/bits/namespace.h>
 #include <cstdio>
+
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 /** @brief Determine verbosity level of MCSTL.
  *  Level 1 prints a message each time when entering a MCSTL function. */
@@ -47,3 +59,8 @@
  *  Recommendation: 0 */
 #define MCSTL_MULTIWAY_MERGESORT_COPY_LAST 0
 
+} // namespace parallel
+
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER

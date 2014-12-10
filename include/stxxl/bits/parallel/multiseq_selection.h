@@ -1,28 +1,35 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/multiseq_selection.h
+ *
+ *  Functions to find elements of a certain global rank in multiple sorted
+ *  sequences. Also serves for splitting such sequence sets.
+ *
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_multiseq_selection.h
- *  @brief Functions to find elements of a certain global rank in multiple sorted sequences.
- *  Also serves for splitting such sequence sets. */
+#ifndef STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
+#define STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 
-#ifndef _MCSTL_MULTISEQ_SELECTION_H
-#define _MCSTL_MULTISEQ_SELECTION_H 1
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/parallel/types.h>
 
 #include <vector>
 #include <queue>
+#include <cstdlib>
+#include <algorithm>
 
-#include <mod_stl/stl_algo.h>
+STXXL_BEGIN_NAMESPACE
 
-#include <bits/mcstl_sort.h>
-
-namespace mcstl
-{
+namespace parallel {
 
 /** @brief Compare a pair of types lexcigraphically, ascending. */
 template<typename T1, typename T2, typename Comparator>
@@ -147,7 +154,7 @@ void multiseq_partition(
 	for(int i = 0; i < m; i++)
 		if(n < ns[i])	//sequence long enough
 			sample.push_back(std::make_pair(S(i)[n], i));
-	std::__mcstl_sequential_sort(sample.begin(), sample.end(), lcomp);
+	std::sort(sample.begin(), sample.end(), lcomp);
 	for(int i = 0; i < m; i++)	//conceptual infinity
 		if(n >= ns[i])	//sequence too short, conceptual infinity
 			sample.push_back(std::make_pair(S(i)[0] /*dummy element*/, i));
@@ -366,7 +373,7 @@ T multiseq_selection(
 	for(int i = 0; i < m; i++)
 		if(n < ns[i])
 			sample.push_back(std::make_pair(S(i)[n], i));
-	std::__mcstl_sequential_sort(sample.begin(), sample.end(), lcomp, sequential_tag());
+	std::sort(sample.begin(), sample.end(), lcomp);
 	for(int i = 0; i < m; i++)	//conceptual infinity
 		if(n >= ns[i])
 			sample.push_back(std::make_pair(S(i)[0] /*dummy element*/, i));
@@ -527,8 +534,10 @@ T multiseq_selection(
 	return minright;
 }
 
-}
-
 #undef S
 
-#endif
+} // namespace parallel
+
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER

@@ -1,27 +1,32 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/multiway_merge.h
+ *
+ *  Provides a simple tool to do performance debugging, also in parallel code.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_timing.h
- *  @brief Provides a simple tool to do performance debugging, also in parallel code. */
-
-#ifndef _MCSTL_TIMING_H
-#define _MCSTL_TIMING_H 1
+#ifndef STXXL_PARALLEL_TIMING_HEADER
+#define STXXL_PARALLEL_TIMING_HEADER
 
 #include <omp.h>
 #include <cstdio>
 #include <cstring>
 #include <cassert>
 
-#include <bits/mcstl_tags.h>
+#include <stxxl/bits/parallel/tags.h>
 
-namespace mcstl
-{
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 /** @brief Type of of point in time, used for the Timing classes. */
 typedef double point_in_time;
@@ -180,6 +185,8 @@ public:
 template<typename must_be_int>
 const char* Timing<inactive_tag, must_be_int>::empty_string = "";
 
-}
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_TIMING_HEADER

@@ -1,24 +1,29 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler and Felix Putze                *
- *   singler@ira.uka.de, kontakt@felix-putze.de                            *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/types.h
+ *
+ *  Basic typedefs.
+ *  Extracted from MCSTL http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/**
- * @file mcstl_types.h
- * @brief Basic typedefs.
- */
+#ifndef STXXL_PARALLEL_TYPES_HEADER
+#define STXXL_PARALLEL_TYPES_HEADER
 
-#ifndef _MCSTL_TYPES_H
-#define _MCSTL_TYPES_H 1
-
+#include <stxxl/bits/namespace.h>
 #include <cstdlib>
 
-namespace mcstl
-{
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
+
 /** @brief 8-bit signed integer. */
 typedef char int8;
 /** @brief 8-bit unsigned integer. */
@@ -58,6 +63,9 @@ static const int lcas_t_bits = sizeof(lcas_t) * 8;
  * @brief ::lcas_t with the right half of bits set to 1.
  */
 static const lcas_t lcas_t_mask = (((lcas_t)1 << (lcas_t_bits / 2)) - 1);
-}
 
-#endif /* _MCSTL_TYPES_H */
+} // namespace parallel
+
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_TYPES_HEADER

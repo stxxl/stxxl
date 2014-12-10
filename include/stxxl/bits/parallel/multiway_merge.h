@@ -1,35 +1,41 @@
- /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+/***************************************************************************
+ *  include/stxxl/bits/parallel/multiway_merge.h
+ *
+ *  Implementation of sequential and parallel multiway merge.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_multiway_merge.h
- *  @brief Implementation of sequential and parallel multiway merge. */
-
-#ifndef _MCSTL_MULTIWAY_MERGE_H
-#define _MCSTL_MULTIWAY_MERGE_H
+#ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
+#define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
-#include <mod_stl/stl_algo.h>
-#include <bits/mcstl_features.h>
-#include <mcstl.h>
-#include <bits/mcstl_merge.h>
-#include <bits/mcstl_losertree.h>
-#include <meta/mcstl_timing.h>
-#if MCSTL_ASSERTIONS
-#include <meta/mcstl_checkers.h>
-#endif
+#include <stxxl/bits/parallel/features.h>
+#include <stxxl/bits/parallel/merge.h>
+#include <stxxl/bits/parallel/losertree.h>
+#include <stxxl/bits/parallel/settings.h>
+#include <stxxl/bits/parallel/equally_split.h>
+#include <stxxl/bits/parallel/multiseq_selection.h>
+#include <stxxl/bits/parallel/timing.h>
+#include <stxxl/bits/parallel/tags.h>
 
-/** @brief Length of a sequence described by a pair of iterators. */
+/*! Length of a sequence described by a pair of iterators. */
 #define LENGTH(s) ((s).second - (s).first)
 
-namespace mcstl
-{
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 template<typename RandomAccessIterator, typename Comparator>
 class guarded_iterator;
@@ -152,7 +158,7 @@ private:
 	/** @brief Current iterator position. */
 	RandomAccessIterator& current;
 	/** @brief Comparator. */
-	mutable Comparator& comp;
+	Comparator& comp;
 
 public:
 	/** @brief Constructor. Sets iterator to beginning of sequence.
@@ -1350,9 +1356,9 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin, RandomAccessIte
 			}
 	
 		if(stable)
-			std::__mcstl_sequential_stable_sort(samples, samples + (num_samples * k), comp);
+			std::stable_sort(samples, samples + (num_samples * k), comp);
 		else
-			std::__mcstl_sequential_sort(samples, samples + (num_samples * k), comp);
+			std::sort(samples, samples + (num_samples * k), comp);
 
 		for(int slab = 0; slab < num_threads; slab++)
 			//for each slab / processor
@@ -1547,6 +1553,8 @@ multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
 		return multiway_merge(seqs_begin, seqs_end, target, comp, length, stable, true, sequential_tag());
 }
 
-}	//namespace mcstl
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_MULTIWAY_MERGE_HEADER

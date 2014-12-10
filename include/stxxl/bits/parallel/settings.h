@@ -1,29 +1,36 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler and Felix Putze                *
- *   singler@ira.uka.de, kontakt@felix-putze.de                            *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/settings.h
+ *
+ *  Settings and tuning parameters, heuristics to decide whether to use
+ *  parallelized algorithms.
+ *  Extracted from MCSTL http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_settings.h
- *  @brief Settings and tuning parameters, heuristics to decide whether to use parallelized algorithms. */
+#ifndef STXXL_PARALLEL_SETTINGS_HEADER
+#define STXXL_PARALLEL_SETTINGS_HEADER
 
-#ifndef _MCSTL_SETTINGS_H
-#define _MCSTL_SETTINGS_H 1
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/parallel/types.h>
 
 #include <omp.h>
 
-#include <bits/mcstl_types.h>
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 /** @brief The extensible condition on whether the parallel variant of an algorithm sould be called.
  * @param c A condition that is overruled by mcstl::Settings::force_parallel,
  * i. e. usually a decision based on the input size. */
-#define MCSTL_PARALLEL_CONDITION(c) (!(mcstl::SETTINGS::force_sequential) && ((mcstl::SETTINGS::num_threads > 1 && (c)) || mcstl::SETTINGS::force_parallel))
-
-namespace mcstl
-{
+#define MCSTL_PARALLEL_CONDITION(c) (!(SETTINGS::force_sequential) && ((SETTINGS::num_threads > 1 && (c)) || SETTINGS::force_parallel))
 
 /** @brief Type to be passed to algorithm calls in order to guide their level of parallelism.
  *
@@ -450,6 +457,8 @@ NumberOfThreads Settings<must_be_int>::num_threads;
 template<typename must_be_int>
 volatile sequence_index_t Settings<must_be_int>::qsb_steals = 0;
 
-}
+} // namespace parallel
 
-#endif /* _MCSTL_SETTINGS_H */
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_SETTINGS_HEADER

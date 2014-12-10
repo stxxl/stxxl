@@ -1,28 +1,40 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Johannes Singler                                *
- *   singler@ira.uka.de                                                    *
- *   Distributed under the Boost Software License, Version 1.0.            *
- *   (See accompanying file LICENSE_1_0.txt or copy at                     *
- *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the MCSTL   http://algo2.iti.uni-karlsruhe.de/singler/mcstl/  *
- ***************************************************************************/
+ *  include/stxxl/bits/parallel/multiway_mergesort.h
+ *
+ *  Parallel multiway mergesort.
+ *  Extracted from MCSTL - http://algo2.iti.uni-karlsruhe.de/singler/mcstl/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-/** @file mcstl_multiway_mergesort.h
- *  @brief Parallel multiway mergesort. */
-
-#ifndef _MCSTL_MERGESORT_H
-#define _MCSTL_MERGESORT_H 1
+#ifndef STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
+#define STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
 
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
-#include <bits/mcstl_basic_iterator.h>
-#include <mod_stl/stl_algo.h>
-#include <mcstl.h>
-#include <bits/mcstl_multiway_merge.h>
-#include <meta/mcstl_timing.h>
+#include <stxxl/bits/parallel/features.h>
+#include <stxxl/bits/parallel/merge.h>
+#include <stxxl/bits/parallel/losertree.h>
+#include <stxxl/bits/parallel/settings.h>
+#include <stxxl/bits/parallel/equally_split.h>
+#include <stxxl/bits/parallel/multiseq_selection.h>
+#include <stxxl/bits/parallel/timing.h>
 
-namespace mcstl
-{
+/*! Length of a sequence described by a pair of iterators. */
+#define LENGTH(s) ((s).second - (s).first)
+
+STXXL_BEGIN_NAMESPACE
+
+namespace parallel {
 
 /** @brief Subsequence description. */
 template<typename DiffType>
@@ -135,9 +147,9 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d, Compar
 
 	//sort locally
 	if(d->stable)
-		std::__mcstl_sequential_stable_sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
+		std::stable_sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
 	else
-		std::__mcstl_sequential_sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
+		std::sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
 
 #if MCSTL_ASSERTIONS
 	assert(is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
@@ -157,7 +169,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d, Compar
 		t.tic("sample/wait");
 
 		#pragma omp single
-		std::__mcstl_sequential_sort(sd->samples, sd->samples + (num_samples * d->num_threads), comp);
+		std::sort(sd->samples, sd->samples + (num_samples * d->num_threads), comp);
 
 		#pragma omp barrier
 
@@ -348,6 +360,8 @@ parallel_sort_mwms(	RandomAccessIterator begin,
 	delete[] pus;
 }
 
-}	//namespace mcstl
+} // namespace parallel
 
-#endif
+STXXL_END_NAMESPACE
+
+#endif // !STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
