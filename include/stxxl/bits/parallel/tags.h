@@ -30,10 +30,6 @@ class active_tag
 class inactive_tag
 { };
 
-/** Forces sequential execution at compile time. */
-struct sequential_tag { };
-/** Recommends parallel execution at compile time. */
-struct parallel_tag { };
 /** Recommends parallel execution using dynamic load-balancing, at compile time. */
 struct balanced_tag { };
 /** Recommends parallel execution using static load-balancing, at compile time. */

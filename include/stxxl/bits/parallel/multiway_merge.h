@@ -1245,11 +1245,11 @@ template <typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
           typename DiffType, typename Comparator>
 RandomAccessIterator3
-multiway_merge(RandomAccessIteratorIterator seqs_begin,
-               RandomAccessIteratorIterator seqs_end,
-               RandomAccessIterator3 target,
-               Comparator comp, DiffType length,
-               bool stable, bool sentinel, sequential_tag)
+sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
+                          RandomAccessIteratorIterator seqs_end,
+                          RandomAccessIterator3 target,
+                          Comparator comp, DiffType length,
+                          bool stable, bool sentinel)
 {
     MCSTL_CALL(length)
 
@@ -1510,15 +1510,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                 local_length += LENGTH(chunks[s]);
             }
 
-            multiway_merge(
+            sequential_multiway_merge(
                 chunks,
                 chunks + k,
                 target + target_position,
                 comp,
                 std::min(local_length, length - target_position),
                 stable,
-                false,
-                sequential_tag());
+                false);
 
             delete[] chunks;
         }
@@ -1591,7 +1590,7 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
     if (MCSTL_PARALLEL_CONDITION(((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) && ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
         target_end = parallel_multiway_merge(seqs_begin, seqs_end, target, comp, length, stable);
     else
-        target_end = multiway_merge(seqs_begin, seqs_end, target, comp, length, stable, false, sequential_tag());
+        target_end = sequential_multiway_merge(seqs_begin, seqs_end, target, comp, length, stable, false);
 
     return target_end;
 }
@@ -1628,7 +1627,7 @@ multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
     if (MCSTL_PARALLEL_CONDITION(((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) && ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
         return parallel_multiway_merge(seqs_begin, seqs_end, target, comp, (typename std::iterator_traits<RandomAccessIterator3>::difference_type)length, stable, true);
     else
-        return multiway_merge(seqs_begin, seqs_end, target, comp, length, stable, true, sequential_tag());
+        return sequtial_multiway_merge(seqs_begin, seqs_end, target, comp, length, stable, true);
 }
 
 }                     // namespace parallel
