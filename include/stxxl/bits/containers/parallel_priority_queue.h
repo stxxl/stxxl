@@ -2225,7 +2225,7 @@ protected:
         heap_type& insheap = m_proc[id].insertion_heap;
         size_t size = insheap.size();
 
-        STXXL_VERBOSE1_PPQ(
+        STXXL_VERBOSE2_PPQ(
             "Flushing insertion heap array id=" << id <<
             " size=" << insheap.size() <<
             " capacity=" << insheap.capacity() <<
@@ -2469,6 +2469,8 @@ protected:
         // TODO
 #endif
 
+        STXXL_VERBOSE1_PPQ("Merge done");
+
         // TODO: directly write to block? -> no useless mem copy. Does not work if size > block size
         for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
             a << *i;
@@ -2494,6 +2496,8 @@ protected:
 
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.internal_array_flush_time.stop();
+
+        STXXL_VERBOSE1_PPQ("Write done");
     }
 
     //! Flushes the insertion heaps into an external array.
