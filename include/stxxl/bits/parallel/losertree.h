@@ -205,7 +205,7 @@ public:
     inline LoserTree(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = 1 << (log2(ik - 1) + 1);            //next greater power of 2
+        k = 1 << ilog2_ceil(ik); // next greater power of 2
         offset = k;
         losers = new Loser[k * 2];
         for (unsigned int i = ik - 1; i < k; i++)
@@ -381,7 +381,7 @@ public:
     inline LoserTreeReference(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = 1 << (log2(ik - 1) + 1);            //next greater power of 2
+        k = 1 << ilog2_ceil(ik); // next greater power of 2
         offset = k;
         losers = new Loser[k * 2];
 #ifndef COPY
@@ -558,7 +558,7 @@ public:
     inline LoserTreePointer(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = 1 << (log2(ik - 1) + 1);            //next greater power of 2
+        k = 1 << ilog2_ceil(ik); // next greater power of 2
         offset = k;
         losers = new Loser[k * 2];
         for (unsigned int i = ik - 1; i < k; i++)
@@ -723,7 +723,7 @@ private:
             mapping[begin] = root;
         else
         {
-            unsigned int left = 1 << (log2(end - begin - 1));                   //next greater or equal power of 2
+            unsigned int left = 1 << ilog2_floor(end - begin - 1);
             map(root * 2, begin, begin + left);
             map(root * 2 + 1, begin + left, end);
         }
@@ -733,7 +733,7 @@ public:
     inline LoserTreeUnguarded(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = 1 << (log2(ik - 1) + 1);            //next greater or equal power of 2
+        k = 1 << ilog2_ceil(ik); // next greater or equal power of 2
         offset = k;
         losers = new Loser[k + ik];
         mapping = new unsigned int[ik];
@@ -771,7 +771,7 @@ public:
             return mapping[begin];
         else
         {
-            unsigned int division = 1 << (log2(end - begin - 1)); //next greater or equal power of 2
+            unsigned int division = 1 << ilog2_floor(end - begin - 1);
             unsigned int left = init_winner(2 * root, begin, begin + division);
             unsigned int right = init_winner(2 * root + 1, begin + division, end);
             if (!comp(losers[right].key, losers[left].key))
@@ -860,7 +860,7 @@ private:
             mapping[begin] = root;
         else
         {
-            unsigned int left = 1 << (log2(end - begin - 1));                   //next greater or equal power of 2
+            unsigned int left = 1 << (ilog2_floor(end - begin - 1));
             map(root * 2, begin, begin + left);
             map(root * 2 + 1, begin + left, end);
         }
@@ -870,7 +870,7 @@ public:
     inline LoserTreePointerUnguarded(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = 1 << (log2(ik - 1) + 1);            //next greater power of 2
+        k = 1 << ilog2_ceil(ik); // next greater power of 2
         offset = k;
         losers = new Loser[k + ik];
         mapping = new unsigned int[ik];
@@ -908,7 +908,7 @@ public:
             return mapping[begin];
         else
         {
-            unsigned int division = 1 << (log2(end - begin - 1)); //next greater or equal power of 2
+            unsigned int division = 1 << ilog2_floor(end - begin - 1);
             unsigned int left = init_winner(2 * root, begin, begin + division);
             unsigned int right = init_winner(2 * root + 1, begin + division, end);
             if (!comp(*losers[right].keyp, *losers[left].keyp))
