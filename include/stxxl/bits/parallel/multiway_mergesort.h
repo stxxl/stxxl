@@ -118,7 +118,8 @@ inline void determine_samples(PMWMSSorterPU<RandomAccessIterator>* d,
     num_samples = SETTINGS::sort_mwms_oversampling * d->num_threads - 1;
 
     std::vector<DiffType> es(num_samples + 2);
-    equally_split(sd->starts[d->iam + 1] - sd->starts[d->iam], num_samples + 1, es.begin());
+    equally_split(sd->starts[d->iam + 1] - sd->starts[d->iam],
+                  (thread_index_t)(num_samples + 1), es.begin());
 
     for (DiffType i = 0; i < num_samples; i++)
         sd->samples[d->iam * num_samples + i] = sd->source[sd->starts[d->iam] + es[i + 1]];

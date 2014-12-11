@@ -444,7 +444,7 @@ multiway_merge_3_combined(RandomAccessIteratorIterator seqs_begin,
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
         total_length += LENGTH(*s);
 
-    if (overhang != -1)
+    if (overhang != (DiffType) - 1)
     {
         DiffType unguarded_length = std::min(length, total_length - overhang);
         target_end = multiway_merge_3_variant<unguarded_iterator>
@@ -630,7 +630,7 @@ multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
         total_length += LENGTH(*s);
 
-    if (overhang != -1)
+    if (overhang != (DiffType) - 1)
     {
         DiffType unguarded_length = std::min(length, total_length - overhang);
         target_end = multiway_merge_4_variant<unguarded_iterator>
