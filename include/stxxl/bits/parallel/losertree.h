@@ -20,7 +20,6 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/base.h>
-#include <stxxl/bits/parallel/features.h>
 #include <functional>
 
 STXXL_BEGIN_NAMESPACE

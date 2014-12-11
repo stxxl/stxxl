@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/parallel/features.h>
 #include <stxxl/bits/parallel/merge.h>
 #include <stxxl/bits/parallel/losertree.h>
 #include <stxxl/bits/parallel/settings.h>
@@ -220,13 +219,16 @@ public:
     }
 };
 
-/** Prepare a set of sequences to be merged without a (end) guard
- *  \param seqs_begin
- *  \param seqs_end
- *  \param comp
- *  \param min_sequence
- *  \param stable
- *  \pre (seqs_end - seqs_begin > 0) */
+/*!
+ * Prepare a set of sequences to be merged without a (end) guard
+ *
+ * \param seqs_begin
+ * \param seqs_end
+ * \param comp
+ * \param min_sequence
+ * \param stable
+ * \pre (seqs_end - seqs_begin > 0)
+ */
 template <typename RandomAccessIteratorIterator, typename Comparator>
 typename std::iterator_traits<
     typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
@@ -237,7 +239,7 @@ prepare_unguarded(RandomAccessIteratorIterator seqs_begin,
                   int& min_sequence,
                   bool stable)
 {
-    MCSTL_CALL(seqs_end - seqs_begin)
+    MCSTL_CALL(seqs_end - seqs_begin);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -314,7 +316,7 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
                            RandomAccessIteratorIterator seqs_end,
                            Comparator comp)
 {
-    MCSTL_CALL(seqs_end - seqs_begin)
+    MCSTL_CALL(seqs_end - seqs_begin);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -647,7 +649,8 @@ multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
         overhang = length - unguarded_length;
     }
     else
-    {                               //empty sequence found
+    {
+        // empty sequence found
         overhang = length;
         target_end = target;
     }
@@ -696,7 +699,7 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
                       RandomAccessIterator3 target, DiffType length,
                       Comparator comp, bool stable)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -878,7 +881,7 @@ multiway_merge_loser_tree(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIterator3 target, DiffType length,
                           Comparator comp, bool stable)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -983,9 +986,9 @@ multiway_merge_loser_tree_unguarded(
     RandomAccessIterator3 target, DiffType length,
     Comparator comp, bool stable)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
-    int k = seqs_end - seqs_begin;
+    int k = (int)(seqs_end - seqs_begin);
 
     LoserTreeType lt(k, comp);
 
@@ -1001,7 +1004,7 @@ multiway_merge_loser_tree_unguarded(
         else
             lt.insert_start(*seqs_begin[t].first, t, false);
 
-        total_length += iterpair_length(seqs_begin[t]);
+        total_length += iterpair_size(seqs_begin[t]);
     }
 
     if (stable)
@@ -1023,7 +1026,7 @@ multiway_merge_loser_tree_unguarded(
         RandomAccessIterator3 target_end = target + length;
         while (target < target_end)
         {
-            //take out
+            // take out
             source = lt.get_min_source();
 
 #if MCSTL_ASSERTIONS
@@ -1036,8 +1039,9 @@ multiway_merge_loser_tree_unguarded(
             assert((seqs_begin[source].first != seqs_begin[source].second) || (i == length - 1));
             i++;
 #endif
-            //feed
-            lt.delete_min_insert_stable(*seqs_begin[source].first, false);                         //replace from same source
+            // feed
+            // replace from same source
+            lt.delete_min_insert_stable(*seqs_begin[source].first, false);
         }
     }
     else
@@ -1045,7 +1049,7 @@ multiway_merge_loser_tree_unguarded(
         RandomAccessIterator3 target_end = target + length;
         while (target < target_end)
         {
-            //take out
+            // take out
             source = lt.get_min_source();
 
 #if MCSTL_ASSERTIONS
@@ -1062,8 +1066,9 @@ multiway_merge_loser_tree_unguarded(
             assert((seqs_begin[source].first != seqs_begin[source].second) || (i >= length - 1));
             i++;
 #endif
-            //feed
-            lt.delete_min_insert(*seqs_begin[source].first, false);                         //replace from same source
+            // feed
+            // replace from same source
+            lt.delete_min_insert(*seqs_begin[source].first, false);
         }
     }
 
@@ -1134,7 +1139,7 @@ multiway_merge_loser_tree_combined(
     RandomAccessIterator3 target, DiffType length,
     Comparator comp, bool stable)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -1149,12 +1154,12 @@ multiway_merge_loser_tree_combined(
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
         total_length += iterpair_size(*s);
 
-    if (overhang != -1)
+    if (overhang != (DiffType)(-1))
     {
         DiffType unguarded_length = std::min(length, total_length - overhang);
         target_end = multiway_merge_loser_tree_unguarded
                      <typename loser_tree_traits_unguarded<ValueType, Comparator>::LT>
-                         (seqs_begin, seqs_end, target, comp, unguarded_length, stable);
+                         (seqs_begin, seqs_end, target, unguarded_length, comp, stable);
         overhang = length - unguarded_length;
     }
     else
@@ -1171,7 +1176,7 @@ multiway_merge_loser_tree_combined(
 
     target_end = multiway_merge_loser_tree
                  <typename loser_tree_traits<ValueType, Comparator>::LT>
-                     (seqs_begin, seqs_end, target_end, comp, overhang, stable);
+                     (seqs_begin, seqs_end, target_end, overhang, comp, stable);
 
 #if MCSTL_ASSERTIONS
     assert(target_end == target + length);
@@ -1191,7 +1196,7 @@ multiway_merge_loser_tree_sentinel(
     RandomAccessIterator3 target, DiffType length,
     Comparator comp, bool stable)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -1213,7 +1218,7 @@ multiway_merge_loser_tree_sentinel(
     DiffType unguarded_length = std::min(length, total_length - overhang);
     target_end = multiway_merge_loser_tree_unguarded
                  <typename loser_tree_traits_unguarded<ValueType, Comparator>::LT>
-                     (seqs_begin, seqs_end, target, comp, unguarded_length, stable);
+                     (seqs_begin, seqs_end, target, unguarded_length, comp, stable);
     overhang = length - unguarded_length;
 
 #if MCSTL_ASSERTIONS
@@ -1225,7 +1230,7 @@ multiway_merge_loser_tree_sentinel(
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end && overhang > 0; s++)
     {
         (*s).second--;                         //restore
-        DiffType local_length = std::min((DiffType)overhang, iterpair_size(*s));
+        DiffType local_length = std::min((DiffType)overhang, (DiffType)iterpair_size(*s));
         target_end = std::copy((*s).first, (*s).first + local_length, target_end);
         (*s).first += local_length;
         overhang -= local_length;
@@ -1263,7 +1268,7 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIterator3 target, DiffType length,
                           Comparator comp, bool stable, bool sentinel)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -1329,26 +1334,18 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         case SETTINGS::BUBBLE:
             return_target = multiway_merge_bubble(seqs_begin, seqs_end, target, length, comp, stable);
             break;
-#if MCSTL_LOSER_TREE_EXPLICIT
         case SETTINGS::LOSER_TREE_EXPLICIT:
             return_target = multiway_merge_loser_tree<LoserTreeExplicit<ValueType, Comparator> >(seqs_begin, seqs_end, target, length, comp, stable);
             break;
-#endif
-#if MCSTL_LOSER_TREE
         case SETTINGS::LOSER_TREE:
             return_target = multiway_merge_loser_tree<LoserTree<ValueType, Comparator> >(seqs_begin, seqs_end, target, length, comp, stable);
             break;
-#endif
-#if MCSTL_LOSER_TREE_COMBINED
         case SETTINGS::LOSER_TREE_COMBINED:
             return_target = multiway_merge_loser_tree_combined(seqs_begin, seqs_end, target, length, comp, stable);
             break;
-#endif
-#if MCSTL_LOSER_TREE_SENTINEL
         case SETTINGS::LOSER_TREE_SENTINEL:
             return_target = multiway_merge_loser_tree_sentinel(seqs_begin, seqs_end, target, length, comp, stable);
             break;
-#endif
         default:
             assert(0 && "multiway_merge algorithm not implemented");
             break;
@@ -1386,7 +1383,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                         RandomAccessIterator3 target, DiffType length,
                         Comparator comp, bool stable)
 {
-    MCSTL_CALL(length)
+    MCSTL_CALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
         RandomAccessIterator1;
@@ -1398,13 +1395,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         assert(is_sorted((*rii).first, (*rii).second, comp));
 #endif
 
-    int k = static_cast<int>(seqs_end - seqs_begin);                         //k sequences
+    // k sequences
+    int k = static_cast<int>(seqs_end - seqs_begin);
 
     DiffType total_length = 0;
     for (RandomAccessIteratorIterator raii = seqs_begin; raii != seqs_end; raii++)
         total_length += iterpair_size(*raii);
 
-    MCSTL_CALL(total_length)
+    MCSTL_CALL(total_length);
 
     if (total_length == 0 || k == 0)
         return target;
@@ -1418,7 +1416,8 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
     bool tight = (total_length == length);
 
-    std::vector<std::pair<DiffType, DiffType> >* pieces = new std::vector<std::pair<DiffType, DiffType> >[num_threads];                         //thread t will have to merge pieces[iam][0..k - 1]
+    // thread t will have to merge pieces[iam][0..k - 1]
+    std::vector<std::pair<DiffType, DiffType> >* pieces = new std::vector<std::pair<DiffType, DiffType> >[num_threads];
     for (int s = 0; s < num_threads; s++)
         pieces[s].resize(k);
 
@@ -1431,7 +1430,11 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         for (int s = 0; s < k; s++)
             for (int i = 0; (DiffType)i < num_samples; i++)
             {
-                DiffType sample_index = static_cast<DiffType>(iterpair_size(seqs_begin[s]) * (double(i + 1) / (num_samples + 1)) * (double(length) / total_length));
+                DiffType sample_index = static_cast<DiffType>(
+                    double(iterpair_size(seqs_begin[s]))
+                    * (double(i + 1) / double(num_samples + 1))
+                    * (double(length) / double(total_length))
+                    );
                 samples[s * num_samples + i] = seqs_begin[s].first[sample_index];
             }
 
@@ -1455,7 +1458,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             }
         delete[] samples;
     }
-    else                                                                        //(SETTINGS::multiway_merge_splitting == SETTINGS::EXACT)
+    else // (SETTINGS::multiway_merge_splitting == SETTINGS::EXACT)
     {
         std::vector<RandomAccessIterator1>* offsets = new std::vector<RandomAccessIterator1>[num_threads];
         std::vector<std::pair<RandomAccessIterator1, RandomAccessIterator1> > se(k);
@@ -1522,23 +1525,21 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             }
 
             sequential_multiway_merge(
-                chunks,
-                chunks + k,
+                chunks, chunks + k,
                 target + target_position,
                 std::min(local_length, length - target_position),
-                comp,
-                stable,
-                false);
+                comp, stable, false);
 
             delete[] chunks;
         }
         else if (k == 2)
         {
-            RandomAccessIterator1 begin0 = seqs_begin[0].first + pieces[iam][0].first, begin1 = seqs_begin[1].first + pieces[iam][1].first;
-            merge_advance(begin0,
-                          seqs_begin[0].first + pieces[iam][0].second,
-                          begin1,
-                          seqs_begin[1].first + pieces[iam][1].second,
+            RandomAccessIterator1
+                begin0 = seqs_begin[0].first + pieces[iam][0].first,
+                begin1 = seqs_begin[1].first + pieces[iam][1].first;
+
+            merge_advance(begin0, seqs_begin[0].first + pieces[iam][0].second,
+                          begin1, seqs_begin[1].first + pieces[iam][1].second,
                           target + target_position,
                           (pieces[iam][0].second - pieces[iam][0].first) + (pieces[iam][1].second - pieces[iam][1].first),
                           comp
@@ -1590,7 +1591,7 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
                RandomAccessIterator3 target, DiffType length,
                Comparator comp, bool stable)
 {
-    MCSTL_CALL(seqs_end - seqs_begin)
+    MCSTL_CALL(seqs_end - seqs_begin);
 
     if (seqs_begin == seqs_end)
         return target;
@@ -1630,10 +1631,11 @@ multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
     if (seqs_begin == seqs_end)
         return target;
 
-    MCSTL_CALL(seqs_end - seqs_begin)
+    MCSTL_CALL(seqs_end - seqs_begin);
 
-    if (MCSTL_PARALLEL_CONDITION(((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) && ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
-        return parallel_multiway_merge(seqs_begin, seqs_end, target, (typename std::iterator_traits<RandomAccessIterator3>::difference_type)length, comp, stable, true);
+    if (MCSTL_PARALLEL_CONDITION(((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
+                                 ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
+        return parallel_multiway_merge(seqs_begin, seqs_end, target, length, comp, stable, true);
     else
         return sequtial_multiway_merge(seqs_begin, seqs_end, target, length, comp, stable, true);
 }

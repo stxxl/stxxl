@@ -18,7 +18,6 @@
 #define STXXL_PARALLEL_BASE_HEADER
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/parallel/features.h>
 #include <stxxl/bits/parallel/types.h>
 
 #include <functional>

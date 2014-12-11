@@ -23,14 +23,10 @@
 
 #include <stxxl/bits/parallel/compiletime_settings.h>
 #include <stxxl/bits/parallel/equally_split.h>
-#include <stxxl/bits/parallel/features.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 #include <stxxl/bits/parallel/multiseq_selection.h>
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/timing.h>
-
-/*! Length of a sequence described by a pair of iterators. */
-#define LENGTH(s) ((s).second - (s).first)
 
 STXXL_BEGIN_NAMESPACE
 
