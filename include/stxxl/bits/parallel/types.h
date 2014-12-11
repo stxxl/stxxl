@@ -18,28 +18,12 @@
 #define STXXL_PARALLEL_TYPES_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/types.h>
 #include <cstdlib>
 
 STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
-
-/** 8-bit signed integer. */
-typedef char int8;
-/** 8-bit unsigned integer. */
-typedef unsigned char uint8;
-/** 16-bit signed integer. */
-typedef short int16;
-/** 16-bit unsigned integer. */
-typedef unsigned short uint16;
-/** 32-bit signed integer. */
-typedef int int32;
-/** 32-bit unsigned integer. */
-typedef unsigned int uint32;
-/** 64-bit signed integer. */
-typedef long long int64;
-/** 64-bit unsigned integer. */
-typedef unsigned long long uint64;
 
 /**
  * Unsigned integer to index elements.

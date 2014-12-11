@@ -39,20 +39,9 @@ namespace parallel {
 #define MCSTL_CALL(n) printf("   %s:\niam = %d, n = %ld, num_threads = %d\n", __PRETTY_FUNCTION__, omp_get_thread_num(), (n), SETTINGS::num_threads);   //avoid usage of iostream in the MCSTL
 #endif
 
-/** Use floating-point scaling instead of modulo for mapping random numbers to a range.
- *  This can be faster on certain CPUs. */
-#define MCSTL_SCALE_DOWN_FPU 0
-
 /** Switch on many assertions in MCSTL code.
  *  Should be switched on only locally. */
 #define MCSTL_ASSERTIONS 0
-
-/** Switch on many assertions in MCSTL code.
- *  Consider the size of the L1 cache for mcstl::parallel_random_shuffle(). */
-#define MCSTL_RANDOM_SHUFFLE_CONSIDER_L1 0
-/** Switch on many assertions in MCSTL code.
- *  Consider the size of the TLB for mcstl::parallel_random_shuffle(). */
-#define MCSTL_RANDOM_SHUFFLE_CONSIDER_TLB 0
 
 /** First copy the data, sort it locally, and merge it back (0); or copy it back after everyting is done (1).
  *

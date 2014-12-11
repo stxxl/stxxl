@@ -31,20 +31,6 @@ namespace parallel {
 #define MCSTL_MERGESORT 1
 #endif
 
-#ifndef MCSTL_QUICKSORT
-/** \def MCSTL_QUICKSORT
- *  Include parallel unbalanced quicksort.
- *  \see mcstl::Settings::sort_algorithm */
-#define MCSTL_QUICKSORT 1
-#endif
-
-#ifndef MCSTL_BAL_QUICKSORT
-/** \def MCSTL_BAL_QUICKSORT
- *  Include parallel dynamically load-balanced quicksort.
- *  \see mcstl::Settings::sort_algorithm */
-#define MCSTL_BAL_QUICKSORT 1
-#endif
-
 #ifndef MCSTL_LOSER_TREE
 /** \def MCSTL_LOSER_TREE
  *  Include guarded (sequences may run empty) loser tree, moving objects.
@@ -99,46 +85,6 @@ namespace parallel {
  *  Include some loser tree variant.
  *  \see mcstl::Settings multiway_merge_algorithm */
 #define MCSTL_LOSER_TREE_SENTINEL 0
-#endif
-
-#ifndef MCSTL_FIND_GROWING_BLOCKS
-/** Include the growing blocks variant for std::find.
- *  \see mcstl::Settings::find_distribution */
-#define MCSTL_FIND_GROWING_BLOCKS 1
-#endif
-
-#ifndef MCSTL_FIND_CONSTANT_SIZE_BLOCKS
-/** Include the equal-sized blocks variant for std::find.
- *  \see mcstl::Settings::find_distribution */
-#define MCSTL_FIND_CONSTANT_SIZE_BLOCKS 1
-#endif
-
-#ifndef MCSTL_FIND_EQUAL_SPLIT
-/** \def MCSTL_FIND_EQUAL_SPLIT
- *  Include the equal splitting variant for std::find.
- *  \see mcstl::Settings::find_distribution */
-#define MCSTL_FIND_EQUAL_SPLIT 1
-#endif
-
-#ifndef MCSTL_TREE_INITIAL_SPLITTING
-/** \def MCSTL_TREE_INITIAL_SPLITTING
- *  Include the initial splitting variant for _Rb_tree::insert_unique(InputIterator beg, InputIterator end).
- *  \see mcstl::_Rb_tree */
-#define MCSTL_TREE_INITIAL_SPLITTING 1
-#endif
-
-#ifndef MCSTL_TREE_DYNAMIC_BALANCING
-/** \def MCSTL_TREE_DYNAMIC_BALANCING
- *  Include the dynamic balancing variant for _Rb_tree::insert_unique(InputIterator beg, InputIterator end).
- *  \see mcstl::_Rb_tree */
-#define MCSTL_TREE_DYNAMIC_BALANCING 1
-#endif
-
-#ifndef MCSTL_TREE_FULL_COPY
-/** \def MCSTL_TREE_FULL_COPY
- *  In order to sort the input sequence of _Rb_tree::insert_unique(InputIterator beg, InputIterator end) a full copy of the input elements is done.
- *  \see mcstl::_Rb_tree */
-#define MCSTL_TREE_FULL_COPY 1
 #endif
 
 } // namespace parallel
