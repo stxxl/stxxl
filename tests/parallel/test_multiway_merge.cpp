@@ -98,9 +98,9 @@ void test_vecs(unsigned int vecnum)
     }
 
     stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                    output.begin(),
+                                    output.begin(), totalsize,
                                     std::less<Something>(),
-                                    totalsize, false);
+                                    false);
 
     STXXL_CHECK(output.size() == totalsize);
 
