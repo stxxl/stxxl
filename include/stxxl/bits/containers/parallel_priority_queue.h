@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <list>
@@ -52,512 +53,9 @@ STXXL_BEGIN_NAMESPACE
 
 namespace ppq_local {
 
-/*!
- * Internal arrays store a sorted sequence of values in RAM, which will be
- * merged together into the deletion buffer, when it needs to be
- * refilled. Internal arrays are constructed from the insertions heaps when
- * they overflow.
- */
-template <class ValueType>
-class internal_array : private noncopyable
-{
-protected:
-    //! Contains the items of the sorted sequence.
-    std::vector<ValueType> m_values;
-
-    //! Index of the current head
-    size_t m_min_index;
-
-public:
-    //! The value iterator type used by begin() and end(). We use pointers as
-    //! iterator so internal arrays are compatible to external arrays and can
-    //! be merged together.
-    typedef ValueType* iterator;
-
-    //! Default constructor. Don't use this directy. Needed for regrowing in
-    //! surrounding vector.
-    internal_array() { }
-
-    //! Constructor which takes a value vector. The value vector is empty
-    //! afterwards.
-    internal_array(std::vector<ValueType>& values)
-        : m_values(), m_min_index(0)
-    {
-        std::swap(m_values, values);
-    }
-
-    //! Swap internal_array with another one.
-    void swap(internal_array& o)
-    {
-        std::swap(m_values, o.m_values);
-        std::swap(m_min_index, o.m_min_index);
-    }
-
-    //! Random access operator
-    inline ValueType& operator [] (size_t i) const
-    {
-        return m_values[i];
-    }
-
-    //! Use inc_min if a value has been extracted.
-    inline void inc_min()
-    {
-        m_min_index++;
-    }
-
-    //! Use inc_min(diff) if multiple values have been extracted.
-    inline void inc_min(size_t diff)
-    {
-        m_min_index += diff;
-    }
-
-    //! The currently smallest element in the array.
-    inline const ValueType & get_min() const
-    {
-        return m_values[m_min_index];
-    }
-
-    //! The index of the currently smallest element in the array.
-    inline size_t get_min_index() const
-    {
-        return m_min_index;
-    }
-
-    //! The index of the largest element in the array.
-    inline size_t get_max_index() const
-    {
-        return (m_values.size() - 1);
-    }
-
-    //! Returns if the array has run empty.
-    inline bool empty() const
-    {
-        return (m_min_index >= m_values.size());
-    }
-
-    //! Returns the current size of the array.
-    inline size_t size() const
-    {
-        return (m_values.size() - m_min_index);
-    }
-
-    //! Return the amount of internal memory used by the array
-    inline size_t int_memory() const
-    {
-        return m_values.capacity() * sizeof(ValueType);
-    }
-
-    //! Begin iterator
-    inline iterator begin()
-    {
-        // We use &(*()) in order to get a pointer iterator. This is allowed
-        // because values are guaranteed to be consecutive in std::vecotor.
-        return &(*(m_values.begin() + m_min_index));
-    }
-
-    //! End iterator
-    inline iterator end()
-    {
-        // We use &(*()) in order to get a pointer iterator. This is allowed
-        // because values are guaranteed to be consecutive in std::vecotor.
-        return &(*(m_values.end()));
-    }
-};
-
-/*!
- * External array stores a sorted sequence of values on the hard disk and
- * allows access to the first block (containing the smallest values).  The
- * class uses buffering and prefetching in order to improve the performance.
- *
- * \tparam ValueType Type of the contained objects (POD with no references to
- * internal memory).
- *
- * \tparam BlockSize External block size. Default =
- * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
- *
- * \tparam AllocStrategy Allocation strategy for the external memory. Default =
- * STXXL_DEFAULT_ALLOC_STRATEGY.
- */
-template <
-    class ValueType,
-    unsigned_type BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
-    >
-class external_array : private noncopyable
-{
-public:
-    typedef external_array<ValueType, BlockSize, AllocStrategy> self_type;
-    typedef std::vector<BID<BlockSize> > bid_vector;
-    typedef typed_block<BlockSize, ValueType> block_type;
-    typedef ValueType* iterator;
-    typedef const ValueType* const_iterator;
-    typedef typename bid_vector::iterator bid_iterator;
-    typedef typename block_type::iterator block_iterator;
-    typedef read_write_pool<block_type> pool_type;
-
-protected:
-    //! Allocation strategy for new blocks
-    AllocStrategy m_alloc_strategy;
-
-    //! The total capacity of the external array. Cannot be changed after
-    //! construction.
-    size_t m_capacity;
-
-    //! The total number of elements minus the number of extracted values
-    size_t m_size;
-
-    //! The number of elements fitting into one block
-    static const unsigned_type num_elements_per_block = BlockSize / sizeof(ValueType);
-
-    //! Number of blocks in external memory
-    size_t m_num_bids;
-
-    //! Number of blocks to prefetch from EM
-    size_t m_num_prefetch_blocks;
-
-    //! Size of the write buffer in number of blocks
-    size_t m_num_write_buffer_blocks;
-
-    //! The IDs of each block in external memory
-    bid_vector m_bids;
-
-    //! The block with the currently smallest elements
-    block_type* m_first_block;
-
-    //! Prefetch and write buffer pool
-    pool_type* m_pool;
-
-    //! The read_request can be used to wait until the block has been
-    //! completely fetched.
-    request_ptr m_read_request;
-
-    //! The write position in the block currently being filled. Used by the
-    //! <<-operator.
-    size_t m_write_position;
-
-    //! Index of the next block to be prefetched.
-    size_t m_hint_index;
-
-    /* Write phase: Index of the external block where the current block will be
-     * stored in when it's filled. Read phase: Index of the external block
-     * which will be fetched next.
-     */
-    size_t m_current_bid_index;
-
-    //! True means write phase, false means read phase.
-    bool m_write_phase;
-
-    //! The first block is valid if wait_for_first_block() has already been
-    //! called.
-    bool m_first_block_valid;
-
-    //! Indicates if first_block is actually the first block of all which has
-    //! never been written to external memory.
-    bool m_is_first_block;
-
-    //! boundaries inside the first block
-    size_t m_begin_index;
-
-    //! boundaries inside the first block
-    size_t m_end_index;
-
-public:
-    /*!
-     * Constructs an external array
-     *
-     * \param size The total number of elements. Cannot be changed after
-     * construction.
-     *
-     * \param num_prefetch_blocks Number of blocks to prefetch from hard disk
-     *
-     * \param num_write_buffer_blocks Size of the write buffer in number of
-     * blocks
-     */
-    external_array(size_t size, size_t num_prefetch_blocks,
-                   size_t num_write_buffer_blocks)
-        : m_capacity(size),
-          m_size(0),
-          m_num_bids((size_t)div_ceil(m_capacity, num_elements_per_block)),
-          m_num_prefetch_blocks(std::min(num_prefetch_blocks, m_num_bids)),
-          m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_bids)),
-          m_bids(m_num_bids),
-          m_first_block(new block_type),
-          m_pool(new pool_type(0, m_num_write_buffer_blocks)),
-          m_write_position(0),
-          m_hint_index(0),
-          m_current_bid_index(0),
-          m_write_phase(true),
-          m_first_block_valid(false),
-          m_is_first_block(true),
-          m_begin_index(0),
-          m_end_index(0)
-    {
-        assert(size > 0);
-
-        // allocate blocks in EM.
-        block_manager* bm = block_manager::get_instance();
-        bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end());
-    }
-
-    //! Default constructor. Don't use this directy. Needed for regrowing in
-    //! surrounding vector.
-    external_array()
-        : m_pool(NULL)
-    { }
-
-    //! Swap internal_array with another one.
-    void swap(external_array& o)
-    {
-        std::swap(m_alloc_strategy, o.m_alloc_strategy);
-        std::swap(m_capacity, o.m_capacity);
-        std::swap(m_size, o.m_size);
-        std::swap(m_num_bids, o.m_num_bids);
-        std::swap(m_num_prefetch_blocks, o.m_num_prefetch_blocks);
-        std::swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
-        std::swap(m_bids, o.m_bids);
-        std::swap(m_first_block, o.m_first_block);
-        std::swap(m_pool, o.m_pool);
-        std::swap(m_read_request, o.m_read_request);
-        std::swap(m_write_position, o.m_write_position);
-        std::swap(m_hint_index, o.m_hint_index);
-        std::swap(m_current_bid_index, o.m_current_bid_index);
-        std::swap(m_write_phase, o.m_write_phase);
-        std::swap(m_first_block_valid, o.m_first_block_valid);
-        std::swap(m_is_first_block, o.m_is_first_block);
-        std::swap(m_begin_index, o.m_begin_index);
-        std::swap(m_end_index, o.m_end_index);
-    }
-
-    //! Destructor
-    ~external_array()
-    {
-        block_manager* bm = block_manager::get_instance();
-        if (m_pool != NULL) {
-            // This could also be done step by step in remove_first_...() in
-            // future.
-            bm->delete_blocks(m_bids.begin(), m_bids.end());
-            delete m_first_block;
-            delete m_pool;
-        }   // else: the array has been moved.
-    }
-
-    //! Returns the current size
-    size_t size() const
-    {
-        return m_size;
-    }
-
-    //! Returns if the array is empty
-    bool empty() const
-    {
-        return (m_size == 0);
-    }
-
-    //! Returns if one can safely access elements from the first block.
-    bool first_block_valid() const
-    {
-        return m_first_block_valid;
-    }
-
-    //! Returns the smallest element in the array
-    const ValueType & get_min_element() const
-    {
-        assert(m_first_block_valid);
-        assert(m_end_index - 1 >= m_begin_index);
-        return *begin_block();
-    }
-
-    //! Returns the largest element in the first block / internal memory
-    const ValueType & get_current_max_element() const
-    {
-        assert(m_first_block_valid);
-        assert(m_end_index - 1 >= m_begin_index);
-        block_iterator i = end_block();
-        return *(--i);
-    }
-
-    //! Begin iterator of the first block
-    iterator begin_block() const
-    {
-        assert(m_first_block_valid);
-        return m_first_block->begin() + m_begin_index;
-    }
-
-    //! End iterator of the first block
-    iterator end_block() const
-    {
-        assert(m_first_block_valid);
-        return m_first_block->begin() + m_end_index;
-    }
-
-    //! Random access operator for the first block
-    const ValueType& operator [] (size_t i) const
-    {
-        assert(i >= m_begin_index);
-        assert(i < m_end_index);
-        return m_first_block->elem[i];
-    }
-
-    //! Pushes <record> at the end of the array
-    void operator << (const ValueType& record)
-    {
-        assert(m_write_phase);
-        assert(m_size < m_capacity);
-        ++m_size;
-
-        if (UNLIKELY(m_write_position >= block_type::size)) {
-            m_write_position = 0;
-            write_out();
-        }
-
-        m_first_block->elem[m_write_position++] = record;
-    }
-
-    //! Finish write phase. Afterwards the values can be extracted from bottom
-    //! up (ascending order).
-    void finish_write_phase()
-    {
-        // Idea for the future: If we write the block with the smallest values
-        // in the end, we don't need to write it into EM.
-
-        assert(m_capacity == m_size);
-
-        if (m_write_position > 0) {
-            // This works only if the <<-operator has been used.
-            write_out();
-        }
-
-        m_pool->resize_write(0);
-        m_pool->resize_prefetch(m_num_prefetch_blocks);
-        m_write_phase = false;
-
-        m_current_bid_index = 0;
-        m_begin_index = 0;
-        m_end_index = m_write_position;
-
-        for (size_t i = 0; i < m_num_prefetch_blocks; ++i)
-            hint();
-
-        load_next_block();
-    }
-
-    //! Removes the first block and loads the next one if there's any
-    void remove_first_block()
-    {
-        assert(m_first_block_valid);
-
-        if (has_next_block()) {
-            m_size -= num_elements_per_block;
-            load_next_block();
-        }
-        else {
-            m_size = 0;
-            m_begin_index = m_end_index = 0;
-            m_first_block_valid = true;
-        }
-    }
-
-    //! Removes the first <n> elements from the array (first block).  Loads the
-    //! next block if the current one has run empty.  Make shure there are at
-    //! least <n> elements left in the first block.
-    void remove_first_n_elements(size_t n)
-    {
-        assert(m_first_block_valid);
-
-        if (m_begin_index + n < m_end_index) {
-            m_size -= n;
-            m_begin_index += n;
-        }
-        else {
-            assert(m_begin_index + n == m_end_index);
-
-            if (has_next_block()) {
-                assert(m_size >= n);
-                m_size -= n;
-                load_next_block();
-            }
-            else {
-                m_size -= n;
-                assert(m_size == 0);
-                m_begin_index = 0;
-                m_end_index = 0;
-                m_first_block_valid = true;
-            }
-        }
-    }
-
-    //! Has to be called before using begin_block() and end_block() in order to
-    //! set _first_block_valid.
-    void wait_for_first_block()
-    {
-        assert(!m_write_phase);
-
-        if (m_first_block_valid)
-            return;
-
-        if (m_read_request)
-            m_read_request->wait();
-
-        m_first_block_valid = true;
-    }
-
-protected:
-    //! Write the current block into external memory
-    void write_out()
-    {
-        assert(m_write_phase);
-        m_pool->write(m_first_block, m_bids[m_current_bid_index++]);
-        m_first_block = m_pool->steal();
-    }
-
-    //! Gives the prefetcher a hint for the next block to prefetch
-    void hint()
-    {
-        if (m_hint_index < m_num_bids) {
-            m_pool->hint(m_bids[m_hint_index]);
-        }
-        ++m_hint_index;
-    }
-
-    //! Fetches the next block from the hard disk and calls hint() afterwards.
-    void load_next_block()
-    {
-        m_first_block_valid = false;
-
-        if (!m_is_first_block) {
-            ++m_current_bid_index;
-        }
-        else {
-            m_is_first_block = false;
-        }
-
-        m_read_request = m_pool->read(m_first_block, m_bids[m_current_bid_index]);
-        hint();
-
-        m_begin_index = 0;
-        if (is_last_block()) {
-            m_end_index = m_size % num_elements_per_block;
-            m_end_index = (m_end_index == 0 ? num_elements_per_block : m_end_index);
-        }
-        else {
-            m_end_index = num_elements_per_block;
-        }
-    }
-
-    //! Returns if there is a next block on hard disk.
-    bool has_next_block() const
-    {
-        return ((m_is_first_block && m_num_bids > 0) ||
-                (m_current_bid_index + 1 < m_num_bids));
-    }
-
-    //! Returns if the current block is the last one.
-    bool is_last_block() const
-    {
-        return ((m_current_bid_index == m_num_bids - 1) ||
-                (m_capacity < num_elements_per_block));
-    }
-};
+#include "ppq_iterator.h"
+#include "ppq_internal_array.h"
+#include "ppq_external_array.h"
 
 } // namespace ppq_local
 
@@ -647,7 +145,7 @@ protected:
             case IA:
                 return m_ias[m_parent.m_ia.top()].get_min();
             case EA:
-                return m_eas[m_parent.m_ea.top()].get_min_element();
+                return m_eas[m_parent.m_ea.top()].get_min();
             default:
                 abort();
             }
@@ -708,8 +206,8 @@ protected:
 
         bool operator () (const int a, const int b) const
         {
-            return m_compare(m_eas[a].get_min_element(),
-                             m_eas[b].get_min_element());
+            return m_compare(m_eas[a].get_min(),
+                             m_eas[b].get_min());
         }
     };
 
@@ -952,9 +450,8 @@ protected:
     typedef bid_vector bids_container_type;
     typedef ppq_local::internal_array<ValueType> internal_array_type;
     typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
-    typedef typename std::vector<ValueType>::iterator extract_iterator;
     typedef typename std::vector<ValueType>::iterator value_iterator;
-    typedef typename block_type::iterator block_iterator;
+    typedef typename internal_array_type::iterator iterator;
 
     //! type of insertion heap itself
     typedef std::vector<ValueType> heap_type;
@@ -1185,7 +682,7 @@ protected:
                                   m_internal_arrays.end(),
                                   empty_internal_array_eraser());
 
-        size_type size_removed = 0;
+        //size_type size_removed = 0;
 
         for (typename internal_arrays_type::iterator i = swapend;
              i != m_internal_arrays.end(); ++i)
@@ -1766,14 +1263,18 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
+            //STXXL_VERBOSE1_PPQ("heap "<<index<<": "<<m_proc[index].insertion_heap[0]);
             return m_proc[index].insertion_heap[0];
         case minima_type::EB:
+            //STXXL_VERBOSE1_PPQ("eb "<<m_extract_buffer_index<<": "<<m_extract_buffer[m_extract_buffer_index]);
             return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
+            //STXXL_VERBOSE1_PPQ("ia "<<index<<": "<<m_internal_arrays[index].get_min());
             return m_internal_arrays[index].get_min();
         case minima_type::EA:
-            // wait_for_first_block() already done by comparator....
-            return m_external_arrays[index].get_min_element();
+            //STXXL_VERBOSE1_PPQ("ea "<<index<<": "<<m_external_arrays[index].get_min());
+            // wait() already done by comparator....
+            return m_external_arrays[index].get_min();
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -1849,12 +1350,12 @@ public:
         }
         case minima_type::EA:
         {
-            // wait_for_first_block() already done by comparator...
-            min = m_external_arrays[index].get_min_element();
+            // wait() already done by comparator...
+            min = m_external_arrays[index].get_min();
             assert(m_external_size > 0);
             --m_external_size;
-            m_external_arrays[index].remove_first_n_elements(1);
-            m_external_arrays[index].wait_for_first_block();
+            m_external_arrays[index].remove(1);
+            m_external_arrays[index].wait();
 
             if (!m_external_arrays[index].empty())
                 m_minima.update_external_array(index);
@@ -1894,30 +1395,27 @@ public:
         size_type total_size = m_external_size;
         assert(total_size > 0);
 
-        external_array_type temp_array(total_size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(temp_array);
-
-        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
-        std::vector<ValueType> merge_buffer;
+        external_array_type a(total_size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(a);
 
         m_mem_left += (m_external_arrays.size() - 1) * m_mem_per_external_array;
 
         while (m_external_arrays.size() > 0) {
             size_type eas = m_external_arrays.size();
 
-            m_external_arrays[0].wait_for_first_block();
-            ValueType min_max_value = m_external_arrays[0].get_current_max_element();
+            m_external_arrays[0].wait();
+            ValueType min_max_value = m_external_arrays[0].get_current_max();
 
             for (size_type i = 1; i < eas; ++i) {
-                m_external_arrays[i].wait_for_first_block();
-                ValueType max_value = m_external_arrays[i].get_current_max_element();
+                m_external_arrays[i].wait();
+                ValueType max_value = m_external_arrays[i].get_current_max();
                 if (m_inv_compare(max_value, min_max_value)) {
                     min_max_value = max_value;
                 }
             }
 
             std::vector<size_type> sizes(eas);
-            std::vector<std::pair<block_iterator, block_iterator> > sequences(eas);
+            std::vector<std::pair<iterator, iterator> > sequences(eas);
             size_type output_size = 0;
 
 #if STXXL_PARALLEL
@@ -1926,49 +1424,48 @@ public:
             for (size_type i = 0; i < eas; ++i) {
                 assert(!m_external_arrays[i].empty());
 
-                m_external_arrays[i].wait_for_first_block();
-                block_iterator begin = m_external_arrays[i].begin_block();
-                block_iterator end = m_external_arrays[i].end_block();
+                m_external_arrays[i].wait();
+                iterator begin = m_external_arrays[i].begin();
+                iterator end = m_external_arrays[i].end();
 
                 assert(begin != end);
 
-                block_iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 sizes[i] = ub - begin;
 #pragma omp atomic
                 output_size += ub - begin;
                 sequences[i] = std::make_pair(begin, ub);
             }
 
-            merge_buffer.resize(output_size);
+            a.request_write_buffer(output_size);
 
 #if STXXL_PARALLEL
             parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                     merge_buffer.begin(), m_inv_compare, output_size);
+                                     a.begin(), m_inv_compare, output_size);
 #else
             // TODO
 #endif
 
-            for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].remove_first_n_elements(sizes[i]);
-            }
+            a.flush_write_buffer();
 
-            for (value_iterator i = merge_buffer.begin(); i != merge_buffer.end(); ++i) {
-                a << *i;
+            for (size_type i = 0; i < eas; ++i) {
+                m_external_arrays[i].remove(sizes[i]);
             }
 
             for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].wait_for_first_block();
+                m_external_arrays[i].wait();
             }
 
             m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
         }
 
         a.finish_write_phase();
+        m_external_arrays.swap_back(a);
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2054,55 +1551,63 @@ protected:
         // check only relevant if c_merge_ias_into_eb==true
         if (eas > 0) {
             m_stats.refill_wait_time.start();
-            m_external_arrays[0].wait_for_first_block();
+            m_external_arrays[0].wait();
             m_stats.refill_wait_time.stop();
             assert(m_external_arrays[0].size() > 0);
-            min_max_value = m_external_arrays[0].get_current_max_element();
+            min_max_value = m_external_arrays[0].get_current_max();
+        } else {
+            assert(ias>0);
         }
 
         for (size_type i = 1; i < eas; ++i) {
             m_stats.refill_wait_time.start();
-            m_external_arrays[i].wait_for_first_block();
+            m_external_arrays[i].wait();
             m_stats.refill_wait_time.stop();
 
-            ValueType max_value = m_external_arrays[i].get_current_max_element();
+            ValueType max_value = m_external_arrays[i].get_current_max();
             if (m_inv_compare(max_value, min_max_value)) {
                 min_max_value = max_value;
             }
         }
+
+        STXXL_VARDUMP(min_max_value);
 
         m_stats.refill_minmax_time.stop();
 
         // the number of elements in each external array that are smaller than min_max_value or equal
         // plus the number of elements in the internal arrays
         std::vector<size_type> sizes(eas + ias);
-        std::vector<std::pair<ValueType*, ValueType*> > sequences(eas + ias);
+        std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
 
         /*
          * calculate size and create sequences to merge
          */
 
 #if STXXL_PARALLEL
-        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+        //#pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
             // check only relevant if c_merge_ias_into_eb==true
             if (i < eas) {
                 assert(!m_external_arrays[i].empty());
 
-                assert(m_external_arrays[i].first_block_valid());
-                ValueType* begin = m_external_arrays[i].begin_block();
-                ValueType* end = m_external_arrays[i].end_block();
+                assert(m_external_arrays[i].valid());
+                iterator begin = m_external_arrays[i].begin();
+                iterator end = m_external_arrays[i].end();
 
                 assert(begin != end);
 
                 // remove if parallel
                 //stats.refill_upper_bound_time.start();
-                ValueType* ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
+                
+                STXXL_VERBOSE1_PPQ("adding external seq, size="<<sizes[i]
+                    <<" begin="<<*begin<<" ub="<<*(ub-1)<<" end="<<*(end-1)<<" currentmax="<<m_external_arrays[i].get_current_max());
+                
             }
             else {
                 // else part only relevant if c_merge_ias_into_eb==true
@@ -2110,18 +1615,25 @@ protected:
                 size_type j = i - eas;
                 assert(!(m_internal_arrays[j].empty()));
 
-                ValueType* begin = m_internal_arrays[j].begin();
-                ValueType* end = m_internal_arrays[j].end();
+                iterator begin = m_internal_arrays[j].begin();
+                iterator end = m_internal_arrays[j].end();
                 assert(begin != end);
 
                 if (eas > 0) {
                     //remove if parallel
                     //stats.refill_upper_bound_time.start();
-                    ValueType* ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                    iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                     //stats.refill_upper_bound_time.stop();
 
                     sizes[i] = std::distance(begin, ub);
                     sequences[i] = std::make_pair(begin, ub);
+                
+                    STXXL_VERBOSE1_PPQ("adding internal seq, size="<<sizes[i]
+                        <<" begin="<<*begin<<" ub="<<*(ub-1)<<" end="<<*(end-1));
+                        
+                   if (ub!=end) {
+                        STXXL_VARDUMP(*ub);
+                   }
                 }
                 else {
                     //there is no min_max_value
@@ -2153,6 +1665,8 @@ protected:
 
         m_stats.refill_time_before_merge.stop();
         m_stats.refill_merge_time.start();
+        
+        STXXL_VARDUMP(output_size);
 
 #if STXXL_PARALLEL
         parallel::multiway_merge(sequences.begin(), sequences.end(),
@@ -2164,35 +1678,43 @@ protected:
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
+        //size_t deleted_size = 0;
+
         // remove elements
-        if (c_limit_extract_buffer) {
+        //if (c_limit_extract_buffer) {
             for (size_type i = 0; i < eas + ias; ++i) {
                 // dist represents the number of elements that haven't been merged
                 size_type dist = std::distance(sequences[i].first, sequences[i].second);
-                if (i < eas) {
-                    m_external_arrays[i].remove_first_n_elements(sizes[i] - dist);
-                    assert(m_external_size >= sizes[i] - dist);
-                    m_external_size -= sizes[i] - dist;
-                }
-                else {
-                    size_type j = i - eas;
-                    m_internal_arrays[j].inc_min(sizes[i] - dist);
-                    assert(m_internal_size >= sizes[i] - dist);
-                    m_internal_size -= sizes[i] - dist;
+                //deleted_size+=sizes[i]-dist;
+                if (dist<sizes[i]) {
+                    if (i < eas) {
+                        m_external_arrays[i].remove(sizes[i] - dist);
+                        assert(m_external_size >= sizes[i] - dist);
+                        m_external_size -= sizes[i] - dist;
+                    }
+                    else {
+                        size_type j = i - eas;
+                        m_internal_arrays[j].inc_min(sizes[i] - dist);
+                        assert(m_internal_size >= sizes[i] - dist);
+                        m_internal_size -= sizes[i] - dist;
+                    }
                 }
             }
-        }
+        /*}
         else {
             for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].remove_first_n_elements(sizes[i]);
+                // deleted_size+=sizes[i];
+                m_external_arrays[i].remove(sizes[i]);
                 assert(m_external_size >= sizes[i]);
                 m_external_size -= sizes[i];
             }
-        }
+        }*/
+        
+        //assert(deleted_size==output_size);
 
         //stats.refill_wait_time.start();
         for (size_type i = 0; i < eas; ++i) {
-            m_external_arrays[i].wait_for_first_block();
+            m_external_arrays[i].wait();
         }
         //stats.refill_wait_time.stop();
 
@@ -2442,7 +1964,7 @@ protected:
         size_type num_arrays = m_internal_arrays.size();
         size_type size = m_internal_size;
         size_type int_memory = 0;
-        std::vector<std::pair<ValueType*, ValueType*> > sequences(num_arrays);
+        std::vector<std::pair<iterator, iterator> > sequences(num_arrays);
 
         for (unsigned i = 0; i < num_arrays; ++i)
         {
@@ -2460,23 +1982,19 @@ protected:
 
         m_stats.max_merge_buffer_size.set_max(size);
 
-        std::vector<ValueType> write_buffer(size);
+        a.request_write_buffer(size);
 
 #if STXXL_PARALLEL
         parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 write_buffer.begin(), m_inv_compare, size);
+                                 a.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
 
-        STXXL_VERBOSE1_PPQ("Merge done");
-
-        // TODO: directly write to block? -> no useless mem copy. Does not work if size > block size
-        for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
-            a << *i;
-        }
-
+        a.flush_write_buffer();
         a.finish_write_phase();
+        
+        STXXL_VERBOSE1_PPQ("Merge done");
 
         m_internal_size = 0;
         m_external_size += size;
@@ -2487,7 +2005,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2528,21 +2046,17 @@ protected:
         m_external_arrays.swap_back(temp_array);
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
-        // TODO: write in chunks in order to safe RAM
-        std::vector<ValueType> write_buffer(size);
+        // TODO: write in chunks in order to safe RAM?
+        a.request_write_buffer(size);
 
 #if STXXL_PARALLEL
         parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 write_buffer.begin(), m_inv_compare, size);
+                                 a.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
 
-        // TODO: directly write to block -> no useless mem copy
-        for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
-            a << *i;
-        }
-
+        a.flush_write_buffer();
         a.finish_write_phase();
 
         m_external_size += size;
@@ -2561,7 +2075,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2589,7 +2103,7 @@ protected:
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
-            a << *i;
+            a.push_back(*i);
         }
 
         a.finish_write_phase();
@@ -2599,7 +2113,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2775,7 +2289,7 @@ protected:
         //! Part of refill_extract_buffer_time.
         stats_timer refill_time_after_merge;
 
-        //! Total time of wait_for_first_block() calls in first part of
+        //! Total time of wait() calls in first part of
         //! refill_extract_buffer(). Part of refill_time_before_merge and
         //! refill_extract_buffer_time.
         stats_timer refill_wait_time;
