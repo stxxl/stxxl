@@ -546,7 +546,7 @@ protected:
      * Each internal array reserves space for the extract buffer in the size of
      * all heaps together.
      */
-    static const bool c_limit_extract_buffer = true;
+    static const bool c_limit_extract_buffer = false;
 
     //! For bulks of size up to c_single_insert_limit sequential single insert
     //! is faster than bulk_push.
