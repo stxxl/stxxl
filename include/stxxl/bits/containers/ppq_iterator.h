@@ -1,6 +1,3 @@
-//#define PPQ_VERBOSE_ITERATOR(x) STXXL_MSG(x);
-#define PPQ_VERBOSE_ITERATOR(x) 
-
 //! A random-access iterator class for block oriented data.
 //! The iterator is intended to be provided by the internal_array and
 //! external_array classes and to be used by the multiway_merge algorithm.
@@ -16,7 +13,6 @@ public:
     typedef value_type* pointer;
     typedef ptrdiff_t difference_type;
     typedef std::random_access_iterator_tag iterator_category;
-    
     typedef std::vector< std::pair<pointer,pointer> > block_pointers_type;
 
 protected:
@@ -65,18 +61,7 @@ public:
         m_index(index),
         m_block_size(block_size)
     {
-        m_block_index = index / block_size;
-        const size_t local_index = index % block_size;
-        
-        if ( m_block_index < m_block_pointers.size() ) {
-            m_current = m_block_pointers[m_block_index].first + local_index;
-            assert(m_current < m_block_pointers[m_block_index].second);
-        } else {
-            // global end
-            assert(m_block_index==m_block_pointers.size());
-            assert(local_index==0);
-            m_current = m_block_pointers[m_block_index-1].second;
-        }
+        update();
     }
     
     //! copy constructor
@@ -107,42 +92,27 @@ public:
     
     reference operator* () const
     {
-        //PPQ_VERBOSE_ITERATOR("*");
         return *m_current;
     }
     pointer operator-> () const
     {
-        //PPQ_VERBOSE_ITERATOR("->");
         return m_current;
     }
     reference operator[] (difference_type index) const
     {
-        PPQ_VERBOSE_ITERATOR("[] myindex="<<m_index<<" index="<<index);
-        
         const size_t block_index = index / m_block_size;
         const size_t local_index = index % m_block_size;
-        
-        if ( block_index >= m_block_pointers.size() ) {
-            // STXXL_MSG("Workaround for multiway_merge bug");
-            assert(block_index == m_block_pointers.size());
-            return *(m_block_pointers[block_index-1].second);
-        }
         
         assert(block_index<m_block_pointers.size());
         assert(m_block_pointers[block_index].first + local_index
                 < m_block_pointers[block_index].second);
-        
-        PPQ_VERBOSE_ITERATOR("accessing block_index="<<block_index
-            <<" local_index="<<local_index<<" value="
-            <<(m_block_pointers[block_index].first + local_index)->first);
-        
+            
         return *(m_block_pointers[block_index].first + local_index);
     }
     
     //! pre-increment operator
     self_type& operator ++ ()
     {
-        PPQ_VERBOSE_ITERATOR("++ old_index = "<<m_index<<" old current="<<m_current->first);
         ++m_index;
         ++m_current;
         
@@ -156,14 +126,11 @@ public:
             }
         }
         
-        PPQ_VERBOSE_ITERATOR("++ new_index = "<<m_index<<" new current="<<m_current->first);
-        
         return *this;
     }
     //! post-increment operator
     self_type operator ++ (int)
     {
-        PPQ_VERBOSE_ITERATOR("++(int)");
         self_type former(*this);
         operator ++ ();
         return former;
@@ -171,7 +138,7 @@ public:
     //! pre-increment operator
     self_type& operator -- ()
     {
-        PPQ_VERBOSE_ITERATOR("--");
+        assert(m_index>0);
         --m_index;
         
         if ( m_block_index >= m_block_pointers.size()
@@ -189,38 +156,32 @@ public:
     //! post-increment operator
     self_type operator -- (int)
     {
-        PPQ_VERBOSE_ITERATOR("--(int)");
         self_type former(*this);
         operator -- ();
         return former;
     }
     self_type operator + (difference_type addend) const
     {
-        //PPQ_VERBOSE_ITERATOR("+int");
         return self_type(m_block_pointers, m_block_size, m_index+addend);
     }
     self_type& operator += (difference_type addend)
     {
-        PPQ_VERBOSE_ITERATOR("+=int myindex="<<m_index<<" addend="<<addend);
         m_index += addend;
-        m_current = &(operator[](m_index));
+        update();
         return *this;
     }
     self_type operator - (difference_type subtrahend) const
     {
-        PPQ_VERBOSE_ITERATOR("-int");
         return self_type(m_block_pointers, m_block_size, m_index-subtrahend);
     }
     difference_type operator - (const self_type& o) const
     {
-        PPQ_VERBOSE_ITERATOR("-iterator myindex="<<m_index<<" otherindex="<<o.m_index);
         return (m_index-o.m_index);
     }
     self_type& operator -= (difference_type subtrahend)
     {
-        PPQ_VERBOSE_ITERATOR("-=int");
         m_index -= subtrahend;
-        m_current = &(operator[](m_index));
+        update();
         return *this;
     }
     bool operator == (const self_type& o) const
@@ -247,4 +208,23 @@ public:
     {
         return m_index >= o.m_index;
     }
+    
+private:
+
+    //! updates m_block_index and m_current based on m_index
+    inline void update() {
+        m_block_index = m_index / m_block_size;
+        const size_t local_index = m_index % m_block_size;
+        
+        if ( m_block_index < m_block_pointers.size() ) {
+            m_current = m_block_pointers[m_block_index].first + local_index;
+            assert(m_current < m_block_pointers[m_block_index].second);
+        } else {
+            // global end
+            assert(m_block_index==m_block_pointers.size());
+            assert(local_index==0);
+            m_current = m_block_pointers[m_block_index-1].second;
+        }
+    }
+   
 };
