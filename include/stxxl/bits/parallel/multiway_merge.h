@@ -331,7 +331,7 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
         if ((*s).first == (*s).second)
             continue;
         ValueType& v = *((*s).second - 1);      //last element in sequence
-        if (!max_value || comp(*max_value, v))              //strictly greater
+        if (!max_value || comp(*max_value, v))  //strictly greater
             max_value = &v;
     }
 
@@ -341,10 +341,10 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
     {
         RandomAccessIterator1 split = std::lower_bound((*s).first, (*s).second, *max_value, comp);
         overhang_size += (*s).second - split;
-        *((*s).second) = *max_value;   //set sentinel
+        *((*s).second) = *max_value; //set sentinel
     }
 
-    return overhang_size;       // so many elements will be left over afterwards
+    return overhang_size;            // so many elements will be left over afterwards
 }
 
 /*!
@@ -692,7 +692,7 @@ multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
     target_end = multiway_merge_3_variant<guarded_iterator>(one_missing.begin(), one_missing.end(), target_end, overhang, comp);
 
     one_missing.insert(one_missing.begin() + min_seq, seqs_begin[min_seq]);                         //insert back again
-    std::copy(one_missing.begin(), one_missing.end(), seqs_begin);                                       //write back modified iterators
+    std::copy(one_missing.begin(), one_missing.end(), seqs_begin);                                  //write back modified iterators
 
 #if MCSTL_ASSERTIONS
     assert(target_end == target + length);

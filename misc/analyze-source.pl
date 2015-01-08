@@ -381,7 +381,7 @@ foreach my $file (@filelist)
     elsif ($file =~ m!^include/stxxl/[^/]*$!) {
         process_cpp($file);
     }
-    elsif ($file =~ m!\.pl$!) {
+    elsif ($file =~ m!\.(pl|plot)$!) {
         process_pl_cmake($file);
     }
     elsif ($file =~ m!/CMakeLists\.txt$!) {

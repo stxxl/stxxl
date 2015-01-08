@@ -12,3 +12,4 @@
 
 stxxl_build_test(test_multiway_merge)
 stxxl_build_test(test_multiway_mergesort)
+stxxl_build_test(bench_multiway_merge)
