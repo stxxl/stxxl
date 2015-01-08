@@ -234,7 +234,7 @@ protected:
     uint64 m_bytes;
 
     //! timer
-    timer m_timer;
+    stxxl::timer m_timer;
 
 public:
     //! save message and start timer
@@ -263,6 +263,12 @@ public:
                       << "Processed " << format_IEC_size(m_bytes) << "B"
                       << " @ " << format_IEC_size((uint64)bps) << "B/s");
         }
+    }
+
+    //! constant access to enclosed timer
+    const stxxl::timer& timer() const
+    {
+        return m_timer;
     }
 };
 
