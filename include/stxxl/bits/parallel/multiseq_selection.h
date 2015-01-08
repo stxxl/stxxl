@@ -117,7 +117,8 @@ void multiseq_partition(
     lexicographic_rev<value_type, diff_type, Comparator> lrcomp(comp);
 
     // number of sequences, number of elements in total (possibly including padding)
-    diff_type m = std::distance(begin_seqs, end_seqs), nmax, n, r;
+    const diff_type m = std::distance(begin_seqs, end_seqs);
+    diff_type nmax, n, r;
     RankType N = 0;
 
     for (diff_type i = 0; i < m; i++)
@@ -177,9 +178,14 @@ void multiseq_partition(
     }
 
     std::sort(sample.begin(), sample.end(), lcomp);
-    for (diff_type i = 0; i < m; i++) //conceptual infinity
-        if (n >= ns[i])               //sequence too short, conceptual infinity
+
+    for (diff_type i = 0; i < m; i++) {
+        // conceptual infinity
+        if (n >= ns[i]) {
+            // sequence too short, conceptual infinity
             sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
+        }
+    }
 
     diff_type localrank = rank * m / N;
 

@@ -349,6 +349,20 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
 
 /*!
  * Highly efficient 3-way merging procedure.
+ *
+ * Merging is done with the algorithm implementation described by Peter
+ * Sanders.  Basically, the idea is to minimize the number of necessary
+ * comparison after merging an element.  The implementation trick that makes
+ * this fast is that the order of the sequences is stored in the instruction
+ * pointer (translated into labels in C++).
+ *
+ * This works well for merging up to 4 sequences.
+ *
+ * Note that making the merging stable does \a not come at a performance hit.
+ *
+ * Whether the merging is done guarded or unguarded is selected by the used
+ * iterator class.
+ *
  * \param seqs_begin Begin iterator of iterator pair input sequence.
  * \param seqs_end End iterator of iterator pair input sequence.
  * \param target Begin iterator out output sequence.
@@ -506,6 +520,20 @@ multiway_merge_3_combined(RandomAccessIteratorIterator seqs_begin,
 
 /*!
  * Highly efficient 4-way merging procedure.
+ *
+ * Merging is done with the algorithm implementation described by Peter
+ * Sanders. Basically, the idea is to minimize the number of necessary
+ * comparison after merging an element.  The implementation trick that makes
+ * this fast is that the order of the sequences is stored in the instruction
+ * pointer (translated into goto labels in C++).
+ *
+ * This works well for merging up to 4 sequences.
+ *
+ * Note that making the merging stable does \a not come at a performance hit.
+ *
+ * Whether the merging is done guarded or unguarded is selected by the used
+ * iterator class.
+ *
  * \param seqs_begin Begin iterator of iterator pair input sequence.
  * \param seqs_end End iterator of iterator pair input sequence.
  * \param target Begin iterator out output sequence.
@@ -664,7 +692,7 @@ multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
     target_end = multiway_merge_3_variant<guarded_iterator>(one_missing.begin(), one_missing.end(), target_end, overhang, comp);
 
     one_missing.insert(one_missing.begin() + min_seq, seqs_begin[min_seq]);                         //insert back again
-    copy(one_missing.begin(), one_missing.end(), seqs_begin);                                       //write back modified iterators
+    std::copy(one_missing.begin(), one_missing.end(), seqs_begin);                                       //write back modified iterators
 
 #if MCSTL_ASSERTIONS
     assert(target_end == target + length);
@@ -1368,7 +1396,6 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
  * \param length Maximum length to merge.
  * \param comp Comparator.
  * \param stable Stable merging incurs a performance penalty.
- * \param sentinel Ignored.
  * \return End iterator of output sequence.
  */
 template <typename RandomAccessIteratorIterator,
@@ -1389,7 +1416,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         ValueType;
 
 #if MCSTL_ASSERTIONS
-    for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; rii++)
+    for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; ++rii)
         assert(is_sorted((*rii).first, (*rii).second, comp));
 #endif
 
@@ -1397,7 +1424,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     int k = static_cast<int>(seqs_end - seqs_begin);
 
     DiffType total_length = 0;
-    for (RandomAccessIteratorIterator raii = seqs_begin; raii != seqs_end; raii++)
+    for (RandomAccessIteratorIterator raii = seqs_begin; raii != seqs_end; ++raii)
         total_length += iterpair_size(*raii);
 
     MCSTL_CALL(total_length);
@@ -1461,7 +1488,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         std::vector<RandomAccessIterator1>* offsets = new std::vector<RandomAccessIterator1>[num_threads];
         std::vector<std::pair<RandomAccessIterator1, RandomAccessIterator1> > se(k);
 
-        copy(seqs_begin, seqs_end, se.begin());
+        std::copy(seqs_begin, seqs_end, se.begin());
 
         std::vector<DiffType> borders(num_threads + 1);
         equally_split(length, num_threads, borders.begin());
@@ -1469,12 +1496,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         for (int s = 0; s < (num_threads - 1); s++)
         {
             offsets[s].resize(k);
-            multiseq_partition(se.begin(), se.end(), borders[s + 1], offsets[s].begin(), comp);
+            multiseq_partition(se.begin(), se.end(),
+                               borders[s + 1], offsets[s].begin(), comp);
 
             if (!tight)                         //last one also needed and available
             {
                 offsets[num_threads - 1].resize(k);
-                multiseq_partition(se.begin(), se.end(), (DiffType)length, offsets[num_threads - 1].begin(), comp);
+                multiseq_partition(se.begin(), se.end(),
+                                   (DiffType)length, offsets[num_threads - 1].begin(), comp);
             }
         }
 
@@ -1633,9 +1662,9 @@ multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
 
     if (MCSTL_PARALLEL_CONDITION(((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
                                  ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
-        return parallel_multiway_merge(seqs_begin, seqs_end, target, length, comp, stable, true);
+        return parallel_multiway_merge(seqs_begin, seqs_end, target, length, comp, stable);
     else
-        return sequtial_multiway_merge(seqs_begin, seqs_end, target, length, comp, stable, true);
+        return sequential_multiway_merge(seqs_begin, seqs_end, target, length, comp, stable, true);
 }
 
 }                     // namespace parallel
