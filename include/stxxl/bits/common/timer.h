@@ -266,7 +266,7 @@ public:
     }
 
     //! constant access to enclosed timer
-    const stxxl::timer& timer() const
+    const stxxl::timer & timer() const
     {
         return m_timer;
     }

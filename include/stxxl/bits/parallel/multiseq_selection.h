@@ -107,14 +107,14 @@ void multiseq_partition(
         typename std::iterator_traits<typename std::iterator_traits<RanSeqs>::value_type::first_type>::value_type
         >())         //std::less<T>
 {
-    MCSTL_CALL(end_seqs - begin_seqs)
+    MCSTL_CALL(end_seqs - begin_seqs);
 
     typedef typename std::iterator_traits<RanSeqs>::value_type::first_type iterator;
     typedef typename std::iterator_traits<iterator>::difference_type diff_type;
     typedef typename std::iterator_traits<iterator>::value_type value_type;
 
-    lexicographic<value_type, int, Comparator> lcomp(comp);
-    lexicographic_rev<value_type, int, Comparator> lrcomp(comp);
+    lexicographic<value_type, diff_type, Comparator> lcomp(comp);
+    lexicographic_rev<value_type, diff_type, Comparator> lrcomp(comp);
 
     // number of sequences, number of elements in total (possibly including padding)
     diff_type m = std::distance(begin_seqs, end_seqs), nmax, n, r;
@@ -166,19 +166,20 @@ void multiseq_partition(
 
     //initial partition
 
-    std::vector<std::pair<value_type, int> > sample;
+    typedef std::pair<value_type, diff_type> sample_pair;
+    std::vector<sample_pair> sample;
 
     for (diff_type i = 0; i < m; i++) {
         if (n < ns[i]) {
             // sequence long enough
-            sample.push_back(std::make_pair(S(i)[n], i));
+            sample.push_back(sample_pair(S(i)[n], i));
         }
     }
 
     std::sort(sample.begin(), sample.end(), lcomp);
     for (diff_type i = 0; i < m; i++) //conceptual infinity
         if (n >= ns[i])               //sequence too short, conceptual infinity
-            sample.push_back(std::make_pair(S(i)[0] /*dummy element*/, i));
+            sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
 
     diff_type localrank = rank * m / N;
 
@@ -221,7 +222,7 @@ void multiseq_partition(
         {
             diff_type middle = (b[i] + a[i]) / 2;
             if (lmax && middle < ns[i] &&
-                lcomp(std::make_pair(S(i)[middle], i), std::make_pair(*lmax, lmax_seq)))
+                lcomp(sample_pair(S(i)[middle], i), sample_pair(*lmax, lmax_seq)))
                 a[i] = std::min(a[i] + n + 1, ns[i]);
             else
                 b[i] -= n + 1;
@@ -239,49 +240,47 @@ void multiseq_partition(
         if (skew > 0)
         {
             // move to the left, find smallest
-            std::priority_queue<std::pair<value_type, int>,
-                                std::vector<std::pair<value_type, int> >,
-                                lexicographic_rev<value_type, int, Comparator> >
+            std::priority_queue<sample_pair, std::vector<sample_pair>,
+                                lexicographic_rev<value_type, diff_type, Comparator> >
             pq(lrcomp);
 
             for (diff_type i = 0; i < m; i++)
                 if (b[i] < ns[i])
-                    pq.push(std::make_pair(S(i)[b[i]], i));
+                    pq.push(sample_pair(S(i)[b[i]], i));
 
             for ( ; skew != 0 && !pq.empty(); skew--)
             {
-                int source = pq.top().second;
+                diff_type source = pq.top().second;
                 pq.pop();
 
                 a[source] = std::min(a[source] + n + 1, ns[source]);
                 b[source] += n + 1;
 
                 if (b[source] < ns[source])
-                    pq.push(std::make_pair(S(source)[b[source]], source));
+                    pq.push(sample_pair(S(source)[b[source]], source));
             }
         }
         else if (skew < 0)
         {
             // move to the right, find greatest
-            std::priority_queue<std::pair<value_type, int>,
-                                std::vector<std::pair<value_type, int> >,
-                                lexicographic<value_type, int, Comparator> >
+            std::priority_queue<sample_pair, std::vector<sample_pair>,
+                                lexicographic<value_type, diff_type, Comparator> >
             pq(lcomp);
 
             for (diff_type i = 0; i < m; i++)
                 if (a[i] > 0)
-                    pq.push(std::make_pair(S(i)[a[i] - 1], i));
+                    pq.push(sample_pair(S(i)[a[i] - 1], i));
 
             for ( ; skew != 0; skew++)
             {
-                int source = pq.top().second;
+                diff_type source = pq.top().second;
                 pq.pop();
 
                 a[source] -= n + 1;
                 b[source] -= n + 1;
 
                 if (a[source] > 0)
-                    pq.push(std::make_pair(S(source)[a[source] - 1], source));
+                    pq.push(sample_pair(S(source)[a[source] - 1], source));
             }
         }
     }
@@ -404,11 +403,11 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
 
     for (diff_type i = 0; i < m; i++)
         if (n < ns[i])
-            sample.push_back(std::make_pair(S(i)[n], i));
+            sample.push_back(sample_pair(S(i)[n], i));
     std::sort(sample.begin(), sample.end(), lcomp);
     for (diff_type i = 0; i < m; i++)         //conceptual infinity
         if (n >= ns[i])
-            sample.push_back(std::make_pair(S(i)[0] /*dummy element*/, i));
+            sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
 
     diff_type localrank = rank * m / N;
 
@@ -470,7 +469,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
 
             for (diff_type i = 0; i < m; i++)
                 if (b[i] < ns[i])
-                    pq.push(std::make_pair(S(i)[b[i]], i));
+                    pq.push(sample_pair(S(i)[b[i]], i));
 
             for ( ; skew != 0 && !pq.empty(); skew--)
             {
@@ -481,7 +480,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
                 b[source] += n + 1;
 
                 if (b[source] < ns[source])
-                    pq.push(std::make_pair(S(source)[b[source]], source));
+                    pq.push(sample_pair(S(source)[b[source]], source));
             }
         }
         else if (skew < 0)
@@ -494,7 +493,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
 
             for (diff_type i = 0; i < m; i++)
                 if (a[i] > 0)
-                    pq.push(std::make_pair(S(i)[a[i] - 1], i));
+                    pq.push(sample_pair(S(i)[a[i] - 1], i));
 
             for ( ; skew != 0; skew++)
             {
@@ -505,7 +504,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
                 b[source] -= n + 1;
 
                 if (a[source] > 0)
-                    pq.push(std::make_pair(S(source)[a[source] - 1], source));
+                    pq.push(sample_pair(S(source)[a[source] - 1], source));
             }
         }
     }

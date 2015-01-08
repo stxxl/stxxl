@@ -325,25 +325,23 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
     typedef typename std::iterator_traits<RandomAccessIterator1>::difference_type
         DiffType;
 
-    ValueType max;      //last element in sequence
-    bool max_found = false;
+    ValueType* max_value = NULL;   // last element in sequence
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
     {
         if ((*s).first == (*s).second)
             continue;
         ValueType& v = *((*s).second - 1);      //last element in sequence
-        if (!max_found || comp(max, v))         //strictly greater
-            max = v;
-        max_found = true;
+        if (!max_value || comp(*max_value, v))              //strictly greater
+            max_value = &v;
     }
 
     DiffType overhang_size = 0;
 
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
     {
-        RandomAccessIterator1 split = std::lower_bound((*s).first, (*s).second, max, comp);
+        RandomAccessIterator1 split = std::lower_bound((*s).first, (*s).second, *max_value, comp);
         overhang_size += (*s).second - split;
-        *((*s).second) = max;   //set sentinel
+        *((*s).second) = *max_value;   //set sentinel
     }
 
     return overhang_size;       // so many elements will be left over afterwards
