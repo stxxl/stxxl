@@ -68,7 +68,7 @@ public:
     /** Different parallel sorting algorithms to choose from: multi-way mergesort, quicksort, load-balanced quicksort. */
     enum SortAlgorithm { MWMS, QS, QS_BALANCED };
     /** Different merging algorithms: bubblesort-alike, loser-tree variants, enum sentinel */
-    enum MultiwayMergeAlgorithm { BUBBLE, LOSER_TREE_EXPLICIT, LOSER_TREE, LOSER_TREE_COMBINED, LOSER_TREE_SENTINEL, MWM_ALGORITHM_LAST };
+    enum MultiwayMergeAlgorithm { BUBBLE, LOSER_TREE, LOSER_TREE_COMBINED, LOSER_TREE_SENTINEL, MWM_ALGORITHM_LAST };
     /** Different splitting strategies for sorting/merging: by sampling, exact */
     enum Splitting { SAMPLING, EXACT };
 

@@ -1360,9 +1360,6 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         case SETTINGS::BUBBLE:
             return_target = multiway_merge_bubble(seqs_begin, seqs_end, target, length, comp, stable);
             break;
-        case SETTINGS::LOSER_TREE_EXPLICIT:
-            return_target = multiway_merge_loser_tree<LoserTreeExplicit<ValueType, Comparator> >(seqs_begin, seqs_end, target, length, comp, stable);
-            break;
         case SETTINGS::LOSER_TREE:
             return_target = multiway_merge_loser_tree<LoserTree<ValueType, Comparator> >(seqs_begin, seqs_end, target, length, comp, stable);
             break;

@@ -34,7 +34,6 @@ struct Something
     }
 };
 
-template class stxxl::parallel::LoserTreeExplicit<Something>;
 template class stxxl::parallel::LoserTree<Something>;
 template class stxxl::parallel::LoserTreeReference<Something>;
 template class stxxl::parallel::LoserTreePointer<Something>;
