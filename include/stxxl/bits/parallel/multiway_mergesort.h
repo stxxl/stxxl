@@ -94,8 +94,6 @@ struct PMWMSSorterPU
     thread_index_t num_threads;
     /** Number of owning thread. */
     thread_index_t iam;
-    /** Stable sorting desired. */
-    bool stable;
     /** Pointer to global data. */
     PMWMSSortingData<RandomAccessIterator>* sd;
 };
@@ -126,7 +124,7 @@ inline void determine_samples(PMWMSSorterPU<RandomAccessIterator>* d,
  * \param d Pointer to thread-local data.
  * \param comp Comparator.
  */
-template <typename RandomAccessIterator, typename Comparator>
+template <bool Stable, typename RandomAccessIterator, typename Comparator>
 inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
                                   Comparator& comp)
 {
@@ -158,7 +156,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
 #endif
 
     // sort locally
-    if (d->stable)
+    if (Stable)
         std::stable_sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
     else
         std::sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
@@ -280,7 +278,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
 #endif
     }
 
-    sequential_multiway_merge(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp, d->stable, false);
+    sequential_multiway_merge<Stable>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp, false);
 
     t.tic("merge");
 
@@ -309,15 +307,15 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
  * \param comp Comparator.
  * \param n Length of sequence.
  * \param num_threads Number of threads to use.
- * \param stable Stable sorting.
+ * \tparam Stable Stable sorting.
  */
-template <typename RandomAccessIterator, typename Comparator>
+template <bool Stable = false,
+          typename RandomAccessIterator, typename Comparator>
 inline void
 parallel_sort_mwms(RandomAccessIterator begin,
                    RandomAccessIterator end,
                    Comparator comp,
-                   int num_threads,
-                   bool stable)
+                   int num_threads)
 {
     MCSTL_CALL(end - begin)
 
@@ -364,13 +362,12 @@ parallel_sort_mwms(RandomAccessIterator begin,
         pus[i].num_threads = num_threads;
         pus[i].iam = i;
         pus[i].sd = &sd;
-        pus[i].stable = stable;
     }
     starts[num_threads] = start;
 
     //now sort in parallel
 #pragma omp parallel num_threads(num_threads)
-    parallel_sort_mwms_pu(&(pus[omp_get_thread_num()]), comp);
+    parallel_sort_mwms_pu<Stable>(&(pus[omp_get_thread_num()]), comp);
 
     delete[] starts;
     delete[] sd.temporaries;

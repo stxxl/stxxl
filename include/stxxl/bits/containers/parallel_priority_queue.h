@@ -1942,8 +1942,8 @@ public:
             merge_buffer.resize(output_size);
 
 #if STXXL_PARALLEL
-            parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                     merge_buffer.begin(), m_inv_compare, output_size);
+            parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
+                                        merge_buffer.begin(), m_inv_compare, output_size);
 #else
             // TODO
 #endif
@@ -2155,8 +2155,8 @@ protected:
         m_stats.refill_merge_time.start();
 
 #if STXXL_PARALLEL
-        parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 m_extract_buffer.begin(), m_inv_compare, output_size);
+        parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
+                                    m_extract_buffer.begin(), m_inv_compare, output_size);
 #else
         // TODO
 #endif
@@ -2350,8 +2350,8 @@ protected:
             std::vector<ValueType> merged_array(size);
 
 #if STXXL_PARALLEL
-            parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                     merged_array.begin(), m_inv_compare, size);
+            parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
+                                        merged_array.begin(), m_inv_compare, size);
 #else
             // TODO
 #endif
@@ -2463,8 +2463,8 @@ protected:
         std::vector<ValueType> write_buffer(size);
 
 #if STXXL_PARALLEL
-        parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 write_buffer.begin(), m_inv_compare, size);
+        parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
+                                    write_buffer.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
@@ -2532,8 +2532,8 @@ protected:
         std::vector<ValueType> write_buffer(size);
 
 #if STXXL_PARALLEL
-        parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                 write_buffer.begin(), m_inv_compare, size);
+        parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
+                                    write_buffer.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif

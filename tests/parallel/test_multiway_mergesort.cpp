@@ -35,6 +35,7 @@ struct Something
     }
 };
 
+template <bool Stable>
 void test_size(unsigned int size)
 {
     std::cout << "testing parallel_sort_mwms with " << size << " items.\n";
@@ -47,8 +48,7 @@ void test_size(unsigned int size)
     for (unsigned int i = 0; i < size; ++i)
         v[i] = rnd();
 
-    stxxl::parallel::parallel_sort_mwms(v.begin(), v.end(), cmp,
-                                        8, false);
+    stxxl::parallel::parallel_sort_mwms<Stable>(v.begin(), v.end(), cmp, 8);
 
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp));
 }
@@ -57,11 +57,17 @@ int main()
 {
     // run multiway mergesort tests for 0..256 sequences
     for (unsigned int i = 0; i < 256; ++i)
-        test_size(i);
+    {
+        test_size<false>(i);
+        test_size<true>(i);
+    }
 
     // run multiway mergesort tests for 0..256 sequences
     for (unsigned int i = 256; i <= 16 * 1024 * 1024; i = 2 * i - i / 2)
-        test_size(i);
+    {
+        test_size<false>(i);
+        test_size<true>(i);
+    }
 
     return 0;
 }

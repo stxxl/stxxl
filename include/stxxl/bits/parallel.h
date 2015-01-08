@@ -149,11 +149,11 @@ namespace parallel {
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3, typename DiffType, typename Comparator>
 RandomAccessIterator3
-multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
-               RandomAccessIteratorPairIterator seqs_end,
-               RandomAccessIterator3 target,
-               Comparator comp,
-               DiffType length)
+sw_multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
+                  RandomAccessIteratorPairIterator seqs_end,
+                  RandomAccessIterator3 target,
+                  Comparator comp,
+                  DiffType length)
 {
 #if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
     return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
@@ -176,11 +176,11 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3, typename DiffType, typename Comparator>
 RandomAccessIterator3
-multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
-                        RandomAccessIteratorPairIterator seqs_end,
-                        RandomAccessIterator3 target,
-                        Comparator comp,
-                        DiffType length)
+sw_multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
+                           RandomAccessIteratorPairIterator seqs_end,
+                           RandomAccessIterator3 target,
+                           Comparator comp,
+                           DiffType length)
 {
 #if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
     return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);

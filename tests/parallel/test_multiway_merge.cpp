@@ -40,6 +40,7 @@ template class stxxl::parallel::LoserTreePointer<Something>;
 template class stxxl::parallel::LoserTreeUnguarded<Something>;
 template class stxxl::parallel::LoserTreePointerUnguarded<Something>;
 
+template <bool Stable>
 void test_vecs(unsigned int vecnum)
 {
     static const bool debug = false;
@@ -96,10 +97,9 @@ void test_vecs(unsigned int vecnum)
         sequences[i] = std::make_pair(vec[i].begin(), vec[i].end());
     }
 
-    stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                    output.begin(), totalsize,
-                                    std::less<Something>(),
-                                    false);
+    stxxl::parallel::multiway_merge<Stable>(sequences.begin(), sequences.end(),
+                                            output.begin(), totalsize,
+                                            std::less<Something>());
 
     STXXL_CHECK(output.size() == totalsize);
 
@@ -116,7 +116,10 @@ int main()
 {
     // run multiway merge tests for 0..256 sequences
     for (unsigned int i = 0; i <= 256; ++i)
-        test_vecs(i);
+    {
+        test_vecs<false>(i);
+        test_vecs<true>(i);
+    }
 
     return 0;
 }

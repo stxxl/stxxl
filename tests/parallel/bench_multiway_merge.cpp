@@ -70,9 +70,11 @@ void test_multiway_merge(unsigned int seqnum)
 
     const char* method_name =
         Method == 0 ? "seq_mwm" :
-        Method == 1 ? "seq_gnu_mwm" :
-        Method == 2 ? "para_mwm" :
-        Method == 3 ? "para_gnu_mwm" :
+        Method == 1 ? "seq_stmwm" :
+        Method == 2 ? "seq_gnu_mwm" :
+        Method == 3 ? "para_mwm" :
+        Method == 4 ? "para_stmwm" :
+        Method == 5 ? "para_gnu_mwm" :
         "???";
 
     {
@@ -88,23 +90,37 @@ void test_multiway_merge(unsigned int seqnum)
 
         if (Method == 0)
         {
-            stxxl::parallel::sequential_multiway_merge(sequences.begin(), sequences.end(),
-                                                       out.begin(), total_size, cmp,
-                                                       false, false);
+            stxxl::parallel::sequential_multiway_merge<false>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp,
+                false);
         }
         else if (Method == 1)
+        {
+            stxxl::parallel::sequential_multiway_merge<true>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp,
+                false);
+        }
+        else if (Method == 2)
         {
             __gnu_parallel::multiway_merge(sequences.begin(), sequences.end(),
                                            out.begin(), total_size, cmp,
                                            __gnu_parallel::sequential_tag());
         }
-        else if (Method == 2)
-        {
-            stxxl::parallel::multiway_merge(sequences.begin(), sequences.end(),
-                                            out.begin(), total_size, cmp,
-                                            false);
-        }
         else if (Method == 3)
+        {
+            stxxl::parallel::multiway_merge<false>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp);
+        }
+        else if (Method == 4)
+        {
+            stxxl::parallel::multiway_merge<true>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp);
+        }
+        else if (Method == 5)
         {
             __gnu_parallel::multiway_merge(sequences.begin(), sequences.end(),
                                            out.begin(), total_size, cmp);
@@ -149,6 +165,8 @@ int main()
     test_all<1>();
     test_all<2>();
     test_all<3>();
+    test_all<4>();
+    test_all<5>();
 
     return 0;
 }

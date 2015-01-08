@@ -301,7 +301,7 @@ protected:
                 std::make_pair(current[1], current_end[1])
             };
 
-            parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+            parallel::sw_multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
 
             current[0] = seqs[0].first;
             current[1] = seqs[1].first;
@@ -325,7 +325,7 @@ protected:
                 std::make_pair(current[3], current_end[3])
             };
 
-            parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+            parallel::sw_multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
 
             current[0] = seqs[0].first;
             current[1] = seqs[1].first;
@@ -358,8 +358,8 @@ protected:
                 }
             }
 
-            parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(),
-                                              target, inv_cmp, length);
+            parallel::sw_multiway_merge_sentinel(seqs.begin(), seqs.end(),
+                                                 target, inv_cmp, length);
 
             for (unsigned int i = 0; i < seqs.size(); ++i)
             {
