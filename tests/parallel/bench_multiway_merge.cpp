@@ -92,15 +92,13 @@ void test_multiway_merge(unsigned int seqnum)
         {
             stxxl::parallel::sequential_multiway_merge<false>(
                 sequences.begin(), sequences.end(),
-                out.begin(), total_size, cmp,
-                false);
+                out.begin(), total_size, cmp);
         }
         else if (Method == 1)
         {
             stxxl::parallel::sequential_multiway_merge<true>(
                 sequences.begin(), sequences.end(),
-                out.begin(), total_size, cmp,
-                false);
+                out.begin(), total_size, cmp);
         }
         else if (Method == 2)
         {

@@ -278,7 +278,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
 #endif
     }
 
-    sequential_multiway_merge<Stable>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp, false);
+    sequential_multiway_merge<Stable>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp);
 
     t.tic("merge");
 

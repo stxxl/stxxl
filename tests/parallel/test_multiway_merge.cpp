@@ -120,11 +120,28 @@ void test_vecs(unsigned int vecnum)
             std::less<ValueType>());
     }
     else {
-        stxxl::parallel::multiway_merge_sentinel<Stable>(
+        stxxl::parallel::multiway_merge_sentinels<Stable>(
             sequences.begin(), sequences.end(),
             output.begin(), totalsize,
             std::less<ValueType>());
     }
+
+#ifdef TODO
+    // sequential version's losertrees with sentinels does not work correctly!
+
+    if (!Sentinels) {
+        stxxl::parallel::sequential_multiway_merge<Stable, false>(
+            sequences.begin(), sequences.end(),
+            output.begin(), totalsize,
+            std::less<ValueType>());
+    }
+    else {
+        stxxl::parallel::sequential_multiway_merge<Stable, true>(
+            sequences.begin(), sequences.end(),
+            output.begin(), totalsize,
+            std::less<ValueType>());
+    }
+#endif
 
     if (debug)
     {

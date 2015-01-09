@@ -693,7 +693,7 @@ protected:
     Comparator comp;
 
 public:
-    LoserTreeCopyUnguardedBase(unsigned int _k,
+    LoserTreeCopyUnguardedBase(unsigned int _k, const ValueType& _sentinel,
                                Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(1 << ilog2_ceil(ik)),
@@ -703,6 +703,7 @@ public:
         for (unsigned int i = 0; i < 2 * k; i++)
         {
             losers[i].source = -1;
+            losers[i].key = _sentinel;
         }
     }
 
@@ -720,7 +721,7 @@ public:
     //! return the index of the player with the smallest element.
     int get_min_source()
     {
-        assert(losers[0].source != -1 && !"Data underrun in unguarded merging.");
+        assert(losers[0].source != -1 && "Data underrun in unguarded merging.");
         return losers[0].source;
     }
 
@@ -773,9 +774,9 @@ protected:
     using base_type::comp;
 
 public:
-    LoserTreeCopyUnguarded(unsigned int _k,
+    LoserTreeCopyUnguarded(unsigned int _k, const ValueType& _sentinel,
                            Comparator _comp = std::less<ValueType>())
-        : base_type(_k, _comp)
+        : base_type(_k, _sentinel, _comp)
     { }
 
     // do not pass const reference since key will be used as local variable
@@ -810,9 +811,9 @@ protected:
     using base_type::comp;
 
 public:
-    LoserTreeCopyUnguarded(unsigned int _k,
+    LoserTreeCopyUnguarded(unsigned int _k, const ValueType& _sentinel,
                            Comparator _comp = std::less<ValueType>())
-        : base_type(_k, _comp)
+        : base_type(_k, _sentinel, _comp)
     { }
 
     // do not pass const reference since key will be used as local variable
@@ -865,7 +866,7 @@ protected:
     Comparator comp;
 
 public:
-    LoserTreePointerUnguardedBase(unsigned int _k,
+    LoserTreePointerUnguardedBase(unsigned int _k, const ValueType& _sentinel,
                                   Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(1 << ilog2_ceil(ik)),
@@ -873,7 +874,10 @@ public:
           comp(_comp)
     {
         for (unsigned int i = ik - 1; i < k; i++)
+        {
             losers[i + k].source = -1;
+            losers[i + k].keyp = &_sentinel;
+        }
     }
 
     ~LoserTreePointerUnguardedBase()
@@ -942,9 +946,9 @@ protected:
     using base_type::comp;
 
 public:
-    LoserTreePointerUnguarded(unsigned int _k,
+    LoserTreePointerUnguarded(unsigned int _k, const ValueType& _sentinel,
                               Comparator _comp = std::less<ValueType>())
-        : base_type(_k, _comp)
+        : base_type(_k, _sentinel, _comp)
     { }
 
     void delete_min_insert(const ValueType& key)
@@ -979,9 +983,9 @@ protected:
     using base_type::comp;
 
 public:
-    LoserTreePointerUnguarded(unsigned int _k,
+    LoserTreePointerUnguarded(unsigned int _k, const ValueType& _sentinel,
                               Comparator _comp = std::less<ValueType>())
-        : base_type(_k, _comp)
+        : base_type(_k, _sentinel, _comp)
     { }
 
     void delete_min_insert(const ValueType& key)
