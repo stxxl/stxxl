@@ -207,6 +207,36 @@ STXXL_END_NAMESPACE
 
 #endif
 
+// STXXL_DEBUG_ASSERT is an assertions, that is only active if the compile flag
+// STXXL_DEBUG_ASSERTIONS=1 is true. This macro should be used for more costly
+// assertions inside the library, that can be deactivated after development.
+
+#if STXXL_DEBUG_ASSERTIONS
+
+#define STXXL_DEBUG_ASSERT(condition)                                             \
+    do { if (0) {                                                                 \
+             if (!(condition)) {                                                  \
+                 _STXXL_PRINT("STXXL-DEBUG-ASSERT",                               \
+                              #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                              _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+             }                                                                    \
+         }                                                                        \
+    } while (0)
+
+#else
+
+#define STXXL_DEBUG_ASSERT(condition)                                             \
+    do { if (1) {                                                                 \
+             if (!(condition)) {                                                  \
+                 _STXXL_PRINT("STXXL-DEBUG-ASSERT",                               \
+                              #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+                              _STXXL_PRINT_FLAGS_ERROR); abort();                 \
+             }                                                                    \
+         }                                                                        \
+    } while (0)
+
+#endif
+
 // STXXL_CHECK_THROW is an assertion macro for unit tests, which checks that
 // the enclosed code throws an exception.
 
