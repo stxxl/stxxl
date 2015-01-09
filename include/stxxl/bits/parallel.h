@@ -82,6 +82,8 @@
 #include <algorithm>
 #endif
 
+#include <stxxl/bits/parallel/multiway_merge.h>
+
 STXXL_BEGIN_NAMESPACE
 
 inline unsigned sort_memory_usage_factor()
@@ -155,13 +157,7 @@ sw_multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
                   Comparator comp,
                   DiffType length)
 {
-#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
-    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
-#elif defined(STXXL_PARALLEL_MODE)
-    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
-#else
-#error "no implementation found for multiway_merge()"
-#endif
+    return multiway_merge(seqs_begin, seqs_end, target, length, comp);
 }
 
 /*! Multi-way merging front-end.
@@ -182,13 +178,7 @@ sw_multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
                            Comparator comp,
                            DiffType length)
 {
-#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
-    return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
-#elif defined(STXXL_PARALLEL_MODE)
-    return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
-#else
-#error "no implementation found for multiway_merge_sentinel()"
-#endif
+    return multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
 }
 
 #endif
