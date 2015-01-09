@@ -41,7 +41,9 @@ namespace parallel {
 
 /** Switch on many assertions in MCSTL code.
  *  Should be switched on only locally. */
+#ifndef MCSTL_ASSERTIONS
 #define MCSTL_ASSERTIONS 0
+#endif
 
 /** First copy the data, sort it locally, and merge it back (0); or copy it back after everyting is done (1).
  *

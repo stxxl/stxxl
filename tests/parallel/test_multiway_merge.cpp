@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2014-2015 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,9 +17,9 @@
 
 struct Something
 {
-    int a, b;
+    unsigned int a, b;
 
-    Something(int x = 0)
+    explicit Something(unsigned int x = 0)
         : a(x), b(x * x)
     { }
 
@@ -28,32 +28,39 @@ struct Something
         return a < other.a;
     }
 
+    bool operator == (const Something& other) const
+    {
+        return (a == other.a) && (b == other.b);
+    }
+
     friend std::ostream& operator << (std::ostream& os, const Something& s)
     {
         return os << '(' << s.a << ',' << s.b << ')';
     }
 };
 
-template class stxxl::parallel::LoserTree<Something>;
+template class stxxl::parallel::LoserTreeCopy<false, Something>;
+template class stxxl::parallel::LoserTreeCopy<true, Something>;
 template class stxxl::parallel::LoserTreeReference<Something>;
-template class stxxl::parallel::LoserTreePointer<Something>;
-template class stxxl::parallel::LoserTreeUnguarded<Something>;
-template class stxxl::parallel::LoserTreePointerUnguarded<Something>;
+template class stxxl::parallel::LoserTreePointer<false, Something>;
+template class stxxl::parallel::LoserTreePointer<true, Something>;
+template class stxxl::parallel::LoserTreeCopyUnguarded<false, Something>;
+template class stxxl::parallel::LoserTreeCopyUnguarded<true, Something>;
+template class stxxl::parallel::LoserTreePointerUnguarded<false, Something>;
+template class stxxl::parallel::LoserTreePointerUnguarded<true, Something>;
 
-template <bool Stable>
+template <typename ValueType, bool Stable, bool Sentinels>
 void test_vecs(unsigned int vecnum)
 {
     static const bool debug = false;
 
-    std::cout << "testing winner_tree with " << vecnum << " players\n";
-
     // construct many vectors of sorted random numbers
 
     stxxl::random_number32 rnd;
-    std::vector<std::vector<unsigned int> > vec(vecnum);
+    std::vector<std::vector<ValueType> > vec(vecnum);
 
     size_t totalsize = 0;
-    std::vector<unsigned int> output, correct;
+    std::vector<ValueType> output, correct;
 
     for (size_t i = 0; i < vecnum; ++i)
     {
@@ -64,13 +71,24 @@ void test_vecs(unsigned int vecnum)
 
         // pick random items
         for (size_t j = 0; j < inum; ++j)
-            vec[i][j] = (unsigned int)(rnd() % (vecnum * 20));
+            vec[i][j] = ValueType(rnd() % (vecnum * 20));
 
         std::sort(vec[i].begin(), vec[i].end());
 
         // put items into correct vector as well
         correct.insert(correct.end(), vec[i].begin(), vec[i].end());
     }
+
+    // append sentinels
+    if (Sentinels)
+    {
+        for (size_t i = 0; i < vecnum; ++i)
+            vec[i].push_back(ValueType(std::numeric_limits<unsigned int>::max()));
+    }
+
+    // prepare output and correct vector
+    output.resize(totalsize);
+    std::sort(correct.begin(), correct.end());
 
     if (debug)
     {
@@ -83,25 +101,30 @@ void test_vecs(unsigned int vecnum)
         }
     }
 
-    // prepare output and correct vector
-    output.resize(totalsize);
-    std::sort(correct.begin(), correct.end());
-
     // construct vector of input iterator ranges
-    typedef std::vector<unsigned int>::iterator input_iterator;
+    typedef typename std::vector<ValueType>::iterator input_iterator;
 
     std::vector<std::pair<input_iterator, input_iterator> > sequences(vecnum);
 
     for (size_t i = 0; i < vecnum; ++i)
     {
-        sequences[i] = std::make_pair(vec[i].begin(), vec[i].end());
+        sequences[i] = std::make_pair(vec[i].begin(), vec[i].end() - (Sentinels ? 1 : 0));
+
+        STXXL_CHECK(stxxl::is_sorted(vec[i].begin(), vec[i].end()));
     }
 
-    stxxl::parallel::multiway_merge<Stable>(sequences.begin(), sequences.end(),
-                                            output.begin(), totalsize,
-                                            std::less<Something>());
-
-    STXXL_CHECK(output.size() == totalsize);
+    if (!Sentinels) {
+        stxxl::parallel::multiway_merge<Stable>(
+            sequences.begin(), sequences.end(),
+            output.begin(), totalsize,
+            std::less<ValueType>());
+    }
+    else {
+        stxxl::parallel::multiway_merge_sentinel<Stable>(
+            sequences.begin(), sequences.end(),
+            output.begin(), totalsize,
+            std::less<ValueType>());
+    }
 
     if (debug)
     {
@@ -115,10 +138,19 @@ void test_vecs(unsigned int vecnum)
 int main()
 {
     // run multiway merge tests for 0..256 sequences
-    for (unsigned int i = 0; i <= 256; ++i)
+    for (unsigned int n = 0; n <= 256; ++n)
     {
-        test_vecs<false>(i);
-        test_vecs<true>(i);
+        std::cout << "testing winner_tree with " << n << " players\n";
+
+        test_vecs<Something, false, false>(n);    // unstable, no-sentinels
+        test_vecs<Something, true, false>(n);     // stable, no-sentinels
+        test_vecs<Something, false, true>(n);     // unstable, sentinels
+        test_vecs<Something, true, true>(n);      // stable, sentinels
+
+        test_vecs<unsigned int, false, false>(n); // unstable, no-sentinels
+        test_vecs<unsigned int, true, false>(n);  // stable, no-sentinels
+        test_vecs<unsigned int, false, true>(n);  // unstable, sentinels
+        test_vecs<unsigned int, true, true>(n);   // stable, sentinels
     }
 
     return 0;

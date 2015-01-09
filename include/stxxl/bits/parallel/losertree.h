@@ -7,7 +7,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2014-2015 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +18,7 @@
 #define STXXL_PARALLEL_LOSERTREE_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/base.h>
 #include <functional>
@@ -26,37 +27,59 @@ STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-/** Guarded loser tree, either copying the whole element into the tree structure, or looking up the element via the index.
+/**
+ * Guarded loser tree/tournament tree, either copying the whole element into
+ * the tree structure, or looking up the element via the index.
  *
- *  Guarding is done explicitly through one flag sup per element, inf is not needed due to a better initialization routine.
- *  This is a well-performing variant. */
-template <typename T, typename Comparator = std::less<T> >
-class LoserTree
+ * This is a base class for the LoserTreeCopy<true> and <false> classes.
+ *
+ * Guarding is done explicitly through one flag sup per element, inf is not
+ * needed due to a better initialization routine.  This is a well-performing
+ * variant.
+ *
+ * \tparam ValueType the element type
+ * \tparam Comparator comparator to use for binary comparisons.
+ */
+template <typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreeCopyBase : private noncopyable
 {
-private:
+protected:
+    //! Internal representation of a loser tree player/node
     struct Loser
     {
+        //! flag, true iff is a virtual maximum sentinel
         bool sup;
+        //! index of source
         int source;
-        T key;
+        //! copy of key value of the element in this node
+        ValueType key;
     };
 
-    unsigned int ik, k, offset;
+    //! number of nodes
+    unsigned int ik;
+    //! log_2(ik) next greater power of 2
+    unsigned int k;
+    //! array containing loser tree nodes
     Loser* losers;
+    //! the comparator object
     Comparator comp;
 
 public:
-    inline LoserTree(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
+    LoserTreeCopyBase(unsigned int _k,
+                      Comparator _comp = std::less<ValueType>())
+        : ik(_k),
+          k(1 << ilog2_ceil(ik)),
+          losers(new Loser[k * 2]),
+          comp(_comp)
     {
-        ik = _k;
-        k = 1 << ilog2_ceil(ik); // next greater power of 2
-        offset = k;
-        losers = new Loser[k * 2];
         for (unsigned int i = ik - 1; i < k; i++)
+        {
             losers[i + k].sup = true;
+            losers[i + k].source = -1;
+        }
     }
 
-    inline ~LoserTree()
+    ~LoserTreeCopyBase()
     {
         delete[] losers;
     }
@@ -67,12 +90,21 @@ public:
             os << i << "    " << losers[i].key << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
-    inline int get_min_source()
+    //! return the index of the player with the smallest element.
+    int get_min_source()
     {
         return losers[0].source;
     }
 
-    inline void insert_start(const T& key, int source, bool sup)
+    /**
+     * Initializes the player source with the element key.
+     *
+     * \param key the element to insert
+     * \param source index of the player
+     * \param sup flag that determines whether the value to insert is an
+     *   explicit supremum sentinel.
+     */
+    void insert_start(const ValueType& key, int source, bool sup)
     {
         unsigned int pos = k + source;
 
@@ -81,6 +113,12 @@ public:
         losers[pos].key = key;
     }
 
+    /**
+     * Computes the winner of the competition at player root.  Called
+     * recursively (starting at 0) to build the initial tree.
+     *
+     * \param root index of the game to start.
+     */
     unsigned int init_winner(unsigned int root)
     {
         if (root >= k)
@@ -105,20 +143,52 @@ public:
         }
     }
 
-    inline void init()
+    void init()
     {
         losers[0] = losers[init_winner(1)];
     }
+};
 
-    inline void delete_min_insert(T key, bool sup)      //do not pass const reference since key will be used as local variable
+/**
+ * Guarded loser tree/tournament tree, either copying the whole element into
+ * the tree structure, or looking up the element via the index.
+ *
+ * Unstable specialization of LoserTreeCopyBase.
+ *
+ * Guarding is done explicitly through one flag sup per element, inf is not
+ * needed due to a better initialization routine.  This is a well-performing
+ * variant.
+ *
+ * \tparam ValueType the element type
+ * \tparam Comparator comparator to use for binary comparisons.
+ */
+template <bool Stable /* == false */,
+          typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreeCopy : public LoserTreeCopyBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreeCopyBase<ValueType, Comparator> base_type;
+
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
+
+public:
+    LoserTreeCopy(unsigned int _k, Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
+
+    // do not pass const reference since key will be used as local variable
+    void delete_min_insert(ValueType key, bool sup)
     {
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
-            //the smaller one gets promoted
+            // the smaller one gets promoted
             if (sup ||
                 (!losers[pos].sup && comp(losers[pos].key, key)))
-            {                   //the other one is smaller
+            {
+                // the other one is smaller
                 std::swap(losers[pos].sup, sup);
                 std::swap(losers[pos].source, source);
                 std::swap(losers[pos].key, key);
@@ -129,52 +199,49 @@ public:
         losers[0].source = source;
         losers[0].key = key;
     }
+};
 
-    inline void insert_start_stable(const T& key, int source, bool sup)
-    {
-        return insert_start(key, source, sup);
-    }
+/**
+ * Guarded loser tree/tournament tree, either copying the whole element into
+ * the tree structure, or looking up the element via the index.
+ *
+ * Stable specialization of LoserTreeCopyBase.
+ *
+ * Guarding is done explicitly through one flag sup per element, inf is not
+ * needed due to a better initialization routine.  This is a well-performing
+ * variant.
+ *
+ * \tparam ValueType the element type
+ * \tparam Comparator comparator to use for binary comparisons.
+ */
+template <typename ValueType, typename Comparator>
+class LoserTreeCopy</* Stable == */ true, ValueType, Comparator>
+    : public LoserTreeCopyBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreeCopyBase<ValueType, Comparator> base_type;
 
-    unsigned int init_winner_stable(unsigned int root)
-    {
-        if (root >= k)
-        {
-            return root;
-        }
-        else
-        {
-            unsigned int left = init_winner(2 * root);
-            unsigned int right = init_winner(2 * root + 1);
-            if (losers[right].sup ||
-                (!losers[left].sup && !comp(losers[right].key, losers[left].key)))
-            {                   //left one is less or equal
-                losers[root] = losers[right];
-                return left;
-            }
-            else
-            {                   //right one is less
-                losers[root] = losers[left];
-                return right;
-            }
-        }
-    }
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
 
-    inline void init_stable()
-    {
-        losers[0] = losers[init_winner_stable(1)];
-    }
+public:
+    LoserTreeCopy(unsigned int _k, Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
 
-    inline void delete_min_insert_stable(T key, bool sup)       //do not pass const reference since key will be used as local variable
+    // do not pass const reference since key will be used as local variable
+    void delete_min_insert(ValueType key, bool sup)
     {
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
-            //the smaller one gets promoted, ties are broken by source
             if ((sup && (!losers[pos].sup || losers[pos].source < source)) ||
                 (!sup && !losers[pos].sup &&
                  ((comp(losers[pos].key, key)) ||
                   (!comp(key, losers[pos].key) && losers[pos].source < source))))
-            {                   //the other one is smaller
+            {
+                // the other one is smaller
                 std::swap(losers[pos].sup, sup);
                 std::swap(losers[pos].source, source);
                 std::swap(losers[pos].key, key);
@@ -214,7 +281,7 @@ private:
 #endif
     };
 
-    unsigned int ik, k, offset;
+    unsigned int ik, k;
     Loser* losers;
 #ifndef COPY
     T* keys;
@@ -222,11 +289,10 @@ private:
     Comparator comp;
 
 public:
-    inline LoserTreeReference(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
+    LoserTreeReference(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
         k = 1 << ilog2_ceil(ik); // next greater power of 2
-        offset = k;
         losers = new Loser[k * 2];
 #ifndef COPY
         keys = new T[ik];
@@ -235,7 +301,7 @@ public:
             losers[i + k].sup = true;
     }
 
-    inline ~LoserTreeReference()
+    ~LoserTreeReference()
     {
         delete[] losers;
 #ifndef COPY
@@ -249,12 +315,12 @@ public:
             os << i << "    " << KEY(i) << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
-    inline int get_min_source()
+    int get_min_source()
     {
         return losers[0].source;
     }
 
-    inline void insert_start(T key, int source, bool sup)
+    void insert_start(T key, int source, bool sup)
     {
         unsigned int pos = k + source;
 
@@ -287,12 +353,12 @@ public:
         }
     }
 
-    inline void init()
+    void init()
     {
         losers[0] = losers[init_winner(1)];
     }
 
-    inline void delete_min_insert(T /* key */, bool sup)
+    void delete_min_insert(T /* key */, bool sup)
     {
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -316,7 +382,7 @@ public:
 #endif
     }
 
-    inline void insert_start_stable(T key, int source, bool sup)
+    void insert_start_stable(T key, int source, bool sup)
     {
         return insert_start(key, source, sup);
     }
@@ -345,12 +411,12 @@ public:
         }
     }
 
-    inline void init_stable()
+    void init_stable()
     {
         losers[0] = losers[init_winner_stable(1)];
     }
 
-    inline void delete_min_insert_stable(T /* key */, bool sup)
+    void delete_min_insert_stable(T /* key */, bool sup)
     {
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -379,37 +445,56 @@ public:
 #undef KEY
 #undef KEY_SOURCE
 
-/** Guarded loser tree, either copying the whole element into the tree structure, or looking up the element via the index.
- *  Guarding is done explicitly through one flag sup per element, inf is not needed due to a better initialization routine.
- *  This is a well-performing variant.
-*/
-template <typename T, typename Comparator = std::less<T> >
-class LoserTreePointer
+/**
+ * Guarded loser tree, using pointers to the elements instead of copying them
+ * into the tree nodes.
+ *
+ * This is a base class for the LoserTreePointer<true> and <false> classes.
+ *
+ * Guarding is done explicitly through one flag sup per element, inf is not
+ * needed due to a better initialization routine.  This is a well-performing
+ * variant.
+ */
+template <typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreePointerBase
 {
-private:
+protected:
+    //! Internal representation of a loser tree player/node
     struct Loser
     {
+        //! flag, true iff is a virtual maximum sentinel
         bool sup;
+        //! index of source
         int source;
-        const T* keyp;
+        //! pointer to key value of the element in this node
+        const ValueType* keyp;
     };
 
-    unsigned int ik, k, offset;
+    //! number of nodes
+    unsigned int ik;
+    //! log_2(ik) next greater power of 2
+    unsigned int k;
+    //! array containing loser tree nodes
     Loser* losers;
+    //! the comparator object
     Comparator comp;
 
 public:
-    inline LoserTreePointer(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
+    LoserTreePointerBase(unsigned int _k,
+                         Comparator _comp = std::less<ValueType>())
+        : ik(_k),
+          k(1 << ilog2_ceil(ik)),
+          losers(new Loser[k * 2]),
+          comp(_comp)
     {
-        ik = _k;
-        k = 1 << ilog2_ceil(ik); // next greater power of 2
-        offset = k;
-        losers = new Loser[k * 2];
         for (unsigned int i = ik - 1; i < k; i++)
+        {
             losers[i + k].sup = true;
+            losers[i + k].source = -1;
+        }
     }
 
-    inline ~LoserTreePointer()
+    ~LoserTreePointerBase()
     {
         delete[] losers;
     }
@@ -420,12 +505,21 @@ public:
             os << i << "    " << losers[i].keyp << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
-    inline int get_min_source()
+    //! return the index of the player with the smallest element.
+    int get_min_source()
     {
         return losers[0].source;
     }
 
-    inline void insert_start(const T& key, int source, bool sup)
+    /**
+     * Initializes the player source with the element key.
+     *
+     * \param key the element to insert
+     * \param source index of the player
+     * \param sup flag that determines whether the value to insert is an
+     *   explicit supremum sentinel.
+     */
+    void insert_start(const ValueType& key, int source, bool sup)
     {
         unsigned int pos = k + source;
 
@@ -434,6 +528,12 @@ public:
         losers[pos].keyp = &key;
     }
 
+    /**
+     * Computes the winner of the competition at player root.  Called
+     * recursively (starting at 0) to build the initial tree.
+     *
+     * \param root index of the game to start.
+     */
     unsigned int init_winner(unsigned int root)
     {
         if (root >= k)
@@ -458,14 +558,41 @@ public:
         }
     }
 
-    inline void init()
+    void init()
     {
         losers[0] = losers[init_winner(1)];
     }
+};
 
-    inline void delete_min_insert(const T& key, bool sup)
+/**
+ * Guarded loser tree, using pointers to the elements instead of copying them
+ * into the tree nodes.
+ *
+ * Unstable specialization of LoserTreeCopyBase.
+ *
+ * Guarding is done explicitly through one flag sup per element, inf is not
+ * needed due to a better initialization routine.  This is a well-performing
+ * variant.
+ */
+template <bool Stable /* == false */,
+          typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreePointer : public LoserTreePointerBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreePointerBase<ValueType, Comparator> base_type;
+
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
+
+public:
+    LoserTreePointer(unsigned int _k, Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
+
+    void delete_min_insert(const ValueType& key, bool sup)
     {
-        const T* keyp = &key;
+        const ValueType* keyp = &key;
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -483,44 +610,37 @@ public:
         losers[0].source = source;
         losers[0].keyp = keyp;
     }
+};
 
-    inline void insert_start_stable(const T& key, int source, bool sup)
-    {
-        return insert_start(key, source, sup);
-    }
+/**
+ * Guarded loser tree, using pointers to the elements instead of copying them
+ * into the tree nodes.
+ *
+ * Unstable specialization of LoserTreeCopyBase.
+ *
+ * Guarding is done explicitly through one flag sup per element, inf is not
+ * needed due to a better initialization routine.  This is a well-performing
+ * variant.
+ */
+template <typename ValueType, typename Comparator>
+class LoserTreePointer</* Stable == */ true, ValueType, Comparator>
+    : public LoserTreePointerBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreePointerBase<ValueType, Comparator> base_type;
 
-    unsigned int init_winner_stable(unsigned int root)
-    {
-        if (root >= k)
-        {
-            return root;
-        }
-        else
-        {
-            unsigned int left = init_winner(2 * root);
-            unsigned int right = init_winner(2 * root + 1);
-            if (losers[right].sup ||
-                (!losers[left].sup && !comp(*losers[right].keyp, *losers[left].keyp)))
-            {                   //left one is less or equal
-                losers[root] = losers[right];
-                return left;
-            }
-            else
-            {                   //right one is less
-                losers[root] = losers[left];
-                return right;
-            }
-        }
-    }
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
 
-    inline void init_stable()
-    {
-        losers[0] = losers[init_winner_stable(1)];
-    }
+public:
+    LoserTreePointer(unsigned int _k, Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
 
-    inline void delete_min_insert_stable(const T& key, bool sup)
+    void delete_min_insert(const ValueType& key, bool sup)
     {
-        const T* keyp = &key;
+        const ValueType* keyp = &key;
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -542,52 +662,53 @@ public:
     }
 };
 
-/** Unguarded loser tree, copying the whole element into the tree structure.
+/**
+ * Unguarded loser tree, copying the whole element into the tree structure.
  *
- *  No guarding is done, therefore not a single input sequence must run empty.
- *  This is a very fast variant. */
-template <typename T, typename Comparator = std::less<T> >
-class LoserTreeUnguarded
+ * This is a base class for the LoserTreeCopyUnguarded<true> and <false> classes.
+ *
+ * No guarding is done, therefore not a single input sequence must run empty.
+ * This is a very fast variant.
+ */
+template <typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreeCopyUnguardedBase : private noncopyable
 {
-private:
+protected:
+    //! Internal representation of a loser tree player/node
     struct Loser
     {
+        //! index of source
         int source;
-        T key;
+        //! copy of key value of the element in this node
+        ValueType key;
     };
 
-    unsigned int ik, k, offset;
-    unsigned int* mapping;
+    //! number of nodes
+    unsigned int ik;
+    //! log_2(ik) next greater power of 2
+    unsigned int k;
+    //! array containing loser tree nodes
     Loser* losers;
+    //! the comparator object
     Comparator comp;
 
-    void map(unsigned int root, unsigned int begin, unsigned int end)
+public:
+    LoserTreeCopyUnguardedBase(unsigned int _k,
+                               Comparator _comp = std::less<ValueType>())
+        : ik(_k),
+          k(1 << ilog2_ceil(ik)),
+          losers(new Loser[k * 2]),
+          comp(_comp)
     {
-        if (begin + 1 == end)
-            mapping[begin] = root;
-        else
+        for (unsigned int i = 0; i < 2 * k; i++)
         {
-            unsigned int left = 1 << ilog2_floor(end - begin - 1);
-            map(root * 2, begin, begin + left);
-            map(root * 2 + 1, begin + left, end);
+            losers[i].source = -1;
         }
     }
 
-public:
-    inline LoserTreeUnguarded(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
-    {
-        ik = _k;
-        k = 1 << ilog2_ceil(ik); // next greater or equal power of 2
-        offset = k;
-        losers = new Loser[k + ik];
-        mapping = new unsigned int[ik];
-        map(1, 0, ik);
-    }
-
-    inline ~LoserTreeUnguarded()
+    ~LoserTreeCopyUnguardedBase()
     {
         delete[] losers;
-        delete[] mapping;
     }
 
     void print(std::ostream& os)
@@ -596,30 +717,33 @@ public:
             os << i << "    " << losers[i].key << " from " << losers[i].source << "\n";
     }
 
-    inline int get_min_source()
+    //! return the index of the player with the smallest element.
+    int get_min_source()
     {
+        assert(losers[0].source != -1 && !"Data underrun in unguarded merging.");
         return losers[0].source;
     }
 
-    inline void insert_start(const T& key, int source, bool)
+    void insert_start(const ValueType& key, int source)
     {
-        unsigned int pos = mapping[source];
+        unsigned int pos = k + source;
 
         losers[pos].source = source;
         losers[pos].key = key;
     }
 
-    unsigned int init_winner(unsigned int root, unsigned int begin, unsigned int end)
+    unsigned int init_winner(unsigned int root)
     {
-        if (begin + 1 == end)
-            return mapping[begin];
+        if (root >= k)
+        {
+            return root;
+        }
         else
         {
-            unsigned int division = 1 << ilog2_floor(end - begin - 1);
-            unsigned int left = init_winner(2 * root, begin, begin + division);
-            unsigned int right = init_winner(2 * root + 1, begin + division, end);
+            unsigned int left = init_winner(2 * root);
+            unsigned int right = init_winner(2 * root + 1);
             if (!comp(losers[right].key, losers[left].key))
-            {                                                     //left one is less or equal
+            {                   //left one is less or equal
                 losers[root] = losers[right];
                 return left;
             }
@@ -631,100 +755,130 @@ public:
         }
     }
 
-    inline void init()
+    void init()
     {
-        losers[0] = losers[init_winner(1, 0, ik)];
-    }
-
-    inline void delete_min_insert(const T& key, bool)           //do not pass const reference since key will be used as local variable
-    {
-        losers[0].key = key;
-        T& keyr = losers[0].key;
-        int& source = losers[0].source;
-        for (int pos = mapping[source] / 2; pos > 0; pos /= 2)
-        {
-            //the smaller one gets promoted
-            if (comp(losers[pos].key, keyr))
-            {                   //the other one is smaller
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].key, keyr);
-            }
-        }
-    }
-
-    inline void insert_start_stable(const T& key, int source, bool)
-    {
-        return insert_start(key, source, false);
-    }
-
-    inline void init_stable()
-    {
-        init();
-    }
-
-    inline void delete_min_insert_stable(const T& key, bool)
-    {
-        losers[0].key = key;
-        T& keyr = losers[0].key;
-        int& source = losers[0].source;
-        for (int pos = mapping[source] / 2; pos > 0; pos /= 2)
-        {
-            //the smaller one gets promoted, ties are broken by source
-            if (comp(losers[pos].key, keyr) || (!comp(keyr, losers[pos].key) && losers[pos].source < source))
-            {                   //the other one is smaller
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].key, keyr);
-            }
-        }
+        losers[0] = losers[init_winner(1)];
     }
 };
 
-/** Unguarded loser tree, keeping only pointers to the elements in the tree structure.
- *
- *  No guarding is done, therefore not a single input sequence must run empty.
- *  This is a very fast variant. */
-template <typename T, typename Comparator = std::less<T> >
-class LoserTreePointerUnguarded
+template <bool Stable /* == false */,
+          typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreeCopyUnguarded : public LoserTreeCopyUnguardedBase<ValueType, Comparator>
 {
-private:
-    struct Loser
-    {
-        int source;
-        const T* keyp;
-    };
+protected:
+    typedef LoserTreeCopyUnguardedBase<ValueType, Comparator> base_type;
 
-    unsigned int ik, k, offset;
-    unsigned int* mapping;
-    Loser* losers;
-    Comparator comp;
-
-    void map(unsigned int root, unsigned int begin, unsigned int end)
-    {
-        if (begin + 1 == end)
-            mapping[begin] = root;
-        else
-        {
-            unsigned int left = 1 << (ilog2_floor(end - begin - 1));
-            map(root * 2, begin, begin + left);
-            map(root * 2 + 1, begin + left, end);
-        }
-    }
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
 
 public:
-    inline LoserTreePointerUnguarded(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
+    LoserTreeCopyUnguarded(unsigned int _k,
+                           Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
+
+    // do not pass const reference since key will be used as local variable
+    void delete_min_insert(ValueType key)
     {
-        ik = _k;
-        k = 1 << ilog2_ceil(ik); // next greater power of 2
-        offset = k;
-        losers = new Loser[k + ik];
-        mapping = new unsigned int[ik];
-        map(1, 0, ik);
+        int source = losers[0].source;
+        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
+        {
+            // the smaller one gets promoted
+            if (comp(losers[pos].key, key))
+            {
+                // the other one is smaller
+                std::swap(losers[pos].source, source);
+                std::swap(losers[pos].key, key);
+            }
+        }
+
+        losers[0].source = source;
+        losers[0].key = key;
+    }
+};
+
+template <typename ValueType, typename Comparator>
+class LoserTreeCopyUnguarded</* Stable == */ true, ValueType, Comparator>
+    : public LoserTreeCopyUnguardedBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreeCopyUnguardedBase<ValueType, Comparator> base_type;
+
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
+
+public:
+    LoserTreeCopyUnguarded(unsigned int _k,
+                           Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
+
+    // do not pass const reference since key will be used as local variable
+    void delete_min_insert(ValueType key)
+    {
+        int source = losers[0].source;
+        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
+        {
+            if (!comp(key, losers[pos].key) && losers[pos].source < source)
+            {
+                // the other one is smaller
+                std::swap(losers[pos].source, source);
+                std::swap(losers[pos].key, key);
+            }
+        }
+
+        losers[0].source = source;
+        losers[0].key = key;
+    }
+};
+
+/**
+ * Unguarded loser tree, keeping only pointers to the elements in the tree structure.
+ *
+ * This is a base class for the LoserTreePointerUnguarded<true> and <false> classes.
+ *
+ * No guarding is done, therefore not a single input sequence must run empty.
+ * This is a very fast variant.
+ */
+template <typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreePointerUnguardedBase : private noncopyable
+{
+protected:
+    //! Internal representation of a loser tree player/node
+    struct Loser
+    {
+        //! index of source
+        int source;
+        //! copy of key value of the element in this node
+        const ValueType* keyp;
+    };
+
+    //! number of nodes
+    unsigned int ik;
+    //! log_2(ik) next greater power of 2
+    unsigned int k;
+    //! array containing loser tree nodes
+    Loser* losers;
+    //! the comparator object
+    Comparator comp;
+
+public:
+    LoserTreePointerUnguardedBase(unsigned int _k,
+                                  Comparator _comp = std::less<ValueType>())
+        : ik(_k),
+          k(1 << ilog2_ceil(ik)),
+          losers(new Loser[k * 2]),
+          comp(_comp)
+    {
+        for (unsigned int i = ik - 1; i < k; i++)
+            losers[i + k].source = -1;
     }
 
-    inline ~LoserTreePointerUnguarded()
+    ~LoserTreePointerUnguardedBase()
     {
         delete[] losers;
-        delete[] mapping;
     }
 
     void print(std::ostream& os)
@@ -733,30 +887,31 @@ public:
             os << i << "    " << *losers[i].keyp << " from " << losers[i].source << "\n";
     }
 
-    inline int get_min_source()
+    int get_min_source()
     {
         return losers[0].source;
     }
 
-    inline void insert_start(const T& key, int source, bool)
+    void insert_start(const ValueType& key, int source)
     {
-        unsigned int pos = mapping[source];
+        unsigned int pos = k + source;
 
         losers[pos].source = source;
         losers[pos].keyp = &key;
     }
 
-    unsigned int init_winner(unsigned int root, unsigned int begin, unsigned int end)
+    unsigned int init_winner(unsigned int root)
     {
-        if (begin + 1 == end)
-            return mapping[begin];
+        if (root >= k)
+        {
+            return root;
+        }
         else
         {
-            unsigned int division = 1 << ilog2_floor(end - begin - 1);
-            unsigned int left = init_winner(2 * root, begin, begin + division);
-            unsigned int right = init_winner(2 * root + 1, begin + division, end);
+            unsigned int left = init_winner(2 * root);
+            unsigned int right = init_winner(2 * root + 1);
             if (!comp(*losers[right].keyp, *losers[left].keyp))
-            {                                                     //left one is less or equal
+            {                   //left one is less or equal
                 losers[root] = losers[right];
                 return left;
             }
@@ -768,52 +923,84 @@ public:
         }
     }
 
-    inline void init()
+    void init()
     {
-        losers[0] = losers[init_winner(1, 0, ik)];
+        losers[0] = losers[init_winner(1)];
     }
+};
 
-    inline void delete_min_insert(const T& key, bool)
+template <bool Stable /* == false */,
+          typename ValueType, typename Comparator = std::less<ValueType> >
+class LoserTreePointerUnguarded
+    : public LoserTreePointerUnguardedBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreePointerUnguardedBase<ValueType, Comparator> base_type;
+
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
+
+public:
+    LoserTreePointerUnguarded(unsigned int _k,
+                              Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
+
+    void delete_min_insert(const ValueType& key)
     {
-        const T* keyp = &key;
-        int& source = losers[0].source;
-        for (int pos = mapping[source] / 2; pos > 0; pos /= 2)
+        const ValueType* keyp = &key;
+        int source = losers[0].source;
+        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             //the smaller one gets promoted
             if (comp(*losers[pos].keyp, *keyp))
-            {                   //the other one is smaller
+            {
+                //the other one is smaller
                 std::swap(losers[pos].source, source);
                 std::swap(losers[pos].keyp, keyp);
             }
         }
 
+        losers[0].source = source;
         losers[0].keyp = keyp;
     }
+};
 
-    inline void insert_start_stable(const T& key, int source, bool)
-    {
-        return insert_start(key, source, false);
-    }
+template <typename ValueType, typename Comparator>
+class LoserTreePointerUnguarded</* Stable == */ true, ValueType, Comparator>
+    : public LoserTreePointerUnguardedBase<ValueType, Comparator>
+{
+protected:
+    typedef LoserTreePointerUnguardedBase<ValueType, Comparator> base_type;
 
-    inline void init_stable()
-    {
-        init();
-    }
+    using base_type::k;
+    using base_type::losers;
+    using base_type::comp;
 
-    inline void delete_min_insert_stable(const T& key, bool)
+public:
+    LoserTreePointerUnguarded(unsigned int _k,
+                              Comparator _comp = std::less<ValueType>())
+        : base_type(_k, _comp)
+    { }
+
+    void delete_min_insert(const ValueType& key)
     {
-        int& source = losers[0].source;
-        const T* keyp = &key;
-        for (int pos = mapping[source] / 2; pos > 0; pos /= 2)
+        const ValueType* keyp = &key;
+        int source = losers[0].source;
+        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             //the smaller one gets promoted, ties are broken by source
-            if (comp(*losers[pos].keyp, *keyp) || (!comp(*keyp, *losers[pos].keyp) && losers[pos].source < source))
-            {                   //the other one is smaller
+            if (comp(*losers[pos].keyp, *keyp) ||
+                (!comp(*keyp, *losers[pos].keyp) && losers[pos].source < source))
+            {
+                //the other one is smaller
                 std::swap(losers[pos].source, source);
                 std::swap(losers[pos].keyp, keyp);
             }
         }
 
+        losers[0].source = source;
         losers[0].keyp = keyp;
     }
 };

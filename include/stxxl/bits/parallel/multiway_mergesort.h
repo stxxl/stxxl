@@ -162,7 +162,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
         std::sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
 
 #if MCSTL_ASSERTIONS
-    assert(is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
+    assert(stxxl::is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
 #endif
 
     // invariant: locally sorted subsequence in sd->sorting_places[iam], sd->sorting_places[iam] + length_local
@@ -274,7 +274,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
         seqs[s] = std::make_pair(sd->sorting_places[s] + sd->pieces[iam][s].begin, sd->sorting_places[s] + sd->pieces[iam][s].end);
 
 #if MCSTL_ASSERTIONS
-        assert(is_sorted(seqs[s].first, seqs[s].second, comp));
+        assert(stxxl::is_sorted(seqs[s].first, seqs[s].second, comp));
 #endif
     }
 
@@ -283,7 +283,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     t.tic("merge");
 
 #if MCSTL_ASSERTIONS
-    assert(is_sorted(sd->merging_places[iam], sd->merging_places[iam] + length_am, comp));
+    assert(stxxl::is_sorted(sd->merging_places[iam], sd->merging_places[iam] + length_am, comp));
 #endif
 
 #pragma omp barrier

@@ -127,6 +127,7 @@ merge_advance_movc(RandomAccessIterator1& begin1, RandomAccessIterator1 end1,
         ++target;
         --max_length;
     }
+
     if (begin1 != end1)
     {
         target = std::copy(begin1, begin1 + max_length, target);
@@ -137,6 +138,7 @@ merge_advance_movc(RandomAccessIterator1& begin1, RandomAccessIterator1 end1,
         target = std::copy(begin2, begin2 + max_length, target);
         begin2 += max_length;
     }
+
     return target;
 }
 
