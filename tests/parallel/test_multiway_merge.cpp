@@ -66,6 +66,7 @@ void test_vecs(unsigned int vecnum)
     {
         // determine number of items in stream
         size_t inum = (rnd() % 128) + 64;
+        if (i == 3) inum = 0; // add an empty sequence
         vec[i].resize(inum);
         totalsize += inum;
 
@@ -152,10 +153,10 @@ void test_vecs(unsigned int vecnum)
     STXXL_CHECK(output == correct);
 }
 
-int main()
+void test_all()
 {
     // run multiway merge tests for 0..256 sequences
-    for (unsigned int n = 0; n <= 256; ++n)
+    for (unsigned int n = 0; n <= 256; n += 1 + n / 64 + n / 128)
     {
         std::cout << "testing winner_tree with " << n << " players\n";
 
@@ -169,6 +170,15 @@ int main()
         test_vecs<unsigned int, false, true>(n);  // unstable, sentinels
         test_vecs<unsigned int, true, true>(n);   // stable, sentinels
     }
+}
+
+int main()
+{
+    stxxl::parallel::SETTINGS::multiway_merge_splitting = stxxl::parallel::SETTINGS::EXACT;
+    test_all();
+
+    stxxl::parallel::SETTINGS::multiway_merge_splitting = stxxl::parallel::SETTINGS::SAMPLING;
+    test_all();
 
     return 0;
 }
