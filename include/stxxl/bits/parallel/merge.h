@@ -101,7 +101,7 @@ merge_advance_movc(RandomAccessIterator1& begin1, RandomAccessIterator1 end1,
     typedef typename std::iterator_traits<RandomAccessIterator1>::value_type ValueType1;
     typedef typename std::iterator_traits<RandomAccessIterator2>::value_type ValueType2;
 
-#if MCSTL_ASSERTIONS
+#if STXXL_DEBUG_ASSERTIONS
     assert(max_length >= 0);
 #endif
 
@@ -167,7 +167,7 @@ merge_advance(RandomAccessIterator1& begin1, RandomAccessIterator1 end1,
               OutputIterator target,
               DiffType max_length, Comparator comp)
 {
-    MCSTL_CALL(max_length)
+    STXXL_PARALLEL_PCALL(max_length);
 
     return merge_advance_movc(begin1, end1, begin2, end2, target, max_length, comp);
 }

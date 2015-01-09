@@ -18,37 +18,34 @@
 #define STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/parallel/settings.h>
 #include <cstdio>
 
 STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-/** Determine verbosity level of MCSTL.
- *  Level 1 prints a message each time when entering a MCSTL function. */
-#define MCSTL_VERBOSE_LEVEL 0
-
-/** \def MCSTL_CALL
- *  Macro to produce log message when entering a function.
+/** \def STXXL_PARALLEL_PCALL Macro to produce log message when entering a
+ *  function.
  *  \param n Input size.
- *  \see MCSTL_VERBOSE_LEVEL */
-#if (MCSTL_VERBOSE_LEVEL == 0)
-#define MCSTL_CALL(n)
+ *  \see STXXL_VERBOSE_LEVEL */
+#if (STXXL_VERBOSE_LEVEL <= 0)
+#define STXXL_PARALLEL_PCALL(n)
 #endif
-#if (MCSTL_VERBOSE_LEVEL == 1)
-#define MCSTL_CALL(n) printf("   %s:\niam = %d, n = %ld, num_threads = %d\n", __PRETTY_FUNCTION__, omp_get_thread_num(), (n), SETTINGS::num_threads);   //avoid usage of iostream in the MCSTL
-#endif
-
-/** Switch on many assertions in MCSTL code.
- *  Should be switched on only locally. */
-#ifndef MCSTL_ASSERTIONS
-#define MCSTL_ASSERTIONS 0
+#if (STXXL_VERBOSE_LEVEL >= 1)
+#define STXXL_PARALLEL_PCALL(n)                        \
+    STXXL_MSG("   " << __PRETTY_FUNCTION__ << ":\n"    \
+              "iam = " << omp_get_thread_num() << ", " \
+              "n = " << (n) << ", "                    \
+              "num_threads = " << SETTINGS::num_threads);
 #endif
 
-/** First copy the data, sort it locally, and merge it back (0); or copy it back after everyting is done (1).
+/** First copy the data, sort it locally, and merge it back (0); or copy it
+ * back after everyting is done (1).
  *
  *  Recommendation: 0 */
-#define MCSTL_MULTIWAY_MERGESORT_COPY_LAST 0
+#define STXXL_MULTIWAY_MERGESORT_COPY_LAST 0
 
 } // namespace parallel
 

@@ -17,5 +17,5 @@ stxxl_build_test(bench_multiway_merge)
 stxxl_test(test_multiway_merge)
 stxxl_test(test_multiway_mergesort)
 
-add_define(test_multiway_merge "MCSTL_ASSERTIONS=1")
-add_define(test_multiway_mergesort "MCSTL_ASSERTIONS=1")
+add_define(test_multiway_merge "STXXL_DEBUG_ASSERTIONS=1")
+add_define(test_multiway_mergesort "STXXL_DEBUG_ASSERTIONS=1")

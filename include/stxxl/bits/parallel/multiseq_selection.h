@@ -107,7 +107,7 @@ void multiseq_partition(
         typename std::iterator_traits<typename std::iterator_traits<RanSeqs>::value_type::first_type>::value_type
         >())         //std::less<T>
 {
-    MCSTL_CALL(end_seqs - begin_seqs);
+    STXXL_PARALLEL_PCALL(end_seqs - begin_seqs);
 
     typedef typename std::iterator_traits<RanSeqs>::value_type::first_type iterator;
     typedef typename std::iterator_traits<iterator>::difference_type diff_type;
@@ -356,7 +356,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
                              RankType& offset,
                              Comparator comp = std::less<ValueType>())
 {
-    MCSTL_CALL(end_seqs - begin_seqs)
+    STXXL_PARALLEL_PCALL(end_seqs - begin_seqs);
 
     typedef typename std::iterator_traits<RanSeqs>::value_type::first_type iterator;
     typedef typename std::iterator_traits<iterator>::difference_type diff_type;

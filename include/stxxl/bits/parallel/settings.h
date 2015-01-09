@@ -28,9 +28,9 @@ STXXL_BEGIN_NAMESPACE
 namespace parallel {
 
 /** The extensible condition on whether the parallel variant of an algorithm sould be called.
- * \param c A condition that is overruled by mcstl::Settings::force_parallel,
+ * \param c A condition that is overruled by stxxl::parallel::SETTINGS::force_parallel,
  * i. e. usually a decision based on the input size. */
-#define MCSTL_PARALLEL_CONDITION(c) (!(SETTINGS::force_sequential) && ((SETTINGS::num_threads > 1 && (c)) || SETTINGS::force_parallel))
+#define STXXL_PARALLEL_CONDITION(c) (!(SETTINGS::force_sequential) && ((SETTINGS::num_threads > 1 && (c)) || SETTINGS::force_parallel))
 
 /** Pseudo-integer that gets its initial value from \c omp_get_max_threads(). */
 class NumberOfThreads

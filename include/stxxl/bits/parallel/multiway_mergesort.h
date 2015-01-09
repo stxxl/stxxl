@@ -64,10 +64,10 @@ struct PMWMSSortingData
      *  Temporary arrays for each thread.
      *
      * Indirection Allows using the temporary storage in different ways,
-     * without code duplication.  \see MCSTL_MULTIWAY_MERGESORT_COPY_LAST
+     * without code duplication.  \see STXXL_MULTIWAY_MERGESORT_COPY_LAST
      */
     ValueType** temporaries;
-#if MCSTL_MULTIWAY_MERGESORT_COPY_LAST
+#if STXXL_MULTIWAY_MERGESORT_COPY_LAST
     /** Storage in which to sort. */
     RandomAccessIterator* sorting_places;
     /** Storage into which to merge. */
@@ -143,7 +143,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     // length of this thread's chunk, before merging
     DiffType length_local = sd->starts[iam + 1] - sd->starts[iam];
 
-#if MCSTL_MULTIWAY_MERGESORT_COPY_LAST
+#if STXXL_MULTIWAY_MERGESORT_COPY_LAST
     typedef RandomAccessIterator SortingPlacesIterator;
     // sort in input storage
     sd->sorting_places[iam] = sd->source + sd->starts[iam];
@@ -161,9 +161,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     else
         std::sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
 
-#if MCSTL_ASSERTIONS
-    assert(stxxl::is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
-#endif
+    STXXL_DEBUG_ASSERT(stxxl::is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
 
     // invariant: locally sorted subsequence in sd->sorting_places[iam], sd->sorting_places[iam] + length_local
 
@@ -258,7 +256,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
         offset += sd->pieces[iam][s].begin;
     }
 
-#if MCSTL_MULTIWAY_MERGESORT_COPY_LAST
+#if STXXL_MULTIWAY_MERGESORT_COPY_LAST
     // merge to temporary storage, uninitialized creation not possible since
     // there is no multiway_merge calling the placement new instead of the
     // assignment operator
@@ -273,22 +271,18 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     {
         seqs[s] = std::make_pair(sd->sorting_places[s] + sd->pieces[iam][s].begin, sd->sorting_places[s] + sd->pieces[iam][s].end);
 
-#if MCSTL_ASSERTIONS
-        assert(stxxl::is_sorted(seqs[s].first, seqs[s].second, comp));
-#endif
+        STXXL_DEBUG_ASSERT(stxxl::is_sorted(seqs[s].first, seqs[s].second, comp));
     }
 
     sequential_multiway_merge<Stable>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp);
 
     t.tic("merge");
 
-#if MCSTL_ASSERTIONS
-    assert(stxxl::is_sorted(sd->merging_places[iam], sd->merging_places[iam] + length_am, comp));
-#endif
+    STXXL_DEBUG_ASSERT(stxxl::is_sorted(sd->merging_places[iam], sd->merging_places[iam] + length_am, comp));
 
 #pragma omp barrier
 
-#if MCSTL_MULTIWAY_MERGESORT_COPY_LAST
+#if STXXL_MULTIWAY_MERGESORT_COPY_LAST
     // write back
     std::copy(sd->merging_places[iam], sd->merging_places[iam] + length_am, sd->source + offset);
 #endif
@@ -317,7 +311,7 @@ parallel_sort_mwms(RandomAccessIterator begin,
                    Comparator comp,
                    int num_threads)
 {
-    MCSTL_CALL(end - begin)
+    STXXL_PARALLEL_PCALL(end - begin)
 
     typedef typename std::iterator_traits<RandomAccessIterator>::value_type
         ValueType;
@@ -336,7 +330,7 @@ parallel_sort_mwms(RandomAccessIterator begin,
 
     sd.source = begin;
     sd.temporaries = new ValueType*[num_threads];
-#if MCSTL_MULTIWAY_MERGESORT_COPY_LAST
+#if STXXL_MULTIWAY_MERGESORT_COPY_LAST
     sd.sorting_places = new RandomAccessIterator[num_threads];
     sd.merging_places = new ValueType*[num_threads];
 #else
