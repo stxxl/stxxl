@@ -1055,14 +1055,14 @@ template <bool Stable, class ValueType, class Comparator>
 struct loser_tree_traits
 {
 public:
-    typedef LoserTreeCopy<Stable, ValueType, Comparator> LT;
+    typedef LoserTreePointer<Stable, ValueType, Comparator> LT;
 };
 
-#define STXXL_NO_POINTER(T)                                 \
-    template <bool Stable, class Comparator>                \
-    struct loser_tree_traits<Stable, T, Comparator>         \
-    {                                                       \
-        typedef LoserTreePointer<Stable, T, Comparator> LT; \
+#define STXXL_NO_POINTER(T)                              \
+    template <bool Stable, class Comparator>             \
+    struct loser_tree_traits<Stable, T, Comparator>      \
+    {                                                    \
+        typedef LoserTreeCopy<Stable, T, Comparator> LT; \
     };
 
 STXXL_NO_POINTER(unsigned char)
@@ -1082,14 +1082,14 @@ template <bool Stable, class ValueType, class Comparator>
 class loser_tree_traits_unguarded
 {
 public:
-    typedef LoserTreeCopyUnguarded<Stable, ValueType, Comparator> LT;
+    typedef LoserTreePointerUnguarded<Stable, ValueType, Comparator> LT;
 };
 
-#define STXXL_NO_POINTER_UNGUARDED(T)                                \
-    template <bool Stable, class Comparator>                         \
-    struct loser_tree_traits_unguarded<Stable, T, Comparator>        \
-    {                                                                \
-        typedef LoserTreePointerUnguarded<Stable, T, Comparator> LT; \
+#define STXXL_NO_POINTER_UNGUARDED(T)                             \
+    template <bool Stable, class Comparator>                      \
+    struct loser_tree_traits_unguarded<Stable, T, Comparator>     \
+    {                                                             \
+        typedef LoserTreeCopyUnguarded<Stable, T, Comparator> LT; \
     };
 
 STXXL_NO_POINTER_UNGUARDED(unsigned char)
