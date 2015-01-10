@@ -32,7 +32,8 @@ namespace parallel {
  * second_argument_type not needed.
  */
 template <class Predicate, typename first_argument_type, typename second_argument_type>
-class binary_negate /*: public std::binary_function<first_argument_type, second_argument_type, bool>*/
+class binary_negate
+    : public std::binary_function<first_argument_type, second_argument_type, bool>
 {
 protected:
     Predicate pred;
