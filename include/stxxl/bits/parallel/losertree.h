@@ -518,7 +518,10 @@ public:
           comp(_comp)
     {
         for (size_type i = ik - 1; i < k; i++)
+        {
             losers[i + k].sup = true;
+            losers[i + k].source = (source_type)-1;
+        }
     }
 
     ~LoserTreePointerBase()
