@@ -251,6 +251,59 @@ inline void swap_1D_arrays(Type* a, Type* b, unsigned_type size)
 
 ////////////////////////////////////////////////////////////////////////////
 
+//! round n up to next power of two
+static inline int32_t round_up_to_power_of_two(int32_t n)
+{
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    return n;
+}
+
+//! round n up to next power of two
+static inline uint32_t round_up_to_power_of_two(uint32_t n)
+{
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    return n;
+}
+
+//! round n up to next power of two
+static inline int64_t round_up_to_power_of_two(int64_t n)
+{
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n |= n >> 32;
+    n++;
+    return n;
+}
+//! round n up to next power of two
+static inline uint64_t round_up_to_power_of_two(uint64_t n)
+{
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n |= n >> 32;
+    n++;
+    return n;
+}
+
 //! round n up to next larger multiple of 2^power. example: (48,4) = 64, (48,3) = 48.
 template <typename Integral>
 inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)

@@ -76,7 +76,7 @@ public:
     LoserTreeCopyBase(size_type _k,
                       Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(1 << ilog2_ceil(ik)),
+          k(round_up_to_power_of_two(ik)),
           comp(_comp),
           first_insert(true)
     {
@@ -314,7 +314,7 @@ public:
     LoserTreeReference(unsigned int _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = 1 << ilog2_ceil(ik); // next greater power of 2
+        k = round_up_to_power_of_two(ik);
         losers = new Loser[k * 2];
 #ifndef COPY
         keys = new T[ik];
@@ -513,7 +513,7 @@ public:
     LoserTreePointerBase(size_type _k,
                          Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(1 << ilog2_ceil(ik)),
+          k(round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
@@ -725,7 +725,7 @@ public:
     LoserTreeCopyUnguardedBase(unsigned int _k, const ValueType& _sentinel,
                                Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(1 << ilog2_ceil(ik)),
+          k(round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
@@ -898,7 +898,7 @@ public:
     LoserTreePointerUnguardedBase(unsigned int _k, const ValueType& _sentinel,
                                   Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(1 << ilog2_ceil(ik)),
+          k(round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
