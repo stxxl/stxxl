@@ -1355,15 +1355,13 @@ parallel_multiway_merge_sampling_splitting(
     std::vector<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type>* chunks,
     const thread_index_t num_threads)
 {
-    STXXL_PARALLEL_PCALL(length);
-
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type::first_type RandomAccessIterator;
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::value_type value_type;
 
     const DiffType num_seqs = seqs_end - seqs_begin;
-    DiffType num_samples = SETTINGS::merge_oversampling * num_threads;
+    const DiffType num_samples = num_threads * SETTINGS::merge_oversampling;
 
     // pick samples
     value_type* samples = new value_type[num_seqs * num_samples];
@@ -1386,9 +1384,11 @@ parallel_multiway_merge_sampling_splitting(
     else
         std::sort(samples, samples + (num_samples * num_seqs), comp);
 
-    for (thread_index_t slab = 0; slab < num_threads; ++slab) // for each processor
+    // for each processor
+    for (thread_index_t slab = 0; slab < num_threads; ++slab)
     {
-        for (size_t seq = 0; seq < num_seqs; ++seq)           // for each sequence
+        // for each sequence
+        for (size_t seq = 0; seq < num_seqs; ++seq)
         {
             if (slab > 0) {
                 chunks[slab][seq].first =
@@ -1438,8 +1438,6 @@ parallel_multiway_merge_exact_splitting(
     std::vector<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type>* chunks,
     const thread_index_t num_threads)
 {
-    STXXL_PARALLEL_PCALL(length);
-
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type RandomAccessIteratorPair;
     typedef typename RandomAccessIteratorPair
@@ -1451,32 +1449,30 @@ parallel_multiway_merge_exact_splitting(
     std::vector<RandomAccessIterator>* offsets
         = new std::vector<RandomAccessIterator>[num_threads];
 
-    // copy sequences since partitioning changes them
-    std::vector<RandomAccessIteratorPair> seq(num_seqs);
-    std::copy(seqs_begin, seqs_end, seq.begin());
-
     std::vector<DiffType> ranks(num_threads + 1);
     equally_split(length, num_threads, ranks.begin());
 
-    for (int s = 0; s < (num_threads - 1); ++s)
+    for (thread_index_t s = 0; s < (num_threads - 1); ++s)
     {
         offsets[s].resize(num_seqs);
-        multiseq_partition(seq.begin(), seq.end(),
+        multiseq_partition(seqs_begin, seqs_end,
                            ranks[s + 1], offsets[s].begin(), comp);
 
         if (!tight) // last one also needed and available
         {
             offsets[num_threads - 1].resize(num_seqs);
-            multiseq_partition(seq.begin(), seq.end(),
+            multiseq_partition(seqs_begin, seqs_end,
                                length, offsets[num_threads - 1].begin(), comp);
         }
     }
 
-    for (thread_index_t slab = 0; slab < num_threads; ++slab) // for each processor
+    // for each processor
+    for (thread_index_t slab = 0; slab < num_threads; ++slab)
     {
-        for (size_t s = 0; s < num_seqs; ++s)                 // for each sequence
+        // for each sequence
+        for (size_t s = 0; s < num_seqs; ++s)
         {
-            if (slab == 0)                                    // absolute beginning
+            if (slab == 0) // absolute beginning
                 chunks[slab][s].first = seqs_begin[s].first;
             else
                 chunks[slab][s].first = offsets[slab - 1][s];
