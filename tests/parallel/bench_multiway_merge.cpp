@@ -302,9 +302,9 @@ int main(int argc, char* argv[])
     // run individually for debugging
     //test_repeat<uint32_t, PARA_GNU_MWM_EXACT>(1024);
     //test_repeat<uint32_t, PARA_MWM_EXACT_LT>(1024);
-    test_repeat<uint32_t, SEQ_MWM_LT>(16);
-    test_repeat<uint32_t, SEQ_GNU_MWM>(16);
-    return 0;
+    //test_repeat<uint32_t, SEQ_MWM_LT>(16);
+    //test_repeat<uint32_t, SEQ_GNU_MWM>(16);
+    //return 0;
 
     std::string benchset;
 

@@ -23,6 +23,7 @@
 
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/merge.h>
 #include <stxxl/bits/parallel/losertree.h>
 #include <stxxl/bits/parallel/settings.h>
@@ -928,43 +929,51 @@ multiway_merge_loser_tree(RandomAccessIteratorIterator seqs_begin,
 {
     STXXL_PARALLEL_PCALL(length);
 
-    typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
-        RandomAccessIterator1;
-    typedef typename std::iterator_traits<RandomAccessIterator1>::value_type
-        ValueType;
+    typedef typename LoserTreeType::source_type source_type;
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type::first_type RandomAccessIterator1;
+    typedef typename std::iterator_traits<RandomAccessIterator1>
+        ::value_type value_type;
 
-    int k = static_cast<int>(seqs_end - seqs_begin);
+    source_type k = static_cast<source_type>(seqs_end - seqs_begin);
 
     LoserTreeType lt(k, comp);
 
     DiffType total_length = 0;
 
-    for (int t = 0; t < k; t++)
+    const value_type* arbitrary_element = NULL;
+
+    // find an arbitrary element to avoid default construction
+    for (source_type t = 0; t < k; ++t)
     {
-        if (seqs_begin[t].first == seqs_begin[t].second)
-            lt.insert_start(ValueType(), t, true);
-        else
-            lt.insert_start(*seqs_begin[t].first, t, false);
+        if (!arbitrary_element && iterpair_size(seqs_begin[t]) > 0)
+            arbitrary_element = &(*seqs_begin[t].first);
 
         total_length += iterpair_size(seqs_begin[t]);
+    }
+
+    for (source_type t = 0; t < k; ++t)
+    {
+        if (UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
+            lt.insert_start(*arbitrary_element, t, true);
+        else
+            lt.insert_start(*seqs_begin[t].first, t, false);
     }
 
     lt.init();
 
     total_length = std::min(total_length, length);
 
-    int source;
-
-    for (DiffType i = 0; i < total_length; i++)
+    for (DiffType i = 0; i < total_length; ++i)
     {
-        //take out
-        source = lt.get_min_source();
+        // take out
+        source_type source = lt.get_min_source();
 
         *(target++) = *(seqs_begin[source].first++);
 
-        //feed
-        if (seqs_begin[source].first == seqs_begin[source].second)
-            lt.delete_min_insert(ValueType(), true);
+        // feed
+        if (UNLIKELY(seqs_begin[source].first == seqs_begin[source].second))
+            lt.delete_min_insert(*arbitrary_element, true);
         else
             // replace from same source
             lt.delete_min_insert(*seqs_begin[source].first, false);
@@ -1349,6 +1358,8 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     typedef typename std::iterator_traits<RandomAccessIterator1>::value_type
         ValueType;
 
+    typedef typename std::pair<RandomAccessIterator1, RandomAccessIterator1> seq_type;
+
 #if STXXL_DEBUG_ASSERTIONS
     for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; ++rii)
         assert(stxxl::is_sorted((*rii).first, (*rii).second, comp));
@@ -1490,7 +1501,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
         if (k > 2)
         {
-            std::pair<RandomAccessIterator1, RandomAccessIterator1>* chunks = new std::pair<RandomAccessIterator1, RandomAccessIterator1>[k];
+            seq_type* chunks = new seq_type[k];
 
             DiffType local_length = 0;
             for (size_t s = 0; s < k; s++)
@@ -1518,7 +1529,8 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             merge_advance(begin0, seqs_ne[0].first + pieces[iam][0].second,
                           begin1, seqs_ne[1].first + pieces[iam][1].second,
                           target + target_position,
-                          (pieces[iam][0].second - pieces[iam][0].first) + (pieces[iam][1].second - pieces[iam][1].first),
+                          (pieces[iam][0].second - pieces[iam][0].first)
+                          + (pieces[iam][1].second - pieces[iam][1].first),
                           comp
                           );
         }

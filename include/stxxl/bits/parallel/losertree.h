@@ -41,8 +41,14 @@ namespace parallel {
  * \tparam Comparator comparator to use for binary comparisons.
  */
 template <typename ValueType, typename Comparator = std::less<ValueType> >
-class LoserTreeCopyBase : private noncopyable
+class LoserTreeCopyBase
 {
+public:
+    //! size of counters and array indexes
+    typedef unsigned int size_type;
+    //! type of the source field
+    typedef int source_type;
+
 protected:
     //! Internal representation of a loser tree player/node
     struct Loser
@@ -50,48 +56,53 @@ protected:
         //! flag, true iff is a virtual maximum sentinel
         bool sup;
         //! index of source
-        int source;
+        source_type source;
         //! copy of key value of the element in this node
         ValueType key;
     };
 
     //! number of nodes
-    unsigned int ik;
+    const size_type ik;
     //! log_2(ik) next greater power of 2
-    unsigned int k;
+    const size_type k;
     //! array containing loser tree nodes
     Loser* losers;
     //! the comparator object
     Comparator comp;
+    //! still have to construct keys
+    bool first_insert;
 
 public:
-    LoserTreeCopyBase(unsigned int _k,
+    LoserTreeCopyBase(size_type _k,
                       Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(1 << ilog2_ceil(ik)),
-          losers(new Loser[k * 2]),
-          comp(_comp)
+          comp(_comp),
+          first_insert(true)
     {
-        for (unsigned int i = ik - 1; i < k; i++)
-        {
+        // avoid default-constructing losers[].key
+        losers = static_cast<Loser*>(operator new (2 * k * sizeof(Loser)));
+
+        for (size_type i = ik - 1; i < k; ++i)
             losers[i + k].sup = true;
-            losers[i + k].source = -1;
-        }
     }
 
     ~LoserTreeCopyBase()
     {
-        delete[] losers;
+        for (size_type i = 0; i < (2 * k); ++i)
+            losers[i].~Loser();
+
+        delete losers;
     }
 
     void print(std::ostream& os)
     {
-        for (unsigned int i = 0; i < (k * 2); i++)
+        for (size_type i = 0; i < (k * 2); i++)
             os << i << "    " << losers[i].key << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
     //! return the index of the player with the smallest element.
-    int get_min_source()
+    source_type get_min_source()
     {
         return losers[0].source;
     }
@@ -104,13 +115,22 @@ public:
      * \param sup flag that determines whether the value to insert is an
      *   explicit supremum sentinel.
      */
-    void insert_start(const ValueType& key, int source, bool sup)
+    void insert_start(const ValueType& key, source_type source, bool sup)
     {
-        unsigned int pos = k + source;
+        size_type pos = k + source;
 
         losers[pos].sup = sup;
         losers[pos].source = source;
-        losers[pos].key = key;
+
+        if (UNLIKELY(first_insert))
+        {
+            // copy construct all keys from this first key
+            for (size_type i = 0; i < (2 * k); ++i)
+                new (&(losers[i].key))ValueType(key);
+            first_insert = false;
+        }
+        else
+            losers[pos].key = key;
     }
 
     /**
@@ -119,7 +139,7 @@ public:
      *
      * \param root index of the game to start.
      */
-    unsigned int init_winner(unsigned int root)
+    size_type init_winner(size_type root)
     {
         if (root >= k)
         {
@@ -127,8 +147,8 @@ public:
         }
         else
         {
-            unsigned int left = init_winner(2 * root);
-            unsigned int right = init_winner(2 * root + 1);
+            size_type left = init_winner(2 * root);
+            size_type right = init_winner(2 * root + 1);
             if (losers[right].sup ||
                 (!losers[left].sup && !comp(losers[right].key, losers[left].key)))
             {                   //left one is less or equal
@@ -166,23 +186,24 @@ template <bool Stable /* == false */,
           typename ValueType, typename Comparator = std::less<ValueType> >
 class LoserTreeCopy : public LoserTreeCopyBase<ValueType, Comparator>
 {
-protected:
+public:
     typedef LoserTreeCopyBase<ValueType, Comparator> base_type;
 
+    typedef typename base_type::size_type size_type;
+    typedef typename base_type::source_type source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
 
-public:
-    LoserTreeCopy(unsigned int _k, Comparator _comp = std::less<ValueType>())
+    LoserTreeCopy(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
     // do not pass const reference since key will be used as local variable
     void delete_min_insert(ValueType key, bool sup)
     {
-        int source = losers[0].source;
-        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
+        source_type source = losers[0].source;
+        for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             // the smaller one gets promoted
             if (sup ||
@@ -218,23 +239,24 @@ template <typename ValueType, typename Comparator>
 class LoserTreeCopy</* Stable == */ true, ValueType, Comparator>
     : public LoserTreeCopyBase<ValueType, Comparator>
 {
-protected:
+public:
     typedef LoserTreeCopyBase<ValueType, Comparator> base_type;
 
+    typedef typename base_type::size_type size_type;
+    typedef typename base_type::source_type source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
 
-public:
-    LoserTreeCopy(unsigned int _k, Comparator _comp = std::less<ValueType>())
+    LoserTreeCopy(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
     // do not pass const reference since key will be used as local variable
     void delete_min_insert(ValueType key, bool sup)
     {
-        int source = losers[0].source;
-        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
+        source_type source = losers[0].source;
+        for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             if ((sup && (!losers[pos].sup || losers[pos].source < source)) ||
                 (!sup && !losers[pos].sup &&
@@ -458,6 +480,14 @@ public:
 template <typename ValueType, typename Comparator = std::less<ValueType> >
 class LoserTreePointerBase
 {
+public:
+    //! size of counters and array indexes
+    typedef typename LoserTreeCopyBase<ValueType, Comparator>
+        ::size_type size_type;
+    //! type of the source field
+    typedef typename LoserTreeCopyBase<ValueType, Comparator>
+        ::source_type source_type;
+
 protected:
     //! Internal representation of a loser tree player/node
     struct Loser
@@ -465,33 +495,30 @@ protected:
         //! flag, true iff is a virtual maximum sentinel
         bool sup;
         //! index of source
-        int source;
+        source_type source;
         //! pointer to key value of the element in this node
         const ValueType* keyp;
     };
 
     //! number of nodes
-    unsigned int ik;
+    const size_type ik;
     //! log_2(ik) next greater power of 2
-    unsigned int k;
+    const size_type k;
     //! array containing loser tree nodes
     Loser* losers;
     //! the comparator object
     Comparator comp;
 
 public:
-    LoserTreePointerBase(unsigned int _k,
+    LoserTreePointerBase(size_type _k,
                          Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(1 << ilog2_ceil(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
-        for (unsigned int i = ik - 1; i < k; i++)
-        {
+        for (size_type i = ik - 1; i < k; i++)
             losers[i + k].sup = true;
-            losers[i + k].source = -1;
-        }
     }
 
     ~LoserTreePointerBase()
@@ -501,12 +528,12 @@ public:
 
     void print(std::ostream& os)
     {
-        for (unsigned int i = 0; i < (k * 2); i++)
+        for (size_type i = 0; i < (k * 2); i++)
             os << i << "    " << losers[i].keyp << " from " << losers[i].source << ",  " << losers[i].sup << "\n";
     }
 
     //! return the index of the player with the smallest element.
-    int get_min_source()
+    source_type get_min_source()
     {
         return losers[0].source;
     }
@@ -519,9 +546,9 @@ public:
      * \param sup flag that determines whether the value to insert is an
      *   explicit supremum sentinel.
      */
-    void insert_start(const ValueType& key, int source, bool sup)
+    void insert_start(const ValueType& key, source_type source, bool sup)
     {
-        unsigned int pos = k + source;
+        size_type pos = k + source;
 
         losers[pos].sup = sup;
         losers[pos].source = source;
@@ -534,7 +561,7 @@ public:
      *
      * \param root index of the game to start.
      */
-    unsigned int init_winner(unsigned int root)
+    size_type init_winner(size_type root)
     {
         if (root >= k)
         {
@@ -542,8 +569,8 @@ public:
         }
         else
         {
-            unsigned int left = init_winner(2 * root);
-            unsigned int right = init_winner(2 * root + 1);
+            size_type left = init_winner(2 * root);
+            size_type right = init_winner(2 * root + 1);
             if (losers[right].sup ||
                 (!losers[left].sup && !comp(*losers[right].keyp, *losers[left].keyp)))
             {                   //left one is less or equal
@@ -578,23 +605,24 @@ template <bool Stable /* == false */,
           typename ValueType, typename Comparator = std::less<ValueType> >
 class LoserTreePointer : public LoserTreePointerBase<ValueType, Comparator>
 {
-protected:
+public:
     typedef LoserTreePointerBase<ValueType, Comparator> base_type;
 
+    typedef typename base_type::size_type size_type;
+    typedef typename base_type::source_type source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
 
-public:
-    LoserTreePointer(unsigned int _k, Comparator _comp = std::less<ValueType>())
+    LoserTreePointer(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
     void delete_min_insert(const ValueType& key, bool sup)
     {
         const ValueType* keyp = &key;
-        int source = losers[0].source;
-        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
+        source_type source = losers[0].source;
+        for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             //the smaller one gets promoted
             if (sup ||
@@ -626,23 +654,24 @@ template <typename ValueType, typename Comparator>
 class LoserTreePointer</* Stable == */ true, ValueType, Comparator>
     : public LoserTreePointerBase<ValueType, Comparator>
 {
-protected:
+public:
     typedef LoserTreePointerBase<ValueType, Comparator> base_type;
 
+    typedef typename base_type::size_type size_type;
+    typedef typename base_type::source_type source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
 
-public:
-    LoserTreePointer(unsigned int _k, Comparator _comp = std::less<ValueType>())
+    LoserTreePointer(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
     void delete_min_insert(const ValueType& key, bool sup)
     {
         const ValueType* keyp = &key;
-        int source = losers[0].source;
-        for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
+        source_type source = losers[0].source;
+        for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             //the smaller one gets promoted, ties are broken by source
             if ((sup && (!losers[pos].sup || losers[pos].source < source)) ||
