@@ -100,8 +100,8 @@ public:
 template <typename RanSeqs, typename RankType, typename RankIterator,
           typename Comparator>
 void multiseq_partition(
-    RanSeqs begin_seqs, RanSeqs end_seqs,
-    RankType rank,
+    const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
+    const RankType& rank,
     RankIterator begin_offsets,
     Comparator comp = std::less<
         typename std::iterator_traits<typename std::iterator_traits<RanSeqs>
@@ -344,8 +344,8 @@ void multiseq_partition(
  * this number is 0.
  * \param comp The ordering functor, defaults to std::less. */
 template <typename ValueType, typename RanSeqs, typename RankType, typename Comparator>
-ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
-                             RankType rank,
+ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
+                             const RankType& rank,
                              RankType& offset,
                              Comparator comp = std::less<ValueType>())
 {

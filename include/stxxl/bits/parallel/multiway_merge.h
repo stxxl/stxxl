@@ -1349,8 +1349,8 @@ template <bool Stable,
           typename Comparator>
 void
 parallel_multiway_merge_sampling_splitting(
-    RandomAccessIteratorIterator seqs_begin,
-    RandomAccessIteratorIterator seqs_end,
+    const RandomAccessIteratorIterator& seqs_begin,
+    const RandomAccessIteratorIterator& seqs_end,
     DiffType length, DiffType total_length, Comparator comp,
     std::vector<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type>* chunks,
     const thread_index_t num_threads)
@@ -1432,8 +1432,8 @@ template <bool Stable,
           typename Comparator>
 void
 parallel_multiway_merge_exact_splitting(
-    RandomAccessIteratorIterator seqs_begin,
-    RandomAccessIteratorIterator seqs_end,
+    const RandomAccessIteratorIterator& seqs_begin,
+    const RandomAccessIteratorIterator& seqs_end,
     DiffType length, DiffType total_length, Comparator comp,
     std::vector<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type>* chunks,
     const thread_index_t num_threads)
