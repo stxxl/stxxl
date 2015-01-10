@@ -158,7 +158,7 @@ void test_all()
     // run multiway merge tests for 0..256 sequences
     for (unsigned int n = 0; n <= 256; n += 1 + n / 64 + n / 128)
     {
-        std::cout << "testing winner_tree with " << n << " players\n";
+        std::cout << "testing multiway_merge with " << n << " players\n";
 
         test_vecs<Something, false, false>(n);    // unstable, no-sentinels
         test_vecs<Something, true, false>(n);     // stable, no-sentinels

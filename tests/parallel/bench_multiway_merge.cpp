@@ -18,25 +18,65 @@
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 
-typedef uint64_t value_type;
+unsigned int g_repeat = 3;
 
-// we allocate a list of blocks, each block being a sequence of items.
-static const size_t value_size = sizeof(value_type);
-static const size_t block_bytes = 2 * 1024 * 1024;
-static const size_t block_size = block_bytes / value_size;
+struct DataStruct
+{
+    unsigned int key;
+    char payload[32];
 
-template <int Method>
+    explicit DataStruct(unsigned int k = 0)
+        : key(k)
+    { }
+
+    bool operator < (const DataStruct& other) const
+    {
+        return key < other.key;
+    }
+
+    bool operator == (const DataStruct& other) const
+    {
+        return (key == other.key);
+    }
+
+    friend std::ostream& operator << (std::ostream& os, const DataStruct& s)
+    {
+        return os << '(' << s.key << ",...)";
+    }
+};
+
+enum benchmark_type {
+    SEQ_MWM_LT,
+    SEQ_MWM_LT_STABLE,
+    SEQ_MWM_LT_COMBINED,
+    SEQ_GNU_MWM,
+
+    PARA_MWM_EXACT_LT,
+    PARA_MWM_EXACT_LT_STABLE,
+    PARA_MWM_SAMPLING_LT,
+    PARA_MWM_SAMPLING_LT_STABLE,
+    PARA_GNU_MWM_EXACT,
+    PARA_GNU_MWM_SAMPLING
+};
+
+template <typename ValueType, benchmark_type Method>
 void test_multiway_merge(unsigned int seqnum)
 {
-    typedef std::vector<value_type> sequence_type;
+    // we allocate a list of blocks, each block being a sequence of items.
+    static const size_t value_size = sizeof(ValueType);
+    static const size_t block_bytes = 2 * 1024 * 1024;
+    static const size_t block_size = block_bytes / value_size;
+
+    typedef std::vector<ValueType> sequence_type;
 
     size_t total_size = seqnum * block_size;
     size_t total_bytes = seqnum * block_bytes;
 
-    std::less<value_type> cmp;
+    std::less<ValueType> cmp;
 
     std::vector<sequence_type> blocks(seqnum);
 
@@ -54,33 +94,28 @@ void test_multiway_merge(unsigned int seqnum)
             for (size_t i = 0; i < seqnum; ++i)
             {
                 for (size_t j = 0; j < block_size; ++j)
-                    blocks[i][j] = rnd();
+                    blocks[i][j] = ValueType(rnd());
 
                 std::sort(blocks[i].begin(), blocks[i].end(), cmp);
             }
         }
     }
 
-    std::vector<value_type> out;
+    std::vector<ValueType> out;
 
     {
         stxxl::scoped_print_timer spt("Allocating output buffer", total_bytes);
         out.resize(total_size);
     }
 
-    const char* method_name =
-        Method == 0 ? "seq_mwm" :
-        Method == 1 ? "seq_stmwm" :
-        Method == 2 ? "seq_gnu_mwm" :
-        Method == 3 ? "para_mwm" :
-        Method == 4 ? "para_stmwm" :
-        Method == 5 ? "para_gnu_mwm" :
-        "???";
-
     {
         stxxl::scoped_print_timer spt("Merging", total_bytes);
 
-        typedef std::pair<sequence_type::iterator, sequence_type::iterator> sequence_iterator_pair_type;
+        const char* method_name = NULL;
+
+        typedef std::pair<typename sequence_type::iterator,
+                          typename sequence_type::iterator>
+            sequence_iterator_pair_type;
         std::vector<sequence_iterator_pair_type> sequences(seqnum);
 
         for (size_t i = 0; i < seqnum; ++i) {
@@ -88,49 +123,125 @@ void test_multiway_merge(unsigned int seqnum)
                 sequence_iterator_pair_type(blocks[i].begin(), blocks[i].end());
         }
 
-        if (Method == 0)
+        using stxxl::parallel::SETTINGS;
+
+        switch (Method)
         {
+        case SEQ_MWM_LT:
+            method_name = "seq_mwm_lt";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
+
             stxxl::parallel::sequential_multiway_merge<false>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
-        }
-        else if (Method == 1)
-        {
+            break;
+
+        case SEQ_MWM_LT_STABLE:
+            method_name = "seq_mwm_lt_stable";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
+
             stxxl::parallel::sequential_multiway_merge<true>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
-        }
-        else if (Method == 2)
-        {
+            break;
+
+        case SEQ_MWM_LT_COMBINED:
+            method_name = "seq_mwm_lt_combined";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE_COMBINED;
+
+            stxxl::parallel::sequential_multiway_merge<false>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp);
+            break;
+
+        case SEQ_GNU_MWM:
+            method_name = "seq_gnu_mwm";
+
             __gnu_parallel::multiway_merge(sequences.begin(), sequences.end(),
                                            out.begin(), total_size, cmp,
                                            __gnu_parallel::sequential_tag());
-        }
-        else if (Method == 3)
-        {
+            break;
+
+        case PARA_MWM_EXACT_LT:
+            method_name = "para_mwm_exact_lt";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
+            SETTINGS::multiway_merge_splitting = SETTINGS::EXACT;
+
             stxxl::parallel::multiway_merge<false>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
-        }
-        else if (Method == 4)
-        {
+            break;
+
+        case PARA_MWM_EXACT_LT_STABLE:
+            method_name = "para_mwm_exact_lt_stable";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
+            SETTINGS::multiway_merge_splitting = SETTINGS::EXACT;
+
             stxxl::parallel::multiway_merge<true>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
-        }
-        else if (Method == 5)
-        {
+            break;
+
+        case PARA_MWM_SAMPLING_LT:
+            method_name = "para_mwm_sampling_lt";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
+            SETTINGS::multiway_merge_splitting = SETTINGS::SAMPLING;
+
+            stxxl::parallel::multiway_merge<false>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp);
+            break;
+
+        case PARA_MWM_SAMPLING_LT_STABLE:
+            method_name = "para_mwm_sampling_lt_stable";
+
+            SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
+            SETTINGS::multiway_merge_splitting = SETTINGS::SAMPLING;
+
+            stxxl::parallel::multiway_merge<true>(
+                sequences.begin(), sequences.end(),
+                out.begin(), total_size, cmp);
+            break;
+
+        case PARA_GNU_MWM_EXACT: {
+            method_name = "para_gnu_mwm_exact";
+
+            __gnu_parallel::_Settings s = __gnu_parallel::_Settings::get();
+            s.multiway_merge_splitting = __gnu_parallel::EXACT;
+            __gnu_parallel::_Settings::set(s);
+
             __gnu_parallel::multiway_merge(sequences.begin(), sequences.end(),
                                            out.begin(), total_size, cmp);
+            break;
+        }
+
+        case PARA_GNU_MWM_SAMPLING: {
+            method_name = "para_gnu_mwm_sampling";
+
+            __gnu_parallel::_Settings s = __gnu_parallel::_Settings::get();
+            s.multiway_merge_splitting = __gnu_parallel::SAMPLING;
+            __gnu_parallel::_Settings::set(s);
+
+            __gnu_parallel::multiway_merge(sequences.begin(), sequences.end(),
+                                           out.begin(), total_size, cmp);
+            break;
+        }
         }
 
         std::cout << "RESULT"
                   << " seqnum=" << seqnum
                   << " method=" << method_name
+                  << " value_size=" << value_size
                   << " block_size=" << block_size
                   << " total_size=" << total_size
                   << " total_bytes=" << total_bytes
-                  << " num_threads=" << omp_get_num_threads()
+                  << " num_threads=" << omp_get_max_threads()
                   << " time=" << spt.timer().seconds()
                   << "\n";
     }
@@ -138,33 +249,88 @@ void test_multiway_merge(unsigned int seqnum)
     STXXL_CHECK(stxxl::is_sorted(out.begin(), out.end(), cmp));
 }
 
-template <int Method>
-void test_all()
+template <typename ValueType, benchmark_type Method>
+void test_repeat(unsigned int seqnum)
 {
-    for (unsigned int s = 1; s < 128; s += 1)
-        test_multiway_merge<Method>(s);
-
-    for (unsigned int s = 128; s < 256; s += 2)
-        test_multiway_merge<Method>(s);
-
-    for (unsigned int s = 256; s < 512; s += 4)
-        test_multiway_merge<Method>(s);
-
-    for (unsigned int s = 512; s < 1024; s += 8)
-        test_multiway_merge<Method>(s);
-
-    for (unsigned int s = 1024; s < 1024 * 1024; s += 32)
-        test_multiway_merge<Method>(s);
+    for (unsigned int r = 0; r < g_repeat; ++r)
+        test_multiway_merge<ValueType, Method>(seqnum);
 }
 
-int main()
+template <typename ValueType, benchmark_type Method>
+void test_all_vecnum()
 {
-    test_all<0>();
-    test_all<1>();
-    test_all<2>();
-    test_all<3>();
-    test_all<4>();
-    test_all<5>();
+    static const unsigned int factor = 32;
+
+    for (unsigned int s = 1; s < 128; s += 1 * factor)
+        test_repeat<ValueType, Method>(s);
+
+    for (unsigned int s = 128; s < 256; s += 4 * factor)
+        test_repeat<ValueType, Method>(s);
+
+    for (unsigned int s = 256; s < 512; s += 16 * factor)
+        test_repeat<ValueType, Method>(s);
+
+    for (unsigned int s = 512; s < 1024; s += 64 * factor)
+        test_repeat<ValueType, Method>(s);
+
+    for (unsigned int s = 1024; s < 4 * 1024; s += 256 * factor)
+        test_repeat<ValueType, Method>(s);
+}
+
+template <typename ValueType>
+void test_sequential()
+{
+    test_all_vecnum<ValueType, SEQ_MWM_LT>();
+    test_all_vecnum<ValueType, SEQ_MWM_LT_STABLE>();
+    test_all_vecnum<ValueType, SEQ_MWM_LT_COMBINED>();
+    test_all_vecnum<ValueType, SEQ_GNU_MWM>();
+}
+
+template <typename ValueType>
+void test_parallel()
+{
+    test_all_vecnum<ValueType, PARA_MWM_EXACT_LT>();
+    test_all_vecnum<ValueType, PARA_MWM_EXACT_LT_STABLE>();
+    test_all_vecnum<ValueType, PARA_MWM_SAMPLING_LT>();
+    test_all_vecnum<ValueType, PARA_MWM_SAMPLING_LT_STABLE>();
+    test_all_vecnum<ValueType, PARA_GNU_MWM_EXACT>();
+    test_all_vecnum<ValueType, PARA_GNU_MWM_SAMPLING>();
+}
+
+int main(int argc, char* argv[])
+{
+    // run individually for debugging
+    //test_repeat<uint32_t, PARA_GNU_MWM_EXACT>(1024);
+    //test_repeat<uint32_t, PARA_MWM_EXACT_LT>(1024);
+    test_repeat<uint32_t, SEQ_MWM_LT>(16);
+    test_repeat<uint32_t, SEQ_GNU_MWM>(16);
+    return 0;
+
+    std::string benchset;
+
+    stxxl::cmdline_parser cp;
+    cp.set_description("STXXL multiway_merge benchmark");
+    cp.add_param_string("seq/para", "benchmark set: seq(uential) or para(llel)", benchset);
+
+    cp.add_uint('r', "repeat", "number of repetitions", g_repeat);
+
+    if (!cp.process(argc, argv))
+        return EXIT_FAILURE;
+
+    if (benchset == "seq" || benchset == "sequential")
+    {
+        test_sequential<uint32_t>();
+        test_sequential<DataStruct>();
+    }
+    else if (benchset == "para" || benchset == "parallel")
+    {
+        test_parallel<uint32_t>();
+        test_parallel<DataStruct>();
+    }
+    else
+    {
+        STXXL_ERRMSG("Required parameter: seq or para");
+    }
 
     return 0;
 }
