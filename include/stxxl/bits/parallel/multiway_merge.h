@@ -176,7 +176,7 @@ public:
      */
     self_type& operator ++ ()
     {
-        current++;
+        ++current;
         return *this;
     }
 
@@ -259,7 +259,7 @@ prepare_unguarded(RandomAccessIteratorIterator seqs_begin,
     // last element in sequence
     ValueType min = *((*seqs_begin).second - 1);
     min_sequence = 0;
-    for (RandomAccessIteratorIterator s = seqs_begin + 1; s != seqs_end; s++)
+    for (RandomAccessIteratorIterator s = seqs_begin + 1; s != seqs_end; ++s)
     {
         if ((*s).first == (*s).second)
         {
@@ -279,7 +279,7 @@ prepare_unguarded(RandomAccessIteratorIterator seqs_begin,
     DiffType overhang_size = 0;
 
     int s = 0;
-    for (s = 0; s <= min_sequence; s++)
+    for (s = 0; s <= min_sequence; ++s)
     {
         RandomAccessIterator1 split;
         if (Stable)
@@ -292,7 +292,7 @@ prepare_unguarded(RandomAccessIteratorIterator seqs_begin,
         overhang_size += seqs_begin[s].second - split;
     }
 
-    for ( ; s < (seqs_end - seqs_begin); s++)
+    for ( ; s < (seqs_end - seqs_begin); ++s)
     {
         RandomAccessIterator1 split =
             std::lower_bound(seqs_begin[s].first, seqs_begin[s].second,
@@ -327,7 +327,7 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
         DiffType;
 
     ValueType* max_value = NULL;   // last element in sequence
-    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
+    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
     {
         if ((*s).first == (*s).second)
             continue;
@@ -338,7 +338,7 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
 
     DiffType overhang_size = 0;
 
-    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
+    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
     {
         RandomAccessIterator1 split = std::lower_bound((*s).first, (*s).second, *max_value, comp);
         overhang_size += (*s).second - split;
@@ -764,21 +764,21 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
 
     //write entries into queue
     nrp = 0;
-    for (int pi = 0; pi < k; pi++)
+    for (int pi = 0; pi < k; ++pi)
     {
         if (STOPS(pi) != POS(pi))
         {
             pl[nrp] = *(POS(pi));
             source[nrp] = pi;
-            nrp++;
+            ++nrp;
             total_length += iterpair_size(seqs_begin[pi]);
         }
     }
 
     if (Stable)
     {
-        for (int k = 0; k < nrp - 1; k++)
-            for (int pi = nrp - 1; pi > k; pi--)
+        for (int k = 0; k < nrp - 1; ++k)
+            for (int pi = nrp - 1; pi > k; --pi)
                 if (comp(pl[pi], pl[pi - 1]) ||
                     (!comp(pl[pi - 1], pl[pi]) && source[pi] < source[pi - 1]))
                 {
@@ -788,8 +788,8 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
     }
     else
     {
-        for (int k = 0; k < nrp - 1; k++)
-            for (int pi = nrp - 1; pi > k; pi--)
+        for (int k = 0; k < nrp - 1; ++k)
+            for (int pi = nrp - 1; pi > k; --pi)
                 if (comp(pl[pi], pl[pi - 1]))
                 {
                     std::swap(pl[pi - 1], pl[pi]);
@@ -811,16 +811,16 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
                     *target = pl[0];
                     ++target;
                     ++POS(source[0]);
-                    length--;
+                    --length;
                     if (POS(source[0]) == STOPS(source[0]))
                     {
                         // move everything to the left
-                        for (int s = 0; s < nrp - 1; s++)
+                        for (int s = 0; s < nrp - 1; ++s)
                         {
                             pl[s] = pl[s + 1];
                             source[s] = source[s + 1];
                         }
-                        nrp--;
+                        --nrp;
                         break;
                     }
                     else
@@ -835,15 +835,15 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
                     *target = pl[0];
                     ++target;
                     ++POS(source[0]);
-                    length--;
+                    --length;
                     if (POS(source[0]) == STOPS(source[0]))
                     {
-                        for (int s = 0; s < nrp - 1; s++)
+                        for (int s = 0; s < nrp - 1; ++s)
                         {
                             pl[s] = pl[s + 1];
                             source[s] = source[s + 1];
                         }
-                        nrp--;
+                        --nrp;
                         break;
                     }
                     else
@@ -858,7 +858,7 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
             {
                 std::swap(pl[j - 1], pl[j]);
                 std::swap(source[j - 1], source[j]);
-                j++;
+                ++j;
             }
         }
     }
@@ -873,15 +873,15 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
                 *target = pl[0];
                 ++target;
                 ++POS(source[0]);
-                length--;
+                --length;
                 if (POS(source[0]) == STOPS(source[0]))
                 {
-                    for (int s = 0; s < (nrp - 1); s++)
+                    for (int s = 0; s < (nrp - 1); ++s)
                     {
                         pl[s] = pl[s + 1];
                         source[s] = source[s + 1];
                     }
-                    nrp--;
+                    --nrp;
                     break;
                 }
                 else
@@ -894,7 +894,7 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
             {
                 std::swap(pl[j - 1], pl[j]);
                 std::swap(source[j - 1], source[j]);
-                j++;
+                ++j;
             }
         }
     }
@@ -1016,7 +1016,7 @@ multiway_merge_loser_tree_unguarded(
 
     DiffType total_length = 0;
 
-    for (int t = 0; t < k; t++)
+    for (int t = 0; t < k; ++t)
     {
         assert(seqs_begin[t].first != seqs_begin[t].second);
 
@@ -1050,7 +1050,7 @@ multiway_merge_loser_tree_unguarded(
 
 #if STXXL_DEBUG_ASSERTIONS
         assert((seqs_begin[source].first != seqs_begin[source].second) || (i == length - 1));
-        i++;
+        ++i;
 #endif
         // feed
         // replace from same source
@@ -1137,7 +1137,7 @@ multiway_merge_loser_tree_combined(
     DiffType overhang = prepare_unguarded<Stable>(seqs_begin, seqs_end, comp, min_seq);
 
     DiffType total_length = 0;
-    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
+    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
         total_length += iterpair_size(*s);
 
     if (overhang != (DiffType)(-1))
@@ -1189,8 +1189,8 @@ multiway_merge_loser_tree_sentinel(
         RandomAccessIterator1;
 
     // move end of sequences to include the sentinel for merging
-    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
-        (*s).second++;
+    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
+        ++(*s).second;
 
     RandomAccessIterator3 target_end
         = multiway_merge_loser_tree_unguarded
@@ -1201,8 +1201,8 @@ multiway_merge_loser_tree_sentinel(
     STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     // restore end of sequences
-    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; s++)
-        (*s).second--;
+    for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
+        --(*s).second;
 
     return target_end;
 }
@@ -1233,10 +1233,10 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 {
     STXXL_PARALLEL_PCALL(length);
 
-    typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type
-        RandomAccessIterator1;
-    typedef typename std::iterator_traits<RandomAccessIterator1>::value_type
-        ValueType;
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type::first_type RandomAccessIterator1;
+    typedef typename std::iterator_traits<RandomAccessIterator1>
+        ::value_type ValueType;
 
 #if STXXL_DEBUG_ASSERTIONS
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
@@ -1256,7 +1256,9 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     case 0:
         break;
     case 1:
-        return_target = std::copy(seqs_begin[0].first, seqs_begin[0].first + length, target);
+        return_target = std::copy(seqs_begin[0].first,
+                                  seqs_begin[0].first + length,
+                                  target);
         seqs_begin[0].first += length;
         break;
     case 2:
@@ -1353,10 +1355,11 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 {
     STXXL_PARALLEL_PCALL(length);
 
-    typedef typename std::iterator_traits<RandomAccessIteratorIterator>::value_type RandomAccessIterator;
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type RandomAccessIterator;
     typedef typename RandomAccessIterator::first_type RandomAccessIterator1;
-    typedef typename std::iterator_traits<RandomAccessIterator1>::value_type
-        ValueType;
+    typedef typename std::iterator_traits<RandomAccessIterator1>
+        ::value_type ValueType;
 
     typedef typename std::pair<RandomAccessIterator1, RandomAccessIterator1> seq_type;
 
@@ -1390,14 +1393,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
     Timing<inactive_tag>* t = new Timing<inactive_tag>[num_threads];
 
-    for (int pr = 0; pr < num_threads; pr++)
+    for (int pr = 0; pr < num_threads; ++pr)
         t[pr].tic();
 
     bool tight = (total_length == length);
 
     // thread t will have to merge pieces[iam][0..k - 1]
     std::vector<std::pair<DiffType, DiffType> >* pieces = new std::vector<std::pair<DiffType, DiffType> >[num_threads];
-    for (int s = 0; s < num_threads; s++)
+    for (int s = 0; s < num_threads; ++s)
         pieces[s].resize(k);
 
     DiffType num_samples = SETTINGS::merge_oversampling * num_threads;
@@ -1406,8 +1409,8 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     {
         ValueType* samples = new ValueType[k * num_samples];
         //sample
-        for (size_t s = 0; s < k; s++)
-            for (int i = 0; (DiffType)i < num_samples; i++)
+        for (size_t s = 0; s < k; ++s)
+            for (int i = 0; (DiffType)i < num_samples; ++i)
             {
                 DiffType sample_index = static_cast<DiffType>(
                     double(iterpair_size(seqs_ne[s]))
@@ -1422,10 +1425,10 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         else
             std::sort(samples, samples + (num_samples * k), comp);
 
-        for (int slab = 0; slab < num_threads; slab++)
+        for (int slab = 0; slab < num_threads; ++slab)
         {
             //for each slab / processor
-            for (size_t seq = 0; seq < k; seq++)
+            for (size_t seq = 0; seq < k; ++seq)
             {                                                                   //for each sequence
                 if (slab > 0)
                     pieces[slab][seq].first =
@@ -1454,7 +1457,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         std::vector<DiffType> borders(num_threads + 1);
         equally_split(length, num_threads, borders.begin());
 
-        for (int s = 0; s < (num_threads - 1); s++)
+        for (int s = 0; s < (num_threads - 1); ++s)
         {
             offsets[s].resize(k);
             multiseq_partition(se.begin(), se.end(),
@@ -1468,9 +1471,9 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             }
         }
 
-        for (int slab = 0; slab < num_threads; slab++)
+        for (int slab = 0; slab < num_threads; ++slab)
         {                                                                 //for each slab / processor
-            for (size_t seq = 0; seq < k; seq++)
+            for (size_t seq = 0; seq < k; ++seq)
             {                                                             //for each sequence
                 if (slab == 0)
                     pieces[slab][seq].first = 0;                          //absolute beginning
@@ -1485,7 +1488,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         delete[] offsets;
     }
 
-    for (int pr = 0; pr < num_threads; pr++)
+    for (int pr = 0; pr < num_threads; ++pr)
         t[pr].tic();
 
 #pragma omp parallel num_threads(num_threads)
@@ -1496,7 +1499,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
         DiffType target_position = 0;
 
-        for (size_t c = 0; c < k; c++)
+        for (size_t c = 0; c < k; ++c)
             target_position += pieces[iam][c].first;
 
         if (k > 2)
@@ -1504,7 +1507,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             seq_type* chunks = new seq_type[k];
 
             DiffType local_length = 0;
-            for (size_t s = 0; s < k; s++)
+            for (size_t s = 0; s < k; ++s)
             {
                 chunks[s] = std::make_pair(
                     seqs_ne[s].first + pieces[iam][s].first,
@@ -1544,7 +1547,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         t[iam].tic();
     }
 
-    for (int pr = 0; pr < num_threads; pr++)
+    for (int pr = 0; pr < num_threads; ++pr)
         t[pr].tic();
 
     STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target + length, comp));
@@ -1564,9 +1567,9 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
     delete[] pieces;
 
-    for (int pr = 0; pr < num_threads; pr++)
+    for (int pr = 0; pr < num_threads; ++pr)
         t[pr].tic();
-    for (int pr = 0; pr < num_threads; pr++)
+    for (int pr = 0; pr < num_threads; ++pr)
         t[pr].print();
     delete[] t;
 
