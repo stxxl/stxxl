@@ -35,24 +35,24 @@ namespace parallel {
 //! Compare a pair of types lexcigraphically, ascending.
 template <typename T1, typename T2, typename Comparator>
 class lexicographic
+    : public std::binary_function<std::pair<T1, T2>, std::pair<T1, T2>, bool>
 {
-private:
-    Comparator& comp;
+protected:
+    Comparator& m_comp;
 
 public:
-    lexicographic(Comparator& _comp) : comp(_comp) { }
+    lexicographic(Comparator& comp) : m_comp(comp) { }
 
     inline bool operator () (const std::pair<T1, T2>& p1,
                              const std::pair<T1, T2>& p2)
     {
-        if (comp(p1.first, p2.first))
+        if (m_comp(p1.first, p2.first))
             return true;
 
-        if (comp(p2.first, p1.first))
+        if (m_comp(p2.first, p1.first))
             return false;
 
         // firsts are equal
-
         return p1.second < p2.second;
     }
 };
@@ -60,24 +60,24 @@ public:
 //! Compare a pair of types lexcigraphically, descending.
 template <typename T1, typename T2, typename Comparator>
 class lexicographic_rev
+    : public std::binary_function<std::pair<T1, T2>, std::pair<T1, T2>, bool>
 {
-private:
-    Comparator& comp;
+protected:
+    Comparator& m_comp;
 
 public:
-    lexicographic_rev(Comparator& _comp) : comp(_comp) { }
+    lexicographic_rev(Comparator& comp) : m_comp(comp) { }
 
     inline bool operator () (const std::pair<T1, T2>& p1,
                              const std::pair<T1, T2>& p2)
     {
-        if (comp(p2.first, p1.first))
+        if (m_comp(p2.first, p1.first))
             return true;
 
-        if (comp(p1.first, p2.first))
+        if (m_comp(p1.first, p2.first))
             return false;
 
         // firsts are equal
-
         return p2.second < p1.second;
     }
 };
@@ -104,24 +104,30 @@ void multiseq_partition(
     RankType rank,
     RankIterator begin_offsets,
     Comparator comp = std::less<
-        typename std::iterator_traits<typename std::iterator_traits<RanSeqs>::value_type::first_type>::value_type
+        typename std::iterator_traits<typename std::iterator_traits<RanSeqs>
+                                      ::value_type::first_type>::value_type
         >())         //std::less<T>
 {
     STXXL_PARALLEL_PCALL(end_seqs - begin_seqs);
 
-    typedef typename std::iterator_traits<RanSeqs>::value_type::first_type iterator;
-    typedef typename std::iterator_traits<iterator>::difference_type diff_type;
-    typedef typename std::iterator_traits<iterator>::value_type value_type;
+    typedef typename std::iterator_traits<RanSeqs>
+        ::value_type::first_type iterator;
+    typedef typename std::iterator_traits<iterator>
+        ::difference_type diff_type;
+    typedef typename std::iterator_traits<iterator>
+        ::value_type value_type;
 
+    typedef std::pair<value_type, diff_type> sample_pair;
+    // comparators for sample_pair
     lexicographic<value_type, diff_type, Comparator> lcomp(comp);
     lexicographic_rev<value_type, diff_type, Comparator> lrcomp(comp);
 
     // number of sequences, number of elements in total (possibly including padding)
     const diff_type m = std::distance(begin_seqs, end_seqs);
-    diff_type nmax, n, r;
+    diff_type nmax, n;
     RankType N = 0;
 
-    for (diff_type i = 0; i < m; i++)
+    for (diff_type i = 0; i < m; ++i)
     {
         N += std::distance(begin_seqs[i].first, begin_seqs[i].second);
         assert(std::distance(begin_seqs[i].first, begin_seqs[i].second) > 0);
@@ -129,49 +135,45 @@ void multiseq_partition(
 
     if (rank == N)
     {
-        for (diff_type i = 0; i < m; i++)
+        for (diff_type i = 0; i < m; ++i)
             begin_offsets[i] = begin_seqs[i].second; // very end
         return;
     }
 
     assert(m != 0 && N != 0 && rank >= 0 && rank < N);
 
-    diff_type* ns = new diff_type[m], * a = new diff_type[m], * b = new diff_type[m];
+    diff_type* seqlen = new diff_type[m];
 
-    ns[0] = std::distance(begin_seqs[0].first, begin_seqs[0].second);
-    nmax = ns[0];
-    for (diff_type i = 0; i < m; i++)
+    seqlen[0] = std::distance(begin_seqs[0].first, begin_seqs[0].second);
+    nmax = seqlen[0];
+    for (diff_type i = 1; i < m; ++i)
     {
-        ns[i] = std::distance(begin_seqs[i].first, begin_seqs[i].second);
-        nmax = std::max(nmax, ns[i]);
+        seqlen[i] = std::distance(begin_seqs[i].first, begin_seqs[i].second);
+        nmax = std::max(nmax, seqlen[i]);
     }
 
-    r = ilog2_floor(nmax) + 1;
-    // pad all lists to this length, at least as long as any ns[i], equliaty
+    // pad all lists to this length, at least as long as any ns[i], equality
     // iff nmax = 2^k - 1
-    diff_type l = ((diff_type)1 << r) - 1;
+    diff_type l = round_up_to_power_of_two(nmax + 1) - 1;
 
-    N = l * m;           // from now on, including padding
+    diff_type* a = new diff_type[m], * b = new diff_type[m];
 
-    for (int i = 0; i < m; i++)
-    {
-        a[i] = 0;
-        b[i] = l;
-    }
+    for (diff_type i = 0; i < m; ++i)
+        a[i] = 0, b[i] = l;
+
     n = l / 2;
 
     // invariants:
-    // 0 <= a[i] <= ns[i], 0 <= b[i] <= l
+    // 0 <= a[i] <= seqlen[i], 0 <= b[i] <= l
 
 #define S(i) (begin_seqs[i].first)
 
-    //initial partition
+    // initial partition
 
-    typedef std::pair<value_type, diff_type> sample_pair;
     std::vector<sample_pair> sample;
 
-    for (diff_type i = 0; i < m; i++) {
-        if (n < ns[i]) {
+    for (diff_type i = 0; i < m; ++i) {
+        if (n < seqlen[i]) {
             // sequence long enough
             sample.push_back(sample_pair(S(i)[n], i));
         }
@@ -179,18 +181,18 @@ void multiseq_partition(
 
     std::sort(sample.begin(), sample.end(), lcomp);
 
-    for (diff_type i = 0; i < m; i++) {
+    for (diff_type i = 0; i < m; ++i) {
         // conceptual infinity
-        if (n >= ns[i]) {
+        if (n >= seqlen[i]) {
             // sequence too short, conceptual infinity
             sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
         }
     }
 
-    diff_type localrank = rank * m / N;
+    diff_type localrank = rank / l;
 
     diff_type j;
-    for (j = 0; j < localrank && ((n + 1) <= ns[sample[j].second]); ++j)
+    for (j = 0; j < localrank && ((n + 1) <= seqlen[sample[j].second]); ++j)
         a[sample[j].second] += n + 1;
     for ( ; j < m; ++j)
         b[sample[j].second] -= n + 1;
@@ -201,47 +203,36 @@ void multiseq_partition(
     {
         n /= 2;
 
-        diff_type lmax_seq = -1;
         const value_type* lmax = NULL; // impossible to avoid the warning?
-        for (diff_type i = 0; i < m; i++)
+        for (diff_type i = 0; i < m; ++i)
         {
             if (a[i] > 0)
             {
                 if (!lmax)
-                {
                     lmax = &(S(i)[a[i] - 1]);
-                    lmax_seq = i;
-                }
                 else
                 {
                     // max, favor rear sequences
                     if (!comp(S(i)[a[i] - 1], *lmax))
-                    {
                         lmax = &(S(i)[a[i] - 1]);
-                        lmax_seq = i;
-                    }
                 }
             }
         }
 
-        for (diff_type i = 0; i < m; i++)
+        for (diff_type i = 0; i < m; ++i)
         {
             diff_type middle = (b[i] + a[i]) / 2;
-            if (lmax && middle < ns[i] &&
-                lcomp(sample_pair(S(i)[middle], i), sample_pair(*lmax, lmax_seq)))
-                a[i] = std::min(a[i] + n + 1, ns[i]);
+            if (lmax && middle < seqlen[i] && comp(S(i)[middle], *lmax))
+                a[i] = std::min(a[i] + n + 1, seqlen[i]);
             else
                 b[i] -= n + 1;
         }
 
-        diff_type leftsize = 0, total = 0;
-        for (diff_type i = 0; i < m; i++)
-        {
+        diff_type leftsize = 0;
+        for (diff_type i = 0; i < m; ++i)
             leftsize += a[i] / (n + 1);
-            total += l / (n + 1);
-        }
 
-        diff_type skew = static_cast<diff_type>(static_cast<uint64>(total) * rank / N - leftsize);
+        diff_type skew = rank / (n + 1) - leftsize;
 
         if (skew > 0)
         {
@@ -250,19 +241,20 @@ void multiseq_partition(
                                 lexicographic_rev<value_type, diff_type, Comparator> >
             pq(lrcomp);
 
-            for (diff_type i = 0; i < m; i++)
-                if (b[i] < ns[i])
+            for (diff_type i = 0; i < m; ++i) {
+                if (b[i] < seqlen[i])
                     pq.push(sample_pair(S(i)[b[i]], i));
+            }
 
-            for ( ; skew != 0 && !pq.empty(); skew--)
+            for ( ; skew != 0 && !pq.empty(); --skew)
             {
                 diff_type source = pq.top().second;
                 pq.pop();
 
-                a[source] = std::min(a[source] + n + 1, ns[source]);
+                a[source] = std::min(a[source] + n + 1, seqlen[source]);
                 b[source] += n + 1;
 
-                if (b[source] < ns[source])
+                if (b[source] < seqlen[source])
                     pq.push(sample_pair(S(source)[b[source]], source));
             }
         }
@@ -273,11 +265,12 @@ void multiseq_partition(
                                 lexicographic<value_type, diff_type, Comparator> >
             pq(lcomp);
 
-            for (diff_type i = 0; i < m; i++)
+            for (diff_type i = 0; i < m; ++i) {
                 if (a[i] > 0)
                     pq.push(sample_pair(S(i)[a[i] - 1], i));
+            }
 
-            for ( ; skew != 0; skew++)
+            for ( ; skew != 0; ++skew)
             {
                 diff_type source = pq.top().second;
                 pq.pop();
@@ -299,7 +292,7 @@ void multiseq_partition(
 
     // maximum of left edge, minimum of right edge
     value_type* maxleft = NULL, * minright = NULL;
-    for (diff_type i = 0; i < m; i++)
+    for (diff_type i = 0; i < m; ++i)
     {
         if (a[i] > 0)
         {
@@ -314,7 +307,7 @@ void multiseq_partition(
                     maxleft = &(S(i)[a[i] - 1]);
             }
         }
-        if (b[i] < ns[i])
+        if (b[i] < seqlen[i])
         {
             if (!minright)
             {
@@ -329,10 +322,10 @@ void multiseq_partition(
         }
     }
 
-    for (diff_type i = 0; i < m; i++)
+    for (diff_type i = 0; i < m; ++i)
         begin_offsets[i] = S(i) + a[i];
 
-    delete[] ns;
+    delete[] seqlen;
     delete[] a;
     delete[] b;
 }
@@ -358,69 +351,77 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
 {
     STXXL_PARALLEL_PCALL(end_seqs - begin_seqs);
 
-    typedef typename std::iterator_traits<RanSeqs>::value_type::first_type iterator;
-    typedef typename std::iterator_traits<iterator>::difference_type diff_type;
+    typedef typename std::iterator_traits<RanSeqs>
+        ::value_type::first_type iterator;
+    typedef typename std::iterator_traits<iterator>
+        ::difference_type diff_type;
 
-    lexicographic<ValueType, int, Comparator> lcomp(comp);
-    lexicographic_rev<ValueType, int, Comparator> lrcomp(comp);
+    typedef std::pair<ValueType, diff_type> sample_pair;
+    // comparators for sample_pair
+    lexicographic<ValueType, diff_type, Comparator> lcomp(comp);
+    lexicographic_rev<ValueType, diff_type, Comparator> lrcomp(comp);
 
     // number of sequences, number of elements in total (possibly including padding)
-    diff_type m = std::distance(begin_seqs, end_seqs), N = 0, nmax, n, r;
+    const diff_type m = std::distance(begin_seqs, end_seqs);
+    diff_type nmax, n;
+    RankType N = 0;
 
-    for (diff_type i = 0; i < m; i++)
+    for (diff_type i = 0; i < m; ++i)
         N += std::distance(begin_seqs[i].first, begin_seqs[i].second);
 
     if (m == 0 || N == 0 || rank < 0 || rank >= N)
         // result undefined when there is no data or rank is outside bounds
         throw std::exception();
 
-    diff_type* ns = new diff_type[m], * a = new diff_type[m], * b = new diff_type[m], l;
+    diff_type* seqlen = new diff_type[m];
 
-    ns[0] = std::distance(begin_seqs[0].first, begin_seqs[0].second);
-    nmax = ns[0];
-    for (diff_type i = 0; i < m; i++)
+    seqlen[0] = std::distance(begin_seqs[0].first, begin_seqs[0].second);
+    nmax = seqlen[0];
+    for (diff_type i = 1; i < m; ++i)
     {
-        ns[i] = std::distance(begin_seqs[i].first, begin_seqs[i].second);
-        nmax = std::max(nmax, ns[i]);
+        seqlen[i] = std::distance(begin_seqs[i].first, begin_seqs[i].second);
+        nmax = std::max(nmax, seqlen[i]);
     }
 
-    r = ilog2_floor(nmax) + 1;
     // pad all lists to this length, at least as long as any ns[i], equliaty iff
     // nmax = 2^k - 1
-    l = pow2(r) - 1;
+    diff_type l = round_up_to_power_of_two(nmax + 1) - 1;
 
-    N = l * m;          // from now on, including padding
+    diff_type* a = new diff_type[m], * b = new diff_type[m];
 
-    for (diff_type i = 0; i < m; i++)
-    {
-        a[i] = 0;
-        b[i] = l;
-    }
+    for (diff_type i = 0; i < m; ++i)
+        a[i] = 0, b[i] = l;
+
     n = l / 2;
 
     // invariants:
-    // 0 <= a[i] <= ns[i], 0 <= b[i] <= l
+    // 0 <= a[i] <= seqlen[i], 0 <= b[i] <= l
 
 #define S(i) (begin_seqs[i].first)
 
     //initial partition
 
-    std::vector<std::pair<ValueType, int> > sample;
+    std::vector<sample_pair> sample;
 
-    for (diff_type i = 0; i < m; i++)
-        if (n < ns[i])
+    for (diff_type i = 0; i < m; ++i) {
+        if (n < seqlen[i])
             sample.push_back(sample_pair(S(i)[n], i));
-    std::sort(sample.begin(), sample.end(), lcomp);
-    for (diff_type i = 0; i < m; i++)         //conceptual infinity
-        if (n >= ns[i])
-            sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
+    }
 
-    diff_type localrank = rank * m / N;
+    std::sort(sample.begin(), sample.end(), lcomp);
+
+    for (diff_type i = 0; i < m; ++i) {
+        //conceptual infinity
+        if (n >= seqlen[i])
+            sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
+    }
+
+    diff_type localrank = rank / l;
 
     diff_type j;
-    for (j = 0; j < localrank && ((n + 1) <= ns[sample[j].second]); j++)
+    for (j = 0; j < localrank && ((n + 1) <= seqlen[sample[j].second]); ++j)
         a[sample[j].second] += n + 1;
-    for ( ; j < m; j++)
+    for ( ; j < m; ++j)
         b[sample[j].second] -= n + 1;
 
     // further refinement
@@ -430,7 +431,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
         n /= 2;
 
         const ValueType* lmax = NULL;
-        for (diff_type i = 0; i < m; i++)
+        for (diff_type i = 0; i < m; ++i)
         {
             if (a[i] > 0)
             {
@@ -447,63 +448,60 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
             }
         }
 
-        for (diff_type i = 0; i < m; i++)
+        for (diff_type i = 0; i < m; ++i)
         {
             diff_type middle = (b[i] + a[i]) / 2;
-            if (lmax && middle < ns[i] && comp(S(i)[middle], *lmax))
-                a[i] = std::min(a[i] + n + 1, ns[i]);
+            if (lmax && middle < seqlen[i] && comp(S(i)[middle], *lmax))
+                a[i] = std::min(a[i] + n + 1, seqlen[i]);
             else
                 b[i] -= n + 1;
         }
 
-        diff_type leftsize = 0, total = 0;
-        for (diff_type i = 0; i < m; i++)
-        {
+        diff_type leftsize = 0;
+        for (diff_type i = 0; i < m; ++i)
             leftsize += a[i] / (n + 1);
-            total += l / (n + 1);
-        }
 
-        diff_type skew = (unsigned long long)total * rank / N - leftsize;
+        diff_type skew = rank / (n + 1) - leftsize;
 
         if (skew > 0)
         {
             // move to the left, find smallest
-            std::priority_queue<std::pair<ValueType, int>,
-                                std::vector<std::pair<ValueType, int> >,
-                                lexicographic_rev<ValueType, int, Comparator> >
+            std::priority_queue<sample_pair, std::vector<sample_pair>,
+                                lexicographic_rev<ValueType, diff_type, Comparator> >
             pq(lrcomp);
 
-            for (diff_type i = 0; i < m; i++)
-                if (b[i] < ns[i])
+            for (diff_type i = 0; i < m; ++i) {
+                if (b[i] < seqlen[i])
                     pq.push(sample_pair(S(i)[b[i]], i));
+            }
 
-            for ( ; skew != 0 && !pq.empty(); skew--)
+            for ( ; skew != 0 && !pq.empty(); --skew)
             {
-                int source = pq.top().second;
+                diff_type source = pq.top().second;
                 pq.pop();
 
-                a[source] = std::min(a[source] + n + 1, ns[source]);
+                a[source] = std::min(a[source] + n + 1, seqlen[source]);
                 b[source] += n + 1;
 
-                if (b[source] < ns[source])
+                if (b[source] < seqlen[source])
                     pq.push(sample_pair(S(source)[b[source]], source));
             }
         }
         else if (skew < 0)
         {
             // move to the right, find greatest
-            std::priority_queue<std::pair<ValueType, int>,
-                                std::vector<std::pair<ValueType, int> >,
-                                lexicographic<ValueType, int, Comparator> >
+            std::priority_queue<sample_pair, std::vector<sample_pair>,
+                                lexicographic<ValueType, diff_type, Comparator> >
             pq(lcomp);
 
-            for (diff_type i = 0; i < m; i++)
+            for (diff_type i = 0; i < m; ++i) {
                 if (a[i] > 0)
                     pq.push(sample_pair(S(i)[a[i] - 1], i));
+            }
 
-            for ( ; skew != 0; skew++)
+            for ( ; skew != 0; ++skew)
             {
-                int source = pq.top().second;
+                diff_type source = pq.top().second;
                 pq.pop();
 
                 a[source] -= n + 1;
@@ -523,7 +521,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
 
     // maximum of left edge, minimum of right edge
     ValueType* maxleft = NULL, * minright = NULL;
-    for (diff_type i = 0; i < m; i++)
+    for (diff_type i = 0; i < m; ++i)
     {
         if (a[i] > 0)
         {
@@ -538,7 +536,7 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
                     maxleft = &(S(i)[a[i] - 1]);
             }
         }
-        if (b[i] < ns[i])
+        if (b[i] < seqlen[i])
         {
             if (!minright)
             {
@@ -565,14 +563,14 @@ ValueType multiseq_selection(RanSeqs begin_seqs, RanSeqs end_seqs,
         // we have to calculate an offset
         offset = 0;
 
-        for (diff_type i = 0; i < m; i++)
+        for (diff_type i = 0; i < m; ++i)
         {
-            diff_type lb = std::lower_bound(S(i), S(i) + ns[i], *minright, comp) - S(i);
+            diff_type lb = std::lower_bound(S(i), S(i) + seqlen[i], *minright, comp) - S(i);
             offset += a[i] - lb;
         }
     }
 
-    delete[] ns;
+    delete[] seqlen;
     delete[] a;
     delete[] b;
 
