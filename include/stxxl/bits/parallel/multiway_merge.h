@@ -1333,6 +1333,166 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 }
 
 /*!
+ * Splitting method for parallel multi-way merge routine: use sampling and
+ * binary search for in-exact splitting.
+ *
+ * \param seqs_begin Begin iterator of iterator pair input sequence.
+ * \param seqs_end End iterator of iterator pair input sequence.
+ * \param length Maximum length to merge.
+ * \param comp Comparator.
+ * \tparam Stable Stable merging incurs a performance penalty.
+ * \return End iterator of output sequence.
+ */
+template <bool Stable,
+          typename RandomAccessIteratorIterator,
+          typename DiffType,
+          typename Comparator>
+void
+parallel_multiway_merge_sampling_splitting(
+    RandomAccessIteratorIterator seqs_begin,
+    RandomAccessIteratorIterator seqs_end,
+    DiffType length, DiffType total_length, Comparator comp,
+    std::vector<std::pair<DiffType, DiffType> >* pieces,
+    const thread_index_t npieces)
+{
+    STXXL_PARALLEL_PCALL(length);
+
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type::first_type RandomAccessIterator;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::value_type value_type;
+
+    const DiffType num_seqs = seqs_end - seqs_begin;
+    DiffType num_samples = SETTINGS::merge_oversampling * npieces;
+
+    // pick samples
+    value_type* samples = new value_type[num_seqs * num_samples];
+
+    for (DiffType s = 0; s < num_seqs; ++s)
+    {
+        for (DiffType i = 0; i < num_samples; ++i)
+        {
+            DiffType sample_index = static_cast<DiffType>(
+                double(iterpair_size(seqs_begin[s]))
+                * (double(i + 1) / double(num_samples + 1))
+                * (double(length) / double(total_length))
+                );
+            samples[s * num_samples + i] = seqs_begin[s].first[sample_index];
+        }
+    }
+
+    if (Stable)
+        std::stable_sort(samples, samples + (num_samples * num_seqs), comp);
+    else
+        std::sort(samples, samples + (num_samples * num_seqs), comp);
+
+    for (thread_index_t slab = 0; slab < npieces; ++slab) // for each processor
+    {
+        for (size_t seq = 0; seq < num_seqs; ++seq)       // for each sequence
+        {
+            if (slab > 0) {
+                pieces[slab][seq].first =
+                    std::upper_bound(
+                        seqs_begin[seq].first, seqs_begin[seq].second,
+                        samples[num_samples * num_seqs * slab / npieces],
+                        comp)
+                    - seqs_begin[seq].first;
+            }
+            else    // absolute beginning
+                pieces[slab][seq].first = 0;
+
+            if ((slab + 1) < npieces) {
+                pieces[slab][seq].second =
+                    std::upper_bound(
+                        seqs_begin[seq].first, seqs_begin[seq].second,
+                        samples[num_samples * num_seqs * (slab + 1) / npieces],
+                        comp)
+                    - seqs_begin[seq].first;
+            }
+            else    // absolute ending
+                pieces[slab][seq].second = iterpair_size(seqs_begin[seq]);
+        }
+    }
+
+    delete[] samples;
+}
+
+/*!
+ * Splitting method for parallel multi-way merge routine: use multisequence
+ * selection for exact splitting.
+ *
+ * \param seqs_begin Begin iterator of iterator pair input sequence.
+ * \param seqs_end End iterator of iterator pair input sequence.
+ * \param length Maximum length to merge.
+ * \param comp Comparator.
+ * \tparam Stable Stable merging incurs a performance penalty.
+ * \return End iterator of output sequence.
+ */
+template <bool Stable,
+          typename RandomAccessIteratorIterator,
+          typename DiffType,
+          typename Comparator>
+void
+parallel_multiway_merge_exact_splitting(
+    RandomAccessIteratorIterator seqs_begin,
+    RandomAccessIteratorIterator seqs_end,
+    DiffType length, DiffType total_length, Comparator comp,
+    std::vector<std::pair<DiffType, DiffType> >* pieces,
+    const thread_index_t npieces)
+{
+    STXXL_PARALLEL_PCALL(length);
+
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type RandomAccessIteratorPair;
+    typedef typename RandomAccessIteratorPair
+        ::first_type RandomAccessIterator;
+
+    const size_t num_seqs = seqs_end - seqs_begin;
+    const bool tight = (total_length == length);
+
+    std::vector<RandomAccessIterator>* offsets
+        = new std::vector<RandomAccessIterator>[npieces];
+
+    // copy sequences since partitioning changes them
+    std::vector<RandomAccessIteratorPair> seq(num_seqs);
+    std::copy(seqs_begin, seqs_end, seq.begin());
+
+    std::vector<DiffType> ranks(npieces + 1);
+    equally_split(length, npieces, ranks.begin());
+
+    for (int s = 0; s < (npieces - 1); ++s)
+    {
+        offsets[s].resize(num_seqs);
+        multiseq_partition(seq.begin(), seq.end(),
+                           ranks[s + 1], offsets[s].begin(), comp);
+
+        if (!tight) // last one also needed and available
+        {
+            offsets[npieces - 1].resize(num_seqs);
+            multiseq_partition(seq.begin(), seq.end(),
+                               length, offsets[npieces - 1].begin(), comp);
+        }
+    }
+
+    for (thread_index_t slab = 0; slab < npieces; ++slab) // for each processor
+    {
+        for (size_t s = 0; s < num_seqs; ++s)             // for each sequence
+        {
+            if (slab == 0)
+                pieces[slab][s].first = 0;                // absolute beginning
+            else
+                pieces[slab][s].first = pieces[slab - 1][s].second;
+            if (!tight || slab < (npieces - 1))
+                pieces[slab][s].second = offsets[slab][s] - seqs_begin[s].first;
+            else    // slab == npieces - 1
+                pieces[slab][s].second = iterpair_size(seqs_begin[s]);
+        }
+    }
+
+    delete[] offsets;
+}
+
+/*!
  * Parallel multi-way merge routine.
  *
  * The decision if based on the branching factor and runtime settings.
@@ -1360,9 +1520,9 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type RandomAccessIteratorPair;
-    typedef typename RandomAccessIteratorPair::first_type RandomAccessIterator;
-    typedef typename std::iterator_traits<RandomAccessIterator>
-        ::value_type value_type;
+    typedef typename RandomAccessIteratorPair
+        ::first_type RandomAccessIterator;
+    typedef std::pair<DiffType, DiffType> diffpair_type;
 
 #if STXXL_DEBUG_ASSERTIONS
     for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; ++rii)
@@ -1383,111 +1543,40 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         }
     }
 
-    size_t k = seqs_ne.size();
+    size_t num_seqs = seqs_ne.size();
 
     STXXL_PARALLEL_PCALL(total_length);
 
-    if (total_length == 0 || k == 0)
+    if (total_length == 0 || num_seqs == 0)
         return target;
 
-    thread_index_t num_threads = static_cast<thread_index_t>(std::min(static_cast<DiffType>(SETTINGS::num_threads), total_length));
+    thread_index_t num_threads = static_cast<thread_index_t>(
+        std::min(static_cast<DiffType>(SETTINGS::num_threads), total_length));
 
     Timing<inactive_tag>* t = new Timing<inactive_tag>[num_threads];
 
     for (int pr = 0; pr < num_threads; ++pr)
         t[pr].tic();
 
-    bool tight = (total_length == length);
-
-    typedef std::pair<DiffType, DiffType> diffpair_type;
     // thread t will have to merge pieces[iam][0..k - 1]
+
     std::vector<diffpair_type>* pieces = new std::vector<diffpair_type>[num_threads];
     for (int s = 0; s < num_threads; ++s)
-        pieces[s].resize(k);
-
-    DiffType num_samples = SETTINGS::merge_oversampling * num_threads;
+        pieces[s].resize(num_seqs);
 
     if (SETTINGS::multiway_merge_splitting == SETTINGS::SAMPLING)
     {
-        value_type* samples = new value_type[k * num_samples];
-        //sample
-        for (size_t s = 0; s < k; ++s)
-            for (int i = 0; (DiffType)i < num_samples; ++i)
-            {
-                DiffType sample_index = static_cast<DiffType>(
-                    double(iterpair_size(seqs_ne[s]))
-                    * (double(i + 1) / double(num_samples + 1))
-                    * (double(length) / double(total_length))
-                    );
-                samples[s * num_samples + i] = seqs_ne[s].first[sample_index];
-            }
-
-        if (Stable)
-            std::stable_sort(samples, samples + (num_samples * k), comp);
-        else
-            std::sort(samples, samples + (num_samples * k), comp);
-
-        for (int slab = 0; slab < num_threads; ++slab)
-        {
-            //for each slab / processor
-            for (size_t seq = 0; seq < k; ++seq)
-            {                                                                   //for each sequence
-                if (slab > 0)
-                    pieces[slab][seq].first =
-                        std::upper_bound(seqs_ne[seq].first, seqs_ne[seq].second,
-                                         samples[num_samples * k * slab / num_threads], comp) - seqs_ne[seq].first;
-                else
-                    pieces[slab][seq].first = 0;                                //absolute beginning
-                if ((slab + 1) < num_threads)
-                    pieces[slab][seq].second =
-                        std::upper_bound(seqs_ne[seq].first, seqs_ne[seq].second,
-                                         samples[num_samples * k * (slab + 1) / num_threads], comp) - seqs_ne[seq].first;
-                else
-                    pieces[slab][seq].second = iterpair_size(seqs_ne[seq]);  //absolute ending
-            }
-        }
-
-        delete[] samples;
+        parallel_multiway_merge_sampling_splitting<Stable>(
+            seqs_ne.begin(), seqs_ne.end(),
+            length, total_length, comp,
+            pieces, num_threads);
     }
     else // (SETTINGS::multiway_merge_splitting == SETTINGS::EXACT)
     {
-        std::vector<RandomAccessIterator>* offsets = new std::vector<RandomAccessIterator>[num_threads];
-        std::vector<RandomAccessIteratorPair> se(k);
-
-        std::copy(seqs_ne.begin(), seqs_ne.end(), se.begin());
-
-        std::vector<DiffType> borders(num_threads + 1);
-        equally_split(length, num_threads, borders.begin());
-
-        for (int s = 0; s < (num_threads - 1); ++s)
-        {
-            offsets[s].resize(k);
-            multiseq_partition(se.begin(), se.end(),
-                               borders[s + 1], offsets[s].begin(), comp);
-
-            if (!tight)                         //last one also needed and available
-            {
-                offsets[num_threads - 1].resize(k);
-                multiseq_partition(se.begin(), se.end(),
-                                   (DiffType)length, offsets[num_threads - 1].begin(), comp);
-            }
-        }
-
-        for (int slab = 0; slab < num_threads; ++slab)
-        {                                                                 //for each slab / processor
-            for (size_t seq = 0; seq < k; ++seq)
-            {                                                             //for each sequence
-                if (slab == 0)
-                    pieces[slab][seq].first = 0;                          //absolute beginning
-                else
-                    pieces[slab][seq].first = pieces[slab - 1][seq].second;
-                if (!tight || slab < (num_threads - 1))
-                    pieces[slab][seq].second = offsets[slab][seq] - seqs_ne[seq].first;
-                else                            /*slab == num_threads - 1*/
-                    pieces[slab][seq].second = iterpair_size(seqs_ne[seq]);
-            }
-        }
-        delete[] offsets;
+        parallel_multiway_merge_exact_splitting<Stable>(
+            seqs_ne.begin(), seqs_ne.end(),
+            length, total_length, comp,
+            pieces, num_threads);
     }
 
     for (int pr = 0; pr < num_threads; ++pr)
@@ -1501,15 +1590,15 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
 
         DiffType target_position = 0;
 
-        for (size_t c = 0; c < k; ++c)
+        for (size_t c = 0; c < num_seqs; ++c)
             target_position += pieces[iam][c].first;
 
-        if (k > 2)
+        if (num_seqs > 2)
         {
-            RandomAccessIteratorPair* chunks = new RandomAccessIteratorPair[k];
+            RandomAccessIteratorPair* chunks = new RandomAccessIteratorPair[num_seqs];
 
             DiffType local_length = 0;
-            for (size_t s = 0; s < k; ++s)
+            for (size_t s = 0; s < num_seqs; ++s)
             {
                 chunks[s] = RandomAccessIteratorPair(
                     seqs_ne[s].first + pieces[iam][s].first,
@@ -1518,14 +1607,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             }
 
             sequential_multiway_merge<Stable, false>(
-                chunks, chunks + k,
+                chunks, chunks + num_seqs,
                 target + target_position,
                 std::min(local_length, length - target_position),
                 comp);
 
             delete[] chunks;
         }
-        else if (k == 2)
+        else if (num_seqs == 2)
         {
             RandomAccessIterator
                 begin0 = seqs_ne[0].first + pieces[iam][0].first,
@@ -1539,7 +1628,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                           comp
                           );
         }
-        else if (k == 1)
+        else if (num_seqs == 1)
         {
             std::copy(seqs_ne[0].first + pieces[iam][0].first,
                       seqs_ne[0].first + pieces[iam][0].second,
@@ -1555,14 +1644,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target + length, comp));
 
     //update ends of sequences
-    k = 0;
+    num_seqs = 0;
     DiffType test_length = 0;
     for (RandomAccessIteratorIterator raii = seqs_begin; raii != seqs_end; ++raii)
     {
         DiffType length = iterpair_size(*raii);
         if (length > 0) {
-            raii->first += pieces[num_threads - 1][k].second;
-            test_length += pieces[num_threads - 1][k++].second;
+            raii->first += pieces[num_threads - 1][num_seqs].second;
+            test_length += pieces[num_threads - 1][num_seqs++].second;
         }
     }
     assert(test_length == length);

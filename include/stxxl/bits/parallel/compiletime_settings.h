@@ -35,7 +35,7 @@ namespace parallel {
 #endif
 #if (STXXL_VERBOSE_LEVEL >= 1)
 #define STXXL_PARALLEL_PCALL(n)                        \
-    STXXL_MSG("   " << __PRETTY_FUNCTION__ << ":\n"    \
+    STXXL_MSG("   " << __FUNCTION__ << ":\n"           \
               "iam = " << omp_get_thread_num() << ", " \
               "n = " << (n) << ", "                    \
               "num_threads = " << SETTINGS::num_threads);
