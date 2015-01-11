@@ -14,7 +14,7 @@
 #define STXXL_COMMON_SETTINGS_HEADER
 
 /*!
- * @file settings.h
+ * @file stxxl/bits/common/settings.h
  * Provides a static class to store runtime tuning parameters.
  */
 

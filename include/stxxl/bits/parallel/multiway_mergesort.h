@@ -34,7 +34,7 @@ namespace parallel {
 
 //! Subsequence description.
 template <typename DiffType>
-struct Piece
+struct PMWMSPiece
 {
     //! Begin of subsequence.
     DiffType begin;
@@ -82,8 +82,8 @@ struct PMWMSSortingData
     ValueType* samples;
     /** Offsets to add to the found positions. */
     DiffType* offsets;
-    /** Pieces of data to merge \c [thread][sequence] */
-    std::vector<Piece<DiffType> >* pieces;
+    /** PMWMSPieces of data to merge \c [thread][sequence] */
+    std::vector<PMWMSPiece<DiffType> >* pieces;
 };
 
 //! Thread local data for PMWMS.
@@ -299,7 +299,6 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
  * \param begin Begin iterator of sequence.
  * \param end End iterator of sequence.
  * \param comp Comparator.
- * \param n Length of sequence.
  * \param num_threads Number of threads to use.
  * \tparam Stable Stable sorting.
  */
@@ -342,7 +341,7 @@ parallel_sort_mwms(RandomAccessIterator begin,
     else
         sd.samples = NULL;
     sd.offsets = new DiffType[num_threads - 1];
-    sd.pieces = new std::vector<Piece<DiffType> >[num_threads];
+    sd.pieces = new std::vector<PMWMSPiece<DiffType> >[num_threads];
     for (int s = 0; s < num_threads; s++)
         sd.pieces[s].resize(num_threads);
     PMWMSSorterPU<RandomAccessIterator>* pus = new PMWMSSorterPU<RandomAccessIterator>[num_threads];

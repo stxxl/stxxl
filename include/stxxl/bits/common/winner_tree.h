@@ -131,14 +131,14 @@ public:
         m_stats.remove_player_time.stop();
     }
 
-    //! Replay after the player at index <index> has been deactivated.
+    //! Replay after the player at index has been deactivated.
     inline void replay_on_deactivations(unsigned int index)
     {
         assert(index < m_num_slots);
         replay_on_change(index, true);
     }
 
-    //! Notify that the value of the player at index <index> has changed.
+    //! Notify that the value of the player at index has changed.
     inline void notify_change(unsigned int index)
     {
         replay_on_change(index);
@@ -165,8 +165,8 @@ public:
 
     /**
      * Replays all games the player with the given index is involved in.  This
-     * corresponds to the path from leaf <index> to root.  If only the value of
-     * player <index> has changed the result is a valid winner tree.
+     * corresponds to the path from leaf [index] to root.  If only the value of
+     * player [index] has changed the result is a valid winner tree.
      *
      * \param index	The player whose value has changed.
      *

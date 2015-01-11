@@ -26,7 +26,7 @@ STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
 
-/** \def STXXL_PARALLEL_PCALL Macro to produce log message when entering a
+/** STXXL_PARALLEL_PCALL Macro to produce log message when entering a
  *  function.
  *  \param n Input size.
  *  \see STXXL_VERBOSE_LEVEL */

@@ -398,7 +398,7 @@ public:
         return m_first_block->elem[i];
     }
 
-    //! Pushes <record> at the end of the array
+    //! Pushes \<record> at the end of the array
     void operator << (const ValueType& record)
     {
         assert(m_write_phase);
@@ -457,9 +457,9 @@ public:
         }
     }
 
-    //! Removes the first <n> elements from the array (first block).  Loads the
+    //! Removes the first n elements from the array (first block).  Loads the
     //! next block if the current one has run empty.  Make shure there are at
-    //! least <n> elements left in the first block.
+    //! least n elements left in the first block.
     void remove_first_n_elements(size_t n)
     {
         assert(m_first_block_valid);

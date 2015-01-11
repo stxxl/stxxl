@@ -161,7 +161,7 @@ public:
     /*!
      * Constructor. Sets iterator to beginning of sequence.
      * \param begin Begin iterator of sequence.
-     * \param end Unused, only for compatibility.
+     * param end Unused, only for compatibility.
      * \param comp Unused, only for compatibility.
      */
     unguarded_iterator(RandomAccessIterator begin,
@@ -1216,7 +1216,7 @@ multiway_merge_loser_tree_sentinel(
  * \param length Maximum length to merge.
  * \param comp Comparator.
  * \tparam Stable Stable merging incurs a performance penalty.
- * \param sentinel The sequences have a sentinel element.
+ * \tparam Sentinels The sequences have a sentinel element.
  * \return End iterator of output sequence.
  */
 template <bool Stable = false, bool Sentinels = false,
@@ -1339,7 +1339,10 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
  * \param seqs_begin Begin iterator of iterator pair input sequence.
  * \param seqs_end End iterator of iterator pair input sequence.
  * \param length Maximum length to merge.
+ * \param total_length Total length of all sequences combined.
  * \param comp Comparator.
+ * \param chunks Output subsequences for num_threads.
+ * \param num_threads Split the sequences into for num_threads.
  * \tparam Stable Stable merging incurs a performance penalty.
  * \return End iterator of output sequence.
  */
@@ -1422,7 +1425,10 @@ parallel_multiway_merge_sampling_splitting(
  * \param seqs_begin Begin iterator of iterator pair input sequence.
  * \param seqs_end End iterator of iterator pair input sequence.
  * \param length Maximum length to merge.
+ * \param total_length Total length of all sequences combined.
  * \param comp Comparator.
+ * \param chunks Output subsequences for num_threads.
+ * \param num_threads Split the sequences into for num_threads.
  * \tparam Stable Stable merging incurs a performance penalty.
  * \return End iterator of output sequence.
  */

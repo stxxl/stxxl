@@ -31,7 +31,7 @@ namespace parallel {
  * Guarded loser tree/tournament tree, either copying the whole element into
  * the tree structure, or looking up the element via the index.
  *
- * This is a base class for the LoserTreeCopy<true> and <false> classes.
+ * This is a base class for the LoserTreeCopy\<true> and \<false> classes.
  *
  * Guarding is done explicitly through one flag sup per element, inf is not
  * needed due to a better initialization routine.  This is a well-performing
@@ -474,7 +474,7 @@ public:
  * Guarded loser tree, using pointers to the elements instead of copying them
  * into the tree nodes.
  *
- * This is a base class for the LoserTreePointer<true> and <false> classes.
+ * This is a base class for the LoserTreePointer\<true> and \<false> classes.
  *
  * Guarding is done explicitly through one flag sup per element, inf is not
  * needed due to a better initialization routine.  This is a well-performing
@@ -700,7 +700,8 @@ public:
 /**
  * Unguarded loser tree, copying the whole element into the tree structure.
  *
- * This is a base class for the LoserTreeCopyUnguarded<true> and <false> classes.
+ * This is a base class for the LoserTreeCopyUnguarded\<true> and \<false>
+ * classes.
  *
  * No guarding is done, therefore not a single input sequence must run empty.
  * This is a very fast variant.
@@ -871,9 +872,11 @@ public:
 };
 
 /**
- * Unguarded loser tree, keeping only pointers to the elements in the tree structure.
+ * Unguarded loser tree, keeping only pointers to the elements in the tree
+ * structure.
  *
- * This is a base class for the LoserTreePointerUnguarded<true> and <false> classes.
+ * This is a base class for the LoserTreePointerUnguarded\<true> and \<false>
+ * classes.
  *
  * No guarding is done, therefore not a single input sequence must run empty.
  * This is a very fast variant.
