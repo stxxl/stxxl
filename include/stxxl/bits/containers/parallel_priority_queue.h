@@ -1369,9 +1369,9 @@ protected:
             // check that each insertion heap is a heap
 
             // TODO: remove soon, because this is very expensive
-            STXXL_CHECK(1 || is_heap(m_proc[p].insertion_heap.begin(),
-                                     m_proc[p].insertion_heap.end(),
-                                     m_compare));
+            STXXL_CHECK(1 || stxxl::is_heap(m_proc[p].insertion_heap.begin(),
+                                            m_proc[p].insertion_heap.end(),
+                                            m_compare));
 
             STXXL_CHECK(m_proc[p].insertion_heap.capacity() <= m_insertion_heap_capacity);
 

@@ -251,19 +251,13 @@ inline void swap_1D_arrays(Type* a, Type* b, unsigned_type size)
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! round n up to next power of two
 template <typename Integral>
 static inline Integral round_up_to_power_of_two(Integral n)
 {
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    if (sizeof(Integral) > 4) // if 64-bit
-        n |= n >> 32;
-    n++;
+    --n;
+    for(int k = 1; !(k & (2 << sizeof(n))); k <<= 1)
+        n |= n >> k;
+    ++n;
     return n;
 }
 

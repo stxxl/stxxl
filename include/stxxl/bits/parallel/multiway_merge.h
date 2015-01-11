@@ -1391,7 +1391,7 @@ parallel_multiway_merge_sampling_splitting(
     for (thread_index_t slab = 0; slab < num_threads; ++slab)
     {
         // for each sequence
-        for (size_t seq = 0; seq < num_seqs; ++seq)
+        for (DiffType seq = 0; seq < num_seqs; ++seq)
         {
             if (slab > 0) {
                 chunks[slab][seq].first =
@@ -1610,7 +1610,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target + length, comp));
 
     //update ends of sequences
-    DiffType count_seqs = 0;
+    size_t count_seqs = 0;
     for (RandomAccessIteratorIterator raii = seqs_begin; raii != seqs_end; ++raii)
     {
         DiffType length = iterpair_size(*raii);

@@ -140,7 +140,7 @@ void multiseq_partition(
         return;
     }
 
-    assert(m != 0 && N != 0 && rank >= 0 && rank < N);
+    assert(m != 0 && N != 0 && rank < N);
 
     diff_type* seqlen = new diff_type[m];
 
