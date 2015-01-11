@@ -300,36 +300,33 @@ void test_parallel()
 int main(int argc, char* argv[])
 {
     // run individually for debugging
-    //test_repeat<uint32_t, PARA_GNU_MWM_EXACT>(1024);
+    //test_repeat<uint32_t, PARA_GNU_MWM_EXACT>(32);
+    //test_repeat<uint32_t, PARA_MWM_EXACT_LT>(32);
     //test_repeat<uint32_t, PARA_MWM_EXACT_LT>(1024);
-    //test_repeat<uint32_t, SEQ_MWM_LT>(16);
-    //test_repeat<uint32_t, SEQ_GNU_MWM>(16);
+    //test_repeat<uint32_t, SEQ_MWM_LT>(256);
+    //test_repeat<uint32_t, SEQ_GNU_MWM>(256);
     //return 0;
 
     std::string benchset;
 
     stxxl::cmdline_parser cp;
     cp.set_description("STXXL multiway_merge benchmark");
-    cp.add_param_string("seq/para", "benchmark set: seq(uential) or para(llel)", benchset);
+    cp.add_param_string("seq/para/both", "benchmark set: seq(uential), para(llel) or both", benchset);
 
     cp.add_uint('r', "repeat", "number of repetitions", g_repeat);
 
     if (!cp.process(argc, argv))
         return EXIT_FAILURE;
 
-    if (benchset == "seq" || benchset == "sequential")
+    if (benchset == "seq" || benchset == "sequential" || benchset == "both")
     {
         test_sequential<uint32_t>();
         test_sequential<DataStruct>();
     }
-    else if (benchset == "para" || benchset == "parallel")
+    if (benchset == "para" || benchset == "parallel" || benchset == "both")
     {
         test_parallel<uint32_t>();
         test_parallel<DataStruct>();
-    }
-    else
-    {
-        STXXL_ERRMSG("Required parameter: seq or para");
     }
 
     return 0;
