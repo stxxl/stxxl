@@ -1219,7 +1219,7 @@ multiway_merge_loser_tree_sentinel(
  * \tparam Sentinels The sequences have a sentinel element.
  * \return End iterator of output sequence.
  */
-template <bool Stable = false, bool Sentinels = false,
+template <bool Stable, bool Sentinels,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
           typename DiffType, typename Comparator>
@@ -1640,7 +1640,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
  * \param length Maximum length to merge.
  * \return End iterator of output sequence.
  */
-template <bool Stable = false,
+template <bool Stable,
           typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
           typename DiffType, typename Comparator>
@@ -1684,7 +1684,7 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
  * \pre For each \c i, \c seqs_begin[i].second must be the end marker of the
  * sequence, but also reference the one more sentinel element.
  */
-template <bool Stable = false,
+template <bool Stable,
           typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
           typename DiffType, typename Comparator>

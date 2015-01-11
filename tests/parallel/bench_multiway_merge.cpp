@@ -132,7 +132,7 @@ void test_multiway_merge(unsigned int seqnum)
 
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
 
-            stxxl::parallel::sequential_multiway_merge<false>(
+            stxxl::parallel::sequential_multiway_merge<false, false>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;
@@ -142,7 +142,7 @@ void test_multiway_merge(unsigned int seqnum)
 
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
 
-            stxxl::parallel::sequential_multiway_merge<true>(
+            stxxl::parallel::sequential_multiway_merge<true, false>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;
@@ -152,7 +152,7 @@ void test_multiway_merge(unsigned int seqnum)
 
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE_COMBINED;
 
-            stxxl::parallel::sequential_multiway_merge<false>(
+            stxxl::parallel::sequential_multiway_merge<false, false>(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;

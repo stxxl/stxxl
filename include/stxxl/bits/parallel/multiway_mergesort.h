@@ -274,7 +274,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
         STXXL_DEBUG_ASSERT(stxxl::is_sorted(seqs[s].first, seqs[s].second, comp));
     }
 
-    sequential_multiway_merge<Stable>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp);
+    sequential_multiway_merge<Stable, false>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp);
 
     t.tic("merge");
 
@@ -302,7 +302,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
  * \param num_threads Number of threads to use.
  * \tparam Stable Stable sorting.
  */
-template <bool Stable = false,
+template <bool Stable,
           typename RandomAccessIterator, typename Comparator>
 inline void
 parallel_sort_mwms(RandomAccessIterator begin,

@@ -157,7 +157,7 @@ sw_multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
                   Comparator comp,
                   DiffType length)
 {
-    return multiway_merge(seqs_begin, seqs_end, target, length, comp);
+    return multiway_merge<false>(seqs_begin, seqs_end, target, length, comp);
 }
 
 /*! Multi-way merging front-end.
@@ -178,7 +178,7 @@ sw_multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
                            Comparator comp,
                            DiffType length)
 {
-    return multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
+    return multiway_merge_sentinels<false>(seqs_begin, seqs_end, target, length, comp);
 }
 
 #endif
