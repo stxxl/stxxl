@@ -31,6 +31,7 @@
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
+#include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_alloc.h>
@@ -1368,9 +1369,9 @@ protected:
             // check that each insertion heap is a heap
 
             // TODO: remove soon, because this is very expensive
-            STXXL_CHECK(1 || std::is_heap(m_proc[p].insertion_heap.begin(),
-                                          m_proc[p].insertion_heap.end(),
-                                          m_compare));
+            STXXL_CHECK(1 || is_heap(m_proc[p].insertion_heap.begin(),
+                                     m_proc[p].insertion_heap.end(),
+                                     m_compare));
 
             STXXL_CHECK(m_proc[p].insertion_heap.capacity() <= m_insertion_heap_capacity);
 
