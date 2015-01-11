@@ -252,7 +252,8 @@ inline void swap_1D_arrays(Type* a, Type* b, unsigned_type size)
 ////////////////////////////////////////////////////////////////////////////
 
 //! round n up to next power of two
-static inline int32_t round_up_to_power_of_two(int32_t n)
+template <typename Integral>
+static inline Integral round_up_to_power_of_two(Integral n)
 {
     n--;
     n |= n >> 1;
@@ -260,46 +261,8 @@ static inline int32_t round_up_to_power_of_two(int32_t n)
     n |= n >> 4;
     n |= n >> 8;
     n |= n >> 16;
-    n++;
-    return n;
-}
-
-//! round n up to next power of two
-static inline uint32_t round_up_to_power_of_two(uint32_t n)
-{
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    n++;
-    return n;
-}
-
-//! round n up to next power of two
-static inline int64_t round_up_to_power_of_two(int64_t n)
-{
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    n |= n >> 32;
-    n++;
-    return n;
-}
-//! round n up to next power of two
-static inline uint64_t round_up_to_power_of_two(uint64_t n)
-{
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    n |= n >> 32;
+    if (sizeof(Integral) > 4) // if 64-bit
+        n |= n >> 32;
     n++;
     return n;
 }
