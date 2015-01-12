@@ -690,12 +690,7 @@ public:
     //! You should call wait() once after fetching data from EM.
     ValueType& operator [] (size_t i) const
     {
-        if (i >= m_capacity) {
-            // STXXL_MSG("warning: accessing index "<<i);
-            // This is a hack for __gnu_parallel::multiway_merge compatibility.
-            // The element one past the last one is accessed by the multiway_merge algorithm.
-            return m_blocks[0]->elem[0];
-        }
+        assert(i < m_capacity);
         const size_t block_index = i / block_size;
         const size_t local_index = i % block_size;
         assert(i < m_capacity);
