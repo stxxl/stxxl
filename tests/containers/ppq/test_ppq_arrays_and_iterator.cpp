@@ -302,6 +302,51 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
         STXXL_CHECK_EQUAL(out.buffer_size(), (NumEAs + 1) * size);
     }
 
+    if (NumEAs > 0) // test ea ppq_iterators
+    {
+        stxxl::scoped_print_timer timer("test ea ppq_iterators", volume);
+
+        ea_type::iterator begin = ealist[0]->begin(), end = ealist[0]->end();
+        size_t index = 1;
+
+        // prefix operator ++
+        for (ea_type::iterator it = begin; it != end; ++it, ++index)
+            STXXL_CHECK_EQUAL(it->first, index);
+
+        // prefix operator --
+        for (ea_type::iterator it = end; it != begin; )
+        {
+            --it, --index;
+            STXXL_CHECK_EQUAL(it->first, index);
+        }
+
+        STXXL_CHECK_EQUAL(index, 1);
+
+        // postfix operator ++
+        for (ea_type::iterator it = begin; it != end; it++, ++index)
+            STXXL_CHECK_EQUAL(it->first, index);
+
+        // postfix operator --
+        for (ea_type::iterator it = end; it != begin; )
+        {
+            it--, --index;
+            STXXL_CHECK_EQUAL(it->first, index);
+        }
+
+        STXXL_CHECK_EQUAL(index, 1);
+
+        // addition operator +
+        for (ea_type::iterator it = begin; it != end; it = it + 1, ++index)
+            STXXL_CHECK_EQUAL(it->first, index);
+
+        // subtraction operator -
+        for (ea_type::iterator it = end; it != begin; )
+        {
+            it = it - 1, --index;
+            STXXL_CHECK_EQUAL(it->first, index);
+        }
+    }
+
     {
         stxxl::scoped_print_timer timer("running multiway merge", volume * (NumEAs + 1));
 
