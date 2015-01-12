@@ -2463,8 +2463,9 @@ protected:
 
         m_stats.refill_minmax_time.stop();
 
-        // the number of elements in each external array that are smaller than min_max_value or equal
-        // plus the number of elements in the internal arrays
+        // the number of elements in each external array that are smaller than
+        // min_max_value or equal plus the number of elements in the internal
+        // arrays
         std::vector<size_type> sizes(eas + ias);
         std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
 
@@ -2494,8 +2495,11 @@ protected:
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
 
-                STXXL_VERBOSE1_PPQ("adding external seq, size=" << sizes[i]
-                                                                << " begin=" << *begin << " ub=" << *(ub - 1) << " end=" << *(end - 1) << " currentmax=" << m_external_arrays[i].get_current_max());
+                STXXL_VERBOSE1_PPQ("adding external seq, size=" << sizes[i] <<
+                                   " begin=" << *begin <<
+                                   " ub=" << (ub == begin ? *ub : *(ub - 1)) <<
+                                   " end=" << *(end - 1) <<
+                                   " currentmax=" << m_external_arrays[i].get_current_max());
             }
             else {
                 // else part only relevant if c_merge_ias_into_eb==true
@@ -2516,15 +2520,17 @@ protected:
                     sizes[i] = std::distance(begin, ub);
                     sequences[i] = std::make_pair(begin, ub);
 
-                    STXXL_VERBOSE1_PPQ("adding internal seq, size=" << sizes[i]
-                                                                    << " begin=" << *begin << " ub=" << *(ub - 1) << " end=" << *(end - 1));
+                    STXXL_VERBOSE1_PPQ("adding internal seq, size=" << sizes[i] <<
+                                       " begin=" << *begin <<
+                                       " ub=" << (ub == begin ? *ub : *(ub - 1)) <<
+                                       " end=" << *(end - 1));
 
                     if (ub != end) {
                         STXXL_VARDUMP(*ub);
                     }
                 }
                 else {
-                    //there is no min_max_value
+                    // there is no min_max_value
                     sizes[i] = std::distance(begin, end);
                     sequences[i] = std::make_pair(begin, end);
                 }
@@ -2532,6 +2538,7 @@ protected:
                 if (!c_limit_extract_buffer) { // otherwise see below...
                     // remove elements
                     m_internal_arrays[j].inc_min(sizes[i]);
+                    m_internal_size -= sizes[i];
                 }
             }
         }
@@ -2566,15 +2573,19 @@ protected:
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
-        //size_t deleted_size = 0;
+        size_t deleted_size = 0;
 
         // remove elements
-        //if (c_limit_extract_buffer) {
-        for (size_type i = 0; i < eas + ias; ++i) {
-            // dist represents the number of elements that haven't been merged
-            size_type dist = std::distance(sequences[i].first, sequences[i].second);
-            //deleted_size+=sizes[i]-dist;
-            if (dist < sizes[i]) {
+        if (c_limit_extract_buffer) {
+            for (size_type i = 0; i < eas + ias; ++i) {
+                // dist represents the number of elements that haven't been merged
+                size_type dist = std::distance(sequences[i].first, sequences[i].second);
+
+                assert(dist <= sizes[i]);
+                if (dist == sizes[i]) continue;
+
+                deleted_size += sizes[i] - dist;
+
                 if (i < eas) {
                     m_external_arrays[i].remove(sizes[i] - dist);
                     assert(m_external_size >= sizes[i] - dist);
@@ -2588,17 +2599,23 @@ protected:
                 }
             }
         }
-        /*}
         else {
-            for (size_type i = 0; i < eas; ++i) {
-                // deleted_size+=sizes[i];
-                m_external_arrays[i].remove(sizes[i]);
-                assert(m_external_size >= sizes[i]);
-                m_external_size -= sizes[i];
-            }
-        }*/
+            for (size_type i = 0; i < eas + ias; ++i)
+            {
+                if (sizes[i] == 0) continue;
 
-        //assert(deleted_size==output_size);
+                deleted_size += sizes[i];
+
+                if (i < eas) {
+                    m_external_arrays[i].remove(sizes[i]);
+                    assert(m_external_size >= sizes[i]);
+                    m_external_size -= sizes[i];
+                }
+                // item from internal arrays have already been removed
+            }
+        }
+
+        assert(deleted_size == output_size);
 
         //stats.refill_wait_time.start();
         for (size_type i = 0; i < eas; ++i) {
@@ -2611,7 +2628,6 @@ protected:
         size_type num_deleted_arrays = eas - m_external_arrays.size();
         if (num_deleted_arrays > 0) {
             m_mem_left += num_deleted_arrays * m_mem_per_external_array;
-            std::cerr << "test1\n";
         }
 
         m_stats.num_new_external_arrays = 0;
