@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <list>
@@ -53,28 +54,263 @@ STXXL_BEGIN_NAMESPACE
 
 namespace ppq_local {
 
+//! A random-access iterator class for block oriented data.
+//! The iterator is intended to be provided by the internal_array and
+//! external_array classes and to be used by the multiway_merge algorithm.
+//!
+//! \tparam ValueType the value type
+template <class ValueType>
+class ppq_iterator
+{
+public:
+    typedef ValueType value_type;
+    typedef value_type& reference;
+    typedef value_type* pointer;
+    typedef ptrdiff_t difference_type;
+    typedef std::random_access_iterator_tag iterator_category;
+    typedef std::vector<std::pair<pointer, pointer> > block_pointers_type;
+
+protected:
+    typedef ppq_iterator self_type;
+
+    //! reference to a vector of begin/end pointer pairs
+    //! They allow access to the data blocks.
+    //! Unfortunately this cannot be const because we need copy-construction
+    block_pointers_type& m_block_pointers;
+
+    //! empty dummy vector for the default constructor
+    block_pointers_type m_dummy_blocks;
+
+    //! pointer to the current element
+    pointer m_current;
+
+    //! index of the current element
+    size_t m_index;
+
+    //! index of the current element's block
+    size_t m_block_index;
+
+    //! size of each data block
+    size_t m_block_size;
+
+public:
+    //! default constructor
+    //! should not be used directly
+    ppq_iterator()
+        : m_block_pointers(m_dummy_blocks)
+    { }
+
+    //! constructor
+    //!
+    //! \param block_pointers   A reference to the properly initialized vector of begin and end pointers.
+    //!                         One pair for each block. The pointers should be valid for all blocks that
+    //!                         are expected to be accessed with this iterator.
+    //! \param block_size       The size of a single block. If there is only one block (e.g. if the iterator
+    //!                         belongs to an internal_array), use the total size here.
+    //! \param index            The index of the current element (global - index 0 belongs to the first element
+    //!                         in the first block, no matter if the values are still valid)
+    ppq_iterator(block_pointers_type& block_pointers, size_t block_size, size_t index)
+        : m_block_pointers(block_pointers),
+          m_index(index),
+          m_block_size(block_size)
+    {
+        update();
+    }
+
+    //! copy constructor
+    ppq_iterator(const self_type& o)
+        : m_block_pointers(o.m_block_pointers),
+          m_current(o.m_current),
+          m_index(o.m_index),
+          m_block_index(o.m_block_index),
+          m_block_size(o.m_block_size)
+    { }
+
+    //! copy assignment
+    self_type& operator = (const self_type& o)
+    {
+        m_block_pointers = o.m_block_pointers;
+        m_current = o.m_current;
+        m_index = o.m_index;
+        m_block_index = o.m_block_index;
+        m_block_size = o.m_block_size;
+        return *this;
+    }
+
+    //! returns the value's index in the external array
+    size_t get_index() const
+    {
+        return m_index;
+    }
+
+    reference operator * () const
+    {
+        return *m_current;
+    }
+    pointer operator -> () const
+    {
+        return m_current;
+    }
+    reference operator [] (difference_type index) const
+    {
+        const size_t block_index = index / m_block_size;
+        const size_t local_index = index % m_block_size;
+
+        assert(block_index < m_block_pointers.size());
+        assert(m_block_pointers[block_index].first + local_index
+               < m_block_pointers[block_index].second);
+
+        return *(m_block_pointers[block_index].first + local_index);
+    }
+
+    //! pre-increment operator
+    self_type& operator ++ ()
+    {
+        ++m_index;
+        ++m_current;
+
+        if (m_current == m_block_pointers[m_block_index].second) {
+            if (m_block_index + 1 < m_block_pointers.size()) {
+                m_current = m_block_pointers[++m_block_index].first;
+            }
+            else {
+                // global end
+                assert(m_block_index + 1 == m_block_pointers.size());
+                m_current = m_block_pointers[m_block_index++].second;
+            }
+        }
+
+        return *this;
+    }
+    //! post-increment operator
+    self_type operator ++ (int)
+    {
+        self_type former(*this);
+        operator ++ ();
+        return former;
+    }
+    //! pre-increment operator
+    self_type& operator -- ()
+    {
+        assert(m_index > 0);
+        --m_index;
+
+        if (m_block_index >= m_block_pointers.size()
+            || m_current == m_block_pointers[m_block_index].first) {
+            // begin of current block or global end
+            assert(m_block_index > 0);
+            assert(m_block_index <= m_block_pointers.size());
+            m_current = m_block_pointers[--m_block_index].second - 1;
+        }
+        else {
+            --m_current;
+        }
+
+        return *this;
+    }
+    //! post-increment operator
+    self_type operator -- (int)
+    {
+        self_type former(*this);
+        operator -- ();
+        return former;
+    }
+    self_type operator + (difference_type addend) const
+    {
+        return self_type(m_block_pointers, m_block_size, m_index + addend);
+    }
+    self_type& operator += (difference_type addend)
+    {
+        m_index += addend;
+        update();
+        return *this;
+    }
+    self_type operator - (difference_type subtrahend) const
+    {
+        return self_type(m_block_pointers, m_block_size, m_index - subtrahend);
+    }
+    difference_type operator - (const self_type& o) const
+    {
+        return (m_index - o.m_index);
+    }
+    self_type& operator -= (difference_type subtrahend)
+    {
+        m_index -= subtrahend;
+        update();
+        return *this;
+    }
+    bool operator == (const self_type& o) const
+    {
+        return m_index == o.m_index;
+    }
+    bool operator != (const self_type& o) const
+    {
+        return m_index != o.m_index;
+    }
+    bool operator < (const self_type& o) const
+    {
+        return m_index < o.m_index;
+    }
+    bool operator <= (const self_type& o) const
+    {
+        return m_index <= o.m_index;
+    }
+    bool operator > (const self_type& o) const
+    {
+        return m_index > o.m_index;
+    }
+    bool operator >= (const self_type& o) const
+    {
+        return m_index >= o.m_index;
+    }
+
+private:
+    //! updates m_block_index and m_current based on m_index
+    inline void update()
+    {
+        m_block_index = m_index / m_block_size;
+        const size_t local_index = m_index % m_block_size;
+
+        if (m_block_index < m_block_pointers.size()) {
+            m_current = m_block_pointers[m_block_index].first + local_index;
+            assert(m_current < m_block_pointers[m_block_index].second);
+        }
+        else {
+            // global end
+            assert(m_block_index == m_block_pointers.size());
+            assert(local_index == 0);
+            m_current = m_block_pointers[m_block_index - 1].second;
+        }
+    }
+};
+
 /*!
  * Internal arrays store a sorted sequence of values in RAM, which will be
- * merged together into the deletion buffer, when it needs to be
+ * merged together into the deletion buffer when it needs to be
  * refilled. Internal arrays are constructed from the insertions heaps when
  * they overflow.
  */
 template <class ValueType>
 class internal_array : private noncopyable
 {
+public:
+    typedef ValueType value_type;
+    typedef ppq_iterator<value_type> iterator;
+
 protected:
+    typedef typename iterator::block_pointers_type block_pointers_type;
+
     //! Contains the items of the sorted sequence.
-    std::vector<ValueType> m_values;
+    std::vector<value_type> m_values;
 
     //! Index of the current head
     size_t m_min_index;
 
-public:
-    //! The value iterator type used by begin() and end(). We use pointers as
-    //! iterator so internal arrays are compatible to external arrays and can
-    //! be merged together.
-    typedef ValueType* iterator;
+    //! Begin and end pointers of the array
+    //! This is used by the iterator
+    block_pointers_type m_block_pointers;
 
+public:
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
     internal_array() { }
@@ -82,9 +318,10 @@ public:
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
     internal_array(std::vector<ValueType>& values)
-        : m_values(), m_min_index(0)
+        : m_values(), m_min_index(0), m_block_pointers(1)
     {
         std::swap(m_values, values);
+        m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.end()));
     }
 
     //! Swap internal_array with another one.
@@ -92,10 +329,11 @@ public:
     {
         std::swap(m_values, o.m_values);
         std::swap(m_min_index, o.m_min_index);
+        std::swap(m_block_pointers, o.m_block_pointers);
     }
 
     //! Random access operator
-    inline ValueType& operator [] (size_t i) const
+    inline ValueType& operator [] (size_t i)
     {
         return m_values[i];
     }
@@ -142,6 +380,12 @@ public:
         return (m_values.size() - m_min_index);
     }
 
+    //! Returns the initial size of the array.
+    inline size_t capacity() const
+    {
+        return m_values.size();
+    }
+
     //! Return the amount of internal memory used by the array
     inline size_t int_memory() const
     {
@@ -151,17 +395,15 @@ public:
     //! Begin iterator
     inline iterator begin()
     {
-        // We use &(*()) in order to get a pointer iterator. This is allowed
-        // because values are guaranteed to be consecutive in std::vecotor.
-        return &(*(m_values.begin() + m_min_index));
+        // not const, unfortunately.
+        return iterator(m_block_pointers, capacity(), m_min_index);
     }
 
     //! End iterator
     inline iterator end()
     {
-        // We use &(*()) in order to get a pointer iterator. This is allowed
-        // because values are guaranteed to be consecutive in std::vecotor.
-        return &(*(m_values.end()));
+        // not const, unfortunately.
+        return iterator(m_block_pointers, capacity(), capacity());
     }
 };
 
@@ -187,31 +429,29 @@ template <
 class external_array : private noncopyable
 {
 public:
-    typedef external_array<ValueType, BlockSize, AllocStrategy> self_type;
-    typedef std::vector<BID<BlockSize> > bid_vector;
-    typedef typed_block<BlockSize, ValueType> block_type;
-    typedef ValueType* iterator;
-    typedef const ValueType* const_iterator;
-    typedef typename bid_vector::iterator bid_iterator;
-    typedef typename block_type::iterator block_iterator;
-    typedef read_write_pool<block_type> pool_type;
+    typedef ValueType value_type;
+    typedef ppq_iterator<value_type> iterator;
 
 protected:
-    //! Allocation strategy for new blocks
-    AllocStrategy m_alloc_strategy;
+    typedef external_array<ValueType, BlockSize, AllocStrategy> self_type;
+    typedef typed_block<BlockSize, ValueType> block_type;
+    typedef read_write_pool<block_type> pool_type;
+    typedef std::vector<BID<BlockSize> > bid_vector;
+    typedef std::vector<block_type*> block_vector;
+    typedef std::vector<request_ptr> request_vector;
+    typedef std::vector<ValueType> maxima_vector;
+    typedef typename iterator::block_pointers_type block_pointers_type;
 
-    //! The total capacity of the external array. Cannot be changed after
-    //! construction.
+public:
+    //! The number of elements fitting into one block
+    static const size_t block_size = (size_t)BlockSize / sizeof(ValueType);
+
+protected:
+    //! The total capacity of the external array. Cannot be changed after construction.
     size_t m_capacity;
 
-    //! The total number of elements minus the number of extracted values
-    size_t m_size;
-
-    //! The number of elements fitting into one block
-    static const unsigned_type num_elements_per_block = BlockSize / sizeof(ValueType);
-
-    //! Number of blocks in external memory
-    size_t m_num_bids;
+    //! Number of blocks
+    size_t m_num_blocks;
 
     //! Number of blocks to prefetch from EM
     size_t m_num_prefetch_blocks;
@@ -219,48 +459,38 @@ protected:
     //! Size of the write buffer in number of blocks
     size_t m_num_write_buffer_blocks;
 
+    //! Prefetch and write buffer pool
+    pool_type* m_pool;
+
     //! The IDs of each block in external memory
     bid_vector m_bids;
 
     //! The block with the currently smallest elements
-    block_type* m_first_block;
+    block_vector m_blocks;
 
-    //! Prefetch and write buffer pool
-    pool_type* m_pool;
+    //! Begin and end pointers for each block
+    block_pointers_type m_block_pointers;
 
-    //! The read_request can be used to wait until the block has been
-    //! completely fetched.
-    request_ptr m_read_request;
+    //! The read request pointers are used to wait until the block has been completely fetched.
+    request_vector m_requests;
 
-    //! The write position in the block currently being filled. Used by the
-    //! <<-operator.
-    size_t m_write_position;
+    //! stores the maximum value of each block
+    maxima_vector m_maxima;
 
-    //! Index of the next block to be prefetched.
-    size_t m_hint_index;
-
-    /* Write phase: Index of the external block where the current block will be
-     * stored in when it's filled. Read phase: Index of the external block
-     * which will be fetched next.
-     */
-    size_t m_current_bid_index;
-
-    //! True means write phase, false means read phase.
+    //! Is array in write phase? True = write phase, false = read phase.
     bool m_write_phase;
 
-    //! The first block is valid if wait_for_first_block() has already been
-    //! called.
-    bool m_first_block_valid;
+    //! The total number of elements minus the number of extracted values
+    size_t m_size;
 
-    //! Indicates if first_block is actually the first block of all which has
-    //! never been written to external memory.
-    bool m_is_first_block;
+    //! The read position in the array.
+    size_t m_index;
 
-    //! boundaries inside the first block
-    size_t m_begin_index;
-
-    //! boundaries inside the first block
+    //! The index behind the last element that is located in RAM (or is at least requested to be so)
     size_t m_end_index;
+
+    //! The index of the next block to be prefetched.
+    size_t m_hint_index;
 
 public:
     /*!
@@ -276,70 +506,112 @@ public:
      */
     external_array(size_t size, size_t num_prefetch_blocks,
                    size_t num_write_buffer_blocks)
-        : m_capacity(size),
-          m_size(0),
-          m_num_bids((size_t)div_ceil(m_capacity, num_elements_per_block)),
-          m_num_prefetch_blocks(std::min(num_prefetch_blocks, m_num_bids)),
-          m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_bids)),
-          m_bids(m_num_bids),
-          m_first_block(new block_type),
+        :   // constants
+          m_capacity(size),
+          m_num_blocks((size_t)div_ceil(m_capacity, block_size)),
+          m_num_prefetch_blocks(std::min(num_prefetch_blocks, m_num_blocks)),
+          m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_blocks)),
           m_pool(new pool_type(0, m_num_write_buffer_blocks)),
-          m_write_position(0),
-          m_hint_index(0),
-          m_current_bid_index(0),
-          m_write_phase(true),
-          m_first_block_valid(false),
-          m_is_first_block(true),
-          m_begin_index(0),
-          m_end_index(0)
-    {
-        assert(size > 0);
 
+          // vectors
+          m_bids(m_num_blocks),
+          m_blocks(m_num_blocks, NULL),
+          m_block_pointers(m_num_blocks),
+          m_requests(m_num_blocks, NULL),
+          m_maxima(m_num_blocks),
+
+          // state
+          m_write_phase(true),
+
+          // indices
+          m_size(0),
+          m_index(0),
+          m_end_index(1),                      // buffer size must be at least 1
+          m_hint_index(1)
+    {
+        assert(m_capacity > 0);
+        assert(m_num_write_buffer_blocks > 0); // needed for steal()
         // allocate blocks in EM.
         block_manager* bm = block_manager::get_instance();
-        bm->new_blocks(m_alloc_strategy, m_bids.begin(), m_bids.end());
+        // first BID is not used, because first block is never written to EM.
+        bm->new_blocks(AllocStrategy(), m_bids.begin() + 1, m_bids.end());
+        m_blocks[0] = new block_type;
+        update_block_pointers(0);
     }
 
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
     external_array()
-        : m_pool(NULL)
+        :   // constants
+          m_capacity(0),
+          m_num_blocks(0),
+          m_num_prefetch_blocks(0),
+          m_num_write_buffer_blocks(0),
+          m_pool(NULL),
+
+          // vectors
+          m_bids(0),
+          m_blocks(0),
+          m_block_pointers(0),
+          m_requests(0),
+          m_maxima(0),
+
+          // state
+          m_write_phase(false),
+
+          // indices
+          m_size(0),
+          m_index(0),
+          m_end_index(0),
+          m_hint_index(0)
     { }
 
     //! Swap internal_array with another one.
     void swap(external_array& o)
     {
-        std::swap(m_alloc_strategy, o.m_alloc_strategy);
+        // constants
         std::swap(m_capacity, o.m_capacity);
-        std::swap(m_size, o.m_size);
-        std::swap(m_num_bids, o.m_num_bids);
+        std::swap(m_num_blocks, o.m_num_blocks);
         std::swap(m_num_prefetch_blocks, o.m_num_prefetch_blocks);
         std::swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
-        std::swap(m_bids, o.m_bids);
-        std::swap(m_first_block, o.m_first_block);
         std::swap(m_pool, o.m_pool);
-        std::swap(m_read_request, o.m_read_request);
-        std::swap(m_write_position, o.m_write_position);
-        std::swap(m_hint_index, o.m_hint_index);
-        std::swap(m_current_bid_index, o.m_current_bid_index);
+
+        // vectors
+        std::swap(m_bids, o.m_bids);
+        std::swap(m_requests, o.m_requests);
+        std::swap(m_blocks, o.m_blocks);
+        std::swap(m_block_pointers, o.m_block_pointers);
+        std::swap(m_maxima, o.m_maxima);
+
+        // state
         std::swap(m_write_phase, o.m_write_phase);
-        std::swap(m_first_block_valid, o.m_first_block_valid);
-        std::swap(m_is_first_block, o.m_is_first_block);
-        std::swap(m_begin_index, o.m_begin_index);
+
+        // indices
+        std::swap(m_size, o.m_size);
+        std::swap(m_index, o.m_index);
         std::swap(m_end_index, o.m_end_index);
+        std::swap(m_hint_index, o.m_hint_index);
     }
 
     //! Destructor
     ~external_array()
     {
-        block_manager* bm = block_manager::get_instance();
-        if (m_pool != NULL) {
-            // This could also be done step by step in remove_first_...() in
-            // future.
-            bm->delete_blocks(m_bids.begin(), m_bids.end());
-            delete m_first_block;
-            delete m_pool;
-        }   // else: the array has been moved.
+        if (m_size > 0) {
+            // not all data has been read!
+
+            assert(m_end_index > 0); // true because m_size>0
+            const size_t block_index = m_index / block_size;
+            const size_t end_block_index = (m_end_index - 1) / block_size;
+
+            block_manager* bm = block_manager::get_instance();
+            typename bid_vector::iterator i_begin = m_bids.begin() + std::max(block_index, (size_t)1);
+            bm->delete_blocks(i_begin, m_bids.end());
+
+            for (size_t i = block_index; i < end_block_index; ++i) {
+                delete m_blocks[i];
+            }
+        }
+        delete m_pool;
     }
 
     //! Returns the current size
@@ -354,209 +626,331 @@ public:
         return (m_size == 0);
     }
 
-    //! Returns if one can safely access elements from the first block.
-    bool first_block_valid() const
+    //! Returns if the array is empty
+    size_t buffer_size() const
     {
-        return m_first_block_valid;
+        return (m_end_index - m_index);
+    }
+
+    //! Returns a random-access iterator to the begin of the data
+    //! in internal memory.
+    iterator begin()
+    {
+        assert(m_index == m_capacity || block_valid(m_index / block_size));
+        // not const, unfortunately.
+        return iterator(m_block_pointers, block_size, m_index);
+    }
+
+    //! Returns a random-access iterator 1 behind the end of the data
+    //! in internal memory.
+    iterator end()
+    {
+        assert(m_end_index == m_index || block_valid((m_end_index - 1) / block_size));
+        // not const, unfortunately.
+        return iterator(m_block_pointers, block_size, m_end_index);
     }
 
     //! Returns the smallest element in the array
-    const ValueType & get_min_element() const
+    ValueType & get_min()
     {
-        assert(m_first_block_valid);
-        assert(m_end_index - 1 >= m_begin_index);
-        return *begin_block();
+        return *begin();
     }
 
-    //! Returns the largest element in the first block / internal memory
-    const ValueType & get_current_max_element() const
+    //! Returns the largest element in internal memory (or at least
+    //! requested to be in internal memory)
+    ValueType & get_current_max()
     {
-        assert(m_first_block_valid);
-        assert(m_end_index - 1 >= m_begin_index);
-        block_iterator i = end_block();
-        return *(--i);
+        assert(m_end_index > 0);
+        const size_t last_block_index = (m_end_index - 1) / block_size;
+        return m_maxima[last_block_index];
     }
 
-    //! Begin iterator of the first block
-    iterator begin_block() const
+    //! Returns if there is data in EM, that's not randomly accessible.
+    bool has_em_data() const
     {
-        assert(m_first_block_valid);
-        return m_first_block->begin() + m_begin_index;
+        assert(m_end_index > 0);
+        const size_t last_block_index = (m_end_index - 1) / block_size;
+        return (last_block_index + 1 < m_num_blocks);
     }
 
-    //! End iterator of the first block
-    iterator end_block() const
+    //! Returns if the data requested to be in internal memory is
+    //! completely fetched. True if wait() has been called before.
+    bool valid() const
     {
-        assert(m_first_block_valid);
-        return m_first_block->begin() + m_end_index;
+        bool result = true;
+        const size_t block_index = m_index / block_size;
+        const size_t end_block_index = (m_end_index - 1) / block_size;
+        for (size_t i = block_index; i <= end_block_index; ++i) {
+            result = result && block_valid(i);
+        }
+        return result;
     }
 
-    //! Random access operator for the first block
-    const ValueType& operator [] (size_t i) const
+    //! Random access operator for data in internal memory
+    //! You should call wait() once after fetching data from EM.
+    ValueType& operator [] (size_t i) const
     {
-        assert(i >= m_begin_index);
-        assert(i < m_end_index);
-        return m_first_block->elem[i];
+        if (i >= m_capacity) {
+            // STXXL_MSG("warning: accessing index "<<i);
+            // This is a hack for __gnu_parallel::multiway_merge compatibility.
+            // The element one past the last one is accessed by the multiway_merge algorithm.
+            return m_blocks[0]->elem[0];
+        }
+        const size_t block_index = i / block_size;
+        const size_t local_index = i % block_size;
+        assert(i < m_capacity);
+        assert(block_valid(block_index));
+        return m_blocks[block_index]->elem[local_index];
     }
 
-    //! Pushes \<record> at the end of the array
-    void operator << (const ValueType& record)
+    //! Pushes the value at the end of the array
+    void push_back(const ValueType& value)
     {
         assert(m_write_phase);
         assert(m_size < m_capacity);
+
+        const size_t block_index = m_size / block_size;
+        const size_t local_index = m_size % block_size;
+
+        m_blocks[block_index]->elem[local_index] = value;
         ++m_size;
 
-        if (UNLIKELY(m_write_position >= block_type::size)) {
-            m_write_position = 0;
-            write_out();
+        // block finished? -> write out.
+        if (UNLIKELY(m_size % block_size == 0 || m_size == m_capacity)) {
+            m_maxima[block_index] = m_blocks[block_index]->elem[block_size - 1];
+            if (block_index > 0) {
+                // first block is never written to EM!
+                assert(m_bids[block_index].valid());
+                m_pool->write(m_blocks[block_index], m_bids[block_index]);
+            }
+            if (block_index + 1 < m_num_blocks) {
+                // Steal block for further filling.
+                m_blocks[block_index + 1] = m_pool->steal();
+                update_block_pointers(block_index + 1);
+            }
         }
 
-        m_first_block->elem[m_write_position++] = record;
+        // compatibility to the block write interface
+        m_index = m_size;
+        m_end_index = m_index + 1;
+    }
+
+    //! Request a write buffer of at least the given size.
+    //! It can be accessed using begin() and end().
+    void request_write_buffer(size_t size)
+    {
+        assert(m_write_phase);
+        assert(size > 0);
+        assert(m_size + size <= m_capacity);
+        assert(m_end_index > m_index);
+
+        const size_t block_index = m_index / block_size;
+        const size_t last_block_index = (m_end_index - 1) / block_size;
+
+        m_end_index = m_size + size;
+
+        const size_t last_block_index_after = (m_end_index - 1) / block_size;
+
+        const size_t num_buffer_blocks = std::max(last_block_index_after, (size_t)1)
+                                         - std::max(block_index, (size_t)1) + 1;
+
+        if (num_buffer_blocks > m_pool->size_write()) {
+            // needed for m_pool->steal()
+            m_pool->resize_write(num_buffer_blocks);
+        }
+
+        for (size_t i = last_block_index + 1; i <= last_block_index_after; ++i) {
+            m_blocks[i] = m_pool->steal();
+            update_block_pointers(i);
+        }
+    }
+
+    //! Writes the data from the write buffer to EM, if necessary.
+    void flush_write_buffer()
+    {
+        const size_t size = m_end_index - m_index;
+        const size_t block_index = m_index / block_size;
+        size_t last_block_index = (m_end_index - 1) / block_size;
+
+        if (m_size + size == m_capacity) {
+            // we have to flush the last block, too.
+            ++last_block_index;
+        }
+
+        for (size_t i = std::max(block_index, (size_t)1); i < last_block_index; ++i) {
+            if (i < m_num_blocks - 1) {
+                m_maxima[i] = m_blocks[i]->elem[block_size - 1];
+            }
+            else {
+                // last block
+                m_maxima[i] = m_blocks[i]->elem[last_block_size() - 1];
+            }
+            assert(m_bids[i].valid());
+            m_pool->write(m_blocks[i], m_bids[i]);
+        }
+
+        if (m_size + size < m_capacity
+            && m_end_index % block_size == 0
+            && last_block_index + 1 < m_num_blocks) {
+            // block was full -> request new one
+            m_blocks[last_block_index + 1] = m_pool->steal();
+            update_block_pointers(last_block_index + 1);
+        }
+
+        m_size += size;
+        m_index = m_size;
+        m_end_index = m_index + 1; // buffer size must be at least 1
     }
 
     //! Finish write phase. Afterwards the values can be extracted from bottom
     //! up (ascending order).
     void finish_write_phase()
     {
-        // Idea for the future: If we write the block with the smallest values
-        // in the end, we don't need to write it into EM.
-
         assert(m_capacity == m_size);
-
-        if (m_write_position > 0) {
-            // This works only if the <<-operator has been used.
-            write_out();
-        }
-
         m_pool->resize_write(0);
         m_pool->resize_prefetch(m_num_prefetch_blocks);
         m_write_phase = false;
 
-        m_current_bid_index = 0;
-        m_begin_index = 0;
-        m_end_index = m_write_position;
+        // set m_maxima[0]
+        if (m_capacity <= block_size) {
+            m_maxima[0] = m_blocks[0]->elem[m_capacity - 1];
+        }
+        else {
+            m_maxima[0] = m_blocks[0]->elem[block_size - 1];
+        }
 
-        for (size_t i = 0; i < m_num_prefetch_blocks; ++i)
+        const size_t local_block_size = block_size; // std::min cannot access static block_size
+        m_end_index = std::min(local_block_size, m_capacity);
+        m_index = 0;
+
+        for (size_t i = 0; i < m_num_prefetch_blocks; ++i) {
             hint();
+        }
 
-        load_next_block();
+        assert(m_blocks[0]);
     }
 
-    //! Removes the first block and loads the next one if there's any
-    void remove_first_block()
-    {
-        assert(m_first_block_valid);
-
-        if (has_next_block()) {
-            m_size -= num_elements_per_block;
-            load_next_block();
-        }
-        else {
-            m_size = 0;
-            m_begin_index = m_end_index = 0;
-            m_first_block_valid = true;
-        }
-    }
-
-    //! Removes the first n elements from the array (first block).  Loads the
-    //! next block if the current one has run empty.  Make shure there are at
-    //! least n elements left in the first block.
-    void remove_first_n_elements(size_t n)
-    {
-        assert(m_first_block_valid);
-
-        if (m_begin_index + n < m_end_index) {
-            m_size -= n;
-            m_begin_index += n;
-        }
-        else {
-            assert(m_begin_index + n == m_end_index);
-
-            if (has_next_block()) {
-                assert(m_size >= n);
-                m_size -= n;
-                load_next_block();
-            }
-            else {
-                m_size -= n;
-                assert(m_size == 0);
-                m_begin_index = 0;
-                m_end_index = 0;
-                m_first_block_valid = true;
-            }
-        }
-    }
-
-    //! Has to be called before using begin_block() and end_block() in order to
-    //! set _first_block_valid.
-    void wait_for_first_block()
+    //! Waits for requested data to be completely fetched into
+    //! internal memory. Call this if you want to read data after
+    //! remove() or request_further_block() has been called.
+    void wait()
     {
         assert(!m_write_phase);
+        assert(m_end_index > 0);
+        const size_t block_index = m_index / block_size;
+        const size_t end_block_index = (m_end_index - 1) / block_size;
 
-        if (m_first_block_valid)
-            return;
+        // ignore first block (never in EM)
+        for (size_t i = std::max((size_t)1, block_index); i <= end_block_index; ++i) {
+            assert(m_requests[i]);
+            m_requests[i]->wait();
+            assert(m_requests[i]->poll());
+            assert(m_blocks[i]);
+        }
+    }
 
-        if (m_read_request)
-            m_read_request->wait();
+    //! Removes the first n elements from the array.  Loads the
+    //! next block if the current one has run empty. Make shure there
+    //! are at least n elements in RAM.
+    void remove(size_t n)
+    {
+        assert(m_index + n <= m_capacity);
+        assert(m_index + n <= m_end_index);
+        assert(m_size >= n);
+        assert(n > 0);
 
-        m_first_block_valid = true;
+        const size_t block_index = m_index / block_size;
+
+        const size_t index_after = m_index + n;
+        const size_t block_index_after = index_after / block_size;
+        const size_t local_index_after = index_after % block_size;
+
+        assert(block_index_after <= m_num_blocks);
+
+        block_manager* bm = block_manager::get_instance();
+        typename bid_vector::iterator i_begin = m_bids.begin() + std::max(block_index, (size_t)1);
+        typename bid_vector::iterator i_end = m_bids.begin() + std::max(block_index_after, (size_t)1);
+        if (i_end > i_begin) {
+            bm->delete_blocks(i_begin, i_end);
+        }
+
+        for (size_t i = block_index; i < block_index_after; ++i) {
+            assert(block_valid(i));
+            delete m_blocks[i];
+        }
+
+        m_index = index_after;
+        m_size -= n;
+
+        if (block_index_after >= m_num_blocks) {
+            assert(block_index_after == m_num_blocks);
+            assert(m_size == 0);
+        }
+        else if (local_index_after == 0) {
+            assert(block_index_after == (m_end_index - 1) / block_size + 1);
+            request_further_block();
+        }
+        else {
+            assert(block_valid(block_index_after));
+        }
+    }
+
+    //! Requests one more block to be fetched into RAM
+    void request_further_block()
+    {
+        assert(has_em_data());
+        assert(m_end_index > 0);
+
+        const size_t block_index = (m_end_index - 1) / block_size + 1;
+
+        assert(block_index < m_num_blocks);
+        assert(block_index > 0); // first block is already in RAM
+        assert(m_bids[block_index].valid());
+
+        m_blocks[block_index] = new block_type;
+        m_requests[block_index] = m_pool->read(m_blocks[block_index], m_bids[block_index]);
+        update_block_pointers(block_index);
+
+        hint();
+        m_end_index = std::min(m_capacity, (block_index + 1) * block_size);
     }
 
 protected:
-    //! Write the current block into external memory
-    void write_out()
+    //! Returns if the block with the given index is completely fetched.
+    bool block_valid(size_t block_index) const
     {
-        assert(m_write_phase);
-        m_pool->write(m_first_block, m_bids[m_current_bid_index++]);
-        m_first_block = m_pool->steal();
+        if (!m_write_phase) {
+            return ((block_index == 0) || (m_requests[block_index] && m_requests[block_index]->poll()));
+        }
+        else {
+            return (bool)m_blocks[block_index];
+        }
     }
 
-    //! Gives the prefetcher a hint for the next block to prefetch
+    //! Gives the prefetcher a hint for the next block to prefetch.
     void hint()
     {
-        if (m_hint_index < m_num_bids) {
+        if (m_hint_index < m_num_blocks) {
             m_pool->hint(m_bids[m_hint_index]);
         }
         ++m_hint_index;
     }
 
-    //! Fetches the next block from the hard disk and calls hint() afterwards.
-    void load_next_block()
+    //! Updates the m_block_pointers vector.
+    //! Should be called after any steal() or read() operation.
+    //! This is necessary for the iterators to work properly.
+    inline void update_block_pointers(size_t block_index)
     {
-        m_first_block_valid = false;
-
-        if (!m_is_first_block) {
-            ++m_current_bid_index;
-        }
-        else {
-            m_is_first_block = false;
-        }
-
-        m_read_request = m_pool->read(m_first_block, m_bids[m_current_bid_index]);
-        hint();
-
-        m_begin_index = 0;
-        if (is_last_block()) {
-            m_end_index = m_size % num_elements_per_block;
-            m_end_index = (m_end_index == 0 ? num_elements_per_block : m_end_index);
-        }
-        else {
-            m_end_index = num_elements_per_block;
-        }
+        m_block_pointers[block_index].first = m_blocks[block_index]->begin();
+        m_block_pointers[block_index].second = m_blocks[block_index]->end();
+        assert(m_block_pointers[block_index].first != NULL);
+        assert(m_block_pointers[block_index].second != NULL);
     }
 
-    //! Returns if there is a next block on hard disk.
-    bool has_next_block() const
+    inline size_t last_block_size()
     {
-        return ((m_is_first_block && m_num_bids > 0) ||
-                (m_current_bid_index + 1 < m_num_bids));
-    }
-
-    //! Returns if the current block is the last one.
-    bool is_last_block() const
-    {
-        return ((m_current_bid_index == m_num_bids - 1) ||
-                (m_capacity < num_elements_per_block));
+        size_t mod = m_capacity % block_size;
+        return (mod > 0) ? mod : block_size;
     }
 };
 
@@ -648,7 +1042,7 @@ protected:
             case IA:
                 return m_ias[m_parent.m_ia.top()].get_min();
             case EA:
-                return m_eas[m_parent.m_ea.top()].get_min_element();
+                return m_eas[m_parent.m_ea.top()].get_min();
             default:
                 abort();
             }
@@ -709,8 +1103,8 @@ protected:
 
         bool operator () (const int a, const int b) const
         {
-            return m_compare(m_eas[a].get_min_element(),
-                             m_eas[b].get_min_element());
+            return m_compare(m_eas[a].get_min(),
+                             m_eas[b].get_min());
         }
     };
 
@@ -953,9 +1347,8 @@ protected:
     typedef bid_vector bids_container_type;
     typedef ppq_local::internal_array<ValueType> internal_array_type;
     typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
-    typedef typename std::vector<ValueType>::iterator extract_iterator;
     typedef typename std::vector<ValueType>::iterator value_iterator;
-    typedef typename block_type::iterator block_iterator;
+    typedef typename internal_array_type::iterator iterator;
 
     //! type of insertion heap itself
     typedef std::vector<ValueType> heap_type;
@@ -1050,7 +1443,7 @@ protected:
      * Each internal array reserves space for the extract buffer in the size of
      * all heaps together.
      */
-    static const bool c_limit_extract_buffer = true;
+    static const bool c_limit_extract_buffer = false;
 
     //! For bulks of size up to c_single_insert_limit sequential single insert
     //! is faster than bulk_push.
@@ -1186,7 +1579,7 @@ protected:
                                   m_internal_arrays.end(),
                                   empty_internal_array_eraser());
 
-        size_type size_removed = 0;
+        //size_type size_removed = 0;
 
         for (typename internal_arrays_type::iterator i = swapend;
              i != m_internal_arrays.end(); ++i)
@@ -1767,14 +2160,18 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
+            //STXXL_VERBOSE1_PPQ("heap "<<index<<": "<<m_proc[index].insertion_heap[0]);
             return m_proc[index].insertion_heap[0];
         case minima_type::EB:
+            //STXXL_VERBOSE1_PPQ("eb "<<m_extract_buffer_index<<": "<<m_extract_buffer[m_extract_buffer_index]);
             return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
+            //STXXL_VERBOSE1_PPQ("ia "<<index<<": "<<m_internal_arrays[index].get_min());
             return m_internal_arrays[index].get_min();
         case minima_type::EA:
-            // wait_for_first_block() already done by comparator....
-            return m_external_arrays[index].get_min_element();
+            //STXXL_VERBOSE1_PPQ("ea "<<index<<": "<<m_external_arrays[index].get_min());
+            // wait() already done by comparator....
+            return m_external_arrays[index].get_min();
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -1850,12 +2247,12 @@ public:
         }
         case minima_type::EA:
         {
-            // wait_for_first_block() already done by comparator...
-            min = m_external_arrays[index].get_min_element();
+            // wait() already done by comparator...
+            min = m_external_arrays[index].get_min();
             assert(m_external_size > 0);
             --m_external_size;
-            m_external_arrays[index].remove_first_n_elements(1);
-            m_external_arrays[index].wait_for_first_block();
+            m_external_arrays[index].remove(1);
+            m_external_arrays[index].wait();
 
             if (!m_external_arrays[index].empty())
                 m_minima.update_external_array(index);
@@ -1895,30 +2292,27 @@ public:
         size_type total_size = m_external_size;
         assert(total_size > 0);
 
-        external_array_type temp_array(total_size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(temp_array);
-
-        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
-        std::vector<ValueType> merge_buffer;
+        external_array_type a(total_size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(a);
 
         m_mem_left += (m_external_arrays.size() - 1) * m_mem_per_external_array;
 
         while (m_external_arrays.size() > 0) {
             size_type eas = m_external_arrays.size();
 
-            m_external_arrays[0].wait_for_first_block();
-            ValueType min_max_value = m_external_arrays[0].get_current_max_element();
+            m_external_arrays[0].wait();
+            ValueType min_max_value = m_external_arrays[0].get_current_max();
 
             for (size_type i = 1; i < eas; ++i) {
-                m_external_arrays[i].wait_for_first_block();
-                ValueType max_value = m_external_arrays[i].get_current_max_element();
+                m_external_arrays[i].wait();
+                ValueType max_value = m_external_arrays[i].get_current_max();
                 if (m_inv_compare(max_value, min_max_value)) {
                     min_max_value = max_value;
                 }
             }
 
             std::vector<size_type> sizes(eas);
-            std::vector<std::pair<block_iterator, block_iterator> > sequences(eas);
+            std::vector<std::pair<iterator, iterator> > sequences(eas);
             size_type output_size = 0;
 
 #if STXXL_PARALLEL
@@ -1927,49 +2321,48 @@ public:
             for (size_type i = 0; i < eas; ++i) {
                 assert(!m_external_arrays[i].empty());
 
-                m_external_arrays[i].wait_for_first_block();
-                block_iterator begin = m_external_arrays[i].begin_block();
-                block_iterator end = m_external_arrays[i].end_block();
+                m_external_arrays[i].wait();
+                iterator begin = m_external_arrays[i].begin();
+                iterator end = m_external_arrays[i].end();
 
                 assert(begin != end);
 
-                block_iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 sizes[i] = ub - begin;
 #pragma omp atomic
                 output_size += ub - begin;
                 sequences[i] = std::make_pair(begin, ub);
             }
 
-            merge_buffer.resize(output_size);
+            a.request_write_buffer(output_size);
 
 #if STXXL_PARALLEL
             parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                        merge_buffer.begin(), m_inv_compare, output_size);
+                                        a.begin(), m_inv_compare, output_size);
 #else
             // TODO
 #endif
 
-            for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].remove_first_n_elements(sizes[i]);
-            }
+            a.flush_write_buffer();
 
-            for (value_iterator i = merge_buffer.begin(); i != merge_buffer.end(); ++i) {
-                a << *i;
+            for (size_type i = 0; i < eas; ++i) {
+                m_external_arrays[i].remove(sizes[i]);
             }
 
             for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].wait_for_first_block();
+                m_external_arrays[i].wait();
             }
 
             m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
         }
 
         a.finish_write_phase();
+        m_external_arrays.swap_back(a);
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2055,55 +2448,63 @@ protected:
         // check only relevant if c_merge_ias_into_eb==true
         if (eas > 0) {
             m_stats.refill_wait_time.start();
-            m_external_arrays[0].wait_for_first_block();
+            m_external_arrays[0].wait();
             m_stats.refill_wait_time.stop();
             assert(m_external_arrays[0].size() > 0);
-            min_max_value = m_external_arrays[0].get_current_max_element();
+            min_max_value = m_external_arrays[0].get_current_max();
+        }
+        else {
+            assert(ias > 0);
         }
 
         for (size_type i = 1; i < eas; ++i) {
             m_stats.refill_wait_time.start();
-            m_external_arrays[i].wait_for_first_block();
+            m_external_arrays[i].wait();
             m_stats.refill_wait_time.stop();
 
-            ValueType max_value = m_external_arrays[i].get_current_max_element();
+            ValueType max_value = m_external_arrays[i].get_current_max();
             if (m_inv_compare(max_value, min_max_value)) {
                 min_max_value = max_value;
             }
         }
+
+        STXXL_VARDUMP(min_max_value);
 
         m_stats.refill_minmax_time.stop();
 
         // the number of elements in each external array that are smaller than min_max_value or equal
         // plus the number of elements in the internal arrays
         std::vector<size_type> sizes(eas + ias);
-        std::vector<std::pair<ValueType*, ValueType*> > sequences(eas + ias);
+        std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
 
         /*
          * calculate size and create sequences to merge
          */
 
 #if STXXL_PARALLEL
-        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+        //#pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
             // check only relevant if c_merge_ias_into_eb==true
             if (i < eas) {
                 assert(!m_external_arrays[i].empty());
 
-                assert(m_external_arrays[i].first_block_valid());
-                ValueType* begin = m_external_arrays[i].begin_block();
-                ValueType* end = m_external_arrays[i].end_block();
+                assert(m_external_arrays[i].valid());
+                iterator begin = m_external_arrays[i].begin();
+                iterator end = m_external_arrays[i].end();
 
                 assert(begin != end);
 
                 // remove if parallel
                 //stats.refill_upper_bound_time.start();
-                ValueType* ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
+
+                STXXL_VERBOSE1_PPQ("adding external seq, size=" << sizes[i]
+                                                                << " begin=" << *begin << " ub=" << *(ub - 1) << " end=" << *(end - 1) << " currentmax=" << m_external_arrays[i].get_current_max());
             }
             else {
                 // else part only relevant if c_merge_ias_into_eb==true
@@ -2111,18 +2512,25 @@ protected:
                 size_type j = i - eas;
                 assert(!(m_internal_arrays[j].empty()));
 
-                ValueType* begin = m_internal_arrays[j].begin();
-                ValueType* end = m_internal_arrays[j].end();
+                iterator begin = m_internal_arrays[j].begin();
+                iterator end = m_internal_arrays[j].end();
                 assert(begin != end);
 
                 if (eas > 0) {
                     //remove if parallel
                     //stats.refill_upper_bound_time.start();
-                    ValueType* ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                    iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                     //stats.refill_upper_bound_time.stop();
 
                     sizes[i] = std::distance(begin, ub);
                     sequences[i] = std::make_pair(begin, ub);
+
+                    STXXL_VERBOSE1_PPQ("adding internal seq, size=" << sizes[i]
+                                                                    << " begin=" << *begin << " ub=" << *(ub - 1) << " end=" << *(end - 1));
+
+                    if (ub != end) {
+                        STXXL_VARDUMP(*ub);
+                    }
                 }
                 else {
                     //there is no min_max_value
@@ -2155,6 +2563,8 @@ protected:
         m_stats.refill_time_before_merge.stop();
         m_stats.refill_merge_time.start();
 
+        STXXL_VARDUMP(output_size);
+
 #if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
                                     m_extract_buffer.begin(), m_inv_compare, output_size);
@@ -2165,13 +2575,17 @@ protected:
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
+        //size_t deleted_size = 0;
+
         // remove elements
-        if (c_limit_extract_buffer) {
-            for (size_type i = 0; i < eas + ias; ++i) {
-                // dist represents the number of elements that haven't been merged
-                size_type dist = std::distance(sequences[i].first, sequences[i].second);
+        //if (c_limit_extract_buffer) {
+        for (size_type i = 0; i < eas + ias; ++i) {
+            // dist represents the number of elements that haven't been merged
+            size_type dist = std::distance(sequences[i].first, sequences[i].second);
+            //deleted_size+=sizes[i]-dist;
+            if (dist < sizes[i]) {
                 if (i < eas) {
-                    m_external_arrays[i].remove_first_n_elements(sizes[i] - dist);
+                    m_external_arrays[i].remove(sizes[i] - dist);
                     assert(m_external_size >= sizes[i] - dist);
                     m_external_size -= sizes[i] - dist;
                 }
@@ -2183,17 +2597,21 @@ protected:
                 }
             }
         }
+        /*}
         else {
             for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].remove_first_n_elements(sizes[i]);
+                // deleted_size+=sizes[i];
+                m_external_arrays[i].remove(sizes[i]);
                 assert(m_external_size >= sizes[i]);
                 m_external_size -= sizes[i];
             }
-        }
+        }*/
+
+        //assert(deleted_size==output_size);
 
         //stats.refill_wait_time.start();
         for (size_type i = 0; i < eas; ++i) {
-            m_external_arrays[i].wait_for_first_block();
+            m_external_arrays[i].wait();
         }
         //stats.refill_wait_time.stop();
 
@@ -2443,7 +2861,7 @@ protected:
         size_type num_arrays = m_internal_arrays.size();
         size_type size = m_internal_size;
         size_type int_memory = 0;
-        std::vector<std::pair<ValueType*, ValueType*> > sequences(num_arrays);
+        std::vector<std::pair<iterator, iterator> > sequences(num_arrays);
 
         for (unsigned i = 0; i < num_arrays; ++i)
         {
@@ -2461,23 +2879,19 @@ protected:
 
         m_stats.max_merge_buffer_size.set_max(size);
 
-        std::vector<ValueType> write_buffer(size);
+        a.request_write_buffer(size);
 
 #if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    write_buffer.begin(), m_inv_compare, size);
+                                    a.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
 
-        STXXL_VERBOSE1_PPQ("Merge done");
-
-        // TODO: directly write to block? -> no useless mem copy. Does not work if size > block size
-        for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
-            a << *i;
-        }
-
+        a.flush_write_buffer();
         a.finish_write_phase();
+
+        STXXL_VERBOSE1_PPQ("Merge done");
 
         m_internal_size = 0;
         m_external_size += size;
@@ -2488,7 +2902,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2529,21 +2943,17 @@ protected:
         m_external_arrays.swap_back(temp_array);
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
-        // TODO: write in chunks in order to safe RAM
-        std::vector<ValueType> write_buffer(size);
+        // TODO: write in chunks in order to safe RAM?
+        a.request_write_buffer(size);
 
 #if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    write_buffer.begin(), m_inv_compare, size);
+                                    a.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
 
-        // TODO: directly write to block -> no useless mem copy
-        for (value_iterator i = write_buffer.begin(); i != write_buffer.end(); ++i) {
-            a << *i;
-        }
-
+        a.flush_write_buffer();
         a.finish_write_phase();
 
         m_external_size += size;
@@ -2562,7 +2972,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2590,7 +3000,7 @@ protected:
         external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
-            a << *i;
+            a.push_back(*i);
         }
 
         a.finish_write_phase();
@@ -2600,7 +3010,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait_for_first_block();
+            a.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2776,7 +3186,7 @@ protected:
         //! Part of refill_extract_buffer_time.
         stats_timer refill_time_after_merge;
 
-        //! Total time of wait_for_first_block() calls in first part of
+        //! Total time of wait() calls in first part of
         //! refill_extract_buffer(). Part of refill_time_before_merge and
         //! refill_extract_buffer_time.
         stats_timer refill_wait_time;
