@@ -101,7 +101,7 @@ int main()
         {
             STXXL_CHECK(!ppq.empty());
             //STXXL_MSG( ppq.top() );
-            STXXL_CHECK_EQUAL(ppq.top().key,int(i + 1));
+            STXXL_CHECK_EQUAL(ppq.top().key, int(i + 1));
 
             ppq.pop();
             if ((i % (1024 * 1024)) == 0)
@@ -109,7 +109,7 @@ int main()
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(),0);
+    STXXL_CHECK_EQUAL(ppq.size(), 0);
     STXXL_CHECK(ppq.empty());
 
     return 0;
