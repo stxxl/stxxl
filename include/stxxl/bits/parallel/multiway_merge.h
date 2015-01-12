@@ -1236,10 +1236,8 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::value_type value_type;
 
-#if STXXL_DEBUG_ASSERTIONS
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
-        assert(stxxl::is_sorted((*s).first, (*s).second, comp));
-#endif
+        STXXL_DEBUG_ASSERT(stxxl::is_sorted((*s).first, (*s).second, comp));
 
     RandomAccessIterator3 return_target = target;
     int k = static_cast<int>(seqs_end - seqs_begin);
@@ -1522,10 +1520,8 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type RandomAccessIteratorPair;
 
-#if STXXL_DEBUG_ASSERTIONS
     for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; ++rii)
-        assert(stxxl::is_sorted((*rii).first, (*rii).second, comp));
-#endif
+        STXXL_DEBUG_ASSERT(stxxl::is_sorted((*rii).first, (*rii).second, comp));
 
     // leave only non-empty sequences
     std::vector<RandomAccessIteratorPair> seqs_ne;

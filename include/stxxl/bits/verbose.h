@@ -214,7 +214,7 @@ STXXL_END_NAMESPACE
 #if STXXL_DEBUG_ASSERTIONS
 
 #define STXXL_DEBUG_ASSERT(condition)                                             \
-    do { if (0) {                                                                 \
+    do { if (true) {                                                              \
              if (!(condition)) {                                                  \
                  _STXXL_PRINT("STXXL-DEBUG-ASSERT",                               \
                               #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
@@ -226,7 +226,7 @@ STXXL_END_NAMESPACE
 #else
 
 #define STXXL_DEBUG_ASSERT(condition)                                             \
-    do { if (1) {                                                                 \
+    do { if (false) {                                                             \
              if (!(condition)) {                                                  \
                  _STXXL_PRINT("STXXL-DEBUG-ASSERT",                               \
                               #condition " - FAILED @ " __FILE__ ":" << __LINE__, \

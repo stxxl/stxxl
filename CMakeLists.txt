@@ -96,6 +96,11 @@ option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers
 
 option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
 
+option(STXXL_DEBUG_ASSERTIONS "Enable more costly assertions for internal debugging." OFF)
+if(STXXL_DEBUG_ASSERTIONS)
+  set(STXXL_DEBUG_ASSERTIONS "1") # change from ON/OFF to 1/0
+endif()
+
 # see tools/benchmarks about older TPIE benchmarks.
 option(USE_TPIE "Try to compile extra benchmarks from the 2007 S&PE paper with an old TPIE version." OFF)
 

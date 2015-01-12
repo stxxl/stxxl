@@ -28,7 +28,9 @@
 #cmakedefine STXXL_VERSION_GIT_REFSPEC "${STXXL_VERSION_GIT_REFSPEC}"
 #cmakedefine STXXL_VERSION_GIT_SHA1 "${STXXL_VERSION_GIT_SHA1}"
 
-#cmakedefine STXXL_DEBUG_ASSERTIONS
+#ifndef STXXL_DEBUG_ASSERTIONS
+#cmakedefine STXXL_DEBUG_ASSERTIONS ${STXXL_DEBUG_ASSERTIONS}
+#endif
 // default: off
 // cmake:   option
 // effect:  enable more costly assertions and checks for debugging the library
