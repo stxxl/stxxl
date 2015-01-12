@@ -15,27 +15,14 @@
 #define STXXL_COMMON_IS_SORTED_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <iterator>
+#include <functional>
 
 STXXL_BEGIN_NAMESPACE
 
-template <class ForwardIterator>
-bool is_sorted_helper(ForwardIterator first, ForwardIterator last)
-{
-    if (first == last)
-        return true;
-
-    ForwardIterator next = first;
-    for (++next; next != last; first = next, ++next) {
-        if (*next < *first)
-            return false;
-    }
-
-    return true;
-}
-
 template <class ForwardIterator, class StrictWeakOrdering>
-bool is_sorted_helper(ForwardIterator first, ForwardIterator last,
-                      StrictWeakOrdering comp)
+bool is_sorted(ForwardIterator first, ForwardIterator last,
+               StrictWeakOrdering comp)
 {
     if (first == last)
         return true;
@@ -52,14 +39,10 @@ bool is_sorted_helper(ForwardIterator first, ForwardIterator last,
 template <class ForwardIterator>
 bool is_sorted(ForwardIterator first, ForwardIterator last)
 {
-    return is_sorted_helper(first, last);
-}
-
-template <class ForwardIterator, class StrictWeakOrdering>
-bool is_sorted(ForwardIterator first, ForwardIterator last,
-               StrictWeakOrdering comp)
-{
-    return is_sorted_helper(first, last, comp);
+    return stxxl::is_sorted(
+        first, last,
+        std::less<typename std::iterator_traits<ForwardIterator>
+                  ::value_type>());
 }
 
 STXXL_END_NAMESPACE

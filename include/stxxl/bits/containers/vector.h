@@ -1877,7 +1877,7 @@ bool is_sorted(
     stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> first,
     stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> last)
 {
-    return is_sorted_helper(
+    return stxxl::is_sorted(
         stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(first),
         stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(last));
 }
@@ -1889,7 +1889,7 @@ bool is_sorted(
     stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> last,
     StrictWeakOrdering comp)
 {
-    return is_sorted_helper(
+    return stxxl::is_sorted(
         stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(first),
         stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(last),
         comp);
