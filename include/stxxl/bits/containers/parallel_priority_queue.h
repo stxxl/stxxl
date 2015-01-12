@@ -73,13 +73,9 @@ public:
 protected:
     typedef ppq_iterator self_type;
 
-    //! reference to a vector of begin/end pointer pairs
+    //! pointer to a vector of begin/end pointer pairs
     //! They allow access to the data blocks.
-    //! Unfortunately this cannot be const because we need copy-construction
-    block_pointers_type& m_block_pointers;
-
-    //! empty dummy vector for the default constructor
-    block_pointers_type m_dummy_blocks;
+    const block_pointers_type* m_block_pointers;
 
     //! pointer to the current element
     pointer m_current;
@@ -97,7 +93,7 @@ public:
     //! default constructor
     //! should not be used directly
     ppq_iterator()
-        : m_block_pointers(m_dummy_blocks)
+        : m_block_pointers(NULL)
     { }
 
     //! constructor
@@ -109,7 +105,7 @@ public:
     //!                         belongs to an internal_array), use the total size here.
     //! \param index            The index of the current element (global - index 0 belongs to the first element
     //!                         in the first block, no matter if the values are still valid)
-    ppq_iterator(block_pointers_type& block_pointers, size_t block_size, size_t index)
+    ppq_iterator(const block_pointers_type* block_pointers, size_t block_size, size_t index)
         : m_block_pointers(block_pointers),
           m_index(index),
           m_block_size(block_size)
@@ -156,11 +152,11 @@ public:
         const size_t block_index = index / m_block_size;
         const size_t local_index = index % m_block_size;
 
-        assert(block_index < m_block_pointers.size());
-        assert(m_block_pointers[block_index].first + local_index
-               < m_block_pointers[block_index].second);
+        assert(block_index < m_block_pointers->size());
+        assert((*m_block_pointers)[block_index].first + local_index
+               < (*m_block_pointers)[block_index].second);
 
-        return *(m_block_pointers[block_index].first + local_index);
+        return *((*m_block_pointers)[block_index].first + local_index);
     }
 
     //! pre-increment operator
@@ -169,14 +165,14 @@ public:
         ++m_index;
         ++m_current;
 
-        if (m_current == m_block_pointers[m_block_index].second) {
-            if (m_block_index + 1 < m_block_pointers.size()) {
-                m_current = m_block_pointers[++m_block_index].first;
+        if (m_current == (*m_block_pointers)[m_block_index].second) {
+            if (m_block_index + 1 < m_block_pointers->size()) {
+                m_current = (*m_block_pointers)[++m_block_index].first;
             }
             else {
                 // global end
-                assert(m_block_index + 1 == m_block_pointers.size());
-                m_current = m_block_pointers[m_block_index++].second;
+                assert(m_block_index + 1 == m_block_pointers->size());
+                m_current = (*m_block_pointers)[m_block_index++].second;
             }
         }
 
@@ -195,12 +191,12 @@ public:
         assert(m_index > 0);
         --m_index;
 
-        if (m_block_index >= m_block_pointers.size()
-            || m_current == m_block_pointers[m_block_index].first) {
+        if (m_block_index >= m_block_pointers->size()
+            || m_current == (*m_block_pointers)[m_block_index].first) {
             // begin of current block or global end
             assert(m_block_index > 0);
-            assert(m_block_index <= m_block_pointers.size());
-            m_current = m_block_pointers[--m_block_index].second - 1;
+            assert(m_block_index <= m_block_pointers->size());
+            m_current = (*m_block_pointers)[--m_block_index].second - 1;
         }
         else {
             --m_current;
@@ -271,15 +267,15 @@ private:
         m_block_index = m_index / m_block_size;
         const size_t local_index = m_index % m_block_size;
 
-        if (m_block_index < m_block_pointers.size()) {
-            m_current = m_block_pointers[m_block_index].first + local_index;
-            assert(m_current < m_block_pointers[m_block_index].second);
+        if (m_block_index < m_block_pointers->size()) {
+            m_current = (*m_block_pointers)[m_block_index].first + local_index;
+            assert(m_current < (*m_block_pointers)[m_block_index].second);
         }
         else {
             // global end
-            assert(m_block_index == m_block_pointers.size());
+            assert(m_block_index == m_block_pointers->size());
             assert(local_index == 0);
-            m_current = m_block_pointers[m_block_index - 1].second;
+            m_current = (*m_block_pointers)[m_block_index - 1].second;
         }
     }
 };
@@ -396,14 +392,14 @@ public:
     inline iterator begin()
     {
         // not const, unfortunately.
-        return iterator(m_block_pointers, capacity(), m_min_index);
+        return iterator(&m_block_pointers, capacity(), m_min_index);
     }
 
     //! End iterator
     inline iterator end()
     {
         // not const, unfortunately.
-        return iterator(m_block_pointers, capacity(), capacity());
+        return iterator(&m_block_pointers, capacity(), capacity());
     }
 };
 
@@ -638,7 +634,7 @@ public:
     {
         assert(m_index == m_capacity || block_valid(m_index / block_size));
         // not const, unfortunately.
-        return iterator(m_block_pointers, block_size, m_index);
+        return iterator(&m_block_pointers, block_size, m_index);
     }
 
     //! Returns a random-access iterator 1 behind the end of the data
@@ -647,7 +643,7 @@ public:
     {
         assert(m_end_index == m_index || block_valid((m_end_index - 1) / block_size));
         // not const, unfortunately.
-        return iterator(m_block_pointers, block_size, m_end_index);
+        return iterator(&m_block_pointers, block_size, m_end_index);
     }
 
     //! Returns the smallest element in the array
