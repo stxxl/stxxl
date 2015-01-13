@@ -147,8 +147,10 @@ public:
     {
         return m_current;
     }
-    reference operator [] (difference_type index) const
+    reference operator [] (difference_type relative_index) const
     {
+        const difference_type index = m_index + relative_index;
+
         const size_t block_index = index / m_block_size;
         const size_t local_index = index % m_block_size;
 
