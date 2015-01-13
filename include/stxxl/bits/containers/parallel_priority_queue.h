@@ -2406,43 +2406,19 @@ public:
     }
 
 protected:
-    //! Refills the extract buffer from the external arrays.
-    inline void refill_extract_buffer()
+
+    //! Calculates the sequences vector needed by the multiway merger,
+    //! considering inaccessible data from external arrays.
+    //! The sizes vector stores the size of each sequence.
+    inline bool calculate_merge_sequences(std::vector<size_type>& sizes,
+            std::vector<std::pair<iterator, iterator> >& sequences)
     {
-        STXXL_VERBOSE1_PPQ("refilling extract buffer");
-
-        check_invariants();
-
-        assert(extract_buffer_empty());
-        assert(m_extract_buffer_size == 0);
-        m_extract_buffer_index = 0;
-
-        m_minima.clear_external_arrays();
-        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
-        size_type eas = m_external_arrays.size();
-
-        size_type ias;
-
-        if (c_merge_ias_into_eb) {
-            m_minima.clear_internal_arrays();
-            cleanup_internal_arrays();
-            ias = m_internal_arrays.size();
-        }
-        else {
-            ias = 0;
-        }
-
-        if (eas == 0 && ias == 0) {
-            m_extract_buffer.resize(0);
-            m_minima.deactivate_extract_buffer();
-            return;
-        }
-
-        m_stats.num_extract_buffer_refills++;
-        m_stats.refill_extract_buffer_time.start();
-        m_stats.refill_time_before_merge.start();
-        m_stats.refill_minmax_time.start();
-
+        const size_type eas = m_external_arrays.size();
+        const size_type ias = c_merge_ias_into_eb ? m_internal_arrays.size() : 0;
+        
+        assert(sizes.size()==eas+ias);
+        assert(sequences.size()==eas+ias);
+        
         /*
          * determine maximum of each first block
          */
@@ -2450,6 +2426,7 @@ protected:
         bool needs_limit = false;
         ValueType min_max_value;
 
+        m_stats.refill_minmax_time.start();
         for (size_type i = 0; i < eas; ++i) {
             if (m_external_arrays[i].has_em_data()) {
                 ValueType max_value = m_external_arrays[i].get_current_max();
@@ -2461,14 +2438,7 @@ protected:
                 }
             }
         }
-
         m_stats.refill_minmax_time.stop();
-
-        // the number of elements in each external array that are smaller than
-        // min_max_value or equal plus the number of elements in the internal
-        // arrays
-        std::vector<size_type> sizes(eas + ias);
-        std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
 
         /*
          * calculate size and create sequences to merge
@@ -2516,7 +2486,50 @@ protected:
             }
             
         }
+        
+        return needs_limit;
+        
+    }
 
+    //! Refills the extract buffer from the external arrays.
+    inline void refill_extract_buffer()
+    {
+        STXXL_VERBOSE1_PPQ("refilling extract buffer");
+
+        check_invariants();
+
+        assert(extract_buffer_empty());
+        assert(m_extract_buffer_size == 0);
+        m_extract_buffer_index = 0;
+
+        m_minima.clear_external_arrays();
+        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        size_type eas = m_external_arrays.size();
+
+        size_type ias;
+
+        if (c_merge_ias_into_eb) {
+            m_minima.clear_internal_arrays();
+            cleanup_internal_arrays();
+            ias = m_internal_arrays.size();
+        }
+        else {
+            ias = 0;
+        }
+
+        if (eas == 0 && ias == 0) {
+            m_extract_buffer.resize(0);
+            m_minima.deactivate_extract_buffer();
+            return;
+        }
+
+        m_stats.num_extract_buffer_refills++;
+        m_stats.refill_extract_buffer_time.start();
+        m_stats.refill_time_before_merge.start();
+
+        std::vector<size_type> sizes(eas + ias);
+        std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
+        calculate_merge_sequences(sizes, sequences);
         size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
 
         if (c_limit_extract_buffer) {
