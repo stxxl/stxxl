@@ -1436,7 +1436,7 @@ protected:
      * Each internal array reserves space for the extract buffer in the size of
      * all heaps together.
      */
-    static const bool c_limit_extract_buffer = false;
+    static const bool c_limit_extract_buffer = true;
 
     //! For bulks of size up to c_single_insert_limit sequential single insert
     //! is faster than bulk_push.
@@ -2444,33 +2444,21 @@ protected:
         /*
          * determine maximum of each first block
          */
-
+         
+        bool needs_limit = false;
         ValueType min_max_value;
 
-        // check only relevant if c_merge_ias_into_eb==true
-        if (eas > 0) {
-            m_stats.refill_wait_time.start();
-            m_external_arrays[0].wait();
-            m_stats.refill_wait_time.stop();
-            assert(m_external_arrays[0].size() > 0);
-            min_max_value = m_external_arrays[0].get_current_max();
-        }
-        else {
-            assert(ias > 0);
-        }
-
-        for (size_type i = 1; i < eas; ++i) {
-            m_stats.refill_wait_time.start();
-            m_external_arrays[i].wait();
-            m_stats.refill_wait_time.stop();
-
-            ValueType max_value = m_external_arrays[i].get_current_max();
-            if (m_inv_compare(max_value, min_max_value)) {
-                min_max_value = max_value;
+        for (size_type i = 0; i < eas; ++i) {
+            if (m_external_arrays[i].has_em_data()) {
+                ValueType max_value = m_external_arrays[i].get_current_max();
+                if (!needs_limit) {
+                    needs_limit = true;
+                    min_max_value = max_value;
+                } else {
+                    min_max_value = std::min(max_value, min_max_value, m_inv_compare);
+                }
             }
         }
-
-        STXXL_VARDUMP(min_max_value);
 
         m_stats.refill_minmax_time.stop();
 
@@ -2485,81 +2473,52 @@ protected:
          */
 
 #if STXXL_PARALLEL
-        //#pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
+            
+            iterator begin;
+            iterator end;
+            
             // check only relevant if c_merge_ias_into_eb==true
             if (i < eas) {
                 assert(!m_external_arrays[i].empty());
-
+                //stats.refill_wait_time.start();
+                m_external_arrays[i].wait();
+                //stats.refill_wait_time.stop();
                 assert(m_external_arrays[i].valid());
-                iterator begin = m_external_arrays[i].begin();
-                iterator end = m_external_arrays[i].end();
-
+                begin = m_external_arrays[i].begin();
+                end = m_external_arrays[i].end();
                 assert(begin != end);
-
-                // remove if parallel
+            } else {
+                // else part only relevant if c_merge_ias_into_eb==true
+                size_type j = i - eas;
+                assert(!(m_internal_arrays[j].empty()));
+                begin = m_internal_arrays[j].begin();
+                end = m_internal_arrays[j].end();
+                assert(begin != end);
+            }
+            
+            if (needs_limit) {
+                // remove timer if parallel
                 //stats.refill_upper_bound_time.start();
                 iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
-
-                STXXL_VERBOSE1_PPQ("adding external seq, size=" << sizes[i] <<
-                                   " begin=" << *begin <<
-                                   " ub=" << (ub == begin ? *ub : *(ub - 1)) <<
-                                   " end=" << *(end - 1) <<
-                                   " currentmax=" << m_external_arrays[i].get_current_max());
+                    
+            } else {
+                sizes[i] = std::distance(begin, end);
+                sequences[i] = std::make_pair(begin, end);
             }
-            else {
-                // else part only relevant if c_merge_ias_into_eb==true
-
-                size_type j = i - eas;
-                assert(!(m_internal_arrays[j].empty()));
-
-                iterator begin = m_internal_arrays[j].begin();
-                iterator end = m_internal_arrays[j].end();
-                assert(begin != end);
-
-                if (eas > 0) {
-                    //remove if parallel
-                    //stats.refill_upper_bound_time.start();
-                    iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
-                    //stats.refill_upper_bound_time.stop();
-
-                    sizes[i] = std::distance(begin, ub);
-                    sequences[i] = std::make_pair(begin, ub);
-
-                    STXXL_VERBOSE1_PPQ("adding internal seq, size=" << sizes[i] <<
-                                       " begin=" << *begin <<
-                                       " ub=" << (ub == begin ? *ub : *(ub - 1)) <<
-                                       " end=" << *(end - 1));
-
-                    if (ub != end) {
-                        STXXL_VARDUMP(*ub);
-                    }
-                }
-                else {
-                    // there is no min_max_value
-                    sizes[i] = std::distance(begin, end);
-                    sequences[i] = std::make_pair(begin, end);
-                }
-
-                if (!c_limit_extract_buffer) { // otherwise see below...
-                    // remove elements
-                    m_internal_arrays[j].inc_min(sizes[i]);
-                    m_internal_size -= sizes[i];
-                }
-            }
+            
         }
 
         size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
 
         if (c_limit_extract_buffer) {
-            if (output_size > m_extract_buffer_limit) {
-                output_size = m_extract_buffer_limit;
-            }
+            output_size = std::min(output_size,m_extract_buffer_limit);
         }
 
         m_stats.max_extract_buffer_size.set_max(output_size);
@@ -2572,61 +2531,33 @@ protected:
         m_stats.refill_time_before_merge.stop();
         m_stats.refill_merge_time.start();
 
-        STXXL_VARDUMP(output_size);
-
 #if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
                                     m_extract_buffer.begin(), m_inv_compare, output_size);
 #else
         // TODO
 #endif
-
+            
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
-        size_t deleted_size = 0;
-
-        // remove elements
-        if (c_limit_extract_buffer) {
-            for (size_type i = 0; i < eas + ias; ++i) {
-                // dist represents the number of elements that haven't been merged
-                size_type dist = std::distance(sequences[i].first, sequences[i].second);
-
-                assert(dist <= sizes[i]);
-                if (dist == sizes[i]) continue;
-
-                deleted_size += sizes[i] - dist;
-
+        for (size_type i = 0; i < eas + ias; ++i) {
+            // dist represents the number of elements that haven't been merged
+            size_type dist = std::distance(sequences[i].first, sequences[i].second);
+            const size_t diff = sizes[i]-dist;
+            if (diff>0) {
                 if (i < eas) {
-                    m_external_arrays[i].remove(sizes[i] - dist);
-                    assert(m_external_size >= sizes[i] - dist);
-                    m_external_size -= sizes[i] - dist;
-                }
-                else {
+                    m_external_arrays[i].remove(diff);
+                    assert(m_external_size >= diff);
+                    m_external_size -= diff;
+                } else {
                     size_type j = i - eas;
-                    m_internal_arrays[j].inc_min(sizes[i] - dist);
-                    assert(m_internal_size >= sizes[i] - dist);
-                    m_internal_size -= sizes[i] - dist;
+                    m_internal_arrays[j].inc_min(diff);
+                    assert(m_internal_size >= diff);
+                    m_internal_size -= diff;
                 }
             }
         }
-        else {
-            for (size_type i = 0; i < eas + ias; ++i)
-            {
-                if (sizes[i] == 0) continue;
-
-                deleted_size += sizes[i];
-
-                if (i < eas) {
-                    m_external_arrays[i].remove(sizes[i]);
-                    assert(m_external_size >= sizes[i]);
-                    m_external_size -= sizes[i];
-                }
-                // item from internal arrays have already been removed
-            }
-        }
-
-        assert(deleted_size == output_size);
 
         //stats.refill_wait_time.start();
         for (size_type i = 0; i < eas; ++i) {
