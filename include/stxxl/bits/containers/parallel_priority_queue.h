@@ -336,14 +336,8 @@ public:
         return m_values[i];
     }
 
-    //! Use inc_min if a value has been extracted.
-    inline void inc_min()
-    {
-        m_min_index++;
-    }
-
     //! Use inc_min(diff) if multiple values have been extracted.
-    inline void inc_min(size_t diff)
+    inline void inc_min(size_t diff = 1)
     {
         m_min_index += diff;
     }
@@ -391,14 +385,14 @@ public:
     }
 
     //! Begin iterator
-    inline iterator begin()
+    inline iterator begin() const
     {
         // not const, unfortunately.
         return iterator(&m_block_pointers, capacity(), m_min_index);
     }
 
     //! End iterator
-    inline iterator end()
+    inline iterator end() const
     {
         // not const, unfortunately.
         return iterator(&m_block_pointers, capacity(), capacity());
@@ -632,7 +626,7 @@ public:
 
     //! Returns a random-access iterator to the begin of the data
     //! in internal memory.
-    iterator begin()
+    iterator begin() const
     {
         assert(m_index == m_capacity || block_valid(m_index / block_size));
         // not const, unfortunately.
@@ -641,7 +635,7 @@ public:
 
     //! Returns a random-access iterator 1 behind the end of the data
     //! in internal memory.
-    iterator end()
+    iterator end() const
     {
         assert(m_end_index == m_index || block_valid((m_end_index - 1) / block_size));
         // not const, unfortunately.
