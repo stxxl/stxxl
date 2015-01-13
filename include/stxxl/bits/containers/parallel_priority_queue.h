@@ -33,6 +33,7 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/is_heap.h>
+#include <stxxl/bits/common/swap_vector.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_alloc.h>
@@ -330,6 +331,12 @@ public:
         std::swap(m_block_pointers, o.m_block_pointers);
     }
 
+    //! Swap internal_array with another one.
+    friend void swap(internal_array& a, internal_array& b)
+    {
+        a.swap(b);
+    }
+
     //! Random access operator
     inline ValueType& operator [] (size_t i)
     {
@@ -558,7 +565,7 @@ public:
           m_hint_index(0)
     { }
 
-    //! Swap internal_array with another one.
+    //! Swap external_array with another one.
     void swap(external_array& o)
     {
         // constants
@@ -583,6 +590,12 @@ public:
         std::swap(m_index, o.m_index);
         std::swap(m_end_index, o.m_end_index);
         std::swap(m_hint_index, o.m_hint_index);
+    }
+
+    //! Swap external_array with another one.
+    friend void swap(external_array& a, external_array& b)
+    {
+        a.swap(b);
     }
 
     //! Destructor
@@ -942,38 +955,6 @@ protected:
         return (mod > 0) ? mod : block_size;
     }
 };
-
-} // namespace ppq_local
-
-STXXL_END_NAMESPACE
-
-namespace std {
-
-template <class ValueType>
-void swap(stxxl::ppq_local::internal_array<ValueType>& a,
-          stxxl::ppq_local::internal_array<ValueType>& b)
-{
-    a.swap(b);
-}
-
-template <
-    class ValueType,
-    stxxl::unsigned_type BlockSize,
-    class AllocStrategy
-    >
-void swap(stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>& a,
-          stxxl::ppq_local::external_array<ValueType, BlockSize, AllocStrategy>& b)
-{
-    a.swap(b);
-}
-} // end namespace std
-
-// swap_vector MUST be included after the swap spezialization but before parallel_priority_queue class!
-#include <stxxl/bits/common/swap_vector.h>
-
-STXXL_BEGIN_NAMESPACE
-
-namespace ppq_local {
 
 /*!
  * The minima_tree contains minima from all sources inside the PPQ. It contains

@@ -187,7 +187,8 @@ public:
                 m_array = new value_type[newsize];
                 for (unsigned i = 0; i < m_size; ++i)
                 {
-                    std::swap(tmp[i], m_array[i]);
+                    using std::swap;
+                    swap(tmp[i], m_array[i]);
                 }
                 delete[] tmp;
             }
@@ -211,7 +212,8 @@ public:
         {
             reserve(std::max((size_type)2, 2 * m_capacity));
         }
-        std::swap(m_array[m_size], val);
+        using std::swap;
+        swap(m_array[m_size], val);
         ++m_size;
     }
     //! Clear the vector. The capacity doesn't change.
@@ -236,7 +238,8 @@ public:
             iterator l = last;
             while (l < end())
             {
-                std::swap(*f, *l);
+                using std::swap;
+                swap(*f, *l);
                 ++f;
                 ++l;
             }
@@ -264,7 +267,8 @@ ForwardIterator swap_remove_if(ForwardIterator first, ForwardIterator last, Unar
     {
         if (!pred(*first))
         {
-            std::swap(*first, *result);
+            using std::swap;
+            swap(*first, *result);
             ++result;
         }
         ++first;

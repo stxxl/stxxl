@@ -205,6 +205,8 @@ public:
     // do not pass const reference since key will be used as local variable
     void delete_min_insert(ValueType key, bool sup)
     {
+        using std::swap;
+
         source_type source = losers[0].source;
         for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -213,9 +215,9 @@ public:
                 (!losers[pos].sup && comp(losers[pos].key, key)))
             {
                 // the other one is smaller
-                std::swap(losers[pos].sup, sup);
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].key, key);
+                swap(losers[pos].sup, sup);
+                swap(losers[pos].source, source);
+                swap(losers[pos].key, key);
             }
         }
 
@@ -258,6 +260,8 @@ public:
     // do not pass const reference since key will be used as local variable
     void delete_min_insert(ValueType key, bool sup)
     {
+        using std::swap;
+
         source_type source = losers[0].source;
         for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -267,9 +271,9 @@ public:
                   (!comp(key, losers[pos].key) && losers[pos].source < source))))
             {
                 // the other one is smaller
-                std::swap(losers[pos].sup, sup);
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].key, key);
+                swap(losers[pos].sup, sup);
+                swap(losers[pos].source, source);
+                swap(losers[pos].key, key);
             }
         }
 
@@ -385,6 +389,8 @@ public:
 
     void delete_min_insert(T /* key */, bool sup)
     {
+        using std::swap;
+
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -392,10 +398,10 @@ public:
             if (sup ||
                 (!losers[pos].sup && comp(KEY(pos), KEY_SOURCE(source))))
             {                   //the other one is smaller
-                std::swap(losers[pos].sup, sup);
-                std::swap(losers[pos].source, source);
+                swap(losers[pos].sup, sup);
+                swap(losers[pos].source, source);
 #ifdef COPY
-                std::swap(KEY(pos), KEY_SOURCE(source));
+                swap(KEY(pos), KEY_SOURCE(source));
 #endif
             }
         }
@@ -443,6 +449,8 @@ public:
 
     void delete_min_insert_stable(T /* key */, bool sup)
     {
+        using std::swap;
+
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -452,10 +460,10 @@ public:
                  ((comp(KEY(pos), KEY_SOURCE(source))) ||
                   (!comp(KEY_SOURCE(source), KEY(pos)) && losers[pos].source < source))))
             {                   //the other one is smaller
-                std::swap(losers[pos].sup, sup);
-                std::swap(losers[pos].source, source);
+                swap(losers[pos].sup, sup);
+                swap(losers[pos].source, source);
 #ifdef COPY
-                std::swap(KEY(pos), KEY_SOURCE(source));
+                swap(KEY(pos), KEY_SOURCE(source));
 #endif
             }
         }
@@ -626,6 +634,8 @@ public:
 
     void delete_min_insert(const ValueType& key, bool sup)
     {
+        using std::swap;
+
         const ValueType* keyp = &key;
         source_type source = losers[0].source;
         for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -634,9 +644,9 @@ public:
             if (sup ||
                 (!losers[pos].sup && comp(*losers[pos].keyp, *keyp)))
             {                   //the other one is smaller
-                std::swap(losers[pos].sup, sup);
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].keyp, keyp);
+                swap(losers[pos].sup, sup);
+                swap(losers[pos].source, source);
+                swap(losers[pos].keyp, keyp);
             }
         }
 
@@ -675,6 +685,8 @@ public:
 
     void delete_min_insert(const ValueType& key, bool sup)
     {
+        using std::swap;
+
         const ValueType* keyp = &key;
         source_type source = losers[0].source;
         for (size_type pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -685,9 +697,9 @@ public:
                  ((comp(*losers[pos].keyp, *keyp)) ||
                   (!comp(*keyp, *losers[pos].keyp) && losers[pos].source < source))))
             {                   //the other one is smaller
-                std::swap(losers[pos].sup, sup);
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].keyp, keyp);
+                swap(losers[pos].sup, sup);
+                swap(losers[pos].source, source);
+                swap(losers[pos].keyp, keyp);
             }
         }
 
@@ -818,6 +830,8 @@ public:
     // do not pass const reference since key will be used as local variable
     void delete_min_insert(ValueType key)
     {
+        using std::swap;
+
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
@@ -825,8 +839,8 @@ public:
             if (comp(losers[pos].key, key))
             {
                 // the other one is smaller
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].key, key);
+                swap(losers[pos].source, source);
+                swap(losers[pos].key, key);
             }
         }
 
@@ -855,14 +869,16 @@ public:
     // do not pass const reference since key will be used as local variable
     void delete_min_insert(ValueType key)
     {
+        using std::swap;
+
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
         {
             if (!comp(key, losers[pos].key) && losers[pos].source < source)
             {
                 // the other one is smaller
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].key, key);
+                swap(losers[pos].source, source);
+                swap(losers[pos].key, key);
             }
         }
 
@@ -991,6 +1007,8 @@ public:
 
     void delete_min_insert(const ValueType& key)
     {
+        using std::swap;
+
         const ValueType* keyp = &key;
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -999,8 +1017,8 @@ public:
             if (comp(*losers[pos].keyp, *keyp))
             {
                 //the other one is smaller
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].keyp, keyp);
+                swap(losers[pos].source, source);
+                swap(losers[pos].keyp, keyp);
             }
         }
 
@@ -1028,6 +1046,8 @@ public:
 
     void delete_min_insert(const ValueType& key)
     {
+        using std::swap;
+
         const ValueType* keyp = &key;
         int source = losers[0].source;
         for (unsigned int pos = (k + source) / 2; pos > 0; pos /= 2)
@@ -1037,8 +1057,8 @@ public:
                 (!comp(*keyp, *losers[pos].keyp) && losers[pos].source < source))
             {
                 //the other one is smaller
-                std::swap(losers[pos].source, source);
-                std::swap(losers[pos].keyp, keyp);
+                swap(losers[pos].source, source);
+                swap(losers[pos].keyp, keyp);
             }
         }
 
