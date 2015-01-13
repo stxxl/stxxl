@@ -2153,7 +2153,7 @@ public:
     ValueType top()
     {
         if (extract_buffer_empty()) {
-            refill_extract_buffer();
+            refill_extract_buffer(std::min(m_extract_buffer_limit,m_internal_size+m_external_size));
         }
 
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
@@ -2188,7 +2188,7 @@ public:
         m_stats.num_extracts++;
 
         if (extract_buffer_empty()) {
-            refill_extract_buffer();
+            refill_extract_buffer(std::min(m_extract_buffer_limit,m_internal_size+m_external_size));
         }
 
         m_stats.extract_min_time.start();
@@ -2503,7 +2503,9 @@ protected:
     }
 
     //! Refills the extract buffer from the external arrays.
-    inline void refill_extract_buffer()
+    //! \param minimum_size requested minimum size of the resulting extract buffer.
+    //!         Prints a warning if there is not enough data to reach this size.
+    inline void refill_extract_buffer(size_t minimum_size=0)
     {
         STXXL_VERBOSE1_PPQ("refilling extract buffer");
 
@@ -2540,8 +2542,25 @@ protected:
 
         std::vector<size_type> sizes(eas + ias);
         std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
-        calculate_merge_sequences(sizes, sequences);
-        size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+        size_type output_size = 0;
+        
+        if (minimum_size>0) {
+            size_t limiting_ea_index = eas+1;
+            while (output_size<minimum_size) {
+                if (limiting_ea_index<eas) {
+                    m_external_arrays[limiting_ea_index].request_further_block();
+                } else if (limiting_ea_index==eas) {
+                    // no more unaccessible EM data
+                    STXXL_MSG("Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!");
+                    break;
+                }
+                limiting_ea_index = calculate_merge_sequences(sizes, sequences);
+                output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+            }
+        } else {
+            calculate_merge_sequences(sizes, sequences);
+            output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+        }
 
         if (c_limit_extract_buffer) {
             output_size = std::min(output_size,m_extract_buffer_limit);
