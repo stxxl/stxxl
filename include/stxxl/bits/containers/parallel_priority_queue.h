@@ -2410,7 +2410,9 @@ protected:
     //! Calculates the sequences vector needed by the multiway merger,
     //! considering inaccessible data from external arrays.
     //! The sizes vector stores the size of each sequence.
-    inline bool calculate_merge_sequences(std::vector<size_type>& sizes,
+    //! \returns the index of the external array which is limiting factor
+    //!             or m_external_arrays.size() if not limited.
+    inline size_t calculate_merge_sequences(std::vector<size_type>& sizes,
             std::vector<std::pair<iterator, iterator> >& sequences)
     {
         const size_type eas = m_external_arrays.size();
@@ -2424,6 +2426,7 @@ protected:
          */
          
         bool needs_limit = false;
+        size_t min_max_index;
         ValueType min_max_value;
 
         m_stats.refill_minmax_time.start();
@@ -2433,8 +2436,12 @@ protected:
                 if (!needs_limit) {
                     needs_limit = true;
                     min_max_value = max_value;
+                    min_max_index = i;
                 } else {
-                    min_max_value = std::min(max_value, min_max_value, m_inv_compare);
+                    if (m_inv_compare(max_value,min_max_value)) {
+                        min_max_value = max_value;
+                        min_max_index = i;
+                    }
                 }
             }
         }
@@ -2487,7 +2494,11 @@ protected:
             
         }
         
-        return needs_limit;
+        if (needs_limit) {
+            return min_max_index;
+        } else {
+            return eas;
+        }
         
     }
 
