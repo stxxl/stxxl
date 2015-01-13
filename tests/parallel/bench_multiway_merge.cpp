@@ -22,7 +22,11 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 
+// number of repetitions of each benchmark
 unsigned int g_repeat = 3;
+
+// factor to multiply while increasing number of arrays
+unsigned int g_factor = 32;
 
 struct DataStruct
 {
@@ -259,21 +263,19 @@ void test_repeat(unsigned int seqnum)
 template <typename ValueType, benchmark_type Method>
 void test_all_vecnum()
 {
-    static const unsigned int factor = 32;
-
-    for (unsigned int s = 1; s < 128; s += 1 * factor)
+    for (unsigned int s = 1; s < 128; s += 1 * g_factor)
         test_repeat<ValueType, Method>(s);
 
-    for (unsigned int s = 128; s < 256; s += 4 * factor)
+    for (unsigned int s = 128; s < 256; s += 4 * g_factor)
         test_repeat<ValueType, Method>(s);
 
-    for (unsigned int s = 256; s < 512; s += 16 * factor)
+    for (unsigned int s = 256; s < 512; s += 16 * g_factor)
         test_repeat<ValueType, Method>(s);
 
-    for (unsigned int s = 512; s < 1024; s += 64 * factor)
+    for (unsigned int s = 512; s < 1024; s += 64 * g_factor)
         test_repeat<ValueType, Method>(s);
 
-    for (unsigned int s = 1024; s < 4 * 1024; s += 256 * factor)
+    for (unsigned int s = 1024; s < 4 * 1024; s += 128 * g_factor)
         test_repeat<ValueType, Method>(s);
 }
 
@@ -311,9 +313,18 @@ int main(int argc, char* argv[])
 
     stxxl::cmdline_parser cp;
     cp.set_description("STXXL multiway_merge benchmark");
-    cp.add_param_string("seq/para/both", "benchmark set: seq(uential), para(llel) or both", benchset);
 
-    cp.add_uint('r', "repeat", "number of repetitions", g_repeat);
+    cp.add_param_string("seq/para/both",
+                        "benchmark set: seq(uential), para(llel) or both",
+                        benchset);
+
+    cp.add_uint('r', "repeat",
+                "number of repetitions of each benchmark",
+                g_repeat);
+
+    cp.add_uint('f', "factor",
+                "factor to multiply while increasing number of arrays",
+                g_factor);
 
     if (!cp.process(argc, argv))
         return EXIT_FAILURE;
