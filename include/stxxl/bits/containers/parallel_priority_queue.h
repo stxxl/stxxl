@@ -2410,10 +2410,13 @@ protected:
     //! Calculates the sequences vector needed by the multiway merger,
     //! considering inaccessible data from external arrays.
     //! The sizes vector stores the size of each sequence.
+    //! \param reuse_previous_upper_bounds Reuse upper bounds from previous runs.
+    //!             sequences[i].second must be valid upper bound iterator from a previous run!
     //! \returns the index of the external array which is limiting factor
     //!             or m_external_arrays.size() if not limited.
     inline size_t calculate_merge_sequences(std::vector<size_type>& sizes,
-            std::vector<std::pair<iterator, iterator> >& sequences)
+            std::vector<std::pair<iterator, iterator> >& sequences,
+            bool reuse_previous_upper_bounds = false)
     {
         const size_type eas = m_external_arrays.size();
         const size_type ias = c_merge_ias_into_eb ? m_internal_arrays.size() : 0;
@@ -2481,7 +2484,14 @@ protected:
             if (needs_limit) {
                 // remove timer if parallel
                 //stats.refill_upper_bound_time.start();
-                iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                iterator ub;
+                if (reuse_previous_upper_bounds) {
+                    // Be careful that sequences[i].second is really valid and
+                    // set by a previous calculate_merge_sequences() run!
+                    ub = std::upper_bound(sequences[i].second, end, min_max_value, m_inv_compare);
+                } else {
+                    ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                }
                 //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
@@ -2546,15 +2556,17 @@ protected:
         
         if (minimum_size>0) {
             size_t limiting_ea_index = eas+1;
+            bool reuse_upper_bounds = false;
             while (output_size<minimum_size) {
                 if (limiting_ea_index<eas) {
                     m_external_arrays[limiting_ea_index].request_further_block();
+                    reuse_upper_bounds = true;
                 } else if (limiting_ea_index==eas) {
                     // no more unaccessible EM data
                     STXXL_MSG("Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!");
                     break;
                 }
-                limiting_ea_index = calculate_merge_sequences(sizes, sequences);
+                limiting_ea_index = calculate_merge_sequences(sizes, sequences, reuse_upper_bounds);
                 output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
             }
         } else {
