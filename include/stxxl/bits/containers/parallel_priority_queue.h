@@ -850,7 +850,9 @@ public:
         assert(m_index + n <= m_capacity);
         assert(m_index + n <= m_end_index);
         assert(m_size >= n);
-        assert(n > 0);
+        
+        if (n==0)
+            return;
 
         const size_t block_index = m_index / block_size;
 
