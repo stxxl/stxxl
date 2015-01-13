@@ -1512,7 +1512,7 @@ template <bool Stable,
 RandomAccessIterator3
 parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                         RandomAccessIteratorIterator seqs_end,
-                        RandomAccessIterator3 target, DiffType length,
+                        RandomAccessIterator3 target, const DiffType length,
                         Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -1613,7 +1613,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         if (length > 0)
             raii->first = chunks[num_threads - 1][count_seqs++].second;
     }
-    assert(count_seqs == num_seqs);
+    STXXL_DEBUG_ASSERT(count_seqs == num_seqs);
 
     delete[] chunks;
 

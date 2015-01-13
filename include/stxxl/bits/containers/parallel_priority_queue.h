@@ -1672,6 +1672,15 @@ public:
     {
         srand(static_cast<unsigned>(time(NULL)));
 
+        if (!omp_get_nested()) {
+            omp_set_nested(1);
+            if (!omp_get_nested()) {
+                STXXL_ERRMSG("Could not enable OpenMP's nested parallelism, "
+                             "however, the PPQ requires this OpenMP feature.");
+                abort();
+            }
+        }
+
         if (c_limit_extract_buffer) {
             m_extract_buffer_limit = (extract_buffer_ram > 0)
                                      ? extract_buffer_ram / sizeof(ValueType)
