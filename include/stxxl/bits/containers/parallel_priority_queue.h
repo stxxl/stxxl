@@ -2654,10 +2654,10 @@ protected:
                 }
             }
 
-            internal_array_type temp_array(insheap);
-            assert(temp_array.int_memory() == size * sizeof(value_type));
-            m_internal_arrays.swap_back(temp_array);
-            // insheap is empty now, insheap vector was swapped into temp_array.
+            internal_array_type new_array(insheap);
+            assert(new_array.int_memory() == size * sizeof(value_type));
+            m_internal_arrays.swap_back(new_array);
+            // insheap is empty now, insheap vector was swapped into new_array.
 
             if (c_merge_ias_into_eb) {
                 if (!extract_buffer_empty()) {
@@ -2758,9 +2758,9 @@ protected:
 
             m_stats.merge_sorted_heaps_time.stop();
 
-            internal_array_type temp_array(merged_array);
-            assert(temp_array.int_memory() == size * sizeof(value_type));
-            m_internal_arrays.swap_back(temp_array);
+            internal_array_type new_array(merged_array);
+            assert(new_array.int_memory() == size * sizeof(value_type));
+            m_internal_arrays.swap_back(new_array);
             // merged_array is empty now.
 
             if (c_merge_ias_into_eb) {
@@ -2792,10 +2792,10 @@ protected:
 
                 if (insheap.size() > 0)
                 {
-                    internal_array_type temp_array(insheap);
-                    assert(temp_array.int_memory() == insheap_capacity);
-                    m_internal_arrays.swap_back(temp_array);
-                    // insheap is empty now, insheap vector was swapped into temp_array.
+                    internal_array_type new_array(insheap);
+                    assert(new_array.int_memory() == insheap_capacity);
+                    m_internal_arrays.swap_back(new_array);
+                    // insheap is empty now, insheap vector was swapped into new_array.
 
                     if (c_merge_ias_into_eb) {
                         if (!extract_buffer_empty()) {
@@ -2852,25 +2852,27 @@ protected:
             int_memory += m_internal_arrays[i].int_memory();
         }
 
-        external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(temp_array);
-        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
+        // construct new external array
+
+        external_array_type new_array(size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(new_array);
+        external_array_type& ea = m_external_arrays[m_external_arrays.size() - 1];
 
         // TODO: write in chunks in order to safe RAM?
 
         m_stats.max_merge_buffer_size.set_max(size);
 
-        a.request_write_buffer(size);
+        ea.request_write_buffer(size);
 
 #if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    a.begin(), m_inv_compare, size);
+                                    ea.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
 
-        a.flush_write_buffer();
-        a.finish_write_phase();
+        ea.flush_write_buffer();
+        ea.finish_write_phase();
 
         STXXL_VERBOSE1_PPQ("Merge done");
 
@@ -2883,7 +2885,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait();
+            ea.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2920,22 +2922,22 @@ protected:
             sequences[i] = std::make_pair(insheap.begin(), insheap.end());
         }
 
-        external_array_type temp_array(size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(temp_array);
-        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
+        external_array_type new_array(size, m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(new_array);
+        external_array_type& ea = m_external_arrays[m_external_arrays.size() - 1];
 
         // TODO: write in chunks in order to safe RAM?
-        a.request_write_buffer(size);
+        ea.request_write_buffer(size);
 
 #if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    a.begin(), m_inv_compare, size);
+                                    ea.begin(), m_inv_compare, size);
 #else
         // TODO
 #endif
 
-        a.flush_write_buffer();
-        a.finish_write_phase();
+        ea.flush_write_buffer();
+        ea.finish_write_phase();
 
         m_external_size += size;
         m_heaps_size = 0;
@@ -2953,7 +2955,7 @@ protected:
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait();
+            ea.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -2976,22 +2978,22 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        external_array_type temp_array(values.size(), m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(temp_array);
-        external_array_type& a = m_external_arrays[m_external_arrays.size() - 1];
+        external_array_type new_array(values.size(), m_num_prefetchers, m_num_write_buffers);
+        m_external_arrays.swap_back(new_array);
+        external_array_type& ea = m_external_arrays[m_external_arrays.size() - 1];
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
-            a.push_back(*i);
+            ea.push_back(*i);
         }
 
-        a.finish_write_phase();
+        ea.finish_write_phase();
 
         m_external_size += values.size();
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait();
+            ea.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
@@ -3019,8 +3021,8 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        internal_array_type temp_array(values);
-        m_internal_arrays.swap_back(temp_array);
+        internal_array_type new_array(values);
+        m_internal_arrays.swap_back(new_array);
         // values is now empty.
 
         if (c_merge_ias_into_eb) {
