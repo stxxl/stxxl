@@ -21,6 +21,7 @@
 #include <list>
 #include <utility>
 #include <vector>
+#include <atomic>
 
 #if STXXL_PARALLEL
     #include <omp.h>
@@ -412,6 +413,8 @@ protected:
 public:
     //! The number of elements fitting into one block
     static const size_t block_size = (size_t)BlockSize / sizeof(ValueType);
+
+    std::atomic<int> m_total_ea_iterators;
 
 protected:
     //! The total capacity of the external array. Cannot be changed after construction.
@@ -826,7 +829,7 @@ public:
         assert(m_index + n <= m_end_index);
         assert(m_size >= n);
 
-        if (n==0)
+        if (n == 0)
             return;
 
         const size_t block_index = m_index / block_size;
@@ -921,6 +924,133 @@ protected:
     {
         size_t mod = m_capacity % block_size;
         return (mod > 0) ? mod : block_size;
+    }
+};
+
+template <class ExternalArrayType>
+class ppq_ea_iterator
+{
+public:
+    typedef ExternalArrayType ea_type;
+
+    typedef typename ea_type::value_type value_type;
+    typedef value_type& reference;
+    typedef value_type* pointer;
+    typedef ptrdiff_t difference_type;
+    typedef std::random_access_iterator_tag iterator_category;
+
+    typedef ppq_ea_iterator self_type;
+
+protected:
+    //! pointer to the external array containing the elements
+    ea_type* m_ea;
+
+    //! index of the current element
+    size_t m_index;
+
+    bool m_accessed;
+
+public:
+    //! default constructor (should not be used directly)
+    ppq_ea_iterator()
+        : m_ea(NULL), m_index(0), m_accessed(false)
+    { }
+
+    ppq_ea_iterator(ea_type* ea, size_t index)
+        : m_ea(ea), m_index(index), m_accessed(false)
+    {
+        //STXXL_VERBOSE1_PPQ("Construct ppq_ea_iterator for index " << m_index);
+    }
+
+    ppq_ea_iterator(const ppq_ea_iterator& other)
+        : m_ea(other.m_ea),
+          m_index(other.m_index),
+          m_accessed(false)
+    {
+        //STXXL_VERBOSE1_PPQ("Copy-Construct ppq_ea_iterator for index " << m_index);
+    }
+
+    ~ppq_ea_iterator()
+    {
+        if (m_accessed)
+        {
+            STXXL_VERBOSE1_PPQ("Destruction of ppq_ea_iterator for index " << m_index
+                               << " atomic: " << m_ea->m_total_ea_iterators);
+            --m_ea->m_total_ea_iterators;
+        }
+    }
+
+    //! returns the value's index in the external array
+    size_t get_index() const
+    {
+        return m_index;
+    }
+
+    reference operator * ()
+    {
+        assert(m_ea);
+        if (!m_accessed)
+            ++m_ea->m_total_ea_iterators;
+        m_accessed = true;
+        return m_ea->operator [] (m_index);
+    }
+    pointer operator -> ()
+    {
+        assert(m_ea);
+        if (!m_accessed)
+            ++m_ea->m_total_ea_iterators;
+        m_accessed = true;
+        return & (m_ea->operator [] (m_index));
+    }
+
+    //! prefix-increment operator
+    self_type& operator ++ ()
+    {
+        ++m_index;
+        return *this;
+    }
+
+    //! prefix-decrement operator
+    self_type& operator -- ()
+    {
+        assert(m_index > 0);
+        --m_index;
+        return *this;
+    }
+
+    self_type operator + (difference_type addend) const
+    {
+        return self_type(m_ea, m_index + addend);
+    }
+
+    self_type operator - (difference_type subtrahend) const
+    {
+        return self_type(m_ea, m_index - subtrahend);
+    }
+
+    bool operator == (const self_type& o) const
+    {
+        return m_index == o.m_index;
+    }
+    bool operator != (const self_type& o) const
+    {
+        return m_index != o.m_index;
+    }
+    bool operator < (const self_type& o) const
+    {
+        return m_index < o.m_index;
+    }
+    bool operator <= (const self_type& o) const
+    {
+        return m_index <= o.m_index;
+    }
+    bool operator > (const self_type& o) const
+    {
+        return m_index > o.m_index;
+    }
+    bool operator >= (const self_type& o) const
+    {
+        return m_index >= o.m_index;
     }
 };
 
@@ -1287,6 +1417,7 @@ protected:
     typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
     typedef typename std::vector<ValueType>::iterator value_iterator;
     typedef typename internal_array_type::iterator iterator;
+    typedef std::pair<iterator, iterator> iterator_pair_type;
 
     //! type of insertion heap itself
     typedef std::vector<ValueType> heap_type;
@@ -2096,7 +2227,7 @@ public:
     ValueType top()
     {
         if (extract_buffer_empty()) {
-            refill_extract_buffer(std::min(m_extract_buffer_limit,m_internal_size+m_external_size));
+            refill_extract_buffer(std::min(m_extract_buffer_limit, m_internal_size + m_external_size));
         }
 
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
@@ -2131,7 +2262,7 @@ public:
         m_stats.num_extracts++;
 
         if (extract_buffer_empty()) {
-            refill_extract_buffer(std::min(m_extract_buffer_limit,m_internal_size+m_external_size));
+            refill_extract_buffer(std::min(m_extract_buffer_limit, m_internal_size + m_external_size));
         }
 
         m_stats.extract_min_time.start();
@@ -2259,7 +2390,7 @@ public:
             }
 
             std::vector<size_type> sizes(eas);
-            std::vector<std::pair<iterator, iterator> > sequences(eas);
+            std::vector<iterator_pair_type> sequences(eas);
             size_type output_size = 0;
 
 #if STXXL_PARALLEL
@@ -2349,7 +2480,6 @@ public:
     }
 
 protected:
-
     //! Calculates the sequences vector needed by the multiway merger,
     //! considering inaccessible data from external arrays.
     //! The sizes vector stores the size of each sequence.
@@ -2357,20 +2487,20 @@ protected:
     //!             sequences[i].second must be valid upper bound iterator from a previous run!
     //! \returns the index of the external array which is limiting factor
     //!             or m_external_arrays.size() if not limited.
-    inline size_t calculate_merge_sequences(std::vector<size_type>& sizes,
-            std::vector<std::pair<iterator, iterator> >& sequences,
-            bool reuse_previous_upper_bounds = false)
+    size_t calculate_merge_sequences(std::vector<size_type>& sizes,
+                                     std::vector<iterator_pair_type>& sequences,
+                                     bool reuse_previous_upper_bounds = false)
     {
         const size_type eas = m_external_arrays.size();
         const size_type ias = c_merge_ias_into_eb ? m_internal_arrays.size() : 0;
-        
-        assert(sizes.size()==eas+ias);
-        assert(sequences.size()==eas+ias);
-        
+
+        assert(sizes.size() == eas + ias);
+        assert(sequences.size() == eas + ias);
+
         /*
          * determine maximum of each first block
          */
-         
+
         bool needs_limit = false;
         size_t min_max_index;
         ValueType min_max_value;
@@ -2383,8 +2513,9 @@ protected:
                     needs_limit = true;
                     min_max_value = max_value;
                     min_max_index = i;
-                } else {
-                    if (m_inv_compare(max_value,min_max_value)) {
+                }
+                else {
+                    if (m_inv_compare(max_value, min_max_value)) {
                         min_max_value = max_value;
                         min_max_index = i;
                     }
@@ -2401,10 +2532,9 @@ protected:
         #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
-            
             iterator begin;
             iterator end;
-            
+
             // check only relevant if c_merge_ias_into_eb==true
             if (i < eas) {
                 assert(!m_external_arrays[i].empty());
@@ -2415,7 +2545,8 @@ protected:
                 begin = m_external_arrays[i].begin();
                 end = m_external_arrays[i].end();
                 assert(begin != end);
-            } else {
+            }
+            else {
                 // else part only relevant if c_merge_ias_into_eb==true
                 size_type j = i - eas;
                 assert(!(m_internal_arrays[j].empty()));
@@ -2423,7 +2554,7 @@ protected:
                 end = m_internal_arrays[j].end();
                 assert(begin != end);
             }
-            
+
             if (needs_limit) {
                 // remove timer if parallel
                 //stats.refill_upper_bound_time.start();
@@ -2432,33 +2563,33 @@ protected:
                     // Be careful that sequences[i].second is really valid and
                     // set by a previous calculate_merge_sequences() run!
                     ub = std::upper_bound(sequences[i].second, end, min_max_value, m_inv_compare);
-                } else {
+                }
+                else {
                     ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 }
                 //stats.refill_upper_bound_time.stop();
 
                 sizes[i] = std::distance(begin, ub);
                 sequences[i] = std::make_pair(begin, ub);
-                    
-            } else {
+            }
+            else {
                 sizes[i] = std::distance(begin, end);
                 sequences[i] = std::make_pair(begin, end);
             }
-            
         }
-        
+
         if (needs_limit) {
             return min_max_index;
-        } else {
+        }
+        else {
             return eas;
         }
-        
     }
 
     //! Refills the extract buffer from the external arrays.
     //! \param minimum_size requested minimum size of the resulting extract buffer.
     //!         Prints a warning if there is not enough data to reach this size.
-    inline void refill_extract_buffer(size_t minimum_size=0)
+    inline void refill_extract_buffer(size_t minimum_size = 0)
     {
         STXXL_VERBOSE1_PPQ("refilling extract buffer");
 
@@ -2494,17 +2625,18 @@ protected:
         m_stats.refill_time_before_merge.start();
 
         std::vector<size_type> sizes(eas + ias);
-        std::vector<std::pair<iterator, iterator> > sequences(eas + ias);
+        std::vector<iterator_pair_type> sequences(eas + ias);
         size_type output_size = 0;
-        
-        if (minimum_size>0) {
-            size_t limiting_ea_index = eas+1;
+
+        if (minimum_size > 0) {
+            size_t limiting_ea_index = eas + 1;
             bool reuse_upper_bounds = false;
-            while (output_size<minimum_size) {
-                if (limiting_ea_index<eas) {
+            while (output_size < minimum_size) {
+                if (limiting_ea_index < eas) {
                     m_external_arrays[limiting_ea_index].request_further_block();
                     reuse_upper_bounds = true;
-                } else if (limiting_ea_index==eas) {
+                }
+                else if (limiting_ea_index == eas) {
                     // no more unaccessible EM data
                     STXXL_MSG("Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!");
                     break;
@@ -2512,13 +2644,14 @@ protected:
                 limiting_ea_index = calculate_merge_sequences(sizes, sequences, reuse_upper_bounds);
                 output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
             }
-        } else {
+        }
+        else {
             calculate_merge_sequences(sizes, sequences);
             output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
         }
 
         if (c_limit_extract_buffer) {
-            output_size = std::min(output_size,m_extract_buffer_limit);
+            output_size = std::min(output_size, m_extract_buffer_limit);
         }
 
         m_stats.max_extract_buffer_size.set_max(output_size);
@@ -2537,20 +2670,21 @@ protected:
 #else
         // TODO
 #endif
-            
+
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
         for (size_type i = 0; i < eas + ias; ++i) {
             // dist represents the number of elements that haven't been merged
             size_type dist = std::distance(sequences[i].first, sequences[i].second);
-            const size_t diff = sizes[i]-dist;
-            if (diff>0) {
+            const size_t diff = sizes[i] - dist;
+            if (diff > 0) {
                 if (i < eas) {
                     m_external_arrays[i].remove(diff);
                     assert(m_external_size >= diff);
                     m_external_size -= diff;
-                } else {
+                }
+                else {
                     size_type j = i - eas;
                     m_internal_arrays[j].inc_min(diff);
                     assert(m_internal_size >= diff);
@@ -2810,7 +2944,7 @@ protected:
         size_type num_arrays = m_internal_arrays.size();
         size_type size = m_internal_size;
         size_type int_memory = 0;
-        std::vector<std::pair<iterator, iterator> > sequences(num_arrays);
+        std::vector<iterator_pair_type> sequences(num_arrays);
 
         for (unsigned i = 0; i < num_arrays; ++i)
         {
@@ -2833,8 +2967,10 @@ protected:
         ea.request_write_buffer(size);
 
 #if STXXL_PARALLEL
-        parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    ea.begin(), m_inv_compare, size);
+        parallel::sw_multiway_merge(
+            sequences.begin(), sequences.end(),
+            ppq_local::ppq_ea_iterator<external_array_type>(&ea, 0),
+            m_inv_compare, size);
 #else
         // TODO
 #endif
