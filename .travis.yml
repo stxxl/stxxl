@@ -31,9 +31,9 @@ before_script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_C_COMPILER=$CMAKE_CC -DCMAKE_CXX_COMPILER=$CMAKE_CXX
-    -DCMAKE_C_FLAGS="-Wconversion $CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="-Wconversion $CMAKE_FLAGS"
     -DBUILD_TESTS=ON -DTRY_COMPILE_HEADERS=ON
     -DUSE_BOOST=$USE_BOOST $CMAKE_ARGS ../
+    #-DCMAKE_C_FLAGS="-Wconversion $CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="-Wconversion $CMAKE_FLAGS"
 
 script:
   - make -j4 && ./tools/stxxl_tool info && ctest -V
