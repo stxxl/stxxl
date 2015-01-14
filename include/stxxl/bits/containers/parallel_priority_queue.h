@@ -55,11 +55,13 @@ STXXL_BEGIN_NAMESPACE
 
 namespace ppq_local {
 
-//! A random-access iterator class for block oriented data.
-//! The iterator is intended to be provided by the internal_array and
-//! external_array classes and to be used by the multiway_merge algorithm.
-//!
-//! \tparam ValueType the value type
+/*!
+ * A random-access iterator class for block oriented data.  The iterator is
+ * intended to be provided by the internal_array and external_array classes
+ * and to be used by the multiway_merge algorithm as input iterators.
+ *
+ * \tparam ValueType the value type
+ */
 template <class ValueType>
 class ppq_iterator
 {
@@ -91,8 +93,7 @@ protected:
     size_t m_block_size;
 
 public:
-    //! default constructor
-    //! should not be used directly
+    //! default constructor (should not be used directly)
     ppq_iterator()
         : m_block_pointers(NULL)
     { }
@@ -114,27 +115,7 @@ public:
         update();
     }
 
-    //! copy constructor
-    ppq_iterator(const self_type& o)
-        : m_block_pointers(o.m_block_pointers),
-          m_current(o.m_current),
-          m_index(o.m_index),
-          m_block_index(o.m_block_index),
-          m_block_size(o.m_block_size)
-    { }
-
-    //! copy assignment
-    self_type& operator = (const self_type& o)
-    {
-        m_block_pointers = o.m_block_pointers;
-        m_current = o.m_current;
-        m_index = o.m_index;
-        m_block_index = o.m_block_index;
-        m_block_size = o.m_block_size;
-        return *this;
-    }
-
-    //! returns the value's index in the external array
+    //! returns the value's index in the internal or external array
     size_t get_index() const
     {
         return m_index;
@@ -162,7 +143,7 @@ public:
         return *((*m_block_pointers)[block_index].first + local_index);
     }
 
-    //! pre-increment operator
+    //! prefix-increment operator
     self_type& operator ++ ()
     {
         ++m_index;
@@ -181,14 +162,7 @@ public:
 
         return *this;
     }
-    //! post-increment operator
-    self_type operator ++ (int)
-    {
-        self_type former(*this);
-        operator ++ ();
-        return former;
-    }
-    //! pre-increment operator
+    //! prefix-decrement operator
     self_type& operator -- ()
     {
         assert(m_index > 0);
@@ -207,13 +181,7 @@ public:
 
         return *this;
     }
-    //! post-increment operator
-    self_type operator -- (int)
-    {
-        self_type former(*this);
-        operator -- ();
-        return former;
-    }
+
     self_type operator + (difference_type addend) const
     {
         return self_type(m_block_pointers, m_block_size, m_index + addend);
@@ -461,7 +429,7 @@ protected:
     //! Prefetch and write buffer pool
     pool_type* m_pool;
 
-    //! The IDs of each block in external memory
+    //! The IDs of each block in external memory, m_bids[0] remains undefined.
     bid_vector m_bids;
 
     //! The block with the currently smallest elements
@@ -857,7 +825,7 @@ public:
         assert(m_index + n <= m_capacity);
         assert(m_index + n <= m_end_index);
         assert(m_size >= n);
-        
+
         if (n==0)
             return;
 

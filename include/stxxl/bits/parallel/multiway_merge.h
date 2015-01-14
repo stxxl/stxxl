@@ -969,7 +969,9 @@ multiway_merge_loser_tree(RandomAccessIteratorIterator seqs_begin,
         // take out
         source_type source = lt.get_min_source();
 
-        *(target++) = *(seqs_begin[source].first++);
+        *target = *seqs_begin[source].first;
+        ++seqs_begin[source].first;
+        ++target;
 
         // feed
         if (UNLIKELY(seqs_begin[source].first == seqs_begin[source].second))
@@ -1046,7 +1048,9 @@ multiway_merge_loser_tree_unguarded(
         assert(i == 0 || !comp(*(seqs_begin[source].first), *(target - 1)));
 #endif
 
-        *(target++) = *(seqs_begin[source].first++);
+        *target = *seqs_begin[source].first;
+        ++seqs_begin[source].first;
+        ++target;
 
 #if STXXL_DEBUG_ASSERTIONS
         assert((seqs_begin[source].first != seqs_begin[source].second) || (i == length - 1));

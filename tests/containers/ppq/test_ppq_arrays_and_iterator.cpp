@@ -322,19 +322,6 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
 
         STXXL_CHECK_EQUAL(index, 1);
 
-        // postfix operator ++
-        for (ea_type::iterator it = begin; it != end; it++, ++index)
-            STXXL_CHECK_EQUAL(it->first, index);
-
-        // postfix operator --
-        for (ea_type::iterator it = end; it != begin; )
-        {
-            it--, --index;
-            STXXL_CHECK_EQUAL(it->first, index);
-        }
-
-        STXXL_CHECK_EQUAL(index, 1);
-
         // addition operator +
         for (ea_type::iterator it = begin; it != end; it = it + 1, ++index)
             STXXL_CHECK_EQUAL(it->first, index);
