@@ -51,9 +51,6 @@
 
 STXXL_BEGIN_NAMESPACE
 
-#define STXXL_VERBOSE1_PPQ(msg) STXXL_MSG("ppq[" << static_cast<const void*>(this) << "]::" << msg)
-#define STXXL_VERBOSE2_PPQ(msg) STXXL_VERBOSE1("ppq[" << static_cast<const void*>(this) << "]::" << msg)
-
 namespace ppq_local {
 
 /*!
@@ -950,6 +947,8 @@ protected:
 
     bool m_accessed;
 
+    static const bool debug = false;
+
 public:
     //! default constructor (should not be used directly)
     ppq_ea_iterator()
@@ -959,7 +958,7 @@ public:
     ppq_ea_iterator(ea_type* ea, size_t index)
         : m_ea(ea), m_index(index), m_accessed(false)
     {
-        //STXXL_VERBOSE1_PPQ("Construct ppq_ea_iterator for index " << m_index);
+        STXXL_DEBUG("Construct ppq_ea_iterator for index " << m_index);
     }
 
     ppq_ea_iterator(const ppq_ea_iterator& other)
@@ -967,15 +966,15 @@ public:
           m_index(other.m_index),
           m_accessed(false)
     {
-        //STXXL_VERBOSE1_PPQ("Copy-Construct ppq_ea_iterator for index " << m_index);
+        STXXL_DEBUG("Copy-Construct ppq_ea_iterator for index " << m_index);
     }
 
     ~ppq_ea_iterator()
     {
         if (m_accessed)
         {
-            STXXL_VERBOSE1_PPQ("Destruction of ppq_ea_iterator for index " << m_index
-                               << " atomic: " << m_ea->m_total_ea_iterators);
+            STXXL_DEBUG("Destruction of ppq_ea_iterator for index " <<
+                        m_index << " atomic: " << m_ea->m_total_ea_iterators);
             --m_ea->m_total_ea_iterators;
         }
     }
@@ -1408,6 +1407,8 @@ public:
     typedef AllocStrategy alloc_strategy;
     static const uint64 block_size = BlockSize;
     typedef uint64 size_type;
+
+    static const bool debug = true;
 
 protected:
     typedef typed_block<block_size, ValueType> block_type;
@@ -2230,6 +2231,8 @@ public:
             refill_extract_buffer(std::min(m_extract_buffer_limit, m_internal_size + m_external_size));
         }
 
+        static const bool debug = false;
+
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
         unsigned type = type_and_index.first;
         unsigned index = type_and_index.second;
@@ -2238,16 +2241,16 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
-            //STXXL_VERBOSE1_PPQ("heap "<<index<<": "<<m_proc[index].insertion_heap[0]);
+            STXXL_DEBUG("heap " << index << ": " << m_proc[index].insertion_heap[0]);
             return m_proc[index].insertion_heap[0];
         case minima_type::EB:
-            //STXXL_VERBOSE1_PPQ("eb "<<m_extract_buffer_index<<": "<<m_extract_buffer[m_extract_buffer_index]);
+            STXXL_DEBUG("eb " << m_extract_buffer_index << ": " << m_extract_buffer[m_extract_buffer_index]);
             return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
-            //STXXL_VERBOSE1_PPQ("ia "<<index<<": "<<m_internal_arrays[index].get_min());
+            STXXL_DEBUG("ia " << index << ": " << m_internal_arrays[index].get_min());
             return m_internal_arrays[index].get_min();
         case minima_type::EA:
-            //STXXL_VERBOSE1_PPQ("ea "<<index<<": "<<m_external_arrays[index].get_min());
+            STXXL_DEBUG("ea " << index << ": " << m_external_arrays[index].get_min());
             // wait() already done by comparator....
             return m_external_arrays[index].get_min();
         default:
@@ -2591,7 +2594,7 @@ protected:
     //!         Prints a warning if there is not enough data to reach this size.
     inline void refill_extract_buffer(size_t minimum_size = 0)
     {
-        STXXL_VERBOSE1_PPQ("refilling extract buffer");
+        STXXL_DEBUG("refilling extract buffer");
 
         check_invariants();
 
@@ -2727,7 +2730,7 @@ protected:
         heap_type& insheap = m_proc[id].insertion_heap;
         size_t size = insheap.size();
 
-        STXXL_VERBOSE2_PPQ(
+        STXXL_DEBUG(
             "Flushing insertion heap array id=" << id <<
             " size=" << insheap.size() <<
             " capacity=" << insheap.capacity() <<
@@ -2931,7 +2934,7 @@ protected:
     //! Flushes the internal arrays into an external array.
     inline void flush_internal_arrays()
     {
-        STXXL_VERBOSE1_PPQ("Flushing internal arrays into external memory");
+        STXXL_DEBUG("Flushing internal arrays into external memory");
 
         m_stats.num_internal_array_flushes++;
         m_stats.internal_array_flush_time.start();
@@ -2978,7 +2981,7 @@ protected:
         ea.flush_write_buffer();
         ea.finish_write_phase();
 
-        STXXL_VERBOSE1_PPQ("Merge done");
+        STXXL_DEBUG("Merge done");
 
         m_internal_size = 0;
         m_external_size += size;
@@ -2999,7 +3002,7 @@ protected:
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.internal_array_flush_time.stop();
 
-        STXXL_VERBOSE1_PPQ("Write done");
+        STXXL_DEBUG("Write done");
     }
 
     //! Flushes the insertion heaps into an external array.
