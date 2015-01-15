@@ -1152,5 +1152,20 @@ int benchmark_pqs(int argc, char* argv[])
         run_benchmark(cstlpq);
     }
 
+    if (do_ppq) {
+#if STXXL_PARALLEL
+        delete ppq;
+#endif
+    }
+    else if (do_stxxlpq) {
+        delete stxxlpq;
+    }
+    else if (do_sorter) {
+        delete stxxlsorter;
+    }
+    else if (do_stlpq) {
+        delete stlpq;
+    }
+
     return EXIT_SUCCESS;
 }
