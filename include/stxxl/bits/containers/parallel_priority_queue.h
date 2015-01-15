@@ -2449,12 +2449,8 @@ public:
 
             a.request_write_buffer(output_size);
 
-#if STXXL_PARALLEL
             parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
                                         a.begin(), m_inv_compare, output_size);
-#else
-            // TODO
-#endif
 
             a.flush_write_buffer();
 
@@ -2699,12 +2695,8 @@ protected:
         m_stats.refill_time_before_merge.stop();
         m_stats.refill_merge_time.start();
 
-#if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
                                     m_extract_buffer.begin(), m_inv_compare, output_size);
-#else
-        // TODO
-#endif
 
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
@@ -2882,12 +2874,8 @@ protected:
             m_stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
 
-#if STXXL_PARALLEL
             parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
                                         merged_array.begin(), m_inv_compare, size);
-#else
-            // TODO
-#endif
 
             m_stats.merge_sorted_heaps_time.stop();
 
@@ -2997,14 +2985,10 @@ protected:
 
         ea.request_write_buffer(size);
 
-#if STXXL_PARALLEL
         parallel::sw_multiway_merge(
             sequences.begin(), sequences.end(),
             ppq_local::ppq_ea_iterator<external_array_type>(&ea, 0),
             m_inv_compare, size);
-#else
-        // TODO
-#endif
 
         ea.flush_write_buffer();
         ea.finish_write_phase();
@@ -3064,12 +3048,8 @@ protected:
         // TODO: write in chunks in order to safe RAM?
         ea.request_write_buffer(size);
 
-#if STXXL_PARALLEL
         parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
                                     ea.begin(), m_inv_compare, size);
-#else
-        // TODO
-#endif
 
         ea.flush_write_buffer();
         ea.finish_write_phase();
