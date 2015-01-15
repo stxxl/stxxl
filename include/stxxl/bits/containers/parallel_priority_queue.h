@@ -399,48 +399,49 @@ public:
     typedef ValueType value_type;
     typedef ppq_iterator<value_type> iterator;
 
-protected:
-    typedef external_array<ValueType, BlockSize, AllocStrategy> self_type;
-    typedef typed_block<BlockSize, ValueType> block_type;
+    typedef external_array<value_type, BlockSize, AllocStrategy> self_type;
+    typedef typed_block<BlockSize, value_type> block_type;
     typedef read_write_pool<block_type> pool_type;
     typedef std::vector<BID<BlockSize> > bid_vector;
     typedef std::vector<block_type*> block_vector;
     typedef std::vector<request_ptr> request_vector;
-    typedef std::vector<ValueType> maxima_vector;
+    typedef std::vector<value_type> maxima_vector;
     typedef typename iterator::block_pointers_type block_pointers_type;
 
-public:
     //! The number of elements fitting into one block
-    static const size_t block_size = (size_t)BlockSize / sizeof(ValueType);
+    enum { block_size = BlockSize / sizeof(value_type) };
 
     std::atomic<int> m_total_ea_iterators;
 
 protected:
-    //! The total capacity of the external array. Cannot be changed after construction.
-    size_t m_capacity;
+    //! The total size of the external array in items. Cannot be changed
+    //! after construction.
+    external_size_type m_capacity;
 
-    //! Number of blocks
-    size_t m_num_blocks;
+    //! Number of blocks, again: calculated at construction time.
+    unsigned_type m_num_blocks;
 
     //! Number of blocks to prefetch from EM
-    size_t m_num_prefetch_blocks;
+    unsigned_type m_num_prefetch_blocks;
 
     //! Size of the write buffer in number of blocks
-    size_t m_num_write_buffer_blocks;
+    unsigned_type m_num_write_buffer_blocks;
 
     //! Prefetch and write buffer pool
     pool_type* m_pool;
 
-    //! The IDs of each block in external memory, m_bids[0] remains undefined.
+    //! The IDs of each block in external memory.
     bid_vector m_bids;
 
     //! The block with the currently smallest elements
     block_vector m_blocks;
 
-    //! Begin and end pointers for each block
+    //! Begin and end pointers for each block, used for merging with
+    //! ppq_iterator.
     block_pointers_type m_block_pointers;
 
-    //! The read request pointers are used to wait until the block has been completely fetched.
+    //! The read request pointers are used to wait until the block has been
+    //! completely fetched.
     request_vector m_requests;
 
     //! stores the maximum value of each block
@@ -450,16 +451,17 @@ protected:
     bool m_write_phase;
 
     //! The total number of elements minus the number of extracted values
-    size_t m_size;
+    external_size_type m_size;
 
     //! The read position in the array.
-    size_t m_index;
+    external_size_type m_index;
 
-    //! The index behind the last element that is located in RAM (or is at least requested to be so)
-    size_t m_end_index;
+    //! The index behind the last element that is located in RAM (or is at
+    //! least requested to be so)
+    external_size_type m_end_index;
 
     //! The index of the next block to be prefetched.
-    size_t m_hint_index;
+    internal_size_type m_hint_index;
 
 public:
     /*!
@@ -473,8 +475,8 @@ public:
      * \param num_write_buffer_blocks Size of the write buffer in number of
      * blocks
      */
-    external_array(size_t size, size_t num_prefetch_blocks,
-                   size_t num_write_buffer_blocks)
+    external_array(external_size_type size, unsigned_type num_prefetch_blocks,
+                   unsigned_type num_write_buffer_blocks)
         :   // constants
           m_capacity(size),
           m_num_blocks((size_t)div_ceil(m_capacity, block_size)),
@@ -552,7 +554,6 @@ public:
         swap(m_requests, o.m_requests);
         swap(m_blocks, o.m_blocks);
         swap(m_block_pointers, o.m_block_pointers);
-        swap(m_minima, o.m_minima);
         swap(m_maxima, o.m_maxima);
 
         // state
@@ -577,7 +578,7 @@ public:
         if (m_size > 0) {
             // not all data has been read!
 
-            assert(m_end_index > 0); // true because m_size>0
+            assert(m_end_index > 0); // true because m_size > 0
             const size_t block_index = m_index / block_size;
             const size_t end_block_index = (m_end_index - 1) / block_size;
 
@@ -585,23 +586,34 @@ public:
             typename bid_vector::iterator i_begin = m_bids.begin() + std::max(block_index, (size_t)1);
             bm->delete_blocks(i_begin, m_bids.end());
 
-            for (size_t i = block_index; i < end_block_index; ++i) {
+            for (size_t i = block_index; i < end_block_index; ++i)
                 delete m_blocks[i];
-            }
         }
         delete m_pool;
     }
 
-    //! Returns the current size
+    //! Returns the capacity in items.
+    size_t capacity() const
+    {
+        return m_capacity;
+    }
+
+    //! Returns the current size in items.
     size_t size() const
     {
         return m_size;
     }
 
-    //! Returns if the array is empty
+    //! Returns true if the array is empty.
     bool empty() const
     {
         return (m_size == 0);
+    }
+
+    //! Return the number of blocks.
+    size_t num_blocks() const
+    {
+        return m_num_blocks;
     }
 
     //! Returns if the array is empty
@@ -629,14 +641,14 @@ public:
     }
 
     //! Returns the smallest element in the array
-    ValueType & get_min()
+    value_type & get_min()
     {
         return *begin();
     }
 
     //! Returns the largest element in internal memory (or at least
     //! requested to be in internal memory)
-    ValueType & get_current_max()
+    value_type & get_current_max()
     {
         assert(m_end_index > 0);
         const size_t last_block_index = (m_end_index - 1) / block_size;
@@ -666,7 +678,7 @@ public:
 
     //! Random access operator for data in internal memory
     //! You should call wait() once after fetching data from EM.
-    ValueType& operator [] (size_t i) const
+    value_type& operator [] (size_t i) const
     {
         assert(i < m_capacity);
         const size_t block_index = i / block_size;
@@ -677,7 +689,7 @@ public:
     }
 
     //! Pushes the value at the end of the array
-    void push_back(const ValueType& value)
+    void push_back(const value_type& value)
     {
         assert(m_write_phase);
         assert(m_size < m_capacity);
@@ -793,7 +805,7 @@ public:
         }
 
         const size_t local_block_size = block_size; // std::min cannot access static block_size
-        m_end_index = std::min(local_block_size, m_capacity);
+        m_end_index = std::min<external_size_type>(local_block_size, m_capacity);
         m_index = 0;
 
         for (size_t i = 0; i < m_num_prefetch_blocks; ++i) {
@@ -887,7 +899,8 @@ public:
         update_block_pointers(block_index);
 
         hint();
-        m_end_index = std::min(m_capacity, (block_index + 1) * block_size);
+        m_end_index = std::min(
+            m_capacity, (block_index + 1) * (external_size_type)block_size);
     }
 
 protected:
@@ -925,7 +938,7 @@ protected:
     inline size_t last_block_size()
     {
         size_t mod = m_capacity % block_size;
-        return (mod > 0) ? mod : block_size;
+        return (mod > 0) ? mod : (size_t)block_size;
     }
 };
 
