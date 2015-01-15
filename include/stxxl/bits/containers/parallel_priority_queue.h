@@ -1426,7 +1426,7 @@ public:
     static const uint64 block_size = BlockSize;
     typedef uint64 size_type;
 
-    static const bool debug = true;
+    static const bool debug = false;
 
 protected:
     typedef typed_block<block_size, ValueType> block_type;
@@ -1662,20 +1662,32 @@ protected:
     //! Clean up empty internal arrays, free their memory and capacity
     void cleanup_internal_arrays()
     {
-        typename internal_arrays_type::iterator swapend =
+        typename internal_arrays_type::iterator swap_end =
             stxxl::swap_remove_if(m_internal_arrays.begin(),
                                   m_internal_arrays.end(),
                                   empty_internal_array_eraser());
 
-        //size_type size_removed = 0;
-
-        for (typename internal_arrays_type::iterator i = swapend;
+        for (typename internal_arrays_type::iterator i = swap_end;
              i != m_internal_arrays.end(); ++i)
         {
             m_mem_left += i->int_memory();
         }
 
-        m_internal_arrays.erase(swapend, m_internal_arrays.end());
+        m_internal_arrays.erase(swap_end, m_internal_arrays.end());
+    }
+
+    //! Clean up empty external arrays, free their memory and capacity
+    void cleanup_external_arrays()
+    {
+        typename external_arrays_type::iterator swap_end =
+            stxxl::swap_remove_if(m_external_arrays.begin(),
+                                  m_external_arrays.end(),
+                                  empty_external_array_eraser());
+
+        m_mem_left +=
+            (m_external_arrays.end() - swap_end) * m_mem_per_external_array;
+
+        m_external_arrays.erase(swap_end, m_external_arrays.end());
     }
 
     /*!
@@ -2386,7 +2398,7 @@ public:
         m_minima.clear_external_arrays();
 
         // clean up external arrays that have been deleted in extract_min!
-        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        cleanup_external_arrays();
 
         size_type total_size = m_external_size;
         assert(total_size > 0);
@@ -2394,6 +2406,8 @@ public:
         external_array_type a(total_size, m_num_prefetchers, m_num_write_buffers);
         m_external_arrays.swap_back(a);
 
+        //-tb this is probably wrong, and violates the memory counter, see
+        //-cleanup above.
         m_mem_left += (m_external_arrays.size() - 1) * m_mem_per_external_array;
 
         while (m_external_arrays.size() > 0) {
@@ -2452,7 +2466,7 @@ public:
                 m_external_arrays[i].wait();
             }
 
-            m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+            cleanup_external_arrays();
         }
 
         a.finish_write_phase();
@@ -2621,7 +2635,7 @@ protected:
         m_extract_buffer_index = 0;
 
         m_minima.clear_external_arrays();
-        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
+        cleanup_external_arrays();
         size_type eas = m_external_arrays.size();
 
         size_type ias;
@@ -2721,11 +2735,7 @@ protected:
         //stats.refill_wait_time.stop();
 
         // remove empty arrays - important for the next round
-        m_external_arrays.erase(stxxl::swap_remove_if(m_external_arrays.begin(), m_external_arrays.end(), empty_external_array_eraser()), m_external_arrays.end());
-        size_type num_deleted_arrays = eas - m_external_arrays.size();
-        if (num_deleted_arrays > 0) {
-            m_mem_left += num_deleted_arrays * m_mem_per_external_array;
-        }
+        cleanup_external_arrays();
 
         m_stats.num_new_external_arrays = 0;
 
