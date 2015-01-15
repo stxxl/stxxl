@@ -292,9 +292,11 @@ public:
     //! Swap internal_array with another one.
     void swap(internal_array& o)
     {
-        std::swap(m_values, o.m_values);
-        std::swap(m_min_index, o.m_min_index);
-        std::swap(m_block_pointers, o.m_block_pointers);
+        using std::swap;
+
+        swap(m_values, o.m_values);
+        swap(m_min_index, o.m_min_index);
+        swap(m_block_pointers, o.m_block_pointers);
     }
 
     //! Swap internal_array with another one.
@@ -536,28 +538,31 @@ public:
     //! Swap external_array with another one.
     void swap(external_array& o)
     {
+        using std::swap;
+
         // constants
-        std::swap(m_capacity, o.m_capacity);
-        std::swap(m_num_blocks, o.m_num_blocks);
-        std::swap(m_num_prefetch_blocks, o.m_num_prefetch_blocks);
-        std::swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
-        std::swap(m_pool, o.m_pool);
+        swap(m_capacity, o.m_capacity);
+        swap(m_num_blocks, o.m_num_blocks);
+        swap(m_num_prefetch_blocks, o.m_num_prefetch_blocks);
+        swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
+        swap(m_pool, o.m_pool);
 
         // vectors
-        std::swap(m_bids, o.m_bids);
-        std::swap(m_requests, o.m_requests);
-        std::swap(m_blocks, o.m_blocks);
-        std::swap(m_block_pointers, o.m_block_pointers);
-        std::swap(m_maxima, o.m_maxima);
+        swap(m_bids, o.m_bids);
+        swap(m_requests, o.m_requests);
+        swap(m_blocks, o.m_blocks);
+        swap(m_block_pointers, o.m_block_pointers);
+        swap(m_minima, o.m_minima);
+        swap(m_maxima, o.m_maxima);
 
         // state
-        std::swap(m_write_phase, o.m_write_phase);
+        swap(m_write_phase, o.m_write_phase);
 
         // indices
-        std::swap(m_size, o.m_size);
-        std::swap(m_index, o.m_index);
-        std::swap(m_end_index, o.m_end_index);
-        std::swap(m_hint_index, o.m_hint_index);
+        swap(m_size, o.m_size);
+        swap(m_index, o.m_index);
+        swap(m_end_index, o.m_end_index);
+        swap(m_hint_index, o.m_hint_index);
     }
 
     //! Swap external_array with another one.
