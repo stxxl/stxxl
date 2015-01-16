@@ -100,7 +100,10 @@ struct value_type {
     key_type second;
     char data[value_size - 2 * sizeof(key_type)];
 
-    value_type(const key_type& _key = 0, const key_type& _data = 0)
+    value_type()
+    { }
+
+    value_type(const key_type& _key, const key_type& _data = 0)
         : first(_key), second(_data)
     {
 #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
