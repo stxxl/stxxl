@@ -768,7 +768,7 @@ protected:
 #if STXXL_DEBUG_ASSERTIONS
         num_threads *= 2; // required for re-reading the external array
 #endif
-        m_pool->resize_write(4 * num_threads * config::get_instance()->disks_number());
+        m_pool->resize_write(num_threads * config::get_instance()->disks_number());
     }
 
     //! finish the writing phase after multiway_merge() filled the vector. this
@@ -3180,7 +3180,7 @@ protected:
         // sort locally, independent of others
         std::sort(insheap.begin(), insheap.end(), m_inv_compare);
 
-#pragma omp critical
+#pragma omp critical (stxxl_flush_insertion_heap)
         {
             // test that enough RAM is available for merged internal array:
             // otherwise flush the existing internal arrays out to disk.
@@ -3367,7 +3367,8 @@ protected:
     //! Flushes the internal arrays into an external array.
     inline void flush_internal_arrays()
     {
-        STXXL_DEBUG("Flushing internal arrays into external memory");
+        STXXL_DEBUG("Flushing internal arrays" <<
+                    " num_arrays=" << m_internal_arrays.size());
 
         m_stats.num_internal_array_flushes++;
         m_stats.internal_array_flush_time.start();
