@@ -678,7 +678,7 @@ public:
 
     //! Returns the largest element in internal memory (or at least
     //! requested to be in internal memory)
-    value_type & get_current_max()
+    const value_type & get_current_max() const
     {
         // we do not use get_end_block_index() here, since we want the last
         // existing block.
