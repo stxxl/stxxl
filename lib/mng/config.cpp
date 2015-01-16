@@ -388,6 +388,21 @@ void disk_config::parse_fileio()
                             "Invalid parameter '" << *p << "' in disk configuration file.");
             }
         }
+        else if (eq[0] == "queue_length")
+        {
+            if (io_impl != "linuxaio") {
+                STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' "
+                            "is only valid for fileio linuxaio "
+                            "in disk configuration file.");
+            }
+
+            char* endp;
+            queue_length = (int)strtoul(eq[1].c_str(), &endp, 10);
+            if (endp && *endp != 0) {
+                STXXL_THROW(std::runtime_error,
+                            "Invalid parameter '" << *p << "' in disk configuration file.");
+            }
+        }
         else if (eq[0] == "device_id" || eq[0] == "devid")
         {
             char* endp;
