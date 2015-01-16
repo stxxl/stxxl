@@ -216,6 +216,10 @@ public:
         return top;
     }
 
+    //! Operation called after filling the container.
+    void fill_end()
+    { }
+
     //! Test if the container is empty.
     bool empty() const
     {
@@ -334,6 +338,12 @@ value_type Container<sorter_type>::top_pop()
     value_type top = *backend;
     ++backend;
     return top;
+}
+
+template <>
+void Container<sorter_type>::fill_end()
+{
+    backend.sort(); // switch state
 }
 
 /*
@@ -1083,6 +1093,7 @@ void run_benchmark(ContainerType& c)
             else {
                 do_bulk_insert(c, do_parallel);
             }
+            c.fill_end();
             if (do_random && do_check) {
                 do_bulk_rand_read_check(c, seed, do_parallel);
             }
@@ -1108,6 +1119,7 @@ void run_benchmark(ContainerType& c)
             else {
                 do_insert(c);
             }
+            c.fill_end();
             if (do_random && do_check) {
                 do_rand_read_check(c, seed);
             }
