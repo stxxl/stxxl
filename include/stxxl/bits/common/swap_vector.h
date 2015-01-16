@@ -24,9 +24,10 @@ STXXL_BEGIN_NAMESPACE
 //! \{
 
 /*!
- * Vector that avoids copying of ValueType objects in push_back() (here: swap_back()) and resize() operations.
- * Values are swapped with default-constructed instances instead.
- * Important: A template spezialization for std::swap(ValueType&,ValueType&) must be provided. Make shure the swap
+ * Vector that avoids copying of ValueType objects in push_back() (here:
+ * swap_back()) and resize() operations.  Values are swapped with
+ * default-constructed instances instead.  Important: A template spezialization
+ * for std::swap(ValueType&,ValueType&) must be provided. Make shure the swap
  * implementation is located above these lines.
  */
 template <typename ValueType>
@@ -66,7 +67,8 @@ public:
         if (m_size > 0)
             m_array = new value_type[m_size];
     }
-    //! Create a vector with the spezified size and reserve (possibly more) space.
+    //! Create a vector with the spezified size and reserve (possibly more)
+    //! space.
     swap_vector(size_type size, size_type capacity)
         : m_size(size), m_capacity(std::max(size, capacity)), m_array(NULL)
     {
@@ -76,9 +78,10 @@ public:
     //! Swap the vector with another one.
     void swap(swap_vector& obj)
     {
-        std::swap(m_size, obj.m_size);
-        std::swap(m_capacity, obj.m_capacity);
-        std::swap(m_array, obj.m_array);
+        using std::swap;
+        swap(m_size, obj.m_size);
+        swap(m_capacity, obj.m_capacity);
+        swap(m_array, obj.m_array);
     }
     //! Delete the vector.
     ~swap_vector()
@@ -205,7 +208,8 @@ public:
         reserve(newsize);
         m_size = newsize;
     }
-    //! Create a new value_type object at the end of the vector and then swap it with val.
+    //! Create a new value_type object at the end of the vector and then swap
+    //! it with val.
     void swap_back(reference val)
     {
         if (m_size + 1 > m_capacity)
@@ -221,12 +225,14 @@ public:
     {
         m_size = 0;
     }
-    //! Erase the element at the given position by swapping it to the and and then reducing the vector size.
+    //! Erase the element at the given position by swapping it to the and and
+    //! then reducing the vector size.
     iterator erase(iterator position)
     {
         return erase(position, position + 1);
     }
-    //! Erase the elements at in the range [begin,last) by swapping them to the and and then reducing the vector size.
+    //! Erase the elements at in the range [begin,last) by swapping them to the
+    //! and and then reducing the vector size.
     iterator erase(iterator first, iterator last)
     {
         assert(first >= begin());
@@ -250,14 +256,12 @@ public:
 };
 
 /*!
- * Transforms the range [first,last) into a range with all the elements for which pred returns true removed,
- * and returns an iterator to the new end of that range.
+ * Transforms the range [first,last) into a range with all the elements for
+ * which pred returns true removed, and returns an iterator to the new end of
+ * that range.
  *
- * The function is compatible to std::remove_if, but uses std::swap instead of copy-assignment
- * (resp. move-assignment in C++11).
- *
- * Important: A template spezialization for std::swap(ValueType&,ValueType&) must be provided. Make shure the swap
- * implementation is located above these lines.
+ * The function is compatible to std::remove_if, but uses std::swap instead of
+ * copy-assignment (resp. move-assignment in C++11).
  */
 template <class ForwardIterator, class UnaryPredicate>
 ForwardIterator swap_remove_if(ForwardIterator first, ForwardIterator last, UnaryPredicate pred)
