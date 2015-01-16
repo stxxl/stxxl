@@ -45,24 +45,26 @@ static inline void progress(const char* text, size_t i, size_t nelements)
 }
 
 //! Fills an external array with increasing numbers
-void fill(ea_type& a, size_t N, size_t index, size_t n)
+void fill(ea_type& ea, size_t index, size_t n)
 {
     STXXL_CHECK(n > 0);
 
-    a.request_write_buffer(n);
+    ea_type::writer_type ea_writer(ea, omp_get_max_threads());
+
     size_t i = index;
 
-    STXXL_CHECK(a.end() - a.begin() == (int)n);
+    STXXL_CHECK_EQUAL(ea_writer.end() - ea_writer.begin(), (ssize_t)n);
 
-    for (ea_type::iterator it = a.begin(); it < a.end(); ++it) {
+    for (ea_type::writer_type::iterator it = ea_writer.begin();
+         it != ea_writer.end(); ++it)
+    {
         STXXL_CHECK(i < index + n);
-        progress("Inserting element", i, N);
+        progress("Inserting element", i, n);
         *it = std::make_pair(i + 1, i + 1);
         ++i;
     }
 
     STXXL_CHECK(i == index + n);
-    a.flush_write_buffer();
 }
 
 //! Run external array test.
@@ -89,38 +91,14 @@ int run_external_array_test(size_t volume, size_t numpbs, size_t numwbs)
     STXXL_VARDUMP(N);
     STXXL_VARDUMP(num_blocks);
 
-    ea_type a(N, numpbs, numwbs);
+    ea_type ea(N, numpbs, numwbs);
 
     {
         stxxl::scoped_print_timer timer("filling", volume);
 
         STXXL_CHECK(N >= 10 + 355 + 2 * block_size);
 
-        size_t index = 0;
-
-        // Testing different block sizes...
-
-        fill(a, N, index, 10);
-        index += 10;
-
-        fill(a, N, index, 355);
-        index += 355;
-
-        fill(a, N, index, 2 * block_size);
-        index += 2 * block_size;
-
-        // Filling the rest...
-
-        while (index < N) {
-            size_t diff = std::min(N - index, 2 * block_size - 167);
-            fill(a, N, index, diff);
-            index += diff;
-        }
-    }
-
-    {
-        stxxl::scoped_print_timer timer("finishing write phase");
-        a.finish_write_phase();
+        fill(ea, 0, N);
     }
 
     {
@@ -129,84 +107,84 @@ int run_external_array_test(size_t volume, size_t numpbs, size_t numwbs)
         STXXL_CHECK(N > 5 * block_size + 876);
         STXXL_CHECK(block_size > 34);
 
-        STXXL_CHECK_EQUAL(a.size(), N);
-        STXXL_CHECK(a.buffer_size() > 7);
+        STXXL_CHECK_EQUAL(ea.size(), N);
+        STXXL_CHECK(ea.buffer_size() > 7);
 
         // Testing iterator...
 
         for (unsigned i = 0; i < 7; ++i) {
-            STXXL_CHECK_EQUAL((a.begin() + i)->first, i + 1);
+            STXXL_CHECK_EQUAL((ea.begin() + i)->first, i + 1);
         }
 
-        STXXL_CHECK(a.buffer_size() > 12);
+        STXXL_CHECK(ea.buffer_size() > 12);
 
         // Testing random access...
 
         for (unsigned i = 7; i < 12; ++i) {
-            STXXL_CHECK_EQUAL(a[i].first, i + 1);
+            STXXL_CHECK_EQUAL(ea[i].first, i + 1);
         }
 
         // Testing remove...
 
-        a.remove(33);
-        a.wait();
+        ea.remove(33);
+        ea.wait();
 
-        STXXL_CHECK_EQUAL(a[33].first, 34);
-        STXXL_CHECK_EQUAL(a.begin().get_index(), 33);
-        STXXL_CHECK_EQUAL(a.begin()->first, 34);
+        STXXL_CHECK_EQUAL(ea[33].first, 34);
+        STXXL_CHECK_EQUAL(ea.begin().get_index(), 33);
+        STXXL_CHECK_EQUAL(ea.begin()->first, 34);
 
         // Testing get_current_max()...
 
         unsigned maxround = 0;
 
-        while (a.get_current_max().first < 5 * block_size + 876) {
+        while (ea.get_current_max().first < 5 * block_size + 876) {
             switch (maxround) {
-            case 0: STXXL_CHECK_EQUAL(a.get_current_max().first, 131072);
+            case 0: STXXL_CHECK_EQUAL(ea.get_current_max().first, 131072);
                 break;
-            case 1: STXXL_CHECK_EQUAL(a.get_current_max().first, 262144);
+            case 1: STXXL_CHECK_EQUAL(ea.get_current_max().first, 262144);
                 break;
-            case 2: STXXL_CHECK_EQUAL(a.get_current_max().first, 393216);
+            case 2: STXXL_CHECK_EQUAL(ea.get_current_max().first, 393216);
                 break;
-            case 3: STXXL_CHECK_EQUAL(a.get_current_max().first, 524288);
+            case 3: STXXL_CHECK_EQUAL(ea.get_current_max().first, 524288);
                 break;
-            case 4: STXXL_CHECK_EQUAL(a.get_current_max().first, 655360);
+            case 4: STXXL_CHECK_EQUAL(ea.get_current_max().first, 655360);
                 break;
             }
 
-            a.request_further_block();
+            ea.request_further_block();
             ++maxround;
         }
 
         // Testing request_further_block() (called above)...
 
-        a.wait();
+        ea.wait();
 
-        STXXL_CHECK((a.end() - 1)->first >= 5 * block_size + 876);
+        STXXL_CHECK((ea.end() - 1)->first >= 5 * block_size + 876);
 
         size_t index = 33;
 
-        for (ea_type::iterator it = a.begin(); it != a.end(); ++it) {
+        for (ea_type::iterator it = ea.begin(); it != ea.end(); ++it) {
             progress("Extracting element", index, N);
             STXXL_CHECK_EQUAL(it.get_index(), index);
             STXXL_CHECK_EQUAL(it->first, index + 1);
             ++index;
         }
 
-        a.remove(a.buffer_size());
-        STXXL_CHECK(a.buffer_size() > 0);
+        ea.remove(ea.buffer_size());
+        STXXL_CHECK(ea.buffer_size() > 0);
 
         // Extracting the rest...
 
         size_t round = 0;
 
-        while (!a.empty()) {
-            if (a.has_em_data() && round % 2 == 0) {
-                a.request_further_block();
+        while (!ea.empty()) {
+            if (ea.has_em_data() && round % 2 == 0) {
+                ea.request_further_block();
             }
 
-            a.wait();
+            ea.wait();
 
-            for (ea_type::iterator it = a.begin(); it != a.end(); ++it) {
+            for (ea_type::iterator it = ea.begin(); it != ea.end(); ++it) {
                 progress("Extracting element", index, N);
                 STXXL_CHECK_EQUAL(it.get_index(), index);
                 STXXL_CHECK_EQUAL(it->first, index + 1);
@@ -215,15 +193,15 @@ int run_external_array_test(size_t volume, size_t numpbs, size_t numwbs)
 
             if (round % 3 == 0) {
                 // Test the case that not the whole buffer is removed...
-                STXXL_CHECK(a.buffer_size() > 0);
-                a.remove(a.buffer_size() - 1);
+                STXXL_CHECK(ea.buffer_size() > 0);
+                ea.remove(ea.buffer_size() - 1);
                 index--;
             }
             else {
-                a.remove(a.buffer_size());
+                ea.remove(ea.buffer_size());
             }
 
-            STXXL_CHECK(a.buffer_size() > 0 || a.empty());
+            STXXL_CHECK(ea.buffer_size() > 0 || ea.empty());
 
             ++round;
         }
@@ -277,10 +255,7 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
         stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume * NumEAs);
 
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
-            fill(*(*ea), size, 0, size);
-
-        for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
-            (*ea)->finish_write_phase();
+            fill(*(*ea), 0, size);
     }
 
     {
@@ -295,11 +270,8 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
             (*ea)->wait();
 
-        out.request_write_buffer(size * (NumEAs + 1));
-
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
             STXXL_CHECK_EQUAL((*ea)->buffer_size(), size);
-        STXXL_CHECK_EQUAL(out.buffer_size(), (NumEAs + 1) * size);
     }
 
     if (NumEAs > 0) // test ea ppq_iterators
@@ -343,20 +315,15 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
 
         seqs.push_back(std::make_pair(ia.begin(), ia.end()));
 
+        ea_type::writer_type ea_writer(out, omp_get_max_threads());
+
         stxxl::parallel::sw_multiway_merge(
             seqs.begin(), seqs.end(),
-            out.begin(), value_comp(),
-            (NumEAs + 1) * size);
+            ea_writer.begin(), value_comp(), (NumEAs + 1) * size);
 
         // sequential:
         //__gnu_parallel::multiway_merge(seqs.begin(), seqs.end(), c.begin(),
         //    2*size, value_comp()); // , __gnu_parallel::sequential_tag()
-    }
-
-    {
-        stxxl::scoped_print_timer timer("flushing the result to EM", volume * NumEAs);
-        out.flush_write_buffer();
-        out.finish_write_phase();
     }
 
     {
@@ -411,29 +378,29 @@ int run_internal_array_test(size_t volume)
         }
     }
 
-    ia_type a(v);
+    ia_type ia(v);
 
     {
         stxxl::scoped_print_timer timer("reading and checking the order", volume);
 
-        a.inc_min();
-        a.inc_min(2);
+        ia.inc_min();
+        ia.inc_min(2);
 
         typedef ia_type::iterator iterator;
         size_t index = 4;
 
         // test iterator
-        for (iterator it = a.begin(); it != a.end(); ++it) {
+        for (iterator it = ia.begin(); it != ia.end(); ++it) {
             STXXL_CHECK_EQUAL(it->first, index++);
         }
 
         for (size_t i = 3; i < size; ++i) {
-            STXXL_CHECK_EQUAL(a.begin()[i].first, i + 1);
-            STXXL_CHECK_EQUAL(a[i].first, i + 1);
+            STXXL_CHECK_EQUAL(ia.begin()[i - 3].first, i + 1);
+            STXXL_CHECK_EQUAL(ia[i].first, i + 1);
         }
 
         STXXL_CHECK_EQUAL(index, size + 1);
-        STXXL_CHECK_EQUAL(a.size(), size - 3);
+        STXXL_CHECK_EQUAL(ia.size(), size - 3);
     }
 
     return EXIT_SUCCESS;
@@ -462,15 +429,19 @@ int run_upper_bound_test(size_t volume)
 
     {
         stxxl::scoped_print_timer timer("filling external array", volume);
-        b.request_write_buffer(size - 10);
-        for (size_t i = 0; i < size - 10; ++i) {
-            *(b.begin() + i) = std::make_pair(2 * i, 2 * i);
-            STXXL_CHECK_EQUAL(b[i].first, 2 * i);
-            STXXL_CHECK_EQUAL(b.begin()[i].first, 2 * i);
-            STXXL_CHECK_EQUAL((b.begin() + i)->first, 2 * i);
+
+        ea_type::writer_type ea_writer(b, 1);
+
+        ea_type::writer_type::iterator it = ea_writer.begin();
+
+        for (size_t i = 0; i < size - 10; ++i, ++it) {
+            *it = std::make_pair(2 * i, 2 * i);
         }
-        b.flush_write_buffer();
-        b.finish_write_phase();
+
+        it = ea_writer.begin();
+        for (size_t i = 0; i < size - 10; ++i, ++it) {
+            STXXL_CHECK_EQUAL(it->first, 2 * i);
+        }
     }
 
     {

@@ -121,12 +121,15 @@ public:
 
     reference operator * () const
     {
+        assert(m_current);
         return *m_current;
     }
+
     pointer operator -> () const
     {
-        return m_current;
+        return &(operator * ());
     }
+
     reference operator [] (difference_type relative_index) const
     {
         const difference_type index = m_index + relative_index;
@@ -229,6 +232,11 @@ public:
         return m_index >= o.m_index;
     }
 
+    friend std::ostream& operator << (std::ostream& os, const ppq_iterator& i)
+    {
+        return os << "[" << i.m_index << "]";
+    }
+
 private:
     //! updates m_block_index and m_current based on m_index
     inline void update()
@@ -238,13 +246,14 @@ private:
 
         if (m_block_index < m_block_pointers->size()) {
             m_current = (*m_block_pointers)[m_block_index].first + local_index;
-            assert(m_current < (*m_block_pointers)[m_block_index].second);
+            assert(m_current <= (*m_block_pointers)[m_block_index].second);
         }
         else {
-            // global end
+            // global end if end is beyond the last real block
             assert(m_block_index == m_block_pointers->size());
             assert(local_index == 0);
-            m_current = (*m_block_pointers)[m_block_index - 1].second;
+            //-tb old: m_current = (*m_block_pointers)[m_block_index - 1].second;
+            m_current = NULL;
         }
     }
 };
@@ -374,6 +383,9 @@ public:
     }
 };
 
+template <class ExternalArrayType>
+class external_array_writer;
+
 /*!
  * External array stores a sorted sequence of values on the hard disk and
  * allows access to the first block (containing the smallest values).  The
@@ -405,13 +417,14 @@ public:
     typedef std::vector<BID<BlockSize> > bid_vector;
     typedef std::vector<block_type*> block_vector;
     typedef std::vector<request_ptr> request_vector;
-    typedef std::vector<value_type> maxima_vector;
+    typedef std::vector<value_type> extrema_vector;
     typedef typename iterator::block_pointers_type block_pointers_type;
+    typedef external_array_writer<self_type> writer_type;
 
     //! The number of elements fitting into one block
     enum { block_size = BlockSize / sizeof(value_type) };
 
-    std::atomic<int> m_total_ea_iterators;
+    static const bool debug = true;
 
 protected:
     //! The total size of the external array in items. Cannot be changed
@@ -433,7 +446,8 @@ protected:
     //! The IDs of each block in external memory.
     bid_vector m_bids;
 
-    //! The block with the currently smallest elements
+    //! A vector of size m_num_write_buffer_blocks with block_type pointers,
+    //! some of them will be filled while writing, but most are NULL.
     block_vector m_blocks;
 
     //! Begin and end pointers for each block, used for merging with
@@ -444,8 +458,11 @@ protected:
     //! completely fetched.
     request_vector m_requests;
 
+    //! stores the minimum value of each block
+    extrema_vector m_minima;
+
     //! stores the maximum value of each block
-    maxima_vector m_maxima;
+    extrema_vector m_maxima;
 
     //! Is array in write phase? True = write phase, false = read phase.
     bool m_write_phase;
@@ -462,6 +479,9 @@ protected:
 
     //! The index of the next block to be prefetched.
     internal_size_type m_hint_index;
+
+    //! allow writer to access to all variables
+    friend class external_array_writer<self_type>;
 
 public:
     /*!
@@ -486,9 +506,10 @@ public:
 
           // vectors
           m_bids(m_num_blocks),
-          m_blocks(m_num_blocks, NULL),
+          m_blocks(m_num_blocks, reinterpret_cast<block_type*>(1)),
           m_block_pointers(m_num_blocks),
           m_requests(m_num_blocks, NULL),
+          m_minima(m_num_blocks),
           m_maxima(m_num_blocks),
 
           // state
@@ -497,17 +518,14 @@ public:
           // indices
           m_size(0),
           m_index(0),
-          m_end_index(1),                      // buffer size must be at least 1
-          m_hint_index(1)
+          m_end_index(0),
+          m_hint_index(0)
     {
         assert(m_capacity > 0);
         assert(m_num_write_buffer_blocks > 0); // needed for steal()
         // allocate blocks in EM.
         block_manager* bm = block_manager::get_instance();
-        // first BID is not used, because first block is never written to EM.
-        bm->new_blocks(AllocStrategy(), m_bids.begin() + 1, m_bids.end());
-        m_blocks[0] = new block_type;
-        update_block_pointers(0);
+        bm->new_blocks(AllocStrategy(), m_bids.begin(), m_bids.end());
     }
 
     //! Default constructor. Don't use this directy. Needed for regrowing in
@@ -525,6 +543,7 @@ public:
           m_blocks(0),
           m_block_pointers(0),
           m_requests(0),
+          m_minima(0),
           m_maxima(0),
 
           // state
@@ -554,6 +573,7 @@ public:
         swap(m_requests, o.m_requests);
         swap(m_blocks, o.m_blocks);
         swap(m_block_pointers, o.m_block_pointers);
+        swap(m_minima, o.m_minima);
         swap(m_maxima, o.m_maxima);
 
         // state
@@ -578,12 +598,12 @@ public:
         if (m_size > 0) {
             // not all data has been read!
 
-            assert(m_end_index > 0); // true because m_size > 0
-            const size_t block_index = m_index / block_size;
-            const size_t end_block_index = (m_end_index - 1) / block_size;
+            const unsigned_type block_index = m_index / block_size;
+            const unsigned_type end_block_index = get_end_block_index();
 
+            // figure out first block that still exists.
             block_manager* bm = block_manager::get_instance();
-            typename bid_vector::iterator i_begin = m_bids.begin() + std::max(block_index, (size_t)1);
+            typename bid_vector::iterator i_begin = m_bids.begin() + block_index;
             bm->delete_blocks(i_begin, m_bids.end());
 
             for (size_t i = block_index; i < end_block_index; ++i)
@@ -616,18 +636,29 @@ public:
         return m_num_blocks;
     }
 
-    //! Returns if the array is empty
+    //! Returns the number elements available in internal memory
     size_t buffer_size() const
     {
         return (m_end_index - m_index);
+    }
+
+    //! Return the block beyond the block in which m_end_index is located.
+    unsigned_type get_end_block_index() const
+    {
+        unsigned_type end_block_index = m_end_index / block_size;
+
+        // increase block index if inside the block
+        if (m_end_index % block_size != 0) ++end_block_index;
+        assert(end_block_index <= m_num_blocks);
+
+        return end_block_index;
     }
 
     //! Returns a random-access iterator to the begin of the data
     //! in internal memory.
     iterator begin() const
     {
-        assert(m_index == m_capacity || block_valid(m_index / block_size));
-        // not const, unfortunately.
+        assert(block_valid(m_index / block_size) || m_index == m_capacity);
         return iterator(&m_block_pointers, block_size, m_index);
     }
 
@@ -635,8 +666,7 @@ public:
     //! in internal memory.
     iterator end() const
     {
-        assert(m_end_index == m_index || block_valid((m_end_index - 1) / block_size));
-        // not const, unfortunately.
+        assert(!block_valid(m_end_index / block_size) || m_end_index == m_capacity);
         return iterator(&m_block_pointers, block_size, m_end_index);
     }
 
@@ -650,17 +680,22 @@ public:
     //! requested to be in internal memory)
     value_type & get_current_max()
     {
-        assert(m_end_index > 0);
-        const size_t last_block_index = (m_end_index - 1) / block_size;
+        // we do not use get_end_block_index() here, since we want the last
+        // existing block.
+        size_t last_block_index = m_end_index / block_size;
+        assert(last_block_index > 0);
+
+        // if first in block -> lookup maximum from previous block
+        if (m_end_index % block_size == 0) --last_block_index;
+
         return m_maxima[last_block_index];
     }
 
     //! Returns if there is data in EM, that's not randomly accessible.
     bool has_em_data() const
     {
-        assert(m_end_index > 0);
-        const size_t last_block_index = (m_end_index - 1) / block_size;
-        return (last_block_index + 1 < m_num_blocks);
+        const unsigned_type end_block_index = get_end_block_index();
+        return (end_block_index < m_num_blocks);
     }
 
     //! Returns if the data requested to be in internal memory is
@@ -668,9 +703,9 @@ public:
     bool valid() const
     {
         bool result = true;
-        const size_t block_index = m_index / block_size;
-        const size_t end_block_index = (m_end_index - 1) / block_size;
-        for (size_t i = block_index; i <= end_block_index; ++i) {
+        const unsigned_type block_index = m_index / block_size;
+        const unsigned_type end_block_index = get_end_block_index();
+        for (unsigned_type i = block_index; i < end_block_index; ++i) {
             result = result && block_valid(i);
         }
         return result;
@@ -688,6 +723,7 @@ public:
         return m_blocks[block_index]->elem[local_index];
     }
 
+#if TODO_REMOVE
     //! Pushes the value at the end of the array
     void push_back(const value_type& value)
     {
@@ -719,7 +755,114 @@ public:
         m_index = m_size;
         m_end_index = m_index + 1;
     }
+#endif
 
+protected:
+    //! prepare the external_array for writing using multiway_merge() with
+    //! num_threads. this method is called by the external_array_writer's
+    //! constructor.
+    void prepare_write(int num_threads)
+    {
+        if (num_threads == 0) num_threads = 1;
+        m_pool->resize_prefetch(0);
+#if STXXL_DEBUG_ASSERTIONS
+        num_threads *= 2; // required for re-reading the external array
+#endif
+        m_pool->resize_write(4 * num_threads * config::get_instance()->disks_number());
+    }
+
+    //! finish the writing phase after multiway_merge() filled the vector. this
+    //! method is called by the external_array_writer's destructor..
+    void finish_write()
+    {
+        m_pool->resize_write(0);
+        m_pool->resize_prefetch(m_num_prefetch_blocks);
+
+        // check that all blocks where written
+        for (unsigned_type i = 0; i < m_num_blocks; ++i)
+        {
+            assert(m_blocks[i] != reinterpret_cast<block_type*>(1));
+        }
+
+        // compatibility to the block write interface
+        m_size = m_capacity;
+        m_index = 0;
+        m_end_index = 0;
+
+        for (size_t i = 0; i < m_num_prefetch_blocks; ++i)
+            hint();
+
+        m_write_phase = false;
+
+        // refill_extract_buffer() assumes at least one loaded block per ea
+        request_further_block();
+        wait();
+    }
+
+    //! Called by the external_array_writer to read a block from disk into
+    //! m_blocks[]. If the block is marked as uninitialized, then no read is
+    //! performed. This is the usual case, and in theory, no block ever has be
+    //! re-read from disk, since all can be written fully. However, we do
+    //! support re-reading blocks for debugging purposes inside
+    //! multiway_merge(), in a full performance build re-reading never occurs.
+    void read_block(size_t block_index)
+    {
+        assert(block_index < m_num_blocks);
+        assert(m_blocks[block_index] == NULL ||
+               m_blocks[block_index] == reinterpret_cast<block_type*>(1));
+
+        if (m_blocks[block_index] == reinterpret_cast<block_type*>(1))
+        {
+            // special marker: this block is uninitialized -> no need to read
+            // from disk.
+            m_blocks[block_index] = m_pool->steal();
+        }
+        else
+        {
+            // block was already written, have to read from EM.
+            STXXL_DEBUG("ea[" << this << "]: "
+                        "read_block needs to re-read block index=" << block_index);
+
+            // this re-reading is not necessary for full performance builds, so
+            // we immediately wait for the I/O to be completed.
+            m_blocks[block_index] = m_pool->steal();
+            request_ptr req = m_pool->read(m_blocks[block_index], m_bids[block_index]);
+            req->wait();
+            assert(req->poll());
+            assert(m_blocks[block_index]);
+        }
+    }
+
+    //! Called by the external_array_writer to write a block from m_blocks[] to
+    //! disk. Prior to writing and releasing the memory, extra information is
+    //! preserved.
+    void write_block(size_t block_index)
+    {
+        assert(block_index < m_num_blocks);
+        assert(m_blocks[block_index] != NULL &&
+               m_blocks[block_index] != reinterpret_cast<block_type*>(1));
+
+        // calculate minimum and maximum values
+        const internal_size_type this_block_size =
+            std::min<internal_size_type>(block_size, m_capacity - block_index * (external_size_type)block_size);
+
+        STXXL_DEBUG("ea[" << this << "]: write_block index=" << block_index <<
+                    " this_block_size=" << this_block_size);
+
+        assert(this_block_size > 0);
+        block_type& this_block = *m_blocks[block_index];
+
+        m_minima[block_index] = this_block[0];
+        m_maxima[block_index] = this_block[this_block_size - 1];
+
+        // write out block (in background)
+        m_pool->write(m_blocks[block_index], m_bids[block_index]);
+
+        m_blocks[block_index] = NULL;
+    }
+
+public:
+#if TODO_REMOVE
     //! Request a write buffer of at least the given size.
     //! It can be accessed using begin() and end().
     void request_write_buffer(size_t size)
@@ -814,19 +957,22 @@ public:
 
         assert(m_blocks[0]);
     }
+#endif
 
-    //! Waits for requested data to be completely fetched into
-    //! internal memory. Call this if you want to read data after
-    //! remove() or request_further_block() has been called.
+    //! Waits for requested data to be completely fetched into internal
+    //! memory. Call this if you want to read data after remove() or
+    //! request_further_block() has been called.
     void wait()
     {
         assert(!m_write_phase);
-        assert(m_end_index > 0);
         const size_t block_index = m_index / block_size;
-        const size_t end_block_index = (m_end_index - 1) / block_size;
+        size_t end_block_index = get_end_block_index();
 
-        // ignore first block (never in EM)
-        for (size_t i = std::max((size_t)1, block_index); i <= end_block_index; ++i) {
+        STXXL_DEBUG("ea[" << this << "]: wait" <<
+                    " from block_index=" << block_index <<
+                    " to end_block_index=" << end_block_index);
+
+        for (size_t i = block_index; i < end_block_index; ++i) {
             assert(m_requests[i]);
             m_requests[i]->wait();
             assert(m_requests[i]->poll());
@@ -834,14 +980,16 @@ public:
         }
     }
 
-    //! Removes the first n elements from the array.  Loads the
-    //! next block if the current one has run empty. Make shure there
-    //! are at least n elements in RAM.
+    //! Removes the first n elements from the array. Loads the next block if
+    //! the current one has run empty. Make shure there are at least n elements
+    //! in RAM.
     void remove(size_t n)
     {
         assert(m_index + n <= m_capacity);
         assert(m_index + n <= m_end_index);
         assert(m_size >= n);
+
+        STXXL_DEBUG("ea[" << this << "]: remove " << n << " items");
 
         if (n == 0)
             return;
@@ -855,8 +1003,8 @@ public:
         assert(block_index_after <= m_num_blocks);
 
         block_manager* bm = block_manager::get_instance();
-        typename bid_vector::iterator i_begin = m_bids.begin() + std::max(block_index, (size_t)1);
-        typename bid_vector::iterator i_end = m_bids.begin() + std::max(block_index_after, (size_t)1);
+        typename bid_vector::iterator i_begin = m_bids.begin() + block_index;
+        typename bid_vector::iterator i_end = m_bids.begin() + block_index_after;
         if (i_end > i_begin) {
             bm->delete_blocks(i_begin, i_end);
         }
@@ -869,38 +1017,47 @@ public:
         m_index = index_after;
         m_size -= n;
 
-        if (block_index_after >= m_num_blocks) {
-            assert(block_index_after == m_num_blocks);
-            assert(m_size == 0);
-        }
-        else if (local_index_after == 0) {
-            assert(block_index_after == (m_end_index - 1) / block_size + 1);
+        STXXL_DEBUG("ea[" << this << "]: after remove:" <<
+                    " index_after=" << index_after <<
+                    " block_index_after=" << block_index_after <<
+                    " local_index_after=" << local_index_after <<
+                    " capacity=" << m_capacity);
+
+        assert(block_index_after <= m_num_blocks);
+        // at most one block outside of the currently loaded range
+        assert(block_index_after <= get_end_block_index());
+
+        if (block_index_after == get_end_block_index() && has_em_data()) {
+            // removed all items of a loaded block -> request another
             request_further_block();
         }
         else {
-            assert(block_valid(block_index_after));
+            // removed some but not all items
+            assert(block_valid(block_index_after) || m_index == m_capacity);
         }
     }
 
     //! Requests one more block to be fetched into RAM
     void request_further_block()
     {
-        assert(has_em_data());
-        assert(m_end_index > 0);
+        const size_t block_index = get_end_block_index();
 
-        const size_t block_index = (m_end_index - 1) / block_size + 1;
+        assert(has_em_data());
 
         assert(block_index < m_num_blocks);
-        assert(block_index > 0); // first block is already in RAM
         assert(m_bids[block_index].valid());
 
-        m_blocks[block_index] = new block_type;
+        m_blocks[block_index] = new block_type; // TODO-tb this is a memory leak?
         m_requests[block_index] = m_pool->read(m_blocks[block_index], m_bids[block_index]);
         update_block_pointers(block_index);
 
         hint();
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_size);
+
+        STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
+                    " block index=" << block_index <<
+                    " end_index=" << m_end_index);
     }
 
 protected:
@@ -908,7 +1065,8 @@ protected:
     bool block_valid(size_t block_index) const
     {
         if (!m_write_phase) {
-            return ((block_index == 0) || (m_requests[block_index] && m_requests[block_index]->poll()));
+            if (block_index >= m_num_blocks) return false;
+            return (m_requests[block_index] && m_requests[block_index]->poll());
         }
         else {
             return (bool)m_blocks[block_index];
@@ -929,8 +1087,16 @@ protected:
     //! This is necessary for the iterators to work properly.
     inline void update_block_pointers(size_t block_index)
     {
+        STXXL_DEBUG("ea[" << this << "]: updating block pointers for " << block_index);
+
         m_block_pointers[block_index].first = m_blocks[block_index]->begin();
-        m_block_pointers[block_index].second = m_blocks[block_index]->end();
+        if (block_index + 1 != m_num_blocks)
+            m_block_pointers[block_index].second = m_blocks[block_index]->end();
+        else
+            m_block_pointers[block_index].second =
+                m_block_pointers[block_index].first
+                + (m_capacity - block_index * block_size);
+
         assert(m_block_pointers[block_index].first != NULL);
         assert(m_block_pointers[block_index].second != NULL);
     }
@@ -942,132 +1108,362 @@ protected:
     }
 };
 
+/**
+ * An external_array can only be written using an external_array_writer
+ * object. The writer objects provides iterators which are designed to be used
+ * by stxxl::parallel::multiway_merge() to write the external memory blocks in
+ * parallel. Thus in the writer we coordinate thread-safe access to the blocks
+ * using reference counting.
+ *
+ * An external_array_writer::iterator has two states: normal and "live". In
+ * normal mode, the iterator only has a valid index into the external array's
+ * items. In normal mode, only index calculations are possible. Once
+ * operator*() is called, the iterators goes into "live" mode by requesting
+ * access to the corresponding block. Using reference counting the blocks is
+ * written once all iterators are finished with the corresponding block. Since
+ * with operator*() we cannot know if the value is going to be written or read,
+ * when going to live mode, the block must be read from EM. This read overhead,
+ * however, is optimized by marking blocks as uninitialized in external_array,
+ * and skipping reads for then. In a full performance build, no block needs to
+ * be read from disk. Reads only occur in debug mode, when the results are
+ * verify.
+ *
+ * The iterator's normal/live mode only stays active for the individual
+ * iterator object. When an iterator is copied/assigned/calculated with the
+ * mode is NOT inherited! The exception is prefix operator ++, which is used by
+ * multiway_merge() to fill an array. Thus the implementation of the iterator
+ * heavily depends on the behavior of multiway_merge() and is optimized for it.
+ */
 template <class ExternalArrayType>
-class ppq_ea_iterator
+class external_array_writer : public noncopyable
 {
 public:
     typedef ExternalArrayType ea_type;
 
+    typedef external_array_writer self_type;
+
     typedef typename ea_type::value_type value_type;
-    typedef value_type& reference;
-    typedef value_type* pointer;
-    typedef ptrdiff_t difference_type;
-    typedef std::random_access_iterator_tag iterator_category;
+    typedef typename ea_type::block_type block_type;
 
-    typedef ppq_ea_iterator self_type;
+    //! prototype declaration of nested class.
+    class iterator;
 
-protected:
-    //! pointer to the external array containing the elements
-    ea_type* m_ea;
-
-    //! index of the current element
-    size_t m_index;
-
-    bool m_accessed;
-
+    //! scope based debug variable
     static const bool debug = false;
 
-public:
-    //! default constructor (should not be used directly)
-    ppq_ea_iterator()
-        : m_ea(NULL), m_index(0), m_accessed(false)
-    { }
+protected:
+    //! reference to the external array to be written
+    ea_type& m_ea;
 
-    ppq_ea_iterator(ea_type* ea, size_t index)
-        : m_ea(ea), m_index(index), m_accessed(false)
+#if STXXL_DEBUG_ASSERTIONS
+    //! total number of iterators referencing this writer
+    unsigned int m_ref_total;
+#endif
+
+    //! reference counters for the number of live iterators on the
+    //! corresponding block in external_array.
+    std::vector<unsigned int> m_ref_count;
+
+    //! mutex for reference counting array (this is actually nicer than
+    //! openmp's critical)
+    mutex m_mutex;
+
+    //! optimization: hold live iterators for the expected boundary blocks of
+    //! multiway_merge().
+    std::vector<iterator> m_live_boundary;
+
+protected:
+    //! read block into memory and increase reference count (called when an
+    //! iterator goes live on the block).
+    block_type * get_block_ref(size_t block_index)
     {
-        STXXL_DEBUG("Construct ppq_ea_iterator for index " << m_index);
+        scoped_mutex_lock lock(m_mutex);
+
+        assert(block_index < m_ea.num_blocks());
+        unsigned int ref = m_ref_count[block_index]++;
+#if STXXL_DEBUG_ASSERTIONS
+        ++m_ref_total;
+#endif
+
+        if (ref == 0) {
+            STXXL_DEBUG("get_block_ref block_index=" << block_index <<
+                        " ref=" << ref << " reading.");
+            m_ea.read_block(block_index);
+        }
+        else {
+            STXXL_DEBUG("get_block_ref block_index=" << block_index <<
+                        " ref=" << ref);
+        }
+
+        return m_ea.m_blocks[block_index];
     }
 
-    ppq_ea_iterator(const ppq_ea_iterator& other)
-        : m_ea(other.m_ea),
-          m_index(other.m_index),
-          m_accessed(false)
+    //! decrease reference count on the block, and possibly write it to disk
+    //! (called when an iterator releases live mode).
+    void free_block_ref(size_t block_index)
     {
-        STXXL_DEBUG("Copy-Construct ppq_ea_iterator for index " << m_index);
-    }
+        scoped_mutex_lock lock(m_mutex);
 
-    ~ppq_ea_iterator()
-    {
-        if (m_accessed)
-        {
-            STXXL_DEBUG("Destruction of ppq_ea_iterator for index " <<
-                        m_index << " atomic: " << m_ea->m_total_ea_iterators);
-            --m_ea->m_total_ea_iterators;
+        assert(block_index < m_ea.num_blocks());
+#if STXXL_DEBUG_ASSERTIONS
+        assert(m_ref_total > 0);
+        --m_ref_total;
+#endif
+        unsigned int ref = --m_ref_count[block_index];
+
+        if (ref == 0) {
+            STXXL_DEBUG("free_block_ref block_index=" << block_index <<
+                        " ref=" << ref << " written.");
+            m_ea.write_block(block_index);
+        }
+        else {
+            STXXL_DEBUG("free_block_ref block_index=" << block_index <<
+                        " ref=" << ref);
         }
     }
 
-    //! returns the value's index in the external array
-    size_t get_index() const
+    //! allow access to the block_ref functions
+    friend class iterator;
+
+public:
+    /**
+     * An iterator which can be used to write (and read) an external_array via
+     * an external_array_writer. See the documentation of external_array_writer.
+     */
+    class iterator
     {
-        return m_index;
+    public:
+        typedef external_array_writer writer_type;
+        typedef ExternalArrayType ea_type;
+
+        typedef typename ea_type::value_type value_type;
+        typedef value_type& reference;
+        typedef value_type* pointer;
+        typedef ptrdiff_t difference_type;
+        typedef std::random_access_iterator_tag iterator_category;
+
+        typedef iterator self_type;
+
+        static const size_t block_size = ea_type::block_size;
+
+        //! scope based debug variable
+        static const bool debug = false;
+
+    protected:
+        //! pointer to the external array containing the elements
+        writer_type* m_writer;
+
+        //! when operator* or operator-> are called, then the iterator goes
+        //! live and allocates a reference to the block's data (possibly
+        //! reading it from EM).
+        bool m_live;
+
+        //! index of the current element, absolute in the external array
+        external_size_type m_index;
+
+        //! index of the current element's block in the external array's block
+        //! list. undefined while m_live is false.
+        internal_size_type m_block_index;
+
+        //! pointer to the referenced block. undefined while m_live is false.
+        block_type* m_block;
+
+        //! pointer to the current element inside the referenced block.
+        //! undefined while m_live is false.
+        internal_size_type m_current;
+
+    public:
+        //! default constructor (should not be used directly)
+        iterator()
+            : m_writer(NULL), m_live(false), m_index(0)
+        { }
+
+        //! construct a new iterator
+        iterator(writer_type* writer, external_size_type index)
+            : m_writer(writer),
+              m_live(false),
+              m_index(index)
+        {
+            STXXL_DEBUG("Construct iterator for index " << m_index);
+        }
+
+        //! copy an iterator, the new iterator is _not_ automatically live!
+        iterator(const iterator& other)
+            : m_writer(other.m_writer),
+              m_live(false),
+              m_index(other.m_index)
+        {
+            STXXL_DEBUG("Copy-Construct iterator for index " << m_index);
+        }
+
+        //! assign an iterator, the assigned iterator is not automatically live!
+        iterator& operator = (const iterator& other)
+        {
+            if (&other != this)
+            {
+                STXXL_DEBUG("Assign iterator to index " << other.m_index);
+
+                if (m_live)
+                    m_writer->free_block_ref(m_block_index);
+
+                m_writer = other.m_writer;
+                m_live = false;
+                m_index = other.m_index;
+            }
+
+            return *this;
+        }
+
+        ~iterator()
+        {
+            if (!m_live) return; // no need for cleanup
+
+            m_writer->free_block_ref(m_block_index);
+
+            STXXL_DEBUG("Destruction of iterator for index " << m_index <<
+                        " in block " << m_index / block_size);
+        }
+
+        //! return the current absolute index inside the external array.
+        external_size_type get_index() const
+        {
+            return m_index;
+        }
+
+        //! allocates a reference to the block's data (possibly reading it from
+        //! EM).
+        void make_live()
+        {
+            assert(!m_live);
+
+            // calculate block and index inside
+            m_block_index = m_index / block_size;
+            m_current = m_index % block_size;
+
+            STXXL_DEBUG("operator*() live request for index=" << m_index <<
+                        " block_index=" << m_block_index <<
+                        " m_current=" << m_current);
+
+            // get block reference
+            m_block = m_writer->get_block_ref(m_block_index);
+            m_live = true;
+        }
+
+        //! access the current item
+        reference operator * ()
+        {
+            if (UNLIKELY(!m_live))
+                make_live();
+
+            return (*m_block)[m_current];
+        }
+
+        //! access the current item
+        pointer operator -> ()
+        {
+            return &(operator * ());
+        }
+
+        //! prefix-increment operator
+        self_type& operator ++ ()
+        {
+            ++m_index;
+            if (UNLIKELY(!m_live)) return *this;
+
+            // if index stays in the same block, everything is fine
+            ++m_current;
+            if (LIKELY(m_current != block_size)) return *this;
+
+            // release current block
+            m_writer->free_block_ref(m_block_index);
+            m_live = false;
+
+            return *this;
+        }
+
+        self_type operator + (difference_type addend) const
+        {
+            return self_type(m_writer, m_index + addend);
+        }
+        self_type operator - (difference_type subtrahend) const
+        {
+            return self_type(m_writer, m_index - subtrahend);
+        }
+        difference_type operator - (const self_type& o) const
+        {
+            return (m_index - o.m_index);
+        }
+
+        bool operator == (const self_type& o) const
+        {
+            return m_index == o.m_index;
+        }
+        bool operator != (const self_type& o) const
+        {
+            return m_index != o.m_index;
+        }
+        bool operator < (const self_type& o) const
+        {
+            return m_index < o.m_index;
+        }
+        bool operator <= (const self_type& o) const
+        {
+            return m_index <= o.m_index;
+        }
+        bool operator > (const self_type& o) const
+        {
+            return m_index > o.m_index;
+        }
+        bool operator >= (const self_type& o) const
+        {
+            return m_index >= o.m_index;
+        }
+    };
+
+public:
+    external_array_writer(ea_type& ea, unsigned int num_threads)
+        : m_ea(ea),
+          m_ref_count(ea.num_blocks(), 0)
+    {
+#if STXXL_DEBUG_ASSERTIONS
+        m_ref_total = 0;
+#endif
+        m_ea.prepare_write(num_threads);
+
+        // optimization: hold live iterators for the boundary blocks which two
+        // threads write to. this prohibits the blocks to be written to disk
+        // and read again.
+
+        double step = (double)m_ea.capacity() / (double)num_threads;
+        m_live_boundary.resize(num_threads - 1);
+
+        for (unsigned int i = 0; i < num_threads - 1; ++i)
+        {
+            external_size_type index = (external_size_type)((i + 1) * step);
+            STXXL_DEBUG("hold index " << index <<
+                        " in block " << index / ea_type::block_size);
+            m_live_boundary[i] = iterator(this, index);
+            m_live_boundary[i].make_live();
+        }
     }
 
-    reference operator * ()
+    ~external_array_writer()
     {
-        assert(m_ea);
-        if (!m_accessed)
-            ++m_ea->m_total_ea_iterators;
-        m_accessed = true;
-        return m_ea->operator [] (m_index);
-    }
-    pointer operator -> ()
-    {
-        assert(m_ea);
-        if (!m_accessed)
-            ++m_ea->m_total_ea_iterators;
-        m_accessed = true;
-        return & (m_ea->operator [] (m_index));
+        m_ea.finish_write();
+#if STXXL_DEBUG_ASSERTIONS
+        m_live_boundary.clear(); // release block boundaries
+        STXXL_ASSERT(m_ref_total == 0);
+#endif
     }
 
-    //! prefix-increment operator
-    self_type& operator ++ ()
+    iterator begin()
     {
-        ++m_index;
-        return *this;
+        return iterator(this, 0);
     }
 
-    //! prefix-decrement operator
-    self_type& operator -- ()
+    iterator end()
     {
-        assert(m_index > 0);
-        --m_index;
-        return *this;
-    }
-
-    self_type operator + (difference_type addend) const
-    {
-        return self_type(m_ea, m_index + addend);
-    }
-
-    self_type operator - (difference_type subtrahend) const
-    {
-        return self_type(m_ea, m_index - subtrahend);
-    }
-
-    bool operator == (const self_type& o) const
-    {
-        return m_index == o.m_index;
-    }
-    bool operator != (const self_type& o) const
-    {
-        return m_index != o.m_index;
-    }
-    bool operator < (const self_type& o) const
-    {
-        return m_index < o.m_index;
-    }
-    bool operator <= (const self_type& o) const
-    {
-        return m_index <= o.m_index;
-    }
-    bool operator > (const self_type& o) const
-    {
-        return m_index > o.m_index;
-    }
-    bool operator >= (const self_type& o) const
-    {
-        return m_index >= o.m_index;
+        return iterator(this, m_ea.capacity());
     }
 };
 
@@ -1426,18 +1822,19 @@ public:
     static const uint64 block_size = BlockSize;
     typedef uint64 size_type;
 
-    static const bool debug = false;
-
-protected:
     typedef typed_block<block_size, ValueType> block_type;
     typedef std::vector<BID<block_size> > bid_vector;
     typedef bid_vector bids_container_type;
     typedef ppq_local::internal_array<ValueType> internal_array_type;
     typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
+    typedef typename external_array_type::writer_type external_array_writer_type;
     typedef typename std::vector<ValueType>::iterator value_iterator;
     typedef typename internal_array_type::iterator iterator;
     typedef std::pair<iterator, iterator> iterator_pair_type;
 
+    static const bool debug = true;
+
+protected:
     //! type of insertion heap itself
     typedef std::vector<ValueType> heap_type;
 
@@ -1683,6 +2080,12 @@ protected:
             stxxl::swap_remove_if(m_external_arrays.begin(),
                                   m_external_arrays.end(),
                                   empty_external_array_eraser());
+
+        for (typename external_arrays_type::iterator i = swap_end;
+             i != m_external_arrays.end(); ++i)
+        {
+            STXXL_DEBUG("Removing empty external array.");
+        }
 
         m_mem_left +=
             (m_external_arrays.end() - swap_end) * m_mem_per_external_array;
@@ -2392,6 +2795,8 @@ public:
      */
     void merge_external_arrays()
     {
+        STXXL_CHECK(0);
+#if TODO_FIXUP_LATER
         m_stats.num_external_array_merges++;
         m_stats.external_array_merge_time.start();
 
@@ -2478,6 +2883,7 @@ public:
         m_stats.external_array_merge_time.stop();
 
         check_invariants();
+#endif
     }
 
     //! Print statistics.
@@ -2522,6 +2928,8 @@ protected:
                                      std::vector<iterator_pair_type>& sequences,
                                      bool reuse_previous_upper_bounds = false)
     {
+        STXXL_DEBUG("calculate merge sequences");
+
         const size_type eas = m_external_arrays.size();
         const size_type ias = c_merge_ias_into_eb ? m_internal_arrays.size() : 0;
 
@@ -2560,13 +2968,12 @@ protected:
          */
 
 #if STXXL_PARALLEL
-        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+//        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
-            iterator begin;
-            iterator end;
+            iterator begin, end;
 
-            // check only relevant if c_merge_ias_into_eb==true
+            // check only relevant if c_merge_ias_into_eb == true
             if (i < eas) {
                 assert(!m_external_arrays[i].empty());
                 //stats.refill_wait_time.start();
@@ -2578,7 +2985,7 @@ protected:
                 assert(begin != end);
             }
             else {
-                // else part only relevant if c_merge_ias_into_eb==true
+                // else part only relevant if c_merge_ias_into_eb == true
                 size_type j = i - eas;
                 assert(!(m_internal_arrays[j].empty()));
                 begin = m_internal_arrays[j].begin();
@@ -2589,30 +2996,34 @@ protected:
             if (needs_limit) {
                 // remove timer if parallel
                 //stats.refill_upper_bound_time.start();
-                iterator ub;
                 if (reuse_previous_upper_bounds) {
                     // Be careful that sequences[i].second is really valid and
                     // set by a previous calculate_merge_sequences() run!
-                    ub = std::upper_bound(sequences[i].second, end, min_max_value, m_inv_compare);
+                    end = std::upper_bound(sequences[i].second, end,
+                                           min_max_value, m_inv_compare);
                 }
                 else {
-                    ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
+                    end = std::upper_bound(begin, end,
+                                           min_max_value, m_inv_compare);
                 }
                 //stats.refill_upper_bound_time.stop();
+            }
 
-                sizes[i] = std::distance(begin, ub);
-                sequences[i] = std::make_pair(begin, ub);
-            }
-            else {
-                sizes[i] = std::distance(begin, end);
-                sequences[i] = std::make_pair(begin, end);
-            }
+            sizes[i] = std::distance(begin, end);
+            sequences[i] = std::make_pair(begin, end);
+
+            STXXL_DEBUG("sequence[" << i << "] " << (i < eas ? "ea " : "ia ") <<
+                        begin << " - " << end <<
+                        " size " << sizes[i] <<
+                        (needs_limit ? " with ub limit" : ""));
         }
 
         if (needs_limit) {
+            STXXL_DEBUG("return with needs_limit: min_max_value=" << min_max_index);
             return min_max_index;
         }
         else {
+            STXXL_DEBUG("return with needs_limit: eas=" << eas);
             return eas;
         }
     }
@@ -2627,7 +3038,6 @@ protected:
         check_invariants();
 
         assert(extract_buffer_empty());
-        assert(m_extract_buffer_size == 0);
         m_extract_buffer_index = 0;
 
         m_minima.clear_external_arrays();
@@ -2662,17 +3072,25 @@ protected:
         if (minimum_size > 0) {
             size_t limiting_ea_index = eas + 1;
             bool reuse_upper_bounds = false;
-            while (output_size < minimum_size) {
+            while (output_size < minimum_size)
+            {
+                STXXL_DEBUG("refill: request more data," <<
+                            " output_size=" << output_size <<
+                            " minimum_size=" << minimum_size);
+
                 if (limiting_ea_index < eas) {
                     m_external_arrays[limiting_ea_index].request_further_block();
                     reuse_upper_bounds = true;
                 }
                 else if (limiting_ea_index == eas) {
                     // no more unaccessible EM data
-                    STXXL_MSG("Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!");
+                    STXXL_MSG("Warning: refill_extract_buffer(n): "
+                              "minimum_size > # mergeable elements!");
                     break;
                 }
-                limiting_ea_index = calculate_merge_sequences(sizes, sequences, reuse_upper_bounds);
+                limiting_ea_index = calculate_merge_sequences(
+                    sizes, sequences, reuse_upper_bounds);
+
                 output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
             }
         }
@@ -2750,7 +3168,7 @@ protected:
         heap_type& insheap = m_proc[id].insertion_heap;
         size_t size = insheap.size();
 
-        STXXL_DEBUG(
+        STXXL_DEBUG0(
             "Flushing insertion heap array id=" << id <<
             " size=" << insheap.size() <<
             " capacity=" << insheap.capacity() <<
@@ -2983,17 +3401,15 @@ protected:
 
         m_stats.max_merge_buffer_size.set_max(size);
 
-        ea.request_write_buffer(size);
+        {
+            external_array_writer_type external_array_writer(ea, omp_get_max_threads());
 
-        parallel::sw_multiway_merge(
-            sequences.begin(), sequences.end(),
-            ppq_local::ppq_ea_iterator<external_array_type>(&ea, 0),
-            m_inv_compare, size);
+            parallel::sw_multiway_merge(
+                sequences.begin(), sequences.end(),
+                external_array_writer.begin(), m_inv_compare, size);
+        }
 
-        ea.flush_write_buffer();
-        ea.finish_write_phase();
-
-        STXXL_DEBUG("Merge done");
+        STXXL_DEBUG("Merge done of new ea " << &ea);
 
         m_internal_size = 0;
         m_external_size += size;
@@ -3013,13 +3429,13 @@ protected:
 
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.internal_array_flush_time.stop();
-
-        STXXL_DEBUG("Write done");
     }
 
     //! Flushes the insertion heaps into an external array.
     void flush_directly_to_hd()
     {
+        STXXL_CHECK(0);
+#if TODO_FIXUP_LATER
         if (m_mem_left < m_mem_per_external_array) {
             merge_external_arrays();
         }
@@ -3081,12 +3497,15 @@ protected:
         m_stats.direct_flush_time.stop();
 
         check_invariants();
+#endif
     }
 
     //! Sorts the values from values and writes them into an external array.
     //! \param values the vector to sort and store
     void flush_array_to_hd(std::vector<ValueType>& values)
     {
+        abort();
+#if TODO_FIXUP_LATER
 #if STXXL_PARALLEL
         __gnu_parallel::sort(values.begin(), values.end(), m_inv_compare);
 #else
@@ -3118,6 +3537,7 @@ protected:
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
 
         check_invariants();
+#endif
     }
 
     /*!

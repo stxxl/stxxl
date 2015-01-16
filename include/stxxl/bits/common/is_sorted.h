@@ -28,7 +28,7 @@ bool is_sorted(ForwardIterator first, ForwardIterator last,
         return true;
 
     ForwardIterator next = first;
-    for (++next; next != last; first = next, ++next) {
+    for (++next; next != last; ++first, ++next) {
         if (comp(*next, *first))
             return false;
     }
