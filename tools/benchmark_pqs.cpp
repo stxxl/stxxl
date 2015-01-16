@@ -40,6 +40,7 @@ using stxxl::uint32;
 using stxxl::uint64;
 
 using stxxl::scoped_print_timer;
+using stxxl::random_number32_r;
 
 static const uint64 KiB = 1024L;
 static const uint64 MiB = 1024L * KiB;
@@ -82,6 +83,8 @@ uint64 value_universe_size = 100000000;
 
 //const unsigned int seed = 12345;
 unsigned int seed = 12345;
+
+random_number32_r g_rand(seed);
 
 void calculate_depending_parameters()
 {
@@ -356,9 +359,11 @@ void do_rand_insert(ContainerType& c, unsigned int seed)
     scoped_print_timer timer("Filling " + c.name() + " randomly",
                              num_elements * value_size);
 
+    random_number32_r datarng(seed);
+
     for (uint64 i = 0; i < num_elements; i++)
     {
-        uint64 k = rand_r(&seed) % value_universe_size;
+        uint64 k = datarng() % value_universe_size;
         progress("Inserting element", i, num_elements);
         c.push(value_type(k));
     }
@@ -410,9 +415,11 @@ void do_rand_read_check(ContainerType& c, unsigned int seed)
     {
         scoped_print_timer timer("Filling sorter for comparison");
 
+        random_number32_r datarng(seed);
+
         for (uint64 i = 0; i < num_elements; ++i)
         {
-            uint64 k = rand_r(&seed) % value_universe_size;
+            uint64 k = datarng() % value_universe_size;
             sorted_vals.push(k);
         }
     }
@@ -462,14 +469,16 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
 #else
                 const unsigned thread_id = parallel
                                            ? thr
-                                           : rand() % num_insertion_heaps;
+                                           : g_rand() % num_insertion_heaps;
 
                 unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
 #endif
+                random_number32_r datarng(seed);
+
                 for (uint64 j = thread_id * bulk_step;
                      j < std::min((thread_id + 1) * bulk_step, bulk_size); ++j)
                 {
-                    uint64 k = rand_r(&seed) % value_universe_size;
+                    uint64 k = datarng() % value_universe_size;
                     sorted_vals.push(k);
                 }
             }
@@ -491,14 +500,16 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
 #else
             const unsigned thread_id = parallel
                                        ? thr
-                                       : rand() % num_insertion_heaps;
+                                       : g_rand() % num_insertion_heaps;
 
             unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
 #endif
+            random_number32_r datarng(seed);
+
             for (uint64 j = thread_id * bulk_step;
                  j < std::min((thread_id + 1) * bulk_step, bulk_remain); ++j)
             {
-                uint64 k = rand_r(&seed) % value_universe_size;
+                uint64 k = datarng() % value_universe_size;
                 sorted_vals.push(k);
             }
         }
@@ -531,7 +542,7 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
 }
 
 template <typename ContainerType>
-void do_rand_intermixed(ContainerType& c, unsigned int _seed, bool filled)
+void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
 {
     uint64 num_inserts = filled ? num_elements : 0;
     uint64 num_deletes = 0;
@@ -539,9 +550,11 @@ void do_rand_intermixed(ContainerType& c, unsigned int _seed, bool filled)
     scoped_print_timer timer(c.name() + ": Intermixed rand insert and delete",
                              2 * num_elements * value_size);
 
+    random_number32_r datarng(seed);
+
     for (uint64_t i = 0; i < 2 * num_elements; ++i)
     {
-        unsigned r = rand_r(&_seed) % 2;
+        unsigned r = datarng() % 2;
 
         if (num_deletes < num_inserts &&
             (r > 0 || num_inserts >= (filled ? 2 * num_elements : num_elements)))
@@ -558,7 +571,7 @@ void do_rand_intermixed(ContainerType& c, unsigned int _seed, bool filled)
         {
             progress("Inserting/deleting element", i, 2 * num_elements);
 
-            uint64 k = rand_r(&_seed) % value_universe_size;
+            uint64 k = datarng() % value_universe_size;
             c.push(value_type(k));
 
             num_inserts++;
@@ -588,7 +601,7 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 #else
             const unsigned thread_id = parallel
                                        ? omp_get_thread_num()
-                                       : rand() % num_insertion_heaps;
+                                       : g_rand() % num_insertion_heaps;
 
             #pragma omp for
 #endif
@@ -614,7 +627,7 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 #else
         const unsigned thread_id = parallel
                                    ? omp_get_thread_num()
-                                   : rand() % num_insertion_heaps;
+                                   : g_rand() % num_insertion_heaps;
 
         #pragma omp for
 #endif
@@ -654,14 +667,16 @@ void do_bulk_rand_insert(ContainerType& c,
 #else
             const unsigned thread_id = parallel
                                        ? omp_get_thread_num()
-                                       : rand() % num_insertion_heaps;
+                                       : g_rand() % num_insertion_heaps;
 
             unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
 #endif
+            random_number32_r datarng(seed);
+
             for (uint64 j = thread_id * bulk_step;
                  j < std::min((thread_id + 1) * bulk_step, bulk_size); ++j)
             {
-                uint64 k = rand_r(&seed) % value_universe_size;
+                uint64 k = datarng() % value_universe_size;
                 c.bulk_push(value_type(k), thread_id);
             }
         }
@@ -687,14 +702,16 @@ void do_bulk_rand_insert(ContainerType& c,
 #else
         const unsigned thread_id = parallel
                                    ? omp_get_thread_num()
-                                   : rand() % num_insertion_heaps;
+                                   : g_rand() % num_insertion_heaps;
 
         unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
 #endif
+        random_number32_r datarng(seed);
+
         for (uint64 j = thread_id * bulk_step;
              j < std::min((thread_id + 1) * bulk_step, bulk_remain); ++j)
         {
-            uint64 k = rand_r(&seed) % value_universe_size;
+            uint64 k = datarng() % value_universe_size;
             c.bulk_push(value_type(k), thread_id);
         }
     }
@@ -716,12 +733,13 @@ void do_bulk_rand_intermixed(ContainerType& c,
     uint64 num_inserts = filled ? num_elements : 0;
     uint64 num_deletes = 0;
 
-    scoped_print_timer timer(c.name() + ": Intermixed parallel rand bulk insert" + parallel_str + " and delete",
-                             (filled ? 3 : 2) * num_elements * value_size);
+    scoped_print_timer timer(
+        c.name() + ": Intermixed parallel rand bulk insert" + parallel_str + " and delete",
+        (filled ? 3 : 2) * num_elements * value_size);
 
     for (uint64_t i = 0; i < (filled ? 3 : 2) * num_elements; ++i)
     {
-        uint64 r = rand() % ((filled ? 2 : 1) * bulk_size);
+        uint64 r = g_rand() % ((filled ? 2 : 1) * bulk_size);
 
         // probability for an extract is bulk_size times larger than for a
         // bulk_insert.  when already filled with num_elements elements:
@@ -753,21 +771,24 @@ void do_bulk_rand_intermixed(ContainerType& c,
             {
 #if !STXXL_PARALLEL
                 const unsigned thread_num = 0;
-                stxxl::STXXL_UNUSED(_seed);
+                random_number32_r datarng(_seed);
 #else
                 const unsigned int thread_num = parallel
                                                 ? omp_get_thread_num()
-                                                : rand() % num_insertion_heaps;
+                                                : g_rand() % num_insertion_heaps;
 
                 unsigned int seed = thread_num * static_cast<unsigned>(i) * _seed;
+                random_number32_r datarng(seed);
+
                 #pragma omp for
 #endif
+
                 for (uint64 j = 0; j < this_bulk_size; j++)
                 {
                     progress("Inserting / deleting element",
                              i + j, (filled ? 3 : 2) * num_elements);
 
-                    uint64 k = rand_r(&seed) % value_universe_size;
+                    uint64 k = datarng() % value_universe_size;
                     c.bulk_push(value_type(k), thread_num);
                 }
             }
@@ -795,7 +816,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 
         for (uint64_t i = 0; i < 2 * num_elements; ++i)
         {
-            uint64 r = rand() % bulk_size;
+            uint64 r = g_rand() % bulk_size;
 
             if (num_deletes < num_inserts && num_deletes < num_elements &&
                 (r > 0 || num_inserts >= num_elements))
@@ -836,7 +857,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 #else
                     const unsigned int thread_num = parallel
                                                     ? omp_get_thread_num()
-                                                    : rand() % num_insertion_heaps;
+                                                    : g_rand() % num_insertion_heaps;
                     #pragma omp for
 #endif
 
@@ -899,11 +920,12 @@ public:
           temp_edges(n)
     {
         unsigned int seed = 12345;
+        random_number32_r datarng(seed);
 
         for (size_type i = 0; i < m; ++i) {
-            size_type source = rand_r(&seed) % n;
-            size_type target = rand_r(&seed) % n;
-            size_type length = rand_r(&seed);
+            size_type source = datarng() % n;
+            size_type target = datarng() % n;
+            size_type length = datarng();
             temp_edges[source].push_back(std::make_pair(target, length));
         }
 
@@ -928,7 +950,9 @@ public:
     void run_random_dijkstra(ContainerType& c)
     {
         unsigned int seed = 678910;
-        size_type source = rand_r(&seed) % n;
+        random_number32_r datarng(seed);
+
+        size_type source = datarng() % n;
         c.push(value_type(source, 0));
 
         while (!c.empty())
