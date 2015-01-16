@@ -2809,7 +2809,6 @@ public:
         assert(total_size > 0);
 
         external_array_type a(total_size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(a);
 
         //-tb this is probably wrong, and violates the memory counter, see
         //-cleanup above.
