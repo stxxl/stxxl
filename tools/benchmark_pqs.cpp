@@ -1208,6 +1208,8 @@ int benchmark_pqs(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+
 #if !STXXL_PARALLEL
     if (do_ppq) {
         STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. Parallel priority queue cannot be used here.");
@@ -1275,6 +1277,8 @@ int benchmark_pqs(int argc, char* argv[])
     else if (do_stlpq) {
         delete stlpq;
     }
+
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     return EXIT_SUCCESS;
 }
