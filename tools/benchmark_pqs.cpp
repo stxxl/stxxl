@@ -78,7 +78,7 @@ uint64 bulk_size;
 uint64 num_arrays = 0;
 uint64 max_merge_buffer_ram_stat = 0;
 
-uint64 value_universe_size = 1000;
+uint64 value_universe_size = 100000000;
 
 //const unsigned int seed = 12345;
 unsigned int seed = 12345;
@@ -99,30 +99,25 @@ struct value_type {
     key_type first;
     key_type second;
     char data[value_size - 2 * sizeof(key_type)];
-    value_type()
-        : first(0), second(0)
-    {
-        #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
-        memset(data, 0, sizeof(data));
-        #endif
-    }
-    value_type(const key_type& _key)
-        : first(_key)
-    {
-        #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
-        memset(data, 0, sizeof(data));
-        #endif
-    }
-    value_type(const key_type& _key, const key_type& _data)
+
+    value_type(const key_type& _key = 0, const key_type& _data = 0)
         : first(_key), second(_data)
     {
-        #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
+#ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
         memset(data, 0, sizeof(data));
-        #endif
+#endif
+    }
+
+    friend std::ostream& operator << (std::ostream& o, const value_type& obj)
+    {
+        o << obj.first;
+        return o;
     }
 };
 
-struct value_type_cmp_smaller : public std::binary_function<value_type, value_type, bool>{
+struct value_type_cmp_smaller
+    : public std::binary_function<value_type, value_type, bool>
+{
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a.first < b.first;
@@ -133,26 +128,39 @@ struct value_type_cmp_smaller : public std::binary_function<value_type, value_ty
     }
     value_type max_value() const
     {
-        return value_type(std::numeric_limits<value_type::key_type>::max());
+        return std::numeric_limits<value_type::key_type>::max();
     }
 };
 
-struct value_type_cmp_greater : public std::binary_function<value_type, value_type, bool>{
+struct value_type_cmp_greater
+    : public std::binary_function<value_type, value_type, bool>
+{
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a.first > b.first;
     }
     value_type min_value() const
     {
-        return value_type(std::numeric_limits<value_type::key_type>::max());
+        return std::numeric_limits<value_type::key_type>::max();
     }
 };
 
-std::ostream& operator << (std::ostream& o, const value_type& obj)
+template <typename ValueType>
+struct less_min_max : public std::binary_function<ValueType, ValueType, bool>
 {
-    o << obj.first;
-    return o;
-}
+    bool operator () (const ValueType& a, const ValueType& b) const
+    {
+        return a < b;
+    }
+    ValueType min_value() const
+    {
+        return std::numeric_limits<ValueType>::min();
+    }
+    ValueType max_value() const
+    {
+        return std::numeric_limits<ValueType>::max();
+    }
+};
 
 /*
  * Progress messages
@@ -393,25 +401,20 @@ void do_read_check(ContainerType& c)
 template <typename ContainerType>
 void do_rand_read_check(ContainerType& c, unsigned int seed)
 {
-    std::vector<uint64> vals;
-    vals.reserve(num_elements);
+    stxxl::sorter<uint64, less_min_max<uint64> >
+    sorted_vals(less_min_max<uint64>(), RAM / 2);
+
     {
-        scoped_print_timer timer("Filling value vector for comarison");
+        scoped_print_timer timer("Filling sorter for comparison");
 
         for (uint64 i = 0; i < num_elements; ++i)
         {
             uint64 k = rand_r(&seed) % value_universe_size;
-            vals.push_back(k);
+            sorted_vals.push(k);
         }
     }
-    {
-        scoped_print_timer timer("Sorting value vector for comarison");
-#if STXXL_PARALLEL
-        __gnu_parallel::sort(vals.begin(), vals.end());
-#else
-        std::sort(vals.begin(), vals.end());
-#endif
-    }
+    sorted_vals.sort();
+
     {
         scoped_print_timer timer("Reading " + c.name() + " and check order",
                                  num_elements * value_size);
@@ -419,11 +422,107 @@ void do_rand_read_check(ContainerType& c, unsigned int seed)
         for (uint64 i = 0; i < num_elements; ++i)
         {
             STXXL_CHECK(!c.empty());
+            STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+            STXXL_CHECK_EQUAL(c.size(), sorted_vals.size());
 
             value_type top = c.top_pop();
 
-            STXXL_CHECK_EQUAL(top.first, vals[i]);
+            STXXL_CHECK_EQUAL(top.first, *sorted_vals);
             progress("Popped element", i, num_elements);
+            ++sorted_vals;
+        }
+    }
+}
+
+template <typename ContainerType>
+void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
+                             bool parallel)
+{
+    stxxl::sorter<uint64, less_min_max<uint64> >
+    sorted_vals(less_min_max<uint64>(), RAM / 2);
+
+    {
+        uint64 bulk_step = bulk_size / omp_get_max_threads();
+
+        scoped_print_timer timer("Filling sorter for comparison",
+                                 num_elements * value_size);
+
+        for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
+        {
+#if STXXL_PARALLEL
+            for (int thr = 0; thr < omp_get_max_threads(); ++thr)
+#endif
+            {
+#if !STXXL_PARALLEL
+                const unsigned thread_id = 0;
+                stxxl::STXXL_UNUSED(_seed);
+#else
+                const unsigned thread_id = parallel
+                                           ? thr
+                                           : rand() % num_insertion_heaps;
+
+                unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
+#endif
+                for (uint64 j = thread_id * bulk_step;
+                     j < std::min((thread_id + 1) * bulk_step, bulk_size); ++j)
+                {
+                    uint64 k = rand_r(&seed) % value_universe_size;
+                    sorted_vals.push(k);
+                }
+            }
+
+            progress("Inserting element", i * bulk_size, num_elements);
+        }
+
+        STXXL_CHECK_EQUAL(sorted_vals.size(), num_elements - (num_elements % bulk_size));
+
+        uint64 bulk_remain = num_elements % bulk_size;
+        bulk_step = (bulk_remain + omp_get_max_threads() - 1) / omp_get_max_threads();
+
+#if STXXL_PARALLEL
+        for (int thr = 0; thr < omp_get_max_threads(); ++thr)
+#endif
+        {
+#if !STXXL_PARALLEL
+            const unsigned thread_id = 0;
+#else
+            const unsigned thread_id = parallel
+                                       ? thr
+                                       : rand() % num_insertion_heaps;
+
+            unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
+#endif
+            for (uint64 j = thread_id * bulk_step;
+                 j < std::min((thread_id + 1) * bulk_step, bulk_remain); ++j)
+            {
+                uint64 k = rand_r(&seed) % value_universe_size;
+                sorted_vals.push(k);
+            }
+        }
+
+        progress("Inserting element", num_elements, num_elements);
+    }
+
+    sorted_vals.sort();
+    STXXL_CHECK_EQUAL(c.size(), sorted_vals.size());
+
+    {
+        scoped_print_timer timer("Reading " + c.name() + " and check order",
+                                 num_elements * value_size);
+
+        for (uint64 i = 0; i < num_elements; ++i)
+        {
+            STXXL_CHECK(!c.empty());
+            STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+            STXXL_CHECK_EQUAL(c.size(), sorted_vals.size());
+
+            value_type top = c.top_pop();
+
+            //STXXL_MSG("val[" << i << "] = " << top.first << " - " << *sorted_vals);
+
+            STXXL_CHECK_EQUAL(top.first, *sorted_vals);
+            progress("Popped element", i, num_elements);
+            ++sorted_vals;
         }
     }
 }
@@ -492,13 +591,13 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 #endif
             for (uint64 j = 0; j < bulk_size; ++j)
             {
-                progress("Inserting element", i * bulk_size + j, num_elements);
-
                 c.bulk_push(value_type(num_elements - (i * bulk_size + j)), thread_id);
             }
         }
 
         c.bulk_push_end();
+
+        progress("Inserting element", i * bulk_size, num_elements);
     }
 
     c.bulk_push_begin(num_elements % bulk_size);
@@ -518,13 +617,13 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 #endif
         for (uint64 j = 0; j < num_elements % bulk_size; j++)
         {
-            progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
-
             c.bulk_push(value_type(num_elements % bulk_size - j), thread_id);
         }
     }
 
     c.bulk_push_end();
+
+    progress("Inserting element", num_elements, num_elements);
 }
 
 template <typename ContainerType>
@@ -535,6 +634,8 @@ void do_bulk_rand_insert(ContainerType& c,
 
     scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
                              num_elements * value_size);
+
+    uint64 bulk_step = bulk_size / omp_get_max_threads();
 
     for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
     {
@@ -553,23 +654,26 @@ void do_bulk_rand_insert(ContainerType& c,
                                        : rand() % num_insertion_heaps;
 
             unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
-            #pragma omp for
 #endif
-            for (uint64 j = 0; j < bulk_size; ++j)
+            for (uint64 j = thread_id * bulk_step;
+                 j < std::min((thread_id + 1) * bulk_step, bulk_size); ++j)
             {
-                progress("Inserting element", i * bulk_size + j, num_elements);
-
                 uint64 k = rand_r(&seed) % value_universe_size;
                 c.bulk_push(value_type(k), thread_id);
             }
         }
 
         c.bulk_push_end();
+
+        progress("Inserting element", i * bulk_size, num_elements);
     }
 
     STXXL_CHECK_EQUAL(c.size(), num_elements - (num_elements % bulk_size));
 
-    c.bulk_push_begin(num_elements % bulk_size);
+    uint64 bulk_remain = num_elements % bulk_size;
+    bulk_step = (bulk_remain + omp_get_max_threads() - 1) / omp_get_max_threads();
+
+    c.bulk_push_begin(bulk_remain);
 
 #if STXXL_PARALLEL
 #pragma omp parallel if(parallel)
@@ -583,18 +687,18 @@ void do_bulk_rand_insert(ContainerType& c,
                                    : rand() % num_insertion_heaps;
 
         unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
-        #pragma omp for
 #endif
-        for (uint64 j = 0; j < num_elements % bulk_size; j++)
+        for (uint64 j = thread_id * bulk_step;
+             j < std::min((thread_id + 1) * bulk_step, bulk_remain); ++j)
         {
-            progress("Inserting element", num_elements - (num_elements % bulk_size) + j, num_elements);
-
             uint64 k = rand_r(&seed) % value_universe_size;
             c.bulk_push(value_type(k), thread_id);
         }
     }
 
     c.bulk_push_end();
+
+    progress("Inserting element", num_elements, num_elements);
 
     STXXL_CHECK_EQUAL(c.size(), num_elements);
 }
@@ -952,8 +1056,10 @@ void run_benchmark(ContainerType& c)
             else {
                 do_bulk_insert(c, do_parallel);
             }
-            if (do_check) {
-                STXXL_CHECK(!do_random);
+            if (do_random && do_check) {
+                do_bulk_rand_read_check(c, seed, do_parallel);
+            }
+            else if (do_check) {
                 do_read_check(c);
             }
             else if (!do_no_read) {
