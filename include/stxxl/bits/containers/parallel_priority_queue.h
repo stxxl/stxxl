@@ -21,7 +21,6 @@
 #include <list>
 #include <utility>
 #include <vector>
-#include <atomic>
 
 #if STXXL_PARALLEL
     #include <omp.h>
@@ -425,7 +424,7 @@ public:
     //! The number of elements fitting into one block
     enum { block_size = BlockSize / sizeof(value_type) };
 
-    static const bool debug = true;
+    static const bool debug = false;
 
 protected:
     //! The total size of the external array in items. Cannot be changed
@@ -1833,7 +1832,7 @@ public:
     typedef typename internal_array_type::iterator iterator;
     typedef std::pair<iterator, iterator> iterator_pair_type;
 
-    static const bool debug = true;
+    static const bool debug = false;
 
 protected:
     //! type of insertion heap itself
