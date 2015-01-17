@@ -35,6 +35,7 @@
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/common/swap_vector.h>
+#include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_alloc.h>
@@ -2038,6 +2039,10 @@ protected:
     //! where the globally smallest element could come from.
     minima_type m_minima;
 
+    //! Random number generator for randomly selecting a heap in sequential
+    //! push()
+    random_number32_r m_rng;
+
     //! \}
 
     /*
@@ -2180,8 +2185,6 @@ public:
           m_proc(m_num_insertion_heaps),
           m_minima(*this)
     {
-        srand(static_cast<unsigned>(time(NULL)));
-
         if (!omp_get_nested()) {
             omp_set_nested(1);
             if (!omp_get_nested()) {
@@ -2465,7 +2468,7 @@ public:
 #if STXXL_PARALLEL
         return bulk_push(element, omp_get_thread_num());
 #else
-        int id = rand() % m_num_insertion_heaps;
+        int id = m_rng() % m_num_insertion_heaps;
         return bulk_push(element, id);
 #endif
     }
@@ -2569,7 +2572,7 @@ public:
             }
         }
 #else
-        const unsigned thread_num = rand() % m_num_insertion_heaps;
+        const unsigned thread_num = m_rng() % m_num_insertion_heaps;
         for (size_type i = 0; i < elements.size(); ++i) {
             bulk_push(elements[i], thread_num);
         }
@@ -2653,7 +2656,7 @@ public:
      */
     void push(const ValueType& element)
     {
-        unsigned id = rand() % m_num_insertion_heaps;
+        unsigned id = m_rng() % m_num_insertion_heaps;
         return push(element, id);
     }
 
