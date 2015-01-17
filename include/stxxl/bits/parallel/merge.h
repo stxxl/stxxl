@@ -101,8 +101,6 @@ merge_advance_movc(RandomAccessIterator1& begin1, RandomAccessIterator1 end1,
     typedef typename std::iterator_traits<RandomAccessIterator1>::value_type ValueType1;
     typedef typename std::iterator_traits<RandomAccessIterator2>::value_type ValueType2;
 
-    STXXL_DEBUG_ASSERT(max_length >= 0);
-
     while (begin1 != end1 && begin2 != end2 && max_length > 0)
     {
         RandomAccessIterator1 next1 = begin1 + 1;

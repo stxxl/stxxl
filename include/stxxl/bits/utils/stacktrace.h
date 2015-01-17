@@ -18,6 +18,8 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 
+#include <stxxl/bits/namespace.h>
+
 STXXL_BEGIN_NAMESPACE
 
 /** Print a demangled stack backtrace of the caller function to FILE* out. */
