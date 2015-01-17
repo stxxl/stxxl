@@ -1421,13 +1421,22 @@ public:
     };
 
 public:
-    external_array_writer(ea_type& ea, unsigned int num_threads)
+    external_array_writer(ea_type& ea, unsigned int num_threads = 0)
         : m_ea(ea),
           m_ref_count(ea.num_blocks(), 0)
     {
 #if STXXL_DEBUG_ASSERTIONS
         m_ref_total = 0;
 #endif
+
+#if STXXL_PARALLEL
+        if (num_threads == 0)
+            num_threads = omp_get_max_threads();
+#else
+        if (num_threads == 0)
+            num_threads = 1;
+#endif
+
         m_ea.prepare_write(num_threads);
 
         // optimization: hold live iterators for the boundary blocks which two
@@ -2184,6 +2193,7 @@ public:
           m_proc(m_num_insertion_heaps),
           m_minima(*this)
     {
+#if STXXL_PARALLEL
         if (!omp_get_nested()) {
             omp_set_nested(1);
             if (!omp_get_nested()) {
@@ -2192,6 +2202,11 @@ public:
                 abort();
             }
         }
+#else
+        STXXL_ERRMSG("You are using stxxl::parallel_priority_queue without "
+                     "support for OpenMP parallelism.\n This is probably not "
+                     "what you want, so check the compilation settings.");
+#endif
 
         if (c_limit_extract_buffer) {
             m_extract_buffer_limit = (extract_buffer_ram > 0)
@@ -2405,7 +2420,9 @@ public:
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items and keep heap invariant.
             if (insheap.size() >= m_insertion_heap_capacity) {
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                 m_heaps_size += m_proc[p].heap_add_size;
 
                 m_proc[p].heap_add_size = 0;
@@ -2424,7 +2441,9 @@ public:
             // internal array list. insert items but DO NOT keep heap
             // invariant.
             if (insheap.size() >= m_insertion_heap_capacity) {
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                 m_heaps_size += m_proc[p].heap_add_size;
 
                 m_proc[p].heap_add_size = 0;
@@ -2439,7 +2458,9 @@ public:
         else // m_is_very_large_bulk
         {
             if (insheap.size() >= 2 * 1024 * 1024) {
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                 m_heaps_size += m_proc[p].heap_add_size;
 
                 m_proc[p].heap_add_size = 0;
@@ -2490,7 +2511,9 @@ public:
         }
         else if (!m_is_very_large_bulk && 1)
         {
+#if STXXL_PARALLEL
 #pragma omp parallel for
+#endif
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
@@ -2500,7 +2523,9 @@ public:
                                    m_compare);
                 }
 
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                 m_heaps_size += m_proc[p].heap_add_size;
             }
 
@@ -2512,12 +2537,16 @@ public:
         }
         else // m_is_very_large_bulk
         {
+#if STXXL_PARALLEL
 #pragma omp parallel for
+#endif
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (m_proc[p].insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                     m_heaps_size += m_proc[p].heap_add_size;
 
                     m_proc[p].heap_add_size = 0;
@@ -2531,7 +2560,9 @@ public:
                                        m_compare);
                     }
 
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                     m_heaps_size += m_proc[p].heap_add_size;
                     m_proc[p].heap_add_size = 0;
                 }
@@ -2848,15 +2879,18 @@ public:
 
                 iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
                 sizes[i] = ub - begin;
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
                 output_size += ub - begin;
                 sequences[i] = std::make_pair(begin, ub);
             }
 
             a.request_write_buffer(output_size);
 
-            parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                        a.begin(), m_inv_compare, output_size);
+            potentially_parallel::multiway_merge(
+                sequences.begin(), sequences.end(),
+                a.begin(), m_inv_compare, output_size);
 
             a.flush_write_buffer();
 
@@ -3114,8 +3148,9 @@ protected:
         m_stats.refill_time_before_merge.stop();
         m_stats.refill_merge_time.start();
 
-        parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    m_extract_buffer.begin(), m_inv_compare, output_size);
+        potentially_parallel::multiway_merge(
+            sequences.begin(), sequences.end(),
+            m_extract_buffer.begin(), m_inv_compare, output_size);
 
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
@@ -3182,7 +3217,9 @@ protected:
         // sort locally, independent of others
         std::sort(insheap.begin(), insheap.end(), m_inv_compare);
 
+#if STXXL_PARALLEL
 #pragma omp critical (stxxl_flush_insertion_heap)
+#endif
         {
             // test that enough RAM is available for merged internal array:
             // otherwise flush the existing internal arrays out to disk.
@@ -3223,11 +3260,15 @@ protected:
             assert(insheap.capacity() * sizeof(value_type)
                    == insertion_heap_int_memory());
 
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
             m_mem_left -= insertion_heap_int_memory();
 
             // update item counts
+#if STXXL_PARALLEL
 #pragma omp atomic
+#endif
             m_heaps_size -= size;
             m_internal_size += size;
 
@@ -3293,8 +3334,9 @@ protected:
             m_stats.merge_sorted_heaps_time.start();
             std::vector<ValueType> merged_array(size);
 
-            parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                        merged_array.begin(), m_inv_compare, size);
+            potentially_parallel::multiway_merge(
+                sequences.begin(), sequences.end(),
+                merged_array.begin(), m_inv_compare, size);
 
             m_stats.merge_sorted_heaps_time.stop();
 
@@ -3404,9 +3446,9 @@ protected:
         m_stats.max_merge_buffer_size.set_max(size);
 
         {
-            external_array_writer_type external_array_writer(ea, omp_get_max_threads());
+            external_array_writer_type external_array_writer(ea);
 
-            parallel::sw_multiway_merge(
+            potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
                 external_array_writer.begin(), m_inv_compare, size);
         }
@@ -3466,8 +3508,9 @@ protected:
         // TODO: write in chunks in order to safe RAM?
         ea.request_write_buffer(size);
 
-        parallel::sw_multiway_merge(sequences.begin(), sequences.end(),
-                                    ea.begin(), m_inv_compare, size);
+        potentially_parallel::multiway_merge(
+            sequences.begin(), sequences.end(),
+            ea.begin(), m_inv_compare, size);
 
         ea.flush_write_buffer();
         ea.finish_write_phase();
@@ -3552,11 +3595,7 @@ protected:
     {
         m_internal_size += values.size();
 
-#if STXXL_PARALLEL
-        __gnu_parallel::sort(values.begin(), values.end(), m_inv_compare);
-#else
-        std::sort(values.begin(), values.end(), m_inv_compare);
-#endif
+        potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
 
         internal_array_type new_array(values);
         m_internal_arrays.swap_back(new_array);

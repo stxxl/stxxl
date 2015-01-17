@@ -566,7 +566,10 @@ void priority_queue<ConfigType>::refill_delete_buffer()
                 std::make_pair(group_buffer_current_mins[0], group_buffers[0] + N),
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N)
             };
-            parallel::sw_multiway_merge_sentinel(seqs, seqs + 2, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
+
+            parallel::multiway_merge_sentinels(
+                seqs, seqs + 2, delete_buffer_current_min, length, inv_cmp);
+            // sequence iterators are progressed appropriately
 
             group_buffer_current_mins[0] = seqs[0].first;
             group_buffer_current_mins[1] = seqs[1].first;
@@ -586,7 +589,10 @@ void priority_queue<ConfigType>::refill_delete_buffer()
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N),
                 std::make_pair(group_buffer_current_mins[2], group_buffers[2] + N)
             };
-            parallel::sw_multiway_merge_sentinel(seqs, seqs + 3, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
+
+            parallel::multiway_merge_sentinels(
+                seqs, seqs + 3, delete_buffer_current_min, length, inv_cmp);
+            // sequence iterators are progressed appropriately
 
             group_buffer_current_mins[0] = seqs[0].first;
             group_buffer_current_mins[1] = seqs[1].first;
@@ -610,7 +616,10 @@ void priority_queue<ConfigType>::refill_delete_buffer()
                 std::make_pair(group_buffer_current_mins[2], group_buffers[2] + N),
                 std::make_pair(group_buffer_current_mins[3], group_buffers[3] + N)
             };
-            parallel::sw_multiway_merge_sentinel(seqs, seqs + 4, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
+
+            parallel::multiway_merge_sentinels(
+                seqs, seqs + 4, delete_buffer_current_min, length, inv_cmp);
+            // sequence iterators are progressed appropriately
 
             group_buffer_current_mins[0] = seqs[0].first;
             group_buffer_current_mins[1] = seqs[1].first;
@@ -623,7 +632,8 @@ void priority_queue<ConfigType>::refill_delete_buffer()
             group_buffer_current_mins[1],
             group_buffer_current_mins[2],
             group_buffer_current_mins[3],
-            delete_buffer_current_min, delete_buffer_current_min + length, cmp); //side effect free
+            delete_buffer_current_min, delete_buffer_current_min + length, cmp);
+        // side effect free
 #endif
         break;
     default:

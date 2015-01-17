@@ -1049,7 +1049,9 @@ private:
 
                 STXXL_VERBOSE1("before merge " << output_size);
 
-                parallel::sw_multiway_merge((*seqs).begin(), (*seqs).end(), m_buffer_block->end() - rest, m_cmp, output_size);
+                potentially_parallel::multiway_merge(
+                    (*seqs).begin(), (*seqs).end(),
+                    m_buffer_block->end() - rest, m_cmp, output_size);
                 // sequence iterators are progressed appropriately
 
                 rest -= output_size;

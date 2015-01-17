@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_mergesort.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/is_sorted.h>

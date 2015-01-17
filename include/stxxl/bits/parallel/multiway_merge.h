@@ -1495,6 +1495,8 @@ parallel_multiway_merge_exact_splitting(
     delete[] offsets;
 }
 
+#if STXXL_PARALLEL
+
 /*!
  * Parallel multi-way merge routine.
  *
@@ -1640,8 +1642,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
  * \param length Maximum length to merge.
  * \return End iterator of output sequence.
  */
-template <bool Stable,
-          typename RandomAccessIteratorPairIterator,
+template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
           typename DiffType, typename Comparator>
 RandomAccessIterator3
@@ -1660,10 +1661,48 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
             ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
             ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)
             ))
-        target_end = parallel_multiway_merge<Stable>(
+        target_end = parallel_multiway_merge<false>(
             seqs_begin, seqs_end, target, length, comp);
     else
-        target_end = sequential_multiway_merge<Stable, false>(
+        target_end = sequential_multiway_merge<false, false>(
+            seqs_begin, seqs_end, target, length, comp);
+
+    return target_end;
+}
+
+/*!
+ * Multi-way merging front-end with unstable mode and without sentinels.
+ *
+ * \param seqs_begin Begin iterator of iterator pair input sequence.
+ * \param seqs_end End iterator of iterator pair input sequence.
+ * \param target Begin iterator out output sequence.
+ * \param comp Comparator.
+ * \param length Maximum length to merge.
+ * \return End iterator of output sequence.
+ */
+template <typename RandomAccessIteratorPairIterator,
+          typename RandomAccessIterator3,
+          typename DiffType, typename Comparator>
+RandomAccessIterator3
+multiway_merge_stable(RandomAccessIteratorPairIterator seqs_begin,
+                      RandomAccessIteratorPairIterator seqs_end,
+                      RandomAccessIterator3 target, DiffType length,
+                      Comparator comp)
+{
+    STXXL_PARALLEL_PCALL(seqs_end - seqs_begin);
+
+    if (seqs_begin == seqs_end)
+        return target;
+
+    RandomAccessIterator3 target_end;
+    if (STXXL_PARALLEL_CONDITION(
+            ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
+            ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)
+            ))
+        target_end = parallel_multiway_merge<true>(
+            seqs_begin, seqs_end, target, length, comp);
+    else
+        target_end = sequential_multiway_merge<true, false>(
             seqs_begin, seqs_end, target, length, comp);
 
     return target_end;
@@ -1684,8 +1723,7 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
  * \pre For each \c i, \c seqs_begin[i].second must be the end marker of the
  * sequence, but also reference the one more sentinel element.
  */
-template <bool Stable,
-          typename RandomAccessIteratorPairIterator,
+template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
           typename DiffType, typename Comparator>
 RandomAccessIterator3
@@ -1703,14 +1741,56 @@ multiway_merge_sentinels(RandomAccessIteratorPairIterator seqs_begin,
             ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
             ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)
             ))
-        return parallel_multiway_merge<Stable>(
+        return parallel_multiway_merge<false>(
             seqs_begin, seqs_end, target, length, comp);
     else
-        return sequential_multiway_merge<Stable, true>(
+        return sequential_multiway_merge<false, true>(
             seqs_begin, seqs_end, target, length, comp);
 }
 
-}                     // namespace parallel
+/*!
+ * Multi-way merging front-end with unstable mode and sentinels.
+ *
+ * Each sequence must be suffixed with a sentinel as *end(), one item beyond
+ * the end of each sequence.
+ *
+ * \param seqs_begin Begin iterator of iterator pair input sequence.
+ * \param seqs_end End iterator of iterator pair input sequence.
+ * \param target Begin iterator out output sequence.
+ * \param comp Comparator.
+ * \param length Maximum length to merge.
+ * \return End iterator of output sequence.
+ * \pre For each \c i, \c seqs_begin[i].second must be the end marker of the
+ * sequence, but also reference the one more sentinel element.
+ */
+template <typename RandomAccessIteratorPairIterator,
+          typename RandomAccessIterator3,
+          typename DiffType, typename Comparator>
+RandomAccessIterator3
+multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
+                                RandomAccessIteratorPairIterator seqs_end,
+                                RandomAccessIterator3 target, DiffType length,
+                                Comparator comp)
+{
+    if (seqs_begin == seqs_end)
+        return target;
+
+    STXXL_PARALLEL_PCALL(seqs_end - seqs_begin);
+
+    if (STXXL_PARALLEL_CONDITION(
+            ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
+            ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)
+            ))
+        return parallel_multiway_merge<true>(
+            seqs_begin, seqs_end, target, length, comp);
+    else
+        return sequential_multiway_merge<true, true>(
+            seqs_begin, seqs_end, target, length, comp);
+}
+
+#endif // STXXL_PARALLEL
+
+} // namespace parallel
 
 STXXL_END_NAMESPACE
 

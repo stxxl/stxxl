@@ -566,8 +566,8 @@ protected:
             //main call
 
             // sequence iterators are progressed appropriately:
-            begin = parallel::sw_multiway_merge(seqs.begin(), seqs.end(),
-                                                begin, inv_cmp, output_size);
+            begin = parallel::multiway_merge(
+                seqs.begin(), seqs.end(), begin, output_size, inv_cmp);
 
             rest -= output_size;
             m_size -= output_size;

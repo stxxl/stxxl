@@ -17,12 +17,16 @@
 #ifndef STXXL_PARALLEL_TIMING_HEADER
 #define STXXL_PARALLEL_TIMING_HEADER
 
-#include <omp.h>
 #include <cstdio>
 #include <cstring>
 #include <cassert>
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/tags.h>
+
+#if STXXL_PARALLEL
+  #include <omp.h>
+#endif
 
 STXXL_BEGIN_NAMESPACE
 
@@ -33,6 +37,8 @@ typedef double point_in_time;
 
 template <typename tag, typename must_be_int = int>
 class Timing;
+
+#if STXXL_PARALLEL
 
 /** A class that provides simple run time measurements, also for parallel code.
  *  \param tag If active_tag, then the measurements are actually done.
@@ -153,15 +159,17 @@ public:
     {
         printf("print\n");
 
-                #pragma omp barrier
+#pragma omp barrier
 
-                #pragma omp master
+#pragma omp master
         printf("\n\n");
 
-                #pragma omp critical
+#pragma omp critical
         printf("%s\n", c_str());
     }
 };
+
+#endif // STXXL_PARALLEL
 
 /** A class that provides simple run time measurements, also for parallel code.
  *  \param tag If active_tag, then the measurements are actually done,

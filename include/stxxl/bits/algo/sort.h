@@ -419,7 +419,9 @@ void merge_runs(RunType** in_runs, int_type nruns,
 
                 STXXL_VERBOSE1("before merge " << output_size);
 
-                parallel::sw_multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size);
+                parallel::multiway_merge(
+                    seqs.begin(), seqs.end(),
+                    out_buffer->end() - rest, output_size, cmp);
                 // sequence iterators are progressed appropriately
 
                 rest -= output_size;

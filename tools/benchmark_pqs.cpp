@@ -462,7 +462,11 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
     sorted_vals(less_min_max<uint64>(), RAM / 2);
 
     {
+#if STXXL_PARALLEL
         uint64 bulk_step = bulk_size / omp_get_max_threads();
+#else
+        uint64 bulk_step = bulk_size;
+#endif
 
         scoped_print_timer timer("Filling sorter for comparison",
                                  num_elements * value_size);
@@ -476,6 +480,7 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
 #if !STXXL_PARALLEL
                 const unsigned thread_id = 0;
                 stxxl::STXXL_UNUSED(_seed);
+                stxxl::STXXL_UNUSED(parallel);
 #else
                 const unsigned thread_id = parallel
                                            ? thr
@@ -499,7 +504,11 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
         STXXL_CHECK_EQUAL(sorted_vals.size(), num_elements - (num_elements % bulk_size));
 
         uint64 bulk_remain = num_elements % bulk_size;
+#if STXXL_PARALLEL
         bulk_step = (bulk_remain + omp_get_max_threads() - 1) / omp_get_max_threads();
+#else
+        bulk_step = bulk_remain;
+#endif
 
 #if STXXL_PARALLEL
         for (int thr = 0; thr < omp_get_max_threads(); ++thr)
@@ -661,7 +670,11 @@ void do_bulk_rand_insert(ContainerType& c,
     scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
                              num_elements * value_size);
 
+#if STXXL_PARALLEL
     uint64 bulk_step = bulk_size / omp_get_max_threads();
+#else
+    uint64 bulk_step = bulk_size;
+#endif
 
     for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
     {
@@ -699,7 +712,11 @@ void do_bulk_rand_insert(ContainerType& c,
     STXXL_CHECK_EQUAL(c.size(), num_elements - (num_elements % bulk_size));
 
     uint64 bulk_remain = num_elements % bulk_size;
+#if STXXL_PARALLEL
     bulk_step = (bulk_remain + omp_get_max_threads() - 1) / omp_get_max_threads();
+#else
+    bulk_step = bulk_remain;
+#endif
 
     c.bulk_push_begin(bulk_remain);
 

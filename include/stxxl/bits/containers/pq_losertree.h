@@ -548,7 +548,8 @@ multi_merge(Element* target, unsigned_type length)
                 std::make_pair(current[0], current_end[0]),
                 std::make_pair(current[1], current_end[1])
             };
-            parallel::sw_multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+            parallel::multiway_merge_sentinels(
+                seqs, seqs + 2, target, length, inv_cmp);
             current[0] = seqs[0].first;
             current[1] = seqs[1].first;
         }
@@ -574,7 +575,8 @@ multi_merge(Element* target, unsigned_type length)
                 std::make_pair(current[2], current_end[2]),
                 std::make_pair(current[3], current_end[3])
             };
-            parallel::sw_multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+            parallel::multiway_merge_sentinels(
+                seqs, seqs + 4, target, length, inv_cmp);
             current[0] = seqs[0].first;
             current[1] = seqs[1].first;
             current[2] = seqs[2].first;
@@ -633,7 +635,8 @@ multi_merge(Element* target, unsigned_type length)
                 }
             }
 
-            parallel::sw_multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
+            parallel::multiway_merge_sentinels(
+                seqs.begin(), seqs.end(), target, length, inv_cmp);
 
             for (unsigned int i = 0; i < seqs.size(); ++i)
             {

@@ -80,8 +80,15 @@ else()
   option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and date_time" OFF)
 endif()
 
+option(USE_OPENMP "Use OpenMP for multi-core parallelism" ON)
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   option(USE_GNU_PARALLEL "Use GNU parallel extensions for multi-core parallelism" ON)
+
+  # GNU parallel mode but NOT OpenMP is impossible.
+  if(USE_GNU_PARALLEL AND NOT USE_OPENMP)
+    set(USE_GNU_PARALLEL OFF)
+  endif()
 endif()
 
 option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
@@ -478,11 +485,39 @@ if(USE_BOOST)
 endif(USE_BOOST)
 
 ###############################################################################
+# optional OpenMP parallelization
+
+if(USE_GNU_PARALLEL AND NOT USE_OPENMP)
+  message(FATAL_ERROR "Configuration selects GNU parallel mode but not OpenMP."
+    "This is impossible.")
+endif()
+
+if(USE_OPENMP OR USE_GNU_PARALLEL)
+
+  include(FindOpenMP)
+
+  if(NOT OPENMP_FOUND)
+    message(STATUS "OpenMP not found. Continuing without parallel algorithm support.")
+  else()
+    set(STXXL_PARALLEL 1)
+    message(STATUS "OpenMP found, enabling built-in parallel algorithms.")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+  endif()
+
+else()
+
+  message(INFO "OpenMP disabled in STXXL (no parallelism is used).")
+  set(STXXL_PARALLEL 0)
+
+endif(USE_OPENMP OR USE_GNU_PARALLEL)
+
+###############################################################################
 # optional GNU parallel STL mode
 
 if(USE_GNU_PARALLEL)
-
-  include(FindOpenMP)
 
   if(NOT OPENMP_FOUND)
     message(FATAL_ERROR "OpenMP not found. Try compilation without GNU parallel mode.")
@@ -492,12 +527,7 @@ if(USE_GNU_PARALLEL)
     if(NOT HAVE_PARALLEL_ALGORITHM_H)
       message(FATAL_ERROR "GNU parallel mode header not found. Try compilation without parallel mode.")
     else()
-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-
-      set(STXXL_PARALLEL_MODE_EXPLICIT "1")
-
+      set(STXXL_WITH_GNU_PARALLEL 1)
     endif()
   endif()
 

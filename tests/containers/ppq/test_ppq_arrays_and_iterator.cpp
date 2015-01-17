@@ -49,7 +49,7 @@ void fill(ea_type& ea, size_t index, size_t n)
 {
     STXXL_CHECK(n > 0);
 
-    ea_type::writer_type ea_writer(ea, omp_get_max_threads());
+    ea_type::writer_type ea_writer(ea);
 
     size_t i = index;
 
@@ -315,9 +315,9 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
 
         seqs.push_back(std::make_pair(ia.begin(), ia.end()));
 
-        ea_type::writer_type ea_writer(out, omp_get_max_threads());
+        ea_type::writer_type ea_writer(out);
 
-        stxxl::parallel::sw_multiway_merge(
+        stxxl::potentially_parallel::multiway_merge(
             seqs.begin(), seqs.end(),
             ea_writer.begin(), value_comp(), (NumEAs + 1) * size);
 

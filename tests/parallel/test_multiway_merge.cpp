@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/parallel/multiway_merge.h>
+#include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/random>
 #include <iostream>
@@ -115,16 +115,24 @@ void test_vecs(unsigned int vecnum)
     }
 
     if (!Sentinels) {
-        stxxl::parallel::multiway_merge<Stable>(
-            sequences.begin(), sequences.end(),
-            output.begin(), totalsize,
-            std::less<ValueType>());
+        if (!Stable)
+            stxxl::potentially_parallel::multiway_merge(
+                sequences.begin(), sequences.end(),
+                output.begin(), std::less<ValueType>(), totalsize);
+        else
+            stxxl::potentially_parallel::multiway_merge_stable(
+                sequences.begin(), sequences.end(),
+                output.begin(), std::less<ValueType>(), totalsize);
     }
     else {
-        stxxl::parallel::multiway_merge_sentinels<Stable>(
-            sequences.begin(), sequences.end(),
-            output.begin(), totalsize,
-            std::less<ValueType>());
+        if (!Stable)
+            stxxl::potentially_parallel::multiway_merge_sentinels(
+                sequences.begin(), sequences.end(),
+                output.begin(), std::less<ValueType>(), totalsize);
+        else
+            stxxl::potentially_parallel::multiway_merge_stable_sentinels(
+                sequences.begin(), sequences.end(),
+                output.begin(), std::less<ValueType>(), totalsize);
     }
 
 #ifdef TODO

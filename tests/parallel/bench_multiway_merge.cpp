@@ -90,11 +90,17 @@ void test_multiway_merge(unsigned int seqnum)
         for (size_t i = 0; i < seqnum; ++i)
             blocks[i].resize(block_size);
 
+#if STXXL_PARALLEL
 #pragma omp parallel
+#endif
         {
+#if STXXL_PARALLEL
             unsigned int seed = 1234 * omp_get_thread_num();
             stxxl::random_number32_r rnd(seed);
 #pragma omp for
+#else
+            stxxl::random_number32_r rnd(1234);
+#endif
             for (size_t i = 0; i < seqnum; ++i)
             {
                 for (size_t j = 0; j < block_size; ++j)
@@ -161,6 +167,7 @@ void test_multiway_merge(unsigned int seqnum)
                 out.begin(), total_size, cmp);
             break;
 
+#if STXXL_WITH_GNU_PARALLEL
         case SEQ_GNU_MWM:
             method_name = "seq_gnu_mwm";
 
@@ -168,14 +175,16 @@ void test_multiway_merge(unsigned int seqnum)
                                            out.begin(), total_size, cmp,
                                            __gnu_parallel::sequential_tag());
             break;
+#endif      // STXXL_WITH_GNU_PARALLEL
 
+#if STXXL_PARALLEL
         case PARA_MWM_EXACT_LT:
             method_name = "para_mwm_exact_lt";
 
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
             SETTINGS::multiway_merge_splitting = SETTINGS::EXACT;
 
-            stxxl::parallel::multiway_merge<false>(
+            stxxl::parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;
@@ -186,7 +195,7 @@ void test_multiway_merge(unsigned int seqnum)
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
             SETTINGS::multiway_merge_splitting = SETTINGS::EXACT;
 
-            stxxl::parallel::multiway_merge<true>(
+            stxxl::parallel::multiway_merge_stable(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;
@@ -197,7 +206,7 @@ void test_multiway_merge(unsigned int seqnum)
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
             SETTINGS::multiway_merge_splitting = SETTINGS::SAMPLING;
 
-            stxxl::parallel::multiway_merge<false>(
+            stxxl::parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;
@@ -208,11 +217,13 @@ void test_multiway_merge(unsigned int seqnum)
             SETTINGS::multiway_merge_algorithm = SETTINGS::LOSER_TREE;
             SETTINGS::multiway_merge_splitting = SETTINGS::SAMPLING;
 
-            stxxl::parallel::multiway_merge<true>(
+            stxxl::parallel::multiway_merge_stable(
                 sequences.begin(), sequences.end(),
                 out.begin(), total_size, cmp);
             break;
+#endif      // STXXL_PARALLEL
 
+#if STXXL_WITH_GNU_PARALLEL
         case PARA_GNU_MWM_EXACT: {
             method_name = "para_gnu_mwm_exact";
 
@@ -236,6 +247,12 @@ void test_multiway_merge(unsigned int seqnum)
                                            out.begin(), total_size, cmp);
             break;
         }
+#endif      // STXXL_WITH_GNU_PARALLEL
+
+        default:
+            STXXL_ERRMSG("Error: method " << Method << " is not available "
+                         "in this compilation.");
+            break;
         }
 
         std::cout << "RESULT"
@@ -245,7 +262,11 @@ void test_multiway_merge(unsigned int seqnum)
                   << " block_size=" << block_size
                   << " total_size=" << total_size
                   << " total_bytes=" << total_bytes
+            #if STXXL_PARALLEL
                   << " num_threads=" << omp_get_max_threads()
+            #else
+                  << " num_threads=1"
+            #endif
                   << " time=" << spt.timer().seconds()
                   << "\n";
     }
