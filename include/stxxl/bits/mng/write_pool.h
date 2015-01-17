@@ -138,7 +138,7 @@ public:
     //! \return pointer to the block. Ownership of the block goes to the caller.
     block_type * steal()
     {
-        assert(size() > 0);
+        STXXL_ASSERT(size() > 0);
         if (!free_blocks.empty())
         {
             block_type* p = free_blocks.back();

@@ -87,7 +87,7 @@ public:
     winner_tree(unsigned int num_players, Comparator& less)
         : m_less(less)
     {
-        assert(num_players > 1);
+        assert(num_players > 0);
 
         m_num_slots = (1 << ilog2_ceil(num_players));
         unsigned int treesize = (m_num_slots << 1) - 1;

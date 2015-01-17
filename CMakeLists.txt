@@ -509,7 +509,7 @@ if(USE_OPENMP OR USE_GNU_PARALLEL)
 
 else()
 
-  message(INFO "OpenMP disabled in STXXL (no parallelism is used).")
+  message(STATUS "OpenMP disabled in STXXL (no parallelism is used).")
   set(STXXL_PARALLEL 0)
 
 endif(USE_OPENMP OR USE_GNU_PARALLEL)

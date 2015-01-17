@@ -763,12 +763,21 @@ protected:
     //! constructor.
     void prepare_write(int num_threads)
     {
-        if (num_threads == 0) num_threads = 1;
         m_pool->resize_prefetch(0);
+
+        unsigned_type write_blocks = num_threads;
+        // need at least one
+        if (write_blocks == 0) write_blocks = 1;
+        // for holding boundary blocks
+        write_blocks *= 2;
+        // more disks than threads?
+        if (write_blocks < config::get_instance()->disks_number())
+            write_blocks = config::get_instance()->disks_number();
 #if STXXL_DEBUG_ASSERTIONS
-        num_threads *= 2; // required for re-reading the external array
+        // required for re-reading the external array
+        write_blocks = 2 * write_blocks;
 #endif
-        m_pool->resize_write(num_threads * config::get_instance()->disks_number());
+        m_pool->resize_write(write_blocks);
     }
 
     //! finish the writing phase after multiway_merge() filled the vector. this
@@ -2204,8 +2213,9 @@ public:
         }
 #else
         STXXL_ERRMSG("You are using stxxl::parallel_priority_queue without "
-                     "support for OpenMP parallelism.\n This is probably not "
-                     "what you want, so check the compilation settings.");
+                     "support for OpenMP parallelism.");
+        STXXL_ERRMSG("This is probably not what you want, so check the "
+                     "compilation settings.");
 #endif
 
         if (c_limit_extract_buffer) {
