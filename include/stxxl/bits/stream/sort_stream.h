@@ -1051,7 +1051,7 @@ private:
 
                 potentially_parallel::multiway_merge(
                     (*seqs).begin(), (*seqs).end(),
-                    m_buffer_block->end() - rest, m_cmp, output_size);
+                    m_buffer_block->end() - rest, output_size, m_cmp);
                 // sequence iterators are progressed appropriately
 
                 rest -= output_size;

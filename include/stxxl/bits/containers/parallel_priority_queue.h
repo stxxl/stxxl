@@ -2890,7 +2890,7 @@ public:
 
             potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
-                a.begin(), m_inv_compare, output_size);
+                a.begin(), output_size, m_inv_compare);
 
             a.flush_write_buffer();
 
@@ -3150,7 +3150,7 @@ protected:
 
         potentially_parallel::multiway_merge(
             sequences.begin(), sequences.end(),
-            m_extract_buffer.begin(), m_inv_compare, output_size);
+            m_extract_buffer.begin(), output_size, m_inv_compare);
 
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
@@ -3336,7 +3336,7 @@ protected:
 
             potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
-                merged_array.begin(), m_inv_compare, size);
+                merged_array.begin(), size, m_inv_compare);
 
             m_stats.merge_sorted_heaps_time.stop();
 
@@ -3450,7 +3450,7 @@ protected:
 
             potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
-                external_array_writer.begin(), m_inv_compare, size);
+                external_array_writer.begin(), size, m_inv_compare);
         }
 
         STXXL_DEBUG("Merge done of new ea " << &ea);
@@ -3510,7 +3510,7 @@ protected:
 
         potentially_parallel::multiway_merge(
             sequences.begin(), sequences.end(),
-            ea.begin(), m_inv_compare, size);
+            ea.begin(), size, m_inv_compare);
 
         ea.flush_write_buffer();
         ea.finish_write_phase();

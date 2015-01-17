@@ -319,7 +319,7 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
 
         stxxl::potentially_parallel::multiway_merge(
             seqs.begin(), seqs.end(),
-            ea_writer.begin(), value_comp(), (NumEAs + 1) * size);
+            ea_writer.begin(), (NumEAs + 1) * size, value_comp());
 
         // sequential:
         //__gnu_parallel::multiway_merge(seqs.begin(), seqs.end(), c.begin(),

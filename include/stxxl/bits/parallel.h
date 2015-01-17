@@ -143,9 +143,8 @@ template <typename RandomAccessIteratorPairIterator,
 RandomAccessIterator3
 multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
                RandomAccessIteratorPairIterator seqs_end,
-               RandomAccessIterator3 target,
-               Comparator comp,
-               DiffType length)
+               RandomAccessIterator3 target, DiffType length,
+               Comparator comp)
 {
 #if STXXL_PARALLEL
     return stxxl::parallel::multiway_merge(
@@ -169,9 +168,8 @@ template <typename RandomAccessIteratorPairIterator,
 RandomAccessIterator3
 multiway_merge_stable(RandomAccessIteratorPairIterator seqs_begin,
                       RandomAccessIteratorPairIterator seqs_end,
-                      RandomAccessIterator3 target,
-                      Comparator comp,
-                      DiffType length)
+                      RandomAccessIterator3 target, DiffType length,
+                      Comparator comp)
 {
 #if STXXL_PARALLEL
     return stxxl::parallel::multiway_merge_stable(
@@ -196,9 +194,8 @@ template <typename RandomAccessIteratorPairIterator,
 RandomAccessIterator3
 multiway_merge_sentinels(RandomAccessIteratorPairIterator seqs_begin,
                          RandomAccessIteratorPairIterator seqs_end,
-                         RandomAccessIterator3 target,
-                         Comparator comp,
-                         DiffType length)
+                         RandomAccessIterator3 target, DiffType length,
+                         Comparator comp)
 {
 #if STXXL_PARALLEL
     return stxxl::parallel::multiway_merge_sentinels(
@@ -223,9 +220,8 @@ template <typename RandomAccessIteratorPairIterator,
 RandomAccessIterator3
 multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
                                 RandomAccessIteratorPairIterator seqs_end,
-                                RandomAccessIterator3 target,
-                                Comparator comp,
-                                DiffType length)
+                                RandomAccessIterator3 target, DiffType length,
+                                Comparator comp)
 {
 #if STXXL_PARALLEL
     return stxxl::parallel::multiway_merge_stable_sentinels(

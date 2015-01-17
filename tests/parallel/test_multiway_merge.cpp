@@ -118,21 +118,21 @@ void test_vecs(unsigned int vecnum)
         if (!Stable)
             stxxl::potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
-                output.begin(), std::less<ValueType>(), totalsize);
+                output.begin(), totalsize, std::less<ValueType>());
         else
             stxxl::potentially_parallel::multiway_merge_stable(
                 sequences.begin(), sequences.end(),
-                output.begin(), std::less<ValueType>(), totalsize);
+                output.begin(), totalsize, std::less<ValueType>());
     }
     else {
         if (!Stable)
             stxxl::potentially_parallel::multiway_merge_sentinels(
                 sequences.begin(), sequences.end(),
-                output.begin(), std::less<ValueType>(), totalsize);
+                output.begin(), totalsize, std::less<ValueType>());
         else
             stxxl::potentially_parallel::multiway_merge_stable_sentinels(
                 sequences.begin(), sequences.end(),
-                output.begin(), std::less<ValueType>(), totalsize);
+                output.begin(), totalsize, std::less<ValueType>());
     }
 
 #ifdef TODO
@@ -141,14 +141,12 @@ void test_vecs(unsigned int vecnum)
     if (!Sentinels) {
         stxxl::parallel::sequential_multiway_merge<Stable, false>(
             sequences.begin(), sequences.end(),
-            output.begin(), totalsize,
-            std::less<ValueType>());
+            output.begin(), totalsize, std::less<ValueType>());
     }
     else {
         stxxl::parallel::sequential_multiway_merge<Stable, true>(
             sequences.begin(), sequences.end(),
-            output.begin(), totalsize,
-            std::less<ValueType>());
+            output.begin(), totalsize, std::less<ValueType>());
     }
 #endif
 
