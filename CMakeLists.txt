@@ -101,6 +101,8 @@ option(NO_CXX11 "Build without C++11 flags" OFF)
 
 option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
 
+option(USE_MALLOC_COUNT "Compile all programs with included malloc_count heap profiler." OFF)
+
 option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
 
 option(STXXL_DEBUG_ASSERTIONS "Enable more costly assertions for internal debugging." OFF)
@@ -559,6 +561,12 @@ include(CheckSymbolExists)
 check_symbol_exists(mallinfo "malloc.h" STXXL_HAVE_MALLINFO_PROTO)
 check_symbol_exists(mlock "sys/mman.h" STXXL_HAVE_MLOCK_PROTO)
 
+if(USE_MALLOC_COUNT)
+  # malloc_count requires the linux dl (dynamic linker) library
+  find_library(DL_LIBRARIES NAMES dl)
+  set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${DL_LIBRARIES})
+endif()
+
 ###############################################################################
 # configure environment for building
 
@@ -573,7 +581,7 @@ set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/incl
 include_directories(${STXXL_INCLUDE_DIRS})
 
 # for targets using stxxl library
-set(STXXL_EXTRA_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 set(STXXL_LIBRARIES stxxl ${STXXL_EXTRA_LIBRARIES})
 
 # export STXXL_INCLUDE_DIRS and STXXL_LIBRARIES to global CACHE

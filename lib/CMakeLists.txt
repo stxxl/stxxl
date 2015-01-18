@@ -68,6 +68,17 @@ if(STXXL_HAVE_LINUXAIO_FILE)
     )
 endif()
 
+if(USE_MALLOC_COUNT)
+  # enable light-weight heap profiling tool malloc_count
+  set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
+    utils/malloc_count.cpp
+    )
+
+  set_source_files_properties(utils/malloc_count.cpp
+    PROPERTIES COMPILE_FLAGS "-Wno-pedantic")
+
+endif(USE_MALLOC_COUNT)
+
 # tell top-level cmakelists which library we build
 set(STXXL_EXPORTED_LIBS stxxl)
 

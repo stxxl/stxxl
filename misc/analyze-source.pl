@@ -193,7 +193,7 @@ sub process_cpp {
             next if $ln =~ /^\s*#(if|elif|define|error)/;
             next if $path eq "include/stxxl/bits/common/types.h";
 
-            if ($ln =~ m@\s__(?!(gnu_parallel|gnu_cxx|glibcxx|typeof__|attribute__|sync_add_and_fetch|FILE__|LINE__|FUNCTION__))@) {
+            if ($ln =~ m@\s__(?!(gnu_parallel|gnu_cxx|glibcxx|cxa_demangle|typeof__|attribute__|sync_add_and_fetch|sync_sub_and_fetch|FILE__|LINE__|FUNCTION__))@) {
                 print("double-underscore found in $path\n");
                 print $ln."\n";
                 system("emacsclient -n $path") if $launch_emacs;
