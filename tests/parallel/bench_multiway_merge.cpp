@@ -28,6 +28,9 @@ unsigned int g_repeat = 3;
 // factor to multiply while increasing number of arrays
 unsigned int g_factor = 32;
 
+// run only a few quick benchmark runs
+bool g_quick = false;
+
 struct DataStruct
 {
     unsigned int key;
@@ -290,6 +293,8 @@ void test_all_vecnum()
     for (unsigned int s = 128; s < 256; s += 4 * g_factor)
         test_repeat<ValueType, Method>(s);
 
+    if (g_quick) return;
+
     for (unsigned int s = 256; s < 512; s += 16 * g_factor)
         test_repeat<ValueType, Method>(s);
 
@@ -346,6 +351,10 @@ int main(int argc, char* argv[])
     cp.add_uint('f', "factor",
                 "factor to multiply while increasing number of arrays",
                 g_factor);
+
+    cp.add_flag('q', "quick",
+                "run only a few quick benchmark runs",
+                g_quick);
 
     if (!cp.process(argc, argv))
         return EXIT_FAILURE;
