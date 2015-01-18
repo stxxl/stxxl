@@ -13,8 +13,8 @@
 
 #include <vector>
 #include <utility>
-#include <omp.h>
 #include <cstdlib>
+
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/is_sorted.h>

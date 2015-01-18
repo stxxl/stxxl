@@ -33,12 +33,21 @@ namespace parallel {
 #if (STXXL_VERBOSE_LEVEL <= 0)
 #define STXXL_PARALLEL_PCALL(n)
 #endif
+
 #if (STXXL_VERBOSE_LEVEL >= 1)
+#if STXXL_PARALLEL
 #define STXXL_PARALLEL_PCALL(n)                        \
     STXXL_MSG("   " << __FUNCTION__ << ":\n"           \
               "iam = " << omp_get_thread_num() << ", " \
               "n = " << (n) << ", "                    \
               "num_threads = " << SETTINGS::num_threads);
+#else
+#define STXXL_PARALLEL_PCALL(n)                        \
+    STXXL_MSG("   " << __FUNCTION__ << ":\n"           \
+              "iam = single-threaded, "                \
+              "n = " << (n) << ", "                    \
+              "num_threads = " << SETTINGS::num_threads);
+#endif
 #endif
 
 /** First copy the data, sort it locally, and merge it back (0); or copy it

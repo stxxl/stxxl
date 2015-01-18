@@ -18,10 +18,13 @@
 #ifndef STXXL_PARALLEL_SETTINGS_HEADER
 #define STXXL_PARALLEL_SETTINGS_HEADER
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel/types.h>
 
-#include <omp.h>
+#if STXXL_PARALLEL
+  #include <omp.h>
+#endif
 
 STXXL_BEGIN_NAMESPACE
 
@@ -40,7 +43,11 @@ public:
 
     NumberOfThreads()
     {
+#if STXXL_PARALLEL
         num_threads = omp_get_max_threads();
+#else
+        num_threads = 1;
+#endif // STXXL_PARALLEL
         if (num_threads < 1)
             num_threads = 1;
     }

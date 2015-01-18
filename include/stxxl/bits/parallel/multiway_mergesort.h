@@ -21,6 +21,7 @@
 #include <iterator>
 #include <algorithm>
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
 #include <stxxl/bits/parallel/equally_split.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
@@ -29,6 +30,8 @@
 #include <stxxl/bits/parallel/timing.h>
 
 STXXL_BEGIN_NAMESPACE
+
+#if STXXL_PARALLEL
 
 namespace parallel {
 
@@ -377,6 +380,8 @@ parallel_sort_mwms(RandomAccessIterator begin,
 }
 
 } // namespace parallel
+
+#endif // STXXL_PARALLEL
 
 STXXL_END_NAMESPACE
 
