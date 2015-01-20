@@ -789,9 +789,7 @@ protected:
 
         // check that all blocks where written
         for (unsigned_type i = 0; i < m_num_blocks; ++i)
-        {
-            assert(m_blocks[i] != reinterpret_cast<block_type*>(1));
-        }
+            assert(m_blocks[i] == NULL);
 
         // compatibility to the block write interface
         m_size = m_capacity;
@@ -1467,11 +1465,11 @@ public:
 
     ~external_array_writer()
     {
-        m_ea.finish_write();
-#if STXXL_DEBUG_ASSERTIONS
         m_live_boundary.clear(); // release block boundaries
+#if STXXL_DEBUG_ASSERTIONS
         STXXL_ASSERT(m_ref_total == 0);
 #endif
+        m_ea.finish_write();
     }
 
     iterator begin()
