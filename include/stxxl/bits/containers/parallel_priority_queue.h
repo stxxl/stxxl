@@ -2831,13 +2831,14 @@ public:
     //! \}
 
     /*!
-     * Merges all external arrays into one external array.  Public for
-     * benchmark purposes.
+     * Merges all external arrays and all internal arrays into one external array.
+     * Public for benchmark purposes.
      */
     void merge_external_arrays()
     {
-        STXXL_CHECK(0);
-#if TODO_FIXUP_LATER
+    
+        STXXL_DEBUG("Merging external arrays");
+    
         m_stats.num_external_array_merges++;
         m_stats.external_array_merge_time.start();
 
@@ -2846,87 +2847,69 @@ public:
         // clean up external arrays that have been deleted in extract_min!
         cleanup_external_arrays();
 
-        size_type total_size = m_external_size;
+        size_t total_size = m_external_size;
         assert(total_size > 0);
 
-        external_array_type a(total_size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type ea(total_size, m_num_prefetchers, m_num_write_buffers);
+        {
+            external_array_writer_type external_array_writer(ea);
 
-        //-tb this is probably wrong, and violates the memory counter, see
-        //-cleanup above.
-        m_mem_left += (m_external_arrays.size() - 1) * m_mem_per_external_array;
+            typename external_array_writer_type::iterator outiter
+                   = external_array_writer.begin();
 
-        while (m_external_arrays.size() > 0) {
-            size_type eas = m_external_arrays.size();
+            while (m_external_arrays.size() > 0) {
+                
+                size_type eas = m_external_arrays.size();
+                size_type ias = m_internal_arrays.size();
+                std::vector<size_type> sizes(eas+ias);
+                std::vector<iterator_pair_type> sequences(eas+ias);
+                
+                calculate_merge_sequences(sizes,sequences,false);
+                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
 
-            m_external_arrays[0].wait();
-            ValueType min_max_value = m_external_arrays[0].get_current_max();
+                outiter = potentially_parallel::multiway_merge(
+                    sequences.begin(), sequences.end(),
+                    outiter, output_size, m_inv_compare);
 
-            for (size_type i = 1; i < eas; ++i) {
-                m_external_arrays[i].wait();
-                ValueType max_value = m_external_arrays[i].get_current_max();
-                if (m_inv_compare(max_value, min_max_value)) {
-                    min_max_value = max_value;
+                for (size_type i = 0; i < eas+ias; ++i) {
+                    if (i < eas) {
+                        m_external_arrays[i].remove(sizes[i]);
+                        // future: m_prefetch_prediction_tree.replay_on_change(i);
+                    }
+                    else {
+                        size_type j = i - eas;
+                        m_internal_arrays[j].inc_min(sizes[j]);
+                        assert(m_internal_size >= sizes[j]);
+                        m_internal_size -= sizes[j];
+                    }
                 }
+                
+                for (size_type i = 0; i < eas; ++i) {
+                    m_external_arrays[i].wait();
+                }
+                
+                cleanup_external_arrays();
+                cleanup_internal_arrays();
+                
             }
-
-            std::vector<size_type> sizes(eas);
-            std::vector<iterator_pair_type> sequences(eas);
-            size_type output_size = 0;
-
-#if STXXL_PARALLEL
-            #pragma omp parallel for if(eas > m_num_insertion_heaps)
-#endif
-            for (size_type i = 0; i < eas; ++i) {
-                assert(!m_external_arrays[i].empty());
-
-                m_external_arrays[i].wait();
-                iterator begin = m_external_arrays[i].begin();
-                iterator end = m_external_arrays[i].end();
-
-                assert(begin != end);
-
-                iterator ub = std::upper_bound(begin, end, min_max_value, m_inv_compare);
-                sizes[i] = ub - begin;
-#if STXXL_PARALLEL
-#pragma omp atomic
-#endif
-                output_size += ub - begin;
-                sequences[i] = std::make_pair(begin, ub);
-            }
-
-            a.request_write_buffer(output_size);
-
-            potentially_parallel::multiway_merge(
-                sequences.begin(), sequences.end(),
-                a.begin(), output_size, m_inv_compare);
-
-            a.flush_write_buffer();
-
-            for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].remove(sizes[i]);
-            }
-
-            for (size_type i = 0; i < eas; ++i) {
-                m_external_arrays[i].wait();
-            }
-
-            cleanup_external_arrays();
-        }
-
-        a.finish_write_phase();
-        m_external_arrays.swap_back(a);
+            
+        } // destroy external_array_writer
+        
+        m_external_arrays.swap_back(ea);
+        // future: m_prefetch_prediction_tree.activate_player(0);
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
             m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            a.wait();
+            ea.wait();
             m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
         }
 
         m_stats.external_array_merge_time.stop();
 
+        m_mem_left -= m_mem_per_external_array;
         check_invariants();
-#endif
+        
     }
 
     //! Print statistics.
@@ -3062,7 +3045,7 @@ protected:
         }
 
         if (needs_limit) {
-            STXXL_DEBUG("return with needs_limit: min_max_value=" << min_max_index);
+            STXXL_DEBUG("return with needs_limit: min_max_index=" << min_max_index);
             return min_max_index;
         }
         else {
