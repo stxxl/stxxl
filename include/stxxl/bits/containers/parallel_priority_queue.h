@@ -477,9 +477,6 @@ protected:
     //! least requested to be so)
     external_size_type m_end_index;
 
-    //! The index of the next block to be prefetched.
-    internal_size_type m_hint_index;
-
     //! allow writer to access to all variables
     friend class external_array_writer<self_type>;
 
@@ -518,8 +515,7 @@ public:
           // indices
           m_size(0),
           m_index(0),
-          m_end_index(0),
-          m_hint_index(0)
+          m_end_index(0)
     {
         assert(m_capacity > 0);
         assert(m_num_write_buffer_blocks > 0); // needed for steal()
@@ -552,8 +548,7 @@ public:
           // indices
           m_size(0),
           m_index(0),
-          m_end_index(0),
-          m_hint_index(0)
+          m_end_index(0)
     { }
 
     //! Swap external_array with another one.
@@ -583,7 +578,6 @@ public:
         swap(m_size, o.m_size);
         swap(m_index, o.m_index);
         swap(m_end_index, o.m_end_index);
-        swap(m_hint_index, o.m_hint_index);
     }
 
     //! Swap external_array with another one.
@@ -796,9 +790,6 @@ protected:
         m_index = 0;
         m_end_index = 0;
 
-        for (size_t i = 0; i < m_num_prefetch_blocks; ++i)
-            hint();
-
         m_write_phase = false;
 
         // refill_extract_buffer() assumes at least one loaded block per ea
@@ -958,10 +949,6 @@ public:
         m_end_index = std::min<external_size_type>(local_block_size, m_capacity);
         m_index = 0;
 
-        for (size_t i = 0; i < m_num_prefetch_blocks; ++i) {
-            hint();
-        }
-
         assert(m_blocks[0]);
     }
 #endif
@@ -1058,13 +1045,19 @@ public:
         m_requests[block_index] = m_pool->read(m_blocks[block_index], m_bids[block_index]);
         update_block_pointers(block_index);
 
-        hint();
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_size);
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
                     " block index=" << block_index <<
                     " end_index=" << m_end_index);
+    }
+
+    //! Gives the prefetcher a hint for the next block to prefetch.
+    void hint()
+    {
+        if (get_end_block_index() < m_num_blocks)
+            m_pool->hint(m_bids[get_end_block_index()]);
     }
 
 protected:
@@ -1078,15 +1071,6 @@ protected:
         else {
             return (bool)m_blocks[block_index];
         }
-    }
-
-    //! Gives the prefetcher a hint for the next block to prefetch.
-    void hint()
-    {
-        if (m_hint_index < m_num_blocks) {
-            m_pool->hint(m_bids[m_hint_index]);
-        }
-        ++m_hint_index;
     }
 
     //! Updates the m_block_pointers vector.
@@ -2153,6 +2137,8 @@ protected:
             m_prefetch_prediction_tree.replay_on_change(i);
         }
 
+        hint();
+
         STXXL_DEBUG("Removed "<<(size_t)(m_external_arrays.end()-swap_end)
             <<" empty external arrays.");
         
@@ -2927,6 +2913,7 @@ public:
                     if (i < eas) {
                         m_external_arrays[i].remove(sizes[i]);
                         update_prefetch_prediction_tree(i);
+                        hint();
                     }
                     else {
                         size_type j = i - eas;
@@ -2949,6 +2936,7 @@ public:
         
         m_external_arrays.swap_back(ea);
         m_prefetch_prediction_tree.activate_player(0);
+        hint();
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
@@ -2972,6 +2960,14 @@ public:
             m_prefetch_prediction_tree.replay_on_change(ea_index);
         } else {
             m_prefetch_prediction_tree.deactivate_player(ea_index);
+        }
+    }
+
+    inline void hint() {
+        int min_max_index = m_prefetch_prediction_tree.top();
+        if (min_max_index>-1) {
+            assert((size_t)min_max_index<m_external_arrays.size());
+            m_external_arrays[min_max_index].hint();
         }
     }
 
@@ -3183,6 +3179,7 @@ protected:
                 if (limiting_ea_index < eas) {
                     m_external_arrays[limiting_ea_index].request_further_block();
                     update_prefetch_prediction_tree(limiting_ea_index);
+                    hint();
                     reuse_upper_bounds = true;
                 }
                 else if (limiting_ea_index == eas) {
@@ -3231,6 +3228,7 @@ protected:
                 if (i < eas) {
                     m_external_arrays[i].remove(diff);
                     update_prefetch_prediction_tree(i);
+                    hint();
                     assert(m_external_size >= diff);
                     m_external_size -= diff;
                 }
@@ -3524,6 +3522,8 @@ protected:
 
         m_external_arrays.swap_back(ea);
         m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
+        hint();
+
         m_internal_size = 0;
         m_external_size += size;
 
@@ -3584,6 +3584,7 @@ protected:
 
         m_external_arrays.swap_back(ea);
         m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
+        hint();
         
         m_external_size += size;
         m_heaps_size = 0;
@@ -3637,6 +3638,7 @@ protected:
 
         m_external_arrays.swap_back(ea);
         m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
+        hint();
         
         m_external_size += values.size();
 
