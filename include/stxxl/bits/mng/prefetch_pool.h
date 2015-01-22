@@ -137,6 +137,12 @@ public:
         return false;
     }
 
+    //! Returns if there are free blocks to prefetch into via hint().
+    bool hint_possible() const
+    {
+        return (free_blocks_size>0);
+    }
+
     bool hint(bid_type bid, write_pool<block_type>& w_pool)
     {
         // if block is already hinted, no need to hint it again

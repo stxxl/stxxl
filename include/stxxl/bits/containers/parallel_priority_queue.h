@@ -427,6 +427,10 @@ public:
     static const bool debug = false;
 
 protected:
+
+// TODO DEBUG remove!!!
+public:
+
     //! The total size of the external array in items. Cannot be changed
     //! after construction.
     external_size_type m_capacity;
@@ -477,6 +481,9 @@ protected:
     //! least requested to be so)
     external_size_type m_end_index;
 
+    //! The block index until which prefetch hints were given.
+    unsigned_type m_hinted_until;
+
     //! allow writer to access to all variables
     friend class external_array_writer<self_type>;
 
@@ -515,7 +522,8 @@ public:
           // indices
           m_size(0),
           m_index(0),
-          m_end_index(0)
+          m_end_index(0),
+          m_hinted_until(0)
     {
         assert(m_capacity > 0);
         assert(m_num_write_buffer_blocks > 0); // needed for steal()
@@ -548,7 +556,8 @@ public:
           // indices
           m_size(0),
           m_index(0),
-          m_end_index(0)
+          m_end_index(0),
+          m_hinted_until(0)
     { }
 
     //! Swap external_array with another one.
@@ -578,6 +587,7 @@ public:
         swap(m_size, o.m_size);
         swap(m_index, o.m_index);
         swap(m_end_index, o.m_end_index);
+        swap(m_hinted_until, o.m_hinted_until);
     }
 
     //! Swap external_array with another one.
@@ -648,6 +658,17 @@ public:
         return end_block_index;
     }
 
+    //! Return the block beyond the block in which m_end_index is located.
+    inline unsigned_type get_current_block_index() const
+    {
+        unsigned_type last_block_index = m_end_index / block_size;
+        assert(last_block_index > 0);
+        // if first in block -> lookup maximum from previous block
+        if (m_end_index % block_size == 0) --last_block_index;
+        assert(last_block_index < m_num_blocks);
+        return last_block_index;
+    }
+
     //! Returns a random-access iterator to the begin of the data
     //! in internal memory.
     iterator begin() const
@@ -674,15 +695,15 @@ public:
     //! requested to be in internal memory)
     const value_type & get_current_max() const
     {
-        // we do not use get_end_block_index() here, since we want the last
-        // existing block.
-        size_t last_block_index = m_end_index / block_size;
-        assert(last_block_index > 0);
+        return m_maxima[get_current_block_index()];
+    }
 
-        // if first in block -> lookup maximum from previous block
-        if (m_end_index % block_size == 0) --last_block_index;
-
-        return m_maxima[last_block_index];
+    //! Returns the largest element of the block which has been
+    //! hinted the latest,
+    const value_type & get_hinted_max() const
+    {
+        assert(m_hinted_until < m_num_blocks);
+        return m_maxima[m_hinted_until];
     }
 
     //! Returns if there is data in EM, that's not randomly accessible.
@@ -690,6 +711,23 @@ public:
     {
         const unsigned_type end_block_index = get_end_block_index();
         return (end_block_index < m_num_blocks);
+    }
+
+    bool hint_possible() {
+        return has_unhinted_em_data() && m_pool->hint_possible();
+    }
+
+    //! Returns if there is data in EM, that's not already hinted
+    //! to the prefetcher.
+    bool has_unhinted_em_data() const
+    {
+        return (m_hinted_until+1 < m_num_blocks);
+    }
+
+    size_t num_hinted_blocks() const
+    {
+        assert(get_current_block_index()<=m_hinted_until);
+        return m_hinted_until-get_current_block_index();
     }
 
     //! Returns if the data requested to be in internal memory is
@@ -748,6 +786,7 @@ public:
         // compatibility to the block write interface
         m_index = m_size;
         m_end_index = m_index + 1;
+        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
     }
 #endif
 
@@ -926,6 +965,7 @@ public:
         m_size += size;
         m_index = m_size;
         m_end_index = m_index + 1; // buffer size must be at least 1
+        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
     }
 
     //! Finish write phase. Afterwards the values can be extracted from bottom
@@ -947,6 +987,7 @@ public:
 
         const size_t local_block_size = block_size; // std::min cannot access static block_size
         m_end_index = std::min<external_size_type>(local_block_size, m_capacity);
+        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
         m_index = 0;
 
         assert(m_blocks[0]);
@@ -1047,6 +1088,7 @@ public:
 
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_size);
+        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
                     " block index=" << block_index <<
@@ -1056,8 +1098,10 @@ public:
     //! Gives the prefetcher a hint for the next block to prefetch.
     void hint()
     {
-        if (get_end_block_index() < m_num_blocks)
-            m_pool->hint(m_bids[get_end_block_index()]);
+        if (m_hinted_until < m_num_blocks) {
+            ++m_hinted_until;
+            m_pool->hint(m_bids[m_hinted_until]);
+        }
     }
 
 protected:
@@ -2039,22 +2083,42 @@ protected:
     minima_type m_minima;
     
     //! Compares the largest accessible value of two external arrays.
-    struct prefetch_prediction_comparator {
+    struct fetch_prediction_comparator {
         const external_arrays_type& m_eas;
         const inv_compare_type& m_compare;
-        prefetch_prediction_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
+        fetch_prediction_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
             : m_eas(eas), m_compare(compare) {}
         bool operator () (const size_t& a, const size_t& b) const
         {
             return m_compare(m_eas[a].get_current_max(), m_eas[b].get_current_max());
         }
-    } m_prefetch_prediction_comparator;
+    } m_fetch_prediction_comparator;
     
     //! Tracks the largest accessible values of the external arrays if there
     //! is unaccessible data in EM. The winning array is the first one that
-    //! needs to fetch further data from EM. Used in calculate_merge_sequences
-    //! and for prefetch hints (TODO).
-    winner_tree<prefetch_prediction_comparator> m_prefetch_prediction_tree;
+    //! needs to fetch further data from EM. Used in calculate_merge_sequences.
+    winner_tree<fetch_prediction_comparator> m_fetch_prediction_tree;
+    
+    //! Compares the largest value of the block hinted the latest of two
+    //! external arrays.
+    struct hint_comparator {
+        const external_arrays_type& m_eas;
+        const inv_compare_type& m_compare;
+        hint_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
+            : m_eas(eas), m_compare(compare) {}
+        bool operator () (const size_t& a, const size_t& b) const
+        {
+            return m_compare(m_eas[a].get_hinted_max(), m_eas[b].get_hinted_max());
+        }
+    } m_hint_comparator;
+    
+    //! Tracks the largest values of the block hinted the latest of the
+    //! external arrays if there is unaccessible data in EM. The winning
+    //! array is the first one that needs to fetch further data from EM.
+    //! Used for prefetch hints.
+    winner_tree<hint_comparator> m_hint_tree;
+
+    unsigned_type m_num_hinted_blocks;
 
     //! Random number generator for randomly selecting a heap in sequential
     //! push()
@@ -2102,7 +2166,7 @@ protected:
         empty_external_array_eraser pred;
 
         // The following is a modified implementation of swap_remove_if().
-        // Updates m_prefetch_prediction_tree accordingly.
+        // Updates m_fetch_prediction_tree accordingly.
 
         ForwardIterator first = m_external_arrays.begin();
         ForwardIterator last = m_external_arrays.end();
@@ -2129,12 +2193,12 @@ protected:
         // Deactivating all affected players first.
         // Otherwise there might be outdated comparisons.
         for (size_t i=first_removed; i<size; ++i) {
-            m_prefetch_prediction_tree.deactivate_player(i);
+            m_fetch_prediction_tree.deactivate_player(i);
         }
         
         // Replay moved arrays.
         for (size_t i=first_removed; i<swap_end_index; ++i) {
-            m_prefetch_prediction_tree.replay_on_change(i);
+            update_fetch_and_hint_trees(i);
         }
 
         hint();
@@ -2235,8 +2299,11 @@ public:
           m_proc(m_num_insertion_heaps),
           m_external_arrays(),
           m_minima(*this),
-          m_prefetch_prediction_comparator(m_external_arrays,m_inv_compare),
-          m_prefetch_prediction_tree(16,m_prefetch_prediction_comparator)
+          m_fetch_prediction_comparator(m_external_arrays,m_inv_compare),
+          m_fetch_prediction_tree(16,m_fetch_prediction_comparator),
+          m_hint_comparator(m_external_arrays,m_inv_compare),
+          m_hint_tree(16,m_hint_comparator),
+          m_num_hinted_blocks(0)
     {
 #if STXXL_PARALLEL
         if (!omp_get_nested()) {
@@ -2875,7 +2942,7 @@ public:
     void merge_external_arrays()
     {
     
-        STXXL_DEBUG("Merging external arrays");
+        STXXL_MSG("Merging external arrays");
     
         m_stats.num_external_array_merges++;
         m_stats.external_array_merge_time.start();
@@ -2912,7 +2979,7 @@ public:
                 for (size_type i = 0; i < eas+ias; ++i) {
                     if (i < eas) {
                         m_external_arrays[i].remove(sizes[i]);
-                        update_prefetch_prediction_tree(i);
+                        update_fetch_and_hint_trees(i);
                         hint();
                     }
                     else {
@@ -2935,8 +3002,7 @@ public:
         } // destroy external_array_writer
         
         m_external_arrays.swap_back(ea);
-        m_prefetch_prediction_tree.activate_player(0);
-        hint();
+        update_trees_after_ea_creation(0);
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
@@ -2952,23 +3018,63 @@ public:
         
     }
 
+    //! Activate player in prefetch prediction tree afer a remove()
+    //! or a request_further_block() call.
+    //! \param ea_index index of the external array in question
+    inline void update_trees_after_ea_creation(size_t ea_index) {
+        if (m_external_arrays[ea_index].has_em_data()) {
+            m_fetch_prediction_tree.activate_player(ea_index);
+            m_hint_tree.activate_player(ea_index);
+        }
+
+        // TODO:    - cancel unfinished prefetch hints! (how?)
+        //          - reset hinted_until counters
+        //          - rebuild m_hint_tree
+
+        hint();
+    }
+
     //! Updates the prefetch prediction tree afer a remove() or
     //! a request_further_block() call.
     //! \param ea_index index of the external array in question
-    inline void update_prefetch_prediction_tree(size_t ea_index) {
+    inline void update_fetch_and_hint_trees(size_t ea_index) {
         if (m_external_arrays[ea_index].has_em_data()) {
-            m_prefetch_prediction_tree.replay_on_change(ea_index);
+            m_fetch_prediction_tree.replay_on_change(ea_index);
         } else {
-            m_prefetch_prediction_tree.deactivate_player(ea_index);
+            m_fetch_prediction_tree.deactivate_player(ea_index);
+        }
+        if (m_external_arrays[ea_index].has_unhinted_em_data()) {
+            m_hint_tree.replay_on_change(ea_index);
+        } else {
+            m_hint_tree.deactivate_player(ea_index);
         }
     }
 
     inline void hint() {
-        int min_max_index = m_prefetch_prediction_tree.top();
-        if (min_max_index>-1) {
-            assert((size_t)min_max_index<m_external_arrays.size());
-            m_external_arrays[min_max_index].hint();
+
+        // TODO: avoid this loop? -> count deleted block in remove()
+
+        size_t num_hinted=0;
+        for (size_t i=0; i<m_external_arrays.size(); ++i) {
+            num_hinted += m_external_arrays[i].num_hinted_blocks();
         }
+
+        int min_max_index = m_hint_tree.top();
+        while (num_hinted < m_num_prefetchers && min_max_index>-1) {
+            assert((size_t)min_max_index<m_external_arrays.size());
+
+            STXXL_DEBUG("Give hint in EA["<<min_max_index<<"]");
+
+            if (m_external_arrays[min_max_index].hint_possible()) {
+                m_external_arrays[min_max_index].hint();
+                num_hinted++;
+                m_hint_tree.replay_on_change(min_max_index);
+            } else {
+                m_hint_tree.deactivate_player(min_max_index);
+            }
+
+        }
+
     }
 
     //! Print statistics.
@@ -3025,8 +3131,8 @@ protected:
          * determine maximum of each first block
          */
 
-        size_t min_max_index = (size_t) m_prefetch_prediction_tree.top();
-        bool needs_limit = (m_prefetch_prediction_tree.top()>-1) ? true : false;
+        size_t min_max_index = (size_t) m_fetch_prediction_tree.top();
+        bool needs_limit = (m_fetch_prediction_tree.top()>-1) ? true : false;
 
 // test correctness of prefetch prediction tree
 #ifdef STXXL_DEBUG_ASSERTIONS
@@ -3178,7 +3284,7 @@ protected:
 
                 if (limiting_ea_index < eas) {
                     m_external_arrays[limiting_ea_index].request_further_block();
-                    update_prefetch_prediction_tree(limiting_ea_index);
+                    update_fetch_and_hint_trees(limiting_ea_index);
                     hint();
                     reuse_upper_bounds = true;
                 }
@@ -3227,7 +3333,7 @@ protected:
             if (diff > 0) {
                 if (i < eas) {
                     m_external_arrays[i].remove(diff);
-                    update_prefetch_prediction_tree(i);
+                    update_fetch_and_hint_trees(i);
                     hint();
                     assert(m_external_size >= diff);
                     m_external_size -= diff;
@@ -3521,8 +3627,7 @@ protected:
         STXXL_DEBUG("Merge done of new ea " << &ea);
 
         m_external_arrays.swap_back(ea);
-        m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
-        hint();
+        update_trees_after_ea_creation(m_external_arrays.size()-1);
 
         m_internal_size = 0;
         m_external_size += size;
@@ -3583,8 +3688,7 @@ protected:
         ea.finish_write_phase();
 
         m_external_arrays.swap_back(ea);
-        m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
-        hint();
+        update_trees_after_ea_creation(m_external_arrays.size()-1);
         
         m_external_size += size;
         m_heaps_size = 0;
@@ -3637,8 +3741,7 @@ protected:
         ea.finish_write_phase();
 
         m_external_arrays.swap_back(ea);
-        m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
-        hint();
+        update_trees_after_ea_creation(m_external_arrays.size()-1);
         
         m_external_size += values.size();
 

@@ -135,6 +135,11 @@ public:
         return p_pool->hint(bid, *w_pool);
     }
 
+    //! Returns if there are free blocks to prefetch into via hint().
+    bool hint_possible() {
+        return p_pool->hint_possible();
+    }
+
     bool invalidate(bid_type bid)
     {
         return p_pool->invalidate(bid);
