@@ -63,10 +63,8 @@ struct random_number32
 };
 
 //! Set a seed value for \c random_number32.
-inline void srandom_number32(unsigned seed = 0)
+inline void srandom_number32(unsigned seed = get_next_seed())
 {
-    if (!seed)
-        seed = get_next_seed();
     ran32State = seed;
 }
 
@@ -78,10 +76,8 @@ struct random_number32_r
     typedef unsigned value_type;
     mutable unsigned state;
 
-    random_number32_r(unsigned seed = 0)
+    random_number32_r(unsigned seed = get_next_seed())
     {
-        if (!seed)
-            seed = get_next_seed();
         state = seed;
     }
 
@@ -103,7 +99,7 @@ class random_number8_r
 public:
     typedef uint8 value_type;
 
-    random_number8_r(unsigned seed = 0)
+    random_number8_r(unsigned seed = get_next_seed())
         : m_rnd32(seed), m_pos(4)
     { }
 
@@ -125,7 +121,7 @@ struct random_uniform_fast
     typedef double value_type;
     random_number32 rnd32;
 
-    random_uniform_fast(unsigned /*seed*/ = 0)
+    random_uniform_fast(unsigned /*seed*/ = get_next_seed())
     { }
 
     //! Returns a random number from [0.0, 1.0)
@@ -153,9 +149,8 @@ struct random_uniform_slow
     typedef std::uniform_real_distribution<> uni_type;
     mutable uni_type uni;
 
-    random_uniform_slow(unsigned seed = 0)
-        : gen(seed ? seed : get_next_seed()),
-          uni(0.0, 1.0)
+    random_uniform_slow(unsigned seed = get_next_seed())
+        : gen(seed), uni(0.0, 1.0)
     { }
 #elif STXXL_BOOST_RANDOM
     typedef boost::minstd_rand base_generator_type;
@@ -163,10 +158,9 @@ struct random_uniform_slow
     boost::uniform_real<> uni_dist;
     mutable boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
 
-    random_uniform_slow(unsigned seed = 0) : uni(generator, uni_dist)
+    random_uniform_slow(unsigned seed = get_next_seed())
+        : uni(generator, uni_dist)
     {
-        if (!seed)
-            seed = get_next_seed();
         uni.engine().seed(seed);
     }
 #else
@@ -218,10 +212,8 @@ struct random_uniform_slow
     }
 /* end erand48.c */
 
-    random_uniform_slow(unsigned seed = 0)
+    random_uniform_slow(unsigned seed = get_next_seed())
     {
-        if (!seed)
-            seed = get_next_seed();
         state48[0] = (unsigned short)(seed & 0xffff);
         state48[1] = (unsigned short)(seed >> 16);
         state48[2] = 42;
@@ -249,7 +241,8 @@ struct random_number
     typedef unsigned value_type;
     UniformRGen uniform;
 
-    random_number(unsigned seed = 0) : uniform(seed)
+    random_number(unsigned seed = get_next_seed())
+        : uniform(seed)
     { }
 
     //! Returns a random number from [0, N)
@@ -265,7 +258,8 @@ struct random_number64
     typedef stxxl::uint64 value_type;
     random_uniform_slow uniform;
 
-    random_number64(unsigned seed = 0) : uniform(seed)
+    random_number64(unsigned seed = get_next_seed())
+        : uniform(seed)
     { }
 
     //! Returns a random number from [0, 2^64)
