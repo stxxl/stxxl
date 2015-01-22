@@ -1018,7 +1018,8 @@ public:
     //! Removes the first n elements from the array. Loads the next block if
     //! the current one has run empty. Make shure there are at least n elements
     //! in RAM.
-    void remove(size_t n)
+    //! \returns true if a new block has been fetched, false if not.
+    bool remove(size_t n)
     {
         assert(m_index + n <= m_capacity);
         assert(m_index + n <= m_end_index);
@@ -1027,7 +1028,7 @@ public:
         STXXL_DEBUG("ea[" << this << "]: remove " << n << " items");
 
         if (n == 0)
-            return;
+            return false;
 
         const size_t block_index = m_index / block_size;
 
@@ -1065,10 +1066,13 @@ public:
         if (block_index_after == get_end_block_index() && has_em_data()) {
             // removed all items of a loaded block -> request another
             request_further_block();
+            return true;
         }
-        else {
+        else
+        {
             // removed some but not all items
             assert(block_valid(block_index_after) || m_index == m_capacity);
+            return false;
         }
     }
 
@@ -2911,7 +2915,10 @@ public:
             min = m_external_arrays[index].get_min();
             assert(m_external_size > 0);
             --m_external_size;
-            m_external_arrays[index].remove(1);
+            bool has_hinted_blocks = m_external_arrays[index].num_hinted_blocks() > 0;
+            bool fetched_new_block = m_external_arrays[index].remove(1);
+            if (has_hinted_blocks&&fetched_new_block)
+                --m_num_hinted_blocks;
             m_external_arrays[index].wait();
 
             if (!m_external_arrays[index].empty())
@@ -2978,7 +2985,10 @@ public:
 
                 for (size_type i = 0; i < eas+ias; ++i) {
                     if (i < eas) {
-                        m_external_arrays[i].remove(sizes[i]);
+                        bool has_hinted_blocks = m_external_arrays[i].num_hinted_blocks() > 0;
+                        bool fetched_new_block = m_external_arrays[i].remove(sizes[i]);
+                        if (has_hinted_blocks&&fetched_new_block)
+                            --m_num_hinted_blocks;
                         update_fetch_and_hint_trees(i);
                         hint();
                     }
@@ -3052,22 +3062,26 @@ public:
 
     inline void hint() {
 
-        // TODO: avoid this loop? -> count deleted block in remove()
+#ifdef STXXL_DEBUG_ASSERTIONS
 
         size_t num_hinted=0;
         for (size_t i=0; i<m_external_arrays.size(); ++i) {
             num_hinted += m_external_arrays[i].num_hinted_blocks();
         }
 
+        STXXL_ASSERT(num_hinted==m_num_hinted_blocks);
+
+#endif
+
         int min_max_index = m_hint_tree.top();
-        while (num_hinted < m_num_prefetchers && min_max_index>-1) {
+        while (m_num_hinted_blocks < m_num_prefetchers && min_max_index>-1) {
             assert((size_t)min_max_index<m_external_arrays.size());
 
             STXXL_DEBUG("Give hint in EA["<<min_max_index<<"]");
 
             if (m_external_arrays[min_max_index].hint_possible()) {
                 m_external_arrays[min_max_index].hint();
-                num_hinted++;
+                ++m_num_hinted_blocks;
                 m_hint_tree.replay_on_change(min_max_index);
             } else {
                 m_hint_tree.deactivate_player(min_max_index);
@@ -3283,7 +3297,10 @@ protected:
                             " minimum_size=" << minimum_size);
 
                 if (limiting_ea_index < eas) {
+                    bool has_hinted_blocks = m_external_arrays[limiting_ea_index].num_hinted_blocks() > 0;
                     m_external_arrays[limiting_ea_index].request_further_block();
+                    if (has_hinted_blocks)
+                        --m_num_hinted_blocks;
                     update_fetch_and_hint_trees(limiting_ea_index);
                     hint();
                     reuse_upper_bounds = true;
@@ -3332,7 +3349,10 @@ protected:
             const size_t diff = sizes[i] - dist;
             if (diff > 0) {
                 if (i < eas) {
-                    m_external_arrays[i].remove(diff);
+                    bool has_hinted_blocks = m_external_arrays[i].num_hinted_blocks() > 0;
+                    bool fetched_new_block = m_external_arrays[i].remove(diff);
+                    if (has_hinted_blocks&&fetched_new_block)
+                        --m_num_hinted_blocks;
                     update_fetch_and_hint_trees(i);
                     hint();
                     assert(m_external_size >= diff);
