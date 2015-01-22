@@ -1884,7 +1884,7 @@ protected:
 
     //! <-Comparator for ValueType
     compare_type m_compare;
-
+    
     //! >-Comparator for ValueType
     inv_compare_type m_inv_compare;
 
@@ -2053,6 +2053,24 @@ protected:
     //! The winner tree containing the smallest values of all sources
     //! where the globally smallest element could come from.
     minima_type m_minima;
+    
+    //! Compares the largest accessible value of two external arrays.
+    struct prefetch_prediction_comparator {
+        const external_arrays_type& m_eas;
+        const inv_compare_type& m_compare;
+        prefetch_prediction_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
+            : m_eas(eas), m_compare(compare) {}
+        bool operator () (const size_t& a, const size_t& b) const
+        {
+            return m_compare(m_eas[a].get_current_max(), m_eas[b].get_current_max());
+        }
+    } m_prefetch_prediction_comparator;
+    
+    //! Tracks the largest accessible values of the external arrays if there
+    //! is unaccessible data in EM. The winning array is the first one that
+    //! needs to fetch further data from EM. Used in calculate_merge_sequences
+    //! and for prefetch hints (TODO).
+    winner_tree<prefetch_prediction_comparator> m_prefetch_prediction_tree;
 
     //! Random number generator for randomly selecting a heap in sequential
     //! push()
@@ -2096,17 +2114,48 @@ protected:
     //! Clean up empty external arrays, free their memory and capacity
     void cleanup_external_arrays()
     {
-        typename external_arrays_type::iterator swap_end =
-            stxxl::swap_remove_if(m_external_arrays.begin(),
-                                  m_external_arrays.end(),
-                                  empty_external_array_eraser());
+        typedef typename external_arrays_type::iterator ForwardIterator;
+        empty_external_array_eraser pred;
 
-        for (typename external_arrays_type::iterator i = swap_end;
-             i != m_external_arrays.end(); ++i)
+        // The following is a modified implementation of swap_remove_if().
+        // Updates m_prefetch_prediction_tree accordingly.
+
+        ForwardIterator first = m_external_arrays.begin();
+        ForwardIterator last = m_external_arrays.end();
+        ForwardIterator swap_end = first;
+        size_t size = m_external_arrays.end()-m_external_arrays.begin();
+        size_t first_removed = size;
+        while (first != last)
         {
-            STXXL_DEBUG("Removing empty external array.");
+            if (!pred(*first))
+            {
+                using std::swap;
+                swap(*first, *swap_end);
+                ++swap_end;
+            }
+            else if (first_removed>=size)
+            {
+                first_removed = first - m_external_arrays.begin();
+            }
+            ++first;
+        }
+        
+        size_t swap_end_index = swap_end - m_external_arrays.begin();
+        
+        // Deactivating all affected players first.
+        // Otherwise there might be outdated comparisons.
+        for (size_t i=first_removed; i<size; ++i) {
+            m_prefetch_prediction_tree.deactivate_player(i);
+        }
+        
+        // Replay moved arrays.
+        for (size_t i=first_removed; i<swap_end_index; ++i) {
+            m_prefetch_prediction_tree.replay_on_change(i);
         }
 
+        STXXL_DEBUG("Removed "<<(size_t)(m_external_arrays.end()-swap_end)
+            <<" empty external arrays.");
+        
         m_mem_left +=
             (m_external_arrays.end() - swap_end) * m_mem_per_external_array;
 
@@ -2198,7 +2247,10 @@ public:
           m_internal_size(0),
           m_external_size(0),
           m_proc(m_num_insertion_heaps),
-          m_minima(*this)
+          m_external_arrays(),
+          m_minima(*this),
+          m_prefetch_prediction_comparator(m_external_arrays,m_inv_compare),
+          m_prefetch_prediction_tree(16,m_prefetch_prediction_comparator)
     {
 #if STXXL_PARALLEL
         if (!omp_get_nested()) {
@@ -2874,7 +2926,7 @@ public:
                 for (size_type i = 0; i < eas+ias; ++i) {
                     if (i < eas) {
                         m_external_arrays[i].remove(sizes[i]);
-                        // future: m_prefetch_prediction_tree.replay_on_change(i);
+                        update_prefetch_prediction_tree(i);
                     }
                     else {
                         size_type j = i - eas;
@@ -2896,7 +2948,7 @@ public:
         } // destroy external_array_writer
         
         m_external_arrays.swap_back(ea);
-        // future: m_prefetch_prediction_tree.activate_player(0);
+        m_prefetch_prediction_tree.activate_player(0);
 
         if (!extract_buffer_empty()) {
             m_stats.num_new_external_arrays++;
@@ -2910,6 +2962,17 @@ public:
         m_mem_left -= m_mem_per_external_array;
         check_invariants();
         
+    }
+
+    //! Updates the prefetch prediction tree afer a remove() or
+    //! a request_further_block() call.
+    //! \param ea_index index of the external array in question
+    inline void update_prefetch_prediction_tree(size_t ea_index) {
+        if (m_external_arrays[ea_index].has_em_data()) {
+            m_prefetch_prediction_tree.replay_on_change(ea_index);
+        } else {
+            m_prefetch_prediction_tree.deactivate_player(ea_index);
+        }
     }
 
     //! Print statistics.
@@ -2966,28 +3029,39 @@ protected:
          * determine maximum of each first block
          */
 
-        bool needs_limit = false;
-        size_t min_max_index;
-        ValueType min_max_value;
+        size_t min_max_index = (size_t) m_prefetch_prediction_tree.top();
+        bool needs_limit = (m_prefetch_prediction_tree.top()>-1) ? true : false;
+
+// test correctness of prefetch prediction tree
+#ifdef STXXL_DEBUG_ASSERTIONS
+
+        bool test_needs_limit = false;
+        size_t test_min_max_index;
+        value_type test_min_max_value;
 
         m_stats.refill_minmax_time.start();
         for (size_type i = 0; i < eas; ++i) {
             if (m_external_arrays[i].has_em_data()) {
-                ValueType max_value = m_external_arrays[i].get_current_max();
-                if (!needs_limit) {
-                    needs_limit = true;
-                    min_max_value = max_value;
-                    min_max_index = i;
+                const value_type max_value = m_external_arrays[i].get_current_max();
+                if (!test_needs_limit) {
+                    test_needs_limit = true;
+                    test_min_max_value = max_value;
+                    test_min_max_index = i;
                 }
                 else {
-                    if (m_inv_compare(max_value, min_max_value)) {
-                        min_max_value = max_value;
-                        min_max_index = i;
+                    if (m_inv_compare(max_value, test_min_max_value)) {
+                        test_min_max_value = max_value;
+                        test_min_max_index = i;
                     }
                 }
             }
         }
         m_stats.refill_minmax_time.stop();
+
+        STXXL_ASSERT(needs_limit == test_needs_limit);
+        STXXL_ASSERT(!needs_limit || min_max_index == test_min_max_index);
+
+#endif
 
         /*
          * calculate size and create sequences to merge
@@ -3020,6 +3094,7 @@ protected:
             }
 
             if (needs_limit) {
+                const value_type min_max_value = m_external_arrays[min_max_index].get_current_max();
                 // remove timer if parallel
                 //stats.refill_upper_bound_time.start();
                 if (reuse_previous_upper_bounds) {
@@ -3028,7 +3103,8 @@ protected:
                     end = std::upper_bound(sequences[i].second, end,
                                            min_max_value, m_inv_compare);
                 }
-                else {
+                else
+                {
                     end = std::upper_bound(begin, end,
                                            min_max_value, m_inv_compare);
                 }
@@ -3106,6 +3182,7 @@ protected:
 
                 if (limiting_ea_index < eas) {
                     m_external_arrays[limiting_ea_index].request_further_block();
+                    update_prefetch_prediction_tree(limiting_ea_index);
                     reuse_upper_bounds = true;
                 }
                 else if (limiting_ea_index == eas) {
@@ -3153,6 +3230,7 @@ protected:
             if (diff > 0) {
                 if (i < eas) {
                     m_external_arrays[i].remove(diff);
+                    update_prefetch_prediction_tree(i);
                     assert(m_external_size >= diff);
                     m_external_size -= diff;
                 }
@@ -3428,9 +3506,7 @@ protected:
 
         // construct new external array
 
-        external_array_type new_array(size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(new_array);
-        external_array_type& ea = m_external_arrays[m_external_arrays.size() - 1];
+        external_array_type ea(size, m_num_prefetchers, m_num_write_buffers);
 
         // TODO: write in chunks in order to safe RAM?
 
@@ -3446,6 +3522,8 @@ protected:
 
         STXXL_DEBUG("Merge done of new ea " << &ea);
 
+        m_external_arrays.swap_back(ea);
+        m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
         m_internal_size = 0;
         m_external_size += size;
 
@@ -3492,9 +3570,7 @@ protected:
             sequences[i] = std::make_pair(insheap.begin(), insheap.end());
         }
 
-        external_array_type new_array(size, m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(new_array);
-        external_array_type& ea = m_external_arrays[m_external_arrays.size() - 1];
+        external_array_type ea(size, m_num_prefetchers, m_num_write_buffers);
 
         // TODO: write in chunks in order to safe RAM?
         ea.request_write_buffer(size);
@@ -3506,6 +3582,9 @@ protected:
         ea.flush_write_buffer();
         ea.finish_write_phase();
 
+        m_external_arrays.swap_back(ea);
+        m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
+        
         m_external_size += size;
         m_heaps_size = 0;
 
@@ -3548,9 +3627,7 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        external_array_type new_array(values.size(), m_num_prefetchers, m_num_write_buffers);
-        m_external_arrays.swap_back(new_array);
-        external_array_type& ea = m_external_arrays[m_external_arrays.size() - 1];
+        external_array_type ea(values.size(), m_num_prefetchers, m_num_write_buffers);
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
             ea.push_back(*i);
@@ -3558,6 +3635,9 @@ protected:
 
         ea.finish_write_phase();
 
+        m_external_arrays.swap_back(ea);
+        m_prefetch_prediction_tree.activate_player(m_external_arrays.size()-1);
+        
         m_external_size += values.size();
 
         if (!extract_buffer_empty()) {
