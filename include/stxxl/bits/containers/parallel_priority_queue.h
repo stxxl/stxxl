@@ -2328,9 +2328,9 @@ public:
           m_external_arrays(),
           m_minima(*this),
           m_fetch_prediction_comparator(m_external_arrays,m_inv_compare),
-          m_fetch_prediction_tree(16,m_fetch_prediction_comparator),
+          m_fetch_prediction_tree(4,m_fetch_prediction_comparator),
           m_hint_comparator(m_external_arrays,m_inv_compare),
-          m_hint_tree(16,m_hint_comparator),
+          m_hint_tree(4,m_hint_comparator),
           m_num_hinted_blocks(0)
     {
 #if STXXL_PARALLEL
