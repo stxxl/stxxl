@@ -3310,6 +3310,40 @@ protected:
         }
     }
 
+public:
+
+    //! Extract exactly n values at once.
+    void bulk_pop_n(std::vector<value_type>& out, size_t num_elements)
+    {
+        assert(num_elements>0);
+        const size_t n_elements = std::min<size_t>(num_elements,size());
+        assert(n_elements<m_extract_buffer_limit);
+
+        if (m_heaps_size>0)
+            flush_insertion_heaps();
+
+        if (m_extract_buffer_size>0)
+            convert_eb_into_ia();
+
+        refill_extract_buffer(n_elements, n_elements);
+
+        out.resize(0);
+        using std::swap;
+        swap(m_extract_buffer,out);
+        m_extract_buffer_index = 0;
+        m_extract_buffer_size = 0;
+    }
+
+protected:
+
+    //! Convert extract buffer into a new internal array.
+    void convert_eb_into_ia()
+    {
+        internal_array_type ia(m_extract_buffer);
+        m_extract_buffer_index = 0;
+        m_extract_buffer_size = 0;
+    }
+
     //! Refills the extract buffer from the external arrays.
     //! \param minimum_size requested minimum size of the resulting extract buffer.
     //!         Prints a warning if there is not enough data to reach this size.
