@@ -428,9 +428,6 @@ public:
 
 protected:
 
-// TODO DEBUG remove!!!
-public:
-
     //! The total size of the external array in items. Cannot be changed
     //! after construction.
     external_size_type m_capacity;
@@ -483,6 +480,11 @@ public:
 
     //! The block index until which prefetch hints were given.
     unsigned_type m_hinted_until;
+
+    //! The block index until which prefetch hints were given as it was
+    //! before the prepare_rebuilding_hints() call. Used for removal of
+    //! hints which aren't needed anymore.
+    unsigned_type m_old_hinted_until;
 
     //! allow writer to access to all variables
     friend class external_array_writer<self_type>;
@@ -698,36 +700,11 @@ public:
         return m_maxima[get_current_block_index()];
     }
 
-    //! Returns the largest element of the block which has been
-    //! hinted the latest,
-    const value_type & get_hinted_max() const
-    {
-        assert(m_hinted_until < m_num_blocks);
-        return m_maxima[m_hinted_until];
-    }
-
     //! Returns if there is data in EM, that's not randomly accessible.
     bool has_em_data() const
     {
         const unsigned_type end_block_index = get_end_block_index();
         return (end_block_index < m_num_blocks);
-    }
-
-    bool hint_possible() {
-        return has_unhinted_em_data() && m_pool->hint_possible();
-    }
-
-    //! Returns if there is data in EM, that's not already hinted
-    //! to the prefetcher.
-    bool has_unhinted_em_data() const
-    {
-        return (m_hinted_until+1 < m_num_blocks);
-    }
-
-    size_t num_hinted_blocks() const
-    {
-        assert(get_current_block_index()<=m_hinted_until);
-        return m_hinted_until-get_current_block_index();
     }
 
     //! Returns if the data requested to be in internal memory is
@@ -796,7 +773,7 @@ protected:
     //! constructor.
     void prepare_write(int num_threads)
     {
-        m_pool->resize_prefetch(0);
+        //m_pool->resize_prefetch(0);
 
         unsigned_type write_blocks = num_threads;
         // need at least one
@@ -818,7 +795,7 @@ protected:
     void finish_write()
     {
         m_pool->resize_write(0);
-        m_pool->resize_prefetch(m_num_prefetch_blocks);
+        //m_pool->resize_prefetch(m_num_prefetch_blocks);
 
         // check that all blocks where written
         for (unsigned_type i = 0; i < m_num_blocks; ++i)
@@ -974,7 +951,7 @@ public:
     {
         assert(m_capacity == m_size);
         m_pool->resize_write(0);
-        m_pool->resize_prefetch(m_num_prefetch_blocks);
+        //m_pool->resize_prefetch(m_num_prefetch_blocks);
         m_write_phase = false;
 
         // set m_maxima[0]
@@ -1099,13 +1076,66 @@ public:
                     " end_index=" << m_end_index);
     }
 
+    /*
+        Hints
+    */
+
     //! Gives the prefetcher a hint for the next block to prefetch.
+    //! Resizes prefetch pool if it's too small.
     void hint()
     {
-        if (m_hinted_until < m_num_blocks) {
-            ++m_hinted_until;
-            m_pool->hint(m_bids[m_hinted_until]);
+        assert(m_hinted_until < m_num_blocks);
+        ++m_hinted_until;
+        const size_t num_hinted = num_hinted_blocks();
+        if (m_pool->size_prefetch()<num_hinted)
+            m_pool->resize_prefetch(num_hinted);
+        m_pool->hint(m_bids[m_hinted_until]);
+    }
+
+    //! Returns the largest element of the block which has been
+    //! hinted the latest,
+    const value_type & get_hinted_max() const
+    {
+        assert(m_hinted_until < m_num_blocks);
+        return m_maxima[m_hinted_until];
+    }
+
+    //! Returns if there is data in EM, that's not already hinted
+    //! to the prefetcher.
+    bool has_unhinted_em_data() const
+    {
+        return (m_hinted_until+1 < m_num_blocks);
+    }
+
+    size_t num_hinted_blocks() const
+    {
+        assert(get_current_block_index()<=m_hinted_until);
+        return m_hinted_until-get_current_block_index();
+    }
+
+    //! This method prepares rebuilding the hints (this is done after
+    //! creating a new EA in order to always have globally the n blocks
+    //! hinted which will be fetched first.
+    //! Resets m_hinted_until to the current block index.
+    //! finish_rebuilding_hints() should be called after placing all
+    //! hints in order to clean up the prefetch pool.
+    void prepare_rebuilding_hints() {
+        m_old_hinted_until = m_hinted_until;
+        m_hinted_until = get_current_block_index();
+    }
+
+    //! Removes hints which aren't needed anymore from the prefetcher 
+    //! and fixes it's size. prepare_rebuilding_hints() must be called
+    //! before!
+    void finish_rebuilding_hints() {
+        // Remove hints which aren't needed anymore
+        for (size_t i=m_hinted_until+1; i<=m_old_hinted_until; ++i) {
+            STXXL_DEBUG("Discarding hint");
+            m_pool->invalidate(m_bids[i]);
         }
+        // Fix prefetch size
+        const size_t num_hints = m_hinted_until-get_current_block_index();
+        m_pool->resize_prefetch(num_hints);
     }
 
 protected:
@@ -3028,20 +3058,47 @@ public:
         
     }
 
-    //! Activate player in prefetch prediction tree afer a remove()
-    //! or a request_further_block() call.
+    //! Activate player in fetch prediction tree afer a remove()
+    //! or a request_further_block() call. Rebuild hint tree
+    //! completely as the hint sequence may have changed.
     //! \param ea_index index of the external array in question
     inline void update_trees_after_ea_creation(size_t ea_index) {
+
+        STXXL_DEBUG("update_trees_after_ea_creation");
+
         if (m_external_arrays[ea_index].has_em_data()) {
             m_fetch_prediction_tree.activate_player(ea_index);
-            m_hint_tree.activate_player(ea_index);
         }
 
-        // TODO:    - cancel unfinished prefetch hints! (how?)
-        //          - reset hinted_until counters
-        //          - rebuild m_hint_tree
+        m_hint_tree.resize_and_clear(m_external_arrays.size());
 
-        hint();
+        // TODO: replace this by more efficient native creation.
+        for (size_t i=0; i<m_external_arrays.size(); ++i) {
+            m_hint_tree.replay_on_change(i);
+            m_external_arrays[i].prepare_rebuilding_hints();
+        }
+
+        m_num_hinted_blocks = 0;
+
+        for (size_t i=0; i<m_num_prefetchers; ++i) {
+            int min_max_index = m_hint_tree.top();
+            if (min_max_index>-1) {
+                STXXL_DEBUG("Give hint in EA["<<min_max_index<<"]");
+                m_external_arrays[min_max_index].hint();
+                ++m_num_hinted_blocks;
+                if (m_external_arrays[min_max_index].has_unhinted_em_data()) {
+                    m_hint_tree.replay_on_change(min_max_index);
+                } else {
+                    m_hint_tree.deactivate_player(min_max_index);
+                }
+            } else {
+                break;
+            }
+        }
+
+        for (size_t i=0; i<m_external_arrays.size(); ++i) {
+            m_external_arrays[i].finish_rebuilding_hints();
+        }
     }
 
     //! Updates the prefetch prediction tree afer a remove() or
@@ -3060,6 +3117,8 @@ public:
         }
     }
 
+    //! Hints EA blocks which will be needed soon. Hints at most
+    //! m_num_prefetchers blocks globally.
     inline void hint() {
 
 #ifdef STXXL_DEBUG_ASSERTIONS
@@ -3078,10 +3137,10 @@ public:
             assert((size_t)min_max_index<m_external_arrays.size());
 
             STXXL_DEBUG("Give hint in EA["<<min_max_index<<"]");
-
-            if (m_external_arrays[min_max_index].hint_possible()) {
-                m_external_arrays[min_max_index].hint();
-                ++m_num_hinted_blocks;
+            m_external_arrays[min_max_index].hint();
+            ++m_num_hinted_blocks;
+            
+            if (m_external_arrays[min_max_index].has_unhinted_em_data()) {
                 m_hint_tree.replay_on_change(min_max_index);
             } else {
                 m_hint_tree.deactivate_player(min_max_index);
