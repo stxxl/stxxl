@@ -660,15 +660,10 @@ public:
         return end_block_index;
     }
 
-    //! Return the block beyond the block in which m_end_index is located.
+    //! Return the block in which m_end_index-1 is located.
     inline unsigned_type get_current_block_index() const
     {
-        unsigned_type last_block_index = m_end_index / block_size;
-        assert(last_block_index > 0);
-        // if first in block -> lookup maximum from previous block
-        if (m_end_index % block_size == 0) --last_block_index;
-        assert(last_block_index < m_num_blocks);
-        return last_block_index;
+        return get_end_block_index()-1;
     }
 
     //! Returns a random-access iterator to the begin of the data
