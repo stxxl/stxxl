@@ -3068,6 +3068,7 @@ public:
             m_fetch_prediction_tree.activate_player(ea_index);
         }
 
+        m_stats.hint_time.start();
         m_hint_tree.resize_and_clear(m_external_arrays.size());
 
         // TODO: replace this by more efficient native creation.
@@ -3097,6 +3098,8 @@ public:
         for (size_t i=0; i<m_external_arrays.size(); ++i) {
             m_external_arrays[i].finish_rebuilding_hints();
         }
+
+        m_stats.hint_time.stop();
     }
 
     //! Updates the prefetch prediction tree afer a remove() or
@@ -3108,11 +3111,13 @@ public:
         } else {
             m_fetch_prediction_tree.deactivate_player(ea_index);
         }
+        m_stats.hint_time.start();
         if (m_external_arrays[ea_index].has_unhinted_em_data()) {
             m_hint_tree.replay_on_change(ea_index);
         } else {
             m_hint_tree.deactivate_player(ea_index);
         }
+        m_stats.hint_time.stop();
     }
 
     //! Hints EA blocks which will be needed soon. Hints at most
@@ -3129,6 +3134,7 @@ public:
         STXXL_ASSERT(num_hinted==m_num_hinted_blocks);
 
 #endif
+        m_stats.hint_time.start();
 
         int min_max_index = m_hint_tree.top();
         while (m_num_hinted_blocks < m_num_prefetchers && min_max_index>-1) {
@@ -3146,6 +3152,7 @@ public:
 
         }
 
+        m_stats.hint_time.stop();
     }
 
     //! Print statistics.
@@ -4023,6 +4030,8 @@ protected:
         //! Part of refill_extract_buffer_time and refill_time_before_merge.
         stats_timer refill_minmax_time;
 
+        stats_timer hint_time;
+
         friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
             return os << "max_extract_buffer_size=" << o.max_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
@@ -4056,7 +4065,8 @@ protected:
                       << "merge_sorted_heaps_time=" << o.merge_sorted_heaps_time << std::endl
                    // << "refill_upper_bound_time=" << o.refill_upper_bound_time << std::endl
                       << "refill_accumulate_time=" << o.refill_accumulate_time << std::endl
-                      << "refill_minmax_time=" << o.refill_minmax_time << std::endl;
+                      << "refill_minmax_time=" << o.refill_minmax_time << std::endl
+                      << "hint_time=" << o.hint_time << std::endl;
         }
     };
 
