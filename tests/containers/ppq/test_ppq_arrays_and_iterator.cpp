@@ -79,9 +79,8 @@ void fill(ea_type& ea, size_t index, size_t n)
 //!     - sizes
 //!
 //! \param volume Volume
-//! \param numpbs Number of prefetch buffer blocks for each external array.
 //! \param numwbs Number of write buffer blocks for each external array.
-int run_external_array_test(size_t volume, size_t numpbs, size_t numwbs)
+int run_external_array_test(size_t volume, size_t numwbs)
 {
     const size_t block_size = ea_type::block_size;
     const size_t N = volume / sizeof(value_type);
@@ -91,7 +90,7 @@ int run_external_array_test(size_t volume, size_t numpbs, size_t numwbs)
     STXXL_VARDUMP(N);
     STXXL_VARDUMP(num_blocks);
 
-    ea_type ea(N, numpbs, numwbs);
+    ea_type ea(N, numwbs);
 
     {
         stxxl::scoped_print_timer timer("filling", volume);
@@ -215,10 +214,9 @@ int run_external_array_test(size_t volume, size_t numpbs, size_t numwbs)
 //! Merges them into one external array and checks the content.
 //!
 //! \param volume Volume
-//! \param numpbs Number of prefetch buffer blocks for each external array.
 //! \param numwbs Number of write buffer blocks for each external array.
 template <int NumEAs>
-int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
+int run_multiway_merge(size_t volume, size_t numwbs)
 {
     const size_t block_size = ea_type::block_size;
     const size_t size = volume / sizeof(value_type);
@@ -247,9 +245,9 @@ int run_multiway_merge(size_t volume, size_t numpbs, size_t numwbs)
 
     ea_vector_type ealist;
     for (int i = 0; i < NumEAs; ++i)
-        ealist.push_back(new ea_type(size, numpbs, numwbs));
+        ealist.push_back(new ea_type(size, numwbs));
 
-    ea_type out(size * (NumEAs + 1), numpbs, numwbs);
+    ea_type out(size * (NumEAs + 1), numwbs);
 
     {
         stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume * NumEAs);
@@ -425,7 +423,7 @@ int run_upper_bound_test(size_t volume)
     }
 
     ia_type a(v);
-    ea_type b(size - 10, 2, 2);
+    ea_type b(size - 10, 2);
 
     {
         stxxl::scoped_print_timer timer("filling external array", volume);
@@ -508,7 +506,7 @@ int main(int argc, char** argv)
     bool succ = EXIT_SUCCESS;
 
     if (volume > 0) {
-        succ = run_external_array_test(volume, numpbs, numwbs) && succ;
+        succ = run_external_array_test(volume, numwbs) && succ;
     }
 
     if (iavolume > 0) {
@@ -516,12 +514,12 @@ int main(int argc, char** argv)
     }
 
     if (mwmvolume > 0) {
-        succ = run_multiway_merge<0>(mwmvolume, numpbs, numwbs) && succ;
-        succ = run_multiway_merge<1>(mwmvolume, numpbs, numwbs) && succ;
-        succ = run_multiway_merge<2>(mwmvolume, numpbs, numwbs) && succ;
-        succ = run_multiway_merge<3>(mwmvolume, numpbs, numwbs) && succ;
-        succ = run_multiway_merge<4>(mwmvolume, numpbs, numwbs) && succ;
-        succ = run_multiway_merge<5>(mwmvolume, numpbs, numwbs) && succ;
+        succ = run_multiway_merge<0>(mwmvolume, numwbs) && succ;
+        succ = run_multiway_merge<1>(mwmvolume, numwbs) && succ;
+        succ = run_multiway_merge<2>(mwmvolume, numwbs) && succ;
+        succ = run_multiway_merge<3>(mwmvolume, numwbs) && succ;
+        succ = run_multiway_merge<4>(mwmvolume, numwbs) && succ;
+        succ = run_multiway_merge<5>(mwmvolume, numwbs) && succ;
     }
 
     succ = run_upper_bound_test(3 * ea_type::block_size * sizeof(value_type)) && succ;

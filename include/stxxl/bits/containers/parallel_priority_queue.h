@@ -435,9 +435,6 @@ protected:
     //! Number of blocks, again: calculated at construction time.
     unsigned_type m_num_blocks;
 
-    //! Number of blocks to prefetch from EM
-    unsigned_type m_num_prefetch_blocks;
-
     //! Size of the write buffer in number of blocks
     unsigned_type m_num_write_buffer_blocks;
 
@@ -501,12 +498,10 @@ public:
      * \param num_write_buffer_blocks Size of the write buffer in number of
      * blocks
      */
-    external_array(external_size_type size, unsigned_type num_prefetch_blocks,
-                   unsigned_type num_write_buffer_blocks)
+    external_array(external_size_type size, unsigned_type num_write_buffer_blocks)
         :   // constants
           m_capacity(size),
           m_num_blocks((size_t)div_ceil(m_capacity, block_size)),
-          m_num_prefetch_blocks(std::min(num_prefetch_blocks, m_num_blocks)),
           m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_blocks)),
           m_pool(new pool_type(0, m_num_write_buffer_blocks)),
 
@@ -540,7 +535,6 @@ public:
         :   // constants
           m_capacity(0),
           m_num_blocks(0),
-          m_num_prefetch_blocks(0),
           m_num_write_buffer_blocks(0),
           m_pool(NULL),
 
@@ -570,7 +564,6 @@ public:
         // constants
         swap(m_capacity, o.m_capacity);
         swap(m_num_blocks, o.m_num_blocks);
-        swap(m_num_prefetch_blocks, o.m_num_prefetch_blocks);
         swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
         swap(m_pool, o.m_pool);
 
@@ -795,7 +788,6 @@ protected:
     void finish_write()
     {
         m_pool->resize_write(0);
-        //m_pool->resize_prefetch(m_num_prefetch_blocks);
 
         // check that all blocks where written
         for (unsigned_type i = 0; i < m_num_blocks; ++i)
@@ -951,7 +943,6 @@ public:
     {
         assert(m_capacity == m_size);
         m_pool->resize_write(0);
-        //m_pool->resize_prefetch(m_num_prefetch_blocks);
         m_write_phase = false;
 
         // set m_maxima[0]
@@ -1093,7 +1084,7 @@ public:
     }
 
     //! Returns the largest element of the block which has been
-    //! hinted the latest,
+    //! hinted the latest.
     const value_type & get_hinted_max() const
     {
         assert(m_hinted_until < m_num_blocks);
@@ -1107,6 +1098,7 @@ public:
         return (m_hinted_until+1 < m_num_blocks);
     }
 
+    //! Returns the number of hinted blocks.
     size_t num_hinted_blocks() const
     {
         assert(get_current_block_index()<=m_hinted_until);
@@ -1115,7 +1107,7 @@ public:
 
     //! This method prepares rebuilding the hints (this is done after
     //! creating a new EA in order to always have globally the n blocks
-    //! hinted which will be fetched first.
+    //! hinted which will be fetched first).
     //! Resets m_hinted_until to the current block index.
     //! finish_rebuilding_hints() should be called after placing all
     //! hints in order to clean up the prefetch pool.
@@ -2392,11 +2384,13 @@ protected:
     //! Initializes member variables concerning the memory management.
     void init_memmanagement()
     {
-        // total_ram - ram for the heaps - ram for the heap merger - ram for the external array write buffer -
-        m_mem_left = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size;
+        // total_ram - ram for the heaps - ram for the heap merger
+        //       - ram for the external array write buffer - EA prefetch buffer blocks
+        m_mem_left = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size
+                            - m_num_prefetchers * block_size;
 
-        // prefetch blocks + first block of array
-        m_mem_per_external_array = (m_num_prefetchers + 1) * block_size;
+        // at least first block of array, TODO: may be larger
+        m_mem_per_external_array = block_size;
 
         if (c_limit_extract_buffer) {
             // ram for the extract buffer
@@ -2404,6 +2398,7 @@ protected:
         }
         else {
             // each: part of the (maximum) ram for the extract buffer
+            // TODO: Merging size may be larger.
             m_mem_per_external_array += block_size;
         }
 
@@ -2427,7 +2422,8 @@ protected:
     {
         size_type mem_used = 0;
 
-        mem_used += 2 * m_mem_for_heaps + m_num_write_buffers * block_size;
+        mem_used += 2 * m_mem_for_heaps + m_num_write_buffers * block_size
+            + m_num_prefetchers * block_size;
 
         // test the processor local data structures
 
@@ -2992,7 +2988,7 @@ public:
         size_t total_size = m_external_size;
         assert(total_size > 0);
 
-        external_array_type ea(total_size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type ea(total_size, m_num_write_buffers);
         {
             external_array_writer_type external_array_writer(ea);
 
@@ -3689,7 +3685,7 @@ protected:
 
         // construct new external array
 
-        external_array_type ea(size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type ea(size, m_num_write_buffers);
 
         // TODO: write in chunks in order to safe RAM?
 
@@ -3754,7 +3750,7 @@ protected:
             sequences[i] = std::make_pair(insheap.begin(), insheap.end());
         }
 
-        external_array_type ea(size, m_num_prefetchers, m_num_write_buffers);
+        external_array_type ea(size, m_num_write_buffers);
 
         // TODO: write in chunks in order to safe RAM?
         ea.request_write_buffer(size);
@@ -3811,7 +3807,7 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        external_array_type ea(values.size(), m_num_prefetchers, m_num_write_buffers);
+        external_array_type ea(values.size(), m_num_write_buffers);
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
             ea.push_back(*i);
