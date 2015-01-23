@@ -635,6 +635,13 @@ public:
         return m_num_blocks;
     }
 
+    //! Returns approximate (current!) memory usage
+    size_t int_memory() const {
+        const size_t num_ram_blocks = get_end_block_index() - get_current_block_index();
+        const size_t num_buffer_blocks = m_pool->size_prefetch() + m_pool->size_write();
+        return (num_ram_blocks+num_buffer_blocks)*block_size;
+    }
+
     //! Returns the number elements available in internal memory
     size_t buffer_size() const
     {
