@@ -3313,9 +3313,15 @@ protected:
     //! Refills the extract buffer from the external arrays.
     //! \param minimum_size requested minimum size of the resulting extract buffer.
     //!         Prints a warning if there is not enough data to reach this size.
-    inline void refill_extract_buffer(size_t minimum_size = 0)
+    //! \param maximum_size maximum size of the extract buffer. Using 
+    //!         m_extract_buffer_limit if set to 0.
+    inline void refill_extract_buffer(size_t minimum_size = 0,
+        size_t maximum_size = 0)
     {
         STXXL_DEBUG("refilling extract buffer");
+
+        if (maximum_size==0)
+            maximum_size = m_extract_buffer_limit;
 
         check_invariants();
 
@@ -3387,7 +3393,7 @@ protected:
         }
 
         if (c_limit_extract_buffer) {
-            output_size = std::min(output_size, m_extract_buffer_limit);
+            output_size = std::min<size_t>(output_size, maximum_size);
         }
 
         m_stats.max_extract_buffer_size.set_max(output_size);
