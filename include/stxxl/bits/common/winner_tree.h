@@ -264,6 +264,27 @@ public:
         clear();
     }
 
+    //! Build from winner tree from scratch.
+    inline void rebuild()
+    {
+        for (int i = (int) (m_tree.size()/2)-1; i>=0; --i) {
+            const int lc = i*2+1;
+            const int rc = i*2+2;
+            int winner;
+
+            if (m_tree[lc] < 0)
+                winner = m_tree[rc];
+            else if (m_tree[rc] < 0)
+                winner = m_tree[lc];
+            else if (m_less(m_tree[lc], m_tree[rc]))
+                winner = m_tree[lc];
+            else
+                winner = m_tree[rc];
+
+            m_tree[i] = winner;
+        }
+    }
+
     //! Returns a readable representation of the winner tree as string.
     std::string to_string() const
     {
