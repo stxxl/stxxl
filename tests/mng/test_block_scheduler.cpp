@@ -350,8 +350,10 @@ int main(int argc, char** argv)
 
     stxxl::cmdline_parser cp;
 
-    cp.add_int('t', "test-case", "I", "number of the test case to run", test_case);
-    cp.add_int('m', "memory", "N", "internal memory to use (in megabytes)", internal_memory_megabytes);
+    cp.add_int('t', "test-case", "I", test_case,
+               "number of the test case to run");
+    cp.add_int('m', "memory", "N", internal_memory_megabytes,
+               "internal memory to use (in megabytes)");
 
     cp.set_description("stxxl block_scheduler test");
     cp.set_author("Raoul Steffen, R-Steffen@gmx.de");

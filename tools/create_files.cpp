@@ -91,8 +91,10 @@ int create_files(int argc, char* argv[])
     stxxl::uint64 offset = 0, length;
 
     stxxl::cmdline_parser cp;
-    cp.add_param_bytes("filesize", "Number of bytes to write to files.", length);
-    cp.add_param_stringlist("filename", "Paths to files to write.", disks_arr);
+    cp.add_param_bytes("filesize", length,
+                       "Number of bytes to write to files.");
+    cp.add_param_stringlist("filename", disks_arr,
+                            "Paths to files to write.");
 
     if (!cp.process(argc, argv))
         return -1;

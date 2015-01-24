@@ -358,25 +358,20 @@ int main(int argc, char* argv[])
     stxxl::cmdline_parser cp;
     cp.set_description("STXXL multiway_merge benchmark");
 
-    cp.add_param_string("sequ/para/both",
-                        "benchmark set: sequ(ential), para(llel) or both",
-                        benchset);
+    cp.add_param_string("sequ/para/both", benchset,
+                        "benchmark set: sequ(ential), para(llel) or both");
 
-    cp.add_uint('r', "inner-repeat",
-                "number of inner repetitions within each benchmark",
-                g_inner_repeat);
+    cp.add_uint('r', "inner-repeat", g_inner_repeat,
+                "number of inner repetitions within each benchmark");
 
-    cp.add_uint('R', "outer-repeat",
-                "number of repetitions of each benchmark",
-                g_outer_repeat);
+    cp.add_uint('R', "outer-repeat", g_outer_repeat,
+                "number of repetitions of each benchmark");
 
-    cp.add_uint('f', "factor",
-                "factor to multiply while increasing number of arrays",
-                g_factor);
+    cp.add_uint('f', "factor", g_factor,
+                "factor to multiply while increasing number of arrays");
 
-    cp.add_flag('q', "quick",
-                "run only a few quick benchmark runs",
-                g_quick);
+    cp.add_flag('q', "quick", g_quick,
+                "run only a few quick benchmark runs");
 
     if (!cp.process(argc, argv))
         return EXIT_FAILURE;

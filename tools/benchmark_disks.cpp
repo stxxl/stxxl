@@ -251,12 +251,19 @@ int benchmark_disks(int argc, char* argv[])
     unsigned_type block_size = 8 * MiB;
     std::string optrw = "rw", allocstr;
 
-    cp.add_param_bytes("size", "Amount of data to write/read from disks (e.g. 10GiB)", length);
-    cp.add_opt_param_string("r|w", "Only read or write blocks (default: both write and read)", optrw);
-    cp.add_opt_param_string("alloc", "Block allocation strategy: RC, SR, FR, striping. (default: RC)", allocstr);
+    cp.add_param_bytes("size", length,
+                       "Amount of data to write/read from disks (e.g. 10GiB)");
+    cp.add_opt_param_string(
+        "r|w", optrw,
+        "Only read or write blocks (default: both write and read)");
+    cp.add_opt_param_string(
+        "alloc", allocstr,
+        "Block allocation strategy: RC, SR, FR, striping. (default: RC)");
 
-    cp.add_uint('b', "batch", "Number of blocks written/read in one batch (default: D * B)", batch_size);
-    cp.add_bytes('B', "block_size", "Size of blocks written in one syscall. (default: B = 8MiB)", block_size);
+    cp.add_uint('b', "batch", batch_size,
+                "Number of blocks written/read in one batch (default: D * B)");
+    cp.add_bytes('B', "block_size", block_size,
+                 "Size of blocks written in one syscall. (default: B = 8MiB)");
 
     cp.set_description(
         "This program will benchmark the disks configured by the standard "
@@ -265,8 +272,7 @@ int benchmark_disks(int argc, char* argv[])
         "size describes how many blocks are written/read in one batch. The "
         "are taken from block_manager using given the specified allocation "
         "strategy. If size == 0, then writing/reading operation are done "
-        "until an error occurs. "
-        );
+        "until an error occurs. ");
 
     if (!cp.process(argc, argv))
         return -1;

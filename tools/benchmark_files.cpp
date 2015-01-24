@@ -114,31 +114,50 @@ int benchmark_files(int argc, char* argv[])
 
     stxxl::cmdline_parser cp;
 
-    cp.add_param_bytes("length", "Length to write in file.", length);
-    cp.add_param_stringlist("filename", "File path to run benchmark on.", files_arr);
+    cp.add_param_bytes("length", length,
+                       "Length to write in file.");
 
-    cp.add_bytes('o', "offset", "Starting offset to write in file.", offset);
+    cp.add_param_stringlist("filename", files_arr,
+                            "File path to run benchmark on.");
 
-    cp.add_flag(0, "no-direct", "open files without O_DIRECT", no_direct_io);
-    cp.add_flag(0, "sync", "open files with O_SYNC|O_DSYNC|O_RSYNC", sync_io);
-    cp.add_flag(0, "resize", "resize the file size after opening, needed e.g. for creating mmap files", resize_after_open);
+    cp.add_bytes('o', "offset", offset,
+                 "Starting offset to write in file.");
 
-    cp.add_bytes(0, "block_size", "block size for operations (default 8 MiB)", block_size);
-    cp.add_uint(0, "batch_size", "increase (default 1) to submit several I/Os at once and report average rate", batch_size);
+    cp.add_flag(0, "no-direct", no_direct_io,
+                "open files without O_DIRECT");
 
-    cp.add_string('f', "file-type",
-                  "Method to open file (syscall|mmap|wincall|boostfd|...) default: " + file_type, file_type);
+    cp.add_flag(0, "sync", sync_io,
+                "open files with O_SYNC|O_DSYNC|O_RSYNC");
 
-    cp.add_string('p', "operations",
-                  "[w]rite pattern, [r]ead without verification, read and [v]erify pattern (default: 'wv')", opstr);
+    cp.add_flag(0, "resize", resize_after_open,
+                "resize the file size after opening, "
+                "needed e.g. for creating mmap files");
 
-    cp.add_uint(0, "pattern",
-                "32-bit pattern to write (default: block index)", pattern);
+    cp.add_bytes(0, "block_size", block_size,
+                 "block size for operations (default 8 MiB)");
 
-    cp.set_description("Open a file using one of STXXL's file abstractions and perform write/read/verify tests on the file. "
-                       "Block sizes and batch size can be adjusted via command line. "
-                       "If length == 0 , then operation will continue till end of space (please ignore the write error). "
-                       "Memory consumption: block_size * batch_size * num_files");
+    cp.add_uint(0, "batch_size", batch_size,
+                "increase (default 1) to submit several I/Os at once "
+                "and report average rate");
+
+    cp.add_string('f', "file-type", file_type,
+                  "Method to open file (syscall|mmap|wincall|boostfd|...) "
+                  "default: " + file_type);
+
+    cp.add_string('p', "operations", opstr,
+                  "[w]rite pattern, [r]ead without verification, "
+                  "read and [v]erify pattern (default: 'wv')");
+
+    cp.add_uint(0, "pattern", pattern,
+                "32-bit pattern to write (default: block index)");
+
+    cp.set_description(
+        "Open a file using one of STXXL's file abstractions and perform "
+        "write/read/verify tests on the file. "
+        "Block sizes and batch size can be adjusted via command line. "
+        "If length == 0 , then operation will continue till end of space "
+        "(please ignore the write error). "
+        "Memory consumption: block_size * batch_size * num_files");
 
     if (!cp.process(argc, argv))
         return -1;

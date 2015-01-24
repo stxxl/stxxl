@@ -21,8 +21,8 @@ void test1()
     std::string a_str;
 
     stxxl::cmdline_parser cp;
-    cp.add_int('i', "int", "<N>", "an integer", a_int);
-    cp.add_string('f', "filename", "<F>", "a filename", a_str);
+    cp.add_int('i', "int", "<N>", a_int, "an integer");
+    cp.add_string('f', "filename", "<F>", a_str, "a filename");
 
     cp.set_description("Command Line Parser Test");
     cp.set_author("Timo Bingmann <tb@panthema.net>");

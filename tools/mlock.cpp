@@ -33,13 +33,14 @@ int do_mlock(int argc, char* argv[])
     // parse command line
     stxxl::cmdline_parser cp;
 
-    cp.set_description("Allocate some memory and mlock() it to consume physical memory. "
-                       "Needs to run as root to block more than 64 KiB in default settings."
-                       );
+    cp.set_description(
+        "Allocate some memory and mlock() it to consume physical memory. "
+        "Needs to run as root to block more than 64 KiB in default settings.");
     cp.set_author("Andreas Beckmann <beckmann@cs.uni-frankfurt.de>");
 
     stxxl::unsigned_type M;
-    cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 4GiB)", M);
+    cp.add_param_bytes("size", M,
+                       "Amount of memory to allocate (e.g. 4GiB)");
 
     if (!cp.process(argc, argv))
         return -1;

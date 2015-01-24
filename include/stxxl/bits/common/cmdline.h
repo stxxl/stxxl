@@ -64,10 +64,12 @@ protected:
         bool m_repeated;
 
         //! contructor filling most attributes
-        argument(char key, const std::string& longkey, const std::string& keytype,
+        argument(char key, const std::string& longkey,
+                 const std::string& keytype,
                  const std::string& desc, bool required)
             : m_key(key), m_longkey(longkey), m_keytype(keytype),
-              m_desc(desc), m_required(required), m_found(false), m_repeated(false)
+              m_desc(desc), m_required(required), m_found(false),
+              m_repeated(false)
         { }
 
         //! empty virtual destructor
@@ -117,7 +119,8 @@ protected:
         bool& m_dest;
 
         //! contructor filling most attributes
-        argument_flag(char key, const std::string& longkey, const std::string& keytype,
+        argument_flag(char key, const std::string& longkey,
+                      const std::string& keytype,
                       const std::string& desc, bool required, bool& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
@@ -143,7 +146,8 @@ protected:
         int& m_dest;
 
         //! contructor filling most attributes
-        argument_int(char key, const std::string& longkey, const std::string& keytype,
+        argument_int(char key, const std::string& longkey,
+                     const std::string& keytype,
                      const std::string& desc, bool required, int& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
@@ -175,8 +179,10 @@ protected:
         unsigned int& m_dest;
 
         //! contructor filling most attributes
-        argument_uint(char key, const std::string& longkey, const std::string& keytype,
-                      const std::string& desc, bool required, unsigned int& dest)
+        argument_uint(char key, const std::string& longkey,
+                      const std::string& keytype,
+                      const std::string& desc, bool required,
+                      unsigned int& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
         { }
@@ -201,13 +207,15 @@ protected:
         { os << m_dest; }
     };
 
-    //! specialization of argument for SI/IEC suffixes byte size options or parameters
+    //! specialization of argument for SI/IEC suffixes byte size options or
+    //! parameters
     struct argument_bytes32 : public argument
     {
         uint32& m_dest;
 
         //! contructor filling most attributes
-        argument_bytes32(char key, const std::string& longkey, const std::string& keytype,
+        argument_bytes32(char key, const std::string& longkey,
+                         const std::string& keytype,
                          const std::string& desc, bool required, uint32& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
@@ -235,13 +243,15 @@ protected:
         { os << m_dest; }
     };
 
-    //! specialization of argument for SI/IEC suffixes byte size options or parameters
+    //! specialization of argument for SI/IEC suffixes byte size options or
+    //! parameters
     struct argument_bytes64 : public argument
     {
         uint64& m_dest;
 
         //! contructor filling most attributes
-        argument_bytes64(char key, const std::string& longkey, const std::string& keytype,
+        argument_bytes64(char key, const std::string& longkey,
+                         const std::string& keytype,
                          const std::string& desc, bool required, uint64& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
@@ -273,8 +283,10 @@ protected:
         std::string& m_dest;
 
         //! contructor filling most attributes
-        argument_string(char key, const std::string& longkey, const std::string& keytype,
-                        const std::string& desc, bool required, std::string& dest)
+        argument_string(char key, const std::string& longkey,
+                        const std::string& keytype,
+                        const std::string& desc, bool required,
+                        std::string& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
         { }
@@ -301,8 +313,10 @@ protected:
         std::vector<std::string>& m_dest;
 
         //! contructor filling most attributes
-        argument_stringlist(char key, const std::string& longkey, const std::string& keytype,
-                            const std::string& desc, bool required, std::vector<std::string>& dest)
+        argument_stringlist(char key, const std::string& longkey,
+                            const std::string& keytype,
+                            const std::string& desc, bool required,
+                            std::vector<std::string>& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
         {
@@ -430,8 +444,11 @@ public:
 
     // ************************************************************************
 
-    //! add boolean option flag -key, --longkey [keytype] with description and store to dest
-    void add_flag(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, bool& dest)
+    //! add boolean option flag -key, --longkey [keytype] with description and
+    //! store to dest
+    void add_flag(char key, const std::string& longkey,
+                  const std::string& keytype, bool& dest,
+                  const std::string& desc)
     {
         m_optlist.push_back(
             new argument_flag(key, longkey, keytype, desc, false, dest)
@@ -439,8 +456,11 @@ public:
         calc_opt_max(m_optlist.back());
     }
 
-    //! add signed integer option -key, --longkey [keytype] with description and store to dest
-    void add_int(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, int& dest)
+    //! add signed integer option -key, --longkey [keytype] with description
+    //! and store to dest
+    void add_int(char key, const std::string& longkey,
+                 const std::string& keytype, int& dest,
+                 const std::string& desc)
     {
         m_optlist.push_back(
             new argument_int(key, longkey, keytype, desc, false, dest)
@@ -448,8 +468,11 @@ public:
         calc_opt_max(m_optlist.back());
     }
 
-    //! add unsigned integer option -key, --longkey [keytype] with description and store to dest
-    void add_uint(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, unsigned int& dest)
+    //! add unsigned integer option -key, --longkey [keytype] with description
+    //! and store to dest
+    void add_uint(char key, const std::string& longkey,
+                  const std::string& keytype, unsigned int& dest,
+                  const std::string& desc)
     {
         m_optlist.push_back(
             new argument_uint(key, longkey, keytype, desc, false, dest)
@@ -457,8 +480,11 @@ public:
         calc_opt_max(m_optlist.back());
     }
 
-    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
-    void add_bytes(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, stxxl::uint32& dest)
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
+    //! store to 64-bit dest
+    void add_bytes(char key, const std::string& longkey,
+                   const std::string& keytype, stxxl::uint32& dest,
+                   const std::string& desc)
     {
         m_optlist.push_back(
             new argument_bytes32(key, longkey, keytype, desc, false, dest)
@@ -466,8 +492,11 @@ public:
         calc_opt_max(m_optlist.back());
     }
 
-    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
-    void add_bytes(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, stxxl::uint64& dest)
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
+    //! store to 64-bit dest
+    void add_bytes(char key, const std::string& longkey,
+                   const std::string& keytype, stxxl::uint64& dest,
+                   const std::string& desc)
     {
         m_optlist.push_back(
             new argument_bytes64(key, longkey, keytype, desc, false, dest)
@@ -476,7 +505,9 @@ public:
     }
 
     //! add string option -key, --longkey [keytype] and store to dest
-    void add_string(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, std::string& dest)
+    void add_string(char key, const std::string& longkey,
+                    const std::string& keytype, std::string& dest,
+                    const std::string& desc)
     {
         m_optlist.push_back(
             new argument_string(key, longkey, keytype, desc, false, dest)
@@ -485,7 +516,10 @@ public:
     }
 
     //! add string list option -key, --longkey [keytype] and store to dest
-    void add_stringlist(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, std::vector<std::string>& dest)
+    void add_stringlist(char key, const std::string& longkey,
+                        const std::string& keytype,
+                        std::vector<std::string>& dest,
+                        const std::string& desc)
     {
         m_optlist.push_back(
             new argument_stringlist(key, longkey, keytype, desc, false, dest)
@@ -493,38 +527,51 @@ public:
         calc_opt_max(m_optlist.back());
     }
 
-    //! add boolean option flag -key, --longkey with description and store to dest
-    void add_flag(char key, const std::string& longkey, const std::string& desc, bool& dest)
-    { return add_flag(key, longkey, "", desc, dest); }
+    //! add boolean option flag -key, --longkey with description and store to
+    //! dest
+    void add_flag(char key, const std::string& longkey, bool& dest,
+                  const std::string& desc)
+    { return add_flag(key, longkey, "", dest, desc); }
 
-    //! add signed integer option -key, --longkey with description and store to dest
-    void add_int(char key, const std::string& longkey, const std::string& desc, int& dest)
-    { return add_int(key, longkey, "", desc, dest); }
+    //! add signed integer option -key, --longkey with description and store to
+    //! dest
+    void add_int(char key, const std::string& longkey, int& dest,
+                 const std::string& desc)
+    { return add_int(key, longkey, "", dest, desc); }
 
-    //! add unsigned integer option -key, --longkey [keytype] with description and store to dest
-    void add_uint(char key, const std::string& longkey, const std::string& desc, unsigned int& dest)
-    { return add_uint(key, longkey, "", desc, dest); }
+    //! add unsigned integer option -key, --longkey [keytype] with description
+    //! and store to dest
+    void add_uint(char key, const std::string& longkey, unsigned int& dest,
+                  const std::string& desc)
+    { return add_uint(key, longkey, "", dest, desc); }
 
-    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 32-bit dest
-    void add_bytes(char key, const std::string& longkey, const std::string& desc, stxxl::uint32& dest)
-    { return add_bytes(key, longkey, "", desc, dest); }
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
+    //! store to 32-bit dest
+    void add_bytes(char key, const std::string& longkey, stxxl::uint32& dest,
+                   const std::string& desc)
+    { return add_bytes(key, longkey, "", dest, desc); }
 
-    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
-    void add_bytes(char key, const std::string& longkey, const std::string& desc, stxxl::uint64& dest)
-    { return add_bytes(key, longkey, "", desc, dest); }
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
+    //! store to 64-bit dest
+    void add_bytes(char key, const std::string& longkey, stxxl::uint64& dest,
+                   const std::string& desc)
+    { return add_bytes(key, longkey, "", dest, desc); }
 
     //! add string option -key, --longkey [keytype] and store to dest
-    void add_string(char key, const std::string& longkey, const std::string& desc, std::string& dest)
-    { return add_string(key, longkey, "", desc, dest); }
+    void add_string(char key, const std::string& longkey, std::string& dest,
+                    const std::string& desc)
+    { return add_string(key, longkey, "", dest, desc); }
 
     //! add string list option -key, --longkey [keytype] and store to dest
-    void add_stringlist(char key, const std::string& longkey, const std::string& desc, std::vector<std::string>& dest)
-    { return add_stringlist(key, longkey, "", desc, dest); }
+    void add_stringlist(char key, const std::string& longkey,
+                        std::vector<std::string>& dest, const std::string& desc)
+    { return add_stringlist(key, longkey, "", dest, desc); }
 
     // ************************************************************************
 
     //! add signed integer parameter [name] with description and store to dest
-    void add_param_int(const std::string& name, const std::string& desc, int& dest)
+    void add_param_int(const std::string& name, int& dest,
+                       const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_int(0, name, "", desc, true, dest)
@@ -533,7 +580,8 @@ public:
     }
 
     //! add unsigned integer parameter [name] with description and store to dest
-    void add_param_uint(const std::string& name, const std::string& desc, unsigned int& dest)
+    void add_param_uint(const std::string& name, unsigned int& dest,
+                        const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_uint(0, name, "", desc, true, dest)
@@ -541,8 +589,10 @@ public:
         calc_param_max(m_paramlist.back());
     }
 
-    //! add SI/IEC suffixes byte size parameter [name] with description and store to dest
-    void add_param_bytes(const std::string& name, const std::string& desc, uint32& dest)
+    //! add SI/IEC suffixes byte size parameter [name] with description and
+    //! store to dest
+    void add_param_bytes(const std::string& name, uint32& dest,
+                         const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_bytes32(0, name, "", desc, true, dest)
@@ -550,8 +600,10 @@ public:
         calc_param_max(m_paramlist.back());
     }
 
-    //! add SI/IEC suffixes byte size parameter [name] with description and store to dest
-    void add_param_bytes(const std::string& name, const std::string& desc, uint64& dest)
+    //! add SI/IEC suffixes byte size parameter [name] with description and
+    //! store to dest
+    void add_param_bytes(const std::string& name, uint64& dest,
+                         const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_bytes64(0, name, "", desc, true, dest)
@@ -560,7 +612,8 @@ public:
     }
 
     //! add string parameter [name] with description and store to dest
-    void add_param_string(const std::string& name, const std::string& desc, std::string& dest)
+    void add_param_string(const std::string& name, std::string& dest,
+                          const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_string(0, name, "", desc, true, dest)
@@ -569,8 +622,11 @@ public:
     }
 
     //! add string list parameter [name] with description and store to dest.
-    //! \warning this parameter must be last, as it will gobble all non-option arguments!
-    void add_param_stringlist(const std::string& name, const std::string& desc, std::vector<std::string>& dest)
+    //! \warning this parameter must be last, as it will gobble all non-option
+    //! arguments!
+    void add_param_stringlist(const std::string& name,
+                              std::vector<std::string>& dest,
+                              const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_stringlist(0, name, "", desc, true, dest)
@@ -580,8 +636,10 @@ public:
 
     // ************************************************************************
 
-    //! add optional signed integer parameter [name] with description and store to dest
-    void add_opt_param_int(const std::string& name, const std::string& desc, int& dest)
+    //! add optional signed integer parameter [name] with description and store
+    //! to dest
+    void add_opt_param_int(const std::string& name, int& dest,
+                           const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_int(0, name, "", desc, false, dest)
@@ -589,8 +647,10 @@ public:
         calc_param_max(m_paramlist.back());
     }
 
-    //! add optional unsigned integer parameter [name] with description and store to dest
-    void add_opt_param_uint(const std::string& name, const std::string& desc, unsigned int& dest)
+    //! add optional unsigned integer parameter [name] with description and
+    //! store to dest
+    void add_opt_param_uint(const std::string& name, unsigned int& dest,
+                            const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_uint(0, name, "", desc, false, dest)
@@ -598,8 +658,10 @@ public:
         calc_param_max(m_paramlist.back());
     }
 
-    //! add optional SI/IEC suffixes byte size parameter [name] with description and store to dest
-    void add_opt_param_bytes(const std::string& name, const std::string& desc, uint32& dest)
+    //! add optional SI/IEC suffixes byte size parameter [name] with
+    //! description and store to dest
+    void add_opt_param_bytes(const std::string& name, uint32& dest,
+                             const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_bytes32(0, name, "", desc, false, dest)
@@ -607,8 +669,10 @@ public:
         calc_param_max(m_paramlist.back());
     }
 
-    //! add optional SI/IEC suffixes byte size parameter [name] with description and store to dest
-    void add_opt_param_bytes(const std::string& name, const std::string& desc, uint64& dest)
+    //! add optional SI/IEC suffixes byte size parameter [name] with
+    //! description and store to dest
+    void add_opt_param_bytes(const std::string& name, uint64& dest,
+                             const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_bytes64(0, name, "", desc, false, dest)
@@ -617,7 +681,8 @@ public:
     }
 
     //! add optional string parameter [name] with description and store to dest
-    void add_opt_param_string(const std::string& name, const std::string& desc, std::string& dest)
+    void add_opt_param_string(const std::string& name, std::string& dest,
+                              const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_string(0, name, "", desc, false, dest)
@@ -626,8 +691,11 @@ public:
     }
 
     //! add optional string parameter [name] with description and store to dest
-    //! \warning this parameter must be last, as it will gobble all non-option arguments!
-    void add_opt_param_stringlist(const std::string& name, const std::string& desc, std::vector<std::string>& dest)
+    //! \warning this parameter must be last, as it will gobble all non-option
+    //! arguments!
+    void add_opt_param_stringlist(const std::string& name,
+                                  std::vector<std::string>& dest,
+                                  const std::string& desc)
     {
         m_paramlist.push_back(
             new argument_stringlist(0, name, "", desc, false, dest)
@@ -643,17 +711,22 @@ public:
 
 private:
     //! print error about option.
-    void print_option_error(int argc, const char* const* argv, const argument* arg,
+    void print_option_error(int argc, const char* const* argv,
+                            const argument* arg,
                             std::ostream& os);
 
     //! print error about parameter.
-    void print_param_error(int argc, const char* const* argv, const argument* arg,
+    void print_param_error(int argc, const char* const* argv,
+                           const argument* arg,
                            std::ostream& os);
 
 public:
-    //! parse command line options as specified by the options and parameters added.
-    //! \return true if command line is okay and all required parameters are present.
-    bool process(int argc, const char* const* argv, std::ostream& os = std::cout);
+    //! parse command line options as specified by the options and parameters
+    //! added.
+    //! \return true if command line is okay and all required parameters are
+    //! present.
+    bool process(int argc, const char* const* argv,
+                 std::ostream& os = std::cout);
 
     //! print nicely formatted result of processing
     void print_result(std::ostream& os = std::cout);

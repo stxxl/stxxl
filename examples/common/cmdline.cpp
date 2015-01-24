@@ -25,15 +25,18 @@ int main(int argc, char* argv[])
 
     // add an unsigned integer option --rounds <N>
     unsigned int rounds = 0;
-    cp.add_uint('r', "rounds", "N", "Run N rounds of the experiment.", rounds);
+    cp.add_uint('r', "rounds", "N", rounds,
+                "Run N rounds of the experiment.");
 
     // add a byte size argument which the user can enter like '1gi'
     stxxl::uint64 a_size = 0;
-    cp.add_bytes('s', "size", "Number of bytes to process.", a_size);
+    cp.add_bytes('s', "size", a_size,
+                 "Number of bytes to process.");
 
     // add a required parameter
     std::string a_filename;
-    cp.add_param_string("filename", "A filename to process", a_filename);
+    cp.add_param_string("filename", a_filename,
+                        "A filename to process");
 
     // process command line
     if (!cp.process(argc, argv))

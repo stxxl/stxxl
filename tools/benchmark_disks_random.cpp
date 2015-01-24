@@ -211,11 +211,21 @@ int benchmark_disks_random(int argc, char* argv[])
     stxxl::uint64 span, block_size = 8 * MiB, worksize = 0;
     std::string optirw = "irw", allocstr;
 
-    cp.add_param_bytes("span", "Span of external memory to write/read to (e.g. 10GiB).", span);
-    cp.add_opt_param_bytes("block_size", "Size of blocks to randomly write/read (default: 8MiB).", block_size);
-    cp.add_opt_param_bytes("size", "Amount of data to operate on (e.g. 2GiB), default: whole span.", worksize);
-    cp.add_opt_param_string("i|r|w", "Operations: [i]nitialize, [r]ead, and/or [w]rite (default: all).", optirw);
-    cp.add_opt_param_string("alloc", "Block allocation strategy: RC, SR, FR, striping (default: RC).", allocstr);
+    cp.add_param_bytes(
+        "span", span,
+        "Span of external memory to write/read to (e.g. 10GiB).");
+    cp.add_opt_param_bytes(
+        "block_size", block_size,
+        "Size of blocks to randomly write/read (default: 8MiB).");
+    cp.add_opt_param_bytes(
+        "size", worksize,
+        "Amount of data to operate on (e.g. 2GiB), default: whole span.");
+    cp.add_opt_param_string(
+        "i|r|w", optirw,
+        "Operations: [i]nitialize, [r]ead, and/or [w]rite (default: all).");
+    cp.add_opt_param_string(
+        "alloc", allocstr,
+        "Block allocation strategy: RC, SR, FR, striping (default: RC).");
 
     cp.set_description(
         "This program will benchmark _random_ block access on the disks "

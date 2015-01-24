@@ -198,17 +198,19 @@ int benchmark_sort(int argc, char* argv[])
     // parse command line
     stxxl::cmdline_parser cp;
 
-    cp.set_description("This program will benchmark the different sorting methods provided "
-                       "by STXXL using three different data types: first a pair of 32-bit uints, "
-                       "then a pair 64-bit uint and then a larger structure of 64 bytes."
-                       );
+    cp.set_description(
+        "This program will benchmark the different sorting methods provided by "
+        "STXXL using three different data types: first a pair of 32-bit uints, "
+        "then a pair 64-bit uint and then a larger structure of 64 bytes.");
     cp.set_author("Timo Bingmann <tb@panthema.net>");
 
     uint64 length = 0;
-    cp.add_param_bytes("size", "Amount of data to sort (e.g. 1GiB)", length);
+    cp.add_param_bytes("size", length,
+                       "Amount of data to sort (e.g. 1GiB)");
 
     unsigned_type memsize = 256 * MB;
-    cp.add_bytes('M', "ram", "Amount of RAM to use when sorting, default: 256 MiB", memsize);
+    cp.add_bytes('M', "ram", memsize,
+                 "Amount of RAM to use when sorting, default: 256 MiB");
 
     if (!cp.process(argc, argv))
         return -1;

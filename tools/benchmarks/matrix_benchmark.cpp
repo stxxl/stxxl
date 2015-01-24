@@ -37,10 +37,30 @@ int main(int argc, char** argv)
     int sched_algo_num = 2;
 
     stxxl::cmdline_parser cp;
-    cp.add_int('r', "rank", "N", "rank of the matrices, default: 10000", rank);
-    cp.add_bytes('m', "memory", "L", "internal memory to use, default: 256 MiB", internal_memory);
-    cp.add_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n   -1: internal multiplication\n   -2: pure BLAS\n  default: 5", mult_algo_num);
-    cp.add_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default: 2", sched_algo_num);
+    cp.add_int('r', "rank", "N", rank,
+               "rank of the matrices, default: 10000");
+    cp.add_bytes('m', "memory", "L", internal_memory,
+                 "internal memory to use, default: 256 MiB");
+    cp.add_int('a', "mult-algo", "N", mult_algo_num,
+               "use multiplication-algorithm number N\n"
+               "available are:\n"
+               "   0: naive_multiply_and_add\n"
+               "   1: recursive_multiply_and_add\n"
+               "   2: strassen_winograd_multiply_and_add\n"
+               "   3: multi_level_strassen_winograd_multiply_and_add\n"
+               "   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n"
+               "   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n"
+               "   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n"
+               "   -1: internal multiplication\n"
+               "   -2: pure BLAS\n"
+               "  default: 5");
+    cp.add_int('s', "scheduling-algo", "N", sched_algo_num,
+               "use scheduling-algorithm number N\n"
+               "  available are:\n"
+               "   0: online LRU\n"
+               "   1: offline LFD\n"
+               "   2: offline LRU prefetching\n"
+               "  default: 2");
 
     cp.set_description("stxxl matrix test");
     cp.set_author("Raoul Steffen <R-Steffen@gmx.de>");
@@ -48,9 +68,10 @@ int main(int argc, char** argv)
     if (!cp.process(argc, argv))
         return -1;
 
-    STXXL_MSG("multiplying two full double matrices of rank " << rank << ", block order " << block_order
-                                                              << " using " << internal_memory / 1024 / 1024 << "MiB internal memory, multiplication-algo "
-                                                              << mult_algo_num << ", scheduling-algo " << sched_algo_num);
+    STXXL_MSG("multiplying two full double matrices of rank " <<
+              rank << ", block order " << block_order <<
+              " using " << internal_memory / 1024 / 1024 << "MiB internal memory, multiplication-algo " <<
+              mult_algo_num << ", scheduling-algo " << sched_algo_num);
 
     typedef double value_type;
 

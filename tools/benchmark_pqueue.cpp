@@ -303,23 +303,33 @@ int benchmark_pqueue(int argc, char* argv[])
     cp.set_description(description);
 
     uint64 size = 0;
-    cp.add_opt_param_bytes("size", "Amount of data to insert (e.g. 1GiB)", size);
+    cp.add_opt_param_bytes("size", size,
+                           "Amount of data to insert (e.g. 1GiB)");
 
     unsigned type = 2;
-    cp.add_uint('t', "type", "Value type of tested priority queue:\n 1 = pair of uint32,\n 2 = pair of uint64 (default),\n 3 = 24 byte struct\n 0 = all of the above", type);
+    cp.add_uint('t', "type", type,
+                "Value type of tested priority queue:\n"
+                " 1 = pair of uint32,\n"
+                " 2 = pair of uint64 (default),\n"
+                " 3 = 24 byte struct\n"
+                " 0 = all of the above");
 
     unsigned pqconfig = 2;
-    cp.add_uint('p', "pq",
+    cp.add_uint('p', "pq", pqconfig,
                 "Priority queue configuration to test:\n"
                 "1 = small (256 MiB RAM, 4 GiB elements)\n"
                 "2 = medium (1 GiB RAM, 16 GiB elements) (default)\n"
 #if __x86_64__ || __LP64__ || (__WORDSIZE == 64)
                 "3 = big (8 GiB RAM, 64 GiB elements)\n"
 #endif
-                "0 = all of the above", pqconfig);
+                "0 = all of the above");
 
     unsigned opseq = 1;
-    cp.add_uint('o', "opseq", "Operation sequence to perform:\n 1 = insert all, delete all (default)\n 2 = insert all, intermixed insert/delete\n 0 = all of the above", opseq);
+    cp.add_uint('o', "opseq", opseq,
+                "Operation sequence to perform:\n"
+                " 1 = insert all, delete all (default)\n"
+                " 2 = insert all, intermixed insert/delete\n"
+                " 0 = all of the above");
 
     if (!cp.process(argc, argv))
         return -1;

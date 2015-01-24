@@ -352,12 +352,35 @@ int main(int argc, char** argv)
     cp.set_description("stxxl matrix test");
     cp.set_author("Raoul Steffen <R-Steffen@gmx.de>");
 
-    cp.add_opt_param_int("K", "number of the test case to run: 1 or 2, or by default: all", test_case);
+    cp.add_opt_param_int(
+        "K", test_case,
+        "number of the test case to run: 1 or 2, or by default: all");
 
-    cp.add_int('r', "rank", "<N>", "rank of the matrices, default: 500", rank);
-    cp.add_bytes('m', "memory", "<L>", "internal memory to, default: 256 MiB", internal_memory);
-    cp.add_int('a', "mult-algo", "<N>", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n  default: 2", mult_algo_num);
-    cp.add_int('s', "scheduling-algo", "<N>", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default: 1", sched_algo_num);
+    cp.add_int('r', "rank", "<N>", rank,
+               "rank of the matrices, default: 500");
+
+    cp.add_bytes('m', "memory", "<L>", internal_memory,
+                 "internal memory to, default: 256 MiB");
+
+    cp.add_int('a', "mult-algo", "<N>", mult_algo_num,
+               "use multiplication-algorithm number N\n"
+               "  available are:\n"
+               "   0: naive_multiply_and_add\n"
+               "   1: recursive_multiply_and_add\n"
+               "   2: strassen_winograd_multiply_and_add\n"
+               "   3: multi_level_strassen_winograd_multiply_and_add\n"
+               "   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n"
+               "   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n"
+               "   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n"
+               "  default: 2");
+
+    cp.add_int('s', "scheduling-algo", "<N>", sched_algo_num,
+               "use scheduling-algorithm number N\n"
+               "  available are:\n"
+               "   0: online LRU\n"
+               "   1: offline LFD\n"
+               "   2: offline LRU prefetching\n"
+               "  default: 1");
 
     if (!cp.process(argc, argv))
         return 0;

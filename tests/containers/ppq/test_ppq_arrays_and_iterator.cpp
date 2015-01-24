@@ -476,23 +476,34 @@ int main(int argc, char** argv)
     stxxl::cmdline_parser cp;
     cp.set_description("STXXL external array test");
     cp.set_author("Thomas Keh <thomas.keh@student.kit.edu>");
-    cp.add_bytes('v', "volume", "Volume to fill into the external array, default: 512 MiB, 0 = disable test", volume);
-    cp.add_bytes('m', "mwmvolume", "Testing multiway merge of two external arrays - the volume of each input array, default: 100 MiB, 0 = disable test", mwmvolume);
-    cp.add_bytes('i', "iavolume", "Volume to fill into the internal array, default: 10 MiB, 0 = disable test", iavolume);
-    cp.add_uint('n', "numprefetchbuffers", "Number of prefetch buffer blocks, default: 1", numpbs);
-    cp.add_uint('w', "numwritebuffers", "Number of write buffer blocks, default: 14", numwbs);
+    cp.add_bytes('v', "volume", volume,
+                 "Volume to fill into the external array, "
+                 "default: 512 MiB, 0 = disable test");
+    cp.add_bytes('m', "mwmvolume", mwmvolume,
+                 "Testing multiway merge of two external arrays - "
+                 "the volume of each input array, "
+                 "default: 100 MiB, 0 = disable test");
+    cp.add_bytes('i', "iavolume", iavolume,
+                 "Volume to fill into the internal array, "
+                 "default: 10 MiB, 0 = disable test");
+    cp.add_uint('n', "num_prefetch_buffers", numpbs,
+                "Number of prefetch buffer blocks, default: 1");
+    cp.add_uint('w', "num_write_buffers", numwbs,
+                "Number of write buffer blocks, default: 14");
 
     if (!cp.process(argc, argv))
         return EXIT_FAILURE;
 
     const size_t block_size = 2 * 1024 * 1024 / sizeof(value_type);
     if (volume > 0 && volume / sizeof(value_type) < 5 * block_size + 876) {
-        STXXL_ERRMSG("The volume is too small for this test. It must be >= " << (5 * block_size + 876) * sizeof(value_type));
+        STXXL_ERRMSG("The volume is too small for this test. It must be >= " <<
+                     (5 * block_size + 876) * sizeof(value_type));
         return EXIT_FAILURE;
     }
 
     if (iavolume > 0 && iavolume / sizeof(value_type) < 3) {
-        STXXL_ERRMSG("The internal array volume is too small for this test. It must be > " << 3);
+        STXXL_ERRMSG("The internal array volume is too small for this test. "
+                     "It must be > " << 3);
         return EXIT_FAILURE;
     }
 

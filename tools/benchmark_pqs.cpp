@@ -1129,44 +1129,55 @@ int benchmark_pqs(int argc, char* argv[])
     stxxl::cmdline_parser cp;
     cp.set_description(description);
 
-    cp.add_flag('n', "ppq", "Benchmark parallel priority queue", do_ppq);
-    cp.add_flag('o', "stxxl", "Benchmark stxxl priority queue", do_stxxlpq);
-    cp.add_flag('s', "sorter", "Benchmark stxxl::sorter", do_sorter);
-    cp.add_flag('l', "stl", "Benchmark std::priority_queue", do_stlpq);
+    cp.add_flag('n', "ppq", do_ppq, "Benchmark parallel priority queue");
+    cp.add_flag('o', "stxxl", do_stxxlpq, "Benchmark stxxl priority queue");
+    cp.add_flag('s', "sorter", do_sorter, "Benchmark stxxl::sorter");
+    cp.add_flag('l', "stl", do_stlpq, "Benchmark std::priority_queue");
 
-    cp.add_flag('d', "dijkstra", "Run dijkstra benchmark", do_dijkstra);
-    cp.add_flag('r', "random", "Use random insert", do_random);
-    cp.add_flag('p', "parallel", "Insert bulks in parallel", do_parallel);
-    cp.add_flag('c', "check", "Check results", do_check);
-    cp.add_flag('b', "bulk", "Use bulk insert", do_bulk);
-    cp.add_flag('i', "intermixed", "Intermixed insert/delete", do_intermixed);
+    cp.add_flag('d', "dijkstra", do_dijkstra, "Run dijkstra benchmark");
+    cp.add_flag('r', "random", do_random, "Use random insert");
+    cp.add_flag('p', "parallel", do_parallel, "Insert bulks in parallel");
+    cp.add_flag('c', "check", do_check, "Check results");
+    cp.add_flag('b', "bulk", do_bulk, "Use bulk insert");
+    cp.add_flag('i', "intermixed", do_intermixed, "Intermixed insert/delete");
 
-    cp.add_flag(0, "prefill", "Prefill queue before starting intermixed insert/delete (only with -i and without -r and -c together)", do_prefill);
-    cp.add_flag(0, "no-read", "Do not read items from queue after insert", do_no_read);
+    cp.add_flag(0, "prefill", do_prefill,
+                "Prefill queue before starting intermixed insert/delete "
+                "(only with -i and without -r and -c together)");
+    cp.add_flag(0, "no-read", do_no_read,
+                "Do not read items from queue after insert");
 
     uint64 temp_volume = 0;
-    cp.add_bytes('v', "volume", "Amount of data to insert in Bytes (not recommended for STXXL PQ)", temp_volume);
+    cp.add_bytes('v', "volume", temp_volume,
+                 "Amount of data to insert in Bytes (not recommended for STXXL PQ)");
 
     uint64 temp_ram = 0;
-    cp.add_bytes('m', "ram", "Amount of main memory in Bytes (not possible for STXXL PQ)", temp_ram);
+    cp.add_bytes('m', "ram", temp_ram,
+                 "Amount of main memory in Bytes (not possible for STXXL PQ)");
 
     unsigned int temp_bulk_size = 0;
-    cp.add_uint('k', "bulksize", "Number of elements per bulk", temp_bulk_size);
+    cp.add_uint('k', "bulksize", temp_bulk_size,
+                "Number of elements per bulk");
 
     unsigned int temp_universe_size = 0;
-    cp.add_uint('u', "universesize", "Range for random values", temp_universe_size);
+    cp.add_uint('u', "universesize", temp_universe_size,
+                "Range for random values");
 
     unsigned int temp_num_write_buffers = std::numeric_limits<unsigned int>::max();
-    cp.add_uint('w', "writebuffers", "Number of buffered blocks when writing to external memory", num_write_buffers);
+    cp.add_uint('w', "writebuffers", num_write_buffers,
+                "Number of buffered blocks when writing to external memory");
 
     uint64 temp_extract_buffer_ram = 0;
-    cp.add_bytes('x', "extractbufferram", "Maximum memory consumption of the extract buffer in Bytes", temp_extract_buffer_ram);
+    cp.add_bytes('x', "extractbufferram", temp_extract_buffer_ram,
+                 "Maximum memory consumption of the extract buffer in Bytes");
 
     uint64 temp_single_heap_ram = 0;
-    cp.add_bytes('y', "heapram", "Size of a single insertion heap in Bytes", temp_single_heap_ram);
+    cp.add_bytes('y', "heapram", temp_single_heap_ram,
+                 "Size of a single insertion heap in Bytes");
 
     unsigned int temp_num_prefetchers = std::numeric_limits<unsigned int>::max();
-    cp.add_uint('z', "prefetchers", "Number of prefetched blocks for each external array", temp_num_prefetchers);
+    cp.add_uint('z', "prefetchers", temp_num_prefetchers,
+                "Number of prefetched blocks for each external array");
 
     if (!cp.process(argc, argv))
         return -1;

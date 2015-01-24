@@ -1343,8 +1343,13 @@ int main(int argc, char* argv[])
 {
     stxxl::cmdline_parser cp;
 
-    cp.set_description("DC3 aka skew3 algorithm for external memory suffix array construction.");
-    cp.set_author("Jens Mehnert <jmehnert@mpi-sb.mpg.de>, Timo Bingmann <tb@panthema.net>, Daniel Feist <daniel.feist@student.kit.edu>");
+    cp.set_description(
+        "DC3 aka skew3 algorithm for external memory suffix array construction."
+        );
+    cp.set_author(
+        "Jens Mehnert <jmehnert@mpi-sb.mpg.de>, "
+        "Timo Bingmann <tb@panthema.net>, "
+        "Daniel Feist <daniel.feist@student.kit.edu>");
 
     std::string input_filename, output_filename;
     size_type sizelimit = std::numeric_limits<size_type>::max();
@@ -1353,28 +1358,43 @@ int main(int argc, char* argv[])
     bool input_verbatim = false;
     unsigned wordsize = 32;
 
-    cp.add_param_string("input", "Path to input file (or verbatim text).\n  The special inputs 'random' and 'unary' generate such text on-the-fly.", input_filename);
-    cp.add_flag('c', "check", "Check suffix array for correctness.", check_flag);
-    cp.add_flag('t', "text", "Print out suffix array in readable text.", text_output_flag);
-    cp.add_string('o', "output", "Output suffix array to given path.", output_filename);
-    cp.add_flag('v', "verbatim", "Consider \"input\" as verbatim text to construct suffix array on.", input_verbatim);
-    cp.add_bytes('s', "size", "Cut input text to given size, e.g. 2 GiB.", sizelimit);
-    cp.add_bytes('M', "memuse", "Amount of RAM to use, default: 1 GiB.", ram_use);
-    cp.add_uint('w', "wordsize", "Set word size of suffix array to 32, 40 or 64 bit, default: 32-bit.", wordsize);
+    cp.add_param_string("input", input_filename,
+                        "Path to input file (or verbatim text).\n"
+                        "  The special inputs 'random' and 'unary' generate "
+                        "such text on-the-fly.");
+    cp.add_flag('c', "check", check_flag,
+                "Check suffix array for correctness.");
+    cp.add_flag('t', "text", text_output_flag,
+                "Print out suffix array in readable text.");
+    cp.add_string('o', "output", output_filename,
+                  "Output suffix array to given path.");
+    cp.add_flag('v', "verbatim", input_verbatim,
+                "Consider \"input\" as verbatim text to construct "
+                "suffix array on.");
+    cp.add_bytes('s', "size", sizelimit,
+                 "Cut input text to given size, e.g. 2 GiB.");
+    cp.add_bytes('M', "memuse", ram_use,
+                 "Amount of RAM to use, default: 1 GiB.");
+    cp.add_uint('w', "wordsize", wordsize,
+                "Set word size of suffix array to 32, 40 or 64 bit, "
+                "default: 32-bit.");
 
     // process command line
     if (!cp.process(argc, argv))
         return -1;
 
     if (wordsize == 32)
-        return process<stxxl::uint32>(input_filename, output_filename, sizelimit,
-                                      text_output_flag, check_flag, input_verbatim);
+        return process<stxxl::uint32>(
+            input_filename, output_filename, sizelimit,
+            text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 40)
-        return process<stxxl::uint40>(input_filename, output_filename, sizelimit,
-                                      text_output_flag, check_flag, input_verbatim);
+        return process<stxxl::uint40>(
+            input_filename, output_filename, sizelimit,
+            text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 64)
-        return process<stxxl::uint64>(input_filename, output_filename, sizelimit,
-                                      text_output_flag, check_flag, input_verbatim);
+        return process<stxxl::uint64>(
+            input_filename, output_filename, sizelimit,
+            text_output_flag, check_flag, input_verbatim);
     else
         std::cerr << "Invalid wordsize for suffix array: 32, 40 or 64 are allowed." << std::endl;
 

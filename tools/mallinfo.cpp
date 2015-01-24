@@ -47,12 +47,13 @@ int do_mallinfo(int argc, char* argv[])
     // parse command line
     stxxl::cmdline_parser cp;
 
-    cp.set_description("Allocate some memory and mlock() it to consume physical memory. "
-                       "Needs to run as root to block more than 64 KiB in default settings."
-                       );
+    cp.set_description(
+        "Allocate some memory and mlock() it to consume physical memory. "
+        "Needs to run as root to block more than 64 KiB in default settings.");
 
     stxxl::internal_size_type M;
-    cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 1GiB)", M);
+    cp.add_param_bytes("size", M,
+                       "Amount of memory to allocate (e.g. 1GiB)");
 
     if (!cp.process(argc, argv))
         return -1;
