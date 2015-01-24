@@ -970,11 +970,11 @@ multiway_merge_loser_tree(RandomAccessIteratorIterator seqs_begin,
         source_type source = lt.get_min_source();
 
         *target = *seqs_begin[source].first;
-        ++seqs_begin[source].first;
         ++target;
+        ++seqs_begin[source].first;
 
         // feed
-        if (UNLIKELY(seqs_begin[source].first == seqs_begin[source].second))
+        if (seqs_begin[source].first == seqs_begin[source].second)
             lt.delete_min_insert(*arbitrary_element, true);
         else
             // replace from same source
