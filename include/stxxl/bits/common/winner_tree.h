@@ -102,6 +102,14 @@ public:
         replay_on_change(index);
     }
 
+    //! activate a player and resize if necessary
+    inline void activate_without_replay(unsigned int index)
+    {
+        while (index >= m_num_slots)
+            double_num_slots();
+        m_tree[((m_tree.size()/2)+index)] = index;
+    }
+
     //! deactivate a player and replay.
     inline void deactivate_player(unsigned int index)
     {
