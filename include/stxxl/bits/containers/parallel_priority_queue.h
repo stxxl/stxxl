@@ -3066,13 +3066,13 @@ public:
         }
 
         m_stats.hint_time.start();
-        m_hint_tree.resize_and_clear(m_external_arrays.size());
 
-        // TODO: replace this by more efficient native creation.
         for (size_t i = 0; i < m_external_arrays.size(); ++i) {
-            m_hint_tree.replay_on_change(i);
             m_external_arrays[i].prepare_rebuilding_hints();
         }
+
+        m_hint_tree.activate_without_replay(ea_index);
+        m_hint_tree.rebuild();
 
         m_num_hinted_blocks = 0;
 
