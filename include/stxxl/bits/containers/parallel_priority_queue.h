@@ -427,7 +427,6 @@ public:
     static const bool debug = false;
 
 protected:
-
     //! The total size of the external array in items. Cannot be changed
     //! after construction.
     external_size_type m_capacity;
@@ -636,10 +635,11 @@ public:
     }
 
     //! Returns approximate (current!) memory usage
-    size_t int_memory() const {
+    size_t int_memory() const
+    {
         const size_t num_ram_blocks = get_end_block_index() - get_current_block_index();
         const size_t num_buffer_blocks = m_pool->size_prefetch() + m_pool->size_write();
-        return (num_ram_blocks+num_buffer_blocks)*block_size;
+        return (num_ram_blocks + num_buffer_blocks) * block_size;
     }
 
     //! Returns the number elements available in internal memory
@@ -663,7 +663,7 @@ public:
     //! Return the block in which m_end_index-1 is located.
     inline unsigned_type get_current_block_index() const
     {
-        return get_end_block_index()-1;
+        return get_end_block_index() - 1;
     }
 
     //! Returns a random-access iterator to the begin of the data
@@ -758,7 +758,7 @@ public:
         // compatibility to the block write interface
         m_index = m_size;
         m_end_index = m_index + 1;
-        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
+        m_hinted_until = std::max(m_hinted_until, get_current_block_index());
     }
 #endif
 
@@ -936,7 +936,7 @@ public:
         m_size += size;
         m_index = m_size;
         m_end_index = m_index + 1; // buffer size must be at least 1
-        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
+        m_hinted_until = std::max(m_hinted_until, get_current_block_index());
     }
 
     //! Finish write phase. Afterwards the values can be extracted from bottom
@@ -957,7 +957,7 @@ public:
 
         const size_t local_block_size = block_size; // std::min cannot access static block_size
         m_end_index = std::min<external_size_type>(local_block_size, m_capacity);
-        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
+        m_hinted_until = std::max(m_hinted_until, get_current_block_index());
         m_index = 0;
 
         assert(m_blocks[0]);
@@ -1062,7 +1062,7 @@ public:
 
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_size);
-        m_hinted_until = std::max(m_hinted_until,get_current_block_index());
+        m_hinted_until = std::max(m_hinted_until, get_current_block_index());
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
                     " block index=" << block_index <<
@@ -1080,7 +1080,7 @@ public:
         assert(m_hinted_until < m_num_blocks);
         ++m_hinted_until;
         const size_t num_hinted = num_hinted_blocks();
-        if (m_pool->size_prefetch()<num_hinted)
+        if (m_pool->size_prefetch() < num_hinted)
             m_pool->resize_prefetch(num_hinted);
         m_pool->hint(m_bids[m_hinted_until]);
     }
@@ -1097,14 +1097,14 @@ public:
     //! to the prefetcher.
     bool has_unhinted_em_data() const
     {
-        return (m_hinted_until+1 < m_num_blocks);
+        return (m_hinted_until + 1 < m_num_blocks);
     }
 
     //! Returns the number of hinted blocks.
     size_t num_hinted_blocks() const
     {
-        assert(get_current_block_index()<=m_hinted_until);
-        return m_hinted_until-get_current_block_index();
+        assert(get_current_block_index() <= m_hinted_until);
+        return m_hinted_until - get_current_block_index();
     }
 
     //! This method prepares rebuilding the hints (this is done after
@@ -1113,22 +1113,24 @@ public:
     //! Resets m_hinted_until to the current block index.
     //! finish_rebuilding_hints() should be called after placing all
     //! hints in order to clean up the prefetch pool.
-    void prepare_rebuilding_hints() {
+    void prepare_rebuilding_hints()
+    {
         m_old_hinted_until = m_hinted_until;
         m_hinted_until = get_current_block_index();
     }
 
-    //! Removes hints which aren't needed anymore from the prefetcher 
+    //! Removes hints which aren't needed anymore from the prefetcher
     //! and fixes it's size. prepare_rebuilding_hints() must be called
     //! before!
-    void finish_rebuilding_hints() {
+    void finish_rebuilding_hints()
+    {
         // Remove hints which aren't needed anymore
-        for (size_t i=m_hinted_until+1; i<=m_old_hinted_until; ++i) {
+        for (size_t i = m_hinted_until + 1; i <= m_old_hinted_until; ++i) {
             STXXL_DEBUG("Discarding hint");
             m_pool->invalidate(m_bids[i]);
         }
         // Fix prefetch size
-        const size_t num_hints = m_hinted_until-get_current_block_index();
+        const size_t num_hints = m_hinted_until - get_current_block_index();
         m_pool->resize_prefetch(num_hints);
     }
 
@@ -1940,7 +1942,7 @@ protected:
 
     //! <-Comparator for ValueType
     compare_type m_compare;
-    
+
     //! >-Comparator for ValueType
     inv_compare_type m_inv_compare;
 
@@ -2109,37 +2111,37 @@ protected:
     //! The winner tree containing the smallest values of all sources
     //! where the globally smallest element could come from.
     minima_type m_minima;
-    
+
     //! Compares the largest accessible value of two external arrays.
     struct fetch_prediction_comparator {
         const external_arrays_type& m_eas;
         const inv_compare_type& m_compare;
         fetch_prediction_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
-            : m_eas(eas), m_compare(compare) {}
+            : m_eas(eas), m_compare(compare) { }
         bool operator () (const size_t& a, const size_t& b) const
         {
             return m_compare(m_eas[a].get_current_max(), m_eas[b].get_current_max());
         }
     } m_fetch_prediction_comparator;
-    
+
     //! Tracks the largest accessible values of the external arrays if there
     //! is unaccessible data in EM. The winning array is the first one that
     //! needs to fetch further data from EM. Used in calculate_merge_sequences.
     winner_tree<fetch_prediction_comparator> m_fetch_prediction_tree;
-    
+
     //! Compares the largest value of the block hinted the latest of two
     //! external arrays.
     struct hint_comparator {
         const external_arrays_type& m_eas;
         const inv_compare_type& m_compare;
         hint_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
-            : m_eas(eas), m_compare(compare) {}
+            : m_eas(eas), m_compare(compare) { }
         bool operator () (const size_t& a, const size_t& b) const
         {
             return m_compare(m_eas[a].get_hinted_max(), m_eas[b].get_hinted_max());
         }
     } m_hint_comparator;
-    
+
     //! Tracks the largest values of the block hinted the latest of the
     //! external arrays if there is unaccessible data in EM. The winning
     //! array is the first one that needs to fetch further data from EM.
@@ -2199,7 +2201,7 @@ protected:
         ForwardIterator first = m_external_arrays.begin();
         ForwardIterator last = m_external_arrays.end();
         ForwardIterator swap_end = first;
-        size_t size = m_external_arrays.end()-m_external_arrays.begin();
+        size_t size = m_external_arrays.end() - m_external_arrays.begin();
         size_t first_removed = size;
         while (first != last)
         {
@@ -2209,31 +2211,31 @@ protected:
                 swap(*first, *swap_end);
                 ++swap_end;
             }
-            else if (first_removed>=size)
+            else if (first_removed >= size)
             {
                 first_removed = first - m_external_arrays.begin();
             }
             ++first;
         }
-        
+
         size_t swap_end_index = swap_end - m_external_arrays.begin();
-        
+
         // Deactivating all affected players first.
         // Otherwise there might be outdated comparisons.
-        for (size_t i=first_removed; i<size; ++i) {
+        for (size_t i = first_removed; i < size; ++i) {
             m_fetch_prediction_tree.deactivate_player(i);
         }
-        
+
         // Replay moved arrays.
-        for (size_t i=first_removed; i<swap_end_index; ++i) {
+        for (size_t i = first_removed; i < swap_end_index; ++i) {
             update_fetch_and_hint_trees(i);
         }
 
         hint();
 
-        STXXL_DEBUG("Removed "<<(size_t)(m_external_arrays.end()-swap_end)
-            <<" empty external arrays.");
-        
+        STXXL_DEBUG("Removed " << (size_t)(m_external_arrays.end() - swap_end)
+                               << " empty external arrays.");
+
         m_mem_left +=
             (m_external_arrays.end() - swap_end) * m_mem_per_external_array;
 
@@ -2327,10 +2329,10 @@ public:
           m_proc(m_num_insertion_heaps),
           m_external_arrays(),
           m_minima(*this),
-          m_fetch_prediction_comparator(m_external_arrays,m_inv_compare),
-          m_fetch_prediction_tree(4,m_fetch_prediction_comparator),
-          m_hint_comparator(m_external_arrays,m_inv_compare),
-          m_hint_tree(4,m_hint_comparator),
+          m_fetch_prediction_comparator(m_external_arrays, m_inv_compare),
+          m_fetch_prediction_tree(4, m_fetch_prediction_comparator),
+          m_hint_comparator(m_external_arrays, m_inv_compare),
+          m_hint_tree(4, m_hint_comparator),
           m_num_hinted_blocks(0)
     {
 #if STXXL_PARALLEL
@@ -2389,7 +2391,7 @@ protected:
         // total_ram - ram for the heaps - ram for the heap merger
         //       - ram for the external array write buffer - EA prefetch buffer blocks
         m_mem_left = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size
-                            - m_num_prefetchers * block_size;
+                     - m_num_prefetchers * block_size;
 
         // at least first block of array, TODO: may be larger
         m_mem_per_external_array = block_size;
@@ -2425,7 +2427,7 @@ protected:
         size_type mem_used = 0;
 
         mem_used += 2 * m_mem_for_heaps + m_num_write_buffers * block_size
-            + m_num_prefetchers * block_size;
+                    + m_num_prefetchers * block_size;
 
         // test the processor local data structures
 
@@ -2945,7 +2947,7 @@ public:
             --m_external_size;
             bool has_hinted_blocks = m_external_arrays[index].num_hinted_blocks() > 0;
             bool fetched_new_block = m_external_arrays[index].remove(1);
-            if (has_hinted_blocks&&fetched_new_block)
+            if (has_hinted_blocks && fetched_new_block)
                 --m_num_hinted_blocks;
             m_external_arrays[index].wait();
 
@@ -2976,9 +2978,8 @@ public:
      */
     void merge_external_arrays()
     {
-    
         STXXL_MSG("Merging external arrays");
-    
+
         m_stats.num_external_array_merges++;
         m_stats.external_array_merge_time.start();
 
@@ -2995,27 +2996,26 @@ public:
             external_array_writer_type external_array_writer(ea);
 
             typename external_array_writer_type::iterator outiter
-                   = external_array_writer.begin();
+                = external_array_writer.begin();
 
             while (m_external_arrays.size() > 0) {
-                
                 size_type eas = m_external_arrays.size();
                 size_type ias = m_internal_arrays.size();
-                std::vector<size_type> sizes(eas+ias);
-                std::vector<iterator_pair_type> sequences(eas+ias);
-                
-                calculate_merge_sequences(sizes,sequences,false);
+                std::vector<size_type> sizes(eas + ias);
+                std::vector<iterator_pair_type> sequences(eas + ias);
+
+                calculate_merge_sequences(sizes, sequences, false);
                 size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
 
                 outiter = potentially_parallel::multiway_merge(
                     sequences.begin(), sequences.end(),
                     outiter, output_size, m_inv_compare);
 
-                for (size_type i = 0; i < eas+ias; ++i) {
+                for (size_type i = 0; i < eas + ias; ++i) {
                     if (i < eas) {
                         bool has_hinted_blocks = m_external_arrays[i].num_hinted_blocks() > 0;
                         bool fetched_new_block = m_external_arrays[i].remove(sizes[i]);
-                        if (has_hinted_blocks&&fetched_new_block)
+                        if (has_hinted_blocks && fetched_new_block)
                             --m_num_hinted_blocks;
                         update_fetch_and_hint_trees(i);
                         hint();
@@ -3027,18 +3027,16 @@ public:
                         m_internal_size -= sizes[j];
                     }
                 }
-                
+
                 for (size_type i = 0; i < eas; ++i) {
                     m_external_arrays[i].wait();
                 }
-                
+
                 cleanup_external_arrays();
                 cleanup_internal_arrays();
-                
             }
-            
         } // destroy external_array_writer
-        
+
         m_external_arrays.swap_back(ea);
         update_trees_after_ea_creation(0);
 
@@ -3053,15 +3051,14 @@ public:
 
         m_mem_left -= m_mem_per_external_array;
         check_invariants();
-        
     }
 
     //! Activate player in fetch prediction tree afer a remove()
     //! or a request_further_block() call. Rebuild hint tree
     //! completely as the hint sequence may have changed.
     //! \param ea_index index of the external array in question
-    inline void update_trees_after_ea_creation(size_t ea_index) {
-
+    inline void update_trees_after_ea_creation(size_t ea_index)
+    {
         STXXL_DEBUG("update_trees_after_ea_creation");
 
         if (m_external_arrays[ea_index].has_em_data()) {
@@ -3072,30 +3069,32 @@ public:
         m_hint_tree.resize_and_clear(m_external_arrays.size());
 
         // TODO: replace this by more efficient native creation.
-        for (size_t i=0; i<m_external_arrays.size(); ++i) {
+        for (size_t i = 0; i < m_external_arrays.size(); ++i) {
             m_hint_tree.replay_on_change(i);
             m_external_arrays[i].prepare_rebuilding_hints();
         }
 
         m_num_hinted_blocks = 0;
 
-        for (size_t i=0; i<m_num_prefetchers; ++i) {
+        for (size_t i = 0; i < m_num_prefetchers; ++i) {
             int min_max_index = m_hint_tree.top();
-            if (min_max_index>-1) {
-                STXXL_DEBUG("Give hint in EA["<<min_max_index<<"]");
+            if (min_max_index > -1) {
+                STXXL_DEBUG("Give hint in EA[" << min_max_index << "]");
                 m_external_arrays[min_max_index].hint();
                 ++m_num_hinted_blocks;
                 if (m_external_arrays[min_max_index].has_unhinted_em_data()) {
                     m_hint_tree.replay_on_change(min_max_index);
-                } else {
+                }
+                else {
                     m_hint_tree.deactivate_player(min_max_index);
                 }
-            } else {
+            }
+            else {
                 break;
             }
         }
 
-        for (size_t i=0; i<m_external_arrays.size(); ++i) {
+        for (size_t i = 0; i < m_external_arrays.size(); ++i) {
             m_external_arrays[i].finish_rebuilding_hints();
         }
 
@@ -3105,16 +3104,19 @@ public:
     //! Updates the prefetch prediction tree afer a remove() or
     //! a request_further_block() call.
     //! \param ea_index index of the external array in question
-    inline void update_fetch_and_hint_trees(size_t ea_index) {
+    inline void update_fetch_and_hint_trees(size_t ea_index)
+    {
         if (m_external_arrays[ea_index].has_em_data()) {
             m_fetch_prediction_tree.replay_on_change(ea_index);
-        } else {
+        }
+        else {
             m_fetch_prediction_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.start();
         if (m_external_arrays[ea_index].has_unhinted_em_data()) {
             m_hint_tree.replay_on_change(ea_index);
-        } else {
+        }
+        else {
             m_hint_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.stop();
@@ -3122,34 +3124,34 @@ public:
 
     //! Hints EA blocks which will be needed soon. Hints at most
     //! m_num_prefetchers blocks globally.
-    inline void hint() {
-
+    inline void hint()
+    {
 #ifdef STXXL_DEBUG_ASSERTIONS
 
-        size_t num_hinted=0;
-        for (size_t i=0; i<m_external_arrays.size(); ++i) {
+        size_t num_hinted = 0;
+        for (size_t i = 0; i < m_external_arrays.size(); ++i) {
             num_hinted += m_external_arrays[i].num_hinted_blocks();
         }
 
-        STXXL_ASSERT(num_hinted==m_num_hinted_blocks);
+        STXXL_ASSERT(num_hinted == m_num_hinted_blocks);
 
 #endif
         m_stats.hint_time.start();
 
         int min_max_index = m_hint_tree.top();
-        while (m_num_hinted_blocks < m_num_prefetchers && min_max_index>-1) {
-            assert((size_t)min_max_index<m_external_arrays.size());
+        while (m_num_hinted_blocks<m_num_prefetchers&& min_max_index>-1) {
+            assert((size_t)min_max_index < m_external_arrays.size());
 
-            STXXL_DEBUG("Give hint in EA["<<min_max_index<<"]");
+            STXXL_DEBUG("Give hint in EA[" << min_max_index << "]");
             m_external_arrays[min_max_index].hint();
             ++m_num_hinted_blocks;
-            
+
             if (m_external_arrays[min_max_index].has_unhinted_em_data()) {
                 m_hint_tree.replay_on_change(min_max_index);
-            } else {
+            }
+            else {
                 m_hint_tree.deactivate_player(min_max_index);
             }
-
         }
 
         m_stats.hint_time.stop();
@@ -3209,8 +3211,8 @@ protected:
          * determine maximum of each first block
          */
 
-        size_t min_max_index = (size_t) m_fetch_prediction_tree.top();
-        bool needs_limit = (m_fetch_prediction_tree.top()>-1) ? true : false;
+        size_t min_max_index = (size_t)m_fetch_prediction_tree.top();
+        bool needs_limit = (m_fetch_prediction_tree.top() > -1) ? true : false;
 
 // test correctness of prefetch prediction tree
 #ifdef STXXL_DEBUG_ASSERTIONS
@@ -3311,31 +3313,29 @@ protected:
     }
 
 public:
-
     //! Extract exactly n values at once.
     void bulk_pop_n(std::vector<value_type>& out, size_t num_elements)
     {
-        assert(num_elements>0);
-        const size_t n_elements = std::min<size_t>(num_elements,size());
-        assert(n_elements<m_extract_buffer_limit);
+        assert(num_elements > 0);
+        const size_t n_elements = std::min<size_t>(num_elements, size());
+        assert(n_elements < m_extract_buffer_limit);
 
-        if (m_heaps_size>0)
+        if (m_heaps_size > 0)
             flush_insertion_heaps();
 
-        if (m_extract_buffer_size>0)
+        if (m_extract_buffer_size > 0)
             convert_eb_into_ia();
 
         refill_extract_buffer(n_elements, n_elements);
 
         out.resize(0);
         using std::swap;
-        swap(m_extract_buffer,out);
+        swap(m_extract_buffer, out);
         m_extract_buffer_index = 0;
         m_extract_buffer_size = 0;
     }
 
 protected:
-
     //! Convert extract buffer into a new internal array.
     void convert_eb_into_ia()
     {
@@ -3347,14 +3347,14 @@ protected:
     //! Refills the extract buffer from the external arrays.
     //! \param minimum_size requested minimum size of the resulting extract buffer.
     //!         Prints a warning if there is not enough data to reach this size.
-    //! \param maximum_size maximum size of the extract buffer. Using 
+    //! \param maximum_size maximum size of the extract buffer. Using
     //!         m_extract_buffer_limit if set to 0.
     inline void refill_extract_buffer(size_t minimum_size = 0,
-        size_t maximum_size = 0)
+                                      size_t maximum_size = 0)
     {
         STXXL_DEBUG("refilling extract buffer");
 
-        if (maximum_size==0)
+        if (maximum_size == 0)
             maximum_size = m_extract_buffer_limit;
 
         check_invariants();
@@ -3455,7 +3455,7 @@ protected:
                 if (i < eas) {
                     bool has_hinted_blocks = m_external_arrays[i].num_hinted_blocks() > 0;
                     bool fetched_new_block = m_external_arrays[i].remove(diff);
-                    if (has_hinted_blocks&&fetched_new_block)
+                    if (has_hinted_blocks && fetched_new_block)
                         --m_num_hinted_blocks;
                     update_fetch_and_hint_trees(i);
                     hint();
@@ -3751,7 +3751,7 @@ protected:
         STXXL_DEBUG("Merge done of new ea " << &ea);
 
         m_external_arrays.swap_back(ea);
-        update_trees_after_ea_creation(m_external_arrays.size()-1);
+        update_trees_after_ea_creation(m_external_arrays.size() - 1);
 
         m_internal_size = 0;
         m_external_size += size;
@@ -3812,8 +3812,8 @@ protected:
         ea.finish_write_phase();
 
         m_external_arrays.swap_back(ea);
-        update_trees_after_ea_creation(m_external_arrays.size()-1);
-        
+        update_trees_after_ea_creation(m_external_arrays.size() - 1);
+
         m_external_size += size;
         m_heaps_size = 0;
 
@@ -3865,8 +3865,8 @@ protected:
         ea.finish_write_phase();
 
         m_external_arrays.swap_back(ea);
-        update_trees_after_ea_creation(m_external_arrays.size()-1);
-        
+        update_trees_after_ea_creation(m_external_arrays.size() - 1);
+
         m_external_size += values.size();
 
         if (!extract_buffer_empty()) {

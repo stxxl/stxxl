@@ -71,8 +71,7 @@ typedef stxxl::parallel_priority_queue<
 
 void test_bulk_pop_n()
 {
-
-    ppq_type ppq(my_cmp(),256* 1024L* 1024L,4);
+    ppq_type ppq(my_cmp(), 256 * 1024L * 1024L, 4);
 
     const uint64 volume = 256 * 1024 * 1024;
     const uint64 bulk_size = 1024;
@@ -101,36 +100,32 @@ void test_bulk_pop_n()
         scoped_print_timer timer("Emptying PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < stxxl::div_ceil(nelements,bulk_size); ++i)
+        for (uint64 i = 0; i < stxxl::div_ceil(nelements, bulk_size); ++i)
         {
             STXXL_CHECK(!ppq.empty());
 
             std::vector<my_type> out;
-            ppq.bulk_pop_n(out,bulk_size);
+            ppq.bulk_pop_n(out, bulk_size);
 
-            for (uint64 j=0; j<out.size(); ++j) {
-
-                const uint64 index = i*bulk_size+j;
+            for (uint64 j = 0; j < out.size(); ++j) {
+                const uint64 index = i * bulk_size + j;
                 //STXXL_MSG( ppq.top() );
                 STXXL_CHECK_EQUAL(out[j].key, int(index + 1));
                 if ((index % (1024 * 1024)) == 0)
                     STXXL_MSG("Element " << index << " popped");
-
             }
         }
     }
 
     STXXL_CHECK_EQUAL(ppq.size(), 0);
     STXXL_CHECK(ppq.empty());
-
 }
 
 int main()
 {
-
     //test_bulk_pop_n();
 
-    ppq_type ppq(my_cmp(),256* 1024L* 1024L,4);
+    ppq_type ppq(my_cmp(), 256 * 1024L * 1024L, 4);
 
     const uint64 volume = 512 * 1024 * 1024;
 

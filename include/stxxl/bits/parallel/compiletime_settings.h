@@ -42,10 +42,10 @@ namespace parallel {
               "n = " << (n) << ", "                    \
               "num_threads = " << SETTINGS::num_threads);
 #else
-#define STXXL_PARALLEL_PCALL(n)                        \
-    STXXL_MSG("   " << __FUNCTION__ << ":\n"           \
-              "iam = single-threaded, "                \
-              "n = " << (n) << ", "                    \
+#define STXXL_PARALLEL_PCALL(n)              \
+    STXXL_MSG("   " << __FUNCTION__ << ":\n" \
+              "iam = single-threaded, "      \
+              "n = " << (n) << ", "          \
               "num_threads = " << SETTINGS::num_threads);
 #endif
 #endif

@@ -185,7 +185,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
                                                out.begin(), total_size, cmp,
                                                __gnu_parallel::sequential_tag());
                 break;
-#endif      // STXXL_WITH_GNU_PARALLEL
+#endif          // STXXL_WITH_GNU_PARALLEL
 
 #if STXXL_PARALLEL
             case PARA_MWM_EXACT_LT:
@@ -231,7 +231,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
                     iterpairs.begin(), iterpairs.end(),
                     out.begin(), total_size, cmp);
                 break;
-#endif      // STXXL_PARALLEL
+#endif          // STXXL_PARALLEL
 
 #if STXXL_WITH_GNU_PARALLEL
             case PARA_GNU_MWM_EXACT: {
@@ -257,7 +257,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
                                                out.begin(), total_size, cmp);
                 break;
             }
-#endif      // STXXL_WITH_GNU_PARALLEL
+#endif          // STXXL_WITH_GNU_PARALLEL
 
             default:
                 STXXL_ERRMSG("Error: method " << Method << " is not available "
@@ -297,7 +297,7 @@ void test_repeat(unsigned int seq_count, const size_t seq_size)
 }
 
 template <typename ValueType, benchmark_type Method>
-void test_seqnum(const size_t seq_size = 2 * 1024 * 1024)
+void test_seqnum(const size_t seq_size = 2* 1024* 1024)
 {
     for (unsigned int s = 1; s < 64; s += 1 * g_factor)
         test_repeat<ValueType, Method>(s, seq_size);

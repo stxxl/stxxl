@@ -47,7 +47,7 @@ public:
         num_threads = omp_get_max_threads();
 #else
         num_threads = 1;
-#endif // STXXL_PARALLEL
+#endif      // STXXL_PARALLEL
         if (num_threads < 1)
             num_threads = 1;
     }
