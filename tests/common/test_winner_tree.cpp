@@ -43,11 +43,12 @@ struct VectorCompare
 template class stxxl::winner_tree<VectorCompare>;
 
 //! Run tests for a specific number of vectors
-void test_vecs(unsigned int vecnum)
+void test_vecs(unsigned int vecnum, bool test_rebuild)
 {
     static const bool debug = false;
 
-    std::cout << "testing winner_tree with " << vecnum << " players\n";
+    std::cout << "testing winner_tree with " << vecnum << " players using "
+        << (test_rebuild ? "replay_on_pop()" : "rebuild()") << "\n";
 
     // construct many vectors of sorted random numbers
 
@@ -113,8 +114,11 @@ void test_vecs(unsigned int vecnum)
         if (vc.m_vecp[top] == vec[top].size())
             wt.deactivate_player(top);
 
-        // replay tree
-        wt.replay_on_pop();
+        // replay or rebuild tree
+        if (test_rebuild)
+            wt.rebuild();
+        else
+            wt.replay_on_pop();
 
         if (debug) std::cout << wt.to_string();
     }
@@ -133,8 +137,10 @@ void test_vecs(unsigned int vecnum)
 int main()
 {
     // run winner tree tests for 2..20 players
-    for (unsigned int i = 2; i <= 20; ++i)
-        test_vecs(i);
+    for (unsigned int i = 2; i <= 20; ++i) {
+        test_vecs(i, false);
+        test_vecs(i, true);
+    }
 
     return 0;
 }
