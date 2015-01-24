@@ -3,8 +3,8 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2014 Thomas Keh <thomas.keh@student.kit.edu>
- *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2014-2015 Thomas Keh <thomas.keh@student.kit.edu>
+ *  Copyright (C) 2014-2015 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,6 +24,7 @@ static const char* description =
 
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/priority_queue.h>
+#include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/cmdline>
@@ -32,8 +33,7 @@ static const char* description =
 #include <stxxl/timer>
 
 #if STXXL_PARALLEL
-    #include <omp.h>
-    #include <stxxl/bits/containers/parallel_priority_queue.h>
+  #include <omp.h>
 #endif
 
 using stxxl::uint32;
@@ -70,8 +70,19 @@ unsigned num_read_blocks = 1;
 uint64 block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
 
 #if STXXL_PARALLEL
-unsigned num_insertion_heaps = omp_get_max_threads();
+const unsigned g_max_threads = omp_get_max_threads();
+#else
+const unsigned g_max_threads = 1;
 #endif
+
+static inline int get_thread_num()
+{
+#if STXXL_PARALLEL
+    return omp_get_thread_num();
+#else
+    return 0;
+#endif
+}
 
 uint64 ram_write_buffers;
 uint64 bulk_size;
@@ -270,8 +281,6 @@ std::string Container<stxxlpq_type>::name()
 
 // *** Specialization for STXXL Parallel PQ
 
-#if STXXL_PARALLEL
-
 typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
 
 template <>
@@ -303,8 +312,6 @@ void Container<ppq_type>::print_stats()
 {
     backend.print_stats();
 }
-
-#endif
 
 // *** Specialization for STL PQ
 
@@ -462,32 +469,23 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
     sorted_vals(less_min_max<uint64>(), RAM / 2);
 
     {
-#if STXXL_PARALLEL
-        uint64 bulk_step = bulk_size / omp_get_max_threads();
-#else
-        uint64 bulk_step = bulk_size;
-#endif
+        uint64 bulk_step = bulk_size / g_max_threads;
 
         scoped_print_timer timer("Filling sorter for comparison",
                                  num_elements * value_size);
 
         for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
         {
-#if STXXL_PARALLEL
+#if !STXXL_PARALLEL
+            int thr = 0;
+#else
             for (int thr = 0; thr < omp_get_max_threads(); ++thr)
 #endif
             {
-#if !STXXL_PARALLEL
-                const unsigned thread_id = 0;
-                stxxl::STXXL_UNUSED(_seed);
-                stxxl::STXXL_UNUSED(parallel);
-#else
-                const unsigned thread_id = parallel
-                                           ? thr
-                                           : g_rand() % num_insertion_heaps;
+                const unsigned thread_id =
+                    parallel ? thr : g_rand() % g_max_threads;
 
                 unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
-#endif
                 random_number32_r datarng(seed);
 
                 for (uint64 j = thread_id * bulk_step;
@@ -504,25 +502,18 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
         STXXL_CHECK_EQUAL(sorted_vals.size(), num_elements - (num_elements % bulk_size));
 
         uint64 bulk_remain = num_elements % bulk_size;
-#if STXXL_PARALLEL
-        bulk_step = (bulk_remain + omp_get_max_threads() - 1) / omp_get_max_threads();
-#else
-        bulk_step = bulk_remain;
-#endif
+        bulk_step = (bulk_remain + g_max_threads - 1) / g_max_threads;
 
-#if STXXL_PARALLEL
+#if !STXXL_PARALLEL
+        int thr = 0;
+#else
         for (int thr = 0; thr < omp_get_max_threads(); ++thr)
 #endif
         {
-#if !STXXL_PARALLEL
-            const unsigned thread_id = 0;
-#else
-            const unsigned thread_id = parallel
-                                       ? thr
-                                       : g_rand() % num_insertion_heaps;
+            const unsigned thread_id =
+                parallel ? thr : g_rand() % g_max_threads;
 
             unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
-#endif
             random_number32_r datarng(seed);
 
             for (uint64 j = thread_id * bulk_step;
@@ -615,13 +606,10 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 #pragma omp parallel if(parallel)
 #endif
         {
-#if !STXXL_PARALLEL
-            const unsigned thread_id = 0;
-#else
-            const unsigned thread_id = parallel
-                                       ? omp_get_thread_num()
-                                       : g_rand() % num_insertion_heaps;
+            const unsigned thread_id =
+                parallel ? get_thread_num() : g_rand() % g_max_threads;
 
+#if STXXL_PARALLEL
             #pragma omp for
 #endif
             for (uint64 j = 0; j < bulk_size; ++j)
@@ -641,13 +629,10 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 #pragma omp parallel if(parallel)
 #endif
     {
-#if !STXXL_PARALLEL
-        const unsigned thread_id = 0;
-#else
-        const unsigned thread_id = parallel
-                                   ? omp_get_thread_num()
-                                   : g_rand() % num_insertion_heaps;
+        const unsigned thread_id =
+            parallel ? get_thread_num() : g_rand() % g_max_threads;
 
+#if STXXL_PARALLEL
         #pragma omp for
 #endif
         for (uint64 j = 0; j < num_elements % bulk_size; j++)
@@ -670,11 +655,7 @@ void do_bulk_rand_insert(ContainerType& c,
     scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
                              num_elements * value_size);
 
-#if STXXL_PARALLEL
-    uint64 bulk_step = bulk_size / omp_get_max_threads();
-#else
-    uint64 bulk_step = bulk_size;
-#endif
+    uint64 bulk_step = bulk_size / g_max_threads;
 
     for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
     {
@@ -684,16 +665,10 @@ void do_bulk_rand_insert(ContainerType& c,
 #pragma omp parallel if(parallel)
 #endif
         {
-#if !STXXL_PARALLEL
-            const unsigned thread_id = 0;
-            stxxl::STXXL_UNUSED(_seed);
-#else
-            const unsigned thread_id = parallel
-                                       ? omp_get_thread_num()
-                                       : g_rand() % num_insertion_heaps;
+            const unsigned thread_id =
+                parallel ? get_thread_num() : g_rand() % g_max_threads;
 
             unsigned int seed = static_cast<unsigned>(i) * _seed * thread_id;
-#endif
             random_number32_r datarng(seed);
 
             for (uint64 j = thread_id * bulk_step;
@@ -712,11 +687,7 @@ void do_bulk_rand_insert(ContainerType& c,
     STXXL_CHECK_EQUAL(c.size(), num_elements - (num_elements % bulk_size));
 
     uint64 bulk_remain = num_elements % bulk_size;
-#if STXXL_PARALLEL
-    bulk_step = (bulk_remain + omp_get_max_threads() - 1) / omp_get_max_threads();
-#else
-    bulk_step = bulk_remain;
-#endif
+    bulk_step = (bulk_remain + g_max_threads - 1) / g_max_threads;
 
     c.bulk_push_begin(bulk_remain);
 
@@ -724,15 +695,11 @@ void do_bulk_rand_insert(ContainerType& c,
 #pragma omp parallel if(parallel)
 #endif
     {
-#if !STXXL_PARALLEL
-        const unsigned thread_id = 0;
-#else
-        const unsigned thread_id = parallel
-                                   ? omp_get_thread_num()
-                                   : g_rand() % num_insertion_heaps;
+        const unsigned thread_id =
+            parallel ? get_thread_num() : g_rand() % g_max_threads;
 
         unsigned int seed = static_cast<unsigned>(num_elements / bulk_size) * _seed * thread_id;
-#endif
+
         random_number32_r datarng(seed);
 
         for (uint64 j = thread_id * bulk_step;
@@ -796,17 +763,13 @@ void do_bulk_rand_intermixed(ContainerType& c,
 #pragma omp parallel if(parallel)
 #endif
             {
-#if !STXXL_PARALLEL
-                const unsigned thread_num = 0;
-                random_number32_r datarng(_seed);
-#else
-                const unsigned int thread_num = parallel
-                                                ? omp_get_thread_num()
-                                                : g_rand() % num_insertion_heaps;
+                const unsigned int thread_num =
+                    parallel ? get_thread_num() : g_rand() % g_max_threads;
 
                 unsigned int seed = thread_num * static_cast<unsigned>(i) * _seed;
                 random_number32_r datarng(seed);
 
+#if STXXL_PARALLEL
                 #pragma omp for
 #endif
 
@@ -879,12 +842,9 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 #pragma omp parallel if(parallel)
 #endif
                 {
-#if !STXXL_PARALLEL
-                    const unsigned int thread_num = 0;
-#else
-                    const unsigned int thread_num = parallel
-                                                    ? omp_get_thread_num()
-                                                    : g_rand() % num_insertion_heaps;
+                    const unsigned int thread_num =
+                        parallel ? get_thread_num() : g_rand() % g_max_threads;
+#if STXXL_PARALLEL
                     #pragma omp for
 #endif
 
@@ -1006,10 +966,8 @@ public:
 #pragma omp parallel
 #endif
             {
-#if !STXXL_PARALLEL
-                const unsigned thread_num = 0;
-#else
-                const unsigned thread_num = omp_get_thread_num();
+                const unsigned thread_num = get_thread_num();
+#if STXXL_PARALLEL
                 #pragma omp for
 #endif
                 for (size_type i = edges_begin; i < edges_end; ++i)
@@ -1042,9 +1000,7 @@ void do_dijkstra(ContainerType& c, uint64 num_nodes, uint64 num_edges)
 
 stxxlpq_type* stxxlpq;
 
-#if STXXL_PARALLEL
 ppq_type* ppq;
-#endif
 
 sorter_type* stxxlsorter;
 
@@ -1065,9 +1021,7 @@ void print_params()
     STXXL_MEMDUMP(value_size);
     STXXL_MEMDUMP(extract_buffer_ram);
     STXXL_VARDUMP(num_elements);
-    #if STXXL_PARALLEL
-    STXXL_VARDUMP(num_insertion_heaps);
-    #endif
+    STXXL_VARDUMP(g_max_threads);
     STXXL_VARDUMP(num_write_buffers);
     STXXL_VARDUMP(num_prefetchers);
     STXXL_VARDUMP(num_read_blocks);
@@ -1236,11 +1190,9 @@ int benchmark_pqs(int argc, char* argv[])
     print_params();
 
     if (do_ppq) {
-#if STXXL_PARALLEL
         ppq = new ppq_type(value_type_cmp_greater(),
                            RAM, num_prefetchers, num_write_buffers,
-                           num_insertion_heaps, single_heap_ram, extract_buffer_ram);
-#endif
+                           g_max_threads, single_heap_ram, extract_buffer_ram);
     }
     else if (do_stxxlpq) {
         stxxlpq = new stxxlpq_type(mem_for_prefetch_pool, mem_for_write_pool);
@@ -1264,8 +1216,9 @@ int benchmark_pqs(int argc, char* argv[])
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
 #if !STXXL_PARALLEL
-    if (do_ppq) {
-        STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. Parallel priority queue cannot be used here.");
+    if (do_parallel) {
+        STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. "
+                  "Parallel processing cannot be used.");
         return EXIT_FAILURE;
     }
 #endif
@@ -1275,11 +1228,9 @@ int benchmark_pqs(int argc, char* argv[])
         uint64 m = 100 * n;
 
         if (do_ppq) {
-#if STXXL_PARALLEL
             Container<ppq_type> cppq(*ppq);
             ::do_dijkstra(cppq, n, m);
             cppq.print_stats();
-#endif
         }
         else if (do_stxxlpq) {
             Container<stxxlpq_type> cstxxlpq(*stxxlpq);
@@ -1295,10 +1246,8 @@ int benchmark_pqs(int argc, char* argv[])
     }
     else if (do_ppq)
     {
-#if STXXL_PARALLEL
         Container<ppq_type> cppq(*ppq);
         run_benchmark(cppq);
-#endif  // STXXL_PARALLEL
     }
     else if (do_stxxlpq)
     {
@@ -1317,9 +1266,7 @@ int benchmark_pqs(int argc, char* argv[])
     }
 
     if (do_ppq) {
-#if STXXL_PARALLEL
         delete ppq;
-#endif
     }
     else if (do_stxxlpq) {
         delete stxxlpq;
