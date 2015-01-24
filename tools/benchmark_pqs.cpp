@@ -65,7 +65,7 @@ uint64 bulk_ram = 1024 * value_size;
 uint64 single_heap_ram = 1 * MiB;
 uint64 extract_buffer_ram = 0;
 unsigned num_write_buffers = 14;
-unsigned num_prefetchers = 1;
+unsigned num_prefetchers = 14;
 unsigned num_read_blocks = 1;
 uint64 block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
 
