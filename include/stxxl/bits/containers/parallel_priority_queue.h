@@ -151,7 +151,7 @@ public:
         ++m_index;
         ++m_current;
 
-        if (m_current == (*m_block_pointers)[m_block_index].second) {
+        if (UNLIKELY(m_current == (*m_block_pointers)[m_block_index].second)) {
             if (m_block_index + 1 < m_block_pointers->size()) {
                 m_current = (*m_block_pointers)[++m_block_index].first;
             }
@@ -2568,7 +2568,7 @@ public:
         {
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items and keep heap invariant.
-            if (insheap.size() >= m_insertion_heap_capacity) {
+            if (UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2589,7 +2589,7 @@ public:
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items but DO NOT keep heap
             // invariant.
-            if (insheap.size() >= m_insertion_heap_capacity) {
+            if (UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2606,7 +2606,7 @@ public:
         }
         else // m_is_very_large_bulk
         {
-            if (insheap.size() >= 2 * 1024 * 1024) {
+            if (UNLIKELY(insheap.size() >= 2 * 1024 * 1024)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
