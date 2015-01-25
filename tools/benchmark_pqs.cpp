@@ -12,8 +12,9 @@
  **************************************************************************/
 
 static const char* description =
-    "Benchmark different priority queue implementations using a sequence of "
-    "operations. The PQ contains of 24 byte values. The operation sequence is either a simple fill/delete "
+    "Benchmark different priority queue implementations using a sequence "
+    "of operations. The PQ contains of 24 byte values. "
+    "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
 #include <cstdlib>
@@ -46,12 +47,16 @@ static const uint64 KiB = 1024L;
 static const uint64 MiB = 1024L * KiB;
 static const uint64 GiB = 1024L * MiB;
 
+// process indicator
+static const bool g_progress = false;
+static const uint64 g_printmod = 16 * MiB;
+
 // value size must be > 16
 static const unsigned value_size = 24;
 
 // constant values for STXXL PQ
-const uint64 _RAM = 3 * GiB;
-const uint64 _volume = 6 * GiB;
+const uint64 _RAM = 16 * GiB;
+const uint64 _volume = 1024 * GiB;
 const uint64 _num_elements = _volume / value_size;
 const uint64 mem_for_queue = _RAM / 2;
 const uint64 mem_for_prefetch_pool = _RAM / 4;
@@ -61,7 +66,6 @@ uint64 RAM = _RAM;
 uint64 volume = _volume;
 uint64 num_elements = _num_elements;
 
-uint64 bulk_ram = 1024 * value_size;
 uint64 single_heap_ram = 1 * MiB;
 uint64 extract_buffer_ram = 0;
 unsigned num_write_buffers = 14;
@@ -101,7 +105,6 @@ void calculate_depending_parameters()
 {
     num_elements = volume / value_size;
     ram_write_buffers = num_write_buffers * block_size;
-    bulk_size = bulk_ram / value_size;
 }
 
 /*
@@ -183,11 +186,13 @@ struct less_min_max : public std::binary_function<ValueType, ValueType, bool>
  * Progress messages
  */
 
-static const uint64 printmod = 16 * MiB;
 static inline void progress(const char* text, uint64 i, uint64 nelements)
 {
-    if ((i % printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
+    if (!g_progress) return;
+
+    if ((i % g_printmod) == 0) {
+        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) <<
+                  (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
     }
 }
 
@@ -200,6 +205,8 @@ class Container
 {
 public:
     static std::string name();
+
+    static std::string shortname();
 
     BackendType& backend;
 
@@ -279,6 +286,12 @@ std::string Container<stxxlpq_type>::name()
     return "STXXL PQ";
 }
 
+template <>
+std::string Container<stxxlpq_type>::shortname()
+{
+    return "oldpq";
+}
+
 // *** Specialization for STXXL Parallel PQ
 
 typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
@@ -287,6 +300,12 @@ template <>
 std::string Container<ppq_type>::name()
 {
     return "Parallel PQ";
+}
+
+template <>
+std::string Container<ppq_type>::shortname()
+{
+    return "ppq";
 }
 
 template <>
@@ -323,6 +342,12 @@ std::string Container<stlpq_type>::name()
     return "STL PQ";
 }
 
+template <>
+std::string Container<stlpq_type>::shortname()
+{
+    return "stlpq";
+}
+
 typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
 
 // *** Specialization for STL Sorter
@@ -331,6 +356,12 @@ template <>
 std::string Container<sorter_type>::name()
 {
     return "STXXL Sorter";
+}
+
+template <>
+std::string Container<sorter_type>::shortname()
+{
+    return "sorter";
 }
 
 template <>
@@ -354,14 +385,72 @@ void Container<sorter_type>::fill_end()
 }
 
 /*
+ * Timer and Statistics
+ */
+
+class scoped_stats : public stxxl::scoped_print_timer
+{
+protected:
+
+    //! short name of tested PQ
+    std::string m_shortname;
+
+    //! operation on PQ being timed
+    std::string m_op;
+
+    //! stxxl stats at start of operation
+    stxxl::stats_data m_stxxl_stats;
+
+public:
+    template <typename ContainerType>
+    scoped_stats(ContainerType& c, const std::string& op,
+                 const std::string& message,
+                 unsigned int rwcycles = 1)
+        : stxxl::scoped_print_timer(message,
+                                    rwcycles * num_elements * value_size),
+          m_shortname(c.shortname()),
+          m_op(op),
+          m_stxxl_stats(*stxxl::stats::get_instance())
+    {
+    }
+
+    ~scoped_stats()
+    {
+        stxxl::stats_data s =
+            stxxl::stats_data(*stxxl::stats::get_instance()) - m_stxxl_stats;
+
+        std::cout << "RESULT"
+                  << " pqname=" << m_shortname
+                  << " op=" << m_op
+                  << " value_size=" << value_size
+                  << " num_elements=" << num_elements
+                  << " volume=" << num_elements * value_size
+                  << " time=" << timer().seconds()
+                  << " read_count=" << s.get_reads()
+                  << " read_vol=" << s.get_read_volume()
+                  << " read_time=" << s.get_read_time()
+                  << " write_count=" << s.get_writes()
+                  << " write_vol=" << s.get_written_volume()
+                  << " write_time=" << s.get_write_time()
+                  << " ram=" << RAM
+                  << " block_size=" << block_size
+                  << " bulk_size=" << bulk_size
+                  << " num_threads=" << g_max_threads
+                  << " single_heap_ram=" << single_heap_ram
+                  << " universe_size=" << value_universe_size
+                  << std::endl;
+    }
+};
+
+/*
  * Benchmark Functions
  */
 
 template <typename ContainerType>
 void do_insert(ContainerType& c)
 {
-    scoped_print_timer timer("Filling " + c.name() + " sequentially",
-                             num_elements * value_size);
+    scoped_stats stats(c, "push",
+                       "Filling " + c.name() + " sequentially");
 
     for (uint64 i = 0; i < num_elements; i++)
     {
@@ -371,26 +460,10 @@ void do_insert(ContainerType& c)
 }
 
 template <typename ContainerType>
-void do_rand_insert(ContainerType& c, unsigned int seed)
-{
-    scoped_print_timer timer("Filling " + c.name() + " randomly",
-                             num_elements * value_size);
-
-    random_number32_r datarng(seed);
-
-    for (uint64 i = 0; i < num_elements; i++)
-    {
-        uint64 k = datarng() % value_universe_size;
-        progress("Inserting element", i, num_elements);
-        c.push(value_type(k));
-    }
-}
-
-template <typename ContainerType>
 void do_read(ContainerType& c)
 {
-    scoped_print_timer timer("Reading " + c.name(),
-                             num_elements * value_size);
+    scoped_stats timer(c, "pop",
+                       "Reading " + c.name());
 
     STXXL_CHECK_EQUAL(c.size(), num_elements);
 
@@ -406,8 +479,8 @@ void do_read(ContainerType& c)
 template <typename ContainerType>
 void do_read_check(ContainerType& c)
 {
-    scoped_print_timer timer("Reading " + c.name() + " and checking order",
-                             num_elements * value_size);
+    scoped_stats timer(c, "pop-check",
+                       "Reading " + c.name() + " and checking order");
 
     STXXL_CHECK_EQUAL(c.size(), num_elements);
 
@@ -420,6 +493,22 @@ void do_read_check(ContainerType& c)
 
         STXXL_CHECK_EQUAL(top.first, i + 1);
         progress("Popped element", i, num_elements);
+    }
+}
+
+template <typename ContainerType>
+void do_rand_insert(ContainerType& c, unsigned int seed)
+{
+    scoped_stats timer(c, "push-rand",
+                       "Filling " + c.name() + " randomly");
+
+    random_number32_r datarng(seed);
+
+    for (uint64 i = 0; i < num_elements; i++)
+    {
+        uint64 k = datarng() % value_universe_size;
+        progress("Inserting element", i, num_elements);
+        c.push(value_type(k));
     }
 }
 
@@ -443,8 +532,8 @@ void do_rand_read_check(ContainerType& c, unsigned int seed)
     sorted_vals.sort();
 
     {
-        scoped_print_timer timer("Reading " + c.name() + " and check order",
-                                 num_elements * value_size);
+        scoped_stats timer(c, "pop-check",
+                           "Reading " + c.name() + " and check order");
 
         for (uint64 i = 0; i < num_elements; ++i)
         {
@@ -530,8 +619,8 @@ void do_bulk_rand_read_check(ContainerType& c, unsigned int _seed,
     STXXL_CHECK_EQUAL(c.size(), sorted_vals.size());
 
     {
-        scoped_print_timer timer("Reading " + c.name() + " and check order",
-                                 num_elements * value_size);
+        scoped_stats timer(c, "pop-check-rand",
+                           "Reading " + c.name() + " and check order");
 
         for (uint64 i = 0; i < num_elements; ++i)
         {
@@ -556,8 +645,9 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
     uint64 num_inserts = filled ? num_elements : 0;
     uint64 num_deletes = 0;
 
-    scoped_print_timer timer(c.name() + ": Intermixed rand insert and delete",
-                             2 * num_elements * value_size);
+    scoped_stats timer(c, "intermix-rand",
+                       c.name() + ": Intermixed rand insert and delete",
+                       2);
 
     random_number32_r datarng(seed);
 
@@ -594,8 +684,8 @@ void do_bulk_insert(ContainerType& c, bool parallel)
 {
     std::string parallel_str = parallel ? " in parallel" : " sequentially";
 
-    scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
-                             num_elements * value_size);
+    scoped_stats timer(c, "push-bulk",
+                       "Filling " + c.name() + " with bulks" + parallel_str);
 
     for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
     {
@@ -653,8 +743,8 @@ void do_bulk_rand_insert(ContainerType& c,
 {
     std::string parallel_str = parallel ? " in parallel" : " sequentially";
 
-    scoped_print_timer timer("Filling " + c.name() + " with bulks" + parallel_str,
-                             num_elements * value_size);
+    scoped_stats timer(c, "push-bulk-rand",
+                       "Filling " + c.name() + " with bulks" + parallel_str);
 
     for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
     {
@@ -729,9 +819,10 @@ void do_bulk_rand_intermixed(ContainerType& c,
     uint64 num_inserts = filled ? num_elements : 0;
     uint64 num_deletes = 0;
 
-    scoped_print_timer timer(
-        c.name() + ": Intermixed parallel rand bulk insert" + parallel_str + " and delete",
-        (filled ? 3 : 2) * num_elements * value_size);
+    scoped_stats timer(c, "intermix-bulk-rand",
+                       c.name() + ": Intermixed parallel rand bulk insert"
+                       + parallel_str + " and delete",
+                       (filled ? 3 : 2));
 
     for (uint64_t i = 0; i < (filled ? 3 : 2) * num_elements; ++i)
     {
@@ -803,8 +894,10 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
     std::vector<bool> extracted_values(num_elements, false);
 
     {
-        scoped_print_timer timer(c.name() + ": Intermixed parallel bulk insert" + parallel_str + " and delete",
-                                 2 * num_elements * value_size);
+        scoped_stats timer(c, "intermix-bulk-check",
+                           c.name() + ": Intermixed parallel bulk insert"
+                           + parallel_str + " and delete",
+                           2);
 
         for (uint64_t i = 0; i < 2 * num_elements; ++i)
         {
@@ -991,8 +1084,7 @@ void do_dijkstra(ContainerType& c, uint64 num_nodes, uint64 num_edges)
 
     dijkstra_graph<ContainerType> dg(num_nodes, num_edges);
 
-    scoped_print_timer timer("Running random dijkstra",
-                             num_elements * value_size);
+    scoped_stats timer(c, "dijkstra", "Running random dijkstra");
     dg.run_random_dijkstra(c);
 }
 
@@ -1018,7 +1110,6 @@ void print_params()
     STXXL_MEMDUMP(volume);
     STXXL_MEMDUMP(block_size);
     STXXL_MEMDUMP(single_heap_ram);
-    STXXL_MEMDUMP(bulk_ram);
     STXXL_VARDUMP(bulk_size);
     STXXL_MEMDUMP(value_size);
     STXXL_MEMDUMP(extract_buffer_ram);
@@ -1044,8 +1135,9 @@ bool do_no_read = false;
 template <typename ContainerType>
 void run_benchmark(ContainerType& c)
 {
-    scoped_print_timer timer("Running selected benchmarks on " + c.name(),
-                             (do_prefill ? 4 : 2) * num_elements * value_size);
+    scoped_stats timer(c, "overall",
+                       "Running selected benchmarks on " + c.name(),
+                       (do_prefill ? 4 : 2));
 
     if (do_bulk) {
         if (do_intermixed) {
@@ -1144,60 +1236,36 @@ int benchmark_pqs(int argc, char* argv[])
     cp.add_flag(0, "prefill", do_prefill,
                 "Prefill queue before starting intermixed insert/delete "
                 "(only with -i and without -r and -c together)");
+
     cp.add_flag(0, "no-read", do_no_read,
                 "Do not read items from queue after insert");
 
-    uint64 temp_volume = 0;
-    cp.add_bytes('v', "volume", temp_volume,
+    cp.add_bytes('v', "volume", volume,
                  "Amount of data to insert in Bytes (not recommended for STXXL PQ)");
 
-    uint64 temp_ram = 0;
-    cp.add_bytes('m', "ram", temp_ram,
+    cp.add_bytes('m', "ram", RAM,
                  "Amount of main memory in Bytes (not possible for STXXL PQ)");
 
-    unsigned int temp_bulk_size = 0;
-    cp.add_uint('k', "bulksize", temp_bulk_size,
-                "Number of elements per bulk");
+    cp.add_bytes('k', "bulk_size", bulk_size,
+                 "Number of elements per bulk");
 
-    unsigned int temp_universe_size = 0;
-    cp.add_uint('u', "universesize", temp_universe_size,
-                "Range for random values");
+    cp.add_bytes('u', "universe_size", value_universe_size,
+                 "Range for random values");
 
-    unsigned int temp_num_write_buffers = std::numeric_limits<unsigned int>::max();
     cp.add_uint('w', "writebuffers", num_write_buffers,
                 "Number of buffered blocks when writing to external memory");
 
-    uint64 temp_extract_buffer_ram = 0;
-    cp.add_bytes('x', "extractbufferram", temp_extract_buffer_ram,
+    cp.add_bytes('x', "extract_buffer_ram", extract_buffer_ram,
                  "Maximum memory consumption of the extract buffer in Bytes");
 
-    uint64 temp_single_heap_ram = 0;
-    cp.add_bytes('y', "heapram", temp_single_heap_ram,
+    cp.add_bytes('y', "heap_ram", single_heap_ram,
                  "Size of a single insertion heap in Bytes");
 
-    unsigned int temp_num_prefetchers = std::numeric_limits<unsigned int>::max();
-    cp.add_uint('z', "prefetchers", temp_num_prefetchers,
+    cp.add_uint('z', "prefetchers", num_prefetchers,
                 "Number of prefetched blocks for each external array");
 
     if (!cp.process(argc, argv))
         return -1;
-
-    if (temp_volume > 0)
-        volume = temp_volume;
-    if (temp_ram > 0)
-        RAM = temp_ram;
-    if (temp_bulk_size > 0)
-        bulk_ram = temp_bulk_size * value_size;
-    if (temp_universe_size > 0)
-        value_universe_size = temp_universe_size;
-    if (temp_single_heap_ram > 0)
-        single_heap_ram = temp_single_heap_ram;
-    if (temp_extract_buffer_ram > 0)
-        extract_buffer_ram = temp_extract_buffer_ram;
-    if (temp_num_write_buffers < std::numeric_limits<unsigned int>::max())
-        num_write_buffers = temp_num_write_buffers;
-    if (temp_num_prefetchers < std::numeric_limits<unsigned int>::max())
-        num_prefetchers = temp_num_prefetchers;
 
     calculate_depending_parameters();
     print_params();
