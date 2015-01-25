@@ -2313,6 +2313,11 @@ protected:
     //! Assert many invariants of the data structures.
     void check_invariants()
     {
+#ifdef NDEBUG
+        // disable in Release builds
+        return;
+#endif
+
         size_type mem_used = 0;
 
         mem_used += 2 * m_mem_for_heaps + m_num_write_buffers * block_size
