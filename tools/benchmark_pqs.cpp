@@ -419,7 +419,10 @@ public:
         stxxl::stats_data s =
             stxxl::stats_data(*stxxl::stats::get_instance()) - m_stxxl_stats;
 
+        const char* hostname = getenv("HOSTNAME");
+
         std::cout << "RESULT"
+                  << " host=" << hostname
                   << " pqname=" << m_shortname
                   << " op=" << m_op
                   << " value_size=" << value_size
