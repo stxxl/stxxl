@@ -727,11 +727,10 @@ public:
         return m_blocks[block_index]->elem[local_index];
     }
 
-protected:
-    //! prepare the external_array for writing using multiway_merge() with
-    //! num_threads. this method is called by the external_array_writer's
-    //! constructor.
-    void prepare_write(unsigned_type num_threads)
+public:
+    //! prepare the pool for writing external arrays with given number of
+    //! threads
+    static void prepare_write_pool(pool_type& pool, unsigned_type num_threads)
     {
         unsigned_type write_blocks = num_threads;
         // need at least one
@@ -745,11 +744,22 @@ protected:
         // required for re-reading the external array
         write_blocks = 2 * write_blocks;
 #endif
-        if (m_pool->size_write() < write_blocks) {
+        //write_blocks = 16 * write_blocks;
+        if (pool.size_write() < write_blocks) {
             STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
-                         write_blocks << " blocks");
-            m_pool->resize_write(write_blocks);
+                         write_blocks << " blocks = " <<
+                         write_blocks * block_size / 1024 / 1024 << " MiB");
+            pool.resize_write(write_blocks);
         }
+    }
+
+protected:
+    //! prepare the external_array for writing using multiway_merge() with
+    //! num_threads. this method is called by the external_array_writer's
+    //! constructor.
+    void prepare_write(unsigned_type num_threads)
+    {
+        prepare_write_pool(*m_pool, num_threads);
     }
 
     //! finish the writing phase after multiway_merge() filled the vector. this
@@ -2245,28 +2255,7 @@ public:
 
         m_mem_left -= m_num_insertion_heaps * insertion_heap_int_memory();
 
-        {
-            unsigned_type write_blocks = num_insertion_heaps;
-#if STXXL_PARALLEL
-            write_blocks = std::max<unsigned_type>(write_blocks, omp_get_max_threads());
-#endif
-            // need at least one
-            if (write_blocks == 0) write_blocks = 1;
-            // for holding boundary blocks
-            write_blocks *= 2;
-            // more disks than threads?
-            if (write_blocks < config::get_instance()->disks_number())
-                write_blocks = config::get_instance()->disks_number();
-#if STXXL_DEBUG_ASSERTIONS
-            // required for re-reading the external array
-            write_blocks = 2 * write_blocks;
-#endif
-            if (m_pool.size_write() < write_blocks) {
-                STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
-                             write_blocks << " blocks");
-                m_pool.resize_write(write_blocks);
-            }
-        }
+        external_array_type::prepare_write_pool(m_pool, m_num_insertion_heaps);
 
         m_external_arrays.reserve(c_num_reserved_external_arrays);
 
