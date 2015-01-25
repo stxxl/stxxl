@@ -416,6 +416,7 @@ public:
     typedef typed_block<BlockSize, value_type> block_type;
     typedef read_write_pool<block_type> pool_type;
     typedef std::vector<BID<BlockSize> > bid_vector;
+    typedef typename bid_vector::iterator bid_iterator;
     typedef std::vector<block_type*> block_vector;
     typedef std::vector<request_ptr> request_vector;
     typedef std::vector<value_type> extrema_vector;
@@ -423,8 +424,10 @@ public:
     typedef external_array_writer<self_type> writer_type;
 
     //! The number of elements fitting into one block
-    enum { block_size = BlockSize,
-           block_items = BlockSize / sizeof(value_type) };
+    enum {
+        block_size = BlockSize,
+        block_items = BlockSize / sizeof(value_type)
+    };
 
     static const bool debug = false;
 
@@ -436,10 +439,7 @@ protected:
     //! Number of blocks, again: calculated at construction time.
     unsigned_type m_num_blocks;
 
-    //! Size of the write buffer in number of blocks
-    unsigned_type m_num_write_buffer_blocks;
-
-    //! Prefetch and write buffer pool
+    //! Common prefetch and write buffer pool
     pool_type* m_pool;
 
     //! The IDs of each block in external memory.
@@ -499,12 +499,11 @@ public:
      * \param num_write_buffer_blocks Size of the write buffer in number of
      * blocks
      */
-    external_array(external_size_type size, unsigned_type num_write_buffer_blocks)
+    external_array(external_size_type size, pool_type* pool)
         :   // constants
           m_capacity(size),
           m_num_blocks((size_t)div_ceil(m_capacity, block_items)),
-          m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_blocks)),
-          m_pool(new pool_type(0, m_num_write_buffer_blocks)),
+          m_pool(pool),
 
           // vectors
           m_bids(m_num_blocks),
@@ -524,7 +523,6 @@ public:
           m_hinted_until(0)
     {
         assert(m_capacity > 0);
-        assert(m_num_write_buffer_blocks > 0); // needed for steal()
         // allocate blocks in EM.
         block_manager* bm = block_manager::get_instance();
         bm->new_blocks(AllocStrategy(), m_bids.begin(), m_bids.end());
@@ -536,7 +534,6 @@ public:
         :   // constants
           m_capacity(0),
           m_num_blocks(0),
-          m_num_write_buffer_blocks(0),
           m_pool(NULL),
 
           // vectors
@@ -565,7 +562,6 @@ public:
         // constants
         swap(m_capacity, o.m_capacity);
         swap(m_num_blocks, o.m_num_blocks);
-        swap(m_num_write_buffer_blocks, o.m_num_write_buffer_blocks);
         swap(m_pool, o.m_pool);
 
         // vectors
@@ -603,13 +599,16 @@ public:
 
             // figure out first block that still exists.
             block_manager* bm = block_manager::get_instance();
-            typename bid_vector::iterator i_begin = m_bids.begin() + block_index;
+            bid_iterator i_begin = m_bids.begin() + block_index;
+
+            for (bid_iterator i = i_begin; i != m_bids.end(); ++i)
+                m_pool->invalidate(*i);
+
             bm->delete_blocks(i_begin, m_bids.end());
 
             for (size_t i = block_index; i < end_block_index; ++i)
                 delete m_blocks[i];
         }
-        delete m_pool;
     }
 
     //! Returns the capacity in items.
@@ -640,8 +639,7 @@ public:
     size_t int_memory() const
     {
         const size_t num_ram_blocks = get_end_block_index() - get_current_block_index();
-        const size_t num_buffer_blocks = m_pool->size_prefetch() + m_pool->size_write();
-        return (num_ram_blocks + num_buffer_blocks) * block_items;
+        return (num_ram_blocks) * block_items;
     }
 
     //! Returns the number elements available in internal memory
@@ -733,10 +731,8 @@ protected:
     //! prepare the external_array for writing using multiway_merge() with
     //! num_threads. this method is called by the external_array_writer's
     //! constructor.
-    void prepare_write(int num_threads)
+    void prepare_write(unsigned_type num_threads)
     {
-        //m_pool->resize_prefetch(0);
-
         unsigned_type write_blocks = num_threads;
         // need at least one
         if (write_blocks == 0) write_blocks = 1;
@@ -749,15 +745,17 @@ protected:
         // required for re-reading the external array
         write_blocks = 2 * write_blocks;
 #endif
-        m_pool->resize_write(write_blocks);
+        if (m_pool->size_write() < write_blocks) {
+            STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
+                         write_blocks << " blocks");
+            m_pool->resize_write(write_blocks);
+        }
     }
 
     //! finish the writing phase after multiway_merge() filled the vector. this
     //! method is called by the external_array_writer's destructor..
     void finish_write()
     {
-        m_pool->resize_write(0);
-
         // check that all blocks where written
         for (unsigned_type i = 0; i < m_num_blocks; ++i)
             assert(m_blocks[i] == NULL);
@@ -882,8 +880,8 @@ public:
         assert(block_index_after <= m_num_blocks);
 
         block_manager* bm = block_manager::get_instance();
-        typename bid_vector::iterator i_begin = m_bids.begin() + block_index;
-        typename bid_vector::iterator i_end = m_bids.begin() + block_index_after;
+        bid_iterator i_begin = m_bids.begin() + block_index;
+        bid_iterator i_end = m_bids.begin() + block_index_after;
         if (i_end > i_begin) {
             bm->delete_blocks(i_begin, i_end);
         }
@@ -1772,6 +1770,7 @@ public:
     typedef typed_block<block_size, ValueType> block_type;
     typedef std::vector<BID<block_size> > bid_vector;
     typedef bid_vector bids_container_type;
+    typedef read_write_pool<block_type> pool_type;
     typedef ppq_local::internal_array<ValueType> internal_array_type;
     typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
     typedef typename external_array_type::writer_type external_array_writer_type;
@@ -1967,6 +1966,10 @@ protected:
 
     //! Array of processor local data structures, including the insertion heaps.
     proc_vector_type m_proc;
+
+    //! Prefetch and write buffer pool for external arrays (has to be in front
+    //! of m_external_arrays)
+    pool_type m_pool;
 
     //! The extract buffer where external (and internal) arrays are merged into
     //! for extracting
@@ -2200,6 +2203,7 @@ public:
           m_internal_size(0),
           m_external_size(0),
           m_proc(m_num_insertion_heaps),
+          m_pool(num_prefetch_buffer_blocks, num_write_buffer_blocks),
           m_external_arrays(),
           m_minima(*this),
           m_fetch_prediction_comparator(m_external_arrays, m_inv_compare),
@@ -2240,6 +2244,29 @@ public:
         }
 
         m_mem_left -= m_num_insertion_heaps * insertion_heap_int_memory();
+
+        {
+            unsigned_type write_blocks = num_insertion_heaps;
+#if STXXL_PARALLEL
+            write_blocks = std::max<unsigned_type>(write_blocks, omp_get_max_threads());
+#endif
+            // need at least one
+            if (write_blocks == 0) write_blocks = 1;
+            // for holding boundary blocks
+            write_blocks *= 2;
+            // more disks than threads?
+            if (write_blocks < config::get_instance()->disks_number())
+                write_blocks = config::get_instance()->disks_number();
+#if STXXL_DEBUG_ASSERTIONS
+            // required for re-reading the external array
+            write_blocks = 2 * write_blocks;
+#endif
+            if (m_pool.size_write() < write_blocks) {
+                STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
+                             write_blocks << " blocks");
+                m_pool.resize_write(write_blocks);
+            }
+        }
 
         m_external_arrays.reserve(c_num_reserved_external_arrays);
 
@@ -2864,7 +2891,7 @@ public:
         size_t total_size = m_external_size;
         assert(total_size > 0);
 
-        external_array_type ea(total_size, m_num_write_buffers);
+        external_array_type ea(total_size, &m_pool);
         {
             external_array_writer_type external_array_writer(ea);
 
@@ -3607,7 +3634,7 @@ protected:
 
         // construct new external array
 
-        external_array_type ea(size, m_num_write_buffers);
+        external_array_type ea(size, &m_pool);
 
         // TODO: write in chunks in order to safe RAM?
 

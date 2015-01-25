@@ -107,7 +107,7 @@ public:
     {
         while (index >= m_num_slots)
             double_num_slots();
-        m_tree[((m_tree.size()/2)+index)] = index;
+        m_tree[((m_tree.size() / 2) + index)] = index;
     }
 
     //! deactivate a player and replay.
@@ -267,9 +267,9 @@ public:
     //! Build from winner tree from scratch.
     inline void rebuild()
     {
-        for (int i = (int) (m_tree.size()/2)-1; i>=0; --i) {
-            const int lc = i*2+1;
-            const int rc = i*2+2;
+        for (int i = (int)(m_tree.size() / 2) - 1; i >= 0; --i) {
+            const int lc = i * 2 + 1;
+            const int rc = i * 2 + 2;
             int winner;
 
             if (m_tree[lc] < 0)

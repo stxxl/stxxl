@@ -80,7 +80,7 @@ void fill(ea_type& ea, size_t index, size_t n)
 //!
 //! \param volume Volume
 //! \param numwbs Number of write buffer blocks for each external array.
-int run_external_array_test(size_t volume, size_t numwbs)
+int run_external_array_test(size_t volume)
 {
     const size_t block_size = ea_type::block_size;
     const size_t N = volume / sizeof(value_type);
@@ -90,7 +90,8 @@ int run_external_array_test(size_t volume, size_t numwbs)
     STXXL_VARDUMP(N);
     STXXL_VARDUMP(num_blocks);
 
-    ea_type ea(N, numwbs);
+    ea_type::pool_type rw_pool;
+    ea_type ea(N, &rw_pool);
 
     {
         stxxl::scoped_print_timer timer("filling", volume);
@@ -216,11 +217,13 @@ int run_external_array_test(size_t volume, size_t numwbs)
 //! \param volume Volume
 //! \param numwbs Number of write buffer blocks for each external array.
 template <int NumEAs>
-int run_multiway_merge(size_t volume, size_t numwbs)
+int run_multiway_merge(size_t volume)
 {
     const size_t block_size = ea_type::block_size;
     const size_t size = volume / sizeof(value_type);
     const size_t num_blocks = stxxl::div_ceil(size, block_size);
+
+    ea_type::pool_type rw_pool;
 
     STXXL_MSG("--- Running run_multiway_merge() test with " <<
               NumEAs << " external arrays");
@@ -245,9 +248,9 @@ int run_multiway_merge(size_t volume, size_t numwbs)
 
     ea_vector_type ealist;
     for (int i = 0; i < NumEAs; ++i)
-        ealist.push_back(new ea_type(size, numwbs));
+        ealist.push_back(new ea_type(size, &rw_pool));
 
-    ea_type out(size * (NumEAs + 1), numwbs);
+    ea_type out(size * (NumEAs + 1), &rw_pool);
 
     {
         stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume * NumEAs);
@@ -413,6 +416,8 @@ int run_upper_bound_test(size_t volume)
     STXXL_VARDUMP(size);
     STXXL_CHECK(size > 2000);
 
+    ea_type::pool_type rw_pool;
+
     std::vector<value_type> v(size);
 
     {
@@ -423,7 +428,7 @@ int run_upper_bound_test(size_t volume)
     }
 
     ia_type a(v);
-    ea_type b(size - 10, 2);
+    ea_type b(size - 10, &rw_pool);
 
     {
         stxxl::scoped_print_timer timer("filling external array", volume);
@@ -517,7 +522,7 @@ int main(int argc, char** argv)
     bool succ = EXIT_SUCCESS;
 
     if (volume > 0) {
-        succ = run_external_array_test(volume, numwbs) && succ;
+        succ = run_external_array_test(volume) && succ;
     }
 
     if (iavolume > 0) {
@@ -525,12 +530,12 @@ int main(int argc, char** argv)
     }
 
     if (mwmvolume > 0) {
-        succ = run_multiway_merge<0>(mwmvolume, numwbs) && succ;
-        succ = run_multiway_merge<1>(mwmvolume, numwbs) && succ;
-        succ = run_multiway_merge<2>(mwmvolume, numwbs) && succ;
-        succ = run_multiway_merge<3>(mwmvolume, numwbs) && succ;
-        succ = run_multiway_merge<4>(mwmvolume, numwbs) && succ;
-        succ = run_multiway_merge<5>(mwmvolume, numwbs) && succ;
+        succ = run_multiway_merge<0>(mwmvolume) && succ;
+        succ = run_multiway_merge<1>(mwmvolume) && succ;
+        succ = run_multiway_merge<2>(mwmvolume) && succ;
+        succ = run_multiway_merge<3>(mwmvolume) && succ;
+        succ = run_multiway_merge<4>(mwmvolume) && succ;
+        succ = run_multiway_merge<5>(mwmvolume) && succ;
     }
 
     succ = run_upper_bound_test(3 * ea_type::block_size * sizeof(value_type)) && succ;

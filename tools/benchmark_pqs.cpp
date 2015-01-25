@@ -391,7 +391,6 @@ void Container<sorter_type>::fill_end()
 class scoped_stats : public stxxl::scoped_print_timer
 {
 protected:
-
     //! short name of tested PQ
     std::string m_shortname;
 
@@ -411,8 +410,7 @@ public:
           m_shortname(c.shortname()),
           m_op(op),
           m_stxxl_stats(*stxxl::stats::get_instance())
-    {
-    }
+    { }
 
     ~scoped_stats()
     {

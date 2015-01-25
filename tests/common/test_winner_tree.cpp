@@ -48,7 +48,7 @@ void test_vecs(unsigned int vecnum, bool test_rebuild)
     static const bool debug = false;
 
     std::cout << "testing winner_tree with " << vecnum << " players using "
-        << (test_rebuild ? "replay_on_pop()" : "rebuild()") << "\n";
+              << (test_rebuild ? "replay_on_pop()" : "rebuild()") << "\n";
 
     // construct many vectors of sorted random numbers
 
