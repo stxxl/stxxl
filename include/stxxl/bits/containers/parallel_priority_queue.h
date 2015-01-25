@@ -88,7 +88,7 @@ protected:
     size_t m_block_index;
 
     //! size of each data block
-    size_t m_block_size;
+    size_t m_block_items;
 
 public:
     //! default constructor (should not be used directly)
@@ -101,14 +101,15 @@ public:
     //! \param block_pointers   A reference to the properly initialized vector of begin and end pointers.
     //!                         One pair for each block. The pointers should be valid for all blocks that
     //!                         are expected to be accessed with this iterator.
-    //! \param block_size       The size of a single block. If there is only one block (e.g. if the iterator
+    //! \param block_items      The size of a single block. If there is only one block (e.g. if the iterator
     //!                         belongs to an internal_array), use the total size here.
     //! \param index            The index of the current element (global - index 0 belongs to the first element
     //!                         in the first block, no matter if the values are still valid)
-    ppq_iterator(const block_pointers_type* block_pointers, size_t block_size, size_t index)
+    ppq_iterator(const block_pointers_type* block_pointers, size_t block_items,
+                 size_t index)
         : m_block_pointers(block_pointers),
           m_index(index),
-          m_block_size(block_size)
+          m_block_items(block_items)
     {
         update();
     }
@@ -134,8 +135,8 @@ public:
     {
         const difference_type index = m_index + relative_index;
 
-        const size_t block_index = index / m_block_size;
-        const size_t local_index = index % m_block_size;
+        const size_t block_index = index / m_block_items;
+        const size_t local_index = index % m_block_items;
 
         assert(block_index < m_block_pointers->size());
         assert((*m_block_pointers)[block_index].first + local_index
@@ -185,7 +186,7 @@ public:
 
     self_type operator + (difference_type addend) const
     {
-        return self_type(m_block_pointers, m_block_size, m_index + addend);
+        return self_type(m_block_pointers, m_block_items, m_index + addend);
     }
     self_type& operator += (difference_type addend)
     {
@@ -195,7 +196,7 @@ public:
     }
     self_type operator - (difference_type subtrahend) const
     {
-        return self_type(m_block_pointers, m_block_size, m_index - subtrahend);
+        return self_type(m_block_pointers, m_block_items, m_index - subtrahend);
     }
     difference_type operator - (const self_type& o) const
     {
@@ -241,8 +242,8 @@ private:
     //! updates m_block_index and m_current based on m_index
     inline void update()
     {
-        m_block_index = m_index / m_block_size;
-        const size_t local_index = m_index % m_block_size;
+        m_block_index = m_index / m_block_items;
+        const size_t local_index = m_index % m_block_items;
 
         if (m_block_index < m_block_pointers->size()) {
             m_current = (*m_block_pointers)[m_block_index].first + local_index;
@@ -422,7 +423,8 @@ public:
     typedef external_array_writer<self_type> writer_type;
 
     //! The number of elements fitting into one block
-    enum { block_size = BlockSize / sizeof(value_type) };
+    enum { block_size = BlockSize,
+           block_items = BlockSize / sizeof(value_type) };
 
     static const bool debug = false;
 
@@ -500,7 +502,7 @@ public:
     external_array(external_size_type size, unsigned_type num_write_buffer_blocks)
         :   // constants
           m_capacity(size),
-          m_num_blocks((size_t)div_ceil(m_capacity, block_size)),
+          m_num_blocks((size_t)div_ceil(m_capacity, block_items)),
           m_num_write_buffer_blocks(std::min(num_write_buffer_blocks, m_num_blocks)),
           m_pool(new pool_type(0, m_num_write_buffer_blocks)),
 
@@ -596,7 +598,7 @@ public:
         if (m_size > 0) {
             // not all data has been read!
 
-            const unsigned_type block_index = m_index / block_size;
+            const unsigned_type block_index = m_index / block_items;
             const unsigned_type end_block_index = get_end_block_index();
 
             // figure out first block that still exists.
@@ -639,7 +641,7 @@ public:
     {
         const size_t num_ram_blocks = get_end_block_index() - get_current_block_index();
         const size_t num_buffer_blocks = m_pool->size_prefetch() + m_pool->size_write();
-        return (num_ram_blocks + num_buffer_blocks) * block_size;
+        return (num_ram_blocks + num_buffer_blocks) * block_items;
     }
 
     //! Returns the number elements available in internal memory
@@ -651,10 +653,10 @@ public:
     //! Return the block beyond the block in which m_end_index is located.
     unsigned_type get_end_block_index() const
     {
-        unsigned_type end_block_index = m_end_index / block_size;
+        unsigned_type end_block_index = m_end_index / block_items;
 
         // increase block index if inside the block
-        if (m_end_index % block_size != 0) ++end_block_index;
+        if (m_end_index % block_items != 0) ++end_block_index;
         assert(end_block_index <= m_num_blocks);
 
         return end_block_index;
@@ -670,16 +672,16 @@ public:
     //! in internal memory.
     iterator begin() const
     {
-        assert(block_valid(m_index / block_size) || m_index == m_capacity);
-        return iterator(&m_block_pointers, block_size, m_index);
+        assert(block_valid(m_index / block_items) || m_index == m_capacity);
+        return iterator(&m_block_pointers, block_items, m_index);
     }
 
     //! Returns a random-access iterator 1 behind the end of the data
     //! in internal memory.
     iterator end() const
     {
-        assert(!block_valid(m_end_index / block_size) || m_end_index == m_capacity);
-        return iterator(&m_block_pointers, block_size, m_end_index);
+        assert(!block_valid(m_end_index / block_items) || m_end_index == m_capacity);
+        return iterator(&m_block_pointers, block_items, m_end_index);
     }
 
     //! Returns the smallest element in the array
@@ -707,7 +709,7 @@ public:
     bool valid() const
     {
         bool result = true;
-        const unsigned_type block_index = m_index / block_size;
+        const unsigned_type block_index = m_index / block_items;
         const unsigned_type end_block_index = get_end_block_index();
         for (unsigned_type i = block_index; i < end_block_index; ++i) {
             result = result && block_valid(i);
@@ -720,8 +722,8 @@ public:
     value_type& operator [] (size_t i) const
     {
         assert(i < m_capacity);
-        const size_t block_index = i / block_size;
-        const size_t local_index = i % block_size;
+        const size_t block_index = i / block_items;
+        const size_t local_index = i % block_items;
         assert(i < m_capacity);
         assert(block_valid(block_index));
         return m_blocks[block_index]->elem[local_index];
@@ -734,15 +736,15 @@ public:
         assert(m_write_phase);
         assert(m_size < m_capacity);
 
-        const size_t block_index = m_size / block_size;
-        const size_t local_index = m_size % block_size;
+        const size_t block_index = m_size / block_items;
+        const size_t local_index = m_size % block_items;
 
         m_blocks[block_index]->elem[local_index] = value;
         ++m_size;
 
         // block finished? -> write out.
-        if (UNLIKELY(m_size % block_size == 0 || m_size == m_capacity)) {
-            m_maxima[block_index] = m_blocks[block_index]->elem[block_size - 1];
+        if (UNLIKELY(m_size % block_items == 0 || m_size == m_capacity)) {
+            m_maxima[block_index] = m_blocks[block_index]->elem[block_items - 1];
             if (block_index > 0) {
                 // first block is never written to EM!
                 assert(m_bids[block_index].valid());
@@ -851,17 +853,17 @@ protected:
                m_blocks[block_index] != reinterpret_cast<block_type*>(1));
 
         // calculate minimum and maximum values
-        const internal_size_type this_block_size =
-            std::min<internal_size_type>(block_size, m_capacity - block_index * (external_size_type)block_size);
+        const internal_size_type this_block_items =
+            std::min<internal_size_type>(block_items, m_capacity - block_index * (external_size_type)block_items);
 
         STXXL_DEBUG("ea[" << this << "]: write_block index=" << block_index <<
-                    " this_block_size=" << this_block_size);
+                    " this_block_items=" << this_block_items);
 
-        assert(this_block_size > 0);
+        assert(this_block_items > 0);
         block_type& this_block = *m_blocks[block_index];
 
         m_minima[block_index] = this_block[0];
-        m_maxima[block_index] = this_block[this_block_size - 1];
+        m_maxima[block_index] = this_block[this_block_items - 1];
 
         // write out block (in background)
         m_pool->write(m_blocks[block_index], m_bids[block_index]);
@@ -880,12 +882,12 @@ public:
         assert(m_size + size <= m_capacity);
         assert(m_end_index > m_index);
 
-        const size_t block_index = m_index / block_size;
-        const size_t last_block_index = (m_end_index - 1) / block_size;
+        const size_t block_index = m_index / block_items;
+        const size_t last_block_index = (m_end_index - 1) / block_items;
 
         m_end_index = m_size + size;
 
-        const size_t last_block_index_after = (m_end_index - 1) / block_size;
+        const size_t last_block_index_after = (m_end_index - 1) / block_items;
 
         const size_t num_buffer_blocks = std::max(last_block_index_after, (size_t)1)
                                          - std::max(block_index, (size_t)1) + 1;
@@ -905,8 +907,8 @@ public:
     void flush_write_buffer()
     {
         const size_t size = m_end_index - m_index;
-        const size_t block_index = m_index / block_size;
-        size_t last_block_index = (m_end_index - 1) / block_size;
+        const size_t block_index = m_index / block_items;
+        size_t last_block_index = (m_end_index - 1) / block_items;
 
         if (m_size + size == m_capacity) {
             // we have to flush the last block, too.
@@ -915,18 +917,18 @@ public:
 
         for (size_t i = std::max(block_index, (size_t)1); i < last_block_index; ++i) {
             if (i < m_num_blocks - 1) {
-                m_maxima[i] = m_blocks[i]->elem[block_size - 1];
+                m_maxima[i] = m_blocks[i]->elem[block_items - 1];
             }
             else {
                 // last block
-                m_maxima[i] = m_blocks[i]->elem[last_block_size() - 1];
+                m_maxima[i] = m_blocks[i]->elem[last_block_items() - 1];
             }
             assert(m_bids[i].valid());
             m_pool->write(m_blocks[i], m_bids[i]);
         }
 
         if (m_size + size < m_capacity
-            && m_end_index % block_size == 0
+            && m_end_index % block_items == 0
             && last_block_index + 1 < m_num_blocks) {
             // block was full -> request new one
             m_blocks[last_block_index + 1] = m_pool->steal();
@@ -948,15 +950,15 @@ public:
         m_write_phase = false;
 
         // set m_maxima[0]
-        if (m_capacity <= block_size) {
+        if (m_capacity <= block_items) {
             m_maxima[0] = m_blocks[0]->elem[m_capacity - 1];
         }
         else {
-            m_maxima[0] = m_blocks[0]->elem[block_size - 1];
+            m_maxima[0] = m_blocks[0]->elem[block_items - 1];
         }
 
-        const size_t local_block_size = block_size; // std::min cannot access static block_size
-        m_end_index = std::min<external_size_type>(local_block_size, m_capacity);
+        const size_t local_block_items = block_items; // std::min cannot access static block_items
+        m_end_index = std::min<external_size_type>(local_block_items, m_capacity);
         m_hinted_until = std::max(m_hinted_until, get_current_block_index());
         m_index = 0;
 
@@ -970,7 +972,7 @@ public:
     void wait()
     {
         assert(!m_write_phase);
-        const size_t block_index = m_index / block_size;
+        const size_t block_index = m_index / block_items;
         size_t end_block_index = get_end_block_index();
 
         STXXL_DEBUG("ea[" << this << "]: wait" <<
@@ -1000,11 +1002,11 @@ public:
         if (n == 0)
             return false;
 
-        const size_t block_index = m_index / block_size;
+        const size_t block_index = m_index / block_items;
 
         const size_t index_after = m_index + n;
-        const size_t block_index_after = index_after / block_size;
-        const size_t local_index_after = index_after % block_size;
+        const size_t block_index_after = index_after / block_items;
+        const size_t local_index_after = index_after % block_items;
 
         assert(block_index_after <= m_num_blocks);
 
@@ -1061,7 +1063,7 @@ public:
         update_block_pointers(block_index);
 
         m_end_index = std::min(
-            m_capacity, (block_index + 1) * (external_size_type)block_size);
+            m_capacity, (block_index + 1) * (external_size_type)block_items);
         m_hinted_until = std::max(m_hinted_until, get_current_block_index());
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
@@ -1160,16 +1162,16 @@ protected:
         else
             m_block_pointers[block_index].second =
                 m_block_pointers[block_index].first
-                + (m_capacity - block_index * block_size);
+                + (m_capacity - block_index * block_items);
 
         assert(m_block_pointers[block_index].first != NULL);
         assert(m_block_pointers[block_index].second != NULL);
     }
 
-    inline size_t last_block_size()
+    inline size_t last_block_items()
     {
-        size_t mod = m_capacity % block_size;
-        return (mod > 0) ? mod : (size_t)block_size;
+        size_t mod = m_capacity % block_items;
+        return (mod > 0) ? mod : (size_t)block_items;
     }
 };
 
@@ -1309,7 +1311,7 @@ public:
 
         typedef iterator self_type;
 
-        static const size_t block_size = ea_type::block_size;
+        static const size_t block_items = ea_type::block_items;
 
         //! scope based debug variable
         static const bool debug = false;
@@ -1386,7 +1388,7 @@ public:
             m_writer->free_block_ref(m_block_index);
 
             STXXL_DEBUG("Destruction of iterator for index " << m_index <<
-                        " in block " << m_index / block_size);
+                        " in block " << m_index / block_items);
         }
 
         //! return the current absolute index inside the external array.
@@ -1402,8 +1404,8 @@ public:
             assert(!m_live);
 
             // calculate block and index inside
-            m_block_index = m_index / block_size;
-            m_current = m_index % block_size;
+            m_block_index = m_index / block_items;
+            m_current = m_index % block_items;
 
             STXXL_DEBUG("operator*() live request for index=" << m_index <<
                         " block_index=" << m_block_index <<
@@ -1437,7 +1439,7 @@ public:
 
             // if index stays in the same block, everything is fine
             ++m_current;
-            if (LIKELY(m_current != block_size)) return *this;
+            if (LIKELY(m_current != block_items)) return *this;
 
             // release current block
             m_writer->free_block_ref(m_block_index);
@@ -1515,7 +1517,7 @@ public:
         {
             external_size_type index = (external_size_type)((i + 1) * step);
             STXXL_DEBUG("hold index " << index <<
-                        " in block " << index / ea_type::block_size);
+                        " in block " << index / ea_type::block_items);
             m_live_boundary[i] = iterator(this, index);
             m_live_boundary[i].make_live();
         }
