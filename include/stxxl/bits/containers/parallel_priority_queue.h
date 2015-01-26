@@ -1470,7 +1470,7 @@ protected:
         {
             switch (input) {
             case HEAP:
-                return m_proc[m_parent.m_heaps.top()].insertion_heap[0];
+                return m_proc[m_parent.m_heaps.top()]->insertion_heap[0];
             case EB:
                 return m_parent.m_parent.m_extract_buffer[
                     m_parent.m_parent.m_extract_buffer_index
@@ -1502,7 +1502,7 @@ protected:
 
         const value_type & get_value(int index) const
         {
-            return m_proc[index].insertion_heap[0];
+            return m_proc[index]->insertion_heap[0];
         }
 
         bool operator () (const int a, const int b) const
@@ -1968,11 +1968,9 @@ protected:
         //! The number of items inserted into the insheap during bulk parallel
         //! access.
         size_type heap_add_size;
+    };
 
-        //! alignment should avoid cache thrashing between processors
-    } __attribute__ ((aligned(64)));
-
-    typedef std::vector<ProcessorData> proc_vector_type;
+    typedef std::vector<ProcessorData*> proc_vector_type;
 
     //! Array of processor local data structures, including the insertion heaps.
     proc_vector_type m_proc;
@@ -2246,10 +2244,15 @@ public:
 
         init_memmanagement();
 
-        for (size_t i = 0; i < m_num_insertion_heaps; ++i)
+        // reverse insertion heap memory on processor-local memory
+#if STXXL_PARALLEL
+#pragma omp parallel for
+#endif
+        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
         {
-            m_proc[i].insertion_heap.reserve(m_insertion_heap_capacity);
-            assert(m_proc[i].insertion_heap.capacity() * sizeof(value_type)
+            m_proc[p] = new ProcessorData;
+            m_proc[p]->insertion_heap.reserve(m_insertion_heap_capacity);
+            assert(m_proc[p]->insertion_heap.capacity() * sizeof(value_type)
                    == insertion_heap_int_memory());
         }
 
@@ -2332,14 +2335,14 @@ protected:
             // check that each insertion heap is a heap
 
             // TODO: remove soon, because this is very expensive
-            STXXL_CHECK(1 || stxxl::is_heap(m_proc[p].insertion_heap.begin(),
-                                            m_proc[p].insertion_heap.end(),
+            STXXL_CHECK(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
+                                            m_proc[p]->insertion_heap.end(),
                                             m_compare));
 
-            STXXL_CHECK(m_proc[p].insertion_heap.capacity() <= m_insertion_heap_capacity);
+            STXXL_CHECK(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
 
-            heaps_size += m_proc[p].insertion_heap.size();
-            mem_used += m_proc[p].insertion_heap.capacity() * sizeof(value_type);
+            heaps_size += m_proc[p]->insertion_heap.size();
+            mem_used += m_proc[p]->insertion_heap.capacity() * sizeof(value_type);
         }
 
         STXXL_CHECK(m_heaps_size == heaps_size);
@@ -2442,7 +2445,7 @@ public:
 
         // zero bulk insertion counters
         for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
-            m_proc[p].heap_add_size = 0;
+            m_proc[p]->heap_add_size = 0;
     }
 
     /*!
@@ -2454,7 +2457,7 @@ public:
      */
     void bulk_push(const ValueType& element, const int p)
     {
-        heap_type& insheap = m_proc[p].insertion_heap;
+        heap_type& insheap = m_proc[p]->insertion_heap;
 
         if (!m_is_very_large_bulk && 0)
         {
@@ -2464,9 +2467,9 @@ public:
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
-                m_heaps_size += m_proc[p].heap_add_size;
+                m_heaps_size += m_proc[p]->heap_add_size;
 
-                m_proc[p].heap_add_size = 0;
+                m_proc[p]->heap_add_size = 0;
                 flush_insertion_heap(p);
             }
 
@@ -2485,9 +2488,9 @@ public:
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
-                m_heaps_size += m_proc[p].heap_add_size;
+                m_heaps_size += m_proc[p]->heap_add_size;
 
-                m_proc[p].heap_add_size = 0;
+                m_proc[p]->heap_add_size = 0;
                 flush_insertion_heap(p);
             }
 
@@ -2502,9 +2505,9 @@ public:
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
-                m_heaps_size += m_proc[p].heap_add_size;
+                m_heaps_size += m_proc[p]->heap_add_size;
 
-                m_proc[p].heap_add_size = 0;
+                m_proc[p]->heap_add_size = 0;
                 flush_insertion_heap(p);
             }
 
@@ -2514,7 +2517,7 @@ public:
             insheap.push_back(element);
         }
 
-        m_proc[p].heap_add_size++;
+        m_proc[p]->heap_add_size++;
     }
 
     /*!
@@ -2544,9 +2547,9 @@ public:
         {
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
-                m_heaps_size += m_proc[p].heap_add_size;
+                m_heaps_size += m_proc[p]->heap_add_size;
 
-                if (!m_proc[p].insertion_heap.empty())
+                if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
             }
         }
@@ -2558,21 +2561,21 @@ public:
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
-                for (unsigned_type index = m_proc[p].heap_add_size; index != 0; ) {
-                    std::push_heap(m_proc[p].insertion_heap.begin(),
-                                   m_proc[p].insertion_heap.end() - (--index),
+                for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
+                    std::push_heap(m_proc[p]->insertion_heap.begin(),
+                                   m_proc[p]->insertion_heap.end() - (--index),
                                    m_compare);
                 }
 
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
-                m_heaps_size += m_proc[p].heap_add_size;
+                m_heaps_size += m_proc[p]->heap_add_size;
             }
 
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
-                if (!m_proc[p].insertion_heap.empty())
+                if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
             }
         }
@@ -2583,35 +2586,35 @@ public:
 #endif
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
-                if (m_proc[p].insertion_heap.size() >= m_insertion_heap_capacity) {
+                if (m_proc[p]->insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
-                    m_heaps_size += m_proc[p].heap_add_size;
+                    m_heaps_size += m_proc[p]->heap_add_size;
 
-                    m_proc[p].heap_add_size = 0;
+                    m_proc[p]->heap_add_size = 0;
                     flush_insertion_heap(p);
                 }
                 else {
                     // reestablish heap property: siftUp only those items pushed
-                    for (unsigned_type index = m_proc[p].heap_add_size; index != 0; ) {
-                        std::push_heap(m_proc[p].insertion_heap.begin(),
-                                       m_proc[p].insertion_heap.end() - (--index),
+                    for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
+                        std::push_heap(m_proc[p]->insertion_heap.begin(),
+                                       m_proc[p]->insertion_heap.end() - (--index),
                                        m_compare);
                     }
 
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
-                    m_heaps_size += m_proc[p].heap_add_size;
-                    m_proc[p].heap_add_size = 0;
+                    m_heaps_size += m_proc[p]->heap_add_size;
+                    m_proc[p]->heap_add_size = 0;
                 }
             }
 
             for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
-                if (!m_proc[p].insertion_heap.empty())
+                if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
             }
         }
@@ -2705,7 +2708,7 @@ public:
      */
     void push(const ValueType& element, unsigned id)
     {
-        heap_type& insheap = m_proc[id].insertion_heap;
+        heap_type& insheap = m_proc[id]->insertion_heap;
 
         if (insheap.size() >= m_insertion_heap_capacity) {
             flush_insertion_heaps();
@@ -2748,8 +2751,8 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
-            STXXL_DEBUG("heap " << index << ": " << m_proc[index].insertion_heap[0]);
-            return m_proc[index].insertion_heap[0];
+            STXXL_DEBUG("heap " << index << ": " << m_proc[index]->insertion_heap[0]);
+            return m_proc[index]->insertion_heap[0];
         case minima_type::EB:
             STXXL_DEBUG("eb " << m_extract_buffer_index << ": " << m_extract_buffer[m_extract_buffer_index]);
             return m_extract_buffer[m_extract_buffer_index];
@@ -2787,7 +2790,7 @@ public:
         switch (type) {
         case minima_type::HEAP:
         {
-            heap_type& insheap = m_proc[index].insertion_heap;
+            heap_type& insheap = m_proc[index]->insertion_heap;
 
             min = insheap[0];
 
@@ -3390,9 +3393,9 @@ protected:
     //! Flushes the insertions heap id into an internal array.
     inline void flush_insertion_heap(unsigned_type id)
     {
-        assert(m_proc[id].insertion_heap.size() != 0);
+        assert(m_proc[id]->insertion_heap.size() != 0);
 
-        heap_type& insheap = m_proc[id].insertion_heap;
+        heap_type& insheap = m_proc[id]->insertion_heap;
         size_t size = insheap.size();
 
         STXXL_DEBUG0(
@@ -3510,7 +3513,7 @@ protected:
 #endif
         for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
         {
-            heap_type& insheap = m_proc[i].insertion_heap;
+            heap_type& insheap = m_proc[i]->insertion_heap;
 
             std::sort(insheap.begin(), insheap.end(), m_inv_compare);
 
@@ -3549,8 +3552,8 @@ protected:
 
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
-                m_proc[i].insertion_heap.clear();
-                m_proc[i].insertion_heap.reserve(m_insertion_heap_capacity);
+                m_proc[i]->insertion_heap.clear();
+                m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
             }
             m_minima.clear_heaps();
 
@@ -3560,7 +3563,7 @@ protected:
         {
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
-                heap_type& insheap = m_proc[i].insertion_heap;
+                heap_type& insheap = m_proc[i]->insertion_heap;
                 size_type insheap_capacity = insheap.capacity() * sizeof(value_type);
 
                 if (insheap.size() > 0)
@@ -3687,7 +3690,7 @@ protected:
 #endif
         for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
         {
-            heap_type& insheap = m_proc[i].insertion_heap;
+            heap_type& insheap = m_proc[i]->insertion_heap;
             // TODO std::sort_heap? We would have to reverse the order...
             std::sort(insheap.begin(), insheap.end(), m_inv_compare);
             sequences[i] = std::make_pair(insheap.begin(), insheap.end());
@@ -3716,8 +3719,8 @@ protected:
         //#pragma omp parallel for
         //#endif
         for (unsigned i = 0; i < m_num_insertion_heaps; ++i) {
-            m_proc[i].insertion_heap.clear();
-            m_proc[i].insertion_heap.reserve(m_insertion_heap_capacity);
+            m_proc[i]->insertion_heap.clear();
+            m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
         }
         m_minima.clear_heaps();
 
