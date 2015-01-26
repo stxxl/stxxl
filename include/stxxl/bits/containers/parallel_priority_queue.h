@@ -2769,8 +2769,8 @@ public:
         }
     }
 
-    //! Access and remove the minimum element.
-    ValueType pop()
+    //! Remove the minimum element.
+    void pop()
     {
         m_stats.num_extracts++;
 
@@ -2783,7 +2783,6 @@ public:
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
         unsigned type = type_and_index.first;
         unsigned index = type_and_index.second;
-        ValueType min;
 
         assert(type < 4);
 
@@ -2791,8 +2790,6 @@ public:
         case minima_type::HEAP:
         {
             heap_type& insheap = m_proc[index]->insertion_heap;
-
-            min = insheap[0];
 
             m_stats.pop_heap_time.start();
             std::pop_heap(insheap.begin(), insheap.end(), m_compare);
@@ -2810,7 +2807,6 @@ public:
         }
         case minima_type::EB:
         {
-            min = m_extract_buffer[m_extract_buffer_index];
             ++m_extract_buffer_index;
             assert(m_extract_buffer_size > 0);
             --m_extract_buffer_size;
@@ -2824,7 +2820,6 @@ public:
         }
         case minima_type::IA:
         {
-            min = m_internal_arrays[index].get_min();
             m_internal_arrays[index].inc_min();
             m_internal_size--;
 
@@ -2839,7 +2834,6 @@ public:
         case minima_type::EA:
         {
             // wait() already done by comparator...
-            min = m_external_arrays[index].get_min();
             assert(m_external_size > 0);
             --m_external_size;
             bool has_hinted_blocks = m_external_arrays[index].num_hinted_blocks() > 0;
@@ -2862,9 +2856,8 @@ public:
         }
 
         m_stats.extract_min_time.stop();
-        check_invariants();
 
-        return min;
+        check_invariants();
     }
 
     //! \}
