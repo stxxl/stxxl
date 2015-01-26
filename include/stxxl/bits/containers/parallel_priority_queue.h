@@ -2041,6 +2041,40 @@ protected:
     //! \}
 
     /*
+     * Helper function to add new internal arrays.
+     */
+
+    //! add new internal array, requires that values are sorted!
+    void add_as_internal_array(std::vector<value_type>& values)
+    {
+        size_t size = values.size();
+
+        internal_array_type new_array(values);
+        assert(new_array.int_memory() == size * sizeof(value_type));
+        m_internal_arrays.swap_back(new_array);
+
+        if (c_merge_ias_into_eb) {
+            if (!extract_buffer_empty()) {
+                m_stats.num_new_internal_arrays++;
+                m_stats.max_num_new_internal_arrays.set_max(
+                    m_stats.num_new_internal_arrays);
+                m_minima.add_internal_array(
+                    static_cast<unsigned>(m_internal_arrays.size()) - 1
+                    );
+            }
+        }
+        else {
+            m_minima.add_internal_array(
+                static_cast<unsigned>(m_internal_arrays.size()) - 1
+                );
+        }
+
+        m_internal_size += size;
+
+        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
+    }
+
+    /*
      * Helper function to remove empty internal/external arrays.
      */
 
@@ -2345,7 +2379,7 @@ protected:
             mem_used += m_proc[p]->insertion_heap.capacity() * sizeof(value_type);
         }
 
-        STXXL_CHECK(m_heaps_size == heaps_size);
+        STXXL_CHECK_EQUAL(m_heaps_size, heaps_size);
 
         // count number of items and memory size of internal arrays
 
@@ -2359,7 +2393,7 @@ protected:
             ia_memory += ia->int_memory();
         }
 
-        STXXL_CHECK(m_internal_size == ia_size);
+        STXXL_CHECK_EQUAL(m_internal_size, ia_size);
         mem_used += ia_memory;
 
         // count number of items in external arrays
@@ -2374,7 +2408,7 @@ protected:
             ea_memory += m_mem_per_external_array;
         }
 
-        STXXL_CHECK(m_external_size == ea_size);
+        STXXL_CHECK_EQUAL(m_external_size, ea_size);
         mem_used += ea_memory;
 
         // calculate mem_used so that == mem_total - mem_left
@@ -3422,25 +3456,8 @@ protected:
                 }
             }
 
-            internal_array_type new_array(insheap);
-            assert(new_array.int_memory() == size * sizeof(value_type));
-            m_internal_arrays.swap_back(new_array);
-            // insheap is empty now, insheap vector was swapped into new_array.
-
-            if (c_merge_ias_into_eb) {
-                if (!extract_buffer_empty()) {
-                    m_stats.num_new_internal_arrays++;
-                    m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
-                    m_minima.add_internal_array(
-                        static_cast<unsigned>(m_internal_arrays.size()) - 1
-                        );
-                }
-            }
-            else {
-                m_minima.add_internal_array(
-                    static_cast<unsigned>(m_internal_arrays.size()) - 1
-                    );
-            }
+            // insheap is empty afterwards, as vector was swapped into new_array
+            add_as_internal_array(insheap);
 
             // reserve new insertion heap
             insheap.reserve(m_insertion_heap_capacity);
@@ -3457,13 +3474,11 @@ protected:
 #pragma omp atomic
 #endif
             m_heaps_size -= size;
-            m_internal_size += size;
 
             // invalidate player in minima tree
             m_minima.deactivate_heap(id);
         }
 
-        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
         m_stats.insertion_heap_flush_time += flush_time;
     }
 
@@ -3527,21 +3542,7 @@ protected:
 
             m_stats.merge_sorted_heaps_time.stop();
 
-            internal_array_type new_array(merged_array);
-            assert(new_array.int_memory() == size * sizeof(value_type));
-            m_internal_arrays.swap_back(new_array);
-            // merged_array is empty now.
-
-            if (c_merge_ias_into_eb) {
-                if (!extract_buffer_empty()) {
-                    m_stats.num_new_internal_arrays++;
-                    m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
-                    m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
-                }
-            }
-            else {
-                m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
-            }
+            add_as_internal_array(merged_array);
 
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
@@ -3557,39 +3558,23 @@ protected:
             for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
                 heap_type& insheap = m_proc[i]->insertion_heap;
-                size_type insheap_capacity = insheap.capacity() * sizeof(value_type);
 
                 if (insheap.size() > 0)
                 {
-                    internal_array_type new_array(insheap);
-                    assert(new_array.int_memory() == insheap_capacity);
-                    m_internal_arrays.swap_back(new_array);
-                    // insheap is empty now, insheap vector was swapped into new_array.
+                    add_as_internal_array(insheap);
 
-                    if (c_merge_ias_into_eb) {
-                        if (!extract_buffer_empty()) {
-                            m_stats.num_new_internal_arrays++;
-                            m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
-                            m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
-                        }
-                    }
-                    else {
-                        m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
-                    }
-
+                    // reserve new insertion heap
                     insheap.reserve(m_insertion_heap_capacity);
+
+                    m_mem_left -= insertion_heap_int_memory();
                 }
             }
 
             m_minima.clear_heaps();
-
-            m_mem_left -= m_num_insertion_heaps * insertion_heap_int_memory();
         }
 
-        m_internal_size += size;
         m_heaps_size = 0;
 
-        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
         m_stats.insertion_heap_flush_time.stop();
 
         check_invariants();
@@ -3783,32 +3768,9 @@ protected:
      */
     void flush_array_internal(std::vector<value_type>& values)
     {
-        m_internal_size += values.size();
-
         potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
 
-        internal_array_type new_array(values);
-        m_internal_arrays.swap_back(new_array);
-        // values is now empty.
-
-        if (c_merge_ias_into_eb) {
-            if (!extract_buffer_empty()) {
-                m_stats.num_new_internal_arrays++;
-                m_stats.max_num_new_internal_arrays.set_max(m_stats.num_new_internal_arrays);
-                m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
-            }
-        }
-        else {
-            m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
-        }
-
-        // TODO: use real value size: ram_left -= 2*values->size()*sizeof(value_type);
-        //TODO m_mem_left -= m_mem_per_internal_array;
-        STXXL_CHECK(0);
-
-        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
-
-        // Vector is now owned by PPQ...
+        add_as_internal_array(values);
     }
 
     /*!
