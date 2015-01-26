@@ -683,7 +683,7 @@ public:
     }
 
     //! Returns the smallest element in the array
-    value_type & get_min()
+    const value_type & get_min()
     {
         return *begin();
     }
@@ -2735,7 +2735,7 @@ public:
     }
 
     //! Access the minimum element.
-    ValueType top()
+    const value_type& top()
     {
         if (extract_buffer_empty()) {
             refill_extract_buffer(std::min(m_extract_buffer_limit, m_internal_size + m_external_size));
