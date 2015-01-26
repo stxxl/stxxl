@@ -648,7 +648,7 @@ public:
         return (m_end_index - m_index);
     }
 
-    //! Return the block beyond the block in which m_end_index is located.
+    //! Returns the block beyond the block in which *(m_end_index-1) is located.
     unsigned_type get_end_block_index() const
     {
         unsigned_type end_block_index = m_end_index / block_items;
@@ -660,10 +660,10 @@ public:
         return end_block_index;
     }
 
-    //! Return the block in which m_end_index-1 is located.
+    //! Returns the block in which m_index is located.
     inline unsigned_type get_current_block_index() const
     {
-        return get_end_block_index() - 1;
+        return (m_index / block_items);
     }
 
     //! Returns a random-access iterator to the begin of the data
@@ -692,7 +692,7 @@ public:
     //! requested to be in internal memory)
     const value_type & get_current_max() const
     {
-        return m_maxima[get_current_block_index()];
+        return m_maxima[get_end_block_index()-1];
     }
 
     //! Returns if there is data in EM, that's not randomly accessible.
@@ -943,7 +943,7 @@ public:
 
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_items);
-        m_hinted_until = std::max(m_hinted_until, get_current_block_index());
+        m_hinted_until = std::max(m_hinted_until, get_end_block_index()-1);
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
                     " block index=" << block_index <<
@@ -984,8 +984,8 @@ public:
     //! Returns the number of hinted blocks.
     size_t num_hinted_blocks() const
     {
-        assert(get_current_block_index() <= m_hinted_until);
-        return m_hinted_until - get_current_block_index();
+        assert(get_end_block_index()-1 <= m_hinted_until);
+        return m_hinted_until - (get_end_block_index()-1);
     }
 
     //! This method prepares rebuilding the hints (this is done after
@@ -997,7 +997,7 @@ public:
     void prepare_rebuilding_hints()
     {
         m_old_hinted_until = m_hinted_until;
-        m_hinted_until = get_current_block_index();
+        m_hinted_until = get_end_block_index()-1;
     }
 
     //! Removes hints which aren't needed anymore from the prefetcher
@@ -1011,7 +1011,7 @@ public:
             m_pool->invalidate(m_bids[i]);
         }
         // Fix prefetch size
-        const size_t num_hints = m_hinted_until - get_current_block_index();
+        const size_t num_hints = m_hinted_until - (get_end_block_index()-1);
         m_pool->resize_prefetch(num_hints);
     }
 
