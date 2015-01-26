@@ -292,7 +292,7 @@ public:
 
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
-    internal_array(std::vector<ValueType>& values)
+    internal_array(std::vector<value_type>& values)
         : m_values(), m_min_index(0), m_block_pointers(1)
     {
         std::swap(m_values, values);
@@ -316,7 +316,7 @@ public:
     }
 
     //! Random access operator
-    inline ValueType& operator [] (size_t i)
+    inline value_type& operator [] (size_t i)
     {
         return m_values[i];
     }
@@ -328,7 +328,7 @@ public:
     }
 
     //! The currently smallest element in the array.
-    inline const ValueType & get_min() const
+    inline const value_type & get_min() const
     {
         return m_values[m_min_index];
     }
@@ -366,7 +366,7 @@ public:
     //! Return the amount of internal memory used by the array
     inline size_t int_memory() const
     {
-        return m_values.capacity() * sizeof(ValueType);
+        return m_values.capacity() * sizeof(value_type);
     }
 
     //! Begin iterator
@@ -1777,14 +1777,14 @@ public:
     static const uint64 block_size = BlockSize;
     typedef uint64 size_type;
 
-    typedef typed_block<block_size, ValueType> block_type;
+    typedef typed_block<block_size, value_type> block_type;
     typedef std::vector<BID<block_size> > bid_vector;
     typedef bid_vector bids_container_type;
     typedef read_write_pool<block_type> pool_type;
-    typedef ppq_local::internal_array<ValueType> internal_array_type;
-    typedef ppq_local::external_array<ValueType, block_size, AllocStrategy> external_array_type;
+    typedef ppq_local::internal_array<value_type> internal_array_type;
+    typedef ppq_local::external_array<value_type, block_size, AllocStrategy> external_array_type;
     typedef typename external_array_type::writer_type external_array_writer_type;
-    typedef typename std::vector<ValueType>::iterator value_iterator;
+    typedef typename std::vector<value_type>::iterator value_iterator;
     typedef typename internal_array_type::iterator iterator;
     typedef std::pair<iterator, iterator> iterator_pair_type;
 
@@ -1792,7 +1792,7 @@ public:
 
 protected:
     //! type of insertion heap itself
-    typedef std::vector<ValueType> heap_type;
+    typedef std::vector<value_type> heap_type;
 
     //! type of internal arrays vector
     typedef typename stxxl::swap_vector<internal_array_type> internal_arrays_type;
@@ -1804,7 +1804,7 @@ protected:
                                     block_size, DefaultMemSize, MaxItems> > minima_type;
     //! allow minima tree access to internal data structures
     friend class ppq_local::minima_tree<
-        parallel_priority_queue<ValueType, compare_type, alloc_strategy,
+        parallel_priority_queue<value_type, compare_type, alloc_strategy,
                                 block_size, DefaultMemSize, MaxItems> >;
 
     //! Inverse comparison functor
@@ -1822,10 +1822,10 @@ protected:
         }
     };
 
-    //! <-Comparator for ValueType
+    //! <-Comparator for value_type
     compare_type m_compare;
 
-    //! >-Comparator for ValueType
+    //! >-Comparator for value_type
     inv_compare_type m_inv_compare;
 
     //! Defines if statistics are gathered: dummy_custom_stats_counter or
@@ -1981,7 +1981,7 @@ protected:
 
     //! The extract buffer where external (and internal) arrays are merged into
     //! for extracting
-    std::vector<ValueType> m_extract_buffer;
+    std::vector<value_type> m_extract_buffer;
 
     //! The sorted arrays in internal memory
     internal_arrays_type m_internal_arrays;
@@ -1990,7 +1990,7 @@ protected:
     external_arrays_type m_external_arrays;
 
     //! The aggregated pushes. They cannot be extracted yet.
-    std::vector<ValueType> m_aggregated_pushes;
+    std::vector<value_type> m_aggregated_pushes;
 
     //! The winner tree containing the smallest values of all sources
     //! where the globally smallest element could come from.
@@ -2201,7 +2201,7 @@ public:
 #else
           m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : 1),
 #endif
-          m_insertion_heap_capacity(single_heap_ram / sizeof(ValueType)),
+          m_insertion_heap_capacity(single_heap_ram / sizeof(value_type)),
           m_mem_total(total_ram),
           m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
           m_is_very_large_bulk(false),
@@ -2238,8 +2238,8 @@ public:
 
         if (c_limit_extract_buffer) {
             m_extract_buffer_limit = (extract_buffer_ram > 0)
-                                     ? extract_buffer_ram / sizeof(ValueType)
-                                     : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(ValueType)));
+                                     ? extract_buffer_ram / sizeof(value_type)
+                                     : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(value_type)));
         }
 
         init_memmanagement();
@@ -2290,7 +2290,7 @@ protected:
 
         if (c_limit_extract_buffer) {
             // ram for the extract buffer
-            //TODO m_mem_left -= m_extract_buffer_limit * sizeof(ValueType);
+            //TODO m_mem_left -= m_extract_buffer_limit * sizeof(value_type);
         }
         else {
             // each: part of the (maximum) ram for the extract buffer
@@ -2455,7 +2455,7 @@ public:
      * \param element The element to push.
      * \param p The id of the insertion heap to use (usually the thread id).
      */
-    void bulk_push(const ValueType& element, const int p)
+    void bulk_push(const value_type& element, const int p)
     {
         heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -2527,7 +2527,7 @@ public:
      *
      * \param element The element to push.
      */
-    void bulk_push(const ValueType& element)
+    void bulk_push(const value_type& element)
     {
 #if STXXL_PARALLEL
         return bulk_push(element, omp_get_thread_num());
@@ -2627,7 +2627,7 @@ public:
      * \param elements Vector containing the elements to push.
      * Attention: elements vector may be owned by the PQ afterwards.
      */
-    void bulk_push_vector(std::vector<ValueType>& elements)
+    void bulk_push_vector(std::vector<value_type>& elements)
     {
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
         if (elements.size() > heap_capacity / 2) {
@@ -2666,7 +2666,7 @@ public:
      * of the aggregated values.
      * \param element The element to push.
      */
-    void aggregate_push(const ValueType& element)
+    void aggregate_push(const value_type& element)
     {
         m_aggregated_pushes.push_back(element);
     }
@@ -2678,7 +2678,7 @@ public:
     void flush_aggregated_pushes()
     {
         size_type size = m_aggregated_pushes.size();
-        size_type ram_internal = 2 * size * sizeof(ValueType); // ram for the sorted array + part of the ram for the merge buffer
+        size_type ram_internal = 2 * size * sizeof(value_type); // ram for the sorted array + part of the ram for the merge buffer
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
 
         if (ram_internal > m_mem_for_heaps / 2) {
@@ -2706,7 +2706,7 @@ public:
      * \param element the element to insert.
      * \param id number of insertion heap to insert item into
      */
-    void push(const ValueType& element, unsigned id)
+    void push(const value_type& element, unsigned id)
     {
         heap_type& insheap = m_proc[id]->insertion_heap;
 
@@ -2728,7 +2728,7 @@ public:
      * Insert new element into a randomly selected insertion heap.
      * \param element the element to insert.
      */
-    void push(const ValueType& element)
+    void push(const value_type& element)
     {
         unsigned id = m_rng() % m_num_insertion_heaps;
         return push(element, id);
@@ -3057,7 +3057,7 @@ public:
 
         if (c_limit_extract_buffer) {
             STXXL_VARDUMP(m_extract_buffer_limit);
-            STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(ValueType));
+            STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(value_type));
         }
 
 #if STXXL_PARALLEL
@@ -3070,7 +3070,7 @@ public:
 
         //if (num_extract_buffer_refills > 0) {
         //    STXXL_VARDUMP(total_extract_buffer_size / num_extract_buffer_refills);
-        //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(ValueType));
+        //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
         //}
 
         STXXL_MSG(m_stats);
@@ -3519,7 +3519,7 @@ protected:
         if (c_merge_sorted_heaps && 0)
         {
             m_stats.merge_sorted_heaps_time.start();
-            std::vector<ValueType> merged_array(size);
+            std::vector<value_type> merged_array(size);
 
             potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
@@ -3736,7 +3736,7 @@ protected:
 
     //! Sorts the values from values and writes them into an external array.
     //! \param values the vector to sort and store
-    void flush_array_to_hd(std::vector<ValueType>& values)
+    void flush_array_to_hd(std::vector<value_type>& values)
     {
         abort();
 #if TODO_FIXUP_LATER
@@ -3781,7 +3781,7 @@ protected:
      *
      * \param values the vector to sort and store
      */
-    void flush_array_internal(std::vector<ValueType>& values)
+    void flush_array_internal(std::vector<value_type>& values)
     {
         m_internal_size += values.size();
 
@@ -3802,7 +3802,7 @@ protected:
             m_minima.add_internal_array(static_cast<unsigned>(m_internal_arrays.size()) - 1);
         }
 
-        // TODO: use real value size: ram_left -= 2*values->size()*sizeof(ValueType);
+        // TODO: use real value size: ram_left -= 2*values->size()*sizeof(value_type);
         //TODO m_mem_left -= m_mem_per_internal_array;
         STXXL_CHECK(0);
 
@@ -3818,10 +3818,10 @@ protected:
      *
      * \param values the vector to sort and store
      */
-    void flush_array(std::vector<ValueType>& values)
+    void flush_array(std::vector<value_type>& values)
     {
         size_type size = values.size();
-        size_type ram_internal = 2 * size * sizeof(ValueType); // ram for the sorted array + part of the ram for the merge buffer
+        size_type ram_internal = 2 * size * sizeof(value_type); // ram for the sorted array + part of the ram for the merge buffer
 
         size_type ram_for_all_internal_arrays = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size - m_external_arrays.size() * m_mem_per_external_array;
 
@@ -3964,9 +3964,9 @@ protected:
 
         friend std::ostream& operator << (std::ostream& os, const stats_type& o)
         {
-            return os << "max_extract_buffer_size=" << o.max_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
-                      << "total_extract_buffer_size=" << o.total_extract_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
-                      << "max_merge_buffer_size=" << o.max_merge_buffer_size.as_memory_amount(sizeof(ValueType)) << std::endl
+            return os << "max_extract_buffer_size=" << o.max_extract_buffer_size.as_memory_amount(sizeof(value_type)) << std::endl
+                      << "total_extract_buffer_size=" << o.total_extract_buffer_size.as_memory_amount(sizeof(value_type)) << std::endl
+                      << "max_merge_buffer_size=" << o.max_merge_buffer_size.as_memory_amount(sizeof(value_type)) << std::endl
                       << "num_extracts=" << o.num_extracts << std::endl
                       << "num_extract_buffer_refills=" << o.num_extract_buffer_refills << std::endl
                       << "num_insertion_heap_flushes=" << o.num_insertion_heap_flushes << std::endl
