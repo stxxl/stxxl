@@ -2927,81 +2927,16 @@ public:
 
         check_invariants();
 
-        if (1)
-        {
-            // perform extract for all items < L into back of insertion_heap
-            std::vector<unsigned_type> back_size(m_num_insertion_heaps);
-
-//#if STXXL_PARALLEL
-//#pragma omp parallel for
-//#endif
-            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
-            {
-                heap_type& insheap = m_proc[p]->insertion_heap;
-
-                typename heap_type::iterator back = insheap.end();
-
-                while (back != insheap.begin() &&
-                       m_compare(m_limit_element, insheap[0]))
-                {
-                    // while top < L, perform pop_heap: put top to back and
-                    // siftDown new items (shortens heap by one)
-                    std::pop_heap(insheap.begin(), back, m_compare);
-                    --back;
-                }
-
-                // range insheap.begin() + back to insheap.end() is < L
-
-                for (typename heap_type::const_iterator it = insheap.begin();
-                     it != insheap.end(); ++it)
-                {
-                    if (it < back)
-                        assert(!m_compare(m_limit_element, insheap[0]));
-                    else
-                        assert(m_compare(m_limit_element, insheap[0]));
-                }
-
-                back_size[p] = insheap.end() - back;
-            }
-
-            // release extract buffer
-            if (m_extract_buffer_size > 0)
-                convert_eb_into_ia();
-
-            // put items from insertion heaps into an internal array
-            unsigned_type back_sum = std::accumulate(
-                back_size.begin(), back_size.end(), unsigned_type(0));
-
-            STXXL_DEBUG("limit_begin(): back_sum = " << back_sum);
-
-            if (back_sum)
-            {
-                // test that enough RAM is available for remaining items
-                flush_ia_ea_until_memory_free(back_sum * sizeof(value_type));
-
-                std::vector<value_type> values(back_sum);
-
-                // copy items into values vector
-                typename std::vector<value_type>::iterator vi = values.begin();
-                for (size_t p = 0; p < m_num_insertion_heaps; ++p)
-                {
-                    heap_type& insheap = m_proc[p]->insertion_heap;
-
-                    std::copy(insheap.end() - back_size[p], insheap.end(), vi);
-                    vi += back_size[p];
-                    insheap.resize(insheap.size() - back_size[p]);
-                }
-
-                potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
-
-                add_as_internal_array(values);
-
-                // account for new internal array
-                m_mem_left -= back_sum * sizeof(value_type);
-                m_heaps_size -= back_sum;
-            }
+        if (m_heaps_size > 0) {
+            if (0)
+                flush_insertion_heaps();
+            else if(1)
+                flush_insertion_heaps_with_limit(limit);
         }
-        // or completely flush insertion heaps?
+
+        // release extract buffer
+        if (m_extract_buffer_size > 0)
+            convert_eb_into_ia();
 
         check_invariants();
 
@@ -3027,18 +2962,94 @@ public:
         return limit_push(element, id);
     }
 
+    //! Flushes all elements of the insertion heaps which are greater
+    //! or equal to a given limit.
+    //! \param limit limit value
+    inline void flush_insertion_heaps_with_limit(const value_type& limit) {
+        // perform extract for all items < L into back of insertion_heap
+        std::vector<unsigned_type> back_size(m_num_insertion_heaps);
+
+//#if STXXL_PARALLEL
+//#pragma omp parallel for
+//#endif
+        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        {
+            heap_type& insheap = m_proc[p]->insertion_heap;
+
+            typename heap_type::iterator back = insheap.end();
+
+            while (back != insheap.begin() &&
+                   m_compare(limit, insheap[0]))
+            {
+                // while top < L, perform pop_heap: put top to back and
+                // siftDown new items (shortens heap by one)
+                std::pop_heap(insheap.begin(), back, m_compare);
+                --back;
+            }
+
+            // range insheap.begin() + back to insheap.end() is < L
+
+            for (typename heap_type::const_iterator it = insheap.begin();
+                 it != insheap.end(); ++it)
+            {
+                if (it < back)
+                    assert(!m_compare(limit, insheap[0]));
+                else
+                    assert(m_compare(limit, insheap[0]));
+            }
+
+            back_size[p] = insheap.end() - back;
+        }
+
+        // put items from insertion heaps into an internal array
+        unsigned_type back_sum = std::accumulate(
+            back_size.begin(), back_size.end(), unsigned_type(0));
+
+        STXXL_DEBUG("flush_insertion_heaps_with_limit(): back_sum = " << back_sum);
+
+        if (back_sum)
+        {
+            // test that enough RAM is available for remaining items
+            flush_ia_ea_until_memory_free(back_sum * sizeof(value_type));
+
+            std::vector<value_type> values(back_sum);
+
+            // copy items into values vector
+            typename std::vector<value_type>::iterator vi = values.begin();
+            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                heap_type& insheap = m_proc[p]->insertion_heap;
+
+                std::copy(insheap.end() - back_size[p], insheap.end(), vi);
+                vi += back_size[p];
+                insheap.resize(insheap.size() - back_size[p]);
+            }
+
+            potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
+
+            add_as_internal_array(values);
+
+            // account for new internal array
+            m_mem_left -= back_sum * sizeof(value_type);
+            m_heaps_size -= back_sum;
+        }
+    }
+
     //! Extracts all elements which are greater or equal to a given limit.
     //! \param out result vector
-    //! \param limit value
+    //! \param limit limit value
     void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit)
     {
 
         if (m_extract_buffer_size > 0)
             convert_eb_into_ia();
 
-        // TODO? Do not flush all, but extract relevant elements, see limit_begin()...
-        if (m_heaps_size > 0)
-            flush_insertion_heaps();
+        if (m_heaps_size > 0) {
+            if (0)
+                flush_insertion_heaps();
+            else if(1)
+                flush_insertion_heaps_with_limit(limit);
+        }
 
         size_type ias = m_internal_arrays.size();
         size_type eas = m_external_arrays.size();
