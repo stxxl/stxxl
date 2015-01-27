@@ -2977,6 +2977,24 @@ public:
         check_invariants();
     }
 
+    //! Free up memory by flushing internal arrays until enough bytes are free.
+    void flush_until_memory_free(internal_size_type mem_free)
+    {
+        if (m_mem_left >= mem_free) return;
+
+        if (m_internal_size > 0) {
+            flush_internal_arrays();
+            // still not enough?
+            if (m_mem_left < mem_free)
+                merge_external_arrays();
+        }
+        else {
+            merge_external_arrays();
+        }
+
+        assert(m_mem_left >= mem_free);
+    }
+
     //! Activate player in fetch prediction tree afer a remove()
     //! or a request_further_block() call. Rebuild hint tree
     //! completely as the hint sequence may have changed.
@@ -3444,17 +3462,7 @@ protected:
         {
             // test that enough RAM is available for merged internal array:
             // otherwise flush the existing internal arrays out to disk.
-            if (m_mem_left < insertion_heap_int_memory()) {
-                if (m_internal_size > 0) {
-                    flush_internal_arrays();
-                    // still not enough?
-                    if (m_mem_left < insertion_heap_int_memory())
-                        merge_external_arrays();
-                }
-                else {
-                    merge_external_arrays();
-                }
-            }
+            flush_until_memory_free(insertion_heap_int_memory());
 
             // insheap is empty afterwards, as vector was swapped into new_array
             add_as_internal_array(insheap);
@@ -3496,17 +3504,7 @@ protected:
 
         // test that enough RAM is available for merged internal array:
         // otherwise flush the existing internal arrays out to disk.
-        if (m_mem_left < ram_needed) {
-            if (m_internal_size > 0) {
-                flush_internal_arrays();
-                // still not enough?
-                if (m_mem_left < ram_needed)
-                    merge_external_arrays();
-            }
-            else {
-                merge_external_arrays();
-            }
-        }
+        flush_until_memory_free(ram_needed);
 
         m_stats.num_insertion_heap_flushes++;
         m_stats.insertion_heap_flush_time.start();
