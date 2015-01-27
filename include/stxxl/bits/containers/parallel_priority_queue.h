@@ -2146,6 +2146,7 @@ protected:
         // Otherwise there might be outdated comparisons.
         for (size_t i = first_removed; i < size; ++i) {
             m_fetch_prediction_tree.deactivate_player(i);
+            m_hint_tree.deactivate_player(i); //TODO-tb: is this correct here?
         }
 
         // Replay moved arrays.
@@ -2902,6 +2903,163 @@ public:
         m_stats.extract_min_time.stop();
 
         check_invariants();
+    }
+
+    //! \}
+
+    //! \name Bulk-Limit Operations
+    //! \{
+
+protected:
+    //! current limit element
+    value_type m_limit_element;
+
+    //! flag if inside a bulk limit extract session
+    bool m_limit_extract;
+
+public:
+    //! Begin bulk-limit extraction session with limit element.
+    void limit_begin(const value_type& limit, size_type bulk_size)
+    {
+        m_limit_extract = true;
+        m_limit_element = limit;
+
+        check_invariants();
+
+        if (1)
+        {
+            // perform extract for all items < L into back of insertion_heap
+            std::vector<unsigned_type> back_size(m_num_insertion_heaps);
+
+//#if STXXL_PARALLEL
+//#pragma omp parallel for
+//#endif
+            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+            {
+                heap_type& insheap = m_proc[p]->insertion_heap;
+
+                typename heap_type::iterator back = insheap.end();
+
+                while (back != insheap.begin() &&
+                       m_compare(m_limit_element, insheap[0]))
+                {
+                    // while top < L, perform pop_heap: put top to back and
+                    // siftDown new items (shortens heap by one)
+                    std::pop_heap(insheap.begin(), back, m_compare);
+                    --back;
+                }
+
+                // range insheap.begin() + back to insheap.end() is < L
+
+                for (typename heap_type::const_iterator it = insheap.begin();
+                     it != insheap.end(); ++it)
+                {
+                    if (it < back)
+                        assert(!m_compare(m_limit_element, insheap[0]));
+                    else
+                        assert(m_compare(m_limit_element, insheap[0]));
+                }
+
+                back_size[p] = insheap.end() - back;
+            }
+
+            // release extract buffer
+            if (m_extract_buffer_size > 0)
+                convert_eb_into_ia();
+
+            // put items from insertion heaps into an internal array
+            unsigned_type back_sum = std::accumulate(
+                back_size.begin(), back_size.end(), unsigned_type(0));
+
+            STXXL_DEBUG("limit_begin(): back_sum = " << back_sum);
+
+            if (back_sum)
+            {
+                // test that enough RAM is available for remaining items
+                flush_ia_ea_until_memory_free(back_sum * sizeof(value_type));
+
+                std::vector<value_type> values(back_sum);
+
+                // copy items into values vector
+                typename std::vector<value_type>::iterator vi = values.begin();
+                for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+                {
+                    heap_type& insheap = m_proc[p]->insertion_heap;
+
+                    std::copy(insheap.end() - back_size[p], insheap.end(), vi);
+                    vi += back_size[p];
+                    insheap.resize(insheap.size() - back_size[p]);
+                }
+
+                potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
+
+                add_as_internal_array(values);
+
+                // account for new internal array
+                m_mem_left -= back_sum * sizeof(value_type);
+                m_heaps_size -= back_sum;
+            }
+        }
+        // or completely flush insertion heaps?
+
+        check_invariants();
+
+        bulk_push_begin(bulk_size);
+
+        refill_extract_buffer(std::min(m_extract_buffer_limit,
+                                       m_internal_size + m_external_size));
+    }
+
+    //! Push new item >= bulk-limit element into insertion heap p.
+    void limit_push(const value_type& element, const unsigned_type p)
+    {
+        assert(m_limit_extract);
+        assert(!m_compare(m_limit_element, element));
+
+        return bulk_push(element, p);
+    }
+
+    //! Push new item >= bulk-limit element, pick the insertion heap randomly.
+    void limit_push(const value_type& element)
+    {
+        unsigned_type id = m_rng() % m_num_insertion_heaps;
+        return limit_push(element, id);
+    }
+
+    //! Access the minimum element, which can only be in the extract buffer.
+    const value_type& limit_top()
+    {
+        assert(m_limit_extract);
+        assert(m_extract_buffer_size > 0);
+
+        return m_extract_buffer[m_extract_buffer_index];
+    }
+
+    //! Remove the minimum element, only works correctly while elements < L.
+    void limit_pop()
+    {
+        assert(m_limit_extract);
+
+        ++m_extract_buffer_index;
+        assert(m_extract_buffer_size > 0);
+        --m_extract_buffer_size;
+
+        if (extract_buffer_empty()) {
+            // no need to modify extract_buffer, since it will extract smallest
+            // items into the EB.
+            refill_extract_buffer(std::min(m_extract_buffer_limit,
+                                           m_internal_size + m_external_size));
+        }
+    }
+
+    //! Finish bulk-limit extraction session.
+    void limit_end()
+    {
+        assert(m_limit_extract);
+
+        bulk_push_end();
+
+        m_limit_extract = false;
     }
 
     //! \}
