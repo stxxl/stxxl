@@ -3027,6 +3027,78 @@ public:
         return limit_push(element, id);
     }
 
+    //! Extracts all elements which are greater or equal to a given limit.
+    //! \param out result vector
+    //! \param limit value
+    void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit)
+    {
+
+        if (m_extract_buffer_size > 0)
+            convert_eb_into_ia();
+
+        // TODO? Do not flush all, but extract relevant elements, see limit_begin()...
+        if (m_heaps_size > 0)
+            flush_insertion_heaps();
+
+        size_type ias = m_internal_arrays.size();
+        size_type eas = m_external_arrays.size();
+        std::vector<size_type> sizes(eas + ias);
+        std::vector<iterator_pair_type> sequences(eas + ias);
+        size_type output_size = 0;
+
+        int limiting_ea_index = eas + 1;
+        value_type current_limit;
+        
+        // get all relevant blocks
+        // TODO: check RAM!
+        while (!m_compare(current_limit,limit)) {
+            if (limiting_ea_index < 0) {
+                // no more unaccessible EM data
+                break;
+            } 
+            else if ((size_t) limiting_ea_index < eas) {
+                request_further_block((size_t)limiting_ea_index);
+            }
+            limiting_ea_index = m_fetch_prediction_tree.top();
+        }
+
+        // build sequences
+        for (size_type i = 0; i < eas + ias; ++i) {
+            iterator begin, end;
+
+            if (i < eas) {
+                assert(!m_external_arrays[i].empty());
+                m_external_arrays[i].wait();
+                assert(m_external_arrays[i].valid());
+                begin = m_external_arrays[i].begin();
+                end = m_external_arrays[i].end();
+            }
+            else {
+                size_type j = i - eas;
+                assert(!(m_internal_arrays[j].empty()));
+                begin = m_internal_arrays[j].begin();
+                end = m_internal_arrays[j].end();
+            }
+
+            assert(begin != end);
+            end = std::upper_bound(begin, end, limit, m_inv_compare);
+
+            sizes[i] = std::distance(begin, end);
+            sequences[i] = std::make_pair(begin, end);
+        }
+
+        output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+        out.resize(output_size);
+
+        potentially_parallel::multiway_merge(
+            sequences.begin(), sequences.end(),
+            out.begin(), output_size, m_inv_compare);
+        
+        cleanup_arrays(sequences,sizes,eas,ias);
+        check_invariants();
+
+    }
+
     //! Access the minimum element, which can only be in the extract buffer.
     const value_type& limit_top()
     {
