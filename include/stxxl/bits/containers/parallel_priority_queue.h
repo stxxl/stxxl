@@ -292,8 +292,9 @@ public:
 
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
-    internal_array(std::vector<value_type>& values)
-        : m_values(), m_min_index(0), m_block_pointers(1)
+    internal_array(std::vector<value_type>& values,
+                   unsigned_type min_index = 0)
+        : m_values(), m_min_index(min_index), m_block_pointers(1)
     {
         std::swap(m_values, values);
         m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.end()));
@@ -2045,11 +2046,13 @@ protected:
      */
 
     //! add new internal array, requires that values are sorted!
-    void add_as_internal_array(std::vector<value_type>& values)
+    void add_as_internal_array(std::vector<value_type>& values,
+                               unsigned_type used = 0)
     {
         size_t size = values.size();
+        assert(size > used); // at least one element
 
-        internal_array_type new_array(values);
+        internal_array_type new_array(values, used);
         assert(new_array.int_memory() == size * sizeof(value_type));
         m_internal_arrays.swap_back(new_array);
 
@@ -2058,6 +2061,7 @@ protected:
                 m_stats.num_new_internal_arrays++;
                 m_stats.max_num_new_internal_arrays.set_max(
                     m_stats.num_new_internal_arrays);
+
                 m_minima.add_internal_array(
                     static_cast<unsigned>(m_internal_arrays.size()) - 1
                     );
@@ -2069,7 +2073,7 @@ protected:
                 );
         }
 
-        m_internal_size += size;
+        m_internal_size += size - used;
 
         m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
     }
@@ -3281,7 +3285,15 @@ protected:
     //! Convert extract buffer into a new internal array.
     void convert_eb_into_ia()
     {
-        internal_array_type ia(m_extract_buffer);
+        // memory is allocated, because extract buffer is currently not counted
+        m_mem_left -= m_extract_buffer.size() * sizeof(value_type);
+
+        // first deactivate extract buffer to replay tree for new IA.
+        m_minima.deactivate_extract_buffer();
+
+        // add eb as internal array with current index
+        add_as_internal_array(m_extract_buffer, m_extract_buffer_index);
+
         m_extract_buffer_index = 0;
         m_extract_buffer_size = 0;
     }
