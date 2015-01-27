@@ -364,10 +364,17 @@ public:
         return m_values.size();
     }
 
+    //! Return the amount of internal memory used by an array with the capacity
+    //! in number of items.
+    static size_t int_memory(size_t capacity)
+    {
+        return sizeof(internal_array) + capacity * sizeof(value_type);
+    }
+
     //! Return the amount of internal memory used by the array
     inline size_t int_memory() const
     {
-        return m_values.capacity() * sizeof(value_type);
+        return int_memory(m_values.capacity());
     }
 
     //! Begin iterator
@@ -2041,7 +2048,8 @@ protected:
      * Helper function to add new internal arrays.
      */
 
-    //! add new internal array, requires that values are sorted!
+    //! Add new internal array, requires that values are sorted! automatically
+    //! decreases m_mem_left!
     void add_as_internal_array(std::vector<value_type>& values,
                                unsigned_type used = 0)
     {
@@ -2050,7 +2058,8 @@ protected:
         assert(size > used); // at least one element
 
         internal_array_type new_array(values, used);
-        STXXL_ASSERT(new_array.int_memory() == capacity * sizeof(value_type));
+        STXXL_ASSERT(new_array.int_memory() ==
+                     internal_array_type::int_memory(capacity));
         m_internal_arrays.swap_back(new_array);
 
         if (c_merge_ias_into_eb) {
@@ -2071,6 +2080,7 @@ protected:
         }
 
         m_internal_size += size - used;
+        m_mem_left -= internal_array_type::int_memory(capacity);
 
         m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
     }
@@ -3032,9 +3042,6 @@ public:
             potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
 
             add_as_internal_array(values);
-
-            // account for new internal array
-            m_mem_left -= back_sum * sizeof(value_type);
             m_heaps_size -= back_sum;
         }
     }
@@ -3539,8 +3546,9 @@ protected:
     {
         // TODO: memory is NOT allocated, but extract buffer is currently not
         // counted
-        flush_ia_ea_until_memory_free(m_extract_buffer.size() * sizeof(value_type));
-        m_mem_left -= m_extract_buffer.size() * sizeof(value_type);
+        flush_ia_ea_until_memory_free(
+            internal_array_type::int_memory(m_extract_buffer.size())
+            );
 
         // first deactivate extract buffer to replay tree for new IA.
         m_minima.deactivate_extract_buffer();
@@ -3730,7 +3738,7 @@ protected:
             "Flushing insertion heap array id=" << id <<
             " size=" << insheap.size() <<
             " capacity=" << insheap.capacity() <<
-            " int_memory=" << insheap.capacity() * sizeof(value_type) <<
+            " int_memory=" << internal_array_type::int_memory(insheap.size()) <<
             " mem_left=" << m_mem_left);
 
         m_stats.num_insertion_heap_flushes++;
@@ -3745,7 +3753,8 @@ protected:
         {
             // test that enough RAM is available for merged internal array:
             // otherwise flush the existing internal arrays out to disk.
-            flush_ia_ea_until_memory_free(insertion_heap_int_memory());
+            flush_ia_ea_until_memory_free(
+                internal_array_type::int_memory(insheap.size()));
 
             // insheap is empty afterwards, as vector was swapped into new_array
             add_as_internal_array(insheap);
@@ -3754,11 +3763,6 @@ protected:
             insheap.reserve(m_insertion_heap_capacity);
             assert(insheap.capacity() * sizeof(value_type)
                    == insertion_heap_int_memory());
-
-#if STXXL_PARALLEL
-#pragma omp atomic
-#endif
-            m_mem_left -= insertion_heap_int_memory();
 
             // update item counts
 #if STXXL_PARALLEL
@@ -3776,18 +3780,18 @@ protected:
     //! Flushes the insertions heaps into an internal array.
     inline void flush_insertion_heaps()
     {
-        size_type ram_needed;
+        size_type max_mem_needed;
 
         if (c_merge_sorted_heaps) {
-            ram_needed = m_mem_for_heaps;
+            max_mem_needed = m_mem_for_heaps;
         }
         else {
-            ram_needed = insertion_heap_int_memory();
+            max_mem_needed = insertion_heap_int_memory();
         }
 
         // test that enough RAM is available for merged internal array:
         // otherwise flush the existing internal arrays out to disk.
-        flush_ia_ea_until_memory_free(ram_needed);
+        flush_ia_ea_until_memory_free(max_mem_needed);
 
         m_stats.num_insertion_heap_flushes++;
         m_stats.insertion_heap_flush_time.start();
@@ -3812,7 +3816,7 @@ protected:
             int_memory += insheap.capacity();
         }
 
-        if (c_merge_sorted_heaps && 0)
+        if (c_merge_sorted_heaps)
         {
             m_stats.merge_sorted_heaps_time.start();
             std::vector<value_type> merged_array(size);
@@ -3831,8 +3835,6 @@ protected:
                 m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
             }
             m_minima.clear_heaps();
-
-            m_mem_left -= size * sizeof(value_type);
         }
         else
         {
@@ -3846,8 +3848,6 @@ protected:
 
                     // reserve new insertion heap
                     insheap.reserve(m_insertion_heap_capacity);
-
-                    m_mem_left -= insertion_heap_int_memory();
                 }
             }
 
@@ -4050,6 +4050,11 @@ protected:
     void flush_array_internal(std::vector<value_type>& values)
     {
         potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
+
+        // flush until enough memory for new array
+        flush_ia_ea_until_memory_free(
+            internal_array_type::int_memory(values.size())
+            );
 
         add_as_internal_array(values);
     }
