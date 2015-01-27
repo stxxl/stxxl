@@ -643,11 +643,25 @@ public:
         return m_num_blocks;
     }
 
-    //! Returns approximate (current!) memory usage
-    size_t int_memory() const
+    //! Returns memory usage of EA with given capacity, excluding blocks loaded
+    //! in RAM. Blocks belong to prefetch pool.
+    static size_t int_memory(size_t capacity)
     {
-        const size_t num_ram_blocks = get_end_block_index() - get_current_block_index();
-        return (num_ram_blocks) * block_items;
+        size_t num_blocks = div_ceil(capacity, block_items);
+
+        return sizeof(external_array)
+            + num_blocks * sizeof(typename bid_vector::value_type)
+            + num_blocks * sizeof(typename block_vector::value_type)
+            + num_blocks * sizeof(typename block_pointers_type::value_type)
+            + num_blocks * sizeof(typename request_vector::value_type)
+            + num_blocks * sizeof(typename extrema_vector::value_type)
+            + num_blocks * sizeof(typename extrema_vector::value_type);
+    }
+
+    //! Return the amount of internal memory used by the EA.
+    inline size_t int_memory() const
+    {
+        return int_memory(m_capacity);
     }
 
     //! Returns the number elements available in internal memory
@@ -1929,10 +1943,6 @@ protected:
     //! Free memory in bytes
     size_type m_mem_left;
 
-    //! Amount of internal memory an external array needs during it's lifetime
-    //! in bytes
-    size_type m_mem_per_external_array;
-
     //! \}
 
     //! If the bulk currently being inserted is very large, this boolean is set
@@ -2109,10 +2119,10 @@ protected:
                                   m_internal_arrays.end(),
                                   empty_internal_array_eraser());
 
-        for (typename internal_arrays_type::iterator i = swap_end;
-             i != m_internal_arrays.end(); ++i)
+        for (typename internal_arrays_type::iterator ia = swap_end;
+             ia != m_internal_arrays.end(); ++ia)
         {
-            m_mem_left += i->int_memory();
+            m_mem_left += ia->int_memory();
         }
 
         m_internal_arrays.erase(swap_end, m_internal_arrays.end());
@@ -2147,13 +2157,17 @@ protected:
             ++first;
         }
 
+        // subtract memory of EAs, which will be freed
+        for (ForwardIterator ea = swap_end; ea != last; ++ea)
+            m_mem_left += ea->int_memory();
+
         size_t swap_end_index = swap_end - m_external_arrays.begin();
 
         // Deactivating all affected players first.
         // Otherwise there might be outdated comparisons.
         for (size_t i = first_removed; i < size; ++i) {
             m_fetch_prediction_tree.deactivate_player(i);
-            m_hint_tree.deactivate_player(i); //TODO-tb: is this correct here?
+            m_hint_tree.deactivate_player(i);
         }
 
         // Replay moved arrays.
@@ -2163,11 +2177,8 @@ protected:
 
         hint();
 
-        STXXL_DEBUG("Removed " << (size_t)(m_external_arrays.end() - swap_end)
+        STXXL_DEBUG("Removed " << m_external_arrays.end() - swap_end
                                << " empty external arrays.");
-
-        m_mem_left +=
-            (m_external_arrays.end() - swap_end) * m_mem_per_external_array;
 
         m_external_arrays.erase(swap_end, m_external_arrays.end());
     }
@@ -2321,6 +2332,13 @@ public:
         // prepare external arrays
         m_external_arrays.reserve(c_num_reserved_external_arrays);
 
+        if (m_mem_total < m_mem_left) // checks if unsigned type wrapped.
+        {
+            STXXL_ERRMSG("Minimum memory requirement insufficient, "
+                         "increase PPQ's memory limit.");
+            abort();
+        }
+
         check_invariants();
     }
 
@@ -2336,9 +2354,6 @@ protected:
         //       - ram for the external array write buffer - EA prefetch buffer blocks
         m_mem_left = m_mem_total - 2 * m_mem_for_heaps;
 
-        // at least first block of array, TODO: may be larger
-        m_mem_per_external_array = block_size;
-
         if (c_limit_extract_buffer) {
             // ram for the extract buffer
             //TODO m_mem_left -= m_extract_buffer_limit * sizeof(value_type);
@@ -2346,21 +2361,11 @@ protected:
         else {
             // each: part of the (maximum) ram for the extract buffer
             // TODO: Merging size may be larger.
-            m_mem_per_external_array += block_size;
         }
 
         if (c_merge_sorted_heaps) {
             // part of the ram for the merge buffer
             //TODO m_mem_left -= m_mem_for_heaps;
-        }
-
-        if (m_mem_left < 2 * m_mem_per_external_array + m_mem_for_heaps) {
-            STXXL_ERRMSG("Insufficent memory: " << m_mem_for_heaps << " < " <<
-                         2 * m_mem_per_external_array + m_mem_for_heaps);
-            exit(EXIT_FAILURE);
-        }
-        else if (m_mem_left < 4 * m_mem_per_external_array + 2 * m_mem_for_heaps) {
-            STXXL_ERRMSG("Warning: Low memory. Performance could suffer.");
         }
     }
 
@@ -2425,7 +2430,7 @@ protected:
              ea != m_external_arrays.end(); ++ea)
         {
             ea_size += ea->size();
-            ea_memory += m_mem_per_external_array;
+            ea_memory += ea->int_memory();
         }
 
         STXXL_CHECK_EQUAL(m_external_size, ea_size);
@@ -3236,11 +3241,12 @@ public:
 
         m_stats.external_array_merge_time.stop();
 
-        m_mem_left -= m_mem_per_external_array;
+        m_mem_left -= m_external_arrays.back().int_memory();
         check_invariants();
     }
 
-    //! Free up memory by flushing internal arrays until enough bytes are free.
+    //! Free up memory by flushing internal arrays and combining external
+    //! arrays until enough bytes are free.
     void flush_ia_ea_until_memory_free(internal_size_type mem_free)
     {
         if (m_mem_left >= mem_free) return;
@@ -3381,7 +3387,6 @@ public:
 
         STXXL_MEMDUMP(m_mem_for_heaps);
         STXXL_MEMDUMP(m_mem_left);
-        STXXL_MEMDUMP(m_mem_per_external_array);
 
         //if (num_extract_buffer_refills > 0) {
         //    STXXL_VARDUMP(total_extract_buffer_size / num_extract_buffer_refills);
@@ -3888,6 +3893,9 @@ protected:
             int_memory += m_internal_arrays[i].int_memory();
         }
 
+        // release more RAM in IAs than the EA takes!
+        assert(int_memory >= external_array_type::int_memory(size));
+
         // construct new external array
 
         external_array_type ea(size, &m_pool);
@@ -3923,7 +3931,7 @@ protected:
         }
 
         m_mem_left += int_memory;
-        m_mem_left -= m_mem_per_external_array;
+        m_mem_left -= m_external_arrays.back().int_memory();
 
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.internal_array_flush_time.stop();
@@ -4068,6 +4076,8 @@ protected:
      */
     void flush_array(std::vector<value_type>& values)
     {
+        STXXL_CHECK(0);
+#if TODO_MAYBE_FIXUP_LATER
         size_type size = values.size();
         size_type ram_internal = 2 * size * sizeof(value_type); // ram for the sorted array + part of the ram for the merge buffer
 
@@ -4092,6 +4102,7 @@ protected:
         }
 
         flush_array_internal(values);
+#endif
     }
 
     //! Struct of all statistical counters and timers.  Turn on/off statistics
