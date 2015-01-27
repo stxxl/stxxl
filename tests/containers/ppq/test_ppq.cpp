@@ -179,8 +179,12 @@ void test_bulk_limit(const int bulk_size)
     const int repeats = 16;
 
     // first insert 2 * bulk_size items (which are put into insertion heaps)
+    // TODO: fix simple push() interface!?
+
+    ppq.bulk_push_begin(2 * bulk_size);
     for (int i = 0; i < 2 * bulk_size; ++i)
-        ppq.push(my_type(windex++));
+        ppq.bulk_push(my_type(windex++));
+    ppq.bulk_push_end();
 
     // extract bulk_size items, and reinsert them with higher indexes
     for (int r = 0; r < repeats; ++r)
@@ -199,7 +203,7 @@ void test_bulk_limit(const int bulk_size)
                 ppq.push(my_type(windex++));
             }
         }
-        else // bulk-limit procedure
+        else if (0) // bulk-limit procedure
         {           
             ppq.limit_begin(my_type(windex), bulk_size);
 
@@ -215,9 +219,27 @@ void test_bulk_limit(const int bulk_size)
 
             ppq.limit_end();
         }
+        else
+        {
+            std::vector<my_type> work;
+            ppq.bulk_pop_limit(work, my_type(windex));
+
+            ppq.bulk_push_begin(this_bulk_size);
+
+            // not parallel!
+            for (size_t i = 0; i < work.size(); ++i)
+            {
+                STXXL_CHECK_EQUAL(work[i].key, rindex);
+                ++rindex;
+                ppq.bulk_push(my_type(windex++));
+            }
+
+            ppq.bulk_push_end();
+
+        }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), windex - rindex);
+    STXXL_CHECK_EQUAL(ppq.size(), (size_t)windex - rindex);
 
     // extract last items
     for (int i = 0; i < 2 * bulk_size; ++i)
