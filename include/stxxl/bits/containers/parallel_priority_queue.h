@@ -3523,12 +3523,7 @@ protected:
                             " limiting_ea_index=" << limiting_ea_index);
 
                 if (limiting_ea_index < eas) {
-                    bool has_hinted_blocks = m_external_arrays[limiting_ea_index].num_hinted_blocks() > 0;
-                    m_external_arrays[limiting_ea_index].request_further_block();
-                    if (has_hinted_blocks)
-                        --m_num_hinted_blocks;
-                    update_fetch_and_hint_trees(limiting_ea_index);
-                    hint();
+                    request_further_block(limiting_ea_index);
                     reuse_upper_bounds = true;
                 }
                 else if (limiting_ea_index == eas) {
@@ -3569,6 +3564,32 @@ protected:
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
+        cleanup_arrays(sequences,sizes,eas,ias);
+
+        m_minima.update_extract_buffer();
+
+        m_stats.refill_time_after_merge.stop();
+        m_stats.refill_extract_buffer_time.stop();
+
+        check_invariants();
+    }
+
+    //! Requests more EM data from a given EA and updates
+    //! the winner trees and hints accordingly.
+    inline void request_further_block(unsigned_type ea_index)
+    {
+        bool has_hinted_blocks = m_external_arrays[ea_index].num_hinted_blocks() > 0;
+        m_external_arrays[ea_index].request_further_block();
+        if (has_hinted_blocks)
+            --m_num_hinted_blocks;
+        update_fetch_and_hint_trees(ea_index);
+        hint();
+    }
+
+    // Removes empty arrays and updates the winner trees accordingly
+    inline void cleanup_arrays(std::vector<iterator_pair_type>& sequences,
+        std::vector<size_type>& sizes, size_t eas, size_t ias)
+    {
         for (size_type i = 0; i < eas + ias; ++i) {
             // dist represents the number of elements that haven't been merged
             size_type dist = std::distance(sequences[i].first, sequences[i].second);
@@ -3604,15 +3625,10 @@ protected:
 
         m_stats.num_new_external_arrays = 0;
 
+        // TODO: remove all c_merge_ias_into_eb
         if (c_merge_ias_into_eb)
             cleanup_internal_arrays();
 
-        m_minima.update_extract_buffer();
-
-        m_stats.refill_time_after_merge.stop();
-        m_stats.refill_extract_buffer_time.stop();
-
-        check_invariants();
     }
 
     //! Flushes the insertions heap id into an internal array.
