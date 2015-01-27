@@ -2751,7 +2751,7 @@ public:
         heap_type& insheap = m_proc[p]->insertion_heap;
 
         if (insheap.size() >= m_insertion_heap_capacity) {
-            flush_insertion_heaps();
+            flush_insertion_heap(p);
         }
 
         // push item to end of heap and siftUp
