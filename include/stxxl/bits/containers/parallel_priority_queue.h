@@ -2493,7 +2493,7 @@ public:
      * \param element The element to push.
      * \param p The id of the insertion heap to use (usually the thread id).
      */
-    void bulk_push(const value_type& element, const int p)
+    void bulk_push(const value_type& element, const unsigned_type p)
     {
         heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -2568,9 +2568,9 @@ public:
     void bulk_push(const value_type& element)
     {
 #if STXXL_PARALLEL
-        return bulk_push(element, omp_get_thread_num());
+        return bulk_push(element, (unsigned_type)omp_get_thread_num());
 #else
-        int id = m_rng() % m_num_insertion_heaps;
+        unsigned_type id = m_rng() % m_num_insertion_heaps;
         return bulk_push(element, id);
 #endif
     }
@@ -2742,11 +2742,11 @@ public:
     /*!
      * Insert new element
      * \param element the element to insert.
-     * \param id number of insertion heap to insert item into
+     * \param p number of insertion heap to insert item into
      */
-    void push(const value_type& element, unsigned id)
+    void push(const value_type& element, unsigned_type p)
     {
-        heap_type& insheap = m_proc[id]->insertion_heap;
+        heap_type& insheap = m_proc[p]->insertion_heap;
 
         if (insheap.size() >= m_insertion_heap_capacity) {
             flush_insertion_heaps();
@@ -2759,7 +2759,7 @@ public:
         ++m_heaps_size;
 
         if (insheap.size() == 1 || index == 0)
-            m_minima.update_heap(id);
+            m_minima.update_heap(p);
     }
 
     /*!
@@ -2768,37 +2768,42 @@ public:
      */
     void push(const value_type& element)
     {
-        unsigned id = m_rng() % m_num_insertion_heaps;
-        return push(element, id);
+        unsigned_type p = m_rng() % m_num_insertion_heaps;
+        return push(element, p);
     }
 
     //! Access the minimum element.
     const value_type& top()
     {
         if (extract_buffer_empty()) {
-            refill_extract_buffer(std::min(m_extract_buffer_limit, m_internal_size + m_external_size));
+            refill_extract_buffer(std::min(m_extract_buffer_limit,
+                                           m_internal_size + m_external_size));
         }
 
         static const bool debug = false;
 
         std::pair<unsigned, unsigned> type_and_index = m_minima.top();
-        unsigned type = type_and_index.first;
-        unsigned index = type_and_index.second;
+        const unsigned& type = type_and_index.first;
+        const unsigned& index = type_and_index.second;
 
         assert(type < 4);
 
         switch (type) {
         case minima_type::HEAP:
-            STXXL_DEBUG("heap " << index << ": " << m_proc[index]->insertion_heap[0]);
+            STXXL_DEBUG("heap " << index <<
+                        ": " << m_proc[index]->insertion_heap[0]);
             return m_proc[index]->insertion_heap[0];
         case minima_type::EB:
-            STXXL_DEBUG("eb " << m_extract_buffer_index << ": " << m_extract_buffer[m_extract_buffer_index]);
+            STXXL_DEBUG("eb " << m_extract_buffer_index <<
+                        ": " << m_extract_buffer[m_extract_buffer_index]);
             return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
-            STXXL_DEBUG("ia " << index << ": " << m_internal_arrays[index].get_min());
+            STXXL_DEBUG("ia " << index <<
+                        ": " << m_internal_arrays[index].get_min());
             return m_internal_arrays[index].get_min();
         case minima_type::EA:
-            STXXL_DEBUG("ea " << index << ": " << m_external_arrays[index].get_min());
+            STXXL_DEBUG("ea " << index <<
+                        ": " << m_external_arrays[index].get_min());
             // wait() already done by comparator....
             return m_external_arrays[index].get_min();
         default:
@@ -2813,7 +2818,8 @@ public:
         m_stats.num_extracts++;
 
         if (extract_buffer_empty()) {
-            refill_extract_buffer(std::min(m_extract_buffer_limit, m_internal_size + m_external_size));
+            refill_extract_buffer(std::min(m_extract_buffer_limit,
+                                           m_internal_size + m_external_size));
         }
 
         m_stats.extract_min_time.start();
@@ -2982,7 +2988,7 @@ public:
     }
 
     //! Free up memory by flushing internal arrays until enough bytes are free.
-    void flush_until_memory_free(internal_size_type mem_free)
+    void flush_ia_ea_until_memory_free(internal_size_type mem_free)
     {
         if (m_mem_left >= mem_free) return;
 
@@ -3285,7 +3291,9 @@ protected:
     //! Convert extract buffer into a new internal array.
     void convert_eb_into_ia()
     {
-        // memory is allocated, because extract buffer is currently not counted
+        // TODO: memory is NOT allocated, but extract buffer is currently not
+        // counted
+        flush_ia_ea_until_memory_free(m_extract_buffer.size() * sizeof(value_type));
         m_mem_left -= m_extract_buffer.size() * sizeof(value_type);
 
         // first deactivate extract buffer to replay tree for new IA.
@@ -3352,7 +3360,8 @@ protected:
             {
                 STXXL_DEBUG("refill: request more data," <<
                             " output_size=" << output_size <<
-                            " minimum_size=" << minimum_size);
+                            " minimum_size=" << minimum_size <<
+                            " limiting_ea_index=" << limiting_ea_index);
 
                 if (limiting_ea_index < eas) {
                     bool has_hinted_blocks = m_external_arrays[limiting_ea_index].num_hinted_blocks() > 0;
@@ -3474,7 +3483,7 @@ protected:
         {
             // test that enough RAM is available for merged internal array:
             // otherwise flush the existing internal arrays out to disk.
-            flush_until_memory_free(insertion_heap_int_memory());
+            flush_ia_ea_until_memory_free(insertion_heap_int_memory());
 
             // insheap is empty afterwards, as vector was swapped into new_array
             add_as_internal_array(insheap);
@@ -3516,7 +3525,7 @@ protected:
 
         // test that enough RAM is available for merged internal array:
         // otherwise flush the existing internal arrays out to disk.
-        flush_until_memory_free(ram_needed);
+        flush_ia_ea_until_memory_free(ram_needed);
 
         m_stats.num_insertion_heap_flushes++;
         m_stats.insertion_heap_flush_time.start();
