@@ -2049,11 +2049,12 @@ protected:
     void add_as_internal_array(std::vector<value_type>& values,
                                unsigned_type used = 0)
     {
-        size_t size = values.size();
+        const size_t size = values.size();
+        const size_t capacity = values.capacity();
         assert(size > used); // at least one element
 
         internal_array_type new_array(values, used);
-        assert(new_array.int_memory() == size * sizeof(value_type));
+        assert(new_array.int_memory() == capacity * sizeof(value_type));
         m_internal_arrays.swap_back(new_array);
 
         if (c_merge_ias_into_eb) {
