@@ -446,8 +446,8 @@ protected:
     //! The IDs of each block in external memory.
     bid_vector m_bids;
 
-    //! A vector of size m_num_write_buffer_blocks with block_type pointers,
-    //! some of them will be filled while writing, but most are NULL.
+    //! A vector of size m_num_blocks with block_type pointers, some of them
+    //! will be filled while writing, but most are NULL.
     block_vector m_blocks;
 
     //! Begin and end pointers for each block, used for merging with
@@ -745,7 +745,6 @@ public:
         // required for re-reading the external array
         write_blocks = 2 * write_blocks;
 #endif
-        //write_blocks = 16 * write_blocks;
         if (pool.size_write() < write_blocks) {
             STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
                          write_blocks << " blocks = " <<
@@ -1895,11 +1894,8 @@ protected:
 
     //! \name Parameters and Sizes for Memory Allocation Policy
 
-    //! Number of prefetch blocks per external array
+    //! Total number of prefetch blocks in pool
     const unsigned m_num_prefetchers;
-
-    //! Number of write buffer blocks for a new external array being filled
-    const unsigned m_num_write_buffers;
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
     const unsigned m_num_insertion_heaps;
@@ -2054,7 +2050,7 @@ protected:
         assert(size > used); // at least one element
 
         internal_array_type new_array(values, used);
-        assert(new_array.int_memory() == capacity * sizeof(value_type));
+        STXXL_ASSERT(new_array.int_memory() == capacity * sizeof(value_type));
         m_internal_arrays.swap_back(new_array);
 
         if (c_merge_ias_into_eb) {
@@ -2235,7 +2231,6 @@ public:
         : m_compare(compare),
           m_inv_compare(m_compare),
           m_num_prefetchers(num_prefetch_buffer_blocks),
-          m_num_write_buffers(num_write_buffer_blocks),
 #if STXXL_PARALLEL
           m_num_insertion_heaps(num_insertion_heaps > 0 ? num_insertion_heaps : omp_get_max_threads()),
 #else
@@ -2298,16 +2293,23 @@ public:
 
         m_mem_left -= m_num_insertion_heaps * insertion_heap_int_memory();
 
+        // prepare prefetch buffer pool (already done in initializer)
+        m_mem_left -= m_pool.size_prefetch() * block_size;
+
+        // prepare write buffer pool: calculate size and subtract from mem_left
         external_array_type::prepare_write_pool(m_pool, m_num_insertion_heaps);
+        m_mem_left -= m_pool.size_write() * block_size;
 
-        m_external_arrays.reserve(c_num_reserved_external_arrays);
-
+        // prepare internal arrays
         if (c_merge_sorted_heaps) {
             m_internal_arrays.reserve(m_mem_total / m_mem_for_heaps);
         }
         else {
             m_internal_arrays.reserve(m_mem_total * m_num_insertion_heaps / m_mem_for_heaps);
         }
+
+        // prepare external arrays
+        m_external_arrays.reserve(c_num_reserved_external_arrays);
 
         check_invariants();
     }
@@ -2322,8 +2324,7 @@ protected:
     {
         // total_ram - ram for the heaps - ram for the heap merger
         //       - ram for the external array write buffer - EA prefetch buffer blocks
-        m_mem_left = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size
-                     - m_num_prefetchers * block_size;
+        m_mem_left = m_mem_total - 2 * m_mem_for_heaps;
 
         // at least first block of array, TODO: may be larger
         m_mem_per_external_array = block_size;
@@ -2363,8 +2364,11 @@ protected:
 
         size_type mem_used = 0;
 
-        mem_used += 2 * m_mem_for_heaps + m_num_write_buffers * block_size
-                    + m_num_prefetchers * block_size;
+        mem_used += 2 * m_mem_for_heaps
+            + m_pool.size_write() * block_size
+            + m_num_prefetchers * block_size;
+
+        STXXL_CHECK_EQUAL(m_num_prefetchers, m_pool.size_prefetch());
 
         // test the processor local data structures
 
@@ -3059,14 +3063,14 @@ public:
 
         int limiting_ea_index = eas + 1;
         value_type current_limit;
-        
+
         // get all relevant blocks
         // TODO: check RAM!
         while (!m_compare(current_limit,limit)) {
             if (limiting_ea_index < 0) {
                 // no more unaccessible EM data
                 break;
-            } 
+            }
             else if ((size_t) limiting_ea_index < eas) {
                 request_further_block((size_t)limiting_ea_index);
             }
@@ -3104,7 +3108,7 @@ public:
         potentially_parallel::multiway_merge(
             sequences.begin(), sequences.end(),
             out.begin(), output_size, m_inv_compare);
-        
+
         cleanup_arrays(sequences,sizes,eas,ias);
         check_invariants();
 
@@ -3951,7 +3955,7 @@ protected:
             sequences[i] = std::make_pair(insheap.begin(), insheap.end());
         }
 
-        external_array_type ea(size, m_num_write_buffers);
+        external_array_type ea(size, m_pool);
 
         // TODO: write in chunks in order to safe RAM?
         ea.request_write_buffer(size);
@@ -4008,7 +4012,7 @@ protected:
         std::sort(values.begin(), values.end(), m_inv_compare);
 #endif
 
-        external_array_type ea(values.size(), m_num_write_buffers);
+        external_array_type ea(values.size(), m_pool);
 
         for (value_iterator i = values.begin(); i != values.end(); ++i) {
             ea.push_back(*i);
@@ -4062,7 +4066,7 @@ protected:
         size_type size = values.size();
         size_type ram_internal = 2 * size * sizeof(value_type); // ram for the sorted array + part of the ram for the merge buffer
 
-        size_type ram_for_all_internal_arrays = m_mem_total - 2 * m_mem_for_heaps - m_num_write_buffers * block_size - m_external_arrays.size() * m_mem_per_external_array;
+        size_type ram_for_all_internal_arrays = m_mem_total - 2 * m_mem_for_heaps - m_pool.size_write() * block_size - m_external_arrays.size() * m_mem_per_external_array;
 
         if (ram_internal > ram_for_all_internal_arrays) {
             flush_array_to_hd(values);
