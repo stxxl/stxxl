@@ -3042,6 +3042,12 @@ public:
                 std::copy(insheap.end() - back_size[p], insheap.end(), vi);
                 vi += back_size[p];
                 insheap.resize(insheap.size() - back_size[p]);
+
+                if (insheap.empty())
+                    m_minima.deactivate_heap(p);
+                else
+                    m_minima.update_heap(p);
+
             }
 
             potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
