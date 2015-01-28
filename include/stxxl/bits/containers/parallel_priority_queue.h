@@ -3079,20 +3079,20 @@ public:
         std::vector<iterator_pair_type> sequences(eas + ias);
         size_type output_size = 0;
 
-        int limiting_ea_index = eas + 1;
-        value_type current_limit;
+        int limiting_ea_index = m_fetch_prediction_tree.top();
+        STXXL_ASSERT(limiting_ea_index<(int)eas);
 
         // get all relevant blocks
-        // TODO: check RAM!
-        while (!m_compare(current_limit,limit)) {
-            if (limiting_ea_index < 0) {
-                // no more unaccessible EM data
+        // TODO: limit number of requested blocks!
+        while (limiting_ea_index>-1) {
+            const value_type& current_limit = m_external_arrays[limiting_ea_index].get_current_max();
+            if (m_compare(current_limit,limit)) {
+                // No more EM data smaller or equal to limit
                 break;
             }
-            else if ((size_t) limiting_ea_index < eas) {
-                request_further_block((size_t)limiting_ea_index);
-            }
+            request_further_block((size_t)limiting_ea_index);
             limiting_ea_index = m_fetch_prediction_tree.top();
+            STXXL_ASSERT(limiting_ea_index<(int)eas);
         }
 
         // build sequences
