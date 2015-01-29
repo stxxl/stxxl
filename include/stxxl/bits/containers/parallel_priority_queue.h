@@ -481,13 +481,13 @@ protected:
     //! least requested to be so)
     external_size_type m_end_index;
 
-    //! The block index until which prefetch hints were given.
-    unsigned_type m_hinted_until;
+    //! The block index up to (exclusive) which prefetch hints were given.
+    unsigned_type m_unhinted_block;
 
-    //! The block index until which prefetch hints were given as it was
-    //! before the prepare_rebuilding_hints() call. Used for removal of
+    //! The block index up to (exclusive) which prefetch hints were given as it
+    //! was before the prepare_rebuilding_hints() call. Used for removal of
     //! hints which aren't needed anymore.
-    unsigned_type m_old_hinted_until;
+    unsigned_type m_old_unhinted_block;
 
     //! allow writer to access to all variables
     friend class external_array_writer<self_type>;
@@ -524,7 +524,7 @@ public:
           m_size(0),
           m_index(0),
           m_end_index(0),
-          m_hinted_until(0)
+          m_unhinted_block(0)
     {
         assert(m_capacity > 0);
         // allocate blocks in EM.
@@ -554,7 +554,7 @@ public:
           m_size(0),
           m_index(0),
           m_end_index(0),
-          m_hinted_until(0)
+          m_unhinted_block(0)
     { }
 
     //! Swap external_array with another one.
@@ -581,7 +581,7 @@ public:
         swap(m_size, o.m_size);
         swap(m_index, o.m_index);
         swap(m_end_index, o.m_end_index);
-        swap(m_hinted_until, o.m_hinted_until);
+        swap(m_unhinted_block, o.m_unhinted_block);
     }
 
     //! Swap external_array with another one.
@@ -685,7 +685,7 @@ public:
     //! in internal memory.
     iterator begin() const
     {
-        assert(block_valid(m_index / block_items) || m_index == m_capacity);
+        //-TODO?: assert(block_valid(m_index / block_items) || m_index == m_capacity);
         return iterator(&m_block_pointers, block_items, m_index);
     }
 
@@ -788,12 +788,9 @@ protected:
         m_size = m_capacity;
         m_index = 0;
         m_end_index = 0;
+        m_unhinted_block = 0;
 
         m_write_phase = false;
-
-        // refill_extract_buffer() assumes at least one loaded block per ea
-        request_further_block();
-        wait();
     }
 
     //! Called by the external_array_writer to read a block from disk into
@@ -956,7 +953,7 @@ public:
 
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_items);
-        m_hinted_until = std::max(m_hinted_until, get_end_block_index() - 1);
+        m_unhinted_block = std::max(m_unhinted_block, get_end_block_index());
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
                     " block index=" << block_index <<
@@ -971,46 +968,46 @@ public:
     //! Resizes prefetch pool if it's too small.
     void hint()
     {
-        assert(m_hinted_until < m_num_blocks);
-        ++m_hinted_until;
+        assert(m_unhinted_block < m_num_blocks);
         const size_t num_hinted = num_hinted_blocks();
         if (m_pool->size_prefetch() < num_hinted)
             m_pool->resize_prefetch(num_hinted);
-        m_pool->hint(m_bids[m_hinted_until]);
+        m_pool->hint(m_bids[m_unhinted_block]);
+        ++m_unhinted_block;
     }
 
     //! Returns if there is data in EM, that's not already hinted
     //! to the prefetcher.
     bool has_unhinted_em_data() const
     {
-        return (m_hinted_until + 1 < m_num_blocks);
+        return (m_unhinted_block < m_num_blocks);
     }
 
     //! Returns the smallest element of the next hint candidate (the block
     //! after the last hinted one).
     const value_type & get_next_hintable_min() const
     {
-        assert(m_hinted_until + 1 < m_num_blocks);
-        return m_minima[m_hinted_until + 1];
+        assert(m_unhinted_block < m_num_blocks);
+        return m_minima[m_unhinted_block];
     }
 
     //! Returns the number of hinted blocks.
     size_t num_hinted_blocks() const
     {
-        assert(get_end_block_index() - 1 <= m_hinted_until);
-        return m_hinted_until - (get_end_block_index() - 1);
+        assert(get_end_block_index() <= m_unhinted_block);
+        return m_unhinted_block - get_end_block_index();
     }
 
     //! This method prepares rebuilding the hints (this is done after
     //! creating a new EA in order to always have globally the n blocks
     //! hinted which will be fetched first).
-    //! Resets m_hinted_until to the current block index.
+    //! Resets m_unhinted_block to the current block index.
     //! finish_rebuilding_hints() should be called after placing all
     //! hints in order to clean up the prefetch pool.
     void prepare_rebuilding_hints()
     {
-        m_old_hinted_until = m_hinted_until;
-        m_hinted_until = get_end_block_index() - 1;
+        m_old_unhinted_block = m_unhinted_block;
+        m_unhinted_block = get_end_block_index();
     }
 
     //! Removes hints which aren't needed anymore from the prefetcher
@@ -1019,12 +1016,12 @@ public:
     void finish_rebuilding_hints()
     {
         // Remove hints which aren't needed anymore
-        for (size_t i = m_hinted_until + 1; i <= m_old_hinted_until; ++i) {
+        for (size_t i = m_unhinted_block; i < m_old_unhinted_block; ++i) {
             STXXL_DEBUG("Discarding hint");
             m_pool->invalidate(m_bids[i]);
         }
         // Fix prefetch size
-        const size_t num_hints = m_hinted_until - (get_end_block_index() - 1);
+        const size_t num_hints = m_unhinted_block - get_end_block_index();
         m_pool->resize_prefetch(num_hints);
     }
 
@@ -3487,7 +3484,7 @@ protected:
                 assert(m_external_arrays[i].valid());
                 begin = m_external_arrays[i].begin();
                 end = m_external_arrays[i].end();
-                assert(begin != end);
+                //-TODO? assert(begin != end);
             }
             else {
                 // else part only relevant if c_merge_ias_into_eb == true

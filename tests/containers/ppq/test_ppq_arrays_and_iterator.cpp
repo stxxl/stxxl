@@ -108,6 +108,11 @@ int run_external_array_test(size_t volume)
         STXXL_CHECK(block_size > 34);
 
         STXXL_CHECK_EQUAL(ea.size(), N);
+
+        // fetch first block
+        ea.request_further_block();
+        ea.wait();
+
         STXXL_CHECK(ea.buffer_size() > 7);
 
         // Testing iterator...
