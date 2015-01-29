@@ -133,21 +133,21 @@ int run_external_array_test(size_t volume)
         STXXL_CHECK_EQUAL(ea.begin().get_index(), 33);
         STXXL_CHECK_EQUAL(ea.begin()->first, 34);
 
-        // Testing get_current_max()...
+        // Testing get_next_block_min()...
 
         unsigned maxround = 0;
 
-        while (ea.get_current_max().first < 5 * block_size + 876) {
+        while (ea.get_next_block_min().first < 5 * block_size + 876) {
             switch (maxround) {
-            case 0: STXXL_CHECK_EQUAL(ea.get_current_max().first, 131072);
+            case 0: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 131073);
                 break;
-            case 1: STXXL_CHECK_EQUAL(ea.get_current_max().first, 262144);
+            case 1: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 262145);
                 break;
-            case 2: STXXL_CHECK_EQUAL(ea.get_current_max().first, 393216);
+            case 2: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 393217);
                 break;
-            case 3: STXXL_CHECK_EQUAL(ea.get_current_max().first, 524288);
+            case 3: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 524289);
                 break;
-            case 4: STXXL_CHECK_EQUAL(ea.get_current_max().first, 655360);
+            case 4: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 655361);
                 break;
             }
 

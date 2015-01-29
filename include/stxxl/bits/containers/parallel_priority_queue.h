@@ -427,7 +427,7 @@ public:
     typedef typename bid_vector::iterator bid_iterator;
     typedef std::vector<block_type*> block_vector;
     typedef std::vector<request_ptr> request_vector;
-    typedef std::vector<value_type> extrema_vector;
+    typedef std::vector<value_type> minima_vector;
     typedef typename iterator::block_pointers_type block_pointers_type;
     typedef external_array_writer<self_type> writer_type;
 
@@ -466,10 +466,7 @@ protected:
     request_vector m_requests;
 
     //! stores the minimum value of each block
-    extrema_vector m_minima;
-
-    //! stores the maximum value of each block
-    extrema_vector m_maxima;
+    minima_vector m_minima;
 
     //! Is array in write phase? True = write phase, false = read phase.
     bool m_write_phase;
@@ -519,7 +516,6 @@ public:
           m_block_pointers(m_num_blocks),
           m_requests(m_num_blocks, NULL),
           m_minima(m_num_blocks),
-          m_maxima(m_num_blocks),
 
           // state
           m_write_phase(true),
@@ -550,7 +546,6 @@ public:
           m_block_pointers(0),
           m_requests(0),
           m_minima(0),
-          m_maxima(0),
 
           // state
           m_write_phase(false),
@@ -578,7 +573,6 @@ public:
         swap(m_blocks, o.m_blocks);
         swap(m_block_pointers, o.m_block_pointers);
         swap(m_minima, o.m_minima);
-        swap(m_maxima, o.m_maxima);
 
         // state
         swap(m_write_phase, o.m_write_phase);
@@ -654,8 +648,7 @@ public:
             + num_blocks * sizeof(typename block_vector::value_type)
             + num_blocks * sizeof(typename block_pointers_type::value_type)
             + num_blocks * sizeof(typename request_vector::value_type)
-            + num_blocks * sizeof(typename extrema_vector::value_type)
-            + num_blocks * sizeof(typename extrema_vector::value_type);
+            + num_blocks * sizeof(typename minima_vector::value_type);
     }
 
     //! Return the amount of internal memory used by the EA.
@@ -710,18 +703,18 @@ public:
         return *begin();
     }
 
-    //! Returns the largest element in internal memory (or at least
-    //! requested to be in internal memory)
-    const value_type & get_current_max() const
-    {
-        return m_maxima[get_end_block_index()-1];
-    }
-
     //! Returns if there is data in EM, that's not randomly accessible.
     bool has_em_data() const
     {
-        const unsigned_type end_block_index = get_end_block_index();
-        return (end_block_index < m_num_blocks);
+        return (get_end_block_index() < m_num_blocks);
+    }
+
+    //! Returns the smallest element of the first block NOT in internal memory
+    //! (or at least requested to be in internal memory)
+    const value_type & get_next_block_min() const
+    {
+        assert(get_end_block_index() < m_num_blocks);
+        return m_minima[get_end_block_index()];
     }
 
     //! Returns if the data requested to be in internal memory is
@@ -857,7 +850,6 @@ protected:
         block_type& this_block = *m_blocks[block_index];
 
         m_minima[block_index] = this_block[0];
-        m_maxima[block_index] = this_block[this_block_items - 1];
 
         // write out block (in background)
         m_pool->write(m_blocks[block_index], m_bids[block_index]);
@@ -987,19 +979,19 @@ public:
         m_pool->hint(m_bids[m_hinted_until]);
     }
 
-    //! Returns the largest element of the block which has been
-    //! hinted the latest.
-    const value_type & get_hinted_max() const
-    {
-        assert(m_hinted_until < m_num_blocks);
-        return m_maxima[m_hinted_until];
-    }
-
     //! Returns if there is data in EM, that's not already hinted
     //! to the prefetcher.
     bool has_unhinted_em_data() const
     {
         return (m_hinted_until + 1 < m_num_blocks);
+    }
+
+    //! Returns the smallest element of the next hint candidate (the block
+    //! after the last hinted one).
+    const value_type & get_next_hintable_min() const
+    {
+        assert(m_hinted_until + 1 < m_num_blocks);
+        return m_minima[m_hinted_until + 1];
     }
 
     //! Returns the number of hinted blocks.
@@ -2014,11 +2006,15 @@ protected:
     struct fetch_prediction_comparator {
         const external_arrays_type& m_eas;
         const inv_compare_type& m_compare;
-        fetch_prediction_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
+
+        fetch_prediction_comparator(const external_arrays_type& eas,
+                                    const inv_compare_type& compare)
             : m_eas(eas), m_compare(compare) { }
+
         bool operator () (const size_t& a, const size_t& b) const
         {
-            return m_compare(m_eas[a].get_current_max(), m_eas[b].get_current_max());
+            return m_compare(m_eas[a].get_next_block_min(),
+                             m_eas[b].get_next_block_min());
         }
     } m_fetch_prediction_comparator;
 
@@ -2032,11 +2028,15 @@ protected:
     struct hint_comparator {
         const external_arrays_type& m_eas;
         const inv_compare_type& m_compare;
-        hint_comparator(const external_arrays_type& eas, const inv_compare_type& compare)
+
+        hint_comparator(const external_arrays_type& eas,
+                        const inv_compare_type& compare)
             : m_eas(eas), m_compare(compare) { }
+
         bool operator () (const size_t& a, const size_t& b) const
         {
-            return m_compare(m_eas[a].get_hinted_max(), m_eas[b].get_hinted_max());
+            return m_compare(m_eas[a].get_next_hintable_min(),
+                             m_eas[b].get_next_hintable_min());
         }
     } m_hint_comparator;
 
@@ -2383,7 +2383,7 @@ protected:
             + m_pool.size_write() * block_size
             + m_num_prefetchers * block_size;
 
-        STXXL_CHECK_EQUAL(m_num_prefetchers, m_pool.size_prefetch());
+        //STXXL_CHECK_EQUAL(m_num_prefetchers, m_pool.size_prefetch());
 
         // test the processor local data structures
 
@@ -3062,6 +3062,7 @@ public:
     //! \param limit limit value
     void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit)
     {
+        STXXL_DEBUG1("bulk_pop_limit with limit=" << limit);
 
         if (m_extract_buffer_size > 0)
             convert_eb_into_ia();
@@ -3080,13 +3081,16 @@ public:
         size_type output_size = 0;
 
         int limiting_ea_index = m_fetch_prediction_tree.top();
-        STXXL_ASSERT(limiting_ea_index<(int)eas);
+        STXXL_ASSERT(limiting_ea_index < (int)eas);
 
         // get all relevant blocks
         // TODO: limit number of requested blocks!
-        while (limiting_ea_index>-1) {
-            const value_type& current_limit = m_external_arrays[limiting_ea_index].get_current_max();
-            if (m_compare(current_limit,limit)) {
+        while (limiting_ea_index > -1) {
+            STXXL_DEBUG1("limiting_ea_index=" << limiting_ea_index);
+            const value_type& current_limit =
+                m_external_arrays[limiting_ea_index].get_next_block_min();
+
+            if (m_compare(current_limit, limit)) {
                 // No more EM data smaller or equal to limit
                 break;
             }
@@ -3114,7 +3118,7 @@ public:
             }
 
             assert(begin != end);
-            end = std::upper_bound(begin, end, limit, m_inv_compare);
+            end = std::lower_bound(begin, end, limit, m_inv_compare);
 
             sizes[i] = std::distance(begin, end);
             sequences[i] = std::make_pair(begin, end);
@@ -3327,6 +3331,7 @@ public:
             m_fetch_prediction_tree.replay_on_change(ea_index);
         }
         else {
+            STXXL_DEBUG1("Deactivate predict player " << ea_index);
             m_fetch_prediction_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.start();
@@ -3334,6 +3339,7 @@ public:
             m_hint_tree.replay_on_change(ea_index);
         }
         else {
+            STXXL_DEBUG1("Deactivate hint player " << ea_index);
             m_hint_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.stop();
@@ -3407,13 +3413,13 @@ protected:
     //! Calculates the sequences vector needed by the multiway merger,
     //! considering inaccessible data from external arrays.
     //! The sizes vector stores the size of each sequence.
-    //! \param reuse_previous_upper_bounds Reuse upper bounds from previous runs.
+    //! \param reuse_previous_lower_bounds Reuse upper bounds from previous runs.
     //!             sequences[i].second must be valid upper bound iterator from a previous run!
     //! \returns the index of the external array which is limiting factor
     //!             or m_external_arrays.size() if not limited.
     size_t calculate_merge_sequences(std::vector<size_type>& sizes,
                                      std::vector<iterator_pair_type>& sequences,
-                                     bool reuse_previous_upper_bounds = false)
+                                     bool reuse_previous_lower_bounds = false)
     {
         STXXL_DEBUG("calculate merge sequences");
 
@@ -3424,32 +3430,34 @@ protected:
         assert(sequences.size() == eas + ias);
 
         /*
-         * determine maximum of each first block
+         * determine minimum of each first block
          */
 
-        size_t min_max_index = (size_t)m_fetch_prediction_tree.top();
+        size_t gmin_index = (size_t)m_fetch_prediction_tree.top();
         bool needs_limit = (m_fetch_prediction_tree.top() > -1) ? true : false;
 
 // test correctness of prefetch prediction tree
 #ifdef STXXL_DEBUG_ASSERTIONS
 
         bool test_needs_limit = false;
-        size_t test_min_max_index;
-        value_type test_min_max_value;
+        size_t test_gmin_index;
+        value_type test_gmin_value;
 
         m_stats.refill_minmax_time.start();
         for (size_type i = 0; i < eas; ++i) {
             if (m_external_arrays[i].has_em_data()) {
-                const value_type max_value = m_external_arrays[i].get_current_max();
+                const value_type max_value =
+                    m_external_arrays[i].get_next_block_min();
+
                 if (!test_needs_limit) {
                     test_needs_limit = true;
-                    test_min_max_value = max_value;
-                    test_min_max_index = i;
+                    test_gmin_value = max_value;
+                    test_gmin_index = i;
                 }
                 else {
-                    if (m_inv_compare(max_value, test_min_max_value)) {
-                        test_min_max_value = max_value;
-                        test_min_max_index = i;
+                    if (m_inv_compare(max_value, test_gmin_value)) {
+                        test_gmin_value = max_value;
+                        test_gmin_index = i;
                     }
                 }
             }
@@ -3457,7 +3465,7 @@ protected:
         m_stats.refill_minmax_time.stop();
 
         STXXL_ASSERT(needs_limit == test_needs_limit);
-        STXXL_ASSERT(!needs_limit || min_max_index == test_min_max_index);
+        STXXL_ASSERT(!needs_limit || gmin_index == test_gmin_index);
 
 #endif
 
@@ -3492,21 +3500,23 @@ protected:
             }
 
             if (needs_limit) {
-                const value_type min_max_value = m_external_arrays[min_max_index].get_current_max();
+                const value_type gmin_value =
+                    m_external_arrays[gmin_index].get_next_block_min();
+
                 // remove timer if parallel
-                //stats.refill_upper_bound_time.start();
-                if (reuse_previous_upper_bounds) {
+                //stats.refill_lower_bound_time.start();
+                if (reuse_previous_lower_bounds) {
                     // Be careful that sequences[i].second is really valid and
                     // set by a previous calculate_merge_sequences() run!
-                    end = std::upper_bound(sequences[i].second, end,
-                                           min_max_value, m_inv_compare);
+                    end = std::lower_bound(sequences[i].second, end,
+                                           gmin_value, m_inv_compare);
                 }
                 else
                 {
-                    end = std::upper_bound(begin, end,
-                                           min_max_value, m_inv_compare);
+                    end = std::lower_bound(begin, end,
+                                           gmin_value, m_inv_compare);
                 }
-                //stats.refill_upper_bound_time.stop();
+                //stats.refill_lower_bound_time.stop();
             }
 
             sizes[i] = std::distance(begin, end);
@@ -3519,8 +3529,8 @@ protected:
         }
 
         if (needs_limit) {
-            STXXL_DEBUG("return with needs_limit: min_max_index=" << min_max_index);
-            return min_max_index;
+            STXXL_DEBUG("return with needs_limit: gmin_index=" << gmin_index);
+            return gmin_index;
         }
         else {
             STXXL_DEBUG("return with needs_limit: eas=" << eas);
@@ -3620,7 +3630,7 @@ protected:
 
         if (minimum_size > 0) {
             size_t limiting_ea_index = eas + 1;
-            bool reuse_upper_bounds = false;
+            bool reuse_lower_bounds = false;
             while (output_size < minimum_size)
             {
                 STXXL_DEBUG("refill: request more data," <<
@@ -3630,7 +3640,7 @@ protected:
 
                 if (limiting_ea_index < eas) {
                     request_further_block(limiting_ea_index);
-                    reuse_upper_bounds = true;
+                    reuse_lower_bounds = true;
                 }
                 else if (limiting_ea_index == eas) {
                     // no more unaccessible EM data
@@ -3639,7 +3649,7 @@ protected:
                     break;
                 }
                 limiting_ea_index = calculate_merge_sequences(
-                    sizes, sequences, reuse_upper_bounds);
+                    sizes, sequences, reuse_lower_bounds);
 
                 output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
             }
@@ -4213,9 +4223,9 @@ protected:
         //! Part of flush_insertion_heaps.
         stats_timer merge_sorted_heaps_time;
 
-        //! Total time for std::upper_bound calls in refill_extract_buffer()
+        //! Total time for std::lower_bound calls in refill_extract_buffer()
         //! Part of refill_extract_buffer_time and refill_time_before_merge.
-        // stats_timer refill_upper_bound_time;
+        // stats_timer refill_lower_bound_time;
 
         //! Total time for std::accumulate calls in refill_extract_buffer()
         //! Part of refill_extract_buffer_time and refill_time_before_merge.
@@ -4258,7 +4268,7 @@ protected:
                       << "refill_wait_time=" << o.refill_wait_time << std::endl
                       << "pop_heap_time=" << o.pop_heap_time << std::endl
                       << "merge_sorted_heaps_time=" << o.merge_sorted_heaps_time << std::endl
-                   // << "refill_upper_bound_time=" << o.refill_upper_bound_time << std::endl
+                   // << "refill_lower_bound_time=" << o.refill_lower_bound_time << std::endl
                       << "refill_accumulate_time=" << o.refill_accumulate_time << std::endl
                       << "refill_minmax_time=" << o.refill_minmax_time << std::endl
                       << "hint_time=" << o.hint_time << std::endl;

@@ -67,14 +67,14 @@ typedef stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
         STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
-        256* 1024L* 1024L                    /* RamSize */
+        512* 1024L* 1024L                    /* RamSize */
         > ppq_type;
 
 void test_simple()
 {
-    ppq_type ppq(my_cmp(), 256 * 1024L * 1024L, 4);
+    ppq_type ppq(my_cmp(), 512 * 1024L * 1024L, 4);
 
-    const uint64 volume = 512 * 1024 * 1024;
+    const uint64 volume = 256 * 1024 * 1024;
 
     uint64 nelements = volume / sizeof(my_type);
 
@@ -116,7 +116,7 @@ void test_simple()
 
 void test_bulk_pop_n()
 {
-    ppq_type ppq(my_cmp(), 256 * 1024L * 1024L, 4);
+    ppq_type ppq(my_cmp(), 512 * 1024L * 1024L, 4);
 
     const uint64 volume = 256 * 1024 * 1024;
     const uint64 bulk_size = 1024;
@@ -168,7 +168,7 @@ void test_bulk_pop_n()
 
 void test_bulk_limit(const int bulk_size)
 {
-    ppq_type ppq(my_cmp(), 256 * 1024L * 1024L, 4);
+    ppq_type ppq(my_cmp(), 512 * 1024L * 1024L, 4);
 
     STXXL_MSG("Running test_bulk_limit(" << bulk_size << ")");
 
