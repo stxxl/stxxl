@@ -3358,19 +3358,21 @@ public:
 #endif
         m_stats.hint_time.start();
 
-        int min_max_index = m_hint_tree.top();
-        while (m_num_hinted_blocks < m_num_prefetchers && min_max_index > -1) {
-            assert((size_t)min_max_index < m_external_arrays.size());
+        int gmin_index;
+        while (m_num_hinted_blocks < m_num_prefetchers &&
+               (gmin_index = m_hint_tree.top()) > -1)
+        {
+            assert((size_t)gmin_index < m_external_arrays.size());
 
-            STXXL_DEBUG("Give hint in EA[" << min_max_index << "]");
-            m_external_arrays[min_max_index].hint();
+            STXXL_DEBUG1("Give hint in EA[" << gmin_index << "]");
+            m_external_arrays[gmin_index].hint();
             ++m_num_hinted_blocks;
 
-            if (m_external_arrays[min_max_index].has_unhinted_em_data()) {
-                m_hint_tree.replay_on_change(min_max_index);
+            if (m_external_arrays[gmin_index].has_unhinted_em_data()) {
+                m_hint_tree.replay_on_change(gmin_index);
             }
             else {
-                m_hint_tree.deactivate_player(min_max_index);
+                m_hint_tree.deactivate_player(gmin_index);
             }
         }
 
