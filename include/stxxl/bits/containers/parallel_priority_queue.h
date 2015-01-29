@@ -644,11 +644,11 @@ public:
         size_t num_blocks = div_ceil(capacity, block_items);
 
         return sizeof(external_array)
-            + num_blocks * sizeof(typename bid_vector::value_type)
-            + num_blocks * sizeof(typename block_vector::value_type)
-            + num_blocks * sizeof(typename block_pointers_type::value_type)
-            + num_blocks * sizeof(typename request_vector::value_type)
-            + num_blocks * sizeof(typename minima_vector::value_type);
+               + num_blocks * sizeof(typename bid_vector::value_type)
+               + num_blocks * sizeof(typename block_vector::value_type)
+               + num_blocks * sizeof(typename block_pointers_type::value_type)
+               + num_blocks * sizeof(typename request_vector::value_type)
+               + num_blocks * sizeof(typename minima_vector::value_type);
     }
 
     //! Return the amount of internal memory used by the EA.
@@ -956,7 +956,7 @@ public:
 
         m_end_index = std::min(
             m_capacity, (block_index + 1) * (external_size_type)block_items);
-        m_hinted_until = std::max(m_hinted_until, get_end_block_index()-1);
+        m_hinted_until = std::max(m_hinted_until, get_end_block_index() - 1);
 
         STXXL_DEBUG("ea[" << this << "]: requesting ea" <<
                     " block index=" << block_index <<
@@ -997,8 +997,8 @@ public:
     //! Returns the number of hinted blocks.
     size_t num_hinted_blocks() const
     {
-        assert(get_end_block_index()-1 <= m_hinted_until);
-        return m_hinted_until - (get_end_block_index()-1);
+        assert(get_end_block_index() - 1 <= m_hinted_until);
+        return m_hinted_until - (get_end_block_index() - 1);
     }
 
     //! This method prepares rebuilding the hints (this is done after
@@ -1010,7 +1010,7 @@ public:
     void prepare_rebuilding_hints()
     {
         m_old_hinted_until = m_hinted_until;
-        m_hinted_until = get_end_block_index()-1;
+        m_hinted_until = get_end_block_index() - 1;
     }
 
     //! Removes hints which aren't needed anymore from the prefetcher
@@ -1024,7 +1024,7 @@ public:
             m_pool->invalidate(m_bids[i]);
         }
         // Fix prefetch size
-        const size_t num_hints = m_hinted_until - (get_end_block_index()-1);
+        const size_t num_hints = m_hinted_until - (get_end_block_index() - 1);
         m_pool->resize_prefetch(num_hints);
     }
 
@@ -2380,8 +2380,8 @@ protected:
         size_type mem_used = 0;
 
         mem_used += 2 * m_mem_for_heaps
-            + m_pool.size_write() * block_size
-            + m_num_prefetchers * block_size;
+                    + m_pool.size_write() * block_size
+                    + m_num_prefetchers * block_size;
 
         //STXXL_CHECK_EQUAL(m_num_prefetchers, m_pool.size_prefetch());
 
@@ -2794,7 +2794,7 @@ public:
     }
 
     //! Access the minimum element.
-    const value_type& top()
+    const value_type & top()
     {
         if (extract_buffer_empty()) {
             refill_extract_buffer(std::min(m_extract_buffer_limit,
@@ -2949,7 +2949,7 @@ public:
         if (m_heaps_size > 0) {
             if (0)
                 flush_insertion_heaps();
-            else if(1)
+            else if (1)
                 flush_insertion_heaps_with_limit(limit);
         }
 
@@ -2984,7 +2984,8 @@ public:
     //! Flushes all elements of the insertion heaps which are greater
     //! or equal to a given limit.
     //! \param limit limit value
-    inline void flush_insertion_heaps_with_limit(const value_type& limit) {
+    inline void flush_insertion_heaps_with_limit(const value_type& limit)
+    {
         // perform extract for all items < L into back of insertion_heap
         std::vector<unsigned_type> back_size(m_num_insertion_heaps);
 
@@ -3047,7 +3048,6 @@ public:
                     m_minima.deactivate_heap(p);
                 else
                     m_minima.update_heap(p);
-
             }
 
             potentially_parallel::sort(values.begin(), values.end(), m_inv_compare);
@@ -3062,7 +3062,7 @@ public:
     //! \param limit limit value
     void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit)
     {
-        STXXL_DEBUG1("bulk_pop_limit with limit=" << limit);
+        STXXL_DEBUG("bulk_pop_limit with limit=" << limit);
 
         if (m_extract_buffer_size > 0)
             convert_eb_into_ia();
@@ -3070,7 +3070,7 @@ public:
         if (m_heaps_size > 0) {
             if (0)
                 flush_insertion_heaps();
-            else if(1)
+            else if (1)
                 flush_insertion_heaps_with_limit(limit);
         }
 
@@ -3086,7 +3086,7 @@ public:
         // get all relevant blocks
         // TODO: limit number of requested blocks!
         while (limiting_ea_index > -1) {
-            STXXL_DEBUG1("limiting_ea_index=" << limiting_ea_index);
+            STXXL_DEBUG("limiting_ea_index=" << limiting_ea_index);
             const value_type& current_limit =
                 m_external_arrays[limiting_ea_index].get_next_block_min();
 
@@ -3096,7 +3096,7 @@ public:
             }
             request_further_block((size_t)limiting_ea_index);
             limiting_ea_index = m_fetch_prediction_tree.top();
-            STXXL_ASSERT(limiting_ea_index<(int)eas);
+            STXXL_ASSERT(limiting_ea_index < (int)eas);
         }
 
         // build sequences
@@ -3131,13 +3131,12 @@ public:
             sequences.begin(), sequences.end(),
             out.begin(), output_size, m_inv_compare);
 
-        cleanup_arrays(sequences,sizes,eas,ias);
+        cleanup_arrays(sequences, sizes, eas, ias);
         check_invariants();
-
     }
 
     //! Access the minimum element, which can only be in the extract buffer.
-    const value_type& limit_top()
+    const value_type & limit_top()
     {
         assert(m_limit_extract);
         assert(m_extract_buffer_size > 0);
@@ -3331,7 +3330,6 @@ public:
             m_fetch_prediction_tree.replay_on_change(ea_index);
         }
         else {
-            STXXL_DEBUG1("Deactivate predict player " << ea_index);
             m_fetch_prediction_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.start();
@@ -3339,7 +3337,6 @@ public:
             m_hint_tree.replay_on_change(ea_index);
         }
         else {
-            STXXL_DEBUG1("Deactivate hint player " << ea_index);
             m_hint_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.stop();
@@ -3362,7 +3359,7 @@ public:
         m_stats.hint_time.start();
 
         int min_max_index = m_hint_tree.top();
-        while (m_num_hinted_blocks<m_num_prefetchers&& min_max_index>-1) {
+        while (m_num_hinted_blocks < m_num_prefetchers && min_max_index > -1) {
             assert((size_t)min_max_index < m_external_arrays.size());
 
             STXXL_DEBUG("Give hint in EA[" << min_max_index << "]");
@@ -3680,7 +3677,7 @@ protected:
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
-        cleanup_arrays(sequences,sizes,eas,ias);
+        cleanup_arrays(sequences, sizes, eas, ias);
 
         m_minima.update_extract_buffer();
 
@@ -3704,7 +3701,7 @@ protected:
 
     // Removes empty arrays and updates the winner trees accordingly
     inline void cleanup_arrays(std::vector<iterator_pair_type>& sequences,
-        std::vector<size_type>& sizes, size_t eas, size_t ias)
+                               std::vector<size_type>& sizes, size_t eas, size_t ias)
     {
         for (size_type i = 0; i < eas + ias; ++i) {
             // dist represents the number of elements that haven't been merged
@@ -3744,7 +3741,6 @@ protected:
         // TODO: remove all c_merge_ias_into_eb
         if (c_merge_ias_into_eb)
             cleanup_internal_arrays();
-
     }
 
     //! Flushes the insertions heap id into an internal array.

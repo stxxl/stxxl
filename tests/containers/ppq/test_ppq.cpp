@@ -204,7 +204,7 @@ void test_bulk_limit(const int bulk_size)
             }
         }
         else if (0) // bulk-limit procedure
-        {           
+        {
             ppq.limit_begin(my_type(windex), bulk_size);
 
             for (int i = 0; i < this_bulk_size; ++i)
@@ -235,7 +235,6 @@ void test_bulk_limit(const int bulk_size)
             }
 
             ppq.bulk_push_end();
-
         }
     }
 
@@ -256,9 +255,9 @@ void test_bulk_limit(const int bulk_size)
 int main()
 {
     test_simple();
-    
+
     //test_bulk_pop_n();
-    
+
     test_bulk_limit(1000);
     test_bulk_limit(1000000);
 
