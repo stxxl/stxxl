@@ -2010,11 +2010,11 @@ protected:
     minima_type m_minima;
 
     //! Compares the largest accessible value of two external arrays.
-    struct fetch_prediction_comparator {
+    struct external_min_comparator {
         const external_arrays_type& m_eas;
         const inv_compare_type& m_compare;
 
-        fetch_prediction_comparator(const external_arrays_type& eas,
+        external_min_comparator(const external_arrays_type& eas,
                                     const inv_compare_type& compare)
             : m_eas(eas), m_compare(compare) { }
 
@@ -2023,12 +2023,12 @@ protected:
             return m_compare(m_eas[a].get_next_block_min(),
                              m_eas[b].get_next_block_min());
         }
-    } m_fetch_prediction_comparator;
+    } m_external_min_comparator;
 
     //! Tracks the largest accessible values of the external arrays if there
     //! is unaccessible data in EM. The winning array is the first one that
     //! needs to fetch further data from EM. Used in calculate_merge_sequences.
-    winner_tree<fetch_prediction_comparator> m_fetch_prediction_tree;
+    winner_tree<external_min_comparator> m_external_min_tree;
 
     //! Compares the largest value of the block hinted the latest of two
     //! external arrays.
@@ -2142,7 +2142,7 @@ protected:
         empty_external_array_eraser pred;
 
         // The following is a modified implementation of swap_remove_if().
-        // Updates m_fetch_prediction_tree accordingly.
+        // Updates m_external_min_tree accordingly.
 
         ForwardIterator first = m_external_arrays.begin();
         ForwardIterator last = m_external_arrays.end();
@@ -2173,7 +2173,7 @@ protected:
         // Deactivating all affected players first.
         // Otherwise there might be outdated comparisons.
         for (size_t i = first_removed; i < size; ++i) {
-            m_fetch_prediction_tree.deactivate_player(i);
+            m_external_min_tree.deactivate_player(i);
             m_hint_tree.deactivate_player(i);
         }
 
@@ -2277,8 +2277,8 @@ public:
           m_pool(num_prefetch_buffer_blocks, num_write_buffer_blocks),
           m_external_arrays(),
           m_minima(*this),
-          m_fetch_prediction_comparator(m_external_arrays, m_inv_compare),
-          m_fetch_prediction_tree(4, m_fetch_prediction_comparator),
+          m_external_min_comparator(m_external_arrays, m_inv_compare),
+          m_external_min_tree(4, m_external_min_comparator),
           m_hint_comparator(m_external_arrays, m_inv_compare),
           m_hint_tree(4, m_hint_comparator),
           m_num_hinted_blocks(0)
@@ -3087,7 +3087,7 @@ public:
         std::vector<iterator_pair_type> sequences(eas + ias);
         size_type output_size = 0;
 
-        int limiting_ea_index = m_fetch_prediction_tree.top();
+        int limiting_ea_index = m_external_min_tree.top();
         STXXL_ASSERT(limiting_ea_index < (int)eas);
 
         // get all relevant blocks
@@ -3102,7 +3102,7 @@ public:
                 break;
             }
             request_further_block((size_t)limiting_ea_index);
-            limiting_ea_index = m_fetch_prediction_tree.top();
+            limiting_ea_index = m_external_min_tree.top();
             STXXL_ASSERT(limiting_ea_index < (int)eas);
         }
 
@@ -3289,7 +3289,7 @@ public:
         STXXL_DEBUG("update_trees_after_ea_creation");
 
         if (m_external_arrays[ea_index].has_em_data()) {
-            m_fetch_prediction_tree.activate_player(ea_index);
+            m_external_min_tree.activate_player(ea_index);
         }
 
         m_stats.hint_time.start();
@@ -3334,10 +3334,10 @@ public:
     inline void update_fetch_and_hint_trees(size_t ea_index)
     {
         if (m_external_arrays[ea_index].has_em_data()) {
-            m_fetch_prediction_tree.replay_on_change(ea_index);
+            m_external_min_tree.replay_on_change(ea_index);
         }
         else {
-            m_fetch_prediction_tree.deactivate_player(ea_index);
+            m_external_min_tree.deactivate_player(ea_index);
         }
         m_stats.hint_time.start();
         if (m_external_arrays[ea_index].has_unhinted_em_data()) {
@@ -3439,8 +3439,8 @@ protected:
          * determine minimum of each first block
          */
 
-        size_t gmin_index = (size_t)m_fetch_prediction_tree.top();
-        bool needs_limit = (m_fetch_prediction_tree.top() > -1) ? true : false;
+        size_t gmin_index = (size_t)m_external_min_tree.top();
+        bool needs_limit = (m_external_min_tree.top() > -1) ? true : false;
 
 // test correctness of prefetch prediction tree
 #ifdef STXXL_DEBUG_ASSERTIONS
