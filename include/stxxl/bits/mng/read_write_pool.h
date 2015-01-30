@@ -116,6 +116,7 @@ public:
         return w_pool->steal();
     }
 
+    //! Add block to write pool
     void add(block_type*& block)
     {
         w_pool->add(block);
@@ -135,20 +136,72 @@ public:
         return p_pool->hint(bid, *w_pool);
     }
 
+    //! Cancel a hint request in case the block is no longer desired.
     bool invalidate(bid_type bid)
     {
         return p_pool->invalidate(bid);
     }
 
-    //! Reads block. If this block is cached block is not read but passed from the cache.
-    //! \param block block object, where data to be read to. If block was cached \c block 's
-    //! ownership goes to the pool and block from cache is returned in \c block value.
-    //! \param bid address of the block
-    //! \warning \c block parameter must be allocated dynamically using \c new .
-    //! \return request pointer object of read operation
+    /*!
+     * Reads block. If this block is cached block is not read but passed from
+     * the cache.
+     *
+     * \param block block object, where data to be read to. If block was cached
+     * \c block 's ownership goes to the pool and block from cache is returned
+     * in \c block value.
+     *
+     * \param bid address of the block
+     * \warning \c block parameter must be allocated dynamically using \c new .
+     * \return request pointer object of read operation
+     */
     request_ptr read(block_type*& block, bid_type bid)
     {
         return p_pool->read(block, bid, *w_pool);
+    }
+
+    //! Returns the request pointer for a hinted block, or an invalid NULL
+    //! request in case it was not requested due to lack of prefetch buffers.
+    request_ptr find_hint(bid_type bid)
+    {
+        return p_pool->find(bid);
+    }
+
+    //! Returns true if the blocks was hinted and the request is finished.
+    bool poll_hint(bid_type bid)
+    {
+        return p_pool->poll(bid);
+    }
+
+    //! Add block to prefetch pool
+    void add_prefetch(block_type*& block)
+    {
+        p_pool->add(block);
+    }
+
+    //! Take out a block from the prefetch pool, one unhinted free block must
+    //! be available.
+    //! \return pointer to the block. Ownership of the block goes to the caller.
+    block_type * steal_prefetch()
+    {
+        return p_pool->steal();
+    }
+
+    //! Checks if a block is in the hinted block set.
+    bool in_prefetching(bid_type bid)
+    {
+        return p_pool->in_prefetching(bid);
+    }
+
+    //! Returns the number of free prefetching blocks.
+    unsigned_type free_size_prefetch() const
+    {
+        return p_pool->free_size();
+    }
+
+    //! Returns the number of busy prefetching blocks.
+    unsigned_type busy_size_prefetch() const
+    {
+        return p_pool->busy_size();
     }
 };
 

@@ -38,7 +38,8 @@ protected:
         size_t operator () (const bid_type& bid) const
         {
             size_t result = size_t(bid.storage) +
-                            size_t(bid.offset & 0xffffffff) + size_t(bid.offset >> 32);
+                            size_t(bid.offset & 0xffffffff) +
+                            size_t(bid.offset >> 32);
             return result;
         }
 #if STXXL_MSVC
@@ -58,17 +59,20 @@ protected:
     typedef typename std::list<block_type*>::iterator free_blocks_iterator;
     typedef typename hash_map_type::iterator busy_blocks_iterator;
 
-    // contains free prefetch blocks
+    //! contains free prefetch blocks
     std::list<block_type*> free_blocks;
-    // blocks that are in reading or already read but not retrieved by user
+
+    //! blocks that are in reading or already read but not retrieved by user
     hash_map_type busy_blocks;
 
+    //! count number of free blocks, since traversing the std::list is slow.
     unsigned_type free_blocks_size;
 
 public:
     //! Constructs pool.
     //! \param init_size initial number of blocks in the pool
-    explicit prefetch_pool(unsigned_type init_size = 1) : free_blocks_size(init_size)
+    explicit prefetch_pool(unsigned_type init_size = 1)
+        : free_blocks_size(init_size)
     {
         unsigned_type i = 0;
         for ( ; i < init_size; ++i)
@@ -106,15 +110,53 @@ public:
 
     //! Returns number of owned blocks.
     unsigned_type size() const
-    { return free_blocks_size + busy_blocks.size(); }
+    {
+        return free_blocks_size + busy_blocks.size();
+    }
 
-    //! Gives a hint for prefetching a block.
-    //! \param bid address of a block to be prefetched
-    //! \return \c true if there was a free block to do prefetch and prefetching
-    //! was scheduled, \c false otherwise
-    //! \note If there are no free blocks available (all blocks
-    //! are already in reading or read but not retrieved by user calling \c read
-    //! method) calling \c hint function has no effect
+    //! Returns the number of free prefetching blocks.
+    unsigned_type free_size() const
+    {
+        return free_blocks_size;
+    }
+
+    //! Returns the number of busy prefetching blocks.
+    unsigned_type busy_size() const
+    {
+        return busy_blocks.size();
+    }
+
+    //! Add a new block to prefetch pool, enlarges size of pool.
+    void add(block_type*& block)
+    {
+        free_blocks.push_back(block);
+        block = NULL; // prevent caller from using the block any further
+    }
+
+    //! Take out a block from the pool, one unhinted free block must be
+    //! available.
+    //! \return pointer to the block. Ownership of the block goes to the caller.
+    block_type * steal()
+    {
+        STXXL_CHECK(!free_blocks.empty());
+
+        block_type* p = free_blocks.back();
+        free_blocks.pop_back();
+        return p;
+    }
+
+    /*!
+     * Gives a hint for prefetching a block, the block may or may not be read
+     * into a prefetch buffer.
+     *
+     * \param bid address of a block to be prefetched
+     * \return \c true if there was a free block to do prefetch and
+     * prefetching was scheduled, \c false otherwise
+     *
+     * \note If there are no free blocks available (all blocks are already in
+     * reading or read but not retrieved by user calling \c read method)
+     * calling \c hint function has no effect
+     */
     bool hint(bid_type bid)
     {
         // if block is already hinted, no need to hint it again
@@ -137,6 +179,19 @@ public:
         return false;
     }
 
+    /*!
+     * Gives a hint for prefetching a block, the block may or may not be read
+     * into a prefetch buffer. This variant checks if the write pool is
+     * currently writing said block.
+     *
+     * \param bid address of a block to be prefetched
+     * \return \c true if there was a free block to do prefetch and
+     * prefetching was scheduled, \c false otherwise
+     *
+     * \note If there are no free blocks available (all blocks are already in
+     * reading or read but not retrieved by user calling \c read method)
+     * calling \c hint function has no effect
+     */
     bool hint(bid_type bid, write_pool<block_type>& w_pool)
     {
         // if block is already hinted, no need to hint it again
@@ -168,6 +223,7 @@ public:
         return false;
     }
 
+    //! Cancel a hint request in case the block is no longer desired.
     bool invalidate(bid_type bid)
     {
         busy_blocks_iterator cache_el = busy_blocks.find(bid);
@@ -186,17 +242,45 @@ public:
         return true;
     }
 
+    //! Checks if a block is in the hinted block set.
     bool in_prefetching(bid_type bid)
     {
         return (busy_blocks.find(bid) != busy_blocks.end());
     }
 
-    //! Reads block. If this block is cached block is not read but passed from the cache.
-    //! \param block block object, where data to be read to. If block was cached \c block 's
-    //! ownership goes to the pool and block from cache is returned in \c block value.
-    //! \param bid address of the block
-    //! \warning \c block parameter must be allocated dynamically using \c new .
-    //! \return request pointer object of read operation
+    //! Returns the request pointer for a hinted block, or an invalid NULL
+    //! request in case it was not requested due to lack of prefetch buffers.
+    request_ptr find(bid_type bid)
+    {
+        busy_blocks_iterator cache_el = busy_blocks.find(bid);
+
+        if (cache_el == busy_blocks.end())
+            return request_ptr(); // invalid pointer
+        else
+            return cache_el->second.second;
+    }
+
+    //! Returns true if the blocks was hinted and the request is finished.
+    bool poll(bid_type bid)
+    {
+        request_ptr req = find(bid);
+        return req.valid() ? req->poll() : false;
+    }
+
+    /*!
+     * Reads block. If this block is cached block is not read but passed from
+     * the cache.
+     *
+     * \param block block object, where data to be read to. If block was cached
+     * \c block 's ownership goes to the pool and block from cache is returned
+     * in \c block value.
+     *
+     * \param bid address of the block
+     *
+     * \warning \c block parameter must be allocated dynamically using \c new .
+     *
+     * \return request pointer object of read operation
+     */
     request_ptr read(block_type*& block, bid_type bid)
     {
         busy_blocks_iterator cache_el = busy_blocks.find(bid);
