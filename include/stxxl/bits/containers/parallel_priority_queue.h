@@ -970,8 +970,11 @@ public:
     {
         assert(m_unhinted_block < m_num_blocks);
         const size_t num_hinted = num_hinted_blocks();
-        if (m_pool->size_prefetch() < num_hinted)
+        if (m_pool->size_prefetch() < num_hinted) {
+            STXXL_ERRMSG("Warning: Enlarging to prefetch pool to " <<
+                         num_hinted << " blocks");
             m_pool->resize_prefetch(num_hinted);
+        }
         m_pool->hint(m_bids[m_unhinted_block]);
         ++m_unhinted_block;
     }
@@ -1020,9 +1023,6 @@ public:
             STXXL_DEBUG("Discarding hint");
             m_pool->invalidate(m_bids[i]);
         }
-        // Fix prefetch size
-        const size_t num_hints = m_unhinted_block - get_end_block_index();
-        m_pool->resize_prefetch(num_hints);
     }
 
 protected:
@@ -3361,7 +3361,7 @@ public:
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
-            STXXL_DEBUG1("Give hint in EA[" << gmin_index << "]");
+            STXXL_DEBUG("Give hint in EA[" << gmin_index << "]");
             m_external_arrays[gmin_index].hint();
             ++m_num_hinted_blocks;
 
