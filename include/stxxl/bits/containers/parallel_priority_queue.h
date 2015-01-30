@@ -817,6 +817,16 @@ protected:
             STXXL_DEBUG("ea[" << this << "]: "
                         "read_block needs to re-read block index=" << block_index);
 
+            static bool s_warned = false;
+            if (!s_warned)
+            {
+                s_warned = true;
+                STXXL_ERRMSG("ppq::external_array[" << this << "] "
+                             "writer requested to re-read block from EM.");
+                STXXL_ERRMSG("This should never occur in full-performance mode, "
+                             "verify that you run in debug mode.");
+            }
+
             // this re-reading is not necessary for full performance builds, so
             // we immediately wait for the I/O to be completed.
             m_blocks[block_index] = m_pool->steal();
