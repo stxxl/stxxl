@@ -130,6 +130,7 @@ public:
     void add(block_type*& block)
     {
         free_blocks.push_back(block);
+        ++free_blocks_size;
         block = NULL; // prevent caller from using the block any further
     }
 
@@ -142,6 +143,7 @@ public:
 
         block_type* p = free_blocks.back();
         free_blocks.pop_back();
+        --free_blocks_size;
         return p;
     }
 
