@@ -1121,7 +1121,7 @@ protected:
     //! reference to the external array to be written
     ea_type& m_ea;
 
-#if STXXL_DEBUG_ASSERTIONS
+#ifndef NDEBUG
     //! total number of iterators referencing this writer
     unsigned int m_ref_total;
 #endif
@@ -1147,7 +1147,7 @@ protected:
 
         assert(block_index < m_ea.num_blocks());
         unsigned int ref = m_ref_count[block_index]++;
-#if STXXL_DEBUG_ASSERTIONS
+#ifndef NDEBUG
         ++m_ref_total;
 #endif
 
@@ -1171,7 +1171,7 @@ protected:
         scoped_mutex_lock lock(m_mutex);
 
         assert(block_index < m_ea.num_blocks());
-#if STXXL_DEBUG_ASSERTIONS
+#ifndef NDEBUG
         assert(m_ref_total > 0);
         --m_ref_total;
 #endif
@@ -1391,7 +1391,7 @@ public:
         : m_ea(ea),
           m_ref_count(ea.num_blocks(), 0)
     {
-#if STXXL_DEBUG_ASSERTIONS
+#ifndef NDEBUG
         m_ref_total = 0;
 #endif
 
@@ -1425,7 +1425,7 @@ public:
     ~external_array_writer()
     {
         m_live_boundary.clear(); // release block boundaries
-#if STXXL_DEBUG_ASSERTIONS
+#ifndef NDEBUG
         STXXL_ASSERT(m_ref_total == 0);
 #endif
         m_ea.finish_write();
@@ -3958,11 +3958,11 @@ protected:
         m_stats.internal_array_flush_time.stop();
     }
 
+#if TODO_FIXUP_LATER
     //! Flushes the insertion heaps into an external array.
     void flush_directly_to_hd()
     {
         STXXL_CHECK(0);
-#if TODO_FIXUP_LATER
         if (m_mem_left < m_mem_per_external_array) {
             merge_external_arrays();
         }
@@ -4026,15 +4026,15 @@ protected:
         m_stats.direct_flush_time.stop();
 
         check_invariants();
-#endif
     }
+#endif
 
+#if TODO_FIXUP_LATER
     //! Sorts the values from values and writes them into an external array.
     //! \param values the vector to sort and store
     void flush_array_to_hd(std::vector<value_type>& values)
     {
         abort();
-#if TODO_FIXUP_LATER
 #if STXXL_PARALLEL
         __gnu_parallel::sort(values.begin(), values.end(), m_inv_compare);
 #else
@@ -4067,8 +4067,8 @@ protected:
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
 
         check_invariants();
-#endif
     }
+#endif
 
     /*!
      * Sorts the values from values and writes them into an internal array.
@@ -4088,6 +4088,7 @@ protected:
         add_as_internal_array(values);
     }
 
+#if TODO_MAYBE_FIXUP_LATER
     /*!
      * Lets the priority queue decide if flush_array_to_hd() or
      * flush_array_internal() should be called.  Don't use the value vector
@@ -4098,7 +4099,6 @@ protected:
     void flush_array(std::vector<value_type>& values)
     {
         STXXL_CHECK(0);
-#if TODO_MAYBE_FIXUP_LATER
         size_type size = values.size();
         size_type ram_internal = 2 * size * sizeof(value_type); // ram for the sorted array + part of the ram for the merge buffer
 
@@ -4123,8 +4123,8 @@ protected:
         }
 
         flush_array_internal(values);
-#endif
     }
+#endif
 
     //! Struct of all statistical counters and timers.  Turn on/off statistics
     //! using the stats_counter and stats_timer typedefs.
