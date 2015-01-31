@@ -69,13 +69,13 @@ void fill(ea_type& ea, size_t index, size_t n)
 
 //! Run external array test.
 //! Testing...
-//!     ⁻ iterators
+//!     - iterators
 //!     - request_write_buffer()
-//!     ⁻ random access
-//!     ⁻ remove()
-//!     ⁻ get_current_max()
-//!     ⁻ request_further_block()
-//!     ⁻ wait()
+//!     - random access
+//!     - remove()
+//!     - get_current_max()
+//!     - request_further_block()
+//!     - wait()
 //!     - sizes
 //!
 //! \param volume Volume
@@ -90,7 +90,7 @@ int run_external_array_test(size_t volume)
     STXXL_VARDUMP(N);
     STXXL_VARDUMP(num_blocks);
 
-    ea_type::pool_type rw_pool;
+    ea_type::pool_type rw_pool(6 * num_blocks, 4);
     ea_type ea(N, &rw_pool);
 
     {
@@ -110,8 +110,8 @@ int run_external_array_test(size_t volume)
         STXXL_CHECK_EQUAL(ea.size(), N);
 
         // fetch first block
-        ea.request_further_block();
-        ea.wait();
+        ea.hint_next_block();
+        ea.wait_next_blocks();
 
         STXXL_CHECK(ea.buffer_size() > 7);
 
@@ -131,8 +131,7 @@ int run_external_array_test(size_t volume)
 
         // Testing remove...
 
-        ea.remove(33);
-        ea.wait();
+        ea.remove_items(33);
 
         STXXL_CHECK_EQUAL(ea[33].first, 34);
         STXXL_CHECK_EQUAL(ea.begin().get_index(), 33);
@@ -156,13 +155,12 @@ int run_external_array_test(size_t volume)
                 break;
             }
 
-            ea.request_further_block();
+            ea.hint_next_block();
+            ea.wait_next_blocks();
             ++maxround;
         }
 
         // Testing request_further_block() (called above)...
-
-        ea.wait();
 
         STXXL_CHECK((ea.end() - 1)->first >= 5 * block_size + 876);
 
@@ -175,8 +173,8 @@ int run_external_array_test(size_t volume)
             ++index;
         }
 
-        ea.remove(ea.buffer_size());
-        STXXL_CHECK(ea.buffer_size() > 0);
+        ea.remove_items(ea.buffer_size());
+        STXXL_CHECK(ea.buffer_size() == 0);
 
         // Extracting the rest...
 
@@ -184,10 +182,11 @@ int run_external_array_test(size_t volume)
 
         while (!ea.empty()) {
             if (ea.has_em_data() && round % 2 == 0) {
-                ea.request_further_block();
+                ea.hint_next_block();
+                ea.wait_next_blocks();
             }
 
-            ea.wait();
+            STXXL_CHECK((size_t)(ea.end() - ea.begin()) == ea.buffer_size());
 
             for (ea_type::iterator it = ea.begin(); it != ea.end(); ++it) {
                 progress("Extracting element", index, N);
@@ -196,17 +195,16 @@ int run_external_array_test(size_t volume)
                 ++index;
             }
 
-            if (round % 3 == 0) {
-                // Test the case that not the whole buffer is removed...
-                STXXL_CHECK(ea.buffer_size() > 0);
-                ea.remove(ea.buffer_size() - 1);
+            std::cout << ea.buffer_size() << " - " << round << "\n";
+
+            if (round % 3 == 0 && ea.buffer_size() > 0) {
+                // remove all items but one
+                ea.remove_items(ea.buffer_size() - 1);
                 index--;
             }
             else {
-                ea.remove(ea.buffer_size());
+                ea.remove_items(ea.buffer_size());
             }
-
-            STXXL_CHECK(ea.buffer_size() > 0 || ea.empty());
 
             ++round;
         }
@@ -227,8 +225,6 @@ int run_multiway_merge(size_t volume)
     const size_t block_size = ea_type::block_size;
     const size_t size = volume / sizeof(value_type);
     const size_t num_blocks = stxxl::div_ceil(size, block_size);
-
-    ea_type::pool_type rw_pool;
 
     STXXL_MSG("--- Running run_multiway_merge() test with " <<
               NumEAs << " external arrays");
@@ -251,11 +247,13 @@ int run_multiway_merge(size_t volume)
     typedef std::vector<ea_type*> ea_vector_type;
     typedef ea_vector_type::iterator ea_iterator;
 
+    ea_type::pool_type rw_pool1;
     ea_vector_type ealist;
     for (int i = 0; i < NumEAs; ++i)
-        ealist.push_back(new ea_type(size, &rw_pool));
+        ealist.push_back(new ea_type(size, &rw_pool1));
 
-    ea_type out(size * (NumEAs + 1), &rw_pool);
+    ea_type::pool_type rw_pool2;
+    ea_type out(size * (NumEAs + 1), &rw_pool2);
 
     {
         stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume * NumEAs);
@@ -267,14 +265,17 @@ int run_multiway_merge(size_t volume)
     {
         stxxl::scoped_print_timer timer("loading input arrays into RAM and requesting output buffer", volume * NumEAs);
 
-        for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
-        {
-            while ((*ea)->has_em_data())
-                (*ea)->request_further_block();
-        }
+        if (ealist.size())
+            rw_pool1.resize_prefetch(ealist.size() * ealist[0]->num_blocks());
 
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
-            (*ea)->wait();
+        {
+            while ((*ea)->has_unhinted_em_data())
+                (*ea)->hint_next_block();
+
+            while ((*ea)->num_hinted_blocks())
+                (*ea)->wait_next_blocks();
+        }
 
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
             STXXL_CHECK_EQUAL((*ea)->buffer_size(), size);
@@ -333,34 +334,25 @@ int run_multiway_merge(size_t volume)
     }
 
     {
-        stxxl::scoped_print_timer timer("loading the result back into RAM", volume * NumEAs);
-
-        while (out.has_em_data()) {
-            out.request_further_block();
-        }
-
-        out.wait();
-    }
-
-    {
         stxxl::scoped_print_timer timer("checking the order", volume * NumEAs);
 
-        size_t index = 1;
+        // each index is contained (NumEAs + 1) times
+        size_t index = 1 * (NumEAs + 1);
 
-        for (ea_type::iterator it = out.begin(); it != out.end(); ++it) {
-            for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
+        while (out.has_em_data())
+        {
+            out.hint_next_block();
+            out.wait_next_blocks();
+
+            for (ea_type::iterator it = out.begin(); it != out.end(); ++it)
             {
                 progress("Extracting element", index, (NumEAs + 1) * size);
-                STXXL_CHECK_EQUAL(it->first, index);
+                STXXL_CHECK_EQUAL(it->first, index / (NumEAs + 1));
 
-                ++it;
-                STXXL_CHECK(it != out.end());
+                ++index;
             }
 
-            progress("Extracting element", index, (NumEAs + 1) * size);
-            STXXL_CHECK_EQUAL(it->first, index);
-
-            ++index;
+            out.remove_items(out.buffer_size());
         }
     }
 
@@ -455,8 +447,8 @@ int run_upper_bound_test(size_t volume)
     {
         stxxl::scoped_print_timer timer("running upper_bound", 2 * volume);
 
-        b.request_further_block();
-        b.wait();
+        b.hint_next_block();
+        b.wait_next_blocks();
 
         value_type minmax = std::make_pair(2000, 2000);
 
