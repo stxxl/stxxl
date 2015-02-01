@@ -207,6 +207,40 @@ protected:
         { os << m_dest; }
     };
 
+    //! specialization of argument for double options or parameters
+    struct argument_double : public argument
+    {
+        double& m_dest;
+
+        //! contructor filling most attributes
+        argument_double(char key, const std::string& longkey,
+                        const std::string& keytype,
+                        const std::string& desc, bool required,
+                        double& dest)
+            : argument(key, longkey, keytype, desc, required),
+              m_dest(dest)
+        { }
+
+        virtual const char * type_name() const
+        { return "double"; }
+
+        //! parse unsigned integer using sscanf.
+        virtual bool process(int& argc, const char* const*& argv)
+        {
+            if (argc == 0) return false;
+            if (sscanf(argv[0], "%lf", &m_dest) == 1) {
+                --argc, ++argv;
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        virtual void print_value(std::ostream& os) const
+        { os << m_dest; }
+    };
+
     //! specialization of argument for SI/IEC suffixes byte size options or
     //! parameters
     struct argument_bytes32 : public argument
@@ -480,6 +514,18 @@ public:
         calc_opt_max(m_optlist.back());
     }
 
+    //! add double option -key, --longkey [keytype] with description and store
+    //! to dest
+    void add_double(char key, const std::string& longkey,
+                    const std::string& keytype, double& dest,
+                    const std::string& desc)
+    {
+        m_optlist.push_back(
+            new argument_double(key, longkey, keytype, desc, false, dest)
+            );
+        calc_opt_max(m_optlist.back());
+    }
+
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
     //! store to 64-bit dest
     void add_bytes(char key, const std::string& longkey,
@@ -545,6 +591,12 @@ public:
                   const std::string& desc)
     { return add_uint(key, longkey, "", dest, desc); }
 
+    //! add double option -key, --longkey [keytype] with description and store
+    //! to dest
+    void add_double(char key, const std::string& longkey, double& dest,
+                    const std::string& desc)
+    { return add_double(key, longkey, "", dest, desc); }
+
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
     //! store to 32-bit dest
     void add_bytes(char key, const std::string& longkey, stxxl::uint32& dest,
@@ -585,6 +637,16 @@ public:
     {
         m_paramlist.push_back(
             new argument_uint(0, name, "", desc, true, dest)
+            );
+        calc_param_max(m_paramlist.back());
+    }
+
+    //! add double parameter [name] with description and store to dest
+    void add_param_double(const std::string& name, double& dest,
+                          const std::string& desc)
+    {
+        m_paramlist.push_back(
+            new argument_double(0, name, "", desc, true, dest)
             );
         calc_param_max(m_paramlist.back());
     }
@@ -654,6 +716,16 @@ public:
     {
         m_paramlist.push_back(
             new argument_uint(0, name, "", desc, false, dest)
+            );
+        calc_param_max(m_paramlist.back());
+    }
+
+    //! add optional double parameter [name] with description and store to dest
+    void add_opt_param_double(const std::string& name, double& dest,
+                              const std::string& desc)
+    {
+        m_paramlist.push_back(
+            new argument_double(0, name, "", desc, false, dest)
             );
         calc_param_max(m_paramlist.back());
     }

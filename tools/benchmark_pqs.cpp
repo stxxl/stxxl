@@ -69,7 +69,7 @@ uint64 num_elements = _num_elements;
 uint64 single_heap_ram = 1 * MiB;
 uint64 extract_buffer_ram = 0;
 unsigned num_write_buffers = 14;
-unsigned num_prefetchers = 14;
+double num_prefetchers = 2.0;
 unsigned num_read_blocks = 1;
 uint64 block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
 
@@ -1252,14 +1252,14 @@ int benchmark_pqs(int argc, char* argv[])
     cp.add_uint('w', "write_buffers", num_write_buffers,
                 "Number of buffered blocks when writing to external memory");
 
-    cp.add_bytes('x', "extract_buffer_ram", extract_buffer_ram,
+    cp.add_bytes('x', "extract_buffer", extract_buffer_ram,
                  "Maximum memory consumption of the extract buffer in Bytes");
 
     cp.add_bytes('y', "heap_ram", single_heap_ram,
                  "Size of a single insertion heap in Bytes");
 
-    cp.add_uint('z', "prefetchers", num_prefetchers,
-                "Number of prefetched blocks for each external array");
+    cp.add_double('z', "prefetchers", num_prefetchers,
+                  "Number of prefetched blocks for each external array");
 
     if (!cp.process(argc, argv))
         return -1;
