@@ -96,10 +96,9 @@ uint64 max_merge_buffer_ram_stat = 0;
 
 uint64 value_universe_size = 100000000;
 
-//const unsigned int seed = 12345;
-unsigned int seed = 12345;
+unsigned int g_seed = 12345;
 
-random_number32_r g_rand(seed);
+random_number32_r g_rand(g_seed);
 
 void calculate_depending_parameters()
 {
@@ -1147,21 +1146,21 @@ void run_benchmark(ContainerType& c)
             }
             else {
                 if (do_prefill) {
-                    do_bulk_rand_insert(c, seed, do_parallel);
+                    do_bulk_rand_insert(c, g_seed, do_parallel);
                 }
-                do_bulk_rand_intermixed(c, seed, do_prefill, do_parallel);
+                do_bulk_rand_intermixed(c, g_seed, do_prefill, do_parallel);
             }
         }
         else {
             if (do_random) {
-                do_bulk_rand_insert(c, seed, do_parallel);
+                do_bulk_rand_insert(c, g_seed, do_parallel);
             }
             else {
                 do_bulk_insert(c, do_parallel);
             }
             c.fill_end();
             if (do_random && do_check) {
-                do_bulk_rand_read_check(c, seed, do_parallel);
+                do_bulk_rand_read_check(c, g_seed, do_parallel);
             }
             else if (do_check) {
                 do_read_check(c);
@@ -1174,20 +1173,20 @@ void run_benchmark(ContainerType& c)
     else {
         if (do_intermixed) {
             if (do_prefill) {
-                do_rand_insert(c, seed);
+                do_rand_insert(c, g_seed);
             }
-            do_rand_intermixed(c, seed, do_prefill);
+            do_rand_intermixed(c, g_seed, do_prefill);
         }
         else {
             if (do_random) {
-                do_rand_insert(c, seed);
+                do_rand_insert(c, g_seed);
             }
             else {
                 do_insert(c);
             }
             c.fill_end();
             if (do_random && do_check) {
-                do_rand_read_check(c, seed);
+                do_rand_read_check(c, g_seed);
             }
             else if (do_check) {
                 do_read_check(c);
@@ -1206,26 +1205,23 @@ void run_benchmark(ContainerType& c)
 
 int benchmark_pqs(int argc, char* argv[])
 {
-    seed = static_cast<unsigned>(time(NULL));
-
     /*
      * Parse flags
      */
 
-    bool do_ppq = false;
-    bool do_stxxlpq = false;
-    bool do_sorter = false;
-    bool do_stlpq = false;
+    std::string opt_queue = "ppq";
 
     bool do_dijkstra = false;
 
     stxxl::cmdline_parser cp;
     cp.set_description(description);
 
-    cp.add_flag('n', "ppq", do_ppq, "Benchmark parallel priority queue");
-    cp.add_flag('o', "stxxl", do_stxxlpq, "Benchmark stxxl priority queue");
-    cp.add_flag('s', "sorter", do_sorter, "Benchmark stxxl::sorter");
-    cp.add_flag('l', "stl", do_stlpq, "Benchmark std::priority_queue");
+    cp.add_string('q', "pq", "type", opt_queue,
+                  "Select priority queue to test:\n"
+                  "  ppq - stxxl::parallel_priority_queue (default)\n"
+                  "  spq - stxxl::priority_queue\n"
+                  "  sorter - stxxl::sorter\n"
+                  "  stl - std::priority_queue");
 
     cp.add_flag('d', "dijkstra", do_dijkstra, "Run dijkstra benchmark");
     cp.add_flag('r', "random", do_random, "Use random insert");
@@ -1253,7 +1249,7 @@ int benchmark_pqs(int argc, char* argv[])
     cp.add_bytes('u', "universe_size", value_universe_size,
                  "Range for random values");
 
-    cp.add_uint('w', "writebuffers", num_write_buffers,
+    cp.add_uint('w', "write_buffers", num_write_buffers,
                 "Number of buffered blocks when writing to external memory");
 
     cp.add_bytes('x', "extract_buffer_ram", extract_buffer_ram,
@@ -1271,27 +1267,22 @@ int benchmark_pqs(int argc, char* argv[])
     calculate_depending_parameters();
     print_params();
 
-    if (do_ppq) {
+    if (opt_queue == "ppq") {
         ppq = new ppq_type(value_type_cmp_greater(),
                            RAM, num_prefetchers, num_write_buffers,
                            g_max_threads, single_heap_ram, extract_buffer_ram);
     }
-    else if (do_stxxlpq) {
+    else if (opt_queue == "spq") {
         stxxlpq = new stxxlpq_type(mem_for_prefetch_pool, mem_for_write_pool);
     }
-    else if (do_sorter) {
+    else if (opt_queue == "sorter") {
         stxxlsorter = new sorter_type(value_type_cmp_smaller(), RAM);
     }
-    else if (do_stlpq) {
+    else if (opt_queue == "stl") {
         stlpq = new stlpq_type;
     }
-
-    /*
-     * Run benchmarks
-     */
-
-    if (do_ppq + do_stxxlpq + do_sorter + do_stlpq == 0) {
-        STXXL_MSG("Please choose a conatiner type. Use -h for help.");
+    else {
+        STXXL_MSG("Please choose a queue container type. Use -h for help.");
         return EXIT_FAILURE;
     }
 
@@ -1309,54 +1300,54 @@ int benchmark_pqs(int argc, char* argv[])
         uint64 n = num_elements / value_size;
         uint64 m = 100 * n;
 
-        if (do_ppq) {
+        if (opt_queue == "ppq") {
             Container<ppq_type> cppq(*ppq);
             ::do_dijkstra(cppq, n, m);
             cppq.print_stats();
         }
-        else if (do_stxxlpq) {
+        else if (opt_queue == "spq") {
             Container<stxxlpq_type> cstxxlpq(*stxxlpq);
             ::do_dijkstra(cstxxlpq, n, m);
         }
-        else if (do_sorter) {
+        else if (opt_queue == "sorter") {
             STXXL_MSG("Sorter not supported.");
         }
-        else if (do_stlpq) {
+        else if (opt_queue == "stl") {
             Container<stlpq_type> cstlpq(*stlpq);
             ::do_dijkstra(cstlpq, n, m);
         }
     }
-    else if (do_ppq)
+    else if (opt_queue == "ppq")
     {
         Container<ppq_type> cppq(*ppq);
         run_benchmark(cppq);
     }
-    else if (do_stxxlpq)
+    else if (opt_queue == "spq")
     {
         Container<stxxlpq_type> cstxxlpq(*stxxlpq);
         run_benchmark(cstxxlpq);
     }
-    else if (do_sorter)
+    else if (opt_queue == "sorter")
     {
         Container<sorter_type> csorter(*stxxlsorter);
         run_benchmark(csorter);
     }
-    else if (do_stlpq)
+    else if (opt_queue == "stl")
     {
         Container<stlpq_type> cstlpq(*stlpq);
         run_benchmark(cstlpq);
     }
 
-    if (do_ppq) {
+    if (opt_queue == "ppq") {
         delete ppq;
     }
-    else if (do_stxxlpq) {
+    else if (opt_queue == "spq") {
         delete stxxlpq;
     }
-    else if (do_sorter) {
+    else if (opt_queue == "sorter") {
         delete stxxlsorter;
     }
-    else if (do_stlpq) {
+    else if (opt_queue == "stl") {
         delete stlpq;
     }
 
