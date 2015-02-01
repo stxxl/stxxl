@@ -81,6 +81,12 @@ struct random_number32_r
         state = seed;
     }
 
+    //! Change the current seed
+    void set_seed(unsigned seed)
+    {
+        state = seed;
+    }
+
     //! Returns a random number from [0, 2^32)
     inline value_type operator () () const
     {
