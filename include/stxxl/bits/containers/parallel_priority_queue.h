@@ -2800,6 +2800,118 @@ public:
         check_invariants();
     }
 
+    //! Extract up to max_size values at once.
+    void bulk_pop(std::vector<value_type>& out, size_t max_size)
+    {
+        STXXL_DEBUG("bulk_pop_size with max_size=" << max_size);
+
+        const size_t n_elements = std::min<size_t>(max_size, size());
+        assert(n_elements < m_extract_buffer_limit);
+
+        if (m_heaps_size > 0)
+            flush_insertion_heaps();
+
+        if (m_extract_buffer_size > 0)
+            convert_eb_into_ia();
+
+        refill_extract_buffer(n_elements, n_elements);
+
+        out.resize(0);
+        using std::swap;
+        swap(m_extract_buffer, out);
+        m_extract_buffer_index = 0;
+        m_extract_buffer_size = 0;
+    }
+
+    //! Extracts all elements which are greater or equal to a given limit.
+    //! \param out result vector
+    //! \param limit limit value
+    //! \param max_size maximum number of items to extract
+    void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit,
+                        size_t max_size = std::numeric_limits<size_t>::max())
+    {
+        STXXL_DEBUG("bulk_pop_limit with limit=" << limit);
+
+        if (m_extract_buffer_size > 0)
+            convert_eb_into_ia();
+
+        if (m_heaps_size > 0) {
+            if (0)
+                flush_insertion_heaps();
+            else if (1)
+                flush_insertion_heaps_with_limit(limit);
+        }
+
+        size_type ias = m_internal_arrays.size();
+        size_type eas = m_external_arrays.size();
+        std::vector<size_type> sizes(eas + ias);
+        std::vector<iterator_pair_type> sequences(eas + ias);
+        size_type output_size = 0;
+
+        int limiting_ea_index = m_external_min_tree.top();
+
+        // pop limit may have to change due to memory limit
+        value_type this_limit = limit;
+
+        // get all relevant blocks
+        while (limiting_ea_index > -1)
+        {
+            const value_type& ea_limit =
+                m_external_arrays[limiting_ea_index].get_next_block_min();
+
+            if (m_compare(ea_limit, this_limit)) {
+                // No more EM data smaller or equal to limit
+                break;
+            }
+
+            if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0) {
+                // No more read/prefetch blocks available for EA
+                this_limit = ea_limit;
+                break;
+            }
+
+            wait_next_ea_blocks(limiting_ea_index);
+            // consider next limiting EA
+            limiting_ea_index = m_external_min_tree.top();
+            STXXL_ASSERT(limiting_ea_index < (int)eas);
+        }
+
+        // build sequences
+        for (size_type i = 0; i < eas + ias; ++i) {
+            iterator begin, end;
+
+            if (i < eas) {
+                assert(!m_external_arrays[i].empty());
+                assert(m_external_arrays[i].valid());
+                begin = m_external_arrays[i].begin();
+                end = m_external_arrays[i].end();
+            }
+            else {
+                size_type j = i - eas;
+                assert(!(m_internal_arrays[j].empty()));
+                begin = m_internal_arrays[j].begin();
+                end = m_internal_arrays[j].end();
+            }
+
+            end = std::lower_bound(begin, end, this_limit, m_inv_compare);
+
+            sizes[i] = std::distance(begin, end);
+            sequences[i] = std::make_pair(begin, end);
+        }
+
+        output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+        if (output_size > max_size) output_size = max_size;
+        out.resize(output_size);
+
+        potentially_parallel::multiway_merge(
+            sequences.begin(), sequences.end(),
+            out.begin(), output_size, m_inv_compare);
+
+        cleanup_arrays(sequences, sizes, eas, ias);
+
+        check_invariants();
+    }
+
 #if TODO_MAYBE_FIXUP_LATER
     /*!
      * Insert a vector of elements at one time.
@@ -2887,7 +2999,7 @@ public:
      * \param element the element to insert.
      * \param p number of insertion heap to insert item into
      */
-    void push(const value_type& element, unsigned_type p)
+    void push(const value_type& element, unsigned_type p = 0)
     {
         heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -2903,16 +3015,6 @@ public:
 
         if (insheap.size() == 1 || index == 0)
             m_minima.update_heap(p);
-    }
-
-    /*!
-     * Insert new element into a randomly selected insertion heap.
-     * \param element the element to insert.
-     */
-    void push(const value_type& element)
-    {
-        unsigned_type p = m_rng() % m_num_insertion_heaps;
-        return push(element, p);
     }
 
     //! Access the minimum element.
@@ -3090,7 +3192,7 @@ public:
     }
 
     //! Push new item >= bulk-limit element into insertion heap p.
-    void limit_push(const value_type& element, const unsigned_type p)
+    void limit_push(const value_type& element, const unsigned_type p = 0)
     {
         assert(m_limit_extract);
         assert(!m_compare(m_limit_element, element));
@@ -3098,17 +3200,49 @@ public:
         return bulk_push(element, p);
     }
 
-    //! Push new item >= bulk-limit element, pick the insertion heap randomly.
-    void limit_push(const value_type& element)
+    //! Access the minimum element, which can only be in the extract buffer.
+    const value_type & limit_top()
     {
-        unsigned_type id = m_rng() % m_num_insertion_heaps;
-        return limit_push(element, id);
+        assert(m_limit_extract);
+        assert(m_extract_buffer_size > 0);
+
+        return m_extract_buffer[m_extract_buffer_index];
     }
 
+    //! Remove the minimum element, only works correctly while elements < L.
+    void limit_pop()
+    {
+        assert(m_limit_extract);
+
+        ++m_extract_buffer_index;
+        assert(m_extract_buffer_size > 0);
+        --m_extract_buffer_size;
+
+        if (extract_buffer_empty()) {
+            // no need to modify extract_buffer, since it will extract smallest
+            // items into the EB.
+            refill_extract_buffer(std::min(m_extract_buffer_limit,
+                                           m_internal_size + m_external_size));
+        }
+    }
+
+    //! Finish bulk-limit extraction session.
+    void limit_end()
+    {
+        assert(m_limit_extract);
+
+        bulk_push_end();
+
+        m_limit_extract = false;
+    }
+
+    //! \}
+
+protected:
     //! Flushes all elements of the insertion heaps which are greater
     //! or equal to a given limit.
     //! \param limit limit value
-    inline void flush_insertion_heaps_with_limit(const value_type& limit)
+    void flush_insertion_heaps_with_limit(const value_type& limit)
     {
         // perform extract for all items < L into back of insertion_heap
         std::vector<unsigned_type> back_size(m_num_insertion_heaps);
@@ -3181,133 +3315,7 @@ public:
         }
     }
 
-    //! Extracts all elements which are greater or equal to a given limit.
-    //! \param out result vector
-    //! \param limit limit value
-    //! \param max_size maximum number of items to extract
-    void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit,
-                        size_t max_size = std::numeric_limits<size_t>::max())
-    {
-        STXXL_DEBUG("bulk_pop_limit with limit=" << limit);
-
-        if (m_extract_buffer_size > 0)
-            convert_eb_into_ia();
-
-        if (m_heaps_size > 0) {
-            if (0)
-                flush_insertion_heaps();
-            else if (1)
-                flush_insertion_heaps_with_limit(limit);
-        }
-
-        size_type ias = m_internal_arrays.size();
-        size_type eas = m_external_arrays.size();
-        std::vector<size_type> sizes(eas + ias);
-        std::vector<iterator_pair_type> sequences(eas + ias);
-        size_type output_size = 0;
-
-        int limiting_ea_index = m_external_min_tree.top();
-
-        // pop limit may have to change due to memory limit
-        value_type this_limit = limit;
-
-        // get all relevant blocks
-        while (limiting_ea_index > -1)
-        {
-            const value_type& ea_limit =
-                m_external_arrays[limiting_ea_index].get_next_block_min();
-
-            if (m_compare(ea_limit, this_limit)) {
-                // No more EM data smaller or equal to limit
-                break;
-            }
-
-            if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0) {
-                // No more read/prefetch blocks available for EA
-                this_limit = ea_limit;
-                break;
-            }
-
-            wait_next_ea_blocks(limiting_ea_index);
-            // consider next limiting EA
-            limiting_ea_index = m_external_min_tree.top();
-            STXXL_ASSERT(limiting_ea_index < (int)eas);
-        }
-
-        // build sequences
-        for (size_type i = 0; i < eas + ias; ++i) {
-            iterator begin, end;
-
-            if (i < eas) {
-                assert(!m_external_arrays[i].empty());
-                assert(m_external_arrays[i].valid());
-                begin = m_external_arrays[i].begin();
-                end = m_external_arrays[i].end();
-            }
-            else {
-                size_type j = i - eas;
-                assert(!(m_internal_arrays[j].empty()));
-                begin = m_internal_arrays[j].begin();
-                end = m_internal_arrays[j].end();
-            }
-
-            end = std::lower_bound(begin, end, this_limit, m_inv_compare);
-
-            sizes[i] = std::distance(begin, end);
-            sequences[i] = std::make_pair(begin, end);
-        }
-
-        output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
-        if (output_size > max_size) output_size = max_size;
-        out.resize(output_size);
-
-        potentially_parallel::multiway_merge(
-            sequences.begin(), sequences.end(),
-            out.begin(), output_size, m_inv_compare);
-
-        cleanup_arrays(sequences, sizes, eas, ias);
-
-        check_invariants();
-    }
-
-    //! Access the minimum element, which can only be in the extract buffer.
-    const value_type & limit_top()
-    {
-        assert(m_limit_extract);
-        assert(m_extract_buffer_size > 0);
-
-        return m_extract_buffer[m_extract_buffer_index];
-    }
-
-    //! Remove the minimum element, only works correctly while elements < L.
-    void limit_pop()
-    {
-        assert(m_limit_extract);
-
-        ++m_extract_buffer_index;
-        assert(m_extract_buffer_size > 0);
-        --m_extract_buffer_size;
-
-        if (extract_buffer_empty()) {
-            // no need to modify extract_buffer, since it will extract smallest
-            // items into the EB.
-            refill_extract_buffer(std::min(m_extract_buffer_limit,
-                                           m_internal_size + m_external_size));
-        }
-    }
-
-    //! Finish bulk-limit extraction session.
-    void limit_end()
-    {
-        assert(m_limit_extract);
-
-        bulk_push_end();
-
-        m_limit_extract = false;
-    }
-
-    //! \}
-
+public:
     /*!
      * Merges all external arrays and all internal arrays into one external array.
      * Public for benchmark purposes.
@@ -3777,29 +3785,6 @@ protected:
             STXXL_DEBUG("return with needs_limit: eas=" << eas);
             return eas;
         }
-    }
-
-public:
-    //! Extract exactly n values at once.
-    void bulk_pop_n(std::vector<value_type>& out, size_t num_elements)
-    {
-        assert(num_elements > 0);
-        const size_t n_elements = std::min<size_t>(num_elements, size());
-        assert(n_elements < m_extract_buffer_limit);
-
-        if (m_heaps_size > 0)
-            flush_insertion_heaps();
-
-        if (m_extract_buffer_size > 0)
-            convert_eb_into_ia();
-
-        refill_extract_buffer(n_elements, n_elements);
-
-        out.resize(0);
-        using std::swap;
-        swap(m_extract_buffer, out);
-        m_extract_buffer_index = 0;
-        m_extract_buffer_size = 0;
     }
 
 protected:

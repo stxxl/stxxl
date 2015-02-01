@@ -114,7 +114,7 @@ void test_simple()
     STXXL_CHECK(ppq.empty());
 }
 
-void test_bulk_pop_n()
+void test_bulk_pop()
 {
     ppq_type ppq(my_cmp(), 512 * 1024L * 1024L, 4);
 
@@ -123,7 +123,7 @@ void test_bulk_pop_n()
 
     uint64 nelements = volume / sizeof(my_type);
 
-    STXXL_MSG("Running bulk_pop_n() test. bulk_size = " << bulk_size);
+    STXXL_MSG("Running bulk_pop() test. bulk_size = " << bulk_size);
 
     {
         scoped_print_timer timer("Filling PPQ",
@@ -150,7 +150,7 @@ void test_bulk_pop_n()
             STXXL_CHECK(!ppq.empty());
 
             std::vector<my_type> out;
-            ppq.bulk_pop_n(out, bulk_size);
+            ppq.bulk_pop(out, bulk_size);
 
             for (uint64 j = 0; j < out.size(); ++j) {
                 const uint64 index = i * bulk_size + j;
@@ -256,7 +256,7 @@ int main()
 {
     test_simple();
 
-    //test_bulk_pop_n();
+    test_bulk_pop();
 
     test_bulk_limit(1000);
     test_bulk_limit(1000000);
