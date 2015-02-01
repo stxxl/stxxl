@@ -291,6 +291,31 @@ public:
         }
     }
 
+    void limit_begin(const value_type& /* v */, size_t /* bulk_size */)
+    {
+        if (!m_have_warned) {
+            std::cout << name() << ": limit_begin not supported\n";
+            m_have_warned = true;
+        }
+    }
+
+    void limit_end()
+    {
+        if (!m_have_warned) {
+            std::cout << name() << ": limit_end not supported\n";
+        }
+    }
+
+    void limit_push(const value_type& v, int /* thread_num */)
+    {
+        backend.push(v);
+    }
+
+    value_type limit_top_pop()
+    {
+        return top_pop();
+    }
+
     //! Output additional stats
     void print_stats()
     { }
@@ -363,6 +388,32 @@ template <>
 void Container<ppq_type>::bulk_pop(std::vector<value_type>& v, size_t max_size)
 {
     backend.bulk_pop(v, max_size);
+}
+
+template <>
+void Container<ppq_type>::limit_begin(const value_type& v, size_t bulk_size)
+{
+    backend.limit_begin(v, bulk_size);
+}
+
+template <>
+void Container<ppq_type>::limit_end()
+{
+    backend.limit_end();
+}
+
+template <>
+void Container<ppq_type>::limit_push(const value_type& v, int thread_num)
+{
+    backend.limit_push(v, thread_num);
+}
+
+template <>
+value_type Container<ppq_type>::limit_top_pop()
+{
+    value_type top = backend.limit_top();
+    backend.limit_pop();
+    return top;
 }
 
 template <>
@@ -1117,17 +1168,21 @@ void do_bulk_push_pop(ContainerType& c)
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
 
-    const int repeats = 16;
+    // fill PQ with num_elements / 4 items
 
-    // first insert 2 * bulk_size items
+    c.bulk_push_begin(num_elements / 2);
 
-    c.bulk_push_begin(2 * bulk_size);
-    for (uint64 i = 0; i < 2 * bulk_size; ++i)
-        c.bulk_push(value_type(windex++), i % g_max_threads);
+    for (uint64 i = 0; i < num_elements / 4; ++i)
+        c.bulk_push(value_type(windex++), 0);
+
     c.bulk_push_end();
 
     // extract bulk_size items, and reinsert them with higher indexes
-    for (int r = 0; r < repeats; ++r)
+
+    const size_t cycles = (num_elements / 2) / bulk_size / 2;
+    std::cout << "bulk-limit cycles: " << cycles << "\n";
+
+    for (int cyc = 0; cyc < cycles; ++cyc)
     {
         uint64 this_bulk_size = bulk_size; // / 2 + g_rand() % bulk_size;
 
@@ -1142,23 +1197,22 @@ void do_bulk_push_pop(ContainerType& c)
                 c.push(value_type(windex++));
             }
         }
-#if 0
-        else if (0) // bulk-limit procedure
+        else if (1) // bulk-limit procedure
         {
             c.limit_begin(value_type(windex), bulk_size);
 
             for (uint64 i = 0; i < this_bulk_size; ++i)
             {
-                value_type top = c.limit_top();
-                c.limit_pop();
+                value_type top = c.limit_top_pop();
                 STXXL_CHECK_EQUAL(top.first, rindex);
                 ++rindex;
 
-                c.push(value_type(windex++));
+                c.limit_push(value_type(windex++), 0);
             }
 
             c.limit_end();
         }
+#if 0
         else // bulk-pop/push procedure
         {
             std::vector<value_type> work;
@@ -1181,12 +1235,17 @@ void do_bulk_push_pop(ContainerType& c)
 
     STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
 
-    // extract last items
-    for (int i = 0; i < 2 * bulk_size; ++i)
+    // extract remaining items
+    std::vector<value_type> work;
+    while (!c.empty())
     {
-        value_type top = c.top_pop();
-        STXXL_CHECK_EQUAL(top.first, rindex);
-        ++rindex;
+        c.bulk_pop(work, std::min<size_t>(bulk_size, c.size()));
+
+        for (uint64 j = 0; j < work.size(); ++j)
+        {
+            STXXL_CHECK_EQUAL(work[j].first, rindex);
+            ++rindex;
+        }
     }
 
     STXXL_CHECK(c.empty());
@@ -1422,7 +1481,7 @@ void run_benchmark(ContainerType& c, const std::string& testset)
         }
     }
     else if (testset == "bulk-limit") {
-        scoped_stats stats(c, testset, testdesc, 4);
+        scoped_stats stats(c, testset, testdesc, 1);
         do_bulk_push_pop(c);
     }
     else if (testset == "dijkstra") {

@@ -214,7 +214,7 @@ void test_bulk_limit(const int bulk_size)
                 STXXL_CHECK_EQUAL(top.key, rindex);
                 ++rindex;
 
-                ppq.push(my_type(windex++));
+                ppq.limit_push(my_type(windex++));
             }
 
             ppq.limit_end();
