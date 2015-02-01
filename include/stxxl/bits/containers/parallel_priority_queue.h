@@ -2821,6 +2821,8 @@ public:
         swap(m_extract_buffer, out);
         m_extract_buffer_index = 0;
         m_extract_buffer_size = 0;
+
+        check_invariants();
     }
 
     //! Extracts all elements which are greater or equal to a given limit.
