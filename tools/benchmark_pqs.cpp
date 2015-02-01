@@ -288,7 +288,7 @@ std::string Container<stxxlpq_type>::name()
 template <>
 std::string Container<stxxlpq_type>::shortname()
 {
-    return "oldpq";
+    return "spq";
 }
 
 // *** Specialization for STXXL Parallel PQ
@@ -344,7 +344,7 @@ std::string Container<stlpq_type>::name()
 template <>
 std::string Container<stlpq_type>::shortname()
 {
-    return "stlpq";
+    return "stl";
 }
 
 typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
@@ -429,9 +429,14 @@ public:
                   << " read_count=" << s.get_reads()
                   << " read_vol=" << s.get_read_volume()
                   << " read_time=" << s.get_read_time()
+                  << " pread_time=" << s.get_pread_time()
                   << " write_count=" << s.get_writes()
                   << " write_vol=" << s.get_written_volume()
                   << " write_time=" << s.get_write_time()
+                  << " pwrite_time=" << s.get_pwrite_time()
+                  << " wait_io_time=" << s.get_io_wait_time()
+                  << " wait_read_time=" << s.get_wait_read_time()
+                  << " wait_write_time=" << s.get_wait_write_time()
                   << " ram=" << RAM
                   << " block_size=" << block_size
                   << " bulk_size=" << bulk_size
