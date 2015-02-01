@@ -1039,6 +1039,12 @@ public:
         return i - begin;
     }
 
+    //! Returns the number of blocks loaded in RAM.
+    size_t num_used_blocks() const
+    {
+        return get_end_block_index() - (m_index / block_items);
+    }
+
     //! Removes the first n elements from the array. Returns the number of
     //! blocks released into the block pool.
     unsigned_type remove_items(size_t n)
@@ -2425,7 +2431,14 @@ public:
 
     //! Destructor.
     ~parallel_priority_queue()
-    { }
+    {
+        // clean up data structures
+
+        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        {
+            delete m_proc[p];
+        }
+    }
 
 protected:
     //! Initializes member variables concerning the memory management.
@@ -2468,12 +2481,14 @@ protected:
 
         // count number of blocks hinted in prefetcher
 
-        size_t num_hinted = 0;
+        size_t num_hinted = 0, num_used_read = 0;
         for (size_t i = 0; i < m_external_arrays.size(); ++i) {
             num_hinted += m_external_arrays[i].num_hinted_blocks();
+            num_used_read += m_external_arrays[i].num_used_blocks();
         }
 
         STXXL_CHECK(num_hinted == m_num_hinted_blocks);
+        STXXL_CHECK(num_used_read == m_num_used_read_blocks);
 
         STXXL_CHECK_EQUAL(m_num_used_read_blocks,
                           m_num_read_blocks
