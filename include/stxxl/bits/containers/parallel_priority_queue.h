@@ -2827,6 +2827,7 @@ public:
         swap(m_extract_buffer, out);
         m_extract_buffer_index = 0;
         m_extract_buffer_size = 0;
+        m_minima.deactivate_extract_buffer();
 
         check_invariants();
     }
@@ -2835,7 +2836,9 @@ public:
     //! \param out result vector
     //! \param limit limit value
     //! \param max_size maximum number of items to extract
-    void bulk_pop_limit(std::vector<value_type>& out, const value_type& limit,
+    //! \return true if the buffer contains all items < limit, false it was too
+    //! small.
+    bool bulk_pop_limit(std::vector<value_type>& out, const value_type& limit,
                         size_t max_size = std::numeric_limits<size_t>::max())
     {
         STXXL_DEBUG("bulk_pop_limit with limit=" << limit);
@@ -2860,6 +2863,7 @@ public:
 
         // pop limit may have to change due to memory limit
         value_type this_limit = limit;
+        bool has_full_range = true;
 
         // get all relevant blocks
         while (limiting_ea_index > -1)
@@ -2875,6 +2879,7 @@ public:
             if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0) {
                 // No more read/prefetch blocks available for EA
                 this_limit = ea_limit;
+                has_full_range = false;
                 break;
             }
 
@@ -2908,8 +2913,16 @@ public:
         }
 
         output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
-        if (output_size > max_size) output_size = max_size;
+        if (output_size > max_size) {
+            output_size = max_size;
+            has_full_range = false;
+        }
         out.resize(output_size);
+
+        STXXL_DEBUG("bulk_pop_limit with" <<
+                    " sequences=" << sequences.size() <<
+                    " output_size=" << output_size <<
+                    " has_full_range=" << has_full_range);
 
         potentially_parallel::multiway_merge(
             sequences.begin(), sequences.end(),
@@ -2918,6 +2931,8 @@ public:
         cleanup_arrays(sequences, sizes, eas, ias);
 
         check_invariants();
+
+        return has_full_range;
     }
 
 #if TODO_MAYBE_FIXUP_LATER
