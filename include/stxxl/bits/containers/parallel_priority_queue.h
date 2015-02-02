@@ -3186,6 +3186,9 @@ protected:
     //! flag if inside a bulk limit extract session
     bool m_limit_extract;
 
+    //! flag if the extract buffer contains the full limit range
+    bool m_limit_has_full_range;
+
 public:
     //! Begin bulk-limit extraction session with limit element.
     void limit_begin(const value_type& limit, size_type bulk_size)
@@ -3193,25 +3196,19 @@ public:
         m_limit_extract = true;
         m_limit_element = limit;
 
-        check_invariants();
+        std::vector<value_type> new_extract_buffer;
+        m_limit_has_full_range =
+            bulk_pop_limit(new_extract_buffer, limit, m_extract_buffer_limit);
+        std::swap(new_extract_buffer, m_extract_buffer);
 
-        if (m_heaps_size > 0) {
-            if (0)
-                flush_insertion_heaps();
-            else if (1)
-                flush_insertion_heaps_with_limit(limit);
-        }
-
-        // release extract buffer
-        if (m_extract_buffer_size > 0)
-            convert_eb_into_ia();
-
-        check_invariants();
+        m_extract_buffer_index = 0;
+        m_extract_buffer_size = m_extract_buffer.size();
+        if (m_extract_buffer_size)
+            m_minima.update_extract_buffer();
+        else
+            m_minima.deactivate_extract_buffer();
 
         bulk_push_begin(bulk_size);
-
-        refill_extract_buffer(std::min(m_extract_buffer_limit,
-                                       m_internal_size + m_external_size));
     }
 
     //! Push new item >= bulk-limit element into insertion heap p.
@@ -3227,9 +3224,12 @@ public:
     const value_type & limit_top()
     {
         assert(m_limit_extract);
-        assert(m_extract_buffer_size > 0);
+        assert(m_extract_buffer_size > 0 || m_limit_has_full_range);
 
-        return m_extract_buffer[m_extract_buffer_index];
+        if (m_extract_buffer_size == 0)
+            return m_limit_element;
+        else
+            return m_extract_buffer[m_extract_buffer_index];
     }
 
     //! Remove the minimum element, only works correctly while elements < L.
@@ -3241,11 +3241,22 @@ public:
         assert(m_extract_buffer_size > 0);
         --m_extract_buffer_size;
 
-        if (extract_buffer_empty()) {
-            // no need to modify extract_buffer, since it will extract smallest
-            // items into the EB.
-            refill_extract_buffer(std::min(m_extract_buffer_limit,
-                                           m_internal_size + m_external_size));
+        if (extract_buffer_empty() && !m_limit_has_full_range)
+        {
+            // extract more items
+            std::vector<value_type> new_extract_buffer;
+            m_limit_has_full_range =
+                bulk_pop_limit(new_extract_buffer, m_limit_element,
+                               m_extract_buffer_limit);
+
+            std::swap(new_extract_buffer, m_extract_buffer);
+
+            m_extract_buffer_index = 0;
+            m_extract_buffer_size = m_extract_buffer.size();
+            if (m_extract_buffer_size)
+                m_minima.update_extract_buffer();
+            else
+                m_minima.deactivate_extract_buffer();
         }
     }
 
