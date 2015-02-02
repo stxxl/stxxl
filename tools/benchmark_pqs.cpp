@@ -223,6 +223,12 @@ public:
         backend.push(v);
     }
 
+    //! Simple single top() operation.
+    value_type top()
+    {
+        return backend.top();
+    }
+
     //! Simple single pop() operation
     void pop()
     {
@@ -232,9 +238,9 @@ public:
     //! Simple single top() and pop() operation.
     value_type top_pop()
     {
-        value_type top = backend.top();
-        backend.pop();
-        return top;
+        value_type item = top();
+        pop();
+        return item;
     }
 
     //! Operation called after filling the container.
@@ -309,6 +315,11 @@ public:
     void limit_push(const value_type& v, int /* thread_num */)
     {
         backend.push(v);
+    }
+
+    value_type limit_top()
+    {
+        return top();
     }
 
     value_type limit_top_pop()
@@ -409,6 +420,12 @@ void Container<ppq_type>::limit_push(const value_type& v, int thread_num)
 }
 
 template <>
+value_type Container<ppq_type>::limit_top()
+{
+    return backend.limit_top();
+}
+
+template <>
 value_type Container<ppq_type>::limit_top_pop()
 {
     value_type top = backend.limit_top();
@@ -455,17 +472,15 @@ std::string Container<sorter_type>::shortname()
 }
 
 template <>
-void Container<sorter_type>::pop()
+value_type Container<sorter_type>::top()
 {
-    ++backend;
+    return *backend;
 }
 
 template <>
-value_type Container<sorter_type>::top_pop()
+void Container<sorter_type>::pop()
 {
-    value_type top = *backend;
     ++backend;
-    return top;
 }
 
 template <>
@@ -1160,82 +1175,49 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 
 #endif
 
+// *****************************************************************************
+// Bulk Limit and Pop/Push Operations
+
 template <typename ContainerType>
-void do_bulk_push_pop(ContainerType& c)
+void do_bulk_prefill(ContainerType& c, bool parallel, value_type::key_type& windex)
 {
-    typedef value_type::key_type key_type;
+    // fill PQ with num_elements items
 
-    key_type windex = 0; // continuous insertion index
-    key_type rindex = 0; // continuous pop index
-
-    // fill PQ with num_elements / 4 items
+    scoped_stats stats(c, g_testset + "|prefill", c.name() + ": prefill", 1);
 
     c.bulk_push_begin(num_elements / 2);
 
-    for (uint64 i = 0; i < num_elements / 4; ++i)
-        c.bulk_push(value_type(windex++), 0);
+#if STXXL_PARALLEL
+#pragma omp parallel if(parallel)
+#endif
+    {
+        const unsigned int thread_num =
+            parallel ? get_thread_num() : 0;
+#if STXXL_PARALLEL
+#pragma omp for
+#endif
+        for (uint64 i = 0; i < num_elements; ++i)
+            c.bulk_push(value_type(i), thread_num);
+    }
 
     c.bulk_push_end();
 
-    // extract bulk_size items, and reinsert them with higher indexes
+    windex += num_elements;
 
-    const size_t cycles = (num_elements / 2) / bulk_size / 2;
-    std::cout << "bulk-limit cycles: " << cycles << "\n";
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
+}
 
-    for (int cyc = 0; cyc < cycles; ++cyc)
-    {
-        uint64 this_bulk_size = bulk_size; // / 2 + g_rand() % bulk_size;
-
-        if (1)                             // simple procedure
-        {
-            for (uint64 i = 0; i < this_bulk_size; ++i)
-            {
-                value_type top = c.top_pop();
-                STXXL_CHECK_EQUAL(top.first, rindex);
-                ++rindex;
-
-                c.push(value_type(windex++));
-            }
-        }
-        else if (1) // bulk-limit procedure
-        {
-            c.limit_begin(value_type(windex), bulk_size);
-
-            for (uint64 i = 0; i < this_bulk_size; ++i)
-            {
-                value_type top = c.limit_top_pop();
-                STXXL_CHECK_EQUAL(top.first, rindex);
-                ++rindex;
-
-                c.limit_push(value_type(windex++), 0);
-            }
-
-            c.limit_end();
-        }
-#if 0
-        else // bulk-pop/push procedure
-        {
-            std::vector<value_type> work;
-            c.bulk_pop_limit(work, value_type(windex));
-
-            c.bulk_push_begin(this_bulk_size);
-
-            // not parallel!
-            for (uint64 i = 0; i < work.size(); ++i)
-            {
-                STXXL_CHECK_EQUAL(work[i].first, rindex);
-                ++rindex;
-                c.bulk_push(value_type(windex++), i % g_max_threads);
-            }
-
-            c.bulk_push_end();
-        }
-#endif
-    }
-
-    STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
-
+template <typename ContainerType>
+void do_bulk_postempty(ContainerType& c, bool /* parallel */,
+                       value_type::key_type& rindex)
+{
     // extract remaining items
+
+    scoped_stats stats(c, g_testset + "|postempty",
+                       c.name() + ": post empty", 1);
+
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
+
     std::vector<value_type> work;
     while (!c.empty())
     {
@@ -1249,6 +1231,144 @@ void do_bulk_push_pop(ContainerType& c)
     }
 
     STXXL_CHECK(c.empty());
+}
+
+template <bool RandomizeBulkSize, typename ContainerType>
+void do_bulk_limit(ContainerType& c, bool parallel)
+{
+    typedef value_type::key_type key_type;
+
+    key_type windex = 0; // continuous insertion index
+    key_type rindex = 0; // continuous pop index
+
+    do_bulk_prefill(c, parallel, windex);
+
+    // extract bulk_size items, and reinsert them with higher indexes
+    {
+        scoped_stats stats(c, g_testset + "|cycles",
+                           c.name() + ": running bulk-limit cycles", 1);
+
+        size_t cycles = 0;
+
+        for (uint64 elem = 0; elem < num_elements; ++cycles)
+        {
+            uint64 this_bulk_size = RandomizeBulkSize
+                                    ? g_rand() % bulk_size
+                                    : bulk_size;
+
+            this_bulk_size = std::min(num_elements, this_bulk_size);
+            elem += this_bulk_size * 2;
+
+            if (0) // simple test procedure
+            {
+                for (uint64 i = 0; i < this_bulk_size; ++i)
+                {
+                    value_type top = c.top_pop();
+                    STXXL_CHECK_EQUAL(top.first, rindex);
+                    ++rindex;
+
+                    c.push(value_type(windex++));
+                }
+            }
+            else // bulk-limit procedure
+            {
+                value_type limit = value_type(rindex + this_bulk_size);
+                c.limit_begin(limit, this_bulk_size);
+
+                unsigned iterations = 0;
+
+                while (c.limit_top().first < limit.first)
+                {
+                    value_type top = c.limit_top_pop();
+                    STXXL_CHECK_EQUAL(top.first, rindex);
+                    ++rindex;
+
+                    c.limit_push(value_type(windex++), 0);
+                    ++iterations;
+                }
+
+                c.limit_end();
+                STXXL_CHECK(iterations == this_bulk_size);
+            }
+        }
+
+        std::cout << "bulk-limit cycles: " << cycles << "\n";
+    }
+
+    STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
+
+    do_bulk_postempty(c, parallel, rindex);
+}
+
+template <bool RandomizeBulkSize, typename ContainerType>
+void do_bulk_pop_push(ContainerType& c, bool parallel)
+{
+    typedef value_type::key_type key_type;
+
+    key_type windex = 0; // continuous insertion index
+    key_type rindex = 0; // continuous pop index
+
+    do_bulk_prefill(c, parallel, windex);
+
+    // extract bulk_size items, and reinsert them with higher indexes
+    {
+        scoped_stats stats(c, g_testset + "|cycles",
+                           c.name() + ": running bulk-pop-push cycles", 1);
+
+        size_t cycles = 0;
+        std::vector<value_type> work;
+
+        for (uint64 elem = 0; elem < num_elements; ++cycles)
+        {
+            uint64 this_bulk_size = RandomizeBulkSize
+                                    ? g_rand() % bulk_size
+                                    : bulk_size;
+
+            this_bulk_size = std::min(num_elements, this_bulk_size);
+            elem += this_bulk_size * 2;
+
+            c.bulk_pop(work, this_bulk_size);
+            c.bulk_push_begin(this_bulk_size);
+
+            if (!parallel)
+            {
+                for (uint64 i = 0; i < work.size(); ++i)
+                {
+                    STXXL_CHECK_EQUAL(work[i].first, rindex + i);
+                    c.bulk_push(value_type(windex + i), 0);
+                }
+            }
+            else // (parallel)
+            {
+#if STXXL_PARALLEL
+#pragma omp parallel
+#endif
+                {
+                    const unsigned int thread_num = get_thread_num();
+#if STXXL_PARALLEL
+#pragma omp for schedule(static)
+#endif
+                    for (uint64 i = 0; i < work.size(); ++i)
+                    {
+                        STXXL_CHECK_EQUAL(work[i].first, rindex + i);
+                        c.bulk_push(value_type(windex + i), thread_num);
+                    }
+                }
+            }
+            c.bulk_push_end();
+
+            rindex += work.size();
+            windex += work.size();
+        }
+
+        std::cout << "bulk-pop-push cycles: " << cycles << "\n";
+    }
+
+    STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
+    STXXL_CHECK_EQUAL(c.size(), num_elements);
+
+    do_bulk_postempty(c, parallel, rindex);
 }
 
 /*
@@ -1411,8 +1531,10 @@ const char* benchmark_desc =
     "  push-rand-pop      push-rand and then pop all\n"
     "  push-asc-popcheck  push-asc and then pop and verify all\n"
     "  push-rand-popcheck push-rand and then pop and verify all\n"
-    "  bulk-push-pop      intermixed bulk-push and bulk-pop\n"
+    "  bulk-pop-push      intermixed bulk-pop and bulk-push\n"
     "  bulk-limit         intermixed bulk-limit sequence\n"
+    "  rbulk-pop-push     intermixed bulk-pop and bulk-push, random bulks\n"
+    "  rbulk-limit        intermixed bulk-limit sequence, random bulks\n"
     "  dijkstra           a Dijkstra SSSP test\n";
 
 template <typename ContainerType>
@@ -1481,8 +1603,20 @@ void run_benchmark(ContainerType& c, const std::string& testset)
         }
     }
     else if (testset == "bulk-limit") {
-        scoped_stats stats(c, testset, testdesc, 1);
-        do_bulk_push_pop(c);
+        scoped_stats stats(c, testset, testdesc, 4);
+        do_bulk_limit<false>(c, opt_parallel);
+    }
+    else if (testset == "rbulk-limit") {
+        scoped_stats stats(c, testset, testdesc, 4);
+        do_bulk_limit<true>(c, opt_parallel);
+    }
+    else if (testset == "bulk-pop-push") {
+        scoped_stats stats(c, testset, testdesc, 4);
+        do_bulk_pop_push<false>(c, opt_parallel);
+    }
+    else if (testset == "rbulk-pop-push") {
+        scoped_stats stats(c, testset, testdesc, 4);
+        do_bulk_pop_push<true>(c, opt_parallel);
     }
     else if (testset == "dijkstra") {
         do_dijkstra(c);
