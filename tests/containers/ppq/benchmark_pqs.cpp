@@ -345,13 +345,21 @@ typedef spq_generator_type::result spq_type;
 template <>
 std::string Container<spq_type>::name()
 {
-    return "STXXL PQ";
+#if STXXL_PARALLEL
+    return "STXXL PQ (parallelized)";
+#else
+    return "STXXL PQ (sequential)";
+#endif
 }
 
 template <>
 std::string Container<spq_type>::shortname()
 {
+#if STXXL_PARALLEL
     return "spq";
+#else
+    return "spqs";
+#endif
 }
 
 // *** Specialization for STXXL Parallel PQ
