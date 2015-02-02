@@ -279,7 +279,10 @@ protected:
     std::vector<value_type> m_values;
 
     //! Index of the current head
-    size_t m_min_index;
+    unsigned_type m_min_index;
+
+    //! Level of internal array (Sander's PQ: group number)
+    unsigned_type m_level;
 
     //! Begin and end pointers of the array
     //! This is used by the iterator
@@ -288,13 +291,15 @@ protected:
 public:
     //! Default constructor. Don't use this directy. Needed for regrowing in
     //! surrounding vector.
-    internal_array() { }
+    internal_array() : m_min_index(0) { }
 
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
     internal_array(std::vector<value_type>& values,
-                   unsigned_type min_index = 0)
-        : m_values(), m_min_index(min_index), m_block_pointers(1)
+                   unsigned_type min_index = 0,
+                   unsigned_type level = 0)
+        : m_values(), m_min_index(min_index), m_level(level),
+          m_block_pointers(1)
     {
         std::swap(m_values, values);
         m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.end()));
@@ -307,6 +312,7 @@ public:
 
         swap(m_values, o.m_values);
         swap(m_min_index, o.m_min_index);
+        swap(m_level, o.m_level);
         swap(m_block_pointers, o.m_block_pointers);
     }
 
@@ -352,6 +358,12 @@ public:
         return (m_min_index >= m_values.size());
     }
 
+    //! Make this array empty.
+    inline void make_empty()
+    {
+        m_min_index = m_values.size();
+    }
+
     //! Returns the current size of the array.
     inline size_t size() const
     {
@@ -362,6 +374,12 @@ public:
     inline size_t capacity() const
     {
         return m_values.size();
+    }
+
+    //! Returns the level (group number) of the array.
+    inline unsigned_type level() const
+    {
+        return m_level;
     }
 
     //! Return the amount of internal memory used by an array with the capacity
@@ -1795,6 +1813,12 @@ public:
         m_head.deactivate_player(EA);
     }
 
+    //! Return size of internal arrays minima tree
+    size_t ia_slots() const
+    {
+        return m_ia.num_slots();
+    }
+
     //! Returns a readable representation of the winner tree as string.
     std::string to_string() const
     {
@@ -1876,6 +1900,9 @@ public:
     typedef std::pair<iterator, iterator> iterator_pair_type;
 
     static const bool debug = false;
+
+    //! currently global public tuning parameter:
+    unsigned_type c_max_internal_level_size;
 
 protected:
     //! type of insertion heap itself
@@ -2079,6 +2106,12 @@ protected:
     //! The aggregated pushes. They cannot be extracted yet.
     std::vector<value_type> m_aggregated_pushes;
 
+    //! The maximum number of internal array levels.
+    static const unsigned_type c_max_internal_levels = 8;
+
+    //! The number of internal arrays on each level, we use plain array.
+    unsigned_type m_internal_levels[c_max_internal_levels];
+
     //! The winner tree containing the smallest values of all sources
     //! where the globally smallest element could come from.
     minima_type m_minima;
@@ -2134,47 +2167,6 @@ protected:
     //! \}
 
     /*
-     * Helper function to add new internal arrays.
-     */
-
-    //! Add new internal array, requires that values are sorted! automatically
-    //! decreases m_mem_left!
-    void add_as_internal_array(std::vector<value_type>& values,
-                               unsigned_type used = 0)
-    {
-        const size_t size = values.size();
-        const size_t capacity = values.capacity();
-        assert(size > used); // at least one element
-
-        internal_array_type new_array(values, used);
-        STXXL_ASSERT(new_array.int_memory() ==
-                     internal_array_type::int_memory(capacity));
-        m_internal_arrays.swap_back(new_array);
-
-        if (c_merge_ias_into_eb) {
-            if (!extract_buffer_empty()) {
-                m_stats.num_new_internal_arrays++;
-                m_stats.max_num_new_internal_arrays.set_max(
-                    m_stats.num_new_internal_arrays);
-
-                m_minima.add_internal_array(
-                    static_cast<unsigned>(m_internal_arrays.size()) - 1
-                    );
-            }
-        }
-        else {
-            m_minima.add_internal_array(
-                static_cast<unsigned>(m_internal_arrays.size()) - 1
-                );
-        }
-
-        m_internal_size += size - used;
-        m_mem_left -= internal_array_type::int_memory(capacity);
-
-        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
-    }
-
-    /*
      * Helper function to remove empty internal/external arrays.
      */
 
@@ -2202,7 +2194,12 @@ protected:
              ia != m_internal_arrays.end(); ++ia)
         {
             m_mem_left += ia->int_memory();
+            --m_internal_levels[ia->level()];
         }
+
+        if (swap_end != m_internal_arrays.end())
+            STXXL_DEBUG0("cleanup_internal_arrays" <<
+                         " cleaned=" << m_internal_arrays.end() - swap_end);
 
         m_internal_arrays.erase(swap_end, m_internal_arrays.end());
     }
@@ -2329,7 +2326,8 @@ public:
         unsigned_type num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
         size_type extract_buffer_ram = 0)
-        : m_compare(compare),
+        : c_max_internal_level_size(256),
+          m_compare(compare),
           m_inv_compare(m_compare),
           // Parameters and Sizes for Memory Allocation Policy
 #if STXXL_PARALLEL
@@ -2385,6 +2383,9 @@ public:
                                      : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(value_type)));
         }
 
+        for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
+            m_internal_levels[i] = 0;
+
         init_memmanagement();
 
         // reverse insertion heap memory on processor-local memory
@@ -2422,7 +2423,7 @@ public:
         if (m_mem_total < m_mem_left) // checks if unsigned type wrapped.
         {
             STXXL_ERRMSG("Minimum memory requirement insufficient, "
-                         "increase PPQ's memory limit.");
+                         "increase PPQ's memory limit or decrease buffers.");
             abort();
         }
 
@@ -2464,7 +2465,7 @@ protected:
     }
 
     //! Assert many invariants of the data structures.
-    void check_invariants()
+    void check_invariants() const
     {
 #ifdef NDEBUG
         // disable in Release builds
@@ -2521,24 +2522,29 @@ protected:
 
         size_type ia_size = 0;
         size_type ia_memory = 0;
+        std::vector<unsigned_type> ia_levels(c_max_internal_levels, 0);
 
-        for (typename internal_arrays_type::iterator ia = m_internal_arrays.begin();
-             ia != m_internal_arrays.end(); ++ia)
+        for (typename internal_arrays_type::const_iterator ia =
+                 m_internal_arrays.begin(); ia != m_internal_arrays.end(); ++ia)
         {
             ia_size += ia->size();
             ia_memory += ia->int_memory();
+            ++ia_levels[ia->level()];
         }
 
         STXXL_CHECK_EQUAL(m_internal_size, ia_size);
         mem_used += ia_memory;
+
+        for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
+            STXXL_CHECK_EQUAL(m_internal_levels[i], ia_levels[i]);
 
         // count number of items in external arrays
 
         size_type ea_size = 0;
         size_type ea_memory = 0;
 
-        for (typename external_arrays_type::iterator ea = m_external_arrays.begin();
-             ea != m_external_arrays.end(); ++ea)
+        for (typename external_arrays_type::const_iterator ea =
+                 m_external_arrays.begin(); ea != m_external_arrays.end(); ++ea)
         {
             ea_size += ea->size();
             ea_memory += ea->int_memory();
@@ -3817,7 +3823,9 @@ protected:
     inline void refill_extract_buffer(size_t minimum_size = 0,
                                       size_t maximum_size = 0)
     {
-        STXXL_DEBUG("refilling extract buffer");
+        STXXL_DEBUG("refilling extract buffer" <<
+                    " ia_size=" << m_internal_arrays.size() <<
+                    " ea_size=" << m_external_arrays.size());
 
         if (maximum_size == 0)
             maximum_size = m_extract_buffer_limit;
@@ -3982,16 +3990,16 @@ protected:
             cleanup_internal_arrays();
     }
 
-    //! Flushes the insertions heap id into an internal array.
-    inline void flush_insertion_heap(unsigned_type id)
+    //! Flushes the insertions heap p into an internal array.
+    inline void flush_insertion_heap(unsigned_type p)
     {
-        assert(m_proc[id]->insertion_heap.size() != 0);
+        assert(m_proc[p]->insertion_heap.size() != 0);
 
-        heap_type& insheap = m_proc[id]->insertion_heap;
+        heap_type& insheap = m_proc[p]->insertion_heap;
         size_t size = insheap.size();
 
         STXXL_DEBUG0(
-            "Flushing insertion heap array id=" << id <<
+            "Flushing insertion heap array p=" << p <<
             " size=" << insheap.size() <<
             " capacity=" << insheap.capacity() <<
             " int_memory=" << internal_array_type::int_memory(insheap.size()) <<
@@ -4027,13 +4035,13 @@ protected:
             m_heaps_size -= size;
 
             // invalidate player in minima tree
-            m_minima.deactivate_heap(id);
+            m_minima.deactivate_heap(p);
         }
 
         m_stats.insertion_heap_flush_time += flush_time;
     }
 
-    //! Flushes the insertions heaps into an internal array.
+    //! Flushes all insertions heaps into an internal array.
     inline void flush_insertion_heaps()
     {
         size_type max_mem_needed;
@@ -4098,13 +4106,12 @@ protected:
             {
                 heap_type& insheap = m_proc[i]->insertion_heap;
 
-                if (insheap.size() > 0)
-                {
-                    add_as_internal_array(insheap);
+                if (insheap.size() == 0) continue;
 
-                    // reserve new insertion heap
-                    insheap.reserve(m_insertion_heap_capacity);
-                }
+                add_as_internal_array(insheap);
+
+                // reserve new insertion heap
+                insheap.reserve(m_insertion_heap_capacity);
             }
 
             m_minima.clear_heaps();
@@ -4176,6 +4183,9 @@ protected:
         m_internal_arrays.clear();
         m_stats.num_new_internal_arrays = 0;
 
+        for (size_t i = 0; i < c_max_internal_levels; ++i)
+            m_internal_levels[i] = 0;
+
         m_mem_left += int_memory;
         m_mem_left -= m_external_arrays.back().int_memory();
 
@@ -4185,6 +4195,105 @@ protected:
         m_stats.internal_array_flush_time.stop();
 
         check_invariants();
+    }
+
+    //! Add new internal array, which requires that values are sorted!
+    //! automatically decreases m_mem_left! also merges internal arrays if
+    //! there are too many internal arrays on the same level.
+    void add_as_internal_array(std::vector<value_type>& values,
+                               unsigned_type used = 0,
+                               unsigned_type level = 0)
+    {
+        const size_t size = values.size();
+        const size_t capacity = values.capacity();
+        assert(size > used); // at least one element
+
+        internal_array_type new_array(values, used, level);
+        STXXL_ASSERT(new_array.int_memory() ==
+                     internal_array_type::int_memory(capacity));
+        m_internal_arrays.swap_back(new_array);
+
+        if (c_merge_ias_into_eb) {
+            if (!extract_buffer_empty()) {
+                m_stats.num_new_internal_arrays++;
+                m_stats.max_num_new_internal_arrays.set_max(
+                    m_stats.num_new_internal_arrays);
+
+                m_minima.add_internal_array(
+                    static_cast<unsigned>(m_internal_arrays.size()) - 1
+                    );
+            }
+        }
+        else {
+            m_minima.add_internal_array(
+                static_cast<unsigned>(m_internal_arrays.size()) - 1
+                );
+        }
+
+        m_internal_size += size - used;
+        m_mem_left -= internal_array_type::int_memory(capacity);
+
+        STXXL_CHECK(level < c_max_internal_levels &&
+                    "Internal array level is larger than anything possible "
+                    "in this universe. Increase the size of m_internal_levels");
+
+        ++m_internal_levels[level];
+
+        m_stats.max_num_internal_arrays.set_max(m_internal_arrays.size());
+
+        // if IA level is too large ...
+        if (m_internal_levels[level] < c_max_internal_level_size) return;
+
+        unsigned_type level_size = 0;
+        size_type int_memory = 0;
+        std::vector<iterator_pair_type> sequences;
+        std::vector<unsigned_type> ia_index;
+
+        for (unsigned_type i = 0; i < m_internal_arrays.size(); ++i)
+        {
+            if (m_internal_arrays[i].level() != level) continue;
+            if (m_internal_arrays[i].empty()) continue;
+
+            level_size += m_internal_arrays[i].size();
+            int_memory += m_internal_arrays[i].int_memory();
+            sequences.push_back(std::make_pair(m_internal_arrays[i].begin(),
+                                               m_internal_arrays[i].end()));
+            ia_index.push_back(i);
+        }
+
+        // AND there is enough RAM to merge it (without flushing out to EA).
+        if (m_mem_left < internal_array_type::int_memory(level_size)) return;
+
+        // must free up more memory than the new array needs.
+        STXXL_ASSERT(int_memory >= internal_array_type::int_memory(level_size));
+
+        STXXL_DEBUG("merging internal arrays" <<
+                    " level=" << level <<
+                    " level_size=" << level_size <<
+                    " sequences=" << sequences.size());
+
+        std::vector<value_type> merged_array(level_size);
+
+        potentially_parallel::multiway_merge(
+            sequences.begin(), sequences.end(),
+            merged_array.begin(), level_size, m_inv_compare);
+
+        // release memory of old internal arrays immediately
+        for (unsigned_type i = 0; i < ia_index.size(); ++i)
+        {
+            unsigned_type ia = ia_index[i];
+            m_internal_arrays[ia].make_empty();
+            if (ia < m_minima.ia_slots())
+                m_minima.deactivate_internal_array(ia);
+        }
+
+        cleanup_internal_arrays();
+
+        // in add_as_internal_array the level_size is re-added!
+        m_internal_size -= level_size;
+
+        // add as new internal array at next level (and maybe recursively merge)
+        add_as_internal_array(merged_array, 0, level + 1);
     }
 
 #if TODO_FIXUP_LATER

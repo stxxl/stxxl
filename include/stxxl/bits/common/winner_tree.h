@@ -165,6 +165,12 @@ public:
         return (m_tree[0] < 0);
     }
 
+    //! Return the current number of slots
+    size_t num_slots() const
+    {
+        return m_num_slots;
+    }
+
     //! Replay after the value of the winning player has changed.
     inline void replay_on_pop()
     {
