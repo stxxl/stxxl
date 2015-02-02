@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tools/benchmark_pqs.cpp
+ *  tests/containers/ppq/benchmark_pqs.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -1630,7 +1630,7 @@ void run_benchmark(ContainerType& c, const std::string& testset)
  * The main procedure.
  */
 
-int benchmark_pqs(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     /*
      * Parse flags

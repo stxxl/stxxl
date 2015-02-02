@@ -49,7 +49,6 @@ extern int benchmark_files(int argc, char* argv[]);
 extern int benchmark_sort(int argc, char* argv[]);
 extern int benchmark_disks_random(int argc, char* argv[]);
 extern int benchmark_pqueue(int argc, char* argv[]);
-extern int benchmark_pqs(int argc, char* argv[]);
 extern int do_mlock(int argc, char* argv[]);
 extern int do_mallinfo(int argc, char* argv[]);
 
@@ -91,10 +90,6 @@ struct SubTool subtools[] = {
     {
         "benchmark_pqueue", &benchmark_pqueue, false,
         "Benchmark priority queue implementation using sequence of operations."
-    },
-    {
-        "benchmark_pqs", &benchmark_pqs, false,
-        "Benchmark different priority queue implementations using a sequence of operations."
     },
     {
         "mlock", &do_mlock, true,

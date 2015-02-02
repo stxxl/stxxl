@@ -10,6 +10,7 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
+stxxl_build_test(benchmark_pqs)
 stxxl_build_test(test_ppq)
 stxxl_build_test(test_ppq_arrays_and_iterator)
 
