@@ -110,6 +110,13 @@ public:
         m_tree[((m_tree.size() / 2) + index)] = index;
     }
 
+    //! deactivate a player
+    inline void deactivate_without_replay(unsigned int index)
+    {
+        assert(index<m_num_slots);
+        m_tree[((m_tree.size() / 2) + index)] = -1;
+    }
+
     //! deactivate a player and replay.
     inline void deactivate_player(unsigned int index)
     {
@@ -261,13 +268,29 @@ public:
         std::fill(m_tree.begin(), m_tree.end(), -1);
     }
 
-    //! Deactivate all players and resize the tree.
-    inline void resize_and_clear(unsigned num_players)
+    inline void resize(unsigned num_players)
     {
         m_num_slots = (1 << ilog2_ceil(num_players));
         unsigned int treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, -1);
+    }
+
+    //! Deactivate all players and resize the tree.
+    inline void resize_and_clear(unsigned num_players)
+    {
+        resize(num_players);
         clear();
+    }
+
+    inline void resize_and_rebuild(unsigned num_players)
+    {
+        //resize(num_players);
+        resize_and_clear(num_players);
+        for (unsigned i=0; i<num_players; ++i)
+            activate_without_replay(i);
+        //for (unsigned i=num_players; i<m_num_slots; ++i)
+        //    deactivate_without_replay(i);
+        rebuild();
     }
 
     //! Build from winner tree from scratch.
