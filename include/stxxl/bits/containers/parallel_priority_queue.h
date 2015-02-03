@@ -3821,15 +3821,16 @@ protected:
 
 protected:
     //! Convert extract buffer into a new internal array.
-    void convert_eb_into_ia()
+    void convert_eb_into_ia(bool do_not_flush = false)
     {
         if (m_extract_buffer_size == 0) return;
 
         // TODO: memory is NOT allocated, but extract buffer is currently not
         // counted
-        flush_ia_ea_until_memory_free(
-            internal_array_type::int_memory(m_extract_buffer.size())
-            );
+        if (!do_not_flush)
+            flush_ia_ea_until_memory_free(
+                internal_array_type::int_memory(m_extract_buffer.size())
+                );
 
         // first deactivate extract buffer to replay tree for new IA.
         m_minima.deactivate_extract_buffer();
@@ -4162,7 +4163,7 @@ protected:
         m_minima.clear_internal_arrays();
 
         // also flush extract buffer items out to disk.
-        convert_eb_into_ia();
+        convert_eb_into_ia(true);
 
         // clean up internal arrays that have been deleted in extract_min!
         cleanup_internal_arrays();
