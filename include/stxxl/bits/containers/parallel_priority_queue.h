@@ -1582,8 +1582,8 @@ protected:
                 ];
             case IA:
                 return m_ias[m_parent.m_ia.top()].get_min();
-            case EA:
-                return m_eas[m_parent.m_ea.top()].get_min();
+            //case EA:
+            //    return m_eas[m_parent.m_ea.top()].get_min();
             default:
                 abort();
             }
@@ -1633,21 +1633,21 @@ protected:
     };
 
     //! Comparator for the external arrays winner tree.
-    struct ea_comp
-    {
-        eas_type& m_eas;
-        const compare_type& m_compare;
+    // struct ea_comp
+    // {
+    //     eas_type& m_eas;
+    //     const compare_type& m_compare;
 
-        ea_comp(eas_type& eas, const compare_type& compare)
-            : m_eas(eas), m_compare(compare)
-        { }
+    //     ea_comp(eas_type& eas, const compare_type& compare)
+    //         : m_eas(eas), m_compare(compare)
+    //     { }
 
-        bool operator () (const int a, const int b) const
-        {
-            return m_compare(m_eas[a].get_min(),
-                             m_eas[b].get_min());
-        }
-    };
+    //     bool operator () (const int a, const int b) const
+    //     {
+    //         return m_compare(m_eas[a].get_min(),
+    //                          m_eas[b].get_min());
+    //     }
+    // };
 
 protected:
     //! The priority queue
@@ -1660,13 +1660,13 @@ protected:
     head_comp m_head_comp;
     heaps_comp m_heaps_comp;
     ia_comp m_ia_comp;
-    ea_comp m_ea_comp;
+    //ea_comp m_ea_comp;
 
     //! The winner trees
     winner_tree<head_comp> m_head;
     winner_tree<heaps_comp> m_heaps;
     winner_tree<ia_comp> m_ia;
-    winner_tree<ea_comp> m_ea;
+    //winner_tree<ea_comp> m_ea;
 
 public:
     //! Entries in the head winner tree.
@@ -1674,7 +1674,7 @@ public:
         HEAP = 0,
         EB = 1,
         IA = 2,
-        EA = 3,
+        //EA = 3,
         ERROR = 4
     };
 
@@ -1688,12 +1688,12 @@ public:
                       m_compare),
           m_heaps_comp(parent.m_proc, m_compare),
           m_ia_comp(parent.m_internal_arrays, m_compare),
-          m_ea_comp(parent.m_external_arrays, m_compare),
+          //m_ea_comp(parent.m_external_arrays, m_compare),
           // construct header winner tree
           m_head(4, m_head_comp),
           m_heaps(m_parent.m_num_insertion_heaps, m_heaps_comp),
-          m_ia(initial_ia_size, m_ia_comp),
-          m_ea(initial_ea_size, m_ea_comp)
+          m_ia(initial_ia_size, m_ia_comp)//,
+          //m_ea(initial_ea_size, m_ea_comp)
     { }
 
     //! Return smallest items of head winner tree.
@@ -1708,8 +1708,8 @@ public:
             return std::make_pair(EB, 0);
         case IA:
             return std::make_pair(IA, m_ia.top());
-        case EA:
-            return std::make_pair(EA, m_ea.top());
+        //case EA:
+        //    return std::make_pair(EA, m_ea.top());
         default:
             return std::make_pair(ERROR, 0);
         }
@@ -1736,11 +1736,11 @@ public:
     }
 
     //! Update minima tree after an item from an external array was removed.
-    void update_external_array(unsigned index)
-    {
-        m_ea.notify_change(index);
-        m_head.notify_change(EA);
-    }
+    // void update_external_array(unsigned index)
+    // {
+    //     m_ea.notify_change(index);
+    //     m_head.notify_change(EA);
+    // }
 
     //! Add a newly created internal array to the minima tree.
     void add_internal_array(unsigned index)
@@ -1750,11 +1750,11 @@ public:
     }
 
     //! Add a newly created external array to the minima tree.
-    void add_external_array(unsigned index)
-    {
-        m_ea.activate_player(index);
-        m_head.notify_change(EA);
-    }
+    // void add_external_array(unsigned index)
+    // {
+    //     m_ea.activate_player(index);
+    //     m_head.notify_change(EA);
+    // }
 
     //! Remove an insertion heap from the minima tree.
     void deactivate_heap(unsigned index)
@@ -1783,14 +1783,14 @@ public:
     }
 
     //! Remove an external array from the minima tree.
-    void deactivate_external_array(unsigned index)
-    {
-        m_ea.deactivate_player(index);
-        if (!m_ea.empty())
-            m_head.notify_change(EA);
-        else
-            m_head.deactivate_player(EA);
-    }
+    // void deactivate_external_array(unsigned index)
+    // {
+    //     m_ea.deactivate_player(index);
+    //     if (!m_ea.empty())
+    //         m_head.notify_change(EA);
+    //     else
+    //         m_head.deactivate_player(EA);
+    // }
 
     //! Remove all insertion heaps from the minima tree.
     void clear_heaps()
@@ -1807,10 +1807,19 @@ public:
     }
 
     //! Remove all external arrays from the minima tree.
-    void clear_external_arrays()
+    // void clear_external_arrays()
+    // {
+    //     m_ea.resize_and_clear(initial_ea_size);
+    //     m_head.deactivate_player(EA);
+    // }
+
+    void rebuild_internal_arrays()
     {
-        m_ea.resize_and_clear(initial_ea_size);
-        m_head.deactivate_player(EA);
+        m_ia.resize_and_rebuild(m_parent.m_internal_arrays.size());
+        if (!m_parent.m_internal_arrays.empty())
+            m_head.notify_change(IA);
+        else
+            m_head.deactivate_player(IA);
     }
 
     //! Return size of internal arrays minima tree
@@ -1826,7 +1835,7 @@ public:
         ss << "Head:" << std::endl << m_head.to_string() << std::endl;
         ss << "Heaps:" << std::endl << m_heaps.to_string() << std::endl;
         ss << "IA:" << std::endl << m_ia.to_string() << std::endl;
-        ss << "EA:" << std::endl << m_ea.to_string() << std::endl;
+        //ss << "EA:" << std::endl << m_ea.to_string() << std::endl;
         return ss.str();
     }
 
@@ -1839,8 +1848,8 @@ public:
         m_heaps.print_stats();
         STXXL_MSG("IA winner tree stats:");
         m_ia.print_stats();
-        STXXL_MSG("EA winner tree stats:");
-        m_ea.print_stats();
+        //STXXL_MSG("EA winner tree stats:");
+        //m_ea.print_stats();
     }
 };
 
@@ -1958,9 +1967,6 @@ protected:
     //! Pro: Reduces the risk of a large winner tree
     //! Con: Flush insertion heaps becomes slower.
     static const bool c_merge_sorted_heaps = true;
-
-    //! Also merge internal arrays into the extract buffer
-    static const bool c_merge_ias_into_eb = true;
 
     //! Default number of write buffer block for a new external array being
     //! filled.
@@ -2202,6 +2208,7 @@ protected:
                          " cleaned=" << m_internal_arrays.end() - swap_end);
 
         m_internal_arrays.erase(swap_end, m_internal_arrays.end());
+        m_minima.rebuild_internal_arrays();
     }
 
     //! Clean up empty external arrays, free their memory and capacity
@@ -3067,11 +3074,11 @@ public:
             STXXL_DEBUG("ia " << index <<
                         ": " << m_internal_arrays[index].get_min());
             return m_internal_arrays[index].get_min();
-        case minima_type::EA:
-            STXXL_DEBUG("ea " << index <<
-                        ": " << m_external_arrays[index].get_min());
+        //case minima_type::EA:
+            //STXXL_DEBUG("ea " << index <<
+            //            ": " << m_external_arrays[index].get_min());
             // wait() already done by comparator....
-            return m_external_arrays[index].get_min();
+            //return m_external_arrays[index].get_min();
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -3141,27 +3148,27 @@ public:
 
             break;
         }
-        case minima_type::EA:
-        {
-            // wait() already done by comparator...
-            assert(m_external_size > 0);
-            --m_external_size;
+        // case minima_type::EA:
+        // {
+        //     // wait() already done by comparator...
+        //     assert(m_external_size > 0);
+        //     --m_external_size;
 
-            unsigned_type freed_blocks =
-                m_external_arrays[index].remove_items(1);
+        //     unsigned_type freed_blocks =
+        //         m_external_arrays[index].remove_items(1);
 
-            m_num_used_read_blocks -= freed_blocks;
+        //     m_num_used_read_blocks -= freed_blocks;
 
-            STXXL_CHECK(0 && "Unknown if this works.");
+        //     STXXL_CHECK(0 && "Unknown if this works.");
 
-            if (!m_external_arrays[index].empty())
-                m_minima.update_external_array(index);
-            else
-                // external array has run empty
-                m_minima.deactivate_external_array(index);
+        //     //if (!m_external_arrays[index].empty())
+        //     //    m_minima.update_external_array(index);
+        //     //else
+        //         // external array has run empty
+        //     //    m_minima.deactivate_external_array(index);
 
-            break;
-        }
+        //     break;
+        // }
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -3359,7 +3366,7 @@ public:
         m_stats.num_external_array_merges++;
         m_stats.external_array_merge_time.start();
 
-        m_minima.clear_external_arrays();
+        //m_minima.clear_external_arrays();
 
         // add IAs to all EAs is the total size of the newly merged EA.
         m_external_size += m_internal_size;
@@ -3538,12 +3545,12 @@ public:
         resize_read_pool();
 
         // register new EA in minima tree, if extracting.TODO-tb-why?
-        if (!extract_buffer_empty())
-        {
-            m_stats.num_new_external_arrays++;
-            m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-            m_minima.add_external_array(static_cast<unsigned>(ea_index));
-        }
+        //if (!extract_buffer_empty())
+        //{
+        //    m_stats.num_new_external_arrays++;
+        //    m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
+        //    m_minima.add_external_array(static_cast<unsigned>(ea_index));
+        //}
 
         // register EA in min tree
         m_external_min_tree.activate_player(ea_index);
@@ -3668,7 +3675,6 @@ public:
     void print_stats() const
     {
         STXXL_VARDUMP(c_merge_sorted_heaps);
-        STXXL_VARDUMP(c_merge_ias_into_eb);
         STXXL_VARDUMP(c_limit_extract_buffer);
         STXXL_VARDUMP(c_single_insert_limit);
 
@@ -3710,7 +3716,7 @@ protected:
         static const bool debug = false;
 
         const size_type eas = m_external_arrays.size();
-        const size_type ias = c_merge_ias_into_eb ? m_internal_arrays.size() : 0;
+        const size_type ias = m_internal_arrays.size();
 
         assert(sizes.size() == eas + ias);
         assert(sequences.size() == eas + ias);
@@ -3768,13 +3774,11 @@ protected:
         for (size_type i = 0; i < eas + ias; ++i) {
             iterator begin, end;
 
-            // check only relevant if c_merge_ias_into_eb == true
             if (i < eas) {
                 begin = m_external_arrays[i].begin();
                 end = m_external_arrays[i].end();
             }
             else {
-                // else part only relevant if c_merge_ias_into_eb == true
                 size_type j = i - eas;
                 begin = m_internal_arrays[j].begin();
                 end = m_internal_arrays[j].end();
@@ -3862,19 +3866,14 @@ protected:
         assert(extract_buffer_empty());
         m_extract_buffer_index = 0;
 
-        m_minima.clear_external_arrays();
+        //m_minima.clear_external_arrays();
         cleanup_external_arrays();
 
         size_type ias, eas = m_external_arrays.size();
 
-        if (c_merge_ias_into_eb) {
-            m_minima.clear_internal_arrays();
-            cleanup_internal_arrays();
-            ias = m_internal_arrays.size();
-        }
-        else {
-            ias = 0;
-        }
+        m_minima.clear_internal_arrays();
+        cleanup_internal_arrays();
+        ias = m_internal_arrays.size();
 
         if (eas == 0 && ias == 0) {
             m_extract_buffer.resize(0);
@@ -4011,10 +4010,7 @@ protected:
             hint_external_arrays();
 
         m_stats.num_new_external_arrays = 0;
-
-        // TODO: remove all c_merge_ias_into_eb
-        if (c_merge_ias_into_eb)
-            cleanup_internal_arrays();
+        cleanup_internal_arrays();
     }
 
     //! Flushes the insertions heap p into an internal array.
@@ -4212,6 +4208,7 @@ protected:
 
         m_internal_arrays.clear();
         m_stats.num_new_internal_arrays = 0;
+        cleanup_internal_arrays();
 
         for (size_t i = 0; i < c_max_internal_levels; ++i)
             m_internal_levels[i] = 0;
@@ -4243,18 +4240,10 @@ protected:
                      internal_array_type::int_memory(capacity));
         m_internal_arrays.swap_back(new_array);
 
-        if (c_merge_ias_into_eb) {
-            if (!extract_buffer_empty()) {
-                m_stats.num_new_internal_arrays++;
-                m_stats.max_num_new_internal_arrays.set_max(
-                    m_stats.num_new_internal_arrays);
-
-                m_minima.add_internal_array(
-                    static_cast<unsigned>(m_internal_arrays.size()) - 1
-                    );
-            }
-        }
-        else {
+        if (!extract_buffer_empty()) {
+            m_stats.num_new_internal_arrays++;
+            m_stats.max_num_new_internal_arrays.set_max(
+                m_stats.num_new_internal_arrays);
             m_minima.add_internal_array(
                 static_cast<unsigned>(m_internal_arrays.size()) - 1
                 );
@@ -4542,8 +4531,6 @@ protected:
         //! created while the extract buffer hadn't been empty)
         stats_counter max_num_new_external_arrays;
 
-        //if (c_merge_ias_into_eb) {
-
         //! Temporary number of new internal arrays at the same time (which
         //! were created while the extract buffer hadn't been empty)
         stats_counter num_new_internal_arrays;
@@ -4551,8 +4538,6 @@ protected:
         //! Largest number of new internal arrays at the same time (which were
         //! created while the extract buffer hadn't been empty)
         stats_counter max_num_new_internal_arrays;
-
-        //}
 
         //! Total time for flush_insertion_heaps()
         stats_timer insertion_heap_flush_time;
@@ -4626,10 +4611,8 @@ protected:
                       << "max_num_external_arrays=" << o.max_num_external_arrays << std::endl
                       << "num_new_external_arrays=" << o.num_new_external_arrays << std::endl
                       << "max_num_new_external_arrays=" << o.max_num_new_external_arrays << std::endl
-                   //if (c_merge_ias_into_eb) {
                       << "num_new_internal_arrays=" << o.num_new_internal_arrays << std::endl
                       << "max_num_new_internal_arrays=" << o.max_num_new_internal_arrays << std::endl
-                   //}
                       << "insertion_heap_flush_time=" << o.insertion_heap_flush_time << std::endl
                       << "direct_flush_time=" << o.direct_flush_time << std::endl
                       << "internal_array_flush_time=" << o.internal_array_flush_time << std::endl
