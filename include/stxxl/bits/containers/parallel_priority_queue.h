@@ -4161,6 +4161,9 @@ protected:
 
         m_minima.clear_internal_arrays();
 
+        // also flush extract buffer items out to disk.
+        convert_eb_into_ia();
+
         // clean up internal arrays that have been deleted in extract_min!
         cleanup_internal_arrays();
 
