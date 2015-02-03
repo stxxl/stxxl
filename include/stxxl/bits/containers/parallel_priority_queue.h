@@ -2817,8 +2817,7 @@ public:
         if (m_heaps_size > 0)
             flush_insertion_heaps();
 
-        if (m_extract_buffer_size > 0)
-            convert_eb_into_ia();
+        convert_eb_into_ia();
 
         refill_extract_buffer(n_elements, n_elements);
 
@@ -2843,8 +2842,7 @@ public:
     {
         STXXL_DEBUG("bulk_pop_limit with limit=" << limit);
 
-        if (m_extract_buffer_size > 0)
-            convert_eb_into_ia();
+        convert_eb_into_ia();
 
         if (m_heaps_size > 0) {
             if (0)
@@ -3825,6 +3823,8 @@ protected:
     //! Convert extract buffer into a new internal array.
     void convert_eb_into_ia()
     {
+        if (m_extract_buffer_size == 0) return;
+
         // TODO: memory is NOT allocated, but extract buffer is currently not
         // counted
         flush_ia_ea_until_memory_free(
