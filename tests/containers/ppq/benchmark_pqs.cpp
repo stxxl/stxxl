@@ -1295,8 +1295,10 @@ void do_bulk_limit(ContainerType& c, bool parallel)
                     ++iterations;
                 }
 
+                STXXL_CHECK_EQUAL(c.limit_top().first, rindex);
+
                 c.limit_end();
-                STXXL_CHECK(iterations == this_bulk_size);
+                STXXL_CHECK_EQUAL(iterations, this_bulk_size);
             }
         }
 
