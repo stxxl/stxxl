@@ -3399,7 +3399,7 @@ public:
                 int limiting_ea_index;
                 while ((limiting_ea_index = m_external_min_tree.top()) >= 0)
                 {
-                    assert(limiting_ea_index < eas);
+                    assert((size_t)limiting_ea_index < eas);
 
                     if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0)
                         break;
@@ -3732,7 +3732,7 @@ protected:
 #ifdef STXXL_DEBUG_ASSERTIONS
 
         bool test_needs_limit = false;
-        size_t test_gmin_index = 0;
+        int test_gmin_index = 0;
         value_type test_gmin_value;
 
         m_stats.refill_minmax_time.start();
