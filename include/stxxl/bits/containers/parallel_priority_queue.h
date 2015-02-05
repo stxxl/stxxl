@@ -2852,9 +2852,9 @@ public:
         convert_eb_into_ia();
 
         if (m_heaps_size > 0) {
-            if (0)
+            if (1)
                 flush_insertion_heaps();
-            else if (1)
+            else if (0)
                 flush_insertion_heaps_with_limit(limit);
         }
 
