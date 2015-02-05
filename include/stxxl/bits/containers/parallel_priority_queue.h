@@ -2248,7 +2248,8 @@ protected:
 
         // Deactivating all affected players first.
         // Otherwise there might be outdated comparisons.
-        for (size_t i = first_removed; i < size; ++i) {
+        for (size_t i = size; i != first_removed; ) {
+            --i;
             m_external_min_tree.deactivate_player(i);
             m_hint_tree.deactivate_player(i);
         }
@@ -3526,7 +3527,7 @@ public:
             }
 
             if (new_num_read_blocks < m_num_read_blocks)
-                STXXL_ERRMSG("Warning: could not reduce read/prefetch pool!");
+                STXXL_ERRMSG("WARNING: could not immediately reduce read/prefetch pool!");
         }
     }
 
