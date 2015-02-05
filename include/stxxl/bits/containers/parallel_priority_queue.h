@@ -3297,7 +3297,7 @@ protected:
             typename heap_type::iterator back = insheap.end();
 
             while (back != insheap.begin() &&
-                   !m_compare(limit,insheap[0]))
+                   m_compare(limit, insheap[0]))
             {
                 // while top < L, perform pop_heap: put top to back and
                 // siftDown new items (shortens heap by one)
@@ -3305,15 +3305,15 @@ protected:
                 --back;
             }
 
-            // range insheap.begin() + back to insheap.end() is < L
+            // range insheap.begin() + back to insheap.end() is < L, rest >= L.
 
             for (typename heap_type::const_iterator it = insheap.begin();
                  it != insheap.end(); ++it)
             {
                 if (it < back)
-                    assert(m_compare(limit, insheap[0]));
+                    assert(!m_compare(limit, *it));
                 else
-                    assert(!m_compare(limit, insheap[0]));
+                    assert(m_compare(limit, *it));
             }
 
             back_size[p] = insheap.end() - back;
