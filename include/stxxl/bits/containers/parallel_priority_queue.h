@@ -1558,16 +1558,13 @@ protected:
         self_type& m_parent;
         proc_vector_type& m_proc;
         ias_type& m_ias;
-        eas_type& m_eas;
         const compare_type& m_compare;
 
         head_comp(self_type& parent, proc_vector_type& proc,
-                  ias_type& ias, eas_type& eas,
-                  const compare_type& compare)
+                  ias_type& ias, const compare_type& compare)
             : m_parent(parent),
               m_proc(proc),
               m_ias(ias),
-              m_eas(eas),
               m_compare(compare)
         { }
 
@@ -1576,14 +1573,12 @@ protected:
             switch (input) {
             case HEAP:
                 return m_proc[m_parent.m_heaps.top()]->insertion_heap[0];
+            case IA:
+                return m_ias[m_parent.m_ia.top()].get_min();
             case EB:
                 return m_parent.m_parent.m_extract_buffer[
                     m_parent.m_parent.m_extract_buffer_index
                 ];
-            case IA:
-                return m_ias[m_parent.m_ia.top()].get_min();
-            //case EA:
-            //    return m_eas[m_parent.m_ea.top()].get_min();
             default:
                 abort();
             }
@@ -1632,23 +1627,6 @@ protected:
         }
     };
 
-    //! Comparator for the external arrays winner tree.
-    // struct ea_comp
-    // {
-    //     eas_type& m_eas;
-    //     const compare_type& m_compare;
-
-    //     ea_comp(eas_type& eas, const compare_type& compare)
-    //         : m_eas(eas), m_compare(compare)
-    //     { }
-
-    //     bool operator () (const int a, const int b) const
-    //     {
-    //         return m_compare(m_eas[a].get_min(),
-    //                          m_eas[b].get_min());
-    //     }
-    // };
-
 protected:
     //! The priority queue
     parent_type& m_parent;
@@ -1660,22 +1638,19 @@ protected:
     head_comp m_head_comp;
     heaps_comp m_heaps_comp;
     ia_comp m_ia_comp;
-    //ea_comp m_ea_comp;
 
     //! The winner trees
     winner_tree<head_comp> m_head;
     winner_tree<heaps_comp> m_heaps;
     winner_tree<ia_comp> m_ia;
-    //winner_tree<ea_comp> m_ea;
 
 public:
     //! Entries in the head winner tree.
     enum Types {
         HEAP = 0,
-        EB = 1,
-        IA = 2,
-        //EA = 3,
-        ERROR = 4
+        IA = 1,
+        EB = 2,
+        ERROR = 3
     };
 
     //! Construct the tree of minima sources.
@@ -1684,16 +1659,13 @@ public:
           m_compare(parent.m_inv_compare),
           // construct comparators
           m_head_comp(*this, parent.m_proc,
-                      parent.m_internal_arrays, parent.m_external_arrays,
-                      m_compare),
+                      parent.m_internal_arrays, m_compare),
           m_heaps_comp(parent.m_proc, m_compare),
           m_ia_comp(parent.m_internal_arrays, m_compare),
-          //m_ea_comp(parent.m_external_arrays, m_compare),
           // construct header winner tree
-          m_head(4, m_head_comp),
+          m_head(3, m_head_comp),
           m_heaps(m_parent.m_num_insertion_heaps, m_heaps_comp),
-          m_ia(initial_ia_size, m_ia_comp)//,
-          //m_ea(initial_ea_size, m_ea_comp)
+          m_ia(initial_ia_size, m_ia_comp)
     { }
 
     //! Return smallest items of head winner tree.
@@ -1704,12 +1676,10 @@ public:
         {
         case HEAP:
             return std::make_pair(HEAP, m_heaps.top());
-        case EB:
-            return std::make_pair(EB, 0);
         case IA:
             return std::make_pair(IA, m_ia.top());
-        //case EA:
-        //    return std::make_pair(EA, m_ea.top());
+        case EB:
+            return std::make_pair(EB, 0);
         default:
             return std::make_pair(ERROR, 0);
         }
@@ -1735,26 +1705,12 @@ public:
         m_head.notify_change(IA);
     }
 
-    //! Update minima tree after an item from an external array was removed.
-    // void update_external_array(unsigned index)
-    // {
-    //     m_ea.notify_change(index);
-    //     m_head.notify_change(EA);
-    // }
-
     //! Add a newly created internal array to the minima tree.
     void add_internal_array(unsigned index)
     {
         m_ia.activate_player(index);
         m_head.notify_change(IA);
     }
-
-    //! Add a newly created external array to the minima tree.
-    // void add_external_array(unsigned index)
-    // {
-    //     m_ea.activate_player(index);
-    //     m_head.notify_change(EA);
-    // }
 
     //! Remove an insertion heap from the minima tree.
     void deactivate_heap(unsigned index)
@@ -1782,16 +1738,6 @@ public:
             m_head.deactivate_player(IA);
     }
 
-    //! Remove an external array from the minima tree.
-    // void deactivate_external_array(unsigned index)
-    // {
-    //     m_ea.deactivate_player(index);
-    //     if (!m_ea.empty())
-    //         m_head.notify_change(EA);
-    //     else
-    //         m_head.deactivate_player(EA);
-    // }
-
     //! Remove all insertion heaps from the minima tree.
     void clear_heaps()
     {
@@ -1805,13 +1751,6 @@ public:
         m_ia.resize_and_clear(initial_ia_size);
         m_head.deactivate_player(IA);
     }
-
-    //! Remove all external arrays from the minima tree.
-    // void clear_external_arrays()
-    // {
-    //     m_ea.resize_and_clear(initial_ea_size);
-    //     m_head.deactivate_player(EA);
-    // }
 
     void rebuild_internal_arrays()
     {
@@ -1835,7 +1774,6 @@ public:
         ss << "Head:" << std::endl << m_head.to_string() << std::endl;
         ss << "Heaps:" << std::endl << m_heaps.to_string() << std::endl;
         ss << "IA:" << std::endl << m_ia.to_string() << std::endl;
-        //ss << "EA:" << std::endl << m_ea.to_string() << std::endl;
         return ss.str();
     }
 
@@ -1848,8 +1786,6 @@ public:
         m_heaps.print_stats();
         STXXL_MSG("IA winner tree stats:");
         m_ia.print_stats();
-        //STXXL_MSG("EA winner tree stats:");
-        //m_ea.print_stats();
     }
 };
 
@@ -3067,19 +3003,14 @@ public:
             STXXL_DEBUG("heap " << index <<
                         ": " << m_proc[index]->insertion_heap[0]);
             return m_proc[index]->insertion_heap[0];
-        case minima_type::EB:
-            STXXL_DEBUG("eb " << m_extract_buffer_index <<
-                        ": " << m_extract_buffer[m_extract_buffer_index]);
-            return m_extract_buffer[m_extract_buffer_index];
         case minima_type::IA:
             STXXL_DEBUG("ia " << index <<
                         ": " << m_internal_arrays[index].get_min());
             return m_internal_arrays[index].get_min();
-        //case minima_type::EA:
-            //STXXL_DEBUG("ea " << index <<
-            //            ": " << m_external_arrays[index].get_min());
-            // wait() already done by comparator....
-            //return m_external_arrays[index].get_min();
+        case minima_type::EB:
+            STXXL_DEBUG("eb " << m_extract_buffer_index <<
+                        ": " << m_extract_buffer[m_extract_buffer_index]);
+            return m_extract_buffer[m_extract_buffer_index];
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -3123,19 +3054,6 @@ public:
 
             break;
         }
-        case minima_type::EB:
-        {
-            ++m_extract_buffer_index;
-            assert(m_extract_buffer_size > 0);
-            --m_extract_buffer_size;
-
-            if (!extract_buffer_empty())
-                m_minima.update_extract_buffer();
-            else
-                m_minima.deactivate_extract_buffer();
-
-            break;
-        }
         case minima_type::IA:
         {
             m_internal_arrays[index].inc_min();
@@ -3149,27 +3067,19 @@ public:
 
             break;
         }
-        // case minima_type::EA:
-        // {
-        //     // wait() already done by comparator...
-        //     assert(m_external_size > 0);
-        //     --m_external_size;
+        case minima_type::EB:
+        {
+            ++m_extract_buffer_index;
+            assert(m_extract_buffer_size > 0);
+            --m_extract_buffer_size;
 
-        //     unsigned_type freed_blocks =
-        //         m_external_arrays[index].remove_items(1);
+            if (!extract_buffer_empty())
+                m_minima.update_extract_buffer();
+            else
+                m_minima.deactivate_extract_buffer();
 
-        //     m_num_used_read_blocks -= freed_blocks;
-
-        //     STXXL_CHECK(0 && "Unknown if this works.");
-
-        //     //if (!m_external_arrays[index].empty())
-        //     //    m_minima.update_external_array(index);
-        //     //else
-        //         // external array has run empty
-        //     //    m_minima.deactivate_external_array(index);
-
-        //     break;
-        // }
+            break;
+        }
         default:
             STXXL_ERRMSG("Unknown extract type: " << type);
             abort();
@@ -3386,8 +3296,6 @@ public:
         m_stats.num_external_array_merges++;
         m_stats.external_array_merge_time.start();
 
-        //m_minima.clear_external_arrays();
-
         // add IAs to all EAs is the total size of the newly merged EA.
         m_external_size += m_internal_size;
 
@@ -3563,14 +3471,6 @@ public:
                     " m_num_hinted_blocks=" << m_num_hinted_blocks);
 
         resize_read_pool();
-
-        // register new EA in minima tree, if extracting.TODO-tb-why?
-        //if (!extract_buffer_empty())
-        //{
-        //    m_stats.num_new_external_arrays++;
-        //    m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-        //    m_minima.add_external_array(static_cast<unsigned>(ea_index));
-        //}
 
         // register EA in min tree
         m_external_min_tree.activate_player(ea_index);
@@ -3890,7 +3790,6 @@ protected:
         assert(extract_buffer_empty());
         m_extract_buffer_index = 0;
 
-        //m_minima.clear_external_arrays();
         cleanup_external_arrays();
 
         size_type ias, eas = m_external_arrays.size();
@@ -4396,13 +4295,6 @@ protected:
         }
         m_minima.clear_heaps();
 
-        // TODO-tb-why?
-        // if (!extract_buffer_empty()) {
-        //     m_stats.num_new_external_arrays++;
-        //     m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-        //     m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
-        // }
-
         //TODO m_mem_left -= m_mem_per_external_array;
         STXXL_CHECK(0);
 
@@ -4437,13 +4329,6 @@ protected:
         update_trees_after_ea_creation(m_external_arrays.size() - 1);
 
         m_external_size += values.size();
-
-        // TODO-tb-why?
-        // if (!extract_buffer_empty()) {
-        //     m_stats.num_new_external_arrays++;
-        //     m_stats.max_num_new_external_arrays.set_max(m_stats.num_new_external_arrays);
-        //     m_minima.add_external_array(static_cast<unsigned>(m_external_arrays.size()) - 1);
-        // }
 
         //TODO m_mem_left -= m_mem_per_external_array;
         STXXL_CHECK(0);
