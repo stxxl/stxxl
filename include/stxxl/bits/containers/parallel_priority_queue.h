@@ -3230,12 +3230,31 @@ public:
     const value_type & limit_top()
     {
         assert(m_limit_extract);
-        assert(m_extract_buffer_size > 0 || m_limit_has_full_range);
 
-        if (m_extract_buffer_size == 0)
+        // if buffer is empty and we extracted the full range last time, return
+        // limit items as sentinel.
+        if (m_extract_buffer_size == 0 && m_limit_has_full_range)
             return m_limit_element;
-        else
-            return m_extract_buffer[m_extract_buffer_index];
+
+        if (extract_buffer_empty())
+        {
+            // extract more items
+            std::vector<value_type> new_extract_buffer;
+            m_limit_has_full_range =
+                bulk_pop_limit(new_extract_buffer, m_limit_element,
+                               m_extract_buffer_limit);
+
+            std::swap(new_extract_buffer, m_extract_buffer);
+
+            m_extract_buffer_index = 0;
+            m_extract_buffer_size = m_extract_buffer.size();
+            if (m_extract_buffer_size)
+                m_minima.update_extract_buffer();
+            else
+                m_minima.deactivate_extract_buffer();
+        }
+
+        return m_extract_buffer[m_extract_buffer_index];
     }
 
     //! Remove the minimum element, only works correctly while elements < L.
@@ -3829,6 +3848,10 @@ protected:
     void convert_eb_into_ia(bool do_not_flush = false)
     {
         if (m_extract_buffer_size == 0) return;
+
+        STXXL_DEBUG("convert_eb_into_ia");
+
+        m_limit_has_full_range = false;
 
         // TODO: memory is NOT allocated, but extract buffer is currently not
         // counted
