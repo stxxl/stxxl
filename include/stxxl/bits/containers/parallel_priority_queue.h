@@ -2852,9 +2852,9 @@ public:
         convert_eb_into_ia();
 
         if (m_heaps_size > 0) {
-            if (1)
+            if (0)
                 flush_insertion_heaps();
-            else if (0)
+            else if (1)
                 flush_insertion_heaps_with_limit(limit);
         }
 
@@ -3296,7 +3296,7 @@ protected:
             typename heap_type::iterator back = insheap.end();
 
             while (back != insheap.begin() &&
-                   m_compare(limit, insheap[0]))
+                   !m_compare(limit,insheap[0]))
             {
                 // while top < L, perform pop_heap: put top to back and
                 // siftDown new items (shortens heap by one)
@@ -3310,9 +3310,9 @@ protected:
                  it != insheap.end(); ++it)
             {
                 if (it < back)
-                    assert(!m_compare(limit, insheap[0]));
-                else
                     assert(m_compare(limit, insheap[0]));
+                else
+                    assert(!m_compare(limit, insheap[0]));
             }
 
             back_size[p] = insheap.end() - back;
