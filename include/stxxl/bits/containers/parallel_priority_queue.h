@@ -2934,7 +2934,7 @@ public:
             sequences.begin(), sequences.end(),
             out.begin(), output_size, m_inv_compare);
 
-        cleanup_arrays(sequences, sizes, eas, ias);
+        advance_arrays(sequences, sizes, eas, ias);
 
         check_invariants();
 
@@ -3946,7 +3946,7 @@ protected:
         m_stats.refill_merge_time.stop();
         m_stats.refill_time_after_merge.start();
 
-        cleanup_arrays(sequences, sizes, eas, ias);
+        advance_arrays(sequences, sizes, eas, ias);
 
         m_minima.update_extract_buffer();
 
@@ -3970,8 +3970,9 @@ protected:
     }
 
     // Removes empty arrays and updates the winner trees accordingly
-    inline void cleanup_arrays(std::vector<iterator_pair_type>& sequences,
-                               std::vector<size_type>& sizes, size_t eas, size_t ias)
+    inline void advance_arrays(std::vector<iterator_pair_type>& sequences,
+                               std::vector<size_type>& sizes,
+                               size_t eas, size_t ias)
     {
         unsigned_type total_freed_blocks = 0;
 
