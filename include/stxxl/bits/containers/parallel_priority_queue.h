@@ -4302,8 +4302,9 @@ protected:
         {
             unsigned_type ia = ia_index[i];
             m_internal_arrays[ia].make_empty();
-            if (ia < m_minima.ia_slots())
-                m_minima.deactivate_internal_array(ia);
+            // this is done in cleanup_internal_arrays()...
+            //if (ia < m_minima.ia_slots())
+            //    m_minima.deactivate_internal_array(ia);
         }
 
         cleanup_internal_arrays();
