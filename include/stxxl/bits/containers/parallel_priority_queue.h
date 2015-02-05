@@ -1991,6 +1991,10 @@ protected:
     //! and bulk_push just accumulate the elements for eventual sorting.
     bool m_is_very_large_bulk;
 
+    //! First index in m_external_arrays that was not re-hinted during a
+    //! bulk_push sequence.
+    unsigned_type m_bulk_first_delayed_external_array;
+
     //! Index of the currently smallest element in the extract buffer
     size_type m_extract_buffer_index;
 
@@ -2548,6 +2552,7 @@ public:
     {
         assert(!m_in_bulk_push);
         m_in_bulk_push = true;
+        m_bulk_first_delayed_external_array = m_external_arrays.size();
 
         size_type heap_capacity = m_num_insertion_heaps * m_insertion_heap_capacity;
 
@@ -2745,6 +2750,11 @@ public:
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
             }
+        }
+
+        if (m_bulk_first_delayed_external_array != m_external_arrays.size()) {
+            STXXL_DEBUG("bulk_push_end: run delayed re-hinting of EAs");
+            rebuild_hint_tree();
         }
 
         check_invariants();
@@ -3476,6 +3486,16 @@ public:
         m_external_min_tree.activate_player(ea_index);
         update_external_min_tree(ea_index);
 
+        if (!m_in_bulk_push)
+            rebuild_hint_tree();
+        else
+            assert(ea_index >= m_bulk_first_delayed_external_array);
+    }
+
+    //! Rebuild hint tree completely as the hint sequence may have changed, and
+    //! re-hint the correct block sequence.
+    void rebuild_hint_tree()
+    {
         m_stats.hint_time.start();
 
         // prepare rehinting sequence: reset hint begin pointer
