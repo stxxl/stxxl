@@ -37,7 +37,6 @@ static const char* description =
   #include <omp.h>
 #endif
 
-using stxxl::uint32;
 using stxxl::uint64;
 
 using stxxl::scoped_print_timer;
@@ -51,14 +50,12 @@ static const uint64 GiB = 1024L * MiB;
 static const bool g_progress = false;
 static const uint64 g_printmod = 16 * MiB;
 
-// value size must be > 16
-static const unsigned value_size = 24;
-
 // constant values for STXXL PQ
 const uint64 _RAM = 16 * GiB;
 const uint64 _volume = 1024 * GiB;
-const uint64 _num_elements = _volume / value_size;
-const uint64 mem_for_queue = _RAM / 2;
+const unsigned _value_size = 8;
+const uint64 _num_elements = _volume / _value_size;
+const uint64 _mem_for_queue = _RAM / 2;
 const uint64 mem_for_prefetch_pool = _RAM / 4;
 const uint64 mem_for_write_pool = _RAM / 4;
 
@@ -91,7 +88,7 @@ static inline int get_thread_num()
 }
 
 uint64 ram_write_buffers;
-uint64 bulk_size;
+uint64 bulk_size = 123456;
 
 uint64 num_arrays = 0;
 uint64 max_merge_buffer_ram_stat = 0;
@@ -102,67 +99,72 @@ unsigned int g_seed = 12345;
 
 random_number32_r g_rand(g_seed);
 
-void calculate_depending_parameters()
-{
-    num_elements = volume / value_size;
-    ram_write_buffers = num_write_buffers * block_size;
-}
-
 /*
- * The value type and corresponding functions-
+ * The value type and corresponding benchmark functions.
  */
 
-struct value_type {
-    typedef uint64 key_type;
-    key_type first;
-    key_type second;
-    char data[value_size - 2 * sizeof(key_type)];
+template <typename KeyType, int ValueSize>
+struct my_type
+{
+    enum { value_size = ValueSize };
+    typedef KeyType key_type;
 
-    value_type()
+    union {
+        key_type key;
+        char padding[sizeof(key_type)];
+    };
+
+    my_type()
     { }
 
-    value_type(const key_type& _key, const key_type& _data = 0)
-        : first(_key), second(_data)
+    my_type(const key_type& _key)
+        : key(_key)
     {
 #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
-        memset(data, 0, sizeof(data));
+        memset(data + sizeof(key_type), 0, sizeof(data) - sizeof(key_type));
 #endif
     }
 
-    friend std::ostream& operator << (std::ostream& o, const value_type& obj)
+    friend std::ostream& operator << (std::ostream& o, const my_type& obj)
     {
-        o << obj.first;
+        o << obj.key;
         return o;
     }
 };
 
-struct value_type_cmp_smaller
-    : public std::binary_function<value_type, value_type, bool>
+template <typename ValueType>
+struct my_type_cmp_smaller
+    : public std::binary_function<ValueType, ValueType, bool>
 {
+    typedef ValueType value_type;
+    typedef typename value_type::key_type key_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
-        return a.first < b.first;
+        return a.key < b.key;
     }
     value_type min_value() const
     {
-        return value_type(0);
+        return value_type(std::numeric_limits<key_type>::min());
     }
     value_type max_value() const
     {
-        return std::numeric_limits<value_type::key_type>::max();
+        return value_type(std::numeric_limits<key_type>::max());
     }
 };
 
-struct value_type_cmp_greater
-    : public std::binary_function<value_type, value_type, bool>
+template <typename ValueType>
+struct my_type_cmp_greater
+    : public std::binary_function<ValueType, ValueType, bool>
 {
+    typedef ValueType value_type;
+    typedef typename value_type::key_type key_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
-        return a.first > b.first;
+        return a.key > b.key;
     }
     value_type min_value() const
     {
-        return std::numeric_limits<value_type::key_type>::max();
+        return value_type(std::numeric_limits<key_type>::max());
     }
 };
 
@@ -184,6 +186,13 @@ struct less_min_max : public std::binary_function<ValueType, ValueType, bool>
 };
 
 /*
+ * my_type specializations used in benchmarks
+ */
+
+typedef my_type<uint64, sizeof(uint64)> my8_type;
+typedef my_type<uint64, 24> my24_type;
+
+/*
  * Progress messages
  */
 
@@ -198,72 +207,53 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
 }
 
 /*!
- * Abstract Container class with template specialized functions for sorter and
- * more.
+ * Abstract Base Container class with derived classes for sorters and PQs.
  */
-template <typename BackendType>
-class Container
-{
-public:
-    static std::string name();
-    static std::string shortname();
 
-    BackendType& backend;
+class PQBase
+{
+protected:
+    std::string m_name, m_shortname;
 
     bool m_have_warned;
 
-    Container(BackendType& b)
-        : backend(b),
+public:
+    PQBase(const std::string& name, const std::string& shortname)
+        : m_name(name), m_shortname(shortname),
           m_have_warned(false)
     { }
 
-    //! Simple single push() operation
-    void push(const value_type& v)
+    //! Return a longer text name
+    const std::string & name() const
     {
-        backend.push(v);
+        return m_name;
     }
 
-    //! Simple single top() operation.
-    value_type top()
+    //! Return a short id
+    const std::string & shortname() const
     {
-        return backend.top();
-    }
-
-    //! Simple single pop() operation
-    void pop()
-    {
-        backend.pop();
-    }
-
-    //! Simple single top() and pop() operation.
-    value_type top_pop()
-    {
-        value_type item = top();
-        pop();
-        return item;
+        return m_shortname;
     }
 
     //! Operation called after filling the container.
     void fill_end()
     { }
 
-    //! Test if the container is empty.
-    bool empty() const
-    {
-        return backend.empty();
-    }
-
-    //! Return number of items still in container.
-    size_t size() const
-    {
-        return backend.size();
-    }
-
     //! Check whether the container supports thread-safe bulk pushes
     bool supports_threaded_bulks() const
     {
         return false;
     }
+};
+
+// *** Base Wrapper containing many Stubs
+
+class PQBaseDefaults : public PQBase
+{
+public:
+    PQBaseDefaults(const std::string& name, const std::string& shortname)
+        : PQBase(name, shortname)
+    { }
 
     void bulk_push_begin(size_t /* this_bulk_size */)
     {
@@ -280,23 +270,7 @@ public:
         }
     }
 
-    void bulk_push(const value_type& v, int /* thread_num */)
-    {
-        backend.push(v);
-    }
-
-    void bulk_pop(std::vector<value_type>& v, size_t max_size)
-    {
-        v.clear();
-        v.reserve(max_size);
-
-        while (!backend.empty() && max_size > 0)
-        {
-            v.push_back(top_pop());
-            --max_size;
-        }
-    }
-
+    template <typename value_type>
     void limit_begin(const value_type& /* v */, size_t /* bulk_size */)
     {
         if (!m_have_warned) {
@@ -311,13 +285,247 @@ public:
             std::cout << name() << ": limit_end not supported\n";
         }
     }
+};
+
+// *** Wrapper for STXXL PQ
+
+template <typename ValueType>
+class CStxxlPQ
+    : public PQBaseDefaults,
+      public stxxl::PRIORITY_QUEUE_GENERATOR<
+          ValueType,
+          my_type_cmp_greater<ValueType>,
+          _mem_for_queue,
+          _num_elements / 1024>::result
+{
+public:
+    typedef ValueType value_type;
+
+    typedef typename stxxl::PRIORITY_QUEUE_GENERATOR<
+            value_type,
+            my_type_cmp_greater<value_type>,
+            _mem_for_queue,
+            _num_elements / 1024>::result pq_type;
+
+    CStxxlPQ() :
+#if STXXL_PARALLEL
+        PQBaseDefaults("STXXL PQ (parallelized)", "spq"),
+#else
+        PQBaseDefaults("STXXL PQ (sequential)", "spqs"),
+#endif
+        pq_type(mem_for_prefetch_pool, mem_for_write_pool)
+    { }
+
+    //! Simple single top() and pop() operation.
+    value_type top_pop()
+    {
+        value_type item = pq_type::top();
+        pq_type::pop();
+        return item;
+    }
+
+    //! Emulate bulk_push() using plain push().
+    void bulk_push(const value_type& v, int /* thread_num */)
+    {
+        return pq_type::push(v);
+    }
+
+    //! Emulate bulk_pop() using iterated pop().
+    void bulk_pop(std::vector<value_type>& v, size_t max_size)
+    {
+        v.clear();
+        v.reserve(max_size);
+
+        while (!pq_type::empty() && max_size > 0)
+        {
+            v.push_back(top_pop());
+            --max_size;
+        }
+    }
+
+    //! Emulate limit_push() using plain push().
+    void limit_push(const value_type& v, int /* thread_num */)
+    {
+        pq_type::push(v);
+    }
+
+    //! Emulate limit_top() using top().
+    const value_type & limit_top()
+    {
+        return pq_type::top();
+    }
+
+    value_type limit_top_pop()
+    {
+        return top_pop();
+    }
+};
+
+// *** Wrapper for STXXL Parallel PQ
+
+template <typename ValueType>
+class CStxxlParallePQ
+    : public PQBase,
+      public stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> >
+{
+public:
+    typedef ValueType value_type;
+
+    typedef stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> > pq_type;
+
+    CStxxlParallePQ()
+        : PQBase("Parallel PQ", "ppq"),
+          pq_type(my_type_cmp_greater<ValueType>(),
+                  RAM, num_prefetchers, num_write_buffers,
+                  g_max_threads, single_heap_ram, extract_buffer_ram)
+    { }
+
+    //! Check whether the container supports thread-safe bulk pushes
+    bool supports_threaded_bulks() const
+    {
+        return true;
+    }
+
+    value_type top_pop()
+    {
+        value_type top = pq_type::top();
+        pq_type::pop();
+        return top;
+    }
+
+    value_type limit_top_pop()
+    {
+        value_type top = pq_type::limit_top();
+        pq_type::limit_pop();
+        return top;
+    }
+};
+
+// *** Wrapper for STL main memory PQ
+
+template <typename ValueType>
+class CStdPriorityQueue
+    : public PQBaseDefaults,
+      public std::priority_queue<
+          ValueType, std::vector<ValueType>,
+          my_type_cmp_greater<ValueType>
+          >
+{
+public:
+    typedef ValueType value_type;
+
+    typedef std::priority_queue<
+            ValueType, std::vector<ValueType>,
+            my_type_cmp_greater<ValueType>
+            > pq_type;
+
+    CStdPriorityQueue()
+        : PQBaseDefaults("STL PQ", "stl"), pq_type()
+    { }
+
+    value_type top_pop()
+    {
+        value_type item = pq_type::top();
+        pq_type::pop();
+        return item;
+    }
+
+    void bulk_push(const value_type& v, int /* thread_num */)
+    {
+        return pq_type::push(v);
+    }
+
+    void bulk_pop(std::vector<value_type>& v, size_t max_size)
+    {
+        v.clear();
+        v.reserve(max_size);
+
+        while (!this->empty() && max_size > 0)
+        {
+            v.push_back(top_pop());
+            --max_size;
+        }
+    }
 
     void limit_push(const value_type& v, int /* thread_num */)
     {
-        backend.push(v);
+        pq_type::push(v);
     }
 
-    value_type limit_top()
+    const value_type & limit_top()
+    {
+        return pq_type::top();
+    }
+
+    value_type limit_top_pop()
+    {
+        return top_pop();
+    }
+};
+
+// *** Wrapper for STL Sorter
+
+template <typename ValueType>
+class CStxxlSorter
+    : public PQBaseDefaults,
+      public stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> >
+{
+public:
+    typedef ValueType value_type;
+
+    // note that we use SMALLER here:
+    typedef stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> > pq_type;
+
+    CStxxlSorter()
+        : PQBaseDefaults("STXXL Sorter", "sorter"),
+          pq_type(my_type_cmp_smaller<ValueType>(), RAM)
+    { }
+
+    void fill_end()
+    {
+        pq_type::sort(); // switch state
+    }
+
+    const value_type & top()
+    {
+        return pq_type::operator * ();
+    }
+
+    void pop()
+    {
+        pq_type::operator ++ ();
+    }
+
+    value_type top_pop()
+    {
+        value_type item = top();
+        pop();
+        return item;
+    }
+
+    void bulk_push(const value_type& v, int /* thread_num */)
+    {
+        return pq_type::push(v);
+    }
+
+    void bulk_pop(std::vector<value_type>& v, size_t max_size)
+    {
+        v.clear();
+        v.reserve(max_size);
+
+        while (!this->empty() && max_size > 0)
+        {
+            v.push_back(top_pop());
+            --max_size;
+        }
+    }
+
+    void limit_push(const value_type& v, int /* thread_num */)
+    {
+        pq_type::push(v);
+    }
+
+    const value_type & limit_top()
     {
         return top();
     }
@@ -326,176 +534,7 @@ public:
     {
         return top_pop();
     }
-
-    //! Output additional stats
-    void print_stats()
-    { }
 };
-
-// *** Specialization for STXXL PQ
-
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<
-        value_type,
-        value_type_cmp_greater,
-        mem_for_queue,
-        _num_elements / 1024> spq_generator_type;
-
-typedef spq_generator_type::result spq_type;
-
-template <>
-std::string Container<spq_type>::name()
-{
-#if STXXL_PARALLEL
-    return "STXXL PQ (parallelized)";
-#else
-    return "STXXL PQ (sequential)";
-#endif
-}
-
-template <>
-std::string Container<spq_type>::shortname()
-{
-#if STXXL_PARALLEL
-    return "spq";
-#else
-    return "spqs";
-#endif
-}
-
-// *** Specialization for STXXL Parallel PQ
-
-typedef stxxl::parallel_priority_queue<value_type, value_type_cmp_greater> ppq_type;
-
-template <>
-std::string Container<ppq_type>::name()
-{
-    return "Parallel PQ";
-}
-
-template <>
-std::string Container<ppq_type>::shortname()
-{
-    return "ppq";
-}
-
-//! Check whether the container supports thread-safe bulk pushes
-template <>
-bool Container<ppq_type>::supports_threaded_bulks() const
-{
-    return true;
-}
-
-template <>
-void Container<ppq_type>::bulk_push_begin(size_t this_bulk_size)
-{
-    backend.bulk_push_begin(this_bulk_size);
-}
-
-template <>
-void Container<ppq_type>::bulk_push_end()
-{
-    backend.bulk_push_end();
-}
-
-template <>
-void Container<ppq_type>::bulk_push(const value_type& v, int thread_num)
-{
-    backend.bulk_push(v, thread_num);
-}
-
-template <>
-void Container<ppq_type>::bulk_pop(std::vector<value_type>& v, size_t max_size)
-{
-    backend.bulk_pop(v, max_size);
-}
-
-template <>
-void Container<ppq_type>::limit_begin(const value_type& v, size_t bulk_size)
-{
-    backend.limit_begin(v, bulk_size);
-}
-
-template <>
-void Container<ppq_type>::limit_end()
-{
-    backend.limit_end();
-}
-
-template <>
-void Container<ppq_type>::limit_push(const value_type& v, int thread_num)
-{
-    backend.limit_push(v, thread_num);
-}
-
-template <>
-value_type Container<ppq_type>::limit_top()
-{
-    return backend.limit_top();
-}
-
-template <>
-value_type Container<ppq_type>::limit_top_pop()
-{
-    value_type top = backend.limit_top();
-    backend.limit_pop();
-    return top;
-}
-
-template <>
-void Container<ppq_type>::print_stats()
-{
-    backend.print_stats();
-}
-
-// *** Specialization for STL PQ
-
-typedef std::priority_queue<value_type, std::vector<value_type>, value_type_cmp_greater> stlpq_type;
-
-template <>
-std::string Container<stlpq_type>::name()
-{
-    return "STL PQ";
-}
-
-template <>
-std::string Container<stlpq_type>::shortname()
-{
-    return "stl";
-}
-
-typedef stxxl::sorter<value_type, value_type_cmp_smaller> sorter_type;
-
-// *** Specialization for STL Sorter
-
-template <>
-std::string Container<sorter_type>::name()
-{
-    return "STXXL Sorter";
-}
-
-template <>
-std::string Container<sorter_type>::shortname()
-{
-    return "sorter";
-}
-
-template <>
-value_type Container<sorter_type>::top()
-{
-    return *backend;
-}
-
-template <>
-void Container<sorter_type>::pop()
-{
-    ++backend;
-}
-
-template <>
-void Container<sorter_type>::fill_end()
-{
-    backend.sort(); // switch state
-}
 
 /*
  * Timer and Statistics
@@ -513,16 +552,21 @@ protected:
     //! stxxl stats at start of operation
     stxxl::stats_data m_stxxl_stats;
 
+    //! size of values in container
+    size_t m_value_size;
+
 public:
     template <typename ContainerType>
     scoped_stats(ContainerType& c, const std::string& op,
                  const std::string& message,
                  unsigned int rwcycles = 1)
         : stxxl::scoped_print_timer(message,
-                                    rwcycles * num_elements * value_size),
+                                    rwcycles * num_elements *
+                                    ContainerType::value_type::value_size),
           m_shortname(c.shortname()),
           m_op(op),
-          m_stxxl_stats(*stxxl::stats::get_instance())
+          m_stxxl_stats(*stxxl::stats::get_instance()),
+          m_value_size(ContainerType::value_type::value_size)
     { }
 
     ~scoped_stats()
@@ -536,9 +580,9 @@ public:
                   << " host=" << hostname
                   << " pqname=" << m_shortname
                   << " op=" << m_op
-                  << " value_size=" << value_size
+                  << " value_size=" << m_value_size
                   << " num_elements=" << num_elements
-                  << " volume=" << num_elements * value_size
+                  << " volume=" << num_elements * m_value_size
                   << " time=" << timer().seconds()
                   << " read_count=" << s.get_reads()
                   << " read_vol=" << s.get_read_volume()
@@ -579,6 +623,8 @@ protected:
 template <typename ContainerType>
 void do_push_asc(ContainerType& c)
 {
+    typedef typename ContainerType::value_type value_type;
+
     scoped_stats stats(c, g_testset + "|push-asc",
                        "Filling " + c.name() + " sequentially");
 
@@ -594,6 +640,8 @@ void do_push_asc(ContainerType& c)
 template <typename ContainerType>
 void do_push_rand(ContainerType& c, unsigned int seed)
 {
+    typedef typename ContainerType::value_type value_type;
+
     scoped_stats stats(c, g_testset + "|push-rand",
                        "Filling " + c.name() + " randomly");
 
@@ -629,6 +677,8 @@ void do_pop(ContainerType& c)
 template <typename ContainerType>
 void do_pop_asc_check(ContainerType& c)
 {
+    typedef typename ContainerType::value_type value_type;
+
     scoped_stats stats(c, g_testset + "|pop-check",
                        "Reading " + c.name() + " and checking order");
 
@@ -641,7 +691,7 @@ void do_pop_asc_check(ContainerType& c)
 
         value_type top = c.top_pop();
 
-        STXXL_CHECK_EQUAL(top.first, i);
+        STXXL_CHECK_EQUAL(top.key, i);
         progress("Popped element", i, num_elements);
     }
 }
@@ -649,6 +699,8 @@ void do_pop_asc_check(ContainerType& c)
 template <typename ContainerType>
 void do_pop_rand_check(ContainerType& c, unsigned int seed)
 {
+    typedef typename ContainerType::value_type value_type;
+
     stxxl::sorter<uint64, less_min_max<uint64> >
     sorted_vals(less_min_max<uint64>(), RAM / 2);
 
@@ -677,7 +729,7 @@ void do_pop_rand_check(ContainerType& c, unsigned int seed)
 
             value_type top = c.top_pop();
 
-            STXXL_CHECK_EQUAL(top.first, *sorted_vals);
+            STXXL_CHECK_EQUAL(top.key, *sorted_vals);
             progress("Popped element", i, num_elements);
             ++sorted_vals;
         }
@@ -687,6 +739,8 @@ void do_pop_rand_check(ContainerType& c, unsigned int seed)
 template <typename ContainerType>
 void do_bulk_push_asc(ContainerType& c, bool parallel)
 {
+    typedef typename ContainerType::value_type value_type;
+
     std::string parallel_str = parallel ? " in parallel" : " sequentially";
 
     scoped_stats stats(c, g_testset + "|bulk-push-asc",
@@ -753,6 +807,8 @@ template <typename ContainerType>
 void do_bulk_push_rand(ContainerType& c,
                        unsigned int _seed, bool parallel)
 {
+    typedef typename ContainerType::value_type value_type;
+
     std::string parallel_str = parallel ? " in parallel" : " sequentially";
 
     scoped_stats stats(c, g_testset + "|bulk-push-rand",
@@ -828,6 +884,8 @@ void do_bulk_push_rand(ContainerType& c,
 template <typename ContainerType>
 void do_bulk_pop(ContainerType& c)
 {
+    typedef typename ContainerType::value_type value_type;
+
     scoped_stats stats(c, g_testset + "|bulk-pop",
                        "Reading " + c.name() + " in bulks");
 
@@ -852,6 +910,8 @@ void do_bulk_pop(ContainerType& c)
 template <typename ContainerType>
 void do_bulk_pop_check_asc(ContainerType& c)
 {
+    typedef typename ContainerType::value_type value_type;
+
     scoped_stats stats(c, g_testset + "|bulk-pop-check",
                        "Reading " + c.name() + " in bulks");
 
@@ -869,7 +929,7 @@ void do_bulk_pop_check_asc(ContainerType& c)
         STXXL_CHECK(work.size() <= std::min(bulk_size, num_elements - i));
 
         for (uint64 j = 0; j < work.size(); ++j)
-            STXXL_CHECK_EQUAL(work[j].first, i + j);
+            STXXL_CHECK_EQUAL(work[j].key, i + j);
 
         progress("Popped element", i, num_elements);
     }
@@ -881,6 +941,8 @@ template <typename ContainerType>
 void do_bulk_pop_check_rand(ContainerType& c,
                             unsigned int _seed, bool parallel)
 {
+    typedef typename ContainerType::value_type value_type;
+
     std::string parallel_str = parallel ? " in parallel" : " sequentially";
 
     stxxl::sorter<uint64, less_min_max<uint64> >
@@ -888,7 +950,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
 
     {
         scoped_print_timer timer("Filling sorter for comparison",
-                                 num_elements * value_size);
+                                 num_elements * value_type::value_size);
 
         // independent random generator (also: in different cache lines)
         std::vector<random_number32_r_bigger> datarng(g_max_threads);
@@ -964,7 +1026,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
 
             for (uint64 j = 0; j < work.size(); ++j)
             {
-                STXXL_CHECK_EQUAL(work[j].first, *sorted_vals);
+                STXXL_CHECK_EQUAL(work[j].key, *sorted_vals);
                 ++sorted_vals;
             }
 
@@ -1119,16 +1181,16 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 
                 value_type top = c.top_pop();
 
-                if (top.first < 1 || top.first > num_elements) {
-                    std::cout << top.first << " has never been inserted." << std::endl;
+                if (top.key < 1 || top.key > num_elements) {
+                    std::cout << top.key << " has never been inserted." << std::endl;
                     ++num_failures;
                 }
-                else if (extracted_values[top.first - 1]) {
-                    std::cout << top.first << " has already been extracted." << std::endl;
+                else if (extracted_values[top.key - 1]) {
+                    std::cout << top.key << " has already been extracted." << std::endl;
                     ++num_failures;
                 }
                 else {
-                    extracted_values[top.first - 1] = true;
+                    extracted_values[top.key - 1] = true;
                 }
 
                 progress("Deleting / inserting element", i, 2 * num_elements);
@@ -1187,8 +1249,11 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 // Bulk Limit and Pop/Push Operations
 
 template <typename ContainerType>
-void do_bulk_prefill(ContainerType& c, bool parallel, value_type::key_type& windex)
+void do_bulk_prefill(ContainerType& c, bool parallel,
+                     typename ContainerType::value_type::key_type& windex)
 {
+    typedef typename ContainerType::value_type value_type;
+
     // fill PQ with num_elements items
 
     scoped_stats stats(c, g_testset + "|prefill", c.name() + ": prefill", 1);
@@ -1217,8 +1282,10 @@ void do_bulk_prefill(ContainerType& c, bool parallel, value_type::key_type& wind
 
 template <typename ContainerType>
 void do_bulk_postempty(ContainerType& c, bool /* parallel */,
-                       value_type::key_type& rindex)
+                       typename ContainerType::value_type::key_type& rindex)
 {
+    typedef typename ContainerType::value_type value_type;
+
     // extract remaining items
 
     scoped_stats stats(c, g_testset + "|postempty",
@@ -1233,7 +1300,7 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
 
         for (uint64 j = 0; j < work.size(); ++j)
         {
-            STXXL_CHECK_EQUAL(work[j].first, rindex);
+            STXXL_CHECK_EQUAL(work[j].key, rindex);
             ++rindex;
         }
     }
@@ -1244,7 +1311,8 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
 template <bool RandomizeBulkSize, typename ContainerType>
 void do_bulk_limit(ContainerType& c, bool parallel)
 {
-    typedef value_type::key_type key_type;
+    typedef typename ContainerType::value_type value_type;
+    typedef typename value_type::key_type key_type;
 
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
@@ -1272,7 +1340,7 @@ void do_bulk_limit(ContainerType& c, bool parallel)
                 for (uint64 i = 0; i < this_bulk_size; ++i)
                 {
                     value_type top = c.top_pop();
-                    STXXL_CHECK_EQUAL(top.first, rindex);
+                    STXXL_CHECK_EQUAL(top.key, rindex);
                     ++rindex;
 
                     c.push(value_type(windex++));
@@ -1285,17 +1353,17 @@ void do_bulk_limit(ContainerType& c, bool parallel)
 
                 unsigned iterations = 0;
 
-                while (c.limit_top().first < limit.first)
+                while (c.limit_top().key < limit.key)
                 {
                     value_type top = c.limit_top_pop();
-                    STXXL_CHECK_EQUAL(top.first, rindex);
+                    STXXL_CHECK_EQUAL(top.key, rindex);
                     ++rindex;
 
                     c.limit_push(value_type(windex++), 0);
                     ++iterations;
                 }
 
-                STXXL_CHECK_EQUAL(c.limit_top().first, rindex);
+                STXXL_CHECK_EQUAL(c.limit_top().key, rindex);
 
                 c.limit_end();
                 STXXL_CHECK_EQUAL(iterations, this_bulk_size);
@@ -1314,7 +1382,8 @@ void do_bulk_limit(ContainerType& c, bool parallel)
 template <bool RandomizeBulkSize, typename ContainerType>
 void do_bulk_pop_push(ContainerType& c, bool parallel)
 {
-    typedef value_type::key_type key_type;
+    typedef typename ContainerType::value_type value_type;
+    typedef typename value_type::key_type key_type;
 
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
@@ -1345,7 +1414,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
             {
                 for (uint64 i = 0; i < work.size(); ++i)
                 {
-                    STXXL_CHECK_EQUAL(work[i].first, rindex + i);
+                    STXXL_CHECK_EQUAL(work[i].key, rindex + i);
                     c.bulk_push(value_type(windex + i), 0);
                 }
             }
@@ -1361,7 +1430,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
 #endif
                     for (uint64 i = 0; i < work.size(); ++i)
                     {
-                        STXXL_CHECK_EQUAL(work[i].first, rindex + i);
+                        STXXL_CHECK_EQUAL(work[i].key, rindex + i);
                         c.bulk_push(value_type(windex + i), thread_num);
                     }
                 }
@@ -1385,6 +1454,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
  * Dijkstra Graph SSP Algorithm with different PQs on a random graph.
  */
 
+#if 0
 template <typename ContainerType>
 class dijkstra_graph
 {
@@ -1426,7 +1496,7 @@ public:
             nodes[i] = offset;
 
             for (size_type j = 0; j < temp_edges[i].size(); ++j) {
-                edge_targets[offset + j] = temp_edges[i][j].first;
+                edge_targets[offset + j] = temp_edges[i][j].key;
                 edge_lengths[offset + j] = temp_edges[i][j].second;
             }
 
@@ -1450,7 +1520,7 @@ public:
         {
             value_type top = c.top_pop();
 
-            size_type target = top.first;
+            size_type target = top.key;
             size_type distance = top.second;
 
             if (node_visited[target]) {
@@ -1504,6 +1574,7 @@ void do_dijkstra(ContainerType& c)
     scoped_stats stats(c, "dijkstra", "Running random dijkstra");
     dg.run_random_dijkstra(c);
 }
+#endif
 
 /*
  * Print statistics and parameters.
@@ -1516,7 +1587,6 @@ void print_params()
     STXXL_MEMDUMP(block_size);
     STXXL_MEMDUMP(single_heap_ram);
     STXXL_VARDUMP(bulk_size);
-    STXXL_MEMDUMP(value_size);
     STXXL_MEMDUMP(extract_buffer_ram);
     STXXL_VARDUMP(num_elements);
     STXXL_VARDUMP(g_max_threads);
@@ -1552,7 +1622,11 @@ void run_benchmark(ContainerType& c, const std::string& testset)
 {
     std::string testdesc = "Running benchmark " + testset + " on " + c.name();
 
+    typedef typename ContainerType::value_type value_type;
+
     g_testset = testset;
+    // calculate_depending_parameters
+    num_elements = volume / sizeof(value_type);
 
     if (testset == "push-asc") {
         scoped_stats stats(c, testset, testdesc, 1);
@@ -1629,7 +1703,7 @@ void run_benchmark(ContainerType& c, const std::string& testset)
         do_bulk_pop_push<true>(c, opt_parallel);
     }
     else if (testset == "dijkstra") {
-        do_dijkstra(c);
+        //do_dijkstra(c);
     }
     else {
         STXXL_ERRMSG("Unknown benchmark test '" << testset << "'");
@@ -1693,7 +1767,8 @@ int main(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    calculate_depending_parameters();
+    ram_write_buffers = num_write_buffers * block_size;
+
     print_params();
 
 #if !STXXL_PARALLEL
@@ -1723,39 +1798,54 @@ int main(int argc, char* argv[])
 
     if (opt_queue == "ppq")
     {
-        ppq_type* ppq
-            = new ppq_type(value_type_cmp_greater(),
-                           RAM, num_prefetchers, num_write_buffers,
-                           g_max_threads, single_heap_ram, extract_buffer_ram);
-        {
-            Container<ppq_type> cppq(*ppq);
-            run_benchmark(cppq, opt_benchmark);
-        }
+        typedef CStxxlParallePQ<my8_type> ppq_type;
+        ppq_type* ppq = new ppq_type();
+        run_benchmark(*ppq, opt_benchmark);
         delete ppq;
     }
     else if (opt_queue == "spq")
     {
-        spq_type* spq = new spq_type(mem_for_prefetch_pool, mem_for_write_pool);
-        {
-            Container<spq_type> cspq(*spq);
-            run_benchmark(cspq, opt_benchmark);
-        }
+        typedef CStxxlPQ<my8_type> spq_type;
+        spq_type* spq = new spq_type();
+        run_benchmark(*spq, opt_benchmark);
         delete spq;
     }
     else if (opt_queue == "sorter")
     {
-        sorter_type sorter(value_type_cmp_smaller(), RAM);
-
-        Container<sorter_type> csorter(sorter);
-        run_benchmark(csorter, opt_benchmark);
+        CStxxlSorter<my8_type> sorter;
+        run_benchmark(sorter, opt_benchmark);
     }
     else if (opt_queue == "stl")
     {
-        stlpq_type stlpq;
-
-        Container<stlpq_type> cstlpq(stlpq);
-        run_benchmark(cstlpq, opt_benchmark);
+        CStdPriorityQueue<my8_type> stlpq;
+        run_benchmark(stlpq, opt_benchmark);
     }
+#if 1
+    else if (opt_queue == "ppq24")
+    {
+        typedef CStxxlParallePQ<my24_type> ppq_type;
+        ppq_type* ppq = new ppq_type();
+        run_benchmark(*ppq, opt_benchmark);
+        delete ppq;
+    }
+    else if (opt_queue == "spq24")
+    {
+        typedef CStxxlPQ<my24_type> spq_type;
+        spq_type* spq = new spq_type();
+        run_benchmark(*spq, opt_benchmark);
+        delete spq;
+    }
+    else if (opt_queue == "sorter24")
+    {
+        CStxxlSorter<my24_type> sorter;
+        run_benchmark(sorter, opt_benchmark);
+    }
+    else if (opt_queue == "stl24")
+    {
+        CStdPriorityQueue<my24_type> stlpq;
+        run_benchmark(stlpq, opt_benchmark);
+    }
+#endif
     else {
         STXXL_MSG("Please choose a queue container type. Use -h for help.");
         return EXIT_FAILURE;

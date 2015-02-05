@@ -113,7 +113,7 @@ public:
     //! deactivate a player
     inline void deactivate_without_replay(unsigned int index)
     {
-        assert(index<m_num_slots);
+        assert(index < m_num_slots);
         m_tree[((m_tree.size() / 2) + index)] = -1;
     }
 
@@ -286,7 +286,7 @@ public:
     {
         //resize(num_players);
         resize_and_clear(num_players);
-        for (unsigned i=0; i<num_players; ++i)
+        for (unsigned i = 0; i < num_players; ++i)
             activate_without_replay(i);
         //for (unsigned i=num_players; i<m_num_slots; ++i)
         //    deactivate_without_replay(i);
