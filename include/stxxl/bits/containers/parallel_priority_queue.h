@@ -3783,6 +3783,8 @@ protected:
                 internal_array_type::int_memory(m_extract_buffer.size())
                 );
 
+        if (m_extract_buffer_size == 0) return;
+
         // first deactivate extract buffer to replay tree for new IA.
         m_minima.deactivate_extract_buffer();
 
