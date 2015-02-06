@@ -3771,6 +3771,9 @@ protected:
 
         STXXL_DEBUG("convert_eb_into_ia");
 
+        // tb: if in limit sequence and the EB gets flushed out to EM, then we
+        // have to re-merge items into the EB instead of returning the
+        // sentinel.
         m_limit_has_full_range = false;
 
         // TODO: memory is NOT allocated, but extract buffer is currently not
