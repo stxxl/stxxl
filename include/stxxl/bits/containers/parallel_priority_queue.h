@@ -3990,6 +3990,9 @@ protected:
             flush_ia_ea_until_memory_free(
                 internal_array_type::int_memory(insheap.size()));
 
+            // invalidate player in minima tree (before adding the IA to tree)
+            m_minima.deactivate_heap(p);
+
             // insheap is empty afterwards, as vector was swapped into new_array
             add_as_internal_array(insheap);
 
@@ -4003,9 +4006,6 @@ protected:
 #pragma omp atomic
 #endif
             m_heaps_size -= size;
-
-            // invalidate player in minima tree
-            m_minima.deactivate_heap(p);
         }
 
         m_stats.insertion_heap_flush_time += flush_time;
