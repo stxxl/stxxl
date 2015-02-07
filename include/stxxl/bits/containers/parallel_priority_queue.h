@@ -3,7 +3,8 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2014 Thomas Keh <thomas.keh@student.kit.edu>
+ *  Copyright (C) 2014-2015 Thomas Keh <thomas.keh@student.kit.edu>
+ *  Copyright (C) 2014-2015 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
