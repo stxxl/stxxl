@@ -2275,7 +2275,7 @@ public:
         unsigned_type num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
         size_type extract_buffer_ram = 0)
-        : c_max_internal_level_size(256),
+        : c_max_internal_level_size(64),
           m_compare(compare),
           m_inv_compare(m_compare),
           // Parameters and Sizes for Memory Allocation Policy
