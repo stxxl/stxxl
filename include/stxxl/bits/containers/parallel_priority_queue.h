@@ -2308,7 +2308,9 @@ public:
           m_external_min_comparator(m_external_arrays, m_inv_compare),
           m_external_min_tree(4, m_external_min_comparator),
           m_hint_comparator(m_external_arrays, m_inv_compare),
-          m_hint_tree(4, m_hint_comparator)
+          m_hint_tree(4, m_hint_comparator),
+          // flags
+          m_limit_extract(false)
     {
 #if STXXL_PARALLEL
         if (!omp_get_nested()) {
@@ -2977,6 +2979,8 @@ public:
      */
     void push(const value_type& element, unsigned_type p = 0)
     {
+        assert(!m_in_bulk_push && !m_limit_extract);
+
         heap_type& insheap = m_proc[p]->insertion_heap;
 
         if (insheap.size() >= m_insertion_heap_capacity) {
@@ -2996,6 +3000,9 @@ public:
     //! Access the minimum element.
     const value_type & top()
     {
+        assert(!m_in_bulk_push && !m_limit_extract);
+        assert(!empty());
+
         if (extract_buffer_empty()) {
             refill_extract_buffer(std::min(m_extract_buffer_limit,
                                            m_internal_size + m_external_size));
@@ -3031,6 +3038,8 @@ public:
     //! Remove the minimum element.
     void pop()
     {
+        assert(!m_in_bulk_push && !m_limit_extract);
+
         m_stats.num_extracts++;
 
         if (extract_buffer_empty()) {
