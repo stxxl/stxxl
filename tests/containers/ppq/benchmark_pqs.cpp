@@ -111,7 +111,7 @@ struct my_type
 
     union {
         key_type key;
-        char padding[sizeof(key_type)];
+        char padding[value_size];
     };
 
     my_type()
@@ -121,7 +121,7 @@ struct my_type
         : key(_key)
     {
 #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
-        memset(data + sizeof(key_type), 0, sizeof(data) - sizeof(key_type));
+        memset(padding + sizeof(key_type), 0, sizeof(padding) - sizeof(key_type));
 #endif
     }
 
