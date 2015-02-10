@@ -1807,6 +1807,18 @@ int main(int argc, char* argv[])
     {
         typedef CStxxlPQ<my8_type> spq_type;
         spq_type* spq = new spq_type();
+
+        STXXL_DEBUG1("PQ parameters:" <<
+                     " total_memory=" << spq->mem_cons() <<
+                     " delete_buffer_size=" << spq->delete_buffer_size <<
+                     " N=" << spq->N <<
+                     " IntKMAX=" << spq->IntKMAX <<
+                     " num_int_groups=" << spq->num_int_groups <<
+                     " num_ext_groups=" << spq->num_ext_groups <<
+                     " total_num_groups=" << spq->total_num_groups <<
+                     " BlockSize=" << spq->BlockSize <<
+                     " ExtKMAX=" << spq->ExtKMAX);
+
         run_benchmark(*spq, opt_benchmark);
         delete spq;
     }
