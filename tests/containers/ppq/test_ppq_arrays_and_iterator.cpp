@@ -469,7 +469,7 @@ int run_upper_bound_test(size_t volume)
 int main(int argc, char** argv)
 {
     stxxl::uint64 volume = 512 * 1024 * 1024;
-    stxxl::uint64 mwmvolume = 100 * 1024 * 1024;
+    stxxl::uint64 mwmvolume = 50 * 1024 * 1024;
     stxxl::uint64 iavolume = 10 * 1024 * 1024;
 
     unsigned numpbs = 1;
