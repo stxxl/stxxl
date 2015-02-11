@@ -195,7 +195,7 @@ int run_external_array_test(size_t volume)
                 ++index;
             }
 
-            std::cout << ea.buffer_size() << " - " << round << "\n";
+            //std::cout << ea.buffer_size() << " - " << round << "\n";
 
             if (round % 3 == 0 && ea.buffer_size() > 0) {
                 // remove all items but one
@@ -536,6 +536,8 @@ int main(int argc, char** argv)
     }
 
     succ = run_upper_bound_test(3 * ea_type::block_size * sizeof(value_type)) && succ;
+
+    STXXL_MSG("success = " << succ);
 
     return succ;
 }
