@@ -21,6 +21,7 @@
 #include <ctime>
 #include <list>
 #include <utility>
+#include <numeric>
 #include <vector>
 
 #if STXXL_PARALLEL
