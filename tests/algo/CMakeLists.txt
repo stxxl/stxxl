@@ -31,7 +31,7 @@ stxxl_test(test_scan)
 stxxl_test(test_sort)
 stxxl_test(test_stable_ksort)
 
-if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
+if(NOT CYGWIN AND NOT MINGW AND BUILD_EXTRAS) #-tb too big to build on cygwin
 
   stxxl_build_test(test_ksort_all_parameters)
   stxxl_build_test(test_stable_ksort_all_parameters)
