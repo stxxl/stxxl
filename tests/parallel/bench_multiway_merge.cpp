@@ -22,6 +22,8 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 
+using stxxl::uint64;
+
 // number of repetitions of each benchmark
 unsigned int g_outer_repeat = 3;
 
@@ -379,27 +381,27 @@ int main(int argc, char* argv[])
     // run individually for debugging
     if (0)
     {
-        test_repeat<uint64_t, PARA_GNU_MWM_EXACT>(2, 2 * 1024 * 1024);
-        test_repeat<uint64_t, PARA_MWM_EXACT_LT>(2, 2 * 1024 * 1024);
-        //test_repeat<uint64_t, PARA_MWM_EXACT_LT>(1024, 2 * 1024 * 1024);
-        //test_repeat<uint64_t, SEQ_MWM_LT>(2, 2 * 1024 * 1024);
-        //test_repeat<uint64_t, SEQ_GNU_MWM>(2, 2 * 1024 * 1024);
+        test_repeat<uint64, PARA_GNU_MWM_EXACT>(2, 2 * 1024 * 1024);
+        test_repeat<uint64, PARA_MWM_EXACT_LT>(2, 2 * 1024 * 1024);
+        //test_repeat<uint64, PARA_MWM_EXACT_LT>(1024, 2 * 1024 * 1024);
+        //test_repeat<uint64, SEQ_MWM_LT>(2, 2 * 1024 * 1024);
+        //test_repeat<uint64, SEQ_GNU_MWM>(2, 2 * 1024 * 1024);
         return 0;
     }
 
     if (benchset == "sequ" || benchset == "sequential" || benchset == "both")
     {
-        test_seqnum_sequential<uint64_t>();
+        test_seqnum_sequential<uint64>();
         test_seqnum_sequential<DataStruct>();
     }
     if (benchset == "para" || benchset == "parallel" || benchset == "both")
     {
-        test_seqnum_parallel<uint64_t>();
+        test_seqnum_parallel<uint64>();
         test_seqnum_parallel<DataStruct>();
     }
     if (benchset == "vecsize")
     {
-        test_seqsize<uint64_t, PARA_MWM_EXACT_LT>();
+        test_seqsize<uint64, PARA_MWM_EXACT_LT>();
         test_seqsize<DataStruct, PARA_MWM_EXACT_LT>();
     }
 

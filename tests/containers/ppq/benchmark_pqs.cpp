@@ -957,7 +957,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
         for (size_t t = 0; t < g_max_threads; ++t)
             datarng[t].set_seed(t * _seed);
 
-        for (uint64_t i = 0; i < num_elements / bulk_size; ++i)
+        for (uint64 i = 0; i < num_elements / bulk_size; ++i)
         {
 #if STXXL_PARALLEL
 #pragma omp parallel if(parallel) num_threads(g_max_threads)
@@ -971,7 +971,9 @@ void do_bulk_pop_check_rand(ContainerType& c,
                 for (uint64 j = 0; j < bulk_size; ++j)
                 {
                     uint64 k = datarng[thread_id]() % value_universe_size;
+#if STXXL_PARALLEL
                     #pragma omp critical
+#endif
                     sorted_vals.push(k);
                 }
             }
@@ -996,7 +998,9 @@ void do_bulk_pop_check_rand(ContainerType& c,
             for (uint64 j = 0; j < bulk_remain; ++j)
             {
                 uint64 k = datarng[thread_id]() % value_universe_size;
+#if STXXL_PARALLEL
                 #pragma omp critical
+#endif
                 sorted_vals.push(k);
             }
         }
