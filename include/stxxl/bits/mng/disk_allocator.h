@@ -6,7 +6,7 @@
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
- *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013-2015 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +18,8 @@
 
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/config.h>
