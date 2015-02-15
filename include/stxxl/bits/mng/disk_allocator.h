@@ -170,10 +170,15 @@ void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
     if (free_bytes < requested_size)
     {
         if (!autogrow) {
-            STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
-                         " bytes requested, " << free_bytes <<
-                         " bytes free. Trying to extend the external memory space...");
+            STXXL_THROW(bad_ext_alloc,
+                        "Out of external memory error: " << requested_size <<
+                        " requested, " << free_bytes << " bytes free. "
+                        "Maybe enable autogrow flags?");
         }
+
+        STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
+                     " bytes requested, " << free_bytes <<
+                     " bytes free. Trying to extend the external memory space...");
 
         grow_file(requested_size);
     }

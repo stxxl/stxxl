@@ -196,14 +196,17 @@ void block_manager::new_blocks_int(
     simple_vector<bid_array_type> disk_bids(ndisks);
     simple_vector<file*> disk_ptrs(nblocks);
 
-    bl.memzero();
+    // choose disks by calling DiskAssignFunctor
 
+    bl.memzero();
     for (unsigned_type i = 0; i < nblocks; ++i)
     {
         unsigned_type disk = functor(offset + i);
         disk_ptrs[i] = disk_files[disk];
         bl[disk]++;
     }
+
+    // allocate blocks on disks
 
     for (unsigned_type i = 0; i < ndisks; ++i)
     {
@@ -235,8 +238,10 @@ void block_manager::new_blocks_int(
 template <unsigned BlockSize>
 void block_manager::delete_block(const BID<BlockSize>& bid)
 {
-    // do not uncomment it
-    //assert(bid.storage->get_allocator_id() < config::get_instance()->disks_number());
+    if (!bid.valid()) {
+        //STXXL_MSG("Warning: invalid block to be deleted.");
+        return;
+    }
     if (!bid.is_managed())
         return;  // self managed disk
     STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:delete " << FMT_BID(bid));
