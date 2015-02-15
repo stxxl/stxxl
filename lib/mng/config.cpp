@@ -212,7 +212,7 @@ uint64 config::total_size() const
 
 disk_config::disk_config()
     : size(0),
-      autogrow(false),
+      autogrow(true),
       delete_on_exit(false),
       direct(DIRECT_TRY),
       flash(false),
@@ -228,7 +228,7 @@ disk_config::disk_config(const std::string& _path, uint64 _size,
     : path(_path),
       size(_size),
       io_impl(_io_impl),
-      autogrow(false),
+      autogrow(true),
       delete_on_exit(false),
       direct(DIRECT_TRY),
       flash(false),
@@ -243,7 +243,7 @@ disk_config::disk_config(const std::string& _path, uint64 _size,
 
 disk_config::disk_config(const std::string& line)
     : size(0),
-      autogrow(false),
+      autogrow(true),
       delete_on_exit(false),
       direct(DIRECT_TRY),
       flash(false),
@@ -274,7 +274,7 @@ void disk_config::parse_line(const std::string& line)
 
     // *** Set Default Extra Options ***
 
-    autogrow = false;
+    autogrow = true; // was default for a long time, have to keep it this way
     delete_on_exit = false;
     direct = DIRECT_TRY;
     // flash is already set
@@ -348,10 +348,21 @@ void disk_config::parse_fileio()
         if (*p == "") {
             // skip blank options
         }
-        else if (*p == "autogrow")
+        else if (*p == "autogrow" || *p == "noautogrow" || eq[0] == "autogrow")
         {
             // TODO: which fileio implementation support autogrow?
-            autogrow = true;
+
+            if (*p == "autogrow") autogrow = true;
+            else if (*p == "noautogrow") autogrow = false;
+            else if (eq[1] == "off") autogrow = false;
+            else if (eq[1] == "on") autogrow = true;
+            else if (eq[1] == "no") autogrow = false;
+            else if (eq[1] == "yes") autogrow = true;
+            else
+            {
+                STXXL_THROW(std::runtime_error,
+                            "Invalid parameter '" << *p << "' in disk configuration file.");
+            }
         }
         else if (*p == "delete" || *p == "delete_on_exit")
         {
@@ -444,8 +455,8 @@ std::string disk_config::fileio_string() const
 
     oss << io_impl;
 
-    if (autogrow)
-        oss << " autogrow";
+    if (!autogrow)
+        oss << " autogrow=no";
 
     if (delete_on_exit)
         oss << " delete_on_exit";

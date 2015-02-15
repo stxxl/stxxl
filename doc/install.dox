@@ -462,7 +462,7 @@ Description of the parameters:
 
 - <b><tt>\<options></tt></b> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
 
-  - \c autogrow : enables automatic growth of the file beyond the specified capacity.
+  - \c **autogrow**, \c noautogrow, \c autogrow=[off/on] : enables automatic growth of the file beyond the specified capacity, enabled by default except if raw_device.
 
   - \c **direct**, \c nodirect, \c direct=[off/try/on] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
     This is \a recommended as it improves performance, however, not all filesystems support bypassing cache. With \c direct or \c direct=on, STXXL will fail without direct access. With \c nodirect or \c direct=off it is disabled. The default is \c direct=try , which first attempts to open with O_DIRECT and falls back to opening without if it fails.
