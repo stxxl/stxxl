@@ -2261,7 +2261,7 @@ public:
      * \param num_insertion_heaps Number of insertion heaps. 0 = Default =
      * Determine by omp_get_max_threads().
      *
-     * \param single_heap_ram Memory usage for a single insertion heap. 0 =
+     * \param single_heap_ram Memory usage for a single insertion heap.
      * Default = c_single_heap_ram.
      *
      * \param extract_buffer_ram Memory usage for the extract buffer. Only
@@ -2338,7 +2338,10 @@ public:
         for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
             m_internal_levels[i] = 0;
 
-        init_memmanagement();
+        // TODO: Do we still need this line? Insertion heap memory is
+        // registered below. And merge buffer is equal to the new IA...
+        // total_ram - ram for the heaps - ram for the heap merger
+        m_mem_left = m_mem_total - 2 * m_mem_for_heaps;
 
         // reverse insertion heap memory on processor-local memory
 #if STXXL_PARALLEL
@@ -2394,27 +2397,6 @@ public:
     }
 
 protected:
-    //! Initializes member variables concerning the memory management.
-    void init_memmanagement()
-    {
-        // total_ram - ram for the heaps - ram for the heap merger
-        //       - ram for the external array write buffer - EA prefetch buffer blocks
-        m_mem_left = m_mem_total - 2 * m_mem_for_heaps;
-
-        if (c_limit_extract_buffer) {
-            // ram for the extract buffer
-            //TODO m_mem_left -= m_extract_buffer_limit * sizeof(value_type);
-        }
-        else {
-            // each: part of the (maximum) ram for the extract buffer
-            // TODO: Merging size may be larger.
-        }
-
-        if (c_merge_sorted_heaps) {
-            // part of the ram for the merge buffer
-            //TODO m_mem_left -= m_mem_for_heaps;
-        }
-    }
 
     //! Assert many invariants of the data structures.
     void check_invariants() const
