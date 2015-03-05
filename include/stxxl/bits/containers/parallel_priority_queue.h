@@ -2250,16 +2250,16 @@ public:
      * \param compare Comparator for priority queue, which is a Max-PQ.
      *
      * \param total_ram Maximum RAM usage. 0 = Default = Use the template
-     * value Ram.
+     * value DefaultMemSize.
      *
-     * \param num_prefetch_buffer_blocks Number of prefetch blocks per external
-     * array. Default = c_num_prefetch_buffer_blocks
+     * \param num_read_blocks_per_ea Number of read blocks per external
+     * array. Default = 1.5f
      *
      * \param num_write_buffer_blocks Number of write buffer blocks for a new
      * external array being filled. 0 = Default = c_num_write_buffer_blocks
      *
-     * \param num_insertion_heaps Number of insertion heaps. 0 = Determine by
-     * omp_get_max_threads(). Default = Determine by omp_get_max_threads().
+     * \param num_insertion_heaps Number of insertion heaps. 0 = Default =
+     * Determine by omp_get_max_threads().
      *
      * \param single_heap_ram Memory usage for a single insertion heap. 0 =
      * Default = c_single_heap_ram.
@@ -2271,7 +2271,7 @@ public:
     parallel_priority_queue(
         const compare_type& compare = compare_type(),
         size_type total_ram = DefaultMemSize,
-        float num_read_buffer_blocks = 1.5f,
+        float num_read_blocks_per_ea = 1.5f,
         unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
         unsigned_type num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
@@ -2288,7 +2288,7 @@ public:
           m_insertion_heap_capacity(single_heap_ram / sizeof(value_type)),
           m_mem_total(total_ram),
           m_mem_for_heaps(m_num_insertion_heaps * single_heap_ram),
-          m_num_read_blocks_per_ea(num_read_buffer_blocks),
+          m_num_read_blocks_per_ea(num_read_blocks_per_ea),
           m_num_read_blocks(0),
           m_num_hinted_blocks(0),
           m_num_used_read_blocks(0),
