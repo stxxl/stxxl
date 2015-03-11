@@ -18,6 +18,10 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
+#if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
+#include <atomic>
+#endif
+
 #if STXXL_STD_THREADS
  #include <mutex>
 #elif STXXL_BOOST_THREADS
@@ -35,6 +39,15 @@ STXXL_BEGIN_NAMESPACE
 
 #if STXXL_STD_THREADS
 
+#if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
+	
+	class spinLock;
+	typedef spinLock fastmutex;
+#else
+
+	typedef std::mutex fastmutex;
+
+#endif
 typedef std::mutex mutex;
 
 #elif STXXL_BOOST_THREADS
@@ -95,6 +108,7 @@ public:
 #if STXXL_STD_THREADS
 
 typedef std::unique_lock<std::mutex> scoped_mutex_lock;
+typedef std::unique_lock<fastmutex> scoped_fast_mutex_lock;
 
 #elif STXXL_BOOST_THREADS
 
@@ -140,6 +154,44 @@ public:
 
 #endif
 
+#if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
+
+class spinLock
+{
+public:
+#if STXXL_MSVC < 1800
+	spinLock()
+	{
+		lck.clear(std::memory_order_release);
+	}
+#endif
+
+	void lock()
+	{
+		while(lck.test_and_set(std::memory_order_acquire))
+		{}
+	}
+
+	void unlock()
+	{
+		lck.clear(std::memory_order_release);
+	}
+
+private:
+#if STXXL_MSVC >= 1800
+	std::atomic_flag lck = ATOMIC_FLAG_INIT;
+	spinLock(const spinLock&) =delete;
+	spinLock& operator=(const spinLock&) =delete;
+#else
+	std::atomic_flag lck;
+	spinLock(const spinLock&);
+	spinLock& operator=(const spinLock&);
+#endif
+};
+
+
+
+#endif
 STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMMON_MUTEX_HEADER
