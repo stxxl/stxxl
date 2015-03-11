@@ -467,6 +467,9 @@ protected:
     //! Number of blocks, again: calculated at construction time.
     unsigned_type m_num_blocks;
 
+    //! Level of external array (Sander's PQ: group number)
+    unsigned_type m_level;
+
     //! Common prefetch and write buffer pool
     pool_type* m_pool;
 
@@ -524,10 +527,11 @@ public:
      * \param num_write_buffer_blocks Size of the write buffer in number of
      * blocks
      */
-    external_array(external_size_type size, pool_type* pool)
+    external_array(external_size_type size, pool_type* pool, unsigned_type level = 0)
         :   // constants
           m_capacity(size),
           m_num_blocks((size_t)div_ceil(m_capacity, block_items)),
+          m_level(level),
           m_pool(pool),
 
           // vectors
@@ -559,6 +563,7 @@ public:
         :   // constants
           m_capacity(0),
           m_num_blocks(0),
+          m_level(0),
           m_pool(NULL),
 
           // vectors
@@ -587,6 +592,7 @@ public:
         // constants
         swap(m_capacity, o.m_capacity);
         swap(m_num_blocks, o.m_num_blocks);
+        swap(m_level, o.m_level);
         swap(m_pool, o.m_pool);
 
         // vectors
@@ -669,6 +675,12 @@ public:
     bool empty() const
     {
         return (m_size == 0);
+    }
+
+    //! Returns the level (group number) of the array.
+    inline unsigned_type level() const
+    {
+        return m_level;
     }
 
     //! Return the number of blocks.
