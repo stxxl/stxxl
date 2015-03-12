@@ -37,17 +37,11 @@
 
 STXXL_BEGIN_NAMESPACE
 
+
+
 #if STXXL_STD_THREADS
 
-#if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
-	
-	class spinLock;
-	typedef spinLock fastmutex;
-#else
 
-	typedef std::mutex fastmutex;
-
-#endif
 typedef std::mutex mutex;
 
 #elif STXXL_BOOST_THREADS
@@ -104,6 +98,16 @@ public:
 };
 
 #endif
+#if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
+
+class spinLock;
+typedef spinLock fastmutex;
+#else
+
+typedef mutex fastmutex;
+
+#endif
+
 
 #if STXXL_STD_THREADS
 
@@ -113,6 +117,7 @@ typedef std::unique_lock<fastmutex> scoped_fast_mutex_lock;
 #elif STXXL_BOOST_THREADS
 
 typedef boost::mutex::scoped_lock scoped_mutex_lock;
+typedef boost::mutex::scoped_lock scoped_fast_mutex_lock;
 
 #else
 
@@ -153,6 +158,7 @@ public:
 };
 
 #endif
+
 
 #if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
 
