@@ -156,7 +156,7 @@ public:
         return m_mutex.native_handle();
     }
 };
-
+typedef scoped_mutex_lock scoped_fast_mutex_lock;
 #endif
 
 
