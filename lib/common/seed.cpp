@@ -33,7 +33,7 @@ inline unsigned initial_seed();
 
 struct seed_generator_t {
     unsigned seed;
-    mutex mtx;
+    fastmutex mtx;
 
     seed_generator_t(unsigned s) : seed(s)
     { }
@@ -66,13 +66,13 @@ inline unsigned initial_seed()
 
 void set_seed(unsigned seed)
 {
-    scoped_mutex_lock Lock(seed_generator().mtx);
+    scoped_fast_mutex_lock Lock(seed_generator().mtx);
     seed_generator().seed = seed;
 }
 
 unsigned get_next_seed()
 {
-    scoped_mutex_lock Lock(seed_generator().mtx);
+    scoped_fast_mutex_lock Lock(seed_generator().mtx);
     return seed_generator().seed++;
 }
 
