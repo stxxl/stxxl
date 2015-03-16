@@ -2234,14 +2234,16 @@ protected:
         // Otherwise there might be outdated comparisons.
         for (size_t i = size; i != first_removed; ) {
             --i;
-            m_external_min_tree.deactivate_player(i);
-            m_hint_tree.deactivate_player(i);
+            m_external_min_tree.deactivate_player_step(i);
+            // TODO delay if (m_in_bulk_push)?
+            m_hint_tree.deactivate_player_step(i);
         }
 
         // Replay moved arrays.
         for (size_t i = first_removed; i < swap_end_index; ++i) {
-            update_hint_trees(i);
             update_external_min_tree(i);
+            // TODO delay if (m_in_bulk_push)?
+            update_hint_trees(i);  
         }
 
         STXXL_DEBUG("Removed " << m_external_arrays.end() - swap_end <<
