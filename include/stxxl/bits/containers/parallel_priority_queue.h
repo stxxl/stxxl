@@ -3348,103 +3348,17 @@ public:
     void merge_external_arrays()
     {
         STXXL_ERRMSG("Merging external arrays. This should not happen."
-            << "You should adjust memory assignment and/or external array level size.");
+            << " You should adjust memory assignment and/or external array level size.");
+        check_external_level(0, true);
+        STXXL_DEBUG("Merging all external arrays done.");
 
-        STXXL_MSG("Merging external arrays");
+        resize_read_pool();
 
-        m_stats.num_external_array_merges++;
-        m_stats.external_array_merge_time.start();
-
-        // add IAs to all EAs is the total size of the newly merged EA.
-        m_external_size += m_internal_size;
-
-        external_array_type ea(m_external_size, &m_pool);
-        {
-            external_array_writer_type external_array_writer(ea);
-
-            typename external_array_writer_type::iterator out_iter
-                = external_array_writer.begin();
-
-            unsigned_type ea_done = 0;
-
-            for (size_type i = 0; i < m_external_arrays.size(); ++i) {
-                if (m_external_arrays[i].empty())
-                    ++ea_done;
-            }
-
-            while (m_external_arrays.size() != ea_done)
-            {
-                size_type eas = m_external_arrays.size();
-                size_type ias = m_internal_arrays.size();
-
-                STXXL_DEBUG("ea_done= " << ea_done);
-
-                // prefetch new blocks from EAs using freed blocks
-                hint_external_arrays();
-
-                // fetch as many of next blocks from EAs as possible
-                int limiting_ea_index;
-                while ((limiting_ea_index = m_external_min_tree.top()) >= 0)
-                {
-                    assert((size_t)limiting_ea_index < eas);
-
-                    if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0)
-                        break;
-
-                    wait_next_ea_blocks(limiting_ea_index);
-                }
-
-                std::vector<size_type> sizes(eas + ias);
-                std::vector<iterator_pair_type> sequences(eas + ias);
-
-                calculate_merge_sequences(sizes, sequences, false);
-                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
-
-                out_iter = potentially_parallel::multiway_merge(
-                    sequences.begin(), sequences.end(),
-                    out_iter, output_size, m_inv_compare);
-
-                for (size_type i = 0; i < eas + ias; ++i) {
-                    if (i < eas) {
-                        if (!m_external_arrays[i].empty()) {
-                            // remove items and free blocks in RAM.
-                            unsigned_type freed_blocks =
-                                m_external_arrays[i].remove_items(sizes[i]);
-
-                            m_num_used_read_blocks -= freed_blocks;
-
-                            if (m_external_arrays[i].empty())
-                                ++ea_done;
-                        }
-                    }
-                    else {
-                        size_type j = i - eas;
-                        m_internal_arrays[j].inc_min(sizes[i]);
-                        assert(m_internal_size >= sizes[i]);
-                        m_internal_size -= sizes[i];
-                    }
-                }
-
-                // cannot call clear_external_arrays() here, since it could
-                // recursively call this function.
-            }
-        } // destroy external_array_writer
-
-        // clean up now empty arrays
-        cleanup_external_arrays();
-        cleanup_internal_arrays();
-
-        assert(m_internal_arrays.size() == 0);
-        assert(m_external_arrays.size() == 0);
-
-        // all that is left is now one external array
-        m_external_arrays.swap_back(ea);
-
-        m_mem_left -= m_external_arrays.back().int_memory();
-
-        update_trees_after_ea_creation(m_external_arrays.size() - 1);
-
-        m_stats.external_array_merge_time.stop();
+        // Rebuild hint tree completely as the hint sequence may have changed.
+        if (!m_in_bulk_push)
+            rebuild_hint_tree();
+        else
+            assert(m_external_arrays.size()-1 >= m_bulk_first_delayed_external_array);
 
         check_invariants();
     }
@@ -3515,30 +3429,6 @@ public:
             if (new_num_read_blocks < m_num_read_blocks)
                 STXXL_ERRMSG("WARNING: could not immediately reduce read/prefetch pool!");
         }
-    }
-
-    //! Activate player in fetch prediction tree afer a remove()
-    //! or a request_further_block() call. Rebuild hint tree
-    //! completely as the hint sequence may have changed.
-    //! \param ea_index index of the external array in question
-    inline void update_trees_after_ea_creation(const size_t ea_index)
-    {
-        STXXL_DEBUG("update_trees_after_ea_creation" <<
-                    " ea_index=" << ea_index <<
-                    " ea_size=" << m_external_arrays.size() <<
-                    " free_size_prefetch=" << m_pool.free_size_prefetch() <<
-                    " m_num_hinted_blocks=" << m_num_hinted_blocks);
-
-        resize_read_pool();
-
-        // register EA in min tree
-        m_external_min_tree.activate_without_replay(ea_index);
-        update_external_min_tree(ea_index);
-
-        if (!m_in_bulk_push)
-            rebuild_hint_tree();
-        else
-            assert(ea_index >= m_bulk_first_delayed_external_array);
     }
 
     //! Rebuild hint tree completely as the hint sequence may have changed, and
@@ -4149,7 +4039,6 @@ protected:
     //! Flushes the internal arrays into an external array.
     void flush_internal_arrays()
     {
-
         STXXL_DEBUG("Flushing internal arrays" <<
                     " num_arrays=" << m_internal_arrays.size());
 
@@ -4208,7 +4097,6 @@ protected:
 
         // register EA in min tree
         // important for check_external_level()!
-        // TODO: remove from update_trees_after_ea_creation()?
         m_external_min_tree.activate_without_replay(m_external_arrays.size()-1);
         update_external_min_tree(m_external_arrays.size()-1);
 
@@ -4232,23 +4120,31 @@ protected:
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.internal_array_flush_time.stop();
 
-
         // update EA level and potentially merge 
         ++m_external_levels[0];
         check_external_level(0);
 
-        // TODO double update of min tree?
-        update_trees_after_ea_creation(m_external_arrays.size() - 1);
+
+        
+        resize_read_pool();
+        // Rebuild hint tree completely as the hint sequence may have changed.
+        if (!m_in_bulk_push)
+            rebuild_hint_tree();
+        else
+            assert(m_external_arrays.size()-1 >= m_bulk_first_delayed_external_array);
+
         check_invariants();
 
     }
 
     //! Merges external arrays if there are too many external arrays on
     //! the same level.
-    void check_external_level(unsigned_type level) {
+    void check_external_level(unsigned_type level, bool force_merge_all = false) {
+        if (!force_merge_all)
+            STXXL_DEBUG("Checking external level "<<level);
 
         // return if EA level is not full
-        if (m_external_levels[level] < c_max_external_level_size)
+        if (m_external_levels[level] < c_max_external_level_size && !force_merge_all)
             return;
 
         unsigned_type level_size = 0;
@@ -4257,7 +4153,7 @@ protected:
 
         for (unsigned_type i = 0; i < m_external_arrays.size(); ++i)
         {
-            if (m_external_arrays[i].level() != level) continue;
+            if (m_external_arrays[i].level() != level && !force_merge_all) continue;
             if (m_external_arrays[i].empty()) continue;
 
             level_size += m_external_arrays[i].size();
@@ -4266,20 +4162,27 @@ protected:
         }
 
         // return if there is not enough RAM for the new array.
-        if (m_mem_left < external_array_type::int_memory(level_size))
+        // TODO: force_merge_all==true is for freeing memory. Breaking here is not
+        // helpful in this case. But one should maybe reserve some space in advance.
+        if (m_mem_left < external_array_type::int_memory(level_size) && !force_merge_all)
             return;
         m_mem_left -= external_array_type::int_memory(level_size);
 
-        STXXL_ASSERT(c_max_external_level_size==ea_index.size());
-        unsigned_type num_arrays_to_merge = c_max_external_level_size;
+        STXXL_ASSERT(force_merge_all ||c_max_external_level_size==ea_index.size());
+        unsigned_type num_arrays_to_merge = ea_index.size();
 
         STXXL_DEBUG("merging external arrays" <<
                     " level=" << level <<
                     " level_size=" << level_size <<
-                    " sequences=" << num_arrays_to_merge);
+                    " sequences=" << num_arrays_to_merge <<
+                    " force_merge_all=" << force_merge_all);
+
+        // if force_merge_all: create array in highest level to avoid merging
+        // of such a large EA.
+        unsigned_type new_level = force_merge_all ? c_max_external_levels-1 : level+1;
 
         // construct new external array
-        external_array_type ea(level_size, &m_pool, level+1);
+        external_array_type ea(level_size, &m_pool, new_level);
         {
             external_array_writer_type external_array_writer(ea);
             typename external_array_writer_type::iterator out_iter
@@ -4476,7 +4379,7 @@ protected:
         cleanup_external_arrays();
 
         m_external_arrays.swap_back(ea);
-        ++m_external_levels[level+1];
+        ++m_external_levels[new_level];
 
         // register EA in min tree
         m_external_min_tree.activate_without_replay(m_external_arrays.size()-1);
@@ -4488,10 +4391,11 @@ protected:
             update_hint_trees(m_external_arrays.size()-1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
-        STXXL_DEBUG("Merge done of new ea " << &ea
-            <<". Checking EA level "<<level+1<<" now.");
+        STXXL_DEBUG("Merge done of new ea " << &ea);
         
-        check_external_level(level+1);
+        if (!force_merge_all)
+            check_external_level(level+1);
+
         check_invariants();
 
     }
