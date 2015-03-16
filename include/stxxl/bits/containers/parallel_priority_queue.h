@@ -2243,7 +2243,7 @@ protected:
         for (size_t i = first_removed; i < swap_end_index; ++i) {
             update_external_min_tree(i);
             // TODO delay if (m_in_bulk_push)?
-            update_hint_trees(i);  
+            update_hint_tree(i);  
         }
 
         STXXL_DEBUG("Removed " << m_external_arrays.end() - swap_end <<
@@ -3448,8 +3448,7 @@ public:
                 m_hint_tree.activate_without_replay(i);
             }
             else {
-                // TODO deactivate_without_replay?
-                m_hint_tree.deactivate_player(i);
+                m_hint_tree.deactivate_without_replay(i);
             }
         }
         m_hint_tree.rebuild();
@@ -3496,7 +3495,7 @@ public:
     //! Updates the prefetch prediction tree afer a remove_items(), which frees
     //! up blocks.
     //! \param ea_index index of the external array in question
-    inline void update_hint_trees(size_t ea_index)
+    inline void update_hint_tree(size_t ea_index)
     {
         m_stats.hint_time.start();
         if (m_external_arrays[ea_index].has_unhinted_em_data()) {
@@ -4103,7 +4102,7 @@ protected:
         // register EA in hint tree
         m_hint_tree.activate_without_replay(m_external_arrays.size()-1);
         if (!m_in_bulk_push)
-            update_hint_trees(m_external_arrays.size()-1);
+            update_hint_tree(m_external_arrays.size()-1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
         m_internal_arrays.clear();
@@ -4388,7 +4387,7 @@ protected:
         // register EA in hint tree
         m_hint_tree.activate_without_replay(m_external_arrays.size()-1);
         if (!m_in_bulk_push)
-            update_hint_trees(m_external_arrays.size()-1);
+            update_hint_tree(m_external_arrays.size()-1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
         STXXL_DEBUG("Merge done of new ea " << &ea);
