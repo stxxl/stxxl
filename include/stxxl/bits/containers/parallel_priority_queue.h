@@ -1071,6 +1071,25 @@ public:
         return i - begin;
     }
 
+    //! Waits until all hinted blocks are read into RAM. Returns how many
+    //! blocks were successfully read.
+    unsigned_type wait_all_hinted_blocks() {
+        size_t begin = get_end_block_index(), i = begin;
+        while (i < m_unhinted_block)
+        {
+            STXXL_DEBUG("wait_all_hinted_blocks(): ea[" << this << "]: waiting for" <<
+                        " block index=" << i <<
+                        " end_index=" << m_end_index);
+            m_requests[i]->wait();
+            assert(m_requests[i]->poll());
+            assert(m_blocks[i]);
+            update_block_pointers(i);
+            ++i;
+        }
+        m_end_index = std::min(m_capacity, i * (external_size_type)block_items);
+        return i - begin;
+    }
+
     //! Returns the number of blocks loaded in RAM.
     size_t num_used_blocks() const
     {
