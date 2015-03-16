@@ -127,7 +127,7 @@ public:
     /**
      * deactivate one player in a batch of deactivations run
      * replay_on_deactivation() afterwards. If there are multiple consecutive
-     * removes you should run deactivate_player() for all of them first and
+     * removes you should run deactivate_player_step() for all of them first and
      * afterwards run replay_on_deactivation() for each one of them.
      */
     inline void deactivate_player_step(unsigned int index)
