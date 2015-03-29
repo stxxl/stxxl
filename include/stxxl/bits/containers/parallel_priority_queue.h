@@ -4133,6 +4133,24 @@ protected:
         check_invariants();
     }
 
+    // Compares the largest accessible value of two external arrays.
+    struct s_min_tree_comparator {
+        const external_arrays_type& m_eas;
+        const std::vector<unsigned_type>& m_indices;
+        const inv_compare_type& m_compare;
+
+        s_min_tree_comparator(const external_arrays_type& eas,
+                              const inv_compare_type& compare,
+                              const std::vector<unsigned_type>& indices)
+            : m_eas(eas), m_indices(indices), m_compare(compare) { }
+
+        bool operator () (const size_t& a, const size_t& b) const
+        {
+            return m_compare(m_eas[m_indices[a]].get_next_hintable_min(),
+                             m_eas[m_indices[b]].get_next_hintable_min());
+        }
+    };
+
     //! Merges external arrays if there are too many external arrays on
     //! the same level.
     void check_external_level(unsigned_type level, bool force_merge_all = false)
@@ -4186,24 +4204,6 @@ protected:
                 = external_array_writer.begin();
 
             // === build minima_tree over the level's arrays ===
-
-            // Compares the largest accessible value of two external arrays.
-            struct s_min_tree_comparator {
-                const external_arrays_type& m_eas;
-                const typename std::vector<unsigned_type>&m_indices;
-                const inv_compare_type& m_compare;
-
-                s_min_tree_comparator(const external_arrays_type& eas,
-                                      const inv_compare_type& compare,
-                                      const typename std::vector<unsigned_type>& indices)
-                    : m_eas(eas), m_indices(indices), m_compare(compare) { }
-
-                bool operator () (const size_t& a, const size_t& b) const
-                {
-                    return m_compare(m_eas[m_indices[a]].get_next_hintable_min(),
-                                     m_eas[m_indices[b]].get_next_hintable_min());
-                }
-            };
 
             s_min_tree_comparator min_tree_comparator(m_external_arrays,
                                                       m_inv_compare, ea_index);
