@@ -1073,7 +1073,8 @@ public:
 
     //! Waits until all hinted blocks are read into RAM. Returns how many
     //! blocks were successfully read.
-    unsigned_type wait_all_hinted_blocks() {
+    unsigned_type wait_all_hinted_blocks()
+    {
         size_t begin = get_end_block_index(), i = begin;
         while (i < m_unhinted_block)
         {
@@ -2243,7 +2244,7 @@ protected:
         for (size_t i = first_removed; i < swap_end_index; ++i) {
             update_external_min_tree(i);
             // TODO delay if (m_in_bulk_push)?
-            update_hint_tree(i);  
+            update_hint_tree(i);
         }
 
         STXXL_DEBUG("Removed " << m_external_arrays.end() - swap_end <<
@@ -2445,7 +2446,6 @@ public:
     }
 
 protected:
-
     //! Assert many invariants of the data structures.
     void check_invariants() const
     {
@@ -3348,7 +3348,7 @@ public:
     void merge_external_arrays()
     {
         STXXL_ERRMSG("Merging external arrays. This should not happen."
-            << " You should adjust memory assignment and/or external array level size.");
+                     << " You should adjust memory assignment and/or external array level size.");
         check_external_level(0, true);
         STXXL_DEBUG("Merging all external arrays done.");
 
@@ -3358,7 +3358,7 @@ public:
         if (!m_in_bulk_push)
             rebuild_hint_tree();
         else
-            assert(m_external_arrays.size()-1 >= m_bulk_first_delayed_external_array);
+            assert(m_external_arrays.size() - 1 >= m_bulk_first_delayed_external_array);
 
         check_invariants();
     }
@@ -4096,13 +4096,13 @@ protected:
 
         // register EA in min tree
         // important for check_external_level()!
-        m_external_min_tree.activate_without_replay(m_external_arrays.size()-1);
-        update_external_min_tree(m_external_arrays.size()-1);
+        m_external_min_tree.activate_without_replay(m_external_arrays.size() - 1);
+        update_external_min_tree(m_external_arrays.size() - 1);
 
         // register EA in hint tree
-        m_hint_tree.activate_without_replay(m_external_arrays.size()-1);
+        m_hint_tree.activate_without_replay(m_external_arrays.size() - 1);
         if (!m_in_bulk_push)
-            update_hint_tree(m_external_arrays.size()-1);
+            update_hint_tree(m_external_arrays.size() - 1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
         m_internal_arrays.clear();
@@ -4119,28 +4119,26 @@ protected:
         m_stats.max_num_external_arrays.set_max(m_external_arrays.size());
         m_stats.internal_array_flush_time.stop();
 
-        // update EA level and potentially merge 
+        // update EA level and potentially merge
         ++m_external_levels[0];
         check_external_level(0);
 
-
-        
         resize_read_pool();
         // Rebuild hint tree completely as the hint sequence may have changed.
         if (!m_in_bulk_push)
             rebuild_hint_tree();
         else
-            assert(m_external_arrays.size()-1 >= m_bulk_first_delayed_external_array);
+            assert(m_external_arrays.size() - 1 >= m_bulk_first_delayed_external_array);
 
         check_invariants();
-
     }
 
     //! Merges external arrays if there are too many external arrays on
     //! the same level.
-    void check_external_level(unsigned_type level, bool force_merge_all = false) {
+    void check_external_level(unsigned_type level, bool force_merge_all = false)
+    {
         if (!force_merge_all)
-            STXXL_DEBUG("Checking external level "<<level);
+            STXXL_DEBUG("Checking external level " << level);
 
         // return if EA level is not full
         if (m_external_levels[level] < c_max_external_level_size && !force_merge_all)
@@ -4167,7 +4165,7 @@ protected:
             return;
         m_mem_left -= external_array_type::int_memory(level_size);
 
-        STXXL_ASSERT(force_merge_all ||c_max_external_level_size==ea_index.size());
+        STXXL_ASSERT(force_merge_all || c_max_external_level_size == ea_index.size());
         unsigned_type num_arrays_to_merge = ea_index.size();
 
         STXXL_DEBUG("merging external arrays" <<
@@ -4178,7 +4176,7 @@ protected:
 
         // if force_merge_all: create array in highest level to avoid merging
         // of such a large EA.
-        unsigned_type new_level = force_merge_all ? c_max_external_levels-1 : level+1;
+        unsigned_type new_level = force_merge_all ? c_max_external_levels - 1 : level + 1;
 
         // construct new external array
         external_array_type ea(level_size, &m_pool, new_level);
@@ -4188,16 +4186,16 @@ protected:
                 = external_array_writer.begin();
 
             // === build minima_tree over the level's arrays ===
-            
+
             // Compares the largest accessible value of two external arrays.
             struct s_min_tree_comparator {
                 const external_arrays_type& m_eas;
-                const typename std::vector<unsigned_type>& m_indices;
+                const typename std::vector<unsigned_type>&m_indices;
                 const inv_compare_type& m_compare;
 
                 s_min_tree_comparator(const external_arrays_type& eas,
-                                        const inv_compare_type& compare,
-                                        const typename std::vector<unsigned_type>& indices)
+                                      const inv_compare_type& compare,
+                                      const typename std::vector<unsigned_type>& indices)
                     : m_eas(eas), m_indices(indices), m_compare(compare) { }
 
                 bool operator () (const size_t& a, const size_t& b) const
@@ -4208,10 +4206,10 @@ protected:
             };
 
             s_min_tree_comparator min_tree_comparator(m_external_arrays,
-                m_inv_compare, ea_index);
+                                                      m_inv_compare, ea_index);
 
             winner_tree<s_min_tree_comparator> min_tree(num_arrays_to_merge,
-                min_tree_comparator);
+                                                        min_tree_comparator);
 
             // =================================================
 
@@ -4219,15 +4217,15 @@ protected:
 
             while (num_arrays_to_merge != num_arrays_done)
             {
-
                 STXXL_DEBUG("num_arrays_done = " << num_arrays_done);
 
                 // === build hints ===
 
-                for (unsigned_type i=0; i<num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     if (m_external_arrays[ea_index[i]].has_unhinted_em_data()) {
                         min_tree.activate_without_replay(i);
-                    } else {
+                    }
+                    else {
                         min_tree.deactivate_without_replay(i);
                     }
                 }
@@ -4244,7 +4242,7 @@ protected:
                 // ==============================================
 
                 // cleanup hints (all arrays, not only the ones to merge)
-                for (unsigned_type i=0; i<m_external_arrays.size(); ++i) {
+                for (unsigned_type i = 0; i < m_external_arrays.size(); ++i) {
                     m_external_arrays[i].rebuild_hints_prepare();
                 }
 
@@ -4261,7 +4259,7 @@ protected:
                     assert(gmin_index < m_external_arrays.size());
 
                     STXXL_DEBUG0("check_external_level():Give pre-hint in EA[" << gmin_index << "] min " <<
-                                m_external_arrays[gmin_index].get_next_hintable_min());
+                                 m_external_arrays[gmin_index].get_next_hintable_min());
 
                     m_external_arrays[gmin_index].rebuild_hints_prehint_next_block();
                     --free_prefetch_blocks;
@@ -4273,7 +4271,6 @@ protected:
                     else {
                         min_tree.deactivate_player(gmin_index_index);
                     }
-
                 }
 
                 // invalidate all hinted blocks no longer needed
@@ -4310,20 +4307,17 @@ protected:
                 bool needs_limit = (gmin_index_index >= 0) ? true : false;
 
                 for (size_type i = 0; i < num_arrays_to_merge; ++i) {
-
                     const unsigned_type index = ea_index[i];
                     iterator begin = m_external_arrays[index].begin();
                     iterator end = m_external_arrays[index].end();
 
                     if (needs_limit) {
-
                         const unsigned_type gmin_index = ea_index[gmin_index_index];
                         const value_type& gmin_value =
                             m_external_arrays[gmin_index].get_next_block_min();
-                        
-                        end = std::lower_bound(begin, end,
-                                gmin_value, m_inv_compare);
 
+                        end = std::lower_bound(begin, end,
+                                               gmin_value, m_inv_compare);
                     }
 
                     sizes[i] = std::distance(begin, end);
@@ -4333,7 +4327,6 @@ protected:
                                 begin << " - " << end <<
                                 " size " << sizes[i] <<
                                 (needs_limit ? " with ub limit" : ""));
-
                 }
                 // ==========================================
 
@@ -4347,7 +4340,7 @@ protected:
 
                 for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     const unsigned_type index = ea_index[i];
-                    
+
                     if (!m_external_arrays[index].empty()) {
                         // remove items and free blocks in RAM.
                         unsigned_type freed_blocks =
@@ -4358,20 +4351,17 @@ protected:
                         if (m_external_arrays[index].empty())
                             ++num_arrays_done;
                     }
-
                 }
-        
+
                 // reset read buffer
                 resize_read_pool();
 
                 // cannot call clear_external_arrays() here, since it
                 // corrupts ea_index.
-
             }
 
             if (m_in_bulk_push)
                 m_bulk_first_delayed_external_array = 0; // TODO: workaround
-
         } // destroy external_array_writer
 
         // clean up now empty arrays
@@ -4381,22 +4371,21 @@ protected:
         ++m_external_levels[new_level];
 
         // register EA in min tree
-        m_external_min_tree.activate_without_replay(m_external_arrays.size()-1);
-        update_external_min_tree(m_external_arrays.size()-1);
+        m_external_min_tree.activate_without_replay(m_external_arrays.size() - 1);
+        update_external_min_tree(m_external_arrays.size() - 1);
 
         // register EA in hint tree
-        m_hint_tree.activate_without_replay(m_external_arrays.size()-1);
+        m_hint_tree.activate_without_replay(m_external_arrays.size() - 1);
         if (!m_in_bulk_push)
-            update_hint_tree(m_external_arrays.size()-1);
+            update_hint_tree(m_external_arrays.size() - 1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
         STXXL_DEBUG("Merge done of new ea " << &ea);
-        
+
         if (!force_merge_all)
-            check_external_level(level+1);
+            check_external_level(level + 1);
 
         check_invariants();
-
     }
 
     //! Add new internal array, which requires that values are sorted!
