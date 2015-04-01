@@ -51,10 +51,10 @@ using stxxl::uint64;
 #define MiB (1024 * 1024)
 
 template <unsigned_type RawBlockSize, typename AllocStrategy>
-int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
+int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 batch_size,
                                     std::string optrw)
 {
-    uint64 offset = 0, endpos = offset + length;
+    uint64 endpos = start_offset + length;
 
     if (length == 0)
         endpos = std::numeric_limits<uint64>::max();
@@ -102,19 +102,24 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
 
     try {
         AllocStrategy alloc;
-        while (offset < endpos)
+        uint64 current_batch_size;
+
+        for (uint64 offset = 0; offset < endpos; offset += current_batch_size)
         {
-            const uint64 current_batch_size = std::min<uint64>(batch_size, endpos - offset);
+            current_batch_size = std::min<uint64>(batch_size, endpos - offset);
 #if CHECK_AFTER_READ
             const uint64 current_batch_size_int = current_batch_size / sizeof(int);
 #endif
             const unsigned_type current_num_blocks_per_batch = (unsigned_type)stxxl::div_ceil(current_batch_size, raw_block_size);
 
-            std::cout << "Offset    " << std::setw(7) << offset / MiB << " MiB: " << std::fixed;
-
             unsigned_type num_total_blocks = blocks.size();
             blocks.resize(num_total_blocks + current_num_blocks_per_batch);
             stxxl::block_manager::get_instance()->new_blocks(alloc, blocks.begin() + num_total_blocks, blocks.end());
+
+            if (offset < start_offset)
+                continue;
+
+            std::cout << "Offset    " << std::setw(7) << offset / MiB << " MiB: " << std::fixed;
 
             double begin = timestamp(), end, elapsed;
 
@@ -173,8 +178,6 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
                 }
             }
 #endif
-
-            offset += current_batch_size;
         }
     }
     catch (const std::exception& ex)
@@ -195,11 +198,10 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 batch_size,
 }
 
 template <typename AllocStrategy>
-int benchmark_disks_alloc(uint64 length, uint64 batch_size,
-                          unsigned_type block_size,
-                          std::string optrw)
+int benchmark_disks_alloc(uint64 length, uint64 offset, uint64 batch_size,
+                          unsigned_type block_size, std::string optrw)
 {
-#define run(bs) benchmark_disks_blocksize_alloc<bs, AllocStrategy>(length, batch_size, optrw)
+#define run(bs) benchmark_disks_blocksize_alloc<bs, AllocStrategy>(length, offset, batch_size, optrw)
     if (block_size == 4 * KiB)
         run(4 * KiB);
     else if (block_size == 8 * KiB)
@@ -234,7 +236,8 @@ int benchmark_disks_alloc(uint64 length, uint64 batch_size,
         run(128 * MiB);
     else
         std::cerr << "Unsupported block_size " << block_size << "." << std::endl
-                  << "Available are only powers of two from 4 KiB to 128 MiB. You must use 'ki' instead of 'k'." << std::endl;
+                  << "Available are only powers of two from 4 KiB to 128 MiB. "
+                  << "You must use 'ki' instead of 'k'." << std::endl;
 #undef run
 
     return 0;
@@ -246,7 +249,7 @@ int benchmark_disks(int argc, char* argv[])
 
     stxxl::cmdline_parser cp;
 
-    uint64 length = 0;
+    uint64 length = 0, offset = 0;
     unsigned int batch_size = 0;
     unsigned_type block_size = 8 * MiB;
     std::string optrw = "rw", allocstr;
@@ -264,6 +267,8 @@ int benchmark_disks(int argc, char* argv[])
                 "Number of blocks written/read in one batch (default: D * B)");
     cp.add_bytes('B', "block_size", block_size,
                  "Size of blocks written in one syscall. (default: B = 8MiB)");
+    cp.add_bytes('o', "offset", offset,
+                 "Starting offset of operation range. (default: 0)");
 
     cp.set_description(
         "This program will benchmark the disks configured by the standard "
@@ -280,18 +285,23 @@ int benchmark_disks(int argc, char* argv[])
     if (allocstr.size())
     {
         if (allocstr == "RC")
-            return benchmark_disks_alloc<stxxl::RC>(length, batch_size, block_size, optrw);
+            return benchmark_disks_alloc<stxxl::RC>(
+                length, offset, batch_size, block_size, optrw);
         if (allocstr == "SR")
-            return benchmark_disks_alloc<stxxl::SR>(length, batch_size, block_size, optrw);
+            return benchmark_disks_alloc<stxxl::SR>(
+                length, offset, batch_size, block_size, optrw);
         if (allocstr == "FR")
-            return benchmark_disks_alloc<stxxl::FR>(length, batch_size, block_size, optrw);
+            return benchmark_disks_alloc<stxxl::FR>(
+                length, offset, batch_size, block_size, optrw);
         if (allocstr == "striping")
-            return benchmark_disks_alloc<stxxl::striping>(length, batch_size, block_size, optrw);
+            return benchmark_disks_alloc<stxxl::striping>(
+                length, offset, batch_size, block_size, optrw);
 
         std::cout << "Unknown allocation strategy '" << allocstr << "'" << std::endl;
         cp.print_usage();
         return -1;
     }
 
-    return benchmark_disks_alloc<STXXL_DEFAULT_ALLOC_STRATEGY>(length, batch_size, block_size, optrw);
+    return benchmark_disks_alloc<STXXL_DEFAULT_ALLOC_STRATEGY>(
+        length, offset, batch_size, block_size, optrw);
 }
