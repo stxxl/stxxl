@@ -49,15 +49,15 @@ struct ComparatorGreater
 };
 \endcode
 
-If CompareGreater()(a,b) is true, then a is smaller than b. CompareType must also provide a static max_value method, that returns a value of type KeyType that is larger than any key stored in map, i.e. for all x in map holds CompareType()(x,CompareType::max_value())
+If CompareGreater()(a,b) is true, then a is greater than b. CompareType must also provide a static max_value method, that returns a value of type KeyType that is larger than any key stored in map, i.e. for all x in map holds CompareType()(x,CompareType::max_value())
 
-Naturally, we can define a comparator class which returns true if b is smaller than a as follows:
+Naturally, we can define a comparator class which returns true if a is smaller than b as follows:
 
 \code
 struct CompareLess
 {
     bool operator () (const int & a, const int & b) const
-    { return a<b; }
+    { return a < b; }
 
     static int max_value() const
     { return std::numeric_limits<int>::max(); }
