@@ -20,7 +20,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (STXXL_MSVC && _MSC_VER >= 1900)
  #include <unordered_map>
 #elif STXXL_MSVC
  #include <hash_map>
@@ -35,7 +35,7 @@ STXXL_BEGIN_NAMESPACE
 
 template <class KeyType>
 struct compat_hash {
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (STXXL_MSVC && _MSC_VER >= 1900)
     typedef std::hash<KeyType> result;
 #elif STXXL_MSVC
     typedef stdext::hash_compare<KeyType> result;
@@ -50,7 +50,7 @@ struct compat_hash {
 template <class KeyType, class MappedType,
           class HashType = typename compat_hash<KeyType>::result>
 struct compat_hash_map {
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (STXXL_MSVC && _MSC_VER >= 1900)
     typedef std::unordered_map<KeyType, MappedType, HashType> result;
 #elif STXXL_MSVC
     typedef stdext::hash_map<KeyType, MappedType, HashType> result;
@@ -65,7 +65,7 @@ struct compat_hash_map {
 template <class KeyType, class MappedType,
           class HashType = typename compat_hash<KeyType>::result>
 struct compat_hash_multimap {
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (STXXL_MSVC && _MSC_VER >= 1900)
     typedef std::unordered_multimap<KeyType, MappedType, HashType> result;
 #elif STXXL_MSVC
     typedef stdext::hash_multimap<KeyType, MappedType, HashType> result;
