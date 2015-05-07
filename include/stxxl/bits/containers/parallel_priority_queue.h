@@ -26,8 +26,14 @@
 
 #if STXXL_PARALLEL
     #include <omp.h>
+#if NOT(_MSC_VER)
     #include <parallel/algorithm>
     #include <parallel/numeric>
+#endif
+#endif
+
+#ifdef _MSC_VER
+#define _GLIBCXX_MOVE(_Tp) std::move(_Tp)
 #endif
 
 #include <stxxl/bits/common/winner_tree.h>
@@ -1684,7 +1690,7 @@ public:
         HEAP = 0,
         IA = 1,
         EB = 2,
-        ERROR = 3
+        ERRORT = 3
     };
 
     //! Construct the tree of minima sources.
@@ -1715,7 +1721,7 @@ public:
         case EB:
             return std::make_pair(EB, 0);
         default:
-            return std::make_pair(ERROR, 0);
+            return std::make_pair(ERRORT, 0);
         }
     }
 
@@ -2393,10 +2399,10 @@ public:
         m_mem_left = m_mem_total - 2 * m_mem_for_heaps;
 
         // reverse insertion heap memory on processor-local memory
-#if STXXL_PARALLEL
+#if STXXL_PARALLEL 
 #pragma omp parallel for
 #endif
-        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        for (long p = 0; p < m_num_insertion_heaps; ++p)
         {
             m_proc[p] = new ProcessorData;
             m_proc[p]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -2730,7 +2736,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (long p = 0; p < m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
                 for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
@@ -2756,7 +2762,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (long p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (m_proc[p]->insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
@@ -3979,7 +3985,7 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+        for (long i = 0; i < m_num_insertion_heaps; ++i)
         {
             heap_type& insheap = m_proc[i]->insertion_heap;
 
