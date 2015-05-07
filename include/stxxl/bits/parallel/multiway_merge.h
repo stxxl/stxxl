@@ -32,6 +32,12 @@
 #include <stxxl/bits/parallel/timing.h>
 #include <stxxl/bits/parallel/tags.h>
 
+#if defined(_MSC_VER) && STXXL_DEBUG_ASSERTIONS
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
+
 STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
