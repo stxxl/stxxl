@@ -17,7 +17,7 @@
 #include <stxxl/random>
 #include <stxxl/timer>
 
-using stxxl::uint64;
+using stxxl::int64;
 using stxxl::scoped_print_timer;
 
 #define RECORD_SIZE 128
@@ -74,15 +74,15 @@ void test_simple()
 {
     ppq_type ppq(my_cmp(), 1024L * 1024L * 1024L, 4);
 
-    const uint64 volume = 512L * 1024 * 1024;
+    const int64 volume = 512L * 1024 * 1024;
 
-    uint64 nelements = volume / sizeof(my_type);
+    int64 nelements = volume / sizeof(my_type);
 
     {
         scoped_print_timer timer("Filling PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < nelements; i++)
+        for (int64 i = 0; i < nelements; i++)
         {
             if ((i % (1024 * 1024)) == 0)
                 STXXL_MSG("Inserting element " << i);
@@ -98,7 +98,7 @@ void test_simple()
         scoped_print_timer timer("Emptying PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < nelements; ++i)
+        for (int64 i = 0; i < nelements; ++i)
         {
             STXXL_CHECK(!ppq.empty());
             //STXXL_MSG( ppq.top() );
@@ -118,10 +118,10 @@ void test_bulk_pop()
 {
     ppq_type ppq(my_cmp(), 1024L * 1024L * 1024L, 4);
 
-    const uint64 volume = 512L * 1024 * 1024;
-    const uint64 bulk_size = 1024;
+    const int64 volume = 512L * 1024 * 1024;
+    const int64 bulk_size = 1024;
 
-    uint64 nelements = volume / sizeof(my_type);
+    int64 nelements = volume / sizeof(my_type);
 
     STXXL_MSG("Running bulk_pop() test. bulk_size = " << bulk_size);
 
@@ -129,7 +129,7 @@ void test_bulk_pop()
         scoped_print_timer timer("Filling PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < nelements; i++)
+        for (int64 i = 0; i < nelements; i++)
         {
             if ((i % (1024 * 1024)) == 0)
                 STXXL_MSG("Inserting element " << i);
@@ -145,15 +145,15 @@ void test_bulk_pop()
         scoped_print_timer timer("Emptying PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < stxxl::div_ceil(nelements, bulk_size); ++i)
+        for (int64 i = 0; i < stxxl::div_ceil(nelements, bulk_size); ++i)
         {
             STXXL_CHECK(!ppq.empty());
 
             std::vector<my_type> out;
             ppq.bulk_pop(out, bulk_size);
 
-            for (uint64 j = 0; j < out.size(); ++j) {
-                const uint64 index = i * bulk_size + j;
+            for (int64 j = 0; j < out.size(); ++j) {
+                const int64 index = i * bulk_size + j;
                 //STXXL_MSG( ppq.top() );
                 STXXL_CHECK_EQUAL(out[j].key, int(index + 1));
                 if ((index % (1024 * 1024)) == 0)
