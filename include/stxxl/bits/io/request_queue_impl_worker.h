@@ -54,7 +54,7 @@ protected:
 #endif
 
 protected:
-    void start_thread(void* (* worker)(void*), void* arg, thread_type& t, state<thread_state>& s);
+    void start_thread(void* (*worker)(void*), void* arg, thread_type& t, state<thread_state>& s);
     void stop_thread(thread_type& t, state<thread_state>& s, semaphore& sem);
 };
 

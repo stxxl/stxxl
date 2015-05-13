@@ -61,8 +61,8 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 
 // forced instantiation
 template class stxxl::PRIORITY_QUEUE_GENERATOR<
-    my_type, my_cmp, 32* 1024* 1024, volume / sizeof(my_type)
-    >;
+        my_type, my_cmp, 32* 1024* 1024, volume / sizeof(my_type)
+        >;
 
 int main()
 {

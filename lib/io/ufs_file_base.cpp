@@ -226,7 +226,7 @@ void ufs_file_base::_set_size(offset_type newsize)
     if (!(m_mode & RDONLY) && !m_is_device)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
-        HANDLE hfile = (HANDLE) ::_get_osfhandle(file_des);
+        HANDLE hfile = (HANDLE)::_get_osfhandle(file_des);
         STXXL_THROW_ERRNO_NE_0((hfile == INVALID_HANDLE_VALUE), io_error,
                                "_get_osfhandle() path=" << filename << " fd=" << file_des);
 

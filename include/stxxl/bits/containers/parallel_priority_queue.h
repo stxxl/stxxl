@@ -1900,8 +1900,8 @@ protected:
                                     block_size, DefaultMemSize, MaxItems> > minima_type;
     //! allow minima tree access to internal data structures
     friend class ppq_local::minima_tree<
-        parallel_priority_queue<value_type, compare_type, alloc_strategy,
-                                block_size, DefaultMemSize, MaxItems> >;
+            parallel_priority_queue<value_type, compare_type, alloc_strategy,
+                                    block_size, DefaultMemSize, MaxItems> >;
 
     //! Inverse comparison functor
     struct inv_compare_type

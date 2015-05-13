@@ -276,16 +276,16 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
                   << " total_size=" << total_size
                   << " total_bytes=" << total_bytes
             #if STXXL_PARALLEL
-                  << " num_threads=" << omp_get_max_threads()
+            << " num_threads=" << omp_get_max_threads()
             #else
-                  << " num_threads=1"
+            << " num_threads=1"
             #endif
-                  << " time=" << spt.timer().seconds()
-                  << " inner_repeats=" << g_inner_repeat
-                  << " outer_repeats=" << g_outer_repeat
-                  << " time/item[ns]="
-                  << spt.timer().seconds() / g_inner_repeat / total_size * 1e9
-                  << std::endl;
+            << " time=" << spt.timer().seconds()
+            << " inner_repeats=" << g_inner_repeat
+            << " outer_repeats=" << g_outer_repeat
+            << " time/item[ns]="
+            << spt.timer().seconds() / g_inner_repeat / total_size * 1e9
+            << std::endl;
     }
 
     STXXL_CHECK(stxxl::is_sorted(out.begin(), out.end(), cmp));
