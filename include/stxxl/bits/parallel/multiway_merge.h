@@ -37,7 +37,6 @@
 typedef SSIZE_T ssize_t;
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 namespace parallel {

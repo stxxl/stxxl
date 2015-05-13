@@ -18,6 +18,7 @@
 #include <stxxl/timer>
 
 using stxxl::int64;
+using stxxl::uint64;
 using stxxl::scoped_print_timer;
 
 #define RECORD_SIZE 128
@@ -152,7 +153,7 @@ void test_bulk_pop()
             std::vector<my_type> out;
             ppq.bulk_pop(out, bulk_size);
 
-            for (int64 j = 0; j < out.size(); ++j) {
+            for (uint64 j = 0; j < out.size(); ++j) {
                 const int64 index = i * bulk_size + j;
                 //STXXL_MSG( ppq.top() );
                 STXXL_CHECK_EQUAL(out[j].key, int(index + 1));

@@ -172,6 +172,7 @@ public:
 #else
     spin_lock()
     {
+        lck.clear();
     }
 #endif
 
@@ -188,7 +189,7 @@ public:
 
 private:
 #if STXXL_MSVC >= 1800
-    std::atomic_flag lck = ATOMIC_FLAG_INIT;
+    std::atomic_flag lck;
     spin_lock(const spin_lock&) = delete;
     spin_lock& operator = (const spin_lock&) = delete;
 #else
