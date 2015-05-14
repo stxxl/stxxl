@@ -1792,11 +1792,16 @@ public:
 
     void rebuild_internal_arrays()
     {
-        m_ia.resize_and_rebuild(m_parent.m_internal_arrays.size());
+        
         if (!m_parent.m_internal_arrays.empty())
+        {
+            m_ia.resize_and_rebuild(m_parent.m_internal_arrays.size());
             m_head.notify_change(IA);
+        }
         else
+        {
             m_head.deactivate_player(IA);
+        }
     }
 
     //! Return size of internal arrays minima tree
