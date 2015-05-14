@@ -308,7 +308,8 @@ public:
           m_block_pointers(1)
     {
         std::swap(m_values, values);
-        m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.end()));
+		STXXL_ASSERT(values.size() > 0);
+        m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.begin())+m_values.size());
     }
 
     //! Swap internal_array with another one.
