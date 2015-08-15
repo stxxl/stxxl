@@ -44,6 +44,7 @@ The practical part about it: STXXL containers which have an internal counterpart
 Beyond these, STXXL also provides a set of containers that are not part of the STL:
 
 - \subpage tutorial_pqueue "stxxl::priority_queue tutorial"
+- \subpage tutorial_ppq "stxxl::parallel_priority_queue tutorial"
 - \subpage tutorial_matrix "stxxl::matrix tutorial"
 - \subpage tutorial_sorter "stxxl::sorter tutorial"
 - \subpage tutorial_sequence "stxxl::sequence tutorial"

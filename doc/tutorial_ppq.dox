@@ -1,0 +1,95 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_ppq.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2015 Thomas Keh <thomas.keh@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_ppq STXXL Parallel Priority Queue
+
+This page introduces into the stxxl::parallel_priority_queue container. If you want to learn more about the structure of stxxl::parallel_priority_queue we refer to the corresponding <a href="http://arxiv.org/abs/1504.00545">
+technical report</a>.
+
+Basically, the priority queue provides insertion of new elements as well as access and deletion of the element on top.
+The invariant guarantees that the top element is the largest (or smallest if desired) of all inserted elements identified by comparison realized by the customizable comparator class.
+
+In addition to this, STXXL's parallel_priority_queue supports parallel insertion of multiple items as well as extracting a bulk of items at once. Suitable applications can use this to both accellerate priority queue work and parallelize processing of extracted items.
+
+
+
+### Creating a STXXL parallel priority queue
+
+The parallel_priority_queue class takes at least the value type as a template parameter. The second template parameter is the comparator type which is defaulted to std::less<ValueType>. We can create a min priority queue (where pop() returns the smallest element) by using a "greater than" comparator.
+
+The constructor of parallel_priority_queue takes an instance of the comparator and the maximum RAM usage in Bytes as parameters.
+
+Thus the definition may look as follows:
+
+\code
+typedef std::greater<int> comparator_type;
+typedef stxxl::parallel_priority_queue<int, comparator_type> ppq_type;
+ppq_type ppq(comparator_type(), 2 * 1024L * 1024L * 1024L);
+\endcode
+
+One can also define it's own comparator type:
+
+\code
+struct ComparatorGreater
+{
+    bool operator () (const int &a, const int &b) const
+    { return (a > b); }
+};
+\endcode
+
+There are two ways to access the parallel priority queue. The sequential way is compatible to the STL and the STXXL priority_queue. Parallel access is done with another set of methods. Both ways are described below.
+
+
+### Sequential Access
+
+To insert a new element into the priority queue, call push():
+
+\code
+ppq.push(5);
+\endcode
+
+The priority queue only allows to access the top element, which is the smallest or largest element (depending on the used comparator class) of all inserted elements.
+Calling top() on an instance returns this element:
+
+\code
+int x = ppq.top();
+\endcode
+
+Erasing elements is only possible on the top of the priority queue by calling pop().
+Note that after removing the element on top, the priority queue still holds the invariant mentioned above.
+
+\code
+ppq.pop();
+\endcode
+
+To determine the size (i.e. the number of elements) of an instance, call size():
+\code
+std::cout << "priority queue stores: " << ppq.size() << " elements" << std::endl;
+\endcode
+
+To check if the priority queue is empty, call empty() which returns true in case:
+\code
+std::cout << "empty priority queue? " << ppq.empty() << std::endl;
+\endcode
+
+### Parallel Access
+
+
+
+*/
+
+} // namespace stxxl
