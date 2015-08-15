@@ -527,10 +527,9 @@ public:
      * \param size The total number of elements. Cannot be changed after
      * construction.
      *
-     * \param num_prefetch_blocks Number of blocks to prefetch from hard disk
+     * \param pool A pool (read_write_pool<block_type>) of read and write buffer blocks
      *
-     * \param num_write_buffer_blocks Size of the write buffer in number of
-     * blocks
+     * \param level Level index in the merge hierarchy
      */
     external_array(external_size_type size, pool_type* pool, unsigned_type level = 0)
         :   // constants
@@ -1214,9 +1213,9 @@ protected:
  * with operator*() we cannot know if the value is going to be written or read,
  * when going to live mode, the block must be read from EM. This read overhead,
  * however, is optimized by marking blocks as uninitialized in external_array,
- * and skipping reads for then. In a full performance build, no block needs to
+ * and skipping reads for them. In a full performance build, no block needs to
  * be read from disk. Reads only occur in debug mode, when the results are
- * verify.
+ * verified.
  *
  * The iterator's normal/live mode only stays active for the individual
  * iterator object. When an iterator is copied/assigned/calculated with the
@@ -3591,9 +3590,12 @@ public:
 protected:
     //! Calculates the sequences vector needed by the multiway merger,
     //! considering inaccessible data from external arrays.
-    //! The sizes vector stores the size of each sequence.
-    //! \param reuse_previous_lower_bounds Reuse upper bounds from previous runs.
-    //!             sequences[i].second must be valid upper bound iterator from a previous run!
+    //! \param sizes The sizes vector stores the size of each sequence. (output parameter)
+    //! \param sequences Result vector which stores the begin and end iterators of the
+    //!     merge sequences (also input parameter if reuse_previous_lower_bounds is true)
+    //! \param reuse_previous_lower_bounds If true, the method reuses upper bounds from
+    //!     previous runs.sequences[i].second must then be valid upper bound iterator
+    //! from a previous run!
     //! \returns the index of the external array which is limiting factor
     //!             or m_external_arrays.size() if not limited.
     size_t calculate_merge_sequences(std::vector<size_type>& sizes,
