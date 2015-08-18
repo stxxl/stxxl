@@ -1,4 +1,3 @@
-// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
 /***************************************************************************
  *  doc/tutorial_ppq.dox
  *
@@ -17,7 +16,7 @@ namespace stxxl {
 
 /** \page tutorial_ppq STXXL Parallel Priority Queue
 
-This page introduces into the stxxl::parallel_priority_queue container. If you want to learn more about the structure of stxxl::parallel_priority_queue we refer to the corresponding <a href="http://arxiv.org/abs/1504.00545">
+This page introduces the parallel_priority_queue container. If you want to learn more about the structure of stxxl::parallel_priority_queue we refer to the corresponding <a href="http://arxiv.org/abs/1504.00545">
 technical report</a>.
 
 Basically, the priority queue provides insertion of new elements as well as access and deletion of the element on top.
@@ -25,7 +24,7 @@ The invariant guarantees that the top element is the largest (or smallest if des
 
 In addition to this, STXXL's parallel_priority_queue supports parallel insertion of multiple items as well as extracting a bulk of items at once. Suitable applications can use this to both accellerate priority queue work and parallelize processing of extracted items.
 
-
+To use this container, STXXL has to be compiled with the STXXL_PARALLEL flag, and the compiler must support OpenMP >= 2.5 (e.g. GCC >= 4.2).
 
 ### Creating a STXXL parallel priority queue
 
@@ -88,7 +87,63 @@ std::cout << "empty priority queue? " << ppq.empty() << std::endl;
 
 ### Parallel Access
 
+If the application has a sequence of push() operations (not interrupted by any pop()) one can parallelize insertion work. Elements are inserted from different threads using a parallel for loop which distributes the iterations over all threads. Parallel push must be started with a bulk_push_begin() call, together with an estimation of the bulk size and must be finalized with a bulk_push_end() call. Note that the number of items in a bulk should be large in order to compensate for the parallel overhead. Code may look like this:
 
+\code
+ppq.bulk_push_begin(1000);
+#pragma omp parallel for
+for (int i = 0; i < 1000; ++i)
+{
+    const unsigned thread_id = omp_get_thread_num();
+    ppq.bulk_push(i, thread_id);
+}
+ppq.bulk_push_end();
+\endcode
+
+The counterpart of bulk_push is called bulk_pop. It enables the application to extract a number of elements at once. Using bulk_pop instead of a sequence of pop() is faster for a large number of items because parallel_priority_queue uses parallelism internally. Your application can process the extracted elements in parallel if desired.
+
+\code
+std::vector<int> out;
+ppq.bulk_pop(out, 1000);
+#pragma omp parallel for
+for (size_t i = 0; i < out.size(); ++i)
+{
+    // process out[i]
+}
+\endcode
+
+It is also possible to extract all elements which are priorized higher than a given element using bulk_pop_limit:
+
+\code
+std::vector<int> out;
+int limit_item = 5678;
+ppq.bulk_pop_limit(out, limit_item);
+\endcode
+
+There is a related interface where limit_top() provides single elements but internally the PQ extracts and buffers larger chunks of elements smaller or equal to the limit item. It bundles the limited pops with a bulk_push operation where limit_push() verifies that all pushed elements are larger than the limit item. Such a procedure may look like this:
+
+\code
+ppq.limit_begin(5678, 1000); // we will insert 1000 items, all of them > 5678, and we will extract only items <= 5678
+for (size_t i = 0; i < 1000; ++i)
+{
+    int top = ppq.limit_top(); // the PQ must contain at least one element <= 5678
+    ppq.limit_pop();
+    ppq.limit_push(5678+1+i);
+}
+ppq.limit_end();
+\endcode
+
+### Examples
+
+The first example makes use of different access methods and checks the result.
+See \ref examples/containers/ppq1.cpp for the sourcecode.
+
+\snippet examples/containers/ppq1.cpp example
+
+See \ref tests/containers/ppq/test_ppq.cpp for a more sophisticated example which intermixes bulk_push() and bulk_pop().
+
+\example examples/containers/ppq1.cpp
+\example tests/containers/ppq/test_ppq.cpp
 
 */
 
