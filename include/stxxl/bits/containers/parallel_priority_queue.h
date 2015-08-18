@@ -2906,7 +2906,7 @@ public:
                 end = m_internal_arrays[j].end();
             }
 
-            end = std::lower_bound(begin, end, this_limit, m_inv_compare);
+            end = std::upper_bound(begin, end, this_limit, m_inv_compare);
 
             sizes[i] = std::distance(begin, end);
             sequences[i] = std::make_pair(begin, end);
