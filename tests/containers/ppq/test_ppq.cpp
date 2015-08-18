@@ -239,7 +239,7 @@ void test_bulk_limit(const size_t bulk_size)
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), windex - rindex);
+    STXXL_CHECK_EQUAL(ppq.size(), (size_t)(windex-rindex));
 
     // extract last items
     for (size_t i = 0; i < 2 * bulk_size; ++i)
