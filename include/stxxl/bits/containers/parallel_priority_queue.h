@@ -1167,7 +1167,7 @@ protected:
             return (m_requests[block_index] && m_requests[block_index]->poll());
         }
         else {
-            return (bool)m_blocks[block_index];
+            return ( m_blocks[block_index] != 0 );
         }
     }
 
