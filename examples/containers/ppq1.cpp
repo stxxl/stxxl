@@ -50,7 +50,7 @@ int main()
 
     ppq.bulk_push_begin(10000);
     #pragma omp parallel for
-    for (unsigned i = 0; i < 10000; ++i)
+    for (int i = 0; i < 10000; ++i)
     {
         const unsigned thread_id = omp_get_thread_num();
         ppq.bulk_push(i, thread_id);
@@ -71,7 +71,7 @@ int main()
     ppq.bulk_pop(out1, 500);
     
     #pragma omp parallel for
-    for (size_t i = 0; i < out1.size(); ++i)
+    for (int64_t i = 0; i < out1.size(); ++i)
     {
         // process out[i]
     }
@@ -93,7 +93,7 @@ int main()
     ppq.bulk_pop_limit(out2, limit_item);
     
     #pragma omp parallel for
-    for (size_t i = 0; i < out2.size(); ++i)
+    for (int64_t i = 0; i < out2.size(); ++i)
     {
         // process out[i]
     }
