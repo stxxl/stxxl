@@ -1606,7 +1606,7 @@ protected:
               m_compare(compare)
         { }
 
-        const value_type & get_value(int input) const
+        const value_type & get_value(unsigned_type input) const
         {
             switch (input) {
             case HEAP:
@@ -1622,7 +1622,7 @@ protected:
             }
         }
 
-        bool operator () (const int a, const int b) const
+        bool operator () (const unsigned_type a, const unsigned_type b) const
         {
             return m_compare(get_value(a), get_value(b));
         }
@@ -1638,12 +1638,12 @@ protected:
             : m_proc(proc), m_compare(compare)
         { }
 
-        const value_type & get_value(int index) const
+        const value_type & get_value(unsigned_type index) const
         {
             return m_proc[index]->insertion_heap[0];
         }
 
-        bool operator () (const int a, const int b) const
+        bool operator () (const unsigned_type a, const unsigned_type b) const
         {
             return m_compare(get_value(a), get_value(b));
         }
@@ -1659,7 +1659,7 @@ protected:
             : m_ias(ias), m_compare(compare)
         { }
 
-        bool operator () (const int a, const int b) const
+        bool operator () (const unsigned_type a, const unsigned_type b) const
         {
             return m_compare(m_ias[a].get_min(), m_ias[b].get_min());
         }
@@ -1709,7 +1709,7 @@ public:
     //! Return smallest items of head winner tree.
     std::pair<unsigned, unsigned> top()
     {
-        unsigned type = m_head.top();
+        unsigned_type type = m_head.top();
         switch (type)
         {
         case HEAP:
@@ -1724,7 +1724,7 @@ public:
     }
 
     //! Update minima tree after an item from the heap index was removed.
-    void update_heap(int_type index)
+    void update_heap(unsigned_type index)
     {
         m_heaps.notify_change(index);
         m_head.notify_change(HEAP);
@@ -1737,21 +1737,21 @@ public:
     }
 
     //! Update minima tree after an item from an internal array was removed.
-    void update_internal_array(unsigned index)
+    void update_internal_array(unsigned_type index)
     {
         m_ia.notify_change(index);
         m_head.notify_change(IA);
     }
 
     //! Add a newly created internal array to the minima tree.
-    void add_internal_array(unsigned index)
+    void add_internal_array(unsigned_type index)
     {
         m_ia.activate_player(index);
         m_head.notify_change(IA);
     }
 
     //! Remove an insertion heap from the minima tree.
-    void deactivate_heap(unsigned index)
+    void deactivate_heap(unsigned_type index)
     {
         m_heaps.deactivate_player(index);
         if (!m_heaps.empty())
@@ -1767,7 +1767,7 @@ public:
     }
 
     //! Remove an internal array from the minima tree.
-    void deactivate_internal_array(unsigned index)
+    void deactivate_internal_array(unsigned_type index)
     {
         m_ia.deactivate_player(index);
         if (!m_ia.empty())
@@ -2859,14 +2859,14 @@ public:
         std::vector<iterator_pair_type> sequences(eas + ias);
         size_type output_size = 0;
 
-        int limiting_ea_index = m_external_min_tree.top();
+        unsigned_type limiting_ea_index = m_external_min_tree.top();
 
         // pop limit may have to change due to memory limit
         value_type this_limit = limit;
         bool has_full_range = true;
 
         // get all relevant blocks
-        while (limiting_ea_index > -1)
+        while (limiting_ea_index != m_external_min_tree.invalid_key)
         {
             const value_type& ea_limit =
                 m_external_arrays[limiting_ea_index].get_next_block_min();
@@ -2886,7 +2886,7 @@ public:
             wait_next_ea_blocks(limiting_ea_index);
             // consider next limiting EA
             limiting_ea_index = m_external_min_tree.top();
-            STXXL_ASSERT(limiting_ea_index < (int)eas);
+            STXXL_ASSERT(limiting_ea_index < eas);
         }
 
         // build sequences
@@ -3467,9 +3467,9 @@ public:
             m_pool.free_size_prefetch() + m_num_hinted_blocks;
         m_num_hinted_blocks = 0;
 
-        int gmin_index;
+        unsigned_type gmin_index;
         while (free_prefetch_blocks > 0 &&
-               (gmin_index = m_hint_tree.top()) >= 0)
+               (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
@@ -3538,9 +3538,9 @@ public:
         STXXL_DEBUG("hint_external_arrays()"
                     " for free_size_prefetch=" << m_pool.free_size_prefetch());
 
-        int gmin_index;
+        unsigned_type gmin_index;
         while (m_pool.free_size_prefetch() > 0 &&
-               (gmin_index = m_hint_tree.top()) >= 0)
+               (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
@@ -3616,14 +3616,14 @@ protected:
          * determine minimum of each first block
          */
 
-        int gmin_index = m_external_min_tree.top();
-        bool needs_limit = (gmin_index >= 0) ? true : false;
+        unsigned_type gmin_index = m_external_min_tree.top();
+        bool needs_limit = (gmin_index != m_external_min_tree.invalid_key) ? true : false;
 
 // test correctness of external block min tree
 #ifdef STXXL_DEBUG_ASSERTIONS
 
         bool test_needs_limit = false;
-        int test_gmin_index = 0;
+        unsigned_type test_gmin_index = 0;
         value_type test_gmin_value;
 
         m_stats.refill_minmax_time.start();
@@ -4263,9 +4263,9 @@ protected:
                     m_pool.free_size_prefetch() + m_num_hinted_blocks;
                 m_num_hinted_blocks = 0;
 
-                int gmin_index_index; // index in ea_index
+                unsigned_type gmin_index_index; // index in ea_index
                 while (free_prefetch_blocks > 0 &&
-                       (gmin_index_index = min_tree.top()) >= 0)
+                       (gmin_index_index = min_tree.top()) != min_tree.invalid_key)
                 {
                     const unsigned_type gmin_index = ea_index[gmin_index_index];
                     assert(gmin_index < m_external_arrays.size());
@@ -4316,7 +4316,7 @@ protected:
                 std::vector<size_type> sizes(num_arrays_to_merge);
 
                 gmin_index_index = min_tree.top();
-                bool needs_limit = (gmin_index_index >= 0) ? true : false;
+                bool needs_limit = (gmin_index_index != min_tree.invalid_key) ? true : false;
 
                 for (size_type i = 0; i < num_arrays_to_merge; ++i) {
                     const unsigned_type index = ea_index[i];

@@ -74,9 +74,10 @@ protected:
     //! Collection of stats from the winner_tree
     stats_type m_stats;
 
+public:
+
     const unsigned_type invalid_key = std::numeric_limits<unsigned_type>::max();
 
-public:
     /**
      * Constructor. Reserves space, registers free slots. No games are played
      * here! All players and slots are deactivated in the beginning.
