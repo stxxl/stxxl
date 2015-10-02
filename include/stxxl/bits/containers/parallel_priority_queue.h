@@ -1994,10 +1994,10 @@ protected:
     //! \name Parameters and Sizes for Memory Allocation Policy
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
-    const long m_num_insertion_heaps;
+    const unsigned m_num_insertion_heaps;
 
     //! Capacity of one inserion heap
-    const unsigned m_insertion_heap_capacity;
+    const size_type m_insertion_heap_capacity;
 
     //! Return size of insertion heap reservation in bytes
     size_type insertion_heap_int_memory() const
@@ -2327,7 +2327,7 @@ public:
         size_type total_ram = DefaultMemSize,
         float num_read_blocks_per_ea = 1.5f,
         unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
-        unsigned_type num_insertion_heaps = 0,
+        unsigned num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
         size_type extract_buffer_ram = 0)
         : c_max_internal_level_size(64),
@@ -2405,7 +2405,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-        for (long p = 0; p < m_num_insertion_heaps; ++p)
+        for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
         {
             m_proc[p] = new ProcessorData;
             m_proc[p]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -2448,7 +2448,7 @@ public:
     {
         // clean up data structures
 
-        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
         {
             delete m_proc[p];
         }
@@ -2491,7 +2491,7 @@ protected:
 
         size_type heaps_size = 0;
 
-        for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
         {
             // check that each insertion heap is a heap
 
@@ -2620,7 +2620,7 @@ public:
         }
 
         // zero bulk insertion counters
-        for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             m_proc[p]->heap_add_size = 0;
     }
 
@@ -2726,7 +2726,7 @@ public:
 
         if (!m_is_very_large_bulk && 0)
         {
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 m_heaps_size += m_proc[p]->heap_add_size;
 
@@ -2739,7 +2739,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
                 for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
@@ -2754,7 +2754,7 @@ public:
                 m_heaps_size += m_proc[p]->heap_add_size;
             }
 
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -2765,7 +2765,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
             {
                 if (m_proc[p]->insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
@@ -2793,7 +2793,7 @@ public:
                 }
             }
 
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -3284,7 +3284,7 @@ protected:
 //#if STXXL_PARALLEL
 //#pragma omp parallel for
 //#endif
-        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
         {
             heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -3328,7 +3328,7 @@ protected:
 
             // copy items into values vector
             typename std::vector<value_type>::iterator vi = values.begin();
-            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -3393,7 +3393,7 @@ public:
     void resize_read_pool()
     {
         unsigned_type new_num_read_blocks =
-            m_num_read_blocks_per_ea * m_external_arrays.size();
+            (unsigned_type)(m_num_read_blocks_per_ea * (float)m_external_arrays.size());
 
         STXXL_DEBUG("resize_read_pool:" <<
                     " m_num_read_blocks=" << m_num_read_blocks <<
@@ -3661,6 +3661,7 @@ protected:
 
 #if STXXL_PARALLEL
 //        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+//  ATTENTION: change type of i to long if pragma is activated!
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
             iterator begin, end;
@@ -3991,7 +3992,7 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (long i = 0; i < m_num_insertion_heaps; ++i)
+        for (long i = 0; i < (long)m_num_insertion_heaps; ++i)
         {
             heap_type& insheap = m_proc[i]->insertion_heap;
 
@@ -4016,7 +4017,7 @@ protected:
 
             add_as_internal_array(merged_array);
 
-            for (int_type i = 0; i < m_num_insertion_heaps; ++i)
+            for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
             {
                 m_proc[i]->insertion_heap.clear();
                 m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -4080,7 +4081,7 @@ protected:
         // must release more RAM in IAs than the EA takes, otherwise: merge
         // external and internal arrays!
         if (int_memory < external_array_type::int_memory(size)
-            + ceil(m_num_read_blocks_per_ea) * block_size)
+            + (size_t)ceil(m_num_read_blocks_per_ea) * block_size)
         {
             return merge_external_arrays();
         }
@@ -4225,7 +4226,7 @@ protected:
 
             // =================================================
 
-            int_type num_arrays_done = 0;
+            unsigned_type num_arrays_done = 0;
 
             while (num_arrays_to_merge != num_arrays_done)
             {
@@ -4233,7 +4234,7 @@ protected:
 
                 // === build hints ===
 
-                for (int_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     if (m_external_arrays[ea_index[i]].has_unhinted_em_data()) {
                         min_tree.activate_without_replay(i);
                     }
@@ -4300,7 +4301,7 @@ protected:
                 // ================================ end build hints ======
 
                 // === wait for data ===
-                for (size_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     const unsigned_type index = ea_index[i];
 
                     unsigned_type used_blocks =
@@ -4318,7 +4319,7 @@ protected:
                 gmin_index_index = min_tree.top();
                 bool needs_limit = (gmin_index_index != min_tree.invalid_key) ? true : false;
 
-                for (size_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     const unsigned_type index = ea_index[i];
                     iterator begin = m_external_arrays[index].begin();
                     iterator end = m_external_arrays[index].end();

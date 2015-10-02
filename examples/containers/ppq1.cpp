@@ -71,7 +71,7 @@ int main()
     ppq.bulk_pop(out1, 500);
     
     #pragma omp parallel for
-    for (int64_t i = 0; i < out1.size(); ++i)
+    for (int64_t i = 0; i < (int64_t)out1.size(); ++i)
     {
         // process out[i]
     }
@@ -93,7 +93,7 @@ int main()
     ppq.bulk_pop_limit(out2, limit_item);
     
     #pragma omp parallel for
-    for (int64_t i = 0; i < out2.size(); ++i)
+    for (int64_t i = 0; i < (int64_t)out2.size(); ++i)
     {
         // process out[i]
     }

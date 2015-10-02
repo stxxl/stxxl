@@ -377,7 +377,7 @@ public:
     CStxxlParallePQ()
         : PQBase("Parallel PQ", "ppq"),
           pq_type(my_type_cmp_greater<ValueType>(),
-                  RAM, num_prefetchers, num_write_buffers,
+                  RAM, (float)num_prefetchers, num_write_buffers,
                   g_max_threads, single_heap_ram, extract_buffer_ram)
     { }
 
