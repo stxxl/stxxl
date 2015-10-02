@@ -2912,7 +2912,7 @@ public:
             sequences[i] = std::make_pair(begin, end);
         }
 
-        output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+        output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
         if (output_size > max_size) {
             output_size = max_size;
             has_full_range = false;
@@ -3315,7 +3315,7 @@ protected:
 
         // put items from insertion heaps into an internal array
         unsigned_type back_sum = std::accumulate(
-            back_size.begin(), back_size.end(), unsigned_type(0));
+            back_size.begin(), back_size.end(), (uint64)0);
 
         STXXL_DEBUG("flush_insertion_heaps_with_limit(): back_sum = " << back_sum);
 
@@ -3816,12 +3816,12 @@ protected:
                 limiting_ea_index = calculate_merge_sequences(
                     sizes, sequences, reuse_lower_bounds);
 
-                output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+                output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
             }
         }
         else {
             calculate_merge_sequences(sizes, sequences);
-            output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+            output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
         }
 
         if (c_limit_extract_buffer) {
@@ -4345,7 +4345,7 @@ protected:
 
                 // === merge ===
 
-                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
 
                 out_iter = potentially_parallel::multiway_merge(
                     sequences.begin(), sequences.end(),
