@@ -209,7 +209,7 @@ if(MSVC)
   # disable lots of warnings about "unsecure" STL functions
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -pedantic -Wno-long-long")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -pedantic -Wno-long-long -Wconversion")
   # detect -Wextra
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-Wextra CXX_HAS_FLAGS_WEXTRA)
