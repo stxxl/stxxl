@@ -255,7 +255,7 @@ template <typename Integral>
 static inline Integral round_up_to_power_of_two(Integral n)
 {
     --n;
-    for (int k = 1; !(k & (2 << sizeof(n))); k <<= 1)
+    for (int k = 1; k != 8 * sizeof(n); k <<= 1)
         n |= n >> k;
     ++n;
     return n;
