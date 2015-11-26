@@ -43,12 +43,6 @@
 #include <stxxl/algorithm>
 #include <stxxl/bits/common/uint_types.h>
 
-#define DBGX(dbg,X)   do { if (dbg) { std::cout << X; } } while(0)
-#define DBG(dbg,X)    DBGX(dbg, __FUNCTION__ << "() " << X << std::endl)
-#define DBG1(dbg,X)   DBGX(dbg, __FUNCTION__ << "() " << X)
-#define DBG2(dbg,X)   DBGX(dbg, X)
-#define DBG3(dbg,X)   DBGX(dbg, X << std::endl)
-
 using stxxl::internal_size_type;
 using stxxl::external_size_type;
 
@@ -461,22 +455,6 @@ class skew
 {
 public:
 
-    /// Skew debug flags.
-
-    static const bool debug = false;
-    static const bool debug_input = false;
-    static const bool debug_lexname = false;
-    static const bool debug_lcpname = false;
-    static const bool debug_l1array = false;
-    static const bool debug_l2array = false;
-    static const bool debug_l3array = false;
-    static const bool debug_isa = false;
-    static const bool debug_merge = false;
-    static const bool debug_mcreate = false;
-    static const bool debug_S012 = false;
-    static const bool debug_merge_result = false;
-    static const bool debug_memory_usage = false;
-
     /// Types needed by the skew algorithm.                                    
     
     template<class T>
@@ -719,7 +697,7 @@ public:
     
     static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_array_type; //TODO block_size
+    typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_array_type; 
     typedef stxxl::stream::vector_iterator2stream <typename offset_array_type::iterator> offset_array_it_rg;      
 
     typedef stxxl::sequence<offset_type, block_size> simpleDeq;
@@ -833,8 +811,8 @@ public:
     /** 
      * Compare two pairs by their first component. 
      */
-    struct mod12Comparator {
-
+    struct mod12Comparator 
+    {
     	bool operator() (const stxxl::tuple<offset_type, offset_type> & a,
                          const stxxl::tuple<offset_type, offset_type> & b) const {
             return a.first < b.first;
@@ -855,7 +833,8 @@ public:
      * Concatenates two streams as streamA '+' streamB containing "singles".
      */
     template <class StreamA, class StreamB>
-    class single_concat {
+    class single_concat 
+    {
     public:
         typedef offset_type value_type;
 
@@ -1035,7 +1014,6 @@ public:
             prev = *A;
 
             LCPn->push_back(0); // insert zero sentinel to hold LCPn[0] = 0 
-            DBG(debug_lcpname, "lcp_n[" << 0 << "]: ");
 
             result.first = prev.first;
             result.second = lexname;
@@ -1058,18 +1036,13 @@ public:
             if (!quad_eq(prev, curr)) {
                 ++lexname;
                	LCPn->push_back(quad_neq(prev,curr));
-               	DBG(debug_lcpname, "lcp_n[" << static_cast<offset_type>(quad_neq(prev,curr)) << "]: ");
-
             }
             else {
                 if (!A.empty() && curr.second != offset_type(0)) {
                     LCPn->push_back(3);
-                    DBG(debug_lcpname, "lcp_n[" << 3 << "]: ");
                     unique = false;
                 }
             }
-
-            DBG(debug_lexname, "lexname[" << lexname << "]: " << curr << " and prev " << prev);
 
             result.first = curr.first;
             result.second = lexname;
@@ -1143,8 +1116,8 @@ public:
      * i.e. we map (t_i) -> (i,t_i,t_{i+1},t_{i+2}).
      *
      * \param Input holds all characters t_i from input string t.
-     * \param alphabet_type TODO
-     * \param add_alphabet TODO
+     * \param alphabet_type  
+     * \param add_alphabet 
      */
     template <class Input, typename alphabet_type, const int add_alphabet = 0>
     class make_quads
@@ -1203,7 +1176,6 @@ public:
             assert(!A.empty() || !finished);
 
             if (current.second != offset_type(0)) {
-                DBG(debug_input, "Input[" << counter << "] = " << current.second - add_alphabet);
                 backup.push_back(current.second);
             }
 
@@ -1297,7 +1269,7 @@ public:
         }
     };
 
-    /// Basis for Batched Range Minimum Queries (RMQ) construction.
+    /// Basis for (Batched) Range Minimum Queries (RMQ) construction.
         
     /** 
      * Sparse Table construction based on "Bender, M. A., and Farach-Colton, M. 
@@ -1326,7 +1298,7 @@ public:
             offset_type kLimit = dimK - 1;
             offset_type magicCounter = 0;
 
-            this->QTable.push_back(std::vector<offset_type>());
+            QTable.push_back(std::vector<offset_type>());
             std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
             tempVector.reserve(iLimit);
 
@@ -1334,20 +1306,20 @@ public:
                 tempVector.push_back(field[i]);  
             }
 
-            for (offset_type k = 0; k < kLimit; k++) {  
-
-                this->QTable.push_back(std::vector<offset_type>());
+            for (offset_type k = 0; k < kLimit; k++) 
+            {  
+                QTable.push_back(std::vector<offset_type>());
                 std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
                 tempVector.reserve(dimI - (0 + myPow<offset_type>(2, k)));
 
                 magicCounter += myPow<offset_type>(2, k);  
-                for (offset_type i = 0; (i + myPow<offset_type>(2, k)) < dimI; i++) {  
-
-                    if (this->QTable[k][i] <= this->QTable[k][(i + myPow<offset_type>(2, k))]) {
-                        tempVector.push_back(this->QTable[k][i]);
+                for (offset_type i = 0; (i + myPow<offset_type>(2, k)) < dimI; i++) 
+                {  
+                    if (QTable[k][i] <= QTable[k][(i + myPow<offset_type>(2, k))]) {
+                        tempVector.push_back(QTable[k][i]);
   
                     } else {
-                        tempVector.push_back(this->QTable[k][(i + myPow<offset_type>(2, k))]);
+                        tempVector.push_back(QTable[k][(i + myPow<offset_type>(2, k))]);
                     }
 
                     if (i == (iLimit - magicCounter)) { 
@@ -1357,12 +1329,12 @@ public:
             } 
         } 
         
-        offset_type query(offset_type i, offset_type j) {
-
+        offset_type query(offset_type i, offset_type j) 
+        {
             offset_type result;
             offset_type k = floor(log2(j - i + 1));
-            offset_type r = this->QTable[k][i];
-            offset_type s = this->QTable[k][j - myPow<offset_type>(2, k) + 1];
+            offset_type r = QTable[k][i];
+            offset_type s = QTable[k][j - myPow<offset_type>(2, k) + 1];
             
             if (r <= s) {
                 result = r;
@@ -1373,7 +1345,7 @@ public:
         }
 
         void clear() {
-            this->QTable.clear();
+            QTable.clear();
         }
     };
 
@@ -1391,9 +1363,7 @@ public:
      */
     template <class Stream1, class Stream2>
     class sparseTableAlgo
-    { 
-        //static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
-        
+    {         
         typedef leftRmqComparator<offset_type> left_cmp;
         typedef rightRmqComparator<offset_type> right_cmp;
         typedef finalPairComparator<offset_type> final_cmp;
@@ -1411,15 +1381,13 @@ public:
         offset_type span, end_part, numberOfPages;
 
         // Compare min of page k with last minBorderArray entries 
-        offset_type getArrayMin(offset_type pageMin, size_type k, size_type tmpK) {
-
+        offset_type getArrayMin(offset_type pageMin, size_type k, size_type tmpK)
+        {
             offset_type min = pageMin;
             offset_type lastPages = k - 1 - tmpK;
 
             if (lastPages > 0) {
-
                 for (offset_type p = 1 ; p <= lastPages ; p++) {
-                    DBG(debug_minBorderArray, "min: " << min << " vs. minBorderArray min: " << minBorderArray[k - p]);
                     if (min > minBorderArray[k - p]) {
                         min = minBorderArray[k - p];
                     }
@@ -1427,14 +1395,6 @@ public:
             }
             return min;
         }
-
-    public:
-
-        static const bool debug_initialize = false;
-        static const bool debug_split_rmq = false;
-        static const bool debug_minBorderArray = false;
-        static const bool debug_answer_tuples = false;
-        static const bool debug_answer_rmq = false;
     
     public:
         sparseTableAlgo() :  
@@ -1453,7 +1413,6 @@ public:
 
             if (lengthOfVector >= ((ram_use / 2) / sizeof(offset_type))) {
                 span = 10000;
-                DBG(debug_initialize, "range trouble");
             }
 
             do {
@@ -1474,9 +1433,6 @@ public:
             } else {
                 numberOfPages = tmp;
             }
-            
-            DBG(debug_initialize, "lengthOfVector: " << lengthOfVector << ", tmp: " << tmp <<
-                ", numberOfPages: " << numberOfPages << ", span: " << span << ", end_part: " << end_part);
         }
 
         // split up RMQs (id, i, j)) into two parts 
@@ -1508,18 +1464,10 @@ public:
                         // => push leftRMQ(id, relative_i, relative_j, k) into leftRMQSorter
                         if (right >= leftBorder && right <= rightBorder) {
                             left_sorter.push(leftRmq<offset_type>(id, (left - leftBorder) , (right - leftBorder), k));
-                            DBG(debug_split_rmq, "leftRMQ (trivial): " << " id: " << id << ", left - leftBorder: "
-                                << left << " - " << leftBorder << " = " << (left - leftBorder)
-                                << ", right - leftBorder: " << right << " - " << leftBorder << " = " << (right - leftBorder)
-                                << ", k: " << k);
                             finishedI = 1;
                             break;
                         } else { // case: ...|..i..*|*... => push leftRMQ(id, relative_i, relative_j, k) into leftRMQSorter
                             left_sorter.push(leftRmq<offset_type>(id, (left - leftBorder), (rightBorder - leftBorder), k));
-                            DBG(debug_split_rmq, "leftRMQ (non-trivial): " << " id: " << id
-                                << ", left - leftBorder : " << left << " - " << leftBorder << " = " << (left - leftBorder)
-                                << ", rightBorder - leftBorder: " << rightBorder << " - " << leftBorder << " = "
-                                << (rightBorder - leftBorder) << ", k: " << k);
                             finishedI = 1;
                             tmpK = k;
 
@@ -1542,9 +1490,6 @@ public:
                     // => push rightRMQ(id, relative_i, relative_j, k, tmpK) into rightRMQSorter
                     if (right >= leftBorder && right <= rightBorder && finishedI == 1) {
                         right_sorter.push(rightRmq<offset_type>(id, 0, (right - leftBorder), k, tmpK));
-                        DBG(debug_split_rmq, "rightRMQ: " << " id: " << id << ", left: 0"
-                            << ", right - leftBorder: " << right << " - " << leftBorder << " = " << (right - leftBorder)
-                            << ", k: " << k << ", tmpK: " << tmpK);
                         break;
                     }
 
@@ -1577,8 +1522,8 @@ public:
 
                 min = std::numeric_limits<offset_type>::max();
 
-                for (offset_type i = leftBorder; i <= rightBorder; i++) {
-
+                for (offset_type i = leftBorder; i <= rightBorder; i++)
+                {
                     assert(!int_stream.empty());
 
                     temp = *int_stream;
@@ -1599,12 +1544,8 @@ public:
                 // create sparseoffset_typeable of tempVector 
                 sparseTable myTable(tempVector);
 
-                while (!left_sorter.empty() && left_sorter->k <= n) {
-
-                    DBG(debug_answer_tuples, "left_RMQ[i]: " << left_sorter->i
-                    		<< ", left_RMQ [j]: " << left_sorter->j
-                    		<< ", k: " << left_sorter->k);
-
+                while (!left_sorter.empty() && left_sorter->k <= n)
+                {
                     // getMin(i, j, k, tmpK, vector)
                     left_min = myTable.query(left_sorter->i, left_sorter->j);
 
@@ -1612,12 +1553,8 @@ public:
                     ++left_sorter;
                 }
 
-                while (!right_sorter.empty() && right_sorter->k <= n) {
-
-                    DBG(debug_answer_tuples, "left_RMQ[i]: " << left_sorter->i
-                        << ", left_RMQ [j]: " << left_sorter->j
-                        << ", k: " << right_sorter->k << ", tmpK: " << right_sorter->tmpK);
-
+                while (!right_sorter.empty() && right_sorter->k <= n)
+                {
                     // getMin(i, j, k, tmpK, vector)
                     page_min = myTable.query(right_sorter->i, right_sorter->j);
 
@@ -1660,10 +1597,8 @@ public:
 
                 if (id == collective_sorter->id) { // equal id's
                     if (min >= collective_sorter->min) {
-                        DBG(debug_answer_rmq, "id: " << collective_sorter->id << ", min: " << collective_sorter->min);
                         resultDeq.push_back(collective_sorter->min);
                     } else {
-                        DBG(debug_answer_rmq, "id: " << id << ", min: " << min);
                         resultDeq.push_back(min);
                     }
 
@@ -1671,7 +1606,6 @@ public:
                         ++collective_sorter;
                     }
                 } else { // unequal id's
-                    DBG(debug_answer_rmq, "id: " << id << ", min: " << min);
                     resultDeq.push_back(min);
                 }
             }
@@ -1690,8 +1624,6 @@ public:
      */
     class build_lcp
     {
-    	//static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
-
     private:
 
     	typedef l3Tuple<offset_type> l3_type;
@@ -1707,7 +1639,6 @@ public:
     	typedef stxxl::sorter<innerTuple<offset_type>, innerTuple_cmp, block_size> inner_tuple_type;
     	typedef stxxl::sorter<pos_pair<offset_type>, pair_cmp, block_size> pair_type;
     	
-    	// Sequence stream definition
     	typedef typename simpleDeq::stream simpleDeqStream;
     	typedef typename pairDeq::stream pairDeqStream;
     	typedef typename twoDeq::stream twoDeqStream;
@@ -1715,13 +1646,12 @@ public:
     	typedef single_concat<simpleDeqStream, simpleDeqStream> s_concatenation;
 
     	simpleDeq l1Deq, l2Deq, l3Deq;
+        simpleDeq *lcpn_ptr, *isa1_ptr, *isa2_ptr, *sa12_ptr;
+        simpleDeqStream *l1_ptr, *l2_ptr, *l3_ptr;
+        
     	pairDeq l2RMQ;
     	twoDeq l3TempDeq;
-
-    	//simpleDeq::stream *l1_ptr, *l2_ptr, *l3_ptr; //old
-        simpleDeqStream *l1_ptr, *l2_ptr, *l3_ptr;
-    	
-        simpleDeq *lcpn_ptr, *isa1_ptr, *isa2_ptr, *sa12_ptr;
+        
         build_lcp *lcp12_ptr;
 
         bool finished_l2, blank;
@@ -1755,7 +1685,6 @@ public:
 
         void saveL1(char l)
     	{
-            DBG(debug_l1array, "l1[" << (offset_type) l << "]: ");
             l1Deq.push_back(l);
     	}
 
@@ -1769,10 +1698,8 @@ public:
                 assert(lcpn_ptr->size() >= r_j);
 
                 if (r_i <= r_j) {
-                    DBG(debug_l2array, "l2: " << "countl2: " << countl2 << ", r_i: " << r_i << ", r_j: " << r_j);
                     l2RMQ.push_back(intPair<offset_type>(countl2,r_i,r_j));
                 } else {
-                    DBG(debug_l2array, "l2: " << "countl2: " << countl2 << ", r_j: " << r_j << ", r_i: " << r_i);
                     l2RMQ.push_back(intPair<offset_type>(countl2,r_j,r_i));
                 }
                 countl2++;
@@ -1783,14 +1710,11 @@ public:
 
             if (l1_ptr != NULL) return;
 
-            //l1_ptr = new simpleDeq::stream(l1Deq); //old
             l1_ptr = new simpleDeqStream(l1Deq);
 
             if (lcp12_ptr != NULL) {
-                //pairDeq::stream rmqStream = l2RMQ.get_stream(); //old
                 pairDeqStream rmqStream = l2RMQ.get_stream();
                 
-                //sparseTableAlgo<build_lcp, pairDeq::stream> sp_algo; //old
                 sparseTableAlgo<build_lcp, pairDeqStream> sp_algo;
                 sp_algo.initialize(lcpn_ptr->size()); // |lcpn| == |lcp12| 
                 sp_algo.splitAndSortRMQ(rmqStream);
@@ -1800,16 +1724,14 @@ public:
             }
             delete lcp12_ptr; lcp12_ptr = NULL;
 
-            //l2_ptr = new simpleDeq::stream(l2Deq); //old
             l2_ptr = new simpleDeqStream(l2Deq);
             
             finished_l2 = true;
             answerL3();
     	}
 
-    	void preprocessL3(offset_type r_i, offset_type r_j) {
-
-            DBG(debug_l3array, "l3 " << "r_i: " << r_i << ", r_j: " << r_j);
+    	void preprocessL3(offset_type r_i, offset_type r_j)
+        {
             l3TempDeq.push_back(two_tuple<offset_type>(r_i, r_j));
     	}
 
@@ -1819,11 +1741,9 @@ public:
 
             pairDeq rmqDeq;
 
-            // base case (if lexnames are unique) 
             if (l2Deq.size() == 0)
             {
                 offset_type id = 0;
-                //twoDeq::stream l3Stream  = l3TempDeq.get_stream(); //old
                 twoDeqStream l3Stream  = l3TempDeq.get_stream();
 
                 while(!l3Stream.empty()) {
@@ -1847,12 +1767,9 @@ public:
                     ++l3Stream; ++id;
                 }
 
-                //pairDeq::stream rmqStream = rmqDeq.get_stream(); //old
-                //simpleDeq::stream lcpnStream = lcpn_ptr->get_stream(); //old
                 pairDeqStream rmqStream = rmqDeq.get_stream();
                 simpleDeqStream lcpnStream = lcpn_ptr->get_stream();
 
-                //sparseTableAlgo<simpleDeq::stream, pairDeq::stream> sp_algo; //old
                 sparseTableAlgo<simpleDeqStream, pairDeqStream> sp_algo; 
                 sp_algo.initialize(lcpn_ptr->size()); // |lcpn| == |lcp12| 
                 sp_algo.splitAndSortRMQ(rmqStream);
@@ -1860,8 +1777,6 @@ public:
                 sp_algo.answerRMQ(l3Deq);
 
             } else {
-                //simpleDeq::stream l2Stream = l2Deq.get_stream(); //old
-                //twoDeq::stream l3Stream  = l3TempDeq.get_stream(); //old
                 simpleDeqStream l2Stream = l2Deq.get_stream();
                 twoDeqStream l3Stream  = l3TempDeq.get_stream();
 
@@ -1885,17 +1800,13 @@ public:
                 }
 
                 l3_tuple_sorter.sort();
-
                 inner_tuple_type inner_tuple_sorter(innerTuple_cmp(), ram_use / 2, ram_use / 2);
 
                 /// Compute SA12[...] part.
-
+                
                 {
-                    //simpleDeq::stream sa12Stream = sa12_ptr->get_stream(); //old
                     simpleDeqStream sa12Stream = sa12_ptr->get_stream();
                     offset_type flag = 0;
-
-                    //iprint(sa12Stream); abort();
 
                     while (!l3_tuple_sorter.empty()) {
 
@@ -1909,7 +1820,6 @@ public:
                         }
 
                         inner_tuple_sorter.push(inner_type(tmp.first, tmp.second, (*sa12Stream + tmp.fourth)));
-
                         ++l3_tuple_sorter;
                     }
 
@@ -1919,21 +1829,16 @@ public:
 
                 /// Compute ISA[...] part.
 
-                //simpleDeq::stream isa1Stream = isa1_ptr->get_stream(); //old
-                //simpleDeq::stream isa2Stream = isa2_ptr->get_stream(); //old
                 simpleDeqStream isa1Stream = isa1_ptr->get_stream();
                 simpleDeqStream isa2Stream = isa2_ptr->get_stream();
                 
                 s_concatenation isa12Stream(isa1Stream, isa2Stream);
-
-                //iprint(isa12Stream); abort();
-
                 pair_type isa_sorter(pair_cmp(), ram_use / 2, ram_use / 2);
 
                 offset_type add = 0;
 
-                while(!inner_tuple_sorter.empty()) {
-
+                while(!inner_tuple_sorter.empty()) 
+                {
                     inner_type tmp = *inner_tuple_sorter; // tmp (id, k, r)
 
                     while (add < tmp.third) {
@@ -1981,13 +1886,10 @@ public:
                 }
 
                 isa_sorter.finish_clear();
-               
-                //pairDeq::stream rmqStream = rmqDeq.get_stream(); //old
-                //simpleDeq::stream lcpnStream = lcpn_ptr->get_stream(); //old
+
                 pairDeqStream rmqStream = rmqDeq.get_stream();
                 simpleDeqStream lcpnStream = lcpn_ptr->get_stream();
                 
-                //sparseTableAlgo<simpleDeq::stream, pairDeq::stream> sp_algo; //old
                 sparseTableAlgo<simpleDeqStream, pairDeqStream> sp_algo;
                 sp_algo.initialize(lcpn_ptr->size());
                 sp_algo.splitAndSortRMQ(rmqStream);
@@ -1998,7 +1900,6 @@ public:
 
             delete lcpn_ptr;
 
-            //l3_ptr = new simpleDeq::stream(l3Deq); //old
             l3_ptr = new simpleDeqStream(l3Deq);
 
             if (!l2_ptr->empty())
@@ -2078,8 +1979,6 @@ public:
         offset_type index;
         offset_type merge_result;
 
-        // lcp part 
-
         offset_type current1_winner;
         offset_type current2_winner;
         offset_type last1_winner;
@@ -2093,7 +1992,6 @@ public:
         offset_type bound;
 
         build_lcp * b_lcp;
-
 
         bool cmp_mod12()
         {
@@ -2127,7 +2025,8 @@ public:
 
         /// Comparison part of merge.
 
-        char l12_construction0(offset_type c1, offset_type c2) {
+        char l12_construction0(offset_type c1, offset_type c2) 
+        {
             if (last_type == 0) {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
@@ -2173,7 +2072,8 @@ public:
             }
         }
 
-        bool l12_construction1(offset_type c1) {
+        bool l12_construction1(offset_type c1) 
+        {
             if (last_type == 0) {
                 if (last1_winner == c1) {
                     b_lcp->saveRMQ(last_s0.fourth, s1.fourth);
@@ -2196,7 +2096,8 @@ public:
             }
         }
 
-        char l12_construction2(offset_type c1, offset_type c2) {
+        char l12_construction2(offset_type c1, offset_type c2) 
+        {
             if (last_type == 0) {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
@@ -2227,8 +2128,6 @@ public:
 
         void get012()
         {
-            DBG1(debug_merge, "0" << s0 << " 1" << s1 << " 2" << s2 << " -> ");
-
             if (cmp_mod01()) {
                 if (cmp_mod02()) {
                     selected = 0;
@@ -2244,9 +2143,7 @@ public:
 
                     last_type = 0;
                     last_s0 = s0;
-
-                }
-                else {
+                } else {
                     selected = 2;
                     merge_result = s2.first;
 
@@ -2276,8 +2173,7 @@ public:
 
                     last_type = 1;
                     last_s1 = s1;
-                }
-                else {
+                } else {
                     selected = 2;
                     merge_result = s2.first;
 
@@ -2293,14 +2189,10 @@ public:
                     last_s2 = s2;
                 }
             }
-
-            DBG3(debug_merge, "selected " << selected << " - index " << merge_result);
         }
 
         void get01()
         {
-            DBG1(debug_merge, "0" << s0 << " 1" << s1 << " -> ");
-
             if (cmp_mod01()) {
                 selected = 0;
                 merge_result = s0.first;
@@ -2316,8 +2208,7 @@ public:
                 last_type = 0;
                 last_s0 = s0;
 
-            }
-            else {
+            } else {
                 selected = 1;
                 merge_result = s1.first;
 
@@ -2330,14 +2221,10 @@ public:
                 last_type = 1;
                 last_s1 = s1;
             }
-
-            DBG3(debug_merge, "selected " << selected << " - index " << merge_result);
         }
 
         void get12()
         {
-            DBG1(debug_merge, "1" << s1 << " 2" << s2 << " -> ");
-
             if (cmp_mod12()) {
                 selected = 1;
                 merge_result = s1.first;
@@ -2367,14 +2254,10 @@ public:
                 last_type = 2;
                 last_s2 = s2;
             }
-
-            DBG3(debug_merge, "selected " << selected << " - index " << merge_result);
         }
 
         void get02()
         {
-            DBG1(debug_merge, "0" << s0 << " 2" << s2 << " -> ");
-
             if (cmp_mod02()) {
                 selected = 0;
                 merge_result = s0.first;
@@ -2389,8 +2272,7 @@ public:
 
                 last_type = 0;
                 last_s0 = s0;
-            }
-            else {
+            } else {
                 selected = 2;
                 merge_result = s2.first;
 
@@ -2406,8 +2288,6 @@ public:
                 last_s2 = s2;
 
             }
-
-            DBG3(debug_merge, "selected " << selected << " - index " << merge_result);
         }
 
         void solve()
@@ -2436,8 +2316,6 @@ public:
 
                         last_type = 0;
                         last_s0 = s0;
-
-                        DBG(debug_merge, "get0(): 0" << s0 << " -> selected " << selected << " - index " << merge_result);
                     }
                 }
             } else {
@@ -2456,8 +2334,6 @@ public:
 
                         last_type = 1;
                         last_s1 = s1;
-
-                        DBG(debug_merge, "get1(): 1" << s1 << " -> selected " << selected << " - index " << merge_result);
                     }
                 } else {
                     if (exists[2]) {
@@ -2474,17 +2350,12 @@ public:
 
                         last_type = 2;
                         last_s2 = s2;
-
-                        DBG(debug_merge, "get2(): 2" << s2 << " -> selected " << selected << " - index " << merge_result);
-
+                        
                     } else {
                         assert(false);
                     }
-
                 }
             }
-
-            DBG(debug_merge_result, merge_result);
         }
 
 
@@ -2708,43 +2579,26 @@ public:
                 // Mod 2 : (index2,mod2)
 
                 if (exists[2]) { // Nothing is missed
-                    DBG(debug_mcreate, "nomiss");
-                    DBG(debug_mcreate, "Mod0 : (" << index << "|" << t[0] << "," << t[1] << " - " << mod_one << "," << mod_two << ")");
-                    DBG(debug_mcreate, "Mod1 : (" << (index + 1) << "|" << t[1] << " - " << mod_one << "," << mod_two << ")");
-
                     mod0_runs.push(skew_quint_type(index, t[0], t[1], mod_one, mod_two));
                     mod1_runs.push(skew_quad_type(index + 1, mod_one, t[1], mod_two));
 
                     if (index != offset_type(0)) {
-                        DBG(debug_mcreate, "Mod2 : (" << (index - 1) << "|" << old_t2 << "," << t[0]
-                            << " - " << old_mod2 << "," << mod_one << ")");
                         mod2_runs.push(skew_quint_type((index - 1), old_mod2, old_t2, t[0], mod_one));
                     }
                 }
                 else if (exists[1]) { // Last element missed
-                    DBG(debug_mcreate, "nolast");
-                    DBG(debug_mcreate, "Mod0 : (" << index << "|" << t[0] << "," << t[1] << " - " << mod_one << "," << 0 << ")");
-                    DBG(debug_mcreate, "Mod1 : (" << (index + 1) << "|" << t[1] << " - " << mod_one << "," << 0 << ")");
-
                     mod0_runs.push(skew_quint_type(index, t[0], t[1], mod_one, 0));
                     mod1_runs.push(skew_quad_type(index + 1, mod_one, t[1], 0));
 
                     if (index != offset_type(0)) {
-                        DBG(debug_mcreate, "Mod2 : (" << (index - 1) << "|" << old_t2 << "," << t[0]
-                            << " - " << old_mod2 << "," << mod_one << ")");
                         mod2_runs.push(skew_quint_type((index - 1), old_mod2, old_t2, t[0], mod_one));
                     }
                 }
                 else { // Only one element left
                     assert(exists[0]);
-                    DBG(debug_mcreate, "twomiss");
-                    DBG(debug_mcreate, "Mod0 : (" << index << "|" << t[0] << "," << 0 << " - " << 0 << "," << 0 << ")");
-
                     mod0_runs.push(skew_quint_type(index, t[0], 0, 0, 0));
 
                     if (index != offset_type(0)) {
-                        DBG(debug_mcreate, "Mod2 : (" << (index - 1) << "|" << old_t2 << "," << t[0]
-                            << " - " << old_mod2 << "," << 0 << ")");
                         mod2_runs.push(skew_quint_type((index - 1), old_mod2, old_t2, t[0], 0));
                     }
                 }
@@ -2756,8 +2610,6 @@ public:
 
             if ((a_size % 3) == 0) { // changed
                 if (index != offset_type(0)) {
-                    DBG(debug_mcreate, "Mod2 : (" << (index - 1) << "|" << old_t2 << "," << 0
-                        << " - " << old_mod2 << "," << 0 << ")");
                     mod2_runs.push(skew_quint_type((index - 1), old_mod2, old_t2, 0, 0));
                 }
             }
@@ -2765,24 +2617,6 @@ public:
             if ((a_size % 3) == 1) {
                 mod_one = *mod_1 + add_rank;
                 ISA1.push_back(mod_one); 
-            }
-
-            if (debug_S012)
-            {
-                offset_type i = 0;
-                for(mod0_rm_type mod0_result(mod0_runs.result(), less_mod0(), memsize / 5);
-                    !mod0_result.empty(); ++mod0_result, ++i)
-                    DBG(debug_S012, "S0[" << i << "]: " << *mod0_result);
-
-                i = 0;
-                for(mod1_rm_type mod1_result(mod1_runs.result(), less_quad_2nd(), memsize / 5);
-                    !mod1_result.empty(); ++mod1_result, ++i)
-                    DBG(debug_S012, "S1[" << i << "]: " << *mod1_result);
-
-                i = 0;
-                for(mod2_rm_type mod2_result(mod2_runs.result(), less_quint_2nd(), memsize / 5);
-                    !mod2_result.empty(); ++mod2_result, ++i)
-                    DBG(debug_S012, "S2[" << i << "]: " << *mod2_result);
             }
 
             mod0_runs.deallocate();
@@ -2866,7 +2700,6 @@ public:
         // (t_i) -> (i,t_i)
         typedef make_pairs <counter_stream_type, Input> make_pairs_input_type;
 
-        // Variables
         bool finished; // used for empty() check 
         bool unique; // is the current quad array unique? 
         unsigned int rec_depth; // current recusion depth of the algorithm
@@ -2874,7 +2707,6 @@ public:
         typedef mod12Comparator mod12cmp;
         typedef stxxl::sorter<stxxl::tuple<offset_type, offset_type>, mod12cmp, block_size> mod12_sorter_type;
 
-        // Additional streaming items
         typedef stxxl::stream::choose <mod12_sorter_type,2> isa_second_type;
         typedef build_sa <offset_array_it_rg, isa_second_type, isa_second_type> buildSA_type;
         typedef make_pairs <buildSA_type, counter_stream_type> precompute_isa_type;
