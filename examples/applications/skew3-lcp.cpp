@@ -48,8 +48,8 @@ using stxxl::external_size_type;
 
 /// Global variables, types and helpers.
 
-// limits max ram used by external data structures to 1 GiB
-internal_size_type ram_use = 1 * 1024 * 1024 * 1024;
+// limits max ram used by external data structures to 0.8 GiB
+internal_size_type ram_use = 0.8 * 1024 * 1024 * 1024;
 
 // alphabet data type
 typedef unsigned char alphabet_type;
@@ -97,14 +97,12 @@ struct pair_less2nd
  * Helper function to calculate base^exp in O(log^2(p).
  */ 
 template <class T>
-T myPow(T base, T exp)
+T powerOfTwo(T base, T exp)
 {
-    if (exp == 0)
-        return 1;
-    if (exp == 1)
-        return base;
+    if (exp == 0) return 1;
+    if (exp == 1) return base;
 
-    T temp = myPow(base, exp/2);  
+    T temp = powerOfTwo(base, exp/2);  
     if (exp%2 == 0) { return temp * temp; }
     else { return base * temp * temp; }
 }
@@ -161,8 +159,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     {
         offset_type prev_isa = (*build_isa).first;
         offset_type counter = 0;
-        while (!build_isa.empty())
-        {
+        while (!build_isa.empty()) {
             if ((*build_isa).second != counter) {
                 std::cout << "Error: suffix array is not a permutation of 0..n-1." << std::endl;
                 return false;
@@ -192,8 +189,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
 
         ++triple_rm;
 
-        while (!triple_rm.empty())
-        {
+        while (!triple_rm.empty()) {
             const triple_type& this_triple = *triple_rm;
 
             if (prev_triple.second > this_triple.second)
@@ -201,9 +197,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
                 // simple check of first character of suffix
                 std::cout << "Error: suffix array position " << counter << " ordered incorrectly." << std::endl;
                 return false;
-            }
-            else if (prev_triple.second == this_triple.second)
-            {
+            } else if (prev_triple.second == this_triple.second) {
                 if (this_triple.third == (offset_type)totalSize) {
                     // last suffix of string must be first among those with same first character
                     std::cout << "Error: suffix array position " << counter << " ordered incorrectly." << std::endl;
@@ -290,7 +284,6 @@ template <typename InputStream>
 struct pair_2nd_stream_type
 {
     typedef typename InputStream::value_type pair_type;
-
     typedef typename pair_type::first_type value_type;
 
 private:
@@ -369,12 +362,10 @@ void lcparray_stxxl_kasai(const StringContainer& string, const SAContainer& SA, 
 
         std::vector<alphabet_type> stringRAM (string.begin(), string.end());
 
-        while ( !isa_sort.empty() )
-        {
+        while ( !isa_sort.empty() ) {
             offset_type k = isa_sort->second; // k = ISA[i]
 
-            if (k > offset_type(0))
-            {
+            if (k > offset_type(0)) {
                 size_type j = isa_sort->third; // j = SA[k-1];
 
                 while(i + h < stringRAM.size() && j + h < stringRAM.size() &&
@@ -692,6 +683,7 @@ public:
         {
             ++cnt;
             return *this;
+
         }
 
         bool empty() const {
@@ -951,13 +943,11 @@ public:
             : A(a), B(b)
         {
             assert(!A.empty()); assert(!B.empty());
-            if (!empty()) {
+            if (!empty()) 
                 result = value_type(*A, *B + add_alphabet);
-            }
         }
 
-        const value_type & operator*() const
-        {
+        const value_type & operator*() const {
             return result;
         }
 
@@ -1020,8 +1010,7 @@ public:
             if (!A.empty()) {
                 current.third = (*A).second + add_alphabet;
                 ++A;
-            }
-            else {
+            } else {
                 current.third = 0;
                 current.fourth = 0;
             }
@@ -1057,9 +1046,8 @@ public:
             else 
                 current.fourth = 0;
                     
-            if ((current.second == offset_type(0)) && (z3z != 1)) {
+            if ((current.second == offset_type(0)) && (z3z != 1)) 
                 finished = true;
-            }
 
             return *this;
         }
@@ -1132,8 +1120,7 @@ public:
      */
     class sparseTable
     {
-    private:
-          
+    private:          
         std::vector<std::vector<offset_type> > QTable;
 
     public:
@@ -1156,20 +1143,20 @@ public:
             std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
             tempVector.reserve(iLimit);
 
-            for (offset_type i = 0; i <= iLimit; i++) 
+            for (offset_type i = 0; i <= iLimit; ++i) 
                 tempVector.push_back(field[i]);  
            
-            for (offset_type k = 0; k < kLimit; k++) {  
+            for (offset_type k = 0; k < kLimit; ++k) {  
                 QTable.push_back(std::vector<offset_type>());
                 std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
-                tempVector.reserve(dimI - (0 + myPow<offset_type>(2, k)));
+                tempVector.reserve(dimI - (0 + powerOfTwo<offset_type>(2, k)));
 
-                magicCounter += myPow<offset_type>(2, k);  
-                for (offset_type i = 0; (i + myPow<offset_type>(2, k)) < dimI; i++) {  
-                    if (QTable[k][i] <= QTable[k][(i + myPow<offset_type>(2, k))]) 
+                magicCounter += powerOfTwo<offset_type>(2, k);  
+                for (offset_type i = 0; (i + powerOfTwo<offset_type>(2, k)) < dimI; ++i) {  
+                    if (QTable[k][i] <= QTable[k][(i + powerOfTwo<offset_type>(2, k))]) 
                         tempVector.push_back(QTable[k][i]);
                     else 
-                        tempVector.push_back(QTable[k][(i + myPow<offset_type>(2, k))]);
+                        tempVector.push_back(QTable[k][(i + powerOfTwo<offset_type>(2, k))]);
                     
                     if (i == (iLimit - magicCounter)) 
                         break;
@@ -1181,12 +1168,10 @@ public:
         {
             offset_type k = floor(log2(j - i + 1));
             offset_type r = QTable[k][i];
-            offset_type s = QTable[k][j - myPow<offset_type>(2, k) + 1];
-            
-            if (r <= s) 
-                return r;
-            else 
-                return s;
+            offset_type s = QTable[k][j - powerOfTwo<offset_type>(2, k) + 1];
+
+            if (r <= s) return r;
+            else return s;
         }
 
         void clear() {
@@ -1232,7 +1217,7 @@ public:
             offset_type lastPages = k - 1 - tmpK;
 
             if (lastPages > 0) {
-                for (offset_type p = 1 ; p <= lastPages ; p++) {
+                for (offset_type p = 1 ; p <= lastPages ; ++p) {
                     if (min > minBorderArray[k - p]) 
                         min = minBorderArray[k - p];
                 }
@@ -1250,8 +1235,7 @@ public:
         void initialize(offset_type lengthOfVector)
         {
             offset_type M = ((ram_use / 2) / sizeof(offset_type));
-            span = 0;  
-            end_part = 0;
+            span = end_part = 0;  
 
             assert(lengthOfVector > 0);
 
@@ -1261,7 +1245,7 @@ public:
             do {
                 // space inequation: M - c >= v + v*log_2(v) + n/v
                 if ((M - (span + 1) - ((span + 1) * log2(span + 1)) - (lengthOfVector / (span + 1))) > 0) 
-                    span++;
+                    ++span;
                 else 
                     break;
             } while (span < lengthOfVector);
@@ -1297,7 +1281,7 @@ public:
 
                 // i := left, j := right, | := left or right border, *|* := currently considered border
                 
-                for (offset_type k = 0; k < numberOfPages; k++) {
+                for (offset_type k = 0; k < numberOfPages; ++k) {
 
                     // find beginning of RMQ (id, i, j) 
                     if (left >= leftBorder && left <= rightBorder && finishedI == 0) {
@@ -1358,11 +1342,11 @@ public:
             rightBorder = span - 1;
 
             // build up minBorderArray
-            for (offset_type n = 0; n < numberOfPages; n++) {
+            for (offset_type n = 0; n < numberOfPages; ++n) {
                 
                 min = std::numeric_limits<offset_type>::max();
 
-                for (offset_type i = leftBorder; i <= rightBorder; i++) {
+                for (offset_type i = leftBorder; i <= rightBorder; ++i) {
                     assert(!int_stream.empty());
 
                     temp = *int_stream;
@@ -1502,7 +1486,7 @@ public:
             isa1_ptr = ISA1;
             isa2_ptr = ISA2;
             sa12_ptr = SA_12;
-
+            
             l1_ptr = NULL;
         }
         
@@ -1524,7 +1508,7 @@ public:
                 else 
                     l2RMQ.push_back(intPair<offset_type>(countl2,r_j,r_i));
                 
-                countl2++;
+                ++countl2;
             }
     	}
 
@@ -1562,8 +1546,7 @@ public:
 
             pairDeq rmqDeq;
 
-            if (l2Deq.size() == 0)
-            {
+            if (l2Deq.size() == 0) {
                 offset_type id = 0;
                 twoDeqStream l3Stream  = l3TempDeq.get_stream();
 
@@ -1637,7 +1620,7 @@ public:
                             if (!sa12Stream.empty()) 
                                 ++sa12Stream;
                             
-                            flag++;
+                            ++flag;
                         }
 
                         inner_tuple_sorter.push(inner_type(tmp.first, tmp.second, (*sa12Stream + tmp.fourth)));
@@ -1665,7 +1648,7 @@ public:
                         if (!isa12Stream.empty()) 
                             ++isa12Stream;
                     
-                        add++;
+                        ++add;
                     }
 
                     if (tmp.second == 1) {
@@ -1795,8 +1778,6 @@ public:
         offset_type index;
         offset_type merge_result;
 
-        offset_type current1_winner;
-        offset_type current2_winner;
         offset_type last1_winner;
         offset_type last2_winner;
 
@@ -1943,28 +1924,20 @@ public:
                 if (cmp_mod02()) {
                     selected = 0;
                     merge_result = s0.first;
-
-                    current1_winner = s0.second;
-                    current2_winner = s0.third;
-
-                    b_lcp->saveL1(l12_construction0(current1_winner, current2_winner));
-
-                    last1_winner = current1_winner;
-                    last2_winner = current2_winner;
-
+                    
+                    b_lcp->saveL1(l12_construction0(s0.second, s0.third));
+                    last1_winner = s0.second;
+                    last2_winner = s0.third;
+                    
                     last_type = 0;
                     last_s0 = s0;
                 } else {
                     selected = 2;
                     merge_result = s2.first;
-
-                    current1_winner = s2.third;
-                    current2_winner = s2.fourth;
-
-                    b_lcp->saveL1(l12_construction2(current1_winner, current2_winner));
-
-                    last1_winner = current1_winner;
-                    last2_winner = current2_winner;
+                    
+                    b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
+                    last1_winner = s2.third;
+                    last2_winner = s2.fourth;
 
                     last_type = 2;
                     last_s2 = s2;
@@ -1976,26 +1949,19 @@ public:
                     selected = 1;
                     merge_result = s1.first;
 
-                    current1_winner = s1.third;
-
-                    b_lcp->saveL1(l12_construction1(current1_winner));
-
-                    last1_winner = current1_winner;
+                    b_lcp->saveL1(l12_construction1(s1.third));
+                    last1_winner = s1.third;
 
                     last_type = 1;
                     last_s1 = s1;
                 } else {
                     selected = 2;
                     merge_result = s2.first;
-
-                    current1_winner = s2.third;
-                    current2_winner = s2.fourth;
-
-                    b_lcp->saveL1(l12_construction2(current1_winner, current2_winner));
-
-                    last1_winner = current1_winner;
-                    last2_winner = current2_winner;
-
+                    
+                    b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
+                    last1_winner = s2.third;
+                    last2_winner = s2.fourth;
+                    
                     last_type = 2;
                     last_s2 = s2;
                 }
@@ -2008,13 +1974,9 @@ public:
                 selected = 0;
                 merge_result = s0.first;
 
-                current1_winner = s0.second;
-                current2_winner = s0.third;
-
-                b_lcp->saveL1(l12_construction0(current1_winner, current2_winner));
-
-               	last1_winner = current1_winner;
-                last2_winner = current2_winner;
+                b_lcp->saveL1(l12_construction0(s0.second, s0.third));
+                last1_winner = s0.second;
+                last2_winner = s0.third;
 
                 last_type = 0;
                 last_s0 = s0;
@@ -2022,12 +1984,9 @@ public:
             } else {
                 selected = 1;
                 merge_result = s1.first;
-
-                current1_winner = s1.third;
-
-                b_lcp->saveL1(l12_construction1(current1_winner));
-
-                last1_winner = current1_winner;
+                
+                b_lcp->saveL1(l12_construction1(s1.third));
+                last1_winner = s1.third;
 
                 last_type = 1;
                 last_s1 = s1;
@@ -2040,27 +1999,18 @@ public:
                 selected = 1;
                 merge_result = s1.first;
 
-                current1_winner = s1.third;
-
-                b_lcp->saveL1(l12_construction1(current1_winner));
-
-                last1_winner = current1_winner;
+                b_lcp->saveL1(l12_construction1(s1.third));
+                last1_winner = s1.third;
 
                 last_type = 1;
                 last_s1 = s1;
-
-            }
-            else {
+            } else {
                 selected = 2;
                 merge_result = s2.first;
 
-                current1_winner = s2.third;
-                current2_winner = s2.fourth;
-
-                b_lcp->saveL1(l12_construction2(current1_winner, current2_winner));
-
-                last1_winner = current1_winner;
-                last2_winner = current2_winner;
+                b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
+                last1_winner = s2.third;
+                last2_winner = s2.fourth;
 
                 last_type = 2;
                 last_s2 = s2;
@@ -2073,13 +2023,9 @@ public:
                 selected = 0;
                 merge_result = s0.first;
 
-                current1_winner = s0.second;
-                current2_winner = s0.third;
-
-               	b_lcp->saveL1(l12_construction0(current1_winner, current2_winner));
-
-               	last1_winner = current1_winner;
-                last2_winner = current2_winner;
+                b_lcp->saveL1(l12_construction0(s0.second, s0.third));
+                last1_winner = s0.second;
+                last2_winner = s0.third;
 
                 last_type = 0;
                 last_s0 = s0;
@@ -2087,13 +2033,9 @@ public:
                 selected = 2;
                 merge_result = s2.first;
 
-                current1_winner = s2.third;
-                current2_winner = s2.fourth;
-
-                b_lcp->saveL1(l12_construction2(current1_winner, current2_winner));
-
-                last1_winner = current1_winner;
-                last2_winner = current2_winner;
+                b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
+                last1_winner = s2.third;
+                last2_winner = s2.fourth;
 
                 last_type = 2;
                 last_s2 = s2;
@@ -2117,13 +2059,9 @@ public:
                         selected = 0;
                         merge_result = s0.first;
 
-                        current1_winner = s0.second;
-                        current2_winner = s0.third;
-
-                        b_lcp->saveL1(l12_construction0(current1_winner,current2_winner));
-
-                        last1_winner = current1_winner;
-                        last2_winner = current2_winner;
+                        b_lcp->saveL1(l12_construction0(s0.second,s0.third));
+                        last1_winner = s0.second;
+                        last2_winner = s0.third;
 
                         last_type = 0;
                         last_s0 = s0;
@@ -2137,11 +2075,8 @@ public:
                         selected = 1;
                         merge_result = s1.first;
 
-                        current1_winner = s1.third;
-
-                        b_lcp->saveL1(l12_construction1(current1_winner));
-
-                        last1_winner = current1_winner;
+                        b_lcp->saveL1(l12_construction1(s1.third));
+                        last1_winner = s1.third;
 
                         last_type = 1;
                         last_s1 = s1;
@@ -2150,14 +2085,10 @@ public:
                     if (exists[2]) {
                         selected = 2;
                         merge_result = s2.first;
-
-                        current1_winner = s2.third;
-                        current2_winner = s2.fourth;
-
-                        b_lcp->saveL1(l12_construction2(current1_winner, current2_winner));
-
-                        last1_winner = current1_winner;
-                        last2_winner = current2_winner;
+                        
+                        b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
+                        last1_winner = s2.third;
+                        last2_winner = s2.fourth;
 
                         last_type = 2;
                         last_s2 = s2;
@@ -2245,8 +2176,8 @@ public:
     /** 
      * Helper function for computing the size of the 2/3 subproblem. 
      */
-    static inline size_type subp_size(size_type n) {
-        return (n / 3) * 2 + ((n % 3) == 2);
+    static inline offset_type subp_size(size_type n) {
+        return static_cast<offset_type>((n / 3) * 2 + ((n % 3) == 2));
     }
     
     /**
@@ -2718,8 +2649,7 @@ protected:
 
 public:
     cut_stream(InputType& input, size_type count)
-        : m_input(input), m_count(count)
-    { }
+        : m_input(input), m_count(count) { }
 
     const value_type& operator * () const
     {
@@ -2864,8 +2794,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
     int ret = 0;
 
-    if (check_flag)
-    {
+    if (check_flag) {
         (std::cout << "checking suffix array... ").flush();
 
         if (!sacheck_vectors(input_vector, output_vector)) {
@@ -2913,8 +2842,7 @@ int main(int argc, char* argv[])
     stxxl::cmdline_parser cp;
 
     cp.set_description(
-        "DC3-LCP aka skew3-lcp algorithm for external memory suffix array and LCP array construction."
-        );
+        "DC3-LCP aka skew3-lcp algorithm for external memory suffix array and LCP array construction.");
     cp.set_author(
         "Jens Mehnert <jmehnert@mpi-sb.mpg.de>, \n"
         "Timo Bingmann <tb@panthema.net>, \n"
