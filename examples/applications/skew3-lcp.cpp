@@ -1126,49 +1126,51 @@ public:
     public:
 
         sparseTable(std::vector<offset_type> &fieldVector) {
-            offset_type dimI = fieldVector.size(); // y-Dimension of QTable
-            offset_type dimK = floor(log2(dimI)) + 1; // x-Dimension of QTable
+            size_t dimI = fieldVector.size(); // y-Dimension of QTable
+            size_t dimK = floor(log2(dimI)) + 1; // x-Dimension of QTable
             createQTable(fieldVector, dimI, dimK);
         }
         
-        void createQTable(std::vector<offset_type> &field, offset_type dimI, offset_type dimK)
+        void createQTable(std::vector<offset_type> &field, size_t dimI, size_t dimK)
         {
             assert(dimI > 0); assert(dimK > 0);
 
-            offset_type iLimit = dimI - 1;
-            offset_type kLimit = dimK - 1;
-            offset_type magicCounter = 0;
+            size_t iLimit = dimI - 1;
+            size_t kLimit = dimK - 1;
+            size_t magicCounter = 0;
 
             QTable.push_back(std::vector<offset_type>());
             std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
             tempVector.reserve(iLimit);
 
-            for (offset_type i = 0; i <= iLimit; ++i) 
+            for (size_t i = 0; i <= iLimit; ++i) 
                 tempVector.push_back(field[i]);  
            
-            for (offset_type k = 0; k < kLimit; ++k) {  
+            for (size_t k = 0; k < kLimit; ++k) {  
                 QTable.push_back(std::vector<offset_type>());
                 std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
-                tempVector.reserve(dimI - (0 + powerOfTwo<offset_type>(2, k)));
+                tempVector.reserve(dimI - (0 + powerOfTwo<size_t>(2, k)));
 
-                magicCounter += powerOfTwo<offset_type>(2, k);  
-                for (offset_type i = 0; (i + powerOfTwo<offset_type>(2, k)) < dimI; ++i) {  
-                    if (QTable[k][i] <= QTable[k][(i + powerOfTwo<offset_type>(2, k))]) 
+                magicCounter += powerOfTwo<size_t>(2, k);  
+                for (size_t i = 0; (i + powerOfTwo<size_t>(2, k)) < dimI; ++i) {  
+                    if (QTable[k][i] <= QTable[k][(i + powerOfTwo<size_t>(2, k))]) 
                         tempVector.push_back(QTable[k][i]);
                     else 
-                        tempVector.push_back(QTable[k][(i + powerOfTwo<offset_type>(2, k))]);
+                        tempVector.push_back(QTable[k][(i + powerOfTwo<size_t>(2, k))]);
                     
                     if (i == (iLimit - magicCounter)) 
                         break;
                 }
-            } 
-        } 
+            }
+        }
         
-        offset_type query(offset_type i, offset_type j) 
+        offset_type query(offset_type I, offset_type J) 
         {
-            offset_type k = floor(log2(j - i + 1));
+            size_t i = I;
+            size_t j = J;
+            size_t k = floor(log2(j - i + 1)); 
             offset_type r = QTable[k][i];
-            offset_type s = QTable[k][j - powerOfTwo<offset_type>(2, k) + 1];
+            offset_type s = QTable[k][j - powerOfTwo<size_t>(2, k) + 1];
 
             if (r <= s) return r;
             else return s;
@@ -1211,12 +1213,12 @@ public:
         offset_type span, end_part, numberOfPages;
 
         // Compare min of page k with last minBorderArray entries 
-        offset_type getArrayMin(offset_type pageMin, size_type k, size_type tmpK)
+        offset_type getArrayMin(offset_type pageMin, offset_type k, offset_type tmpK)
         {
             offset_type min = pageMin;
             offset_type lastPages = k - 1 - tmpK;
 
-            if (lastPages > 0) {
+            if (lastPages > offset_type(0)) {
                 for (offset_type p = 1 ; p <= lastPages ; ++p) {
                     if (min > minBorderArray[k - p]) 
                         min = minBorderArray[k - p];
@@ -1234,12 +1236,12 @@ public:
         // compute numberOfPages and their page-size (span)
         void initialize(offset_type lengthOfVector)
         {
-            offset_type M = ((ram_use / 2) / sizeof(offset_type));
+            offset_type M = (offset_type(ram_use / 2) / sizeof(offset_type));
             span = end_part = 0;  
 
-            assert(lengthOfVector > 0);
+            assert(lengthOfVector > offset_type(0));
 
-            if (lengthOfVector >= ((ram_use / 2) / sizeof(offset_type))) 
+            if (lengthOfVector >= offset_type((ram_use / 2) / sizeof(offset_type))) 
                 span = 10000;
          
             do {
@@ -1300,7 +1302,7 @@ public:
                             assert(numberOfPages > 1);  
 
                             leftBorder = (rightBorder + 1);
-                            if ((k == numberOfPages - 2) && (end_part > 0)) 
+                            if ((k == offset_type(numberOfPages - 2)) && (end_part > offset_type(0))) 
                                 rightBorder += end_part;
                             else 
                                 rightBorder += span;
@@ -1322,7 +1324,7 @@ public:
                     assert(numberOfPages > 1); 
 
                     leftBorder = (rightBorder + 1);
-                    if ((k == numberOfPages - 2) && (end_part > 0)) 
+                    if ((k == offset_type(numberOfPages - 2)) && (end_part > offset_type(0))) 
                         rightBorder += end_part;
                     else 
                         rightBorder += span;
@@ -1389,7 +1391,7 @@ public:
                 myTable.clear();
 
                 leftBorder = (rightBorder + 1);
-                if ((n == numberOfPages - 2) && (end_part > 0)) 
+                if ((n == offset_type(numberOfPages - 2)) && (end_part > offset_type(0))) 
                     rightBorder += end_part;
                 else 
                     rightBorder += span;
@@ -1498,7 +1500,8 @@ public:
     	{
             if (lcp12_ptr != NULL) {
 
-                if (r_j > 0) r_j -= 1;
+                if (r_j > offset_type(0)) 
+                    r_j = r_j - offset_type(1);
 
                 assert(lcpn_ptr->size() >= r_i);
                 assert(lcpn_ptr->size() >= r_j);
@@ -1555,10 +1558,9 @@ public:
                     offset_type& r_i = tmp.first;
                     offset_type& r_j = tmp.second;
 
-                    if ((r_i > 0) && (r_j > 0)) {
-                        r_j -= 1;
-
-                        if (r_i >= lcpn_ptr->size() || r_j >= lcpn_ptr->size()) 
+                    if ((r_i > offset_type(0)) && (r_j > offset_type(0))) {
+                        r_j = r_j - offset_type(1);
+                        if (r_i >= offset_type(lcpn_ptr->size()) || r_j >= offset_type(lcpn_ptr->size())) 
                             rmqDeq.push_back(intPair<offset_type>(id, 0, 0));
                         else if (r_i <= r_j) 
                             rmqDeq.push_back(intPair<offset_type>(id, r_i, r_j));
@@ -1594,7 +1596,7 @@ public:
                     offset_type& r_i = tmp.first;
                     offset_type& r_j = tmp.second;
 
-                    if (r_i > 0 && r_j > 0) {
+                    if (r_i > offset_type(0) && r_j > offset_type(0)) {
                         l3_tuple_sorter.push(l3_type(id, 0, r_i - 1, *l2Stream)); // (id, k, r_i - 1, l2) 
                         l3_tuple_sorter.push(l3_type(id, 1, r_j - 1, *l2Stream)); // (id, k, r_j - 1, l2) 
                     } else {
@@ -1652,12 +1654,12 @@ public:
                     }
 
                     if (tmp.second == 1) {
-                        if (tmp.third <= (sa12_ptr->size() - 1) ) 
+                        if (tmp.third <= offset_type(sa12_ptr->size() - 1) ) 
                             isa_sorter.push(pos_pair_type(tmp.first, tmp.second, (*isa12Stream - 1)));
                         else 
                             isa_sorter.push(pos_pair_type(tmp.first, tmp.second, 0));
                     } else {
-                        if (tmp.third <= (sa12_ptr->size() - 1)) 
+                        if (tmp.third <= offset_type(sa12_ptr->size() - 1)) 
                             isa_sorter.push(pos_pair_type(tmp.first, tmp.second, *isa12Stream));
                         else 
                             isa_sorter.push(pos_pair_type(tmp.first, tmp.second, 0));
@@ -1819,7 +1821,7 @@ public:
 
         char l12_construction0(offset_type c1, offset_type c2) 
         {
-            if (last_type == 0) {
+            if (last_type == offset_type(0)) {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
                         b_lcp->saveRMQ(last_s0.fifth, s0.fifth);
@@ -1829,13 +1831,13 @@ public:
                         b_lcp->saveRMQ(0, 0);
                         b_lcp->preprocessL3(0, 0);
                         return 1;
-                    }
+                    } 
                 } else {
                     b_lcp->saveRMQ(0, 0);
                     b_lcp->preprocessL3(0, 0);
                     return 0;
                 }
-            } else if (last_type == 1) {
+            } else if (last_type == offset_type(1)) {
                 if (last1_winner == c1) {
                     b_lcp->saveRMQ(last_s1.fourth, s0.fourth);
                     b_lcp->preprocessL3(last_s1.fourth, s0.fourth);
@@ -1866,7 +1868,7 @@ public:
 
         bool l12_construction1(offset_type c1) 
         {
-            if (last_type == 0) {
+            if (last_type == offset_type(0)) {
                 if (last1_winner == c1) {
                     b_lcp->saveRMQ(last_s0.fourth, s1.fourth);
                     b_lcp->preprocessL3(last_s0.fourth, s1.fourth);
@@ -1877,7 +1879,7 @@ public:
                     return 0;
                 }
             } else { // i.e. S1-S1 or S2-S1
-                if (last_type == 1) {
+                if (last_type == offset_type(1)) {
                     b_lcp->saveRMQ(s1.second - 1, s1.second);
                     b_lcp->preprocessL3(last_s1.second, s1.second);
                 } else {
@@ -1890,7 +1892,7 @@ public:
 
         char l12_construction2(offset_type c1, offset_type c2) 
         {
-            if (last_type == 0) {
+            if (last_type == offset_type(0)) {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
                         b_lcp->saveRMQ(last_s0.fifth, s2.fifth);
@@ -1907,7 +1909,7 @@ public:
                     return 0;
                 }
             } else { // i.e. S1-S2 or S2-S2
-                if (last_type == 1) {
+                if (last_type == offset_type(1)) {
                     b_lcp->saveRMQ(s2.second - 1, s2.second);
                     b_lcp->preprocessL3(last_s1.second, s2.second);
                 } else {
@@ -2177,7 +2179,7 @@ public:
      * Helper function for computing the size of the 2/3 subproblem. 
      */
     static inline offset_type subp_size(size_type n) {
-        return static_cast<offset_type>((n / 3) * 2 + ((n % 3) == 2));
+        return offset_type((n / 3) * 2 + ((n % 3) == 2));
     }
     
     /**
@@ -2885,10 +2887,10 @@ int main(int argc, char* argv[])
         return process<stxxl::uint32>(
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);  
-    /*else if (wordsize == 40)
+    else if (wordsize == 40)
         return process<stxxl::uint40>(
             input_filename, output_filename, sizelimit,
-            text_output_flag, check_flag, input_verbatim);*/
+            text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 64)
         return process<stxxl::uint64>(
             input_filename, output_filename, sizelimit,
