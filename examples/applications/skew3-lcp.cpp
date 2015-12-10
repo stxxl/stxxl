@@ -48,7 +48,7 @@ using stxxl::external_size_type;
 
 /// Global variables, types and helpers.
 
-// limits max ram used by external data structures to 0.8 GiB
+// limits max ram used by external data structures to 1.0 GiB the conservative way
 internal_size_type ram_use = 0.8 * 1024 * 1024 * 1024;
 
 // alphabet data type
@@ -326,7 +326,7 @@ void lcparray_stxxl_kasai(const StringContainer& string, const SAContainer& SA, 
     typedef typename SAContainer::value_type         offset_type;
     typedef typename SAContainer::size_type          size_type;
     
-    static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
+    static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
     typedef stxxl::tuple<offset_type,offset_type>               offset_pair_type;
     typedef stxxl::tuple<offset_type,offset_type,offset_type> offset_triple_type;
@@ -420,211 +420,211 @@ class skew
 {
 public:
 
-    /// Types and comparators needed by the skew algorithm.                                    
+    /// Types and comparators needed by the skew algorithm.
     
-    template<class T>
     struct intPair
     {
-         T id, i, j;
+         offset_type id, i, j;
          
          intPair() {}
-         intPair(T _id, T _i, T _j) : id(_id), i(_i), j(_j) {}
-     };
 
-    template<class T>
+        intPair(offset_type _id, offset_type _i, offset_type _j) :
+             id(_id), i(_i), j(_j) {}
+    };
+
     struct leftRmq
     {              
-        T id, i, j, k;
+        offset_type id, i, j, k;
         
         leftRmq() {}
-        leftRmq(T _id, T _i, T _j, T _k) : id(_id), i(_i), j(_j), k(_k) {}
+
+        leftRmq(offset_type _id, offset_type _i, offset_type _j, offset_type _k) :
+            id(_id), i(_i), j(_j), k(_k) {}
     };
 
-    template<class T>
     struct leftRmqComparator
     {
-        bool operator() (const leftRmq<T> & a, const leftRmq<T> & b) const {
+        bool operator() (const leftRmq& a, const leftRmq& b) const {
             return a.k < b.k;
         }
 
-        leftRmq<T> min_value() const {
-            return leftRmq<T>(std::numeric_limits<T>::min(),
-                              std::numeric_limits<T>::min(),
-                              std::numeric_limits<T>::min(),
-                              std::numeric_limits<T>::min());
+        leftRmq min_value() const {
+            return leftRmq(std::numeric_limits<offset_type>::min(),
+                           std::numeric_limits<offset_type>::min(),
+                           std::numeric_limits<offset_type>::min(),
+                           std::numeric_limits<offset_type>::min());
         }
 
-        leftRmq<T> max_value() const {
-            return leftRmq<T>(std::numeric_limits<T>::max(),
-                              std::numeric_limits<T>::max(),
-                              std::numeric_limits<T>::max(),
-                              std::numeric_limits<T>::max());
+        leftRmq max_value() const {
+            return leftRmq(std::numeric_limits<offset_type>::max(),
+                           std::numeric_limits<offset_type>::max(),
+                           std::numeric_limits<offset_type>::max(),
+                           std::numeric_limits<offset_type>::max());
         }
     };
 
-    template<class T>
     struct rightRmq
     {
-        T id, i, j, k, tmpK;
+        offset_type id, i, j, k, tmpK;
         
         rightRmq() {}
-        rightRmq(T _id, T _i, T _j, T _k, T _tmpK) : id(_id), i(_i), j(_j), k(_k), tmpK(_tmpK) {}
+
+        rightRmq(offset_type _id, offset_type _i, offset_type _j, offset_type _k, offset_type _tmpK) :
+            id(_id), i(_i), j(_j), k(_k), tmpK(_tmpK) {}
     };
 
-    template <class T>
     struct rightRmqComparator
     {
-        bool operator()(const rightRmq<T> & a, const rightRmq<T> & b) const {
+        bool operator()(const rightRmq& a, const rightRmq& b) const {
             return a.k < b.k;
         }
 
-        rightRmq<T> min_value() const {
-            return rightRmq<T>(std::numeric_limits<T>::min(),
-                               std::numeric_limits<T>::min(),
-                               std::numeric_limits<T>::min(),
-                               std::numeric_limits<T>::min(),
-                               std::numeric_limits<T>::min());
+        rightRmq min_value() const {
+            return rightRmq(std::numeric_limits<offset_type>::min(),
+                            std::numeric_limits<offset_type>::min(),
+                            std::numeric_limits<offset_type>::min(),
+                            std::numeric_limits<offset_type>::min(),
+                            std::numeric_limits<offset_type>::min());
         }
 
-        rightRmq<T> max_value() const {
-            return rightRmq<T>(std::numeric_limits<T>::max(),
-                               std::numeric_limits<T>::max(),
-                               std::numeric_limits<T>::max(),
-                               std::numeric_limits<T>::max(),
-                               std::numeric_limits<T>::max());
+        rightRmq max_value() const {
+            return rightRmq(std::numeric_limits<offset_type>::max(),
+                            std::numeric_limits<offset_type>::max(),
+                            std::numeric_limits<offset_type>::max(),
+                            std::numeric_limits<offset_type>::max(),
+                            std::numeric_limits<offset_type>::max());
         }
     };
 
-    template <class T>
     struct finalPair
     {
-        T id, min;
+        offset_type id, min;
         
         finalPair() {}
-        finalPair(T _id, T _min) : id(_id), min(_min) {}
+
+        finalPair(offset_type _id, offset_type _min) :
+            id(_id), min(_min) {}
     };
 
-    template<class T>
     struct finalPairComparator
     {
-        bool operator()(const finalPair<T> & a, const finalPair<T> & b) const {
+        bool operator()(const finalPair& a, const finalPair& b) const {
             return a.id < b.id;
         }
 
-        finalPair<T> min_value() const {
-            return finalPair<T>(std::numeric_limits<T>::min(),
-                                std::numeric_limits<T>::min());
+        finalPair min_value() const {
+            return finalPair(std::numeric_limits<offset_type>::min(),
+                             std::numeric_limits<offset_type>::min());
         }
 
-        finalPair<T> max_value() const {
-            return finalPair<T>(std::numeric_limits<T>::max(),
-                                std::numeric_limits<T>::max());
+        finalPair max_value() const {
+            return finalPair(std::numeric_limits<offset_type>::max(),
+                             std::numeric_limits<offset_type>::max());
         }
     };
 
-    template<class T>
     struct two_tuple
     {
-        T first, second;
+        offset_type first, second;
         
         two_tuple() {}
-        two_tuple(T _first, T _second) : first(_first), second(_second) {}
+
+        two_tuple(offset_type _first, offset_type _second) :
+            first(_first), second(_second) {}
     };
 
-    template<class T>
     struct l3Tuple
     {
-    	T first;
+    	offset_type first;
     	bool second;
-        T third, fourth;
+        offset_type third, fourth;
 
         l3Tuple() {}
         
-        l3Tuple(T _first, bool _second, T _third, T _fourth) :
+        l3Tuple(offset_type _first, bool _second, offset_type _third, offset_type _fourth) :
             first(_first), second(_second), third(_third), fourth(_fourth) {}
     };
 
-    template<class T>
     struct l3TupleComparator
     {
-        bool operator() (const l3Tuple<T> & a, const l3Tuple<T> & b) const {
+        bool operator() (const l3Tuple& a, const l3Tuple& b) const {
             return a.third < b.third;
         }
 
-        l3Tuple<T> min_value() const {
-            return l3Tuple<T>(std::numeric_limits<T>::min(),
-                              std::numeric_limits<bool>::min(),
-                              std::numeric_limits<T>::min(),
-                              std::numeric_limits<T>::min());
+        l3Tuple min_value() const {
+            return l3Tuple(std::numeric_limits<offset_type>::min(),
+                           std::numeric_limits<bool>::min(),
+                           std::numeric_limits<offset_type>::min(),
+                           std::numeric_limits<offset_type>::min());
         }
 
-        l3Tuple<T> max_value() const {
-            return l3Tuple<T>(std::numeric_limits<T>::max(),
-                              std::numeric_limits<bool>::max(),
-                              std::numeric_limits<T>::max(),
-                              std::numeric_limits<T>::max());
+        l3Tuple max_value() const {
+            return l3Tuple(std::numeric_limits<offset_type>::max(),
+                           std::numeric_limits<bool>::max(),
+                           std::numeric_limits<offset_type>::max(),
+                           std::numeric_limits<offset_type>::max());
         }
     };
 
-    template<class T>
     struct innerTuple
     {
-        T first;
+        offset_type first;
         bool second;
-        T third;
+        offset_type third;
 
         innerTuple() {}
-        innerTuple(T _first, bool _second, T _third) : first(_first), second(_second), third(_third) {}
+
+        innerTuple(offset_type _first, bool _second, offset_type _third) :
+            first(_first), second(_second), third(_third) {}
     };
 
-    template<class T>
     struct innerTupleComparator
     {
-        bool operator() (const innerTuple<T> & x, const innerTuple<T> & y) const {
+        bool operator() (const innerTuple& x, const innerTuple& y) const {
             return x.third < y.third;
         }
 
-        innerTuple<T> min_value() const {
-            return innerTuple<T>(std::numeric_limits<T>::min(),
-                                 std::numeric_limits<bool>::min(),
-                                 std::numeric_limits<T>::min());
+        innerTuple min_value() const {
+            return innerTuple(std::numeric_limits<offset_type>::min(),
+                              std::numeric_limits<bool>::min(),
+                              std::numeric_limits<offset_type>::min());
         }
 
-        innerTuple<T> max_value() const {
-            return innerTuple<T>(std::numeric_limits<T>::max(),
-                                 std::numeric_limits<bool>::max(),
-                                 std::numeric_limits<T>::max());
+        innerTuple max_value() const {
+            return innerTuple(std::numeric_limits<offset_type>::max(),
+                              std::numeric_limits<bool>::max(),
+                              std::numeric_limits<offset_type>::max());
         }
     };
 
-    template<class T>
     struct pos_pair
     {
-        T first;
+        offset_type first;
         bool second;
-        T third;
+        offset_type third;
 
         pos_pair() {}
-        pos_pair(T _first, bool _second, T _third) : first(_first), second(_second), third(_third) {}
+
+        pos_pair(offset_type _first, bool _second, offset_type _third) :
+            first(_first), second(_second), third(_third) {}
     }; 
 
-    template<class T>
     struct PairComparator
     {
-        bool operator()(const pos_pair<T> & x, const pos_pair<T> & y) const {
+        bool operator()(const pos_pair& x, const pos_pair& y) const {
             return x.first < y.first;
         }
 
-        pos_pair<T> min_value() const {
-            return pos_pair<T>(std::numeric_limits<T>::min(),
-                               std::numeric_limits<bool>::min(),
-                               std::numeric_limits<T>::min());
+        pos_pair min_value() const {
+            return pos_pair(std::numeric_limits<offset_type>::min(),
+                            std::numeric_limits<bool>::min(),
+                            std::numeric_limits<offset_type>::min());
         }
 
-        pos_pair<T> max_value() const {
-            return pos_pair<T>(std::numeric_limits<T>::max(),
-                               std::numeric_limits<bool>::max(),
-                               std::numeric_limits<T>::max());
+        pos_pair max_value() const {
+            return pos_pair(std::numeric_limits<offset_type>::max(),
+                            std::numeric_limits<bool>::max(),
+                            std::numeric_limits<offset_type>::max());
         }
 
     };     
@@ -635,14 +635,14 @@ public:
     typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type> skew_quad_type;
     typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type> skew_quint_type;
     
-    static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
+    static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
     typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_array_type; 
     typedef stxxl::stream::vector_iterator2stream <typename offset_array_type::iterator> offset_array_it_rg;      
 
     typedef stxxl::sequence<offset_type, block_size> simpleDeq;
-    typedef stxxl::sequence<intPair<offset_type>, block_size> pairDeq;    
-    typedef stxxl::sequence<two_tuple<offset_type>, block_size> twoDeq;
+    typedef stxxl::sequence<intPair, block_size> pairDeq;    
+    typedef stxxl::sequence<two_tuple, block_size> twoDeq;
     
     /** 
      * Comparison function for the mod0 tuples. 
@@ -1126,37 +1126,37 @@ public:
     public:
 
         sparseTable(std::vector<offset_type> &fieldVector) {
-            size_t dimI = fieldVector.size(); // y-Dimension of QTable
-            size_t dimK = floor(log2(dimI)) + 1; // x-Dimension of QTable
+            std::size_t dimI = fieldVector.size(); // y-Dimension of QTable
+            std::size_t dimK = floor(log2(dimI)) + 1; // x-Dimension of QTable
             createQTable(fieldVector, dimI, dimK);
         }
         
-        void createQTable(std::vector<offset_type> &field, size_t dimI, size_t dimK)
+        void createQTable(std::vector<offset_type> &field, std::size_t dimI, std::size_t dimK)
         {
             assert(dimI > 0); assert(dimK > 0);
 
-            size_t iLimit = dimI - 1;
-            size_t kLimit = dimK - 1;
-            size_t magicCounter = 0;
+            std::size_t iLimit = dimI - 1;
+            std::size_t kLimit = dimK - 1;
+            std::size_t magicCounter = 0;
 
             QTable.push_back(std::vector<offset_type>());
             std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
             tempVector.reserve(iLimit);
 
-            for (size_t i = 0; i <= iLimit; ++i) 
+            for (std::size_t i = 0; i <= iLimit; ++i) 
                 tempVector.push_back(field[i]);  
            
-            for (size_t k = 0; k < kLimit; ++k) {  
+            for (std::size_t k = 0; k < kLimit; ++k) {  
                 QTable.push_back(std::vector<offset_type>());
                 std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
-                tempVector.reserve(dimI - (0 + powerOfTwo<size_t>(2, k)));
+                tempVector.reserve(dimI - (0 + powerOfTwo<std::size_t>(2, k)));
 
-                magicCounter += powerOfTwo<size_t>(2, k);  
-                for (size_t i = 0; (i + powerOfTwo<size_t>(2, k)) < dimI; ++i) {  
-                    if (QTable[k][i] <= QTable[k][(i + powerOfTwo<size_t>(2, k))]) 
+                magicCounter += powerOfTwo<std::size_t>(2, k);  
+                for (std::size_t i = 0; (i + powerOfTwo<std::size_t>(2, k)) < dimI; ++i) {  
+                    if (QTable[k][i] <= QTable[k][(i + powerOfTwo<std::size_t>(2, k))]) 
                         tempVector.push_back(QTable[k][i]);
                     else 
-                        tempVector.push_back(QTable[k][(i + powerOfTwo<size_t>(2, k))]);
+                        tempVector.push_back(QTable[k][(i + powerOfTwo<std::size_t>(2, k))]);
                     
                     if (i == (iLimit - magicCounter)) 
                         break;
@@ -1166,11 +1166,11 @@ public:
         
         offset_type query(offset_type I, offset_type J) 
         {
-            size_t i = I;
-            size_t j = J;
-            size_t k = floor(log2(j - i + 1)); 
+            std::size_t i = I;
+            std::size_t j = J;
+            std::size_t k = floor(log2(j - i + 1)); 
             offset_type r = QTable[k][i];
-            offset_type s = QTable[k][j - powerOfTwo<size_t>(2, k) + 1];
+            offset_type s = QTable[k][j - powerOfTwo<std::size_t>(2, k) + 1];
 
             if (r <= s) return r;
             else return s;
@@ -1196,13 +1196,13 @@ public:
     template <class Stream1, class Stream2>
     class sparseTableAlgo
     {         
-        typedef leftRmqComparator<offset_type> left_cmp;
-        typedef rightRmqComparator<offset_type> right_cmp;
-        typedef finalPairComparator<offset_type> final_cmp;
+        typedef leftRmqComparator left_cmp;
+        typedef rightRmqComparator right_cmp;
+        typedef finalPairComparator final_cmp;
     
-        typedef stxxl::sorter<leftRmq<offset_type>, left_cmp, block_size> left_sorter_type;
-        typedef stxxl::sorter<rightRmq<offset_type>, right_cmp, block_size> right_sorter_type;
-        typedef stxxl::sorter<finalPair<offset_type>, final_cmp, block_size> final_sorter_type;
+        typedef stxxl::sorter<leftRmq, left_cmp, block_size> left_sorter_type;
+        typedef stxxl::sorter<rightRmq, right_cmp, block_size> right_sorter_type;
+        typedef stxxl::sorter<finalPair, final_cmp, block_size> final_sorter_type;
     
         left_sorter_type left_sorter;
         right_sorter_type right_sorter;
@@ -1266,7 +1266,7 @@ public:
         // split up RMQs (id, i, j)) into two parts 
         void splitAndSortRMQ(Stream2& pair_stream)
         {
-            intPair<offset_type> temp;
+            intPair temp;
             offset_type left, leftBorder, right, rightBorder, id, tmpK;
             bool finishedI;
 
@@ -1291,11 +1291,11 @@ public:
                         // (trivial) case: ...*|*..i..j..*|*...
                         // => push leftRMQ(id, relative_i, relative_j, k) into leftRMQSorter
                         if (right >= leftBorder && right <= rightBorder) {
-                            left_sorter.push(leftRmq<offset_type>(id, (left - leftBorder) , (right - leftBorder), k));
+                            left_sorter.push(leftRmq(id, (left - leftBorder) , (right - leftBorder), k));
                             finishedI = 1;
                             break;
                         } else { // case: ...|..i..*|*... => push leftRMQ(id, relative_i, relative_j, k) into leftRMQSorter
-                            left_sorter.push(leftRmq<offset_type>(id, (left - leftBorder), (rightBorder - leftBorder), k));
+                            left_sorter.push(leftRmq(id, (left - leftBorder), (rightBorder - leftBorder), k));
                             finishedI = 1;
                             tmpK = k;
 
@@ -1317,7 +1317,7 @@ public:
                     // case: *|*..j..|.....|.....|
                     // => push rightRMQ(id, relative_i, relative_j, k, tmpK) into rightRMQSorter
                     if (right >= leftBorder && right <= rightBorder && finishedI == 1) {
-                        right_sorter.push(rightRmq<offset_type>(id, 0, (right - leftBorder), k, tmpK));
+                        right_sorter.push(rightRmq(id, 0, (right - leftBorder), k, tmpK));
                         break;
                     }
 
@@ -1372,7 +1372,7 @@ public:
                     // getMin(i, j, k, tmpK, vector)
                     left_min = myTable.query(left_sorter->i, left_sorter->j);
 
-                    collective_sorter.push(finalPair<offset_type>(left_sorter->id, left_min));
+                    collective_sorter.push(finalPair(left_sorter->id, left_min));
                     ++left_sorter;
                 }
 
@@ -1383,7 +1383,7 @@ public:
                     // mind previous minima in minBorderArray
                     right_min = getArrayMin(page_min, right_sorter->k, right_sorter->tmpK);
 
-                    collective_sorter.push(finalPair<offset_type>(right_sorter->id, right_min));
+                    collective_sorter.push(finalPair(right_sorter->id, right_min));
                     ++right_sorter;
                 }
 		
@@ -1402,7 +1402,7 @@ public:
     
         void answerRMQ(simpleDeq& resultDeq)
         {	
-            finalPair<offset_type> tmp;
+            finalPair tmp;
             offset_type id, min;
 	
             collective_sorter.sort(); // sort by their id's
@@ -1444,18 +1444,18 @@ public:
     class build_lcp
     {
     private:
-    	typedef l3Tuple<offset_type> l3_type;
-    	typedef innerTuple<offset_type> inner_type;
-    	typedef two_tuple<offset_type> two_tuple_type; 
-    	typedef pos_pair<offset_type> pos_pair_type;
+    	typedef l3Tuple l3_type;
+    	typedef innerTuple inner_type;
+    	typedef two_tuple two_tuple_type; 
+    	typedef pos_pair pos_pair_type;
 
-    	typedef l3TupleComparator<offset_type> l3Tuple_cmp;
-    	typedef innerTupleComparator<offset_type> innerTuple_cmp;
-    	typedef PairComparator<offset_type> pair_cmp;
+    	typedef l3TupleComparator l3Tuple_cmp;
+    	typedef innerTupleComparator innerTuple_cmp;
+    	typedef PairComparator pair_cmp;
 
-    	typedef stxxl::sorter<l3Tuple<offset_type>, l3Tuple_cmp, block_size> l3_tuple_type;
-    	typedef stxxl::sorter<innerTuple<offset_type>, innerTuple_cmp, block_size> inner_tuple_type;
-    	typedef stxxl::sorter<pos_pair<offset_type>, pair_cmp, block_size> pair_type;
+    	typedef stxxl::sorter<l3Tuple, l3Tuple_cmp, block_size> l3_tuple_type;
+    	typedef stxxl::sorter<innerTuple, innerTuple_cmp, block_size> inner_tuple_type;
+    	typedef stxxl::sorter<pos_pair, pair_cmp, block_size> pair_type;
     	
     	typedef typename simpleDeq::stream simpleDeqStream;
     	typedef typename pairDeq::stream pairDeqStream;
@@ -1507,9 +1507,9 @@ public:
                 assert(lcpn_ptr->size() >= r_j);
 
                 if (r_i <= r_j) 
-                    l2RMQ.push_back(intPair<offset_type>(countl2,r_i,r_j));
+                    l2RMQ.push_back(intPair(countl2,r_i,r_j));
                 else 
-                    l2RMQ.push_back(intPair<offset_type>(countl2,r_j,r_i));
+                    l2RMQ.push_back(intPair(countl2,r_j,r_i));
                 
                 ++countl2;
             }
@@ -1540,7 +1540,7 @@ public:
     	}
 
     	void preprocessL3(offset_type r_i, offset_type r_j) {
-            l3TempDeq.push_back(two_tuple<offset_type>(r_i, r_j));
+            l3TempDeq.push_back(two_tuple(r_i, r_j));
     	}
 
     	void answerL3()
@@ -1554,21 +1554,21 @@ public:
                 twoDeqStream l3Stream  = l3TempDeq.get_stream();
 
                 while(!l3Stream.empty()) {
-                    two_tuple<offset_type> tmp = *l3Stream;
+                    two_tuple tmp = *l3Stream;
                     offset_type& r_i = tmp.first;
                     offset_type& r_j = tmp.second;
 
                     if ((r_i > offset_type(0)) && (r_j > offset_type(0))) {
                         r_j = r_j - offset_type(1);
                         if (r_i >= offset_type(lcpn_ptr->size()) || r_j >= offset_type(lcpn_ptr->size())) 
-                            rmqDeq.push_back(intPair<offset_type>(id, 0, 0));
+                            rmqDeq.push_back(intPair(id, 0, 0));
                         else if (r_i <= r_j) 
-                            rmqDeq.push_back(intPair<offset_type>(id, r_i, r_j));
+                            rmqDeq.push_back(intPair(id, r_i, r_j));
                         else 
-                            rmqDeq.push_back(intPair<offset_type>(id, r_j, r_i));
+                            rmqDeq.push_back(intPair(id, r_j, r_i));
                         
                     } else {
-                        rmqDeq.push_back(intPair<offset_type>(id, 0, 0));
+                        rmqDeq.push_back(intPair(id, 0, 0));
                     }
                     ++l3Stream; ++id;
                 }
@@ -1591,7 +1591,7 @@ public:
                 offset_type id = 0;
 
                 while (!l3Stream.empty()) {
-                    two_tuple<offset_type> tmp = *l3Stream;
+                    two_tuple tmp = *l3Stream;
 
                     offset_type& r_i = tmp.first;
                     offset_type& r_j = tmp.second;
@@ -1600,7 +1600,7 @@ public:
                         l3_tuple_sorter.push(l3_type(id, 0, r_i - 1, *l2Stream)); // (id, k, r_i - 1, l2) 
                         l3_tuple_sorter.push(l3_type(id, 1, r_j - 1, *l2Stream)); // (id, k, r_j - 1, l2) 
                     } else {
-                        rmqDeq.push_back(intPair<offset_type>(id, 0, 0)); // trivial RMQ 
+                        rmqDeq.push_back(intPair(id, 0, 0)); // trivial RMQ 
                     }
                     ++l2Stream; ++l3Stream; ++id;
                 }
@@ -1680,9 +1680,9 @@ public:
                     pos_pair_type tmp2 = *isa_sorter;
 
                     if (tmp1.third <= tmp2.third) 
-                        rmqDeq.push_back(intPair<offset_type>(tmp1.first, tmp1.third, tmp2.third));
+                        rmqDeq.push_back(intPair(tmp1.first, tmp1.third, tmp2.third));
                     else 
-                        rmqDeq.push_back(intPair<offset_type>(tmp1.first, tmp2.third, tmp1.third));
+                        rmqDeq.push_back(intPair(tmp1.first, tmp2.third, tmp1.third));
 
                     ++isa_sorter;
                 }
@@ -2260,7 +2260,7 @@ public:
 
     public:
 
-        build_sa(S & source_, Mod1 & mod_1_, Mod2 & mod_2_, size_type a_size, size_t memsize,
+        build_sa(S & source_, Mod1 & mod_1_, Mod2 & mod_2_, size_type a_size, std::size_t memsize,
                  simpleDeq *lcp_names, build_lcp *lcp12, simpleDeq *SA_12)
             : source(source_), mod_1(mod_1_), mod_2(mod_2_), index(0), ready(false)
         {
@@ -2680,7 +2680,7 @@ template <typename offset_type>
 int process(const std::string& input_filename, const std::string& output_filename,
             size_type sizelimit, bool text_output_flag, bool check_flag, bool input_verbatim)
 {
-    static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
+    static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
     typedef typename stxxl::VECTOR_GENERATOR<alphabet_type, 1, 2>::result alphabet_vector_type;
     typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
