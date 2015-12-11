@@ -627,6 +627,22 @@ struct tuple_less2nd
     static value_type max_value() { return value_type::max_value(); }
 };
 
+template <typename TupleType>
+struct tuple_less2nd_less1st
+{
+    typedef TupleType value_type;
+
+    bool operator () (const value_type& a, const value_type& b) const
+    {
+        if (a.second == b.second)
+            return (a.first < b.first);
+        return (a.second < b.second);
+    }
+
+    static value_type min_value() { return value_type::min_value(); }
+    static value_type max_value() { return value_type::max_value(); }
+};
+
 namespace stream {
 
 /**

@@ -57,56 +57,6 @@ typedef unsigned char alphabet_type;
 // calculation data type
 typedef external_size_type size_type;
 
-/**
- * Comparator class for ordering of pairs by first component.
- */
-template <typename PairType>
-struct pair_less1st 
-{
-    typedef PairType       value_type;
-
-    bool operator()(const value_type& a, const value_type& b) const {
-        if (a.first == b.first)
-            return (a.second < b.second);
-        return (a.first < b.first);
-    }
-
-    static value_type min_value() { return value_type::min_value(); }
-    static value_type max_value() { return value_type::max_value(); }
-};
-
-/**
- * Comparator class for ordering of pairs by second component.
- */
-template <typename PairType>
-struct pair_less2nd
-{
-    typedef PairType       value_type;
-
-    bool operator()(const value_type& a, const value_type& b) const {
-        if (a.second == b.second)
-            return (a.first < b.first);
-        return (a.second < b.second);
-    }
-
-    static value_type min_value() { return value_type::min_value(); }
-    static value_type max_value() { return value_type::max_value(); }
-};
-
-/**
- * Helper function to calculate base^exp in O(log^2(p).
- */ 
-template <class T>
-T powerOfTwo(T base, T exp)
-{
-    if (exp == 0) return 1;
-    if (exp == 1) return base;
-
-    T temp = powerOfTwo(base, exp/2);  
-    if (exp%2 == 0) { return temp * temp; }
-    else { return base * temp * temp; }
-}
-
 /// Suffix array checker for correctness verification.
 
 /**
@@ -280,33 +230,6 @@ public:
     }
 };
 
-template <typename InputStream>
-struct pair_2nd_stream_type
-{
-    typedef typename InputStream::value_type pair_type;
-    typedef typename pair_type::first_type value_type;
-
-private:
-    InputStream&  m_input;
-
-public:
-    pair_2nd_stream_type(InputStream& input) : m_input(input) {}
-
-    const value_type& operator* () const {
-        return m_input->second;
-    }
-
-    pair_2nd_stream_type& operator++ ()
-    {
-        ++m_input;
-        return *this;
-    }
-
-    bool empty() const {
-        return m_input.empty();
-    }
-};
-
 /** 
  * Algorithm to calculate the LCP array from a string and suffix array in linear time. 
  * Based on the ideas of Kasai et al. (2001), implemented by Timo Bingmann (2012). 
@@ -346,7 +269,7 @@ void lcparray_stxxl_kasai(const StringContainer& string, const SAContainer& SA, 
 
     /// Output sorter.
 
-    typedef pair_less1st<offset_pair_type> offset_pair_less1st_type;
+    typedef stxxl::tuple_less1st_less2nd<offset_pair_type> offset_pair_less1st_type;
     offset_pair_less1st_type offset_pair_less1st;
 
     typedef stxxl::sorter<offset_pair_type, offset_pair_less1st_type, block_size> lcp_sorter_type;
@@ -382,7 +305,7 @@ void lcparray_stxxl_kasai(const StringContainer& string, const SAContainer& SA, 
 
     /// Collect output.
 
-    pair_2nd_stream_type<lcp_sorter_type> pair_2nd_stream(lcp_sorter);
+    stxxl::stream::choose<lcp_sorter_type, 2> pair_2nd_stream(lcp_sorter);
 
     lcp.resize(string.size());
     lcp_sorter.sort();
@@ -1149,14 +1072,14 @@ public:
             for (std::size_t k = 0; k < kLimit; ++k) {  
                 QTable.push_back(std::vector<offset_type>());
                 std::vector<offset_type>& tempVector = QTable[QTable.size() - 1];
-                tempVector.reserve(dimI - (0 + powerOfTwo<std::size_t>(2, k)));
+                tempVector.reserve(dimI - (0 + (1 << k)));
 
-                magicCounter += powerOfTwo<std::size_t>(2, k);  
-                for (std::size_t i = 0; (i + powerOfTwo<std::size_t>(2, k)) < dimI; ++i) {  
-                    if (QTable[k][i] <= QTable[k][(i + powerOfTwo<std::size_t>(2, k))]) 
+                magicCounter += (1 << k);
+                for (std::size_t i = 0; i + (1 << k) < dimI; ++i) {
+                    if (QTable[k][i] <= QTable[k][i + (1 << k)])
                         tempVector.push_back(QTable[k][i]);
                     else 
-                        tempVector.push_back(QTable[k][(i + powerOfTwo<std::size_t>(2, k))]);
+                        tempVector.push_back(QTable[k][i + (1 << k)]);
                     
                     if (i == (iLimit - magicCounter)) 
                         break;
@@ -1170,7 +1093,7 @@ public:
             std::size_t j = J;
             std::size_t k = floor(log2(j - i + 1)); 
             offset_type r = QTable[k][i];
-            offset_type s = QTable[k][j - powerOfTwo<std::size_t>(2, k) + 1];
+            offset_type s = QTable[k][j - (1 << k) + 1];
 
             if (r <= s) return r;
             else return s;
@@ -1252,7 +1175,7 @@ public:
                     break;
             } while (span < lengthOfVector);
 
-            assert(span > 0);
+            assert(span > offset_type(0));
 
             offset_type tmp = (offset_type) lengthOfVector / span;
             if ((lengthOfVector % span) != 0) {
@@ -1299,7 +1222,7 @@ public:
                             finishedI = 1;
                             tmpK = k;
 
-                            assert(numberOfPages > 1);  
+                            assert(numberOfPages > offset_type(1));
 
                             leftBorder = (rightBorder + 1);
                             if ((k == offset_type(numberOfPages - 2)) && (end_part > offset_type(0))) 
@@ -1321,7 +1244,7 @@ public:
                         break;
                     }
 
-                    assert(numberOfPages > 1); 
+                    assert(numberOfPages > offset_type(1));
 
                     leftBorder = (rightBorder + 1);
                     if ((k == offset_type(numberOfPages - 2)) && (end_part > offset_type(0))) 
