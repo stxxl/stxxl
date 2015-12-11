@@ -87,7 +87,7 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
         // ignored
     }
 
-    HANDLE file_des = ::CreateFile(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
+    HANDLE file_des = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
                                    dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
     if (file_des != INVALID_HANDLE_VALUE)
@@ -100,7 +100,7 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
 
         dwFlagsAndAttributes &= ~FILE_FLAG_NO_BUFFERING;
 
-        HANDLE file_des = ::CreateFile(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
+        HANDLE file_des = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
                                        dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
         if (file_des != INVALID_HANDLE_VALUE)
@@ -125,18 +125,18 @@ wfs_file_base::wfs_file_base(
     if (!(mode_ & RDONLY) && (mode & DIRECT))
     {
         char buf[32768], * part;
-        if (!GetFullPathName(filename.c_str(), sizeof(buf), buf, &part))
+        if (!GetFullPathNameA(filename.c_str(), sizeof(buf), buf, &part))
         {
-            STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetFullPathName() error for file " << filename);
+            STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetFullPathNameA() error for file " << filename);
             bytes_per_sector = 512;
         }
         else
         {
             part[0] = char();
             DWORD bytes_per_sector_;
-            if (!GetDiskFreeSpace(buf, NULL, &bytes_per_sector_, NULL, NULL))
+            if (!GetDiskFreeSpaceA(buf, NULL, &bytes_per_sector_, NULL, NULL))
             {
-                STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetDiskFreeSpace() error for path " << buf);
+                STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetDiskFreeSpaceA() error for path " << buf);
                 bytes_per_sector = 512;
             }
             else
@@ -231,7 +231,7 @@ void wfs_file_base::set_size(offset_type newsize)
 void wfs_file_base::close_remove()
 {
     close();
-    ::DeleteFile(filename.c_str());
+    ::DeleteFileA(filename.c_str());
 }
 
 STXXL_END_NAMESPACE
