@@ -127,8 +127,8 @@ void config::load_default_config()
     entry1.autogrow = true;
 
     char* tmpstr = new char[255];
-    if (GetTempPath(255, tmpstr) == 0)
-        STXXL_THROW_WIN_LASTERROR(resource_error, "GetTempPath()");
+    if (GetTempPathA(255, tmpstr) == 0)
+        STXXL_THROW_WIN_LASTERROR(resource_error, "GetTempPathA()");
     entry1.path = tmpstr;
     entry1.path += "stxxl.tmp";
     delete[] tmpstr;
