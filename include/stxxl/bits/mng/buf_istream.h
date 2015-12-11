@@ -71,7 +71,7 @@ public:
 
         // obvious schedule
         //for(int_type i = 0; i < seq_length; ++i)
-        //	prefetch_seq[i] = i;
+        //      prefetch_seq[i] = i;
 
         // optimal schedule
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));

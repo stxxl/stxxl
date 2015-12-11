@@ -143,7 +143,7 @@ extern void * malloc(size_t size) throw ()
     if (real_malloc)
     {
         /* call read malloc procedure in libc */
-        ret = (* real_malloc)(alignment + size);
+        ret = (*real_malloc)(alignment + size);
 
         inc_count(size);
         if (log_operations && size >= log_operations_threshold) {
@@ -217,7 +217,7 @@ extern void free(void* ptr) throw ()
                 ptr, (long long)size, curr);
     }
 
-    (* real_free)(ptr);
+    (*real_free)(ptr);
 }
 
 /* exported calloc() symbol that overrides loading from libc, implemented using
@@ -291,7 +291,7 @@ extern void * realloc(void* ptr, size_t size) throw ()
     dec_count(oldsize);
     inc_count(size);
 
-    newptr = (* real_realloc)(ptr, alignment + size);
+    newptr = (*real_realloc)(ptr, alignment + size);
 
     if (log_operations && size >= log_operations_threshold)
     {

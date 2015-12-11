@@ -90,7 +90,7 @@ public:
     void operator () (request* req)
     {
         if (m_ptr.get())
-            (* m_ptr)(req);
+            (*m_ptr)(req);
     }
 };
 

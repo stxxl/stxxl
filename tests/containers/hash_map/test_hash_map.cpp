@@ -96,8 +96,8 @@ struct cmp_structA
 
 // forced instantiation of a struct
 template class stxxl::unordered_map<
-    structA, structB, hash_structA, cmp_structA, 4* 1024, 4
-    >;
+        structA, structB, hash_structA, cmp_structA, 4* 1024, 4
+        >;
 
 void basic_test()
 {

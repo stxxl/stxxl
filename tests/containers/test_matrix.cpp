@@ -165,8 +165,8 @@ void test1(int rank)
     // create three matrices
     matrix_type
     * a = new matrix_type(bs, rank, rank),
-    * b = new matrix_type(bs, rank, rank),
-    * c = new matrix_type(bs, rank, rank);
+        * b = new matrix_type(bs, rank, rank),
+        * c = new matrix_type(bs, rank, rank);
 
     stxxl::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
@@ -299,8 +299,8 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     block_scheduler_type& bs = *bs_ptr;
     matrix_type
     * a = new matrix_type(bs, rank, rank),
-    * b = new matrix_type(bs, rank, rank),
-    * c = new matrix_type(bs, rank, rank);
+        * b = new matrix_type(bs, rank, rank),
+        * c = new matrix_type(bs, rank, rank);
     stxxl::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 

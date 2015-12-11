@@ -135,7 +135,7 @@ public:
 };
 
 #define STXXL_ADAPTOR_ARITHMETICS(pos)             \
-    bool operator == (const self_type& a) const    \
+    bool operator == (const self_type &a) const    \
     {                                              \
         return (a.pos == pos);                     \
     }                                              \
