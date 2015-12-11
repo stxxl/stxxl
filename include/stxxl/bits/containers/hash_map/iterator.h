@@ -245,9 +245,9 @@ protected:
 public:
     //! Advance iterator to the next value
     //! The next value is determined in the following way
-    //!	- if there are remaining internal or external values in the current
-    //!	  bucket, choose the smallest among them, that is not marked as deleted
-    //!	- otherwise continue with the next bucket
+    //! - if there are remaining internal or external values in the current
+    //!   bucket, choose the smallest among them, that is not marked as deleted
+    //! - otherwise continue with the next bucket
     void find_next(bool start_prefetching = false)
     {
         // invariant: current external value is always > current internal value

@@ -175,8 +175,8 @@ public:
             (**it2fix).source_ = hash_map_type::src_internal;
             (**it2fix).node_ = node;
             (**it2fix).i_external_++;
-            if ((** it2fix).reader_)
-                (** it2fix).reader_->operator ++ ();
+            if ((**it2fix).reader_)
+                (**it2fix).reader_->operator ++ ();
         }
     }
 

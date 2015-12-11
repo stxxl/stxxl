@@ -197,7 +197,7 @@ int main(int argc, const char** argv)
     if (!strcmp(argv[5], "p"))          //parallel
     {
         stxxl::SETTINGS::native_merge = false;
-        //parallel_settings.multiway_merge_minimal_n = 1024;	//leave as default
+        //parallel_settings.multiway_merge_minimal_n = 1024;    //leave as default
     }
     else if (!strcmp(argv[5], "s"))                                             //sequential
     {

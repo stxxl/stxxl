@@ -189,10 +189,10 @@ public:
      * corresponds to the path from leaf [index] to root.  If only the value of
      * player [index] has changed the result is a valid winner tree.
      *
-     * \param index	The player whose value has changed.
+     * \param index     The player whose value has changed.
      *
-     * \param done	Set done to true if the player has been deactivated
-     *		        or removed. All games will be lost then.
+     * \param done      Set done to true if the player has been deactivated
+     *                  or removed. All games will be lost then.
      */
     inline void replay_on_change(unsigned int index, bool done = false)
     {

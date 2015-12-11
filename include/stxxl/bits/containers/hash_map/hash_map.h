@@ -1107,7 +1107,7 @@ protected:
         }
     };
 
-    /*	Rebuild hash-map. The desired number of buckets may be supplied. */
+    /*  Rebuild hash-map. The desired number of buckets may be supplied. */
     void _rebuild_buckets(internal_size_type n_desired = 0)
     {
         STXXL_VERBOSE_HASH_MAP("_rebuild_buckets()");

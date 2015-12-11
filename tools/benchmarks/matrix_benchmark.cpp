@@ -118,8 +118,8 @@ int main(int argc, char** argv)
         bst* b_s = new bst(internal_memory);  // the block_scheduler may use internal_memory byte for caching
         bst& bs = *b_s;
         mt* a = new mt(bs, rank, rank),
-        * b = new mt(bs, rank, rank),
-        * c = new mt(bs, rank, rank);
+            * b = new mt(bs, rank, rank),
+            * c = new mt(bs, rank, rank);
 
         STXXL_MSG("writing input matrices");
         for (mitt mit = a->begin(); mit != a->end(); ++mit)

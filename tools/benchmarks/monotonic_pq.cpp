@@ -115,9 +115,9 @@ int main(int argc, char* argv[])
     {
         std::cout << "Usage: " << argv[0] << " [n in MiB]"
             #if defined(STXXL_PARALLEL)
-                  << " [p threads]"
+            << " [p threads]"
             #endif
-                  << std::endl;
+            << std::endl;
         return -1;
     }
 

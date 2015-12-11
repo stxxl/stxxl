@@ -412,11 +412,11 @@ template <
     class AllocStr
     >
 class runs_creator<
-    use_push<ValueType>,
-    CompareType,
-    BlockSize,
-    AllocStr
-    >: private noncopyable
+        use_push<ValueType>,
+        CompareType,
+        BlockSize,
+        AllocStr
+        >: private noncopyable
 {
 public:
     typedef CompareType cmp_type;
@@ -720,11 +720,11 @@ template <
     class AllocStr
     >
 class runs_creator<
-    from_sorted_sequences<ValueType>,
-    CompareType,
-    BlockSize,
-    AllocStr
-    >: private noncopyable
+        from_sorted_sequences<ValueType>,
+        CompareType,
+        BlockSize,
+        AllocStr
+        >: private noncopyable
 {
 public:
     typedef ValueType value_type;

@@ -603,7 +603,7 @@ protected:
     internal_block_type * get_free_internal_block()
     {
         // try to get a free internal_block
-        if (internal_block_type * iblock = get_free_internal_block_from_block_scheduler())
+        if (internal_block_type* iblock = get_free_internal_block_from_block_scheduler())
             return iblock;
         // evict block
         assert(! evictable_blocks.empty()); // fails it there is not enough memory available
@@ -636,7 +636,7 @@ public:
         while (! evictable_blocks.empty())
         {
             SwappableBlockType& sblock = swappable_blocks[evictable_blocks.pop()];
-            if (internal_block_type * iblock = sblock.deinitialize())
+            if (internal_block_type* iblock = sblock.deinitialize())
                 return_free_internal_block(iblock);
         }
     }
@@ -706,7 +706,7 @@ public:
         SwappableBlockType& sblock = swappable_blocks[sbid];
         if (sblock.is_evictable())
             evictable_blocks.erase(sbid);
-        if (internal_block_type * iblock = sblock.deinitialize())
+        if (internal_block_type* iblock = sblock.deinitialize())
             return_free_internal_block(iblock);
     }
 
@@ -788,7 +788,7 @@ public:
         while (! evictable_blocks.empty())
         {
             SwappableBlockType& sblock = swappable_blocks[evictable_blocks.top()];
-            if (internal_block_type * iblock = sblock.deinitialize())
+            if (internal_block_type* iblock = sblock.deinitialize())
                 return_free_internal_block(iblock);
             evictable_blocks.pop();
         }
@@ -941,7 +941,7 @@ protected:
     internal_block_type * get_free_internal_block()
     {
         // try to get a free internal_block
-        if (internal_block_type * iblock = get_free_internal_block_from_block_scheduler())
+        if (internal_block_type* iblock = get_free_internal_block_from_block_scheduler())
             return iblock;
         // evict block
         assert(! evictable_blocks.empty()); // fails it there is not enough memory available
@@ -1011,7 +1011,7 @@ public:
         while (! evictable_blocks.empty())
         {
             SwappableBlockType& sblock = swappable_blocks[evictable_blocks.pop()];
-            if (internal_block_type * iblock = sblock.deinitialize())
+            if (internal_block_type* iblock = sblock.deinitialize())
                 return_free_internal_block(iblock);
         }
     }
@@ -1095,7 +1095,7 @@ public:
         SwappableBlockType& sblock = swappable_blocks[sbid];
         if (sblock.is_evictable())
             evictable_blocks.erase(sbid);
-        if (internal_block_type * iblock = sblock.deinitialize())
+        if (internal_block_type* iblock = sblock.deinitialize())
             return_free_internal_block(iblock);
     }
 
@@ -1643,7 +1643,7 @@ public:
         while (! free_evictable_blocks.empty())
         {
             SwappableBlockType& sblock = swappable_blocks[pop_begin(free_evictable_blocks)];
-            if (internal_block_type * iblock = sblock.deinitialize())
+            if (internal_block_type* iblock = sblock.deinitialize())
                 return_free_internal_block(iblock);
         }
     }
@@ -1784,7 +1784,7 @@ public:
                 t = free_evictable_blocks.erase(sbid);
             assert(t != 0);
         }
-        if (internal_block_type * iblock = sblock.deinitialize())
+        if (internal_block_type* iblock = sblock.deinitialize())
         {
             if (shall_keep_internal_block(schedule_meta))
                 // => swappable_block shall keep its internal_block
