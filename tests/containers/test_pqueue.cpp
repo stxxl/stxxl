@@ -32,7 +32,13 @@ struct my_type
     typedef int key_type;
     key_type key;
     char data[RECORD_SIZE - sizeof(key_type)];
+
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
     my_type() { }
+#endif
+    
     explicit my_type(key_type k) : key(k)
     {
 #if STXXL_WITH_VALGRIND

@@ -20,12 +20,13 @@ struct TwoInteger
 {
     int i, j;
 
-    TwoInteger()
-    { }
-
-    TwoInteger(int _i, int _j)
-        : i(_i), j(_j)
-    { }
+#if __cplusplus >= 201103L
+    TwoInteger() = default;
+#else     
+    TwoInteger() { }
+#endif
+    
+    TwoInteger(int _i, int _j) : i(_i), j(_j) { }
 };
 
 struct TwoIntegerComparator

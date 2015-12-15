@@ -1,0 +1,55 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_container_datatypes.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+namespace stxxl {
+
+/** \page tutorial_container_datatypes Allowed datatypes in STXXL Containers
+
+This section describes the requirements a `DataType` must satisfy so that a STXXL Container can store it. 
+A `DataType` must be a __trivial type__, i.e. it must satisfy `std::is_trivial<DataType>`.
+
+Following the iso standard, 
+`std::is_trivial` holds B. and C. and is a condition which is slightly weaker than `std::is_pod` which itself holds A., B. and C. as follows:
+
+* A. a standard layout type (checkable by `std::is_standard_layout`), i.e.:
+
+  1. All non-static data members have the same access control
+  2. Has no virtual functions or virtual base classes
+  3. All non-static data members and base classes are themselves standard layout types
+
+* B. a trivially copyable type (checkable by std::is_trivially_copyable), i.e.:
+
+  1. Has no non-trivial copy constructors (this also requires no virtual functions or virtual bases)
+  2. Has no non-trivial move constructors
+  3. Has no non-trivial copy assignment operators
+  4. Has no non-trivial move assignment operators
+  5. Has a trivial destructor
+
+* C. a type with a trivial default constructor (checkable by: `std::is_trivially_default_constructible`), i.e.:
+
+  1. Is not user-provided (i.e., is implicitly-defined or defaulted)
+  2. Has no virtual member functions or virtual base classes
+  3. Has no non-static members with default initializers
+  4. Every direct base of the type has a trivial default constructor
+  5. Every non-static member of type has a trivial default constructor
+
+In contrast, a trivial type (checkable by `std::is_trivial`) fulfills B and C only.
+
+We now present examples of data types which are trivial types:
+
+
+*/
+
+} // namespace stxxl

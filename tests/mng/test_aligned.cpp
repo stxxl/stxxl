@@ -23,7 +23,6 @@
 struct type
 {
     int i;
-    ~type() { }
 };
 
 typedef stxxl::typed_block<BLOCK_SIZE, type> block_type;

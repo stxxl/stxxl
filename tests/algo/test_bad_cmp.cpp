@@ -26,7 +26,12 @@ struct my_type
     key_type m_key;
     key_type m_data;
 
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
     my_type() { }
+#endif
+    
     my_type(key_type k) : m_key(k), m_data(0) { }
 
     static my_type min_value()
@@ -37,8 +42,6 @@ struct my_type
     {
         return my_type(std::numeric_limits<key_type>::max());
     }
-
-    ~my_type() { }
 };
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)

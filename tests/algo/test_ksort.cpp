@@ -30,7 +30,12 @@ struct my_type
         return m_key;
     }
 
-    my_type() : m_key(0), m_key_copy(0) { }
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
+    my_type() { }
+#endif
+    
     my_type(key_type1 k) : m_key(k), m_key_copy(k) { }
 
     my_type min_value() const { return my_type(std::numeric_limits<key_type1>::min()); }

@@ -32,7 +32,7 @@ stack my_stack;  // create empty stack object
 \endcode
 
 Hint: STXXL stack provides specialized implementations for a certain access pattern. If the access pattern is known before, such a customization might gain a significant speedup.
-The default stack is stxxl::normal_stack which is the best for a random sequence of push'es and pop's. See \ref design_stack section for more details.
+The default stack is stxxl::normal_stack which is the best for a random sequence of push'es and pop's. See the \ref design_stack section for more details.
 
 ### Insert / Access / Delete elements
 

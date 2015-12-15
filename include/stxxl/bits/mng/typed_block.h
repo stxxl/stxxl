@@ -72,6 +72,10 @@ public:
     typedef pointer iterator;
     typedef const type* const_iterator;
 
+//#if __cplusplus >= 201103L          
+    static_assert(std::is_trivial<Type>::value, "The data type must be std::is_trivial.");
+//#endif
+    
     enum
     {
         size = Size //!< number of elements in the block

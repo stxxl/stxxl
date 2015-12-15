@@ -18,6 +18,8 @@
 //! [hash]
 struct HashFunctor
 {
+    HashFunctor() = default;
+    
     size_t operator () (int key) const
     {
         // a simple integer hash function

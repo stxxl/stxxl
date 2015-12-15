@@ -42,8 +42,12 @@ struct struct64_type : public pair64_type
 {
     char junk[16 + 32];
 
+#if __cplusplus >= 201103L
+    struct64_type() = default;
+#else
     struct64_type() { }
-
+#endif    
+    
     struct64_type(const pair64_type& pt)
         : pair64_type(pt)
     { }
