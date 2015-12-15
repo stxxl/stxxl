@@ -88,8 +88,16 @@ public:
     //! number of bytes in uint_pair
     static const size_t bytes = sizeof(low_type) + sizeof(high_type);
 
+#if __cplusplus >= 201103L
     //! empty constructor, does not even initialize to zero!
-    inline uint_pair()
+    inline uint_pair() = default;
+#else
+    inline uint_pair() { }
+#endif
+
+    //! construct unit pair from lower and higher parts.
+    inline uint_pair(const low_type& l, const high_type& h)
+        : low(l), high(h)
     {
         // compile-time assertions about size of low_type
         STXXL_STATIC_ASSERT(8 * sizeof(low_type) == 32);
@@ -99,16 +107,6 @@ public:
         STXXL_STATIC_ASSERT(sizeof(uint_pair) == digits / 8);
         STXXL_STATIC_ASSERT(digits / 8 == bytes);
     }
-
-    //! construct unit pair from lower and higher parts.
-    inline uint_pair(const low_type& l, const high_type& h)
-        : low(l), high(h)
-    { }
-
-    //! copy constructor
-    inline uint_pair(const uint_pair& a)
-        : low(a.low), high(a.high)
-    { }
 
     //! const from a simple 32-bit unsigned integer
     inline uint_pair(const uint32& a)

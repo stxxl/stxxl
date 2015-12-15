@@ -40,7 +40,7 @@ struct my_record_
 #if __cplusplus >= 201103L
     my_record_() = default;
 #else
-    my_record_ = { }
+    my_record_() { }
 #endif
         
 };

@@ -59,6 +59,29 @@ public:
     filler_struct() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct<> is constructed"); }
 };
 
+#if __cplusplus >= 201103L
+//! template specialization switch to extend std::is_pod<T>::type for other
+//! types that work with STXXL containers: pair and tuple.
+
+template <typename T, class Enable = void>
+struct is_stxxl_trivial
+{
+    static const bool value = false;
+};
+
+template <typename T>
+struct is_stxxl_trivial<T, typename std::enable_if<std::is_trivial<T>::value>::type>
+{
+    static const bool value = true;
+};
+
+template <typename U, typename V>
+struct is_stxxl_trivial<std::pair<U, V> >
+{
+    static const bool value = true;
+};
+#endif // __cplusplus >= 201103L
+
 //! Contains data elements for \c stxxl::typed_block , not intended for direct use.
 template <typename Type, unsigned Size>
 class element_block
@@ -72,9 +95,9 @@ public:
     typedef pointer iterator;
     typedef const type* const_iterator;
 
-//#if __cplusplus >= 201103L          
-    static_assert(std::is_trivial<Type>::value, "The data type must be std::is_trivial.");
-//#endif
+#if __cplusplus >= 201103L
+    static_assert(is_stxxl_trivial<Type>::value, "The data type must be default-constructible and trivially copyable.");
+#endif
     
     enum
     {
@@ -208,8 +231,7 @@ public:
 };
 
 template <typename BaseType>
-class add_filler<BaseType, 0>
-    : public BaseType
+class add_filler<BaseType, 0> : public BaseType
 {
 public:
     add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] add_filler<> is constructed"); }
@@ -365,6 +387,18 @@ public:
     }
 #endif
 };
+
+//! Block Manager Internals \internal
+namespace mng_local {
+
+#if __cplusplus >= 201103L
+template <unsigned RawSize, typename Type, unsigned NRef, typename MetaInfoType>
+struct is_stxxl_trivial<typed_block<RawSize, Type, NRef, MetaInfoType> > {
+    static const bool value = true;
+};
+#endif
+
+} // namespace mng_local
 
 //! \}
 

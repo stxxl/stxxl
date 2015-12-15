@@ -523,7 +523,11 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     //! Fifth tuple component
     fifth_type fifth;
 
-    
+#if __cplusplus >= 201103L
+    tuple() = default;
+#else
+    tuple() { }
+#endif
 
     //! Construct tuple from components
     tuple(first_type _first,

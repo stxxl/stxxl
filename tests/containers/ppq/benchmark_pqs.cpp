@@ -114,8 +114,11 @@ struct my_type
         char padding[value_size];
     };
 
-    my_type()
-    { }
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
+    my_type() { }
+#endif
 
     my_type(const key_type& _key)
         : key(_key)
