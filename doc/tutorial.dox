@@ -48,9 +48,10 @@ Beyond these, STXXL also provides a set of containers that are not part of the S
 - \subpage tutorial_sorter "stxxl::sorter tutorial"
 - \subpage tutorial_sequence "stxxl::sequence tutorial"
 
-Note that the objects stored in the STXXL Containers must be trivial types, i.e. must satisfy `std::is_trivial`. A more detailed description of the a trivial type's requirements can be found in 
+Note that the objects stored in the STXXL Containers must be trivial type (i.e. must satisfy `std::is_trivial`) or a STL std::pair/std::tuple. 
+A more detailed description of the requirements a datatype must satisfy can be found in 
 
-- \subpage tutorial_container_datatypes "Trivial Data Types - the objects a STXXL container stores"
+- \subpage tutorial_container_datatypes "Allowed Data Types - the objects a STXXL container stores"
 
 Furthermore, the stream pipeline component of STXXL is described in the following tutorials:
 

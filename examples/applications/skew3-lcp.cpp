@@ -359,8 +359,12 @@ public:
     {
         offset_type id, i, j;
 
+#if __cplusplus >= 201103L
+        intPair() = default;
+#else
         intPair() { }
-
+#endif
+        
         intPair(offset_type _id, offset_type _i, offset_type _j)
             : id(_id), i(_i), j(_j) { }
     };
@@ -368,9 +372,13 @@ public:
     struct leftRmq
     {
         offset_type id, i, j, k;
-
+        
+#if __cplusplus >= 201103L
+        leftRmq() = default;
+#else
         leftRmq() { }
-
+#endif
+        
         leftRmq(offset_type _id, offset_type _i, offset_type _j, offset_type _k)
             : id(_id), i(_i), j(_j), k(_k) { }
     };
@@ -403,7 +411,11 @@ public:
     {
         offset_type id, i, j, k, tmpK;
 
+#if __cplusplus >= 201103L
+        rightRmq() = default;
+#else
         rightRmq() { }
+#endif
 
         rightRmq(offset_type _id, offset_type _i, offset_type _j, offset_type _k, offset_type _tmpK)
             : id(_id), i(_i), j(_j), k(_k), tmpK(_tmpK) { }
@@ -438,8 +450,12 @@ public:
     struct finalPair
     {
         offset_type id, min;
-
+        
+#if __cplusplus >= 201103L
+        finalPair() = default;
+#else
         finalPair() { }
+#endif
 
         finalPair(offset_type _id, offset_type _min)
             : id(_id), min(_min) { }
@@ -469,7 +485,11 @@ public:
     {
         offset_type first, second;
 
+#if __cplusplus >= 201103L
+        two_tuple() = default;
+#else
         two_tuple() { }
+#endif
 
         two_tuple(offset_type _first, offset_type _second)
             : first(_first), second(_second) { }
@@ -481,7 +501,11 @@ public:
         bool second;
         offset_type third, fourth;
 
+#if __cplusplus >= 201103L
+        l3Tuple() = default;
+#else
         l3Tuple() { }
+#endif
 
         l3Tuple(offset_type _first, bool _second, offset_type _third, offset_type _fourth)
             : first(_first), second(_second), third(_third), fourth(_fourth) { }
@@ -517,7 +541,11 @@ public:
         bool second;
         offset_type third;
 
+#if __cplusplus >= 201103L
+        innerTuple() = default;
+#else
         innerTuple() { }
+#endif
 
         innerTuple(offset_type _first, bool _second, offset_type _third)
             : first(_first), second(_second), third(_third) { }
@@ -550,9 +578,13 @@ public:
         offset_type first;
         bool second;
         offset_type third;
-
+  
+#if __cplusplus >= 201103L
+        pos_pair() = default;
+#else
         pos_pair() { }
-
+#endif
+        
         pos_pair(offset_type _first, bool _second, offset_type _third)
             : first(_first), second(_second), third(_third) { }
     };

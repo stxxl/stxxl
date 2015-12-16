@@ -35,11 +35,11 @@
 template <unsigned RECORD_SIZE>
 struct my_record_
 {
-    std::array<char, RECORD_SIZE> data;
-
 #if __cplusplus >= 201103L
+    std::array<char, RECORD_SIZE> data;
     my_record_() = default;
 #else
+    char data[RECORD_SIZE];
     my_record_() { }
 #endif
         

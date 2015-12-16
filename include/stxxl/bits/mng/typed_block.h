@@ -60,8 +60,9 @@ public:
 };
 
 #if __cplusplus >= 201103L
-//! template specialization switch to extend std::is_pod<T>::type for other
-//! types that work with STXXL containers: pair and tuple.
+
+//! template specialization switch to extend std::is_trivial<T>::type for other
+//! types that work with STXXL containers: std::pair and std::tuple.
 
 template <typename T, class Enable = void>
 struct is_stxxl_trivial
@@ -78,8 +79,27 @@ struct is_stxxl_trivial<T, typename std::enable_if<std::is_trivial<T>::value>::t
 template <typename U, typename V>
 struct is_stxxl_trivial<std::pair<U, V> >
 {
+    static const bool value = is_stxxl_trivial<U>::value && is_stxxl_trivial<V>::value;
+};
+
+template <typename T>
+struct is_stxxl_trivial<std::tuple<T>> {
+    static const bool value = is_stxxl_trivial<T>::value;
+};
+ 
+template <typename H, typename... T>
+struct is_stxxl_trivial<std::tuple<H, T...>> {
+    static const bool value = is_stxxl_trivial<H>::value && is_stxxl_trivial<std::tuple<T...>>::value;
+};
+
+/*
+template <typename... types>
+struct is_stxxl_trivial<std::tuple<types...> >
+{
     static const bool value = true;
 };
+*/
+
 #endif // __cplusplus >= 201103L
 
 //! Contains data elements for \c stxxl::typed_block , not intended for direct use.
@@ -96,7 +116,7 @@ public:
     typedef const type* const_iterator;
 
 #if __cplusplus >= 201103L
-    static_assert(is_stxxl_trivial<Type>::value, "The data type must be default-constructible and trivially copyable.");
+    static_assert(is_stxxl_trivial<Type>::value, "The data type must be a trivial type or a std::pair/std::tuple. See http://stxxl.sourceforge.net/tags/master/tutorial_container_datatypes.html for more details.");
 #endif
     
     enum

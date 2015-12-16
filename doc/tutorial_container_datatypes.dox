@@ -15,19 +15,31 @@
  **************************************************************************/
 namespace stxxl {
 
-/** \page tutorial_container_datatypes Allowed datatypes in STXXL Containers
+/** \page tutorial_container_datatypes Allowed Data Types - the objects a STXXL container stores
 
-This section describes the requirements a `DataType` must satisfy so that a STXXL Container can store it. 
-A `DataType` must be a __trivial type__, i.e. it must satisfy `std::is_trivial<DataType>`.
+This section describes the requirements a data type referred as `DataType` must satisfy so that a STXXL container
+such as stxxl::vector can store it. 
+__In short__: A `DataType` must satisfy either `std::is_trivial<DataType>` or must be a `std::pair`/`std::tuple`.
 
-Following the iso standard, 
-`std::is_trivial` holds B. and C. and is a condition which is slightly weaker than `std::is_pod` which itself holds A., B. and C. as follows:
+__More detailed__: A `DataType` must be of `is_stxxl_trivial` which is defined
+to be either a trivial type (i.e. a type which satisfies `std::is_trivial<DataType>`) or a pair/tuple.
+This construction is needed since `std::pair`/`std::tuple` are neither
+`std::is_trivially_constructable`, nor `std::is_trivial`, nor `std::is_pod` but
+are very functional and do not hurt one of STXXLs internal contraints.
+Note that the types of the elements in `std::pair`/`std::tuple` must be `is_stxxl_trivial` itself, for example 
+`std::tuple<int, std::string>` is not allowed and will cause an assertion at compile time.
+
+(Sidenode: STXXL provides the data type `stxxl::tuple` which satisfies `std::is_pod`.)
+
+Following the iso standard, `std::is_trivial` holds B. and C. and is a condition
+which is slightly weaker than `std::is_pod` which itself holds A., B. and C. as follows:
 
 * A. a standard layout type (checkable by `std::is_standard_layout`), i.e.:
 
   1. All non-static data members have the same access control
   2. Has no virtual functions or virtual base classes
-  3. All non-static data members and base classes are themselves standard layout types
+  3. All non-static data members and base classes are themselves standard layout
+     types
 
 * B. a trivially copyable type (checkable by std::is_trivially_copyable), i.e.:
 
@@ -47,8 +59,35 @@ Following the iso standard,
 
 In contrast, a trivial type (checkable by `std::is_trivial`) fulfills B and C only.
 
-We now present examples of data types which are trivial types:
+Next, we present example data types which satisfy `is_stxxl_trivial`:
 
+I. Custom data types that are `std::is_trivial` like 
+
+\code
+struct DataType
+{
+    int i, j; // optional (member variables)
+       
+    DataType() = default; // needed (default ctor in C++1y) or
+    //DataType() { }      // needed (default ctor in C++98)
+
+    DataType(int i_, int j_) : i(i_), j(j_) { } // optional (other ctor which does not overwrite default ctor)
+
+    int get_first() { return i; }   // optional (member function)
+    int get_second() { return j; }  // optional (member function)
+    
+    int operator () () const { return (i+j); }                    // optional (additional custom operator)
+    bool operator != (int a) const { return (a != i && a != j); } // optional (additional custom operator)
+};
+\endcode
+
+II. The (exclusive) build-in data types `std::pair` and `std::tuple`
+
+\code
+// (exceptionally) allowed alternatives to DataType
+using DataType2 = std::pair<int, int>;  
+using DataType3 = std::tuple<char, int, float, double>; 
+\endcode
 
 */
 
