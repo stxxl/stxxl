@@ -23,6 +23,7 @@
  */
 
 #include <iomanip>
+#include <cstring>
 #include <vector>
 
 #include <stxxl/io>
