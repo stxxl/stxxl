@@ -232,10 +232,19 @@ void linuxaio_queue::wait_requests()
             break;
 
         // wait for at least one of them to finish
-        long num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
-        if (num_events < 0) {
-            STXXL_THROW_ERRNO(io_error, "linuxaio_queue::wait_requests"
-                              " io_getevents() nr_events=" << max_events);
+        long num_events;
+        while(1) {
+            num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
+            if (num_events < 0) {
+                if (errno == EINTR) {
+                    // io_getevents may return prematurely in case a signal is received
+                    continue;
+                }
+
+                STXXL_THROW_ERRNO(io_error, "linuxaio_queue::wait_requests"
+                                  " io_getevents() nr_events=" << max_events);
+            }
+            break;
         }
 
         num_posted_requests++; // compensate for the one eaten prematurely above
