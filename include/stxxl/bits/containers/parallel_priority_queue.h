@@ -2383,11 +2383,19 @@ public:
         STXXL_ERRMSG("This is probably not what you want, so check the "
                      "compilation settings.");
 #endif
+        if (m_num_read_blocks_per_ea < 1.0) {
+            STXXL_ERRMSG("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
+                         " it is " << m_num_read_blocks_per_ea);
+            abort();
+        }
 
         if (c_limit_extract_buffer) {
-            m_extract_buffer_limit = (extract_buffer_ram > 0)
-                                     ? extract_buffer_ram / sizeof(value_type)
-                                     : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(value_type)));
+            m_extract_buffer_limit =
+                (extract_buffer_ram > 0)
+                ? extract_buffer_ram / sizeof(value_type)
+                : static_cast<size_type>(
+                    (double)(m_mem_total) *
+                    c_default_extract_buffer_ram_part / sizeof(value_type));
         }
 
         for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
@@ -2811,7 +2819,7 @@ public:
     //! Extract up to max_size values at once.
     void bulk_pop(std::vector<value_type>& out, size_t max_size)
     {
-        STXXL_DEBUG("bulk_pop_size with max_size=" << max_size);
+        STXXL_DEBUG("bulk_pop() max_size=" << max_size);
 
         const size_t n_elements = std::min<size_t>(max_size, size());
         assert(n_elements < m_extract_buffer_limit);
@@ -3602,7 +3610,9 @@ protected:
                                      std::vector<iterator_pair_type>& sequences,
                                      bool reuse_previous_lower_bounds = false)
     {
-        STXXL_DEBUG("calculate merge sequences");
+        STXXL_DEBUG(
+            "calculate_merge_sequences() " <<
+            "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds);
 
         static const bool debug = false;
 
@@ -3617,7 +3627,10 @@ protected:
          */
 
         unsigned_type gmin_index = m_external_min_tree.top();
-        bool needs_limit = (gmin_index != m_external_min_tree.invalid_key) ? true : false;
+        bool needs_limit = (gmin_index != m_external_min_tree.invalid_key);
+
+        STXXL_DEBUG("calculate_merge_sequences() gmin_index=" << gmin_index
+                    << " needs_limit=" << needs_limit);
 
 // test correctness of external block min tree
 #ifdef STXXL_DEBUG_ASSERTIONS
@@ -3690,6 +3703,9 @@ protected:
                 }
                 else
                 {
+                    STXXL_DEBUG("lower_bound [" << begin << "," << end << ")" <<
+                                " gmin_value " << gmin_value);
+
                     end = std::lower_bound(begin, end,
                                            gmin_value, m_inv_compare);
                 }
@@ -3755,7 +3771,7 @@ protected:
     inline void refill_extract_buffer(size_t minimum_size = 0,
                                       size_t maximum_size = 0)
     {
-        STXXL_DEBUG("refilling extract buffer" <<
+        STXXL_DEBUG("refill_extract_buffer()" <<
                     " ia_size=" << m_internal_arrays.size() <<
                     " ea_size=" << m_external_arrays.size());
 
@@ -3800,6 +3816,8 @@ protected:
                             " limiting_ea_index=" << limiting_ea_index);
 
                 if (limiting_ea_index < eas) {
+                    STXXL_DEBUG("refill: limiting_ea_index");
+
                     if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0)
                         break;
 
@@ -3859,6 +3877,8 @@ protected:
     //! the winner trees and hints accordingly.
     inline void wait_next_ea_blocks(unsigned_type ea_index)
     {
+        STXXL_DEBUG("wait_next_ea_blocks() ea_index=" << ea_index);
+
         unsigned_type used_blocks =
             m_external_arrays[ea_index].wait_next_blocks();
 
@@ -4100,7 +4120,7 @@ protected:
                 external_array_writer.begin(), size, m_inv_compare);
         }
 
-        STXXL_DEBUG("Merge done of new ea " << &ea);
+        STXXL_DEBUG("Merge done of new ea " << &ea << " size " << size);
 
         m_external_arrays.swap_back(ea);
 
