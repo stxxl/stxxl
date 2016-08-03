@@ -288,16 +288,16 @@ void stats::wait_finished(wait_op_type wait_op)
         p_waits += (acc_waits--) ? diff : 0.0;
 
         if (wait_op == WAIT_OP_READ) {
-            double diff = now - p_begin_wait_read;
-            t_wait_read += double(acc_wait_read) * diff;
+            double diff2 = now - p_begin_wait_read;
+            t_wait_read += double(acc_wait_read) * diff2;
             p_begin_wait_read = now;
-            p_wait_read += (acc_wait_read--) ? diff : 0.0;
+            p_wait_read += (acc_wait_read--) ? diff2 : 0.0;
         }
         else /* if (wait_op == WAIT_OP_WRITE) */ {
-            double diff = now - p_begin_wait_write;
-            t_wait_write += double(acc_wait_write) * diff;
+            double diff2 = now - p_begin_wait_write;
+            t_wait_write += double(acc_wait_write) * diff2;
             p_begin_wait_write = now;
-            p_wait_write += (acc_wait_write--) ? diff : 0.0;
+            p_wait_write += (acc_wait_write--) ? diff2 : 0.0;
         }
 #ifdef STXXL_WAIT_LOG_ENABLED
         std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
