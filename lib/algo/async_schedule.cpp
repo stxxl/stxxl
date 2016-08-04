@@ -112,8 +112,8 @@ int_type simulate_async_write(
         if (oldtime != cur.timestamp)
         {
             // clear disk_busy
-            for (int_type i = 0; i <= D; i++)
-                disk_busy[i] = false;
+            for (int_type j = 0; j <= D; j++)
+                disk_busy[j] = false;
 
             oldtime = cur.timestamp;
         }
@@ -157,8 +157,8 @@ int_type simulate_async_write(
     }
 
     assert(i == -1);
-    for (int_type i = 0; i <= D; i++)
-        assert(disk_queues[i].empty());
+    for (int_type j = 0; j <= D; j++)
+        assert(disk_queues[j].empty());
 
     return (oldtime - 1);
 }
