@@ -17,6 +17,7 @@
 #define STXXL_IO_FILE_HEADER
 
 #include <stxxl/bits/config.h>
+#include <stxxl/bits/io/iostats.h>
 
 #if defined (__linux__)
  #define STXXL_CHECK_BLOCK_ALIGNING
@@ -86,7 +87,7 @@ public:
 
     //! Construct a new file, usually called by a subclass.
     file(unsigned int device_id = DEFAULT_DEVICE_ID)
-        : m_device_id(device_id)
+        : m_device_id(device_id), m_file_stats(stats::get_instance()->add_file_stats(device_id))
     { }
 
     //! Schedules an asynchronous read request to the file.
@@ -169,12 +170,18 @@ protected:
     //! The file's physical device id (e.g. used for prefetching sequence
     //! calculation)
     unsigned int m_device_id;
+    file_stats& m_file_stats;
 
 public:
     //! Returns the file's physical device id
     unsigned int get_device_id() const
     {
         return m_device_id;
+    }
+
+    file_stats& get_file_stats() const
+    {
+        return m_file_stats;
     }
 
 protected:
