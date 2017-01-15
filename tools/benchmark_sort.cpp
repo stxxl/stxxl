@@ -44,7 +44,7 @@ struct struct64_type : public pair64_type
 
     struct64_type() { }
 
-    struct64_type(const pair64_type& pt)
+    explicit struct64_type(const pair64_type& pt)
         : pair64_type(pt)
     { }
 };
@@ -93,7 +93,7 @@ class BenchmarkSort
 
         stxxl::uint64 m_counter;
 
-        random_stream(stxxl::uint64 size)
+        explicit random_stream(stxxl::uint64 size)
             : m_counter(size)
         {
             m_value.first = m_rng();

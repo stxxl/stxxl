@@ -20,7 +20,7 @@ struct Input
     value_type rnd_value;
     stxxl::random_number32 rnd;
     value_type crc;
-    Input(value_type init) : value(init)
+    explicit Input(value_type init) : value(init)
     {
         rnd_value = rnd();
         crc = rnd_value;

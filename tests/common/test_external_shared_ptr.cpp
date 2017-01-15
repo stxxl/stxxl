@@ -53,7 +53,7 @@ typedef stxxl::external_shared_ptr<actual_element_ptr> element;
 struct counter
 {
     int value;
-    counter(int v) : value(v) { }
+    explicit counter(int v) : value(v) { }
     int operator () ()
     {
         int old_val = value;

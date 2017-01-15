@@ -21,7 +21,7 @@ struct Something
 {
     int a, b;
 
-    Something(int x = 0)
+    explicit Something(int x = 0)
         : a(x), b(x * x)
     { }
 

@@ -31,7 +31,7 @@ struct my_type
     }
 
     my_type() : m_key(0), m_key_copy(0) { }
-    my_type(key_type1 k) : m_key(k), m_key_copy(k) { }
+    explicit my_type(key_type1 k) : m_key(k), m_key_copy(k) { }
 
     my_type min_value() const { return my_type(std::numeric_limits<key_type1>::min()); }
     my_type max_value() const { return my_type(std::numeric_limits<key_type1>::max()); }

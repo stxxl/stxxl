@@ -24,7 +24,7 @@ struct my_type  // 24 bytes, not a power of 2 intentionally
     uint64 load0;
     uint64 load1;
 
-    my_type(uint64 i = 0)
+    explicit my_type(uint64 i = 0)
         : key(i),
           load0(i + 1),
           load1(1 + 42)

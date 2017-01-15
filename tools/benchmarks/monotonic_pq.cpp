@@ -50,7 +50,7 @@ struct my_type
 #endif
 
     my_type() { }
-    my_type(key_type k) : key(k) { }
+    explicit my_type(key_type k) : key(k) { }
 #if LOAD
     my_type(key_type k, key_type l) : key(k), load(l) { }
 #endif
