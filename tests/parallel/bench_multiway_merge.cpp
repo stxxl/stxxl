@@ -109,7 +109,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
 #else
             stxxl::random_number32_r rnd(1234);
 #endif
-            for (size_t i = 0; i < seq_count; ++i)
+            for (long i = 0; i < seq_count; ++i)
             {
                 for (size_t j = 0; j < seq_items; ++j)
                     seqs[i][j] = ValueType(rnd());

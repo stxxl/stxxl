@@ -17,5 +17,9 @@ stxxl_build_test(test_ppq_arrays_and_iterator)
 stxxl_test(test_ppq)
 stxxl_test(test_ppq_arrays_and_iterator)
 
+if (MSVC)
+ add_definitions(/bigobj)
+endif()
+
 add_define(test_ppq "STXXL_DEBUG_ASSERTIONS=1")
 add_define(test_ppq_arrays_and_iterator "STXXL_DEBUG_ASSERTIONS=1")

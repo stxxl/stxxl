@@ -109,7 +109,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
 
             // polymorphic_downcast to linuxaio_request,
             // request is canceled, but was not yet posted.
-            dynamic_cast<linuxaio_request*>(pos->get())->completed(false, true);
+            dynamic_cast<linuxaio_request*>(req.get())->completed(false, true);
 
             num_waiting_requests--; // will never block
             return true;
@@ -132,7 +132,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
             // polymorphic_downcast to linuxaio_request,
 
             // request is canceled, already posted
-            dynamic_cast<linuxaio_request*>(pos->get())->completed(true, true);
+            dynamic_cast<linuxaio_request*>(req.get())->completed(true, true);
 
             num_free_events++;
             num_posted_requests--; // will never block
@@ -233,7 +233,7 @@ void linuxaio_queue::wait_requests()
 
         // wait for at least one of them to finish
         long num_events;
-        while(1) {
+        while (1) {
             num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
             if (num_events < 0) {
                 if (errno == EINTR) {

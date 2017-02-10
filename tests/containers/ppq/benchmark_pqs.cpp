@@ -37,27 +37,28 @@ static const char* description =
   #include <omp.h>
 #endif
 
+using stxxl::int64;
 using stxxl::uint64;
 
 using stxxl::scoped_print_timer;
 using stxxl::random_number32_r;
 
-static const uint64 KiB = 1024L;
-static const uint64 MiB = 1024L * KiB;
-static const uint64 GiB = 1024L * MiB;
+static const int64 KiB = 1024L;
+static const int64 MiB = 1024L * KiB;
+static const int64 GiB = 1024L * MiB;
 
 // process indicator
 static const bool g_progress = false;
-static const uint64 g_printmod = 16 * MiB;
+static const int64 g_printmod = 16 * MiB;
 
 // constant values for STXXL PQ
-const uint64 _RAM = 16 * GiB;
-const uint64 _volume = 1024 * GiB;
+const int64 _RAM = 16 * GiB;
+const int64 _volume = 1024 * GiB;
 const unsigned _value_size = 8;
 const uint64 _num_elements = _volume / _value_size;
-const uint64 _mem_for_queue = _RAM / 2;
-const uint64 mem_for_prefetch_pool = _RAM / 4;
-const uint64 mem_for_write_pool = _RAM / 4;
+const int64 _mem_for_queue = _RAM / 2;
+const int64 mem_for_prefetch_pool = _RAM / 4;
+const int64 mem_for_write_pool = _RAM / 4;
 
 std::string g_testset;
 
@@ -70,7 +71,7 @@ uint64 extract_buffer_ram = 0;
 unsigned num_write_buffers = 14;
 double num_prefetchers = 2.0;
 unsigned num_read_blocks = 1;
-uint64 block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
+int64 block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
 
 #if STXXL_PARALLEL
 const unsigned g_max_threads = omp_get_max_threads();
@@ -87,11 +88,11 @@ static inline int get_thread_num()
 #endif
 }
 
-uint64 ram_write_buffers;
+int64 ram_write_buffers;
 uint64 bulk_size = 123456;
 
-uint64 num_arrays = 0;
-uint64 max_merge_buffer_ram_stat = 0;
+int64 num_arrays = 0;
+int64 max_merge_buffer_ram_stat = 0;
 
 uint64 value_universe_size = 100000000;
 
@@ -196,7 +197,7 @@ typedef my_type<uint64, 24> my24_type;
  * Progress messages
  */
 
-static inline void progress(const char* text, uint64 i, uint64 nelements)
+static inline void progress(const char* text, int64 i, int64 nelements)
 {
     if (!g_progress) return;
 
@@ -649,7 +650,7 @@ void do_push_rand(ContainerType& c, unsigned int seed)
 
     for (uint64 i = 0; i < num_elements; i++)
     {
-        uint64 k = datarng() % value_universe_size;
+        int64 k = datarng() % value_universe_size;
         progress("Inserting element", i, num_elements);
         c.push(value_type(k));
     }
@@ -765,7 +766,7 @@ void do_bulk_push_asc(ContainerType& c, bool parallel)
 #if STXXL_PARALLEL
             #pragma omp for schedule(static)
 #endif
-            for (uint64 j = 0; j < bulk_size; ++j)
+            for (int64 j = 0; j < (int64)bulk_size; ++j)
             {
                 c.bulk_push(value_type(num_elements - 1 - i * bulk_size - j), thread_id);
             }
@@ -787,8 +788,8 @@ void do_bulk_push_asc(ContainerType& c, bool parallel)
 #if STXXL_PARALLEL
         #pragma omp for schedule(static)
 #endif
-        for (uint64 j = (num_elements / bulk_size) * bulk_size;
-             j < num_elements; j++)
+        for (int64 j = (num_elements / bulk_size) * bulk_size;
+             j < (int64)num_elements; j++)
         {
             c.bulk_push(value_type(num_elements - 1 - j), thread_id);
         }
@@ -822,7 +823,7 @@ void do_bulk_push_rand(ContainerType& c,
 
     // independent random generator (also: in different cache lines)
     std::vector<random_number32_r_bigger> datarng(g_max_threads);
-    for (size_t t = 0; t < g_max_threads; ++t)
+    for (unsigned int t = 0; t < g_max_threads; ++t)
         datarng[t].set_seed(t * _seed);
 
     for (uint64 i = 0; i < num_elements / bulk_size; ++i)
@@ -838,9 +839,9 @@ void do_bulk_push_rand(ContainerType& c,
 #if STXXL_PARALLEL
             #pragma omp for schedule(static)
 #endif
-            for (uint64 j = 0; j < bulk_size; ++j)
+            for (int64 j = 0; j < (int64)bulk_size; ++j)
             {
-                uint64 k = datarng[thread_id]() % value_universe_size;
+                int64 k = datarng[thread_id]() % value_universe_size;
                 c.bulk_push(value_type(k), thread_id);
             }
         }
@@ -852,7 +853,7 @@ void do_bulk_push_rand(ContainerType& c,
 
     STXXL_CHECK_EQUAL(c.size(), num_elements - (num_elements % bulk_size));
 
-    uint64 bulk_remain = num_elements % bulk_size;
+    int64 bulk_remain = num_elements % bulk_size;
 
     c.bulk_push_begin(bulk_remain);
 
@@ -865,9 +866,9 @@ void do_bulk_push_rand(ContainerType& c,
 #if STXXL_PARALLEL
         #pragma omp for schedule(static)
 #endif
-        for (uint64 j = 0; j < bulk_remain; ++j)
+        for (int64 j = 0; j < bulk_remain; ++j)
         {
-            uint64 k = datarng[thread_id]() % value_universe_size;
+            int64 k = datarng[thread_id]() % value_universe_size;
             c.bulk_push(value_type(k), thread_id);
         }
     }
@@ -954,7 +955,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
 
         // independent random generator (also: in different cache lines)
         std::vector<random_number32_r_bigger> datarng(g_max_threads);
-        for (size_t t = 0; t < g_max_threads; ++t)
+        for (unsigned int t = 0; t < g_max_threads; ++t)
             datarng[t].set_seed(t * _seed);
 
         for (uint64 i = 0; i < num_elements / bulk_size; ++i)
@@ -968,7 +969,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
 #if STXXL_PARALLEL
                 #pragma omp for schedule(static)
 #endif
-                for (uint64 j = 0; j < bulk_size; ++j)
+                for (int64 j = 0; j < (int64)bulk_size; ++j)
                 {
                     uint64 k = datarng[thread_id]() % value_universe_size;
 #if STXXL_PARALLEL
@@ -984,7 +985,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
         STXXL_CHECK_EQUAL(sorted_vals.size(),
                           num_elements - (num_elements % bulk_size));
 
-        uint64 bulk_remain = num_elements % bulk_size;
+        int64 bulk_remain = num_elements % bulk_size;
 
 #if STXXL_PARALLEL
 #pragma omp parallel if(parallel)
@@ -995,7 +996,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
 #if STXXL_PARALLEL
             #pragma omp for schedule(static)
 #endif
-            for (uint64 j = 0; j < bulk_remain; ++j)
+            for (int64 j = 0; j < bulk_remain; ++j)
             {
                 uint64 k = datarng[thread_id]() % value_universe_size;
 #if STXXL_PARALLEL
@@ -1047,8 +1048,8 @@ void do_bulk_pop_check_rand(ContainerType& c,
 template <typename ContainerType>
 void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
 {
-    uint64 num_inserts = filled ? num_elements : 0;
-    uint64 num_deletes = 0;
+    int64 num_inserts = filled ? num_elements : 0;
+    int64 num_deletes = 0;
 
     scoped_stats stats(c, "intermix-rand",
                        c.name() + ": Intermixed rand insert and delete",
@@ -1056,7 +1057,7 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
 
     random_number32_r datarng(seed);
 
-    for (uint64 i = 0; i < 2 * num_elements; ++i)
+    for (int64 i = 0; i < 2 * num_elements; ++i)
     {
         unsigned r = datarng() % 2;
 
@@ -1075,7 +1076,7 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
         {
             progress("Inserting/deleting element", i, 2 * num_elements);
 
-            uint64 k = datarng() % value_universe_size;
+            int64 k = datarng() % value_universe_size;
             c.push(value_type(k));
 
             num_inserts++;
@@ -1091,17 +1092,17 @@ void do_bulk_rand_intermixed(ContainerType& c,
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 
-    uint64 num_inserts = filled ? num_elements : 0;
-    uint64 num_deletes = 0;
+    int64 num_inserts = filled ? num_elements : 0;
+    int64 num_deletes = 0;
 
     scoped_stats stats(c, "intermix-bulk-rand",
                        c.name() + ": Intermixed parallel rand bulk insert"
                        + parallel_str + " and delete",
                        (filled ? 3 : 2));
 
-    for (uint64 i = 0; i < (filled ? 3 : 2) * num_elements; ++i)
+    for (int64 i = 0; i < (filled ? 3 : 2) * num_elements; ++i)
     {
-        uint64 r = g_rand() % ((filled ? 2 : 1) * bulk_size);
+        int64 r = g_rand() % ((filled ? 2 : 1) * bulk_size);
 
         // probability for an extract is bulk_size times larger than for a
         // bulk_insert.  when already filled with num_elements elements:
@@ -1120,7 +1121,7 @@ void do_bulk_rand_intermixed(ContainerType& c,
             STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
         }
         else {
-            uint64 this_bulk_size =
+            int64 this_bulk_size =
                 (num_inserts + bulk_size > (filled ? 2 : 1) * num_elements)
                 ? num_elements % bulk_size
                 : bulk_size;
@@ -1141,12 +1142,12 @@ void do_bulk_rand_intermixed(ContainerType& c,
                 #pragma omp for
 #endif
 
-                for (uint64 j = 0; j < this_bulk_size; j++)
+                for (int64 j = 0; j < this_bulk_size; j++)
                 {
                     progress("Inserting / deleting element",
                              i + j, (filled ? 3 : 2) * num_elements);
 
-                    uint64 k = datarng() % value_universe_size;
+                    int64 k = datarng() % value_universe_size;
                     c.bulk_push(value_type(k), thread_num);
                 }
             }
@@ -1165,7 +1166,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 {
     std::string parallel_str = parallel ? " in parallel" : "";
 
-    uint64 num_inserts = 0, num_deletes = 0, num_failures = 0;
+    int64 num_inserts = 0, num_deletes = 0, num_failures = 0;
     std::vector<bool> extracted_values(num_elements, false);
 
     {
@@ -1174,9 +1175,9 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
                            + parallel_str + " and delete",
                            2);
 
-        for (uint64 i = 0; i < 2 * num_elements; ++i)
+        for (int64 i = 0; i < 2 * num_elements; ++i)
         {
-            uint64 r = g_rand() % bulk_size;
+            int64 r = g_rand() % bulk_size;
 
             if (num_deletes < num_inserts && num_deletes < num_elements &&
                 (r > 0 || num_inserts >= num_elements))
@@ -1203,9 +1204,9 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
             }
             else
             {
-                uint64 this_bulk_size = (num_inserts + bulk_size > num_elements)
-                                        ? num_elements % bulk_size
-                                        : bulk_size;
+                int64 this_bulk_size = (num_inserts + bulk_size > num_elements)
+                                       ? num_elements % bulk_size
+                                       : bulk_size;
 
                 c.bulk_push_begin(this_bulk_size);
 #if STXXL_PARALLEL
@@ -1218,9 +1219,9 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
                     #pragma omp for
 #endif
 
-                    for (uint64 j = 0; j < this_bulk_size; j++)
+                    for (int64 j = 0; j < this_bulk_size; j++)
                     {
-                        uint64 k = num_elements - num_inserts - j;
+                        int64 k = num_elements - num_inserts - j;
                         progress("Inserting/deleting element", i + j, 2 * num_elements);
 
                         c.bulk_push(value_type(k), thread_num);
@@ -1237,7 +1238,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
     }
     {
         scoped_print_timer stats("Check if all values have been extracted");
-        for (uint64 i = 0; i < num_elements; ++i) {
+        for (int64 i = 0; i < num_elements; ++i) {
             if (!extracted_values[i]) {
                 std::cout << i + 1 << " has never been extracted." << std::endl;
                 ++num_failures;
@@ -1273,7 +1274,7 @@ void do_bulk_prefill(ContainerType& c, bool parallel,
 #if STXXL_PARALLEL
 #pragma omp for
 #endif
-        for (uint64 i = 0; i < num_elements; ++i)
+        for (int64 i = 0; i < (int64)num_elements; ++i)
             c.bulk_push(value_type(i), thread_num);
     }
 
@@ -1302,7 +1303,7 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
     {
         c.bulk_pop(work, std::min<size_t>(bulk_size, c.size()));
 
-        for (uint64 j = 0; j < work.size(); ++j)
+        for (int64 j = 0; j < (int64)work.size(); ++j)
         {
             STXXL_CHECK_EQUAL(work[j].key, rindex);
             ++rindex;
@@ -1432,7 +1433,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
 #if STXXL_PARALLEL
 #pragma omp for schedule(static)
 #endif
-                    for (uint64 i = 0; i < work.size(); ++i)
+                    for (int64 i = 0; i < (int64)work.size(); ++i)
                     {
                         STXXL_CHECK_EQUAL(work[i].key, rindex + i);
                         c.bulk_push(value_type(windex + i), thread_num);
@@ -1463,7 +1464,7 @@ template <typename ContainerType>
 class dijkstra_graph
 {
 public:
-    typedef uint64 size_type;
+    typedef int64 size_type;
 
 protected:
     size_type n, m;
@@ -1563,8 +1564,8 @@ public:
 template <typename ContainerType>
 void do_dijkstra(ContainerType& c)
 {
-    uint64 num_nodes = num_elements / value_size;
-    uint64 num_edges = 100 * num_nodes;
+    int64 num_nodes = num_elements / value_size;
+    int64 num_edges = 100 * num_nodes;
 
     if (c.name() == "sorter") {
         STXXL_ERRMSG("Dijkstra benchmark does not work with the stxxl::sorter.");
@@ -1750,7 +1751,7 @@ int main(int argc, char* argv[])
     cp.add_bytes('m', "ram", RAM,
                  "Amount of main memory in Bytes (not possible for STXXL PQ)");
 
-    cp.add_bytes('k', "bulk_size", bulk_size,
+    cp.add_bytes('k', "bulk_size", (uint64&)bulk_size,
                  "Number of elements per bulk");
 
     cp.add_bytes('u', "universe_size", value_universe_size,

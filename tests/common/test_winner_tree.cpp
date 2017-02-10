@@ -13,6 +13,9 @@
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/random>
+#include <stxxl/types>
+
+using stxxl::unsigned_type;
 
 //! Comparator interface for the winner tree: takes two players and decides
 //! which is smaller. In this implementation the players are the top elements
@@ -20,15 +23,15 @@
 struct VectorCompare
 {
     //! number of vectors in comparator
-    size_t m_vecnum;
+    unsigned_type m_vecnum;
     //! vector of pointers to player streams
-    const std::vector<std::vector<unsigned int> >& m_vec;
+    const std::vector<std::vector<unsigned_type> >& m_vec;
 
     //! currently top indices
-    std::vector<unsigned int> m_vecp;
+    std::vector<unsigned_type> m_vecp;
 
-    VectorCompare(size_t vecnum,
-                  const std::vector<std::vector<unsigned int> >& vec)
+    VectorCompare(unsigned_type vecnum,
+                  const std::vector<std::vector<unsigned_type> >& vec)
         : m_vecnum(vecnum), m_vec(vec), m_vecp(vecnum, 0)
     { }
 
@@ -43,7 +46,7 @@ struct VectorCompare
 template class stxxl::winner_tree<VectorCompare>;
 
 //! Run tests for a specific number of vectors
-void test_vecs(unsigned int vecnum, bool test_rebuild)
+void test_vecs(unsigned_type vecnum, bool test_rebuild)
 {
     static const bool debug = false;
 
@@ -53,21 +56,21 @@ void test_vecs(unsigned int vecnum, bool test_rebuild)
     // construct many vectors of sorted random numbers
 
     stxxl::random_number32 rnd;
-    std::vector<std::vector<unsigned int> > vec(vecnum);
+    std::vector<std::vector<unsigned_type> > vec(vecnum);
 
-    size_t totalsize = 0;
-    std::vector<unsigned int> output, correct;
+    unsigned_type totalsize = 0;
+    std::vector<unsigned_type> output, correct;
 
-    for (size_t i = 0; i < vecnum; ++i)
+    for (unsigned_type i = 0; i < vecnum; ++i)
     {
         // determine number of items in stream
-        size_t inum = (rnd() % 128) + 64;
+        unsigned_type inum = static_cast<unsigned_type>((rnd() % 128) + 64);
         vec[i].resize(inum);
         totalsize += inum;
 
         // pick random items
-        for (size_t j = 0; j < inum; ++j)
-            vec[i][j] = (unsigned int)(rnd() % (vecnum * 20));
+        for (unsigned_type j = 0; j < inum; ++j)
+            vec[i][j] = static_cast<unsigned_type>(rnd() % (vecnum * 20));
 
         std::sort(vec[i].begin(), vec[i].end());
 
@@ -77,10 +80,10 @@ void test_vecs(unsigned int vecnum, bool test_rebuild)
 
     if (debug)
     {
-        for (size_t i = 0; i < vecnum; ++i)
+        for (unsigned_type i = 0; i < vecnum; ++i)
         {
             std::cout << "vec[" << i << "]:";
-            for (size_t j = 0; j < vec[i].size(); ++j)
+            for (unsigned_type j = 0; j < vec[i].size(); ++j)
                 std::cout << " " << vec[i][j];
             std::cout << "\n";
         }
@@ -93,41 +96,41 @@ void test_vecs(unsigned int vecnum, bool test_rebuild)
     VectorCompare vc(vecnum, vec);
     stxxl::winner_tree<VectorCompare> wt(vecnum, vc);
 
-    for (size_t i = 0; i < vecnum; ++i)
+    for (unsigned_type i = 0; i < vecnum; ++i)
     {
         if (vec[i].size())
-            wt.activate_player((int)i);
+            wt.activate_player(i);
     }
 
-    if (debug) std::cout << wt.to_string();
+    if (debug) std::cout << "after activation: " << wt.to_string();
 
     while (!wt.empty())
     {
         // get winner
-        int top = wt.top();
+        unsigned_type top = wt.top();
 
         // copy winner's item to output
         output.push_back(vec[top][vc.m_vecp[top]]);
 
         // advance winner's item stream
         vc.m_vecp[top]++;
+
         if (vc.m_vecp[top] == vec[top].size())
             wt.deactivate_player(top);
-
-        // replay or rebuild tree
-        if (test_rebuild)
-            wt.rebuild();
-        else
+        else if (!test_rebuild)
             wt.replay_on_pop();
 
-        if (debug) std::cout << wt.to_string();
+        if (test_rebuild)
+            wt.rebuild();
+
+        if (debug) std::cout << "after replay/rebuild: " << wt.to_string();
     }
 
     STXXL_CHECK(output.size() == totalsize);
 
     if (debug)
     {
-        for (size_t i = 0; i < output.size(); ++i)
+        for (unsigned_type i = 0; i < output.size(); ++i)
             std::cout << output[i] << " ";
     }
 
@@ -137,7 +140,7 @@ void test_vecs(unsigned int vecnum, bool test_rebuild)
 int main()
 {
     // run winner tree tests for 2..20 players
-    for (unsigned int i = 2; i <= 20; ++i) {
+    for (unsigned_type i = 2; i <= 20; ++i) {
         test_vecs(i, false);
         test_vecs(i, true);
     }

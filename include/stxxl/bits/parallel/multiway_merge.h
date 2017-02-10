@@ -32,6 +32,11 @@
 #include <stxxl/bits/parallel/timing.h>
 #include <stxxl/bits/parallel/tags.h>
 
+#if defined(_MSC_VER) && STXXL_DEBUG_ASSERTIONS
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
 STXXL_BEGIN_NAMESPACE
 
 namespace parallel {
@@ -422,7 +427,7 @@ multiway_merge_3_variant(RandomAccessIteratorIterator seqs_begin,
     }
 
 #define STXXL_MERGE3CASE(a, b, c, c0, c1)            \
-    s ## a ## b ## c :                               \
+    s ## a ## b ## c:                                \
     *target = *seq ## a;                             \
     ++target;                                        \
     --length;                                        \
@@ -609,7 +614,7 @@ multiway_merge_4_variant(RandomAccessIteratorIterator seqs_begin,
     }
 
 #define STXXL_MERGE4CASE(a, b, c, d, c0, c1, c2)          \
-    s ## a ## b ## c ## d :                               \
+    s ## a ## b ## c ## d:                                \
     if (length == 0) goto finish;                         \
     *target = *seq ## a;                                  \
     ++target;                                             \

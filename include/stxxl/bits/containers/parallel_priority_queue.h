@@ -26,8 +26,12 @@
 
 #if STXXL_PARALLEL
     #include <omp.h>
-    #include <parallel/algorithm>
-    #include <parallel/numeric>
+#endif
+
+#if __cplusplus >= 201103L
+#define STXXL_MOVE(T) std::move(T)
+#else
+#define STXXL_MOVE(T) T
 #endif
 
 #include <stxxl/bits/common/winner_tree.h>
@@ -304,7 +308,8 @@ public:
           m_block_pointers(1)
     {
         std::swap(m_values, values);
-        m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.end()));
+        STXXL_ASSERT(values.size() > 0);
+        m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.begin()) + m_values.size());
     }
 
     //! Swap internal_array with another one.
@@ -1684,7 +1689,7 @@ public:
         HEAP = 0,
         IA = 1,
         EB = 2,
-        ERROR = 3
+        TYPE_ERROR = 3
     };
 
     //! Construct the tree of minima sources.
@@ -1715,12 +1720,12 @@ public:
         case EB:
             return std::make_pair(EB, 0);
         default:
-            return std::make_pair(ERROR, 0);
+            return std::make_pair(TYPE_ERROR, 0);
         }
     }
 
     //! Update minima tree after an item from the heap index was removed.
-    void update_heap(unsigned index)
+    void update_heap(int_type index)
     {
         m_heaps.notify_change(index);
         m_head.notify_change(HEAP);
@@ -1788,11 +1793,15 @@ public:
 
     void rebuild_internal_arrays()
     {
-        m_ia.resize_and_rebuild(m_parent.m_internal_arrays.size());
         if (!m_parent.m_internal_arrays.empty())
+        {
+            m_ia.resize_and_rebuild(m_parent.m_internal_arrays.size());
             m_head.notify_change(IA);
+        }
         else
+        {
             m_head.deactivate_player(IA);
+        }
     }
 
     //! Return size of internal arrays minima tree
@@ -1985,7 +1994,7 @@ protected:
     //! \name Parameters and Sizes for Memory Allocation Policy
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
-    const unsigned m_num_insertion_heaps;
+    const long m_num_insertion_heaps;
 
     //! Capacity of one inserion heap
     const unsigned m_insertion_heap_capacity;
@@ -2269,18 +2278,18 @@ protected:
         typedef typename std::iterator_traits<RandomAccessIterator>::value_type
             value_type;
 
-        value_type value = _GLIBCXX_MOVE(*(last - 1));
+        value_type value = STXXL_MOVE(*(last - 1));
 
         unsigned_type index = (last - first) - 1;
         unsigned_type parent = (index - 1) / 2;
 
         while (index > 0 && comp(*(first + parent), value))
         {
-            *(first + index) = _GLIBCXX_MOVE(*(first + parent));
+            *(first + index) = STXXL_MOVE(*(first + parent));
             index = parent;
             parent = (index - 1) / 2;
         }
-        *(first + index) = _GLIBCXX_MOVE(value);
+        *(first + index) = STXXL_MOVE(value);
 
         return index;
     }
@@ -2396,7 +2405,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        for (long p = 0; p < m_num_insertion_heaps; ++p)
         {
             m_proc[p] = new ProcessorData;
             m_proc[p]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -2482,7 +2491,7 @@ protected:
 
         size_type heaps_size = 0;
 
-        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+        for (int_type p = 0; p < m_num_insertion_heaps; ++p)
         {
             // check that each insertion heap is a heap
 
@@ -2611,7 +2620,7 @@ public:
         }
 
         // zero bulk insertion counters
-        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+        for (int_type p = 0; p < m_num_insertion_heaps; ++p)
             m_proc[p]->heap_add_size = 0;
     }
 
@@ -2717,7 +2726,7 @@ public:
 
         if (!m_is_very_large_bulk && 0)
         {
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 m_heaps_size += m_proc[p]->heap_add_size;
 
@@ -2730,7 +2739,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
                 for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
@@ -2745,7 +2754,7 @@ public:
                 m_heaps_size += m_proc[p]->heap_add_size;
             }
 
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -2756,7 +2765,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (m_proc[p]->insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
@@ -2784,7 +2793,7 @@ public:
                 }
             }
 
-            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
+            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -3979,7 +3988,7 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+        for (long i = 0; i < m_num_insertion_heaps; ++i)
         {
             heap_type& insheap = m_proc[i]->insertion_heap;
 
@@ -4004,7 +4013,7 @@ protected:
 
             add_as_internal_array(merged_array);
 
-            for (unsigned i = 0; i < m_num_insertion_heaps; ++i)
+            for (int_type i = 0; i < m_num_insertion_heaps; ++i)
             {
                 m_proc[i]->insertion_heap.clear();
                 m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -4213,7 +4222,7 @@ protected:
 
             // =================================================
 
-            unsigned_type num_arrays_done = 0;
+            int_type num_arrays_done = 0;
 
             while (num_arrays_to_merge != num_arrays_done)
             {
@@ -4221,7 +4230,7 @@ protected:
 
                 // === build hints ===
 
-                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (int_type i = 0; i < num_arrays_to_merge; ++i) {
                     if (m_external_arrays[ea_index[i]].has_unhinted_em_data()) {
                         min_tree.activate_without_replay(i);
                     }

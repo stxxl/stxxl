@@ -175,7 +175,7 @@ public:
     //! addition operator (uses 64-bit arithmetic)
     inline uint_pair& operator += (const uint_pair& b)
     {
-        uint64 add = low + b.low;
+        uint64 add = (uint64)low + b.low;
         low = (low_type)(add & low_max());
         high = (high_type)(high + b.high + ((add >> low_bits) & high_max()));
         return *this;

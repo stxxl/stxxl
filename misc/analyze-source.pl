@@ -264,7 +264,7 @@ sub process_cpp {
         my $namespace = 0;
         for(my $i = 0; $i < @uncrust-1; ++$i)
         {
-            if ($uncrust[$i] =~ m!^namespace \S+ {!) {
+            if ($uncrust[$i] =~ m!^namespace \S+ \{!) {
                 splice(@uncrust, $i+1, 0, "\n");
                 ++$namespace;
             }

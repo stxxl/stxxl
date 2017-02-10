@@ -103,7 +103,7 @@ void merge3_iterator(
     }
 
 #define Merge3Case(a, b, c)              \
-    s ## a ## b ## c :                   \
+    s ## a ## b ## c:                    \
     if (target == end)                   \
         return;                          \
     *target = *source ## a;              \
@@ -185,7 +185,7 @@ void merge4_iterator(
     StartMerge4(2, 1, 0, 3);
 
 #define Merge4Case(a, b, c, d)               \
-    s ## a ## b ## c ## d :                  \
+    s ## a ## b ## c ## d:                   \
     if (target == end)                       \
         return;                              \
     *target = *source ## a;                  \
