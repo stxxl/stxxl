@@ -20,7 +20,6 @@
 #include <stxxl/bits/common/cmdline.h>
 
 using stxxl::int_type;
-using stxxl::unsigned_type;
 
 // forced instantiation
 template class stxxl::matrix<int_type, 32>;
@@ -33,6 +32,7 @@ template class stxxl::const_matrix_col_major_iterator<int_type, 32>;
 template class stxxl::column_vector<int_type>;
 template class stxxl::row_vector<int_type>;
 template struct stxxl::matrix_local::matrix_operations<int_type, 32>;
+/*
 
 struct constant_one
 {
@@ -138,11 +138,12 @@ public:
     unsigned_type get_num_errors() { return errors.size(); }
     stxxl::vector<error_type> & get_errors() { return errors; }
 };
+*/
 
 const int small_block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
 const int block_order = 32;       // must be a multiple of 32, assuming at least 4 bytes element size
 
-unsigned_type internal_memory = 16 * 1024 * 1024;
+uint64_t internal_memory = 16 * 1024 * 1024;
 
 void test1(int rank)
 {

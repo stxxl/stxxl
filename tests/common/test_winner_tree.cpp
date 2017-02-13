@@ -15,28 +15,26 @@
 #include <stxxl/random>
 #include <stxxl/types>
 
-using stxxl::unsigned_type;
-
 //! Comparator interface for the winner tree: takes two players and decides
 //! which is smaller. In this implementation the players are the top elements
 //! from an array of vectors.
 struct VectorCompare
 {
     //! number of vectors in comparator
-    unsigned_type m_vecnum;
+    size_t m_vecnum;
     //! vector of pointers to player streams
-    const std::vector<std::vector<unsigned_type> >& m_vec;
+    const std::vector<std::vector<size_t> >& m_vec;
 
     //! currently top indices
-    std::vector<unsigned_type> m_vecp;
+    std::vector<size_t> m_vecp;
 
-    VectorCompare(unsigned_type vecnum,
-                  const std::vector<std::vector<unsigned_type> >& vec)
+    VectorCompare(size_t vecnum,
+                  const std::vector<std::vector<size_t> >& vec)
         : m_vecnum(vecnum), m_vec(vec), m_vecp(vecnum, 0)
     { }
 
     //! perform a game with player v1 and v2.
-    inline bool operator () (unsigned_type v1, unsigned_type v2) const
+    inline bool operator () (size_t v1, size_t v2) const
     {
         return m_vec[v1][m_vecp[v1]] < m_vec[v2][m_vecp[v2]];
     }
@@ -46,7 +44,7 @@ struct VectorCompare
 template class stxxl::winner_tree<VectorCompare>;
 
 //! Run tests for a specific number of vectors
-void test_vecs(unsigned_type vecnum, bool test_rebuild)
+void test_vecs(size_t vecnum, bool test_rebuild)
 {
     static const bool debug = false;
 
@@ -56,21 +54,21 @@ void test_vecs(unsigned_type vecnum, bool test_rebuild)
     // construct many vectors of sorted random numbers
 
     stxxl::random_number32 rnd;
-    std::vector<std::vector<unsigned_type> > vec(vecnum);
+    std::vector<std::vector<size_t> > vec(vecnum);
 
-    unsigned_type totalsize = 0;
-    std::vector<unsigned_type> output, correct;
+    size_t totalsize = 0;
+    std::vector<size_t> output, correct;
 
-    for (unsigned_type i = 0; i < vecnum; ++i)
+    for (size_t i = 0; i < vecnum; ++i)
     {
         // determine number of items in stream
-        unsigned_type inum = static_cast<unsigned_type>((rnd() % 128) + 64);
+        size_t inum = static_cast<size_t>((rnd() % 128) + 64);
         vec[i].resize(inum);
         totalsize += inum;
 
         // pick random items
-        for (unsigned_type j = 0; j < inum; ++j)
-            vec[i][j] = static_cast<unsigned_type>(rnd() % (vecnum * 20));
+        for (size_t j = 0; j < inum; ++j)
+            vec[i][j] = static_cast<size_t>(rnd() % (vecnum * 20));
 
         std::sort(vec[i].begin(), vec[i].end());
 
@@ -80,10 +78,10 @@ void test_vecs(unsigned_type vecnum, bool test_rebuild)
 
     if (debug)
     {
-        for (unsigned_type i = 0; i < vecnum; ++i)
+        for (size_t i = 0; i < vecnum; ++i)
         {
             std::cout << "vec[" << i << "]:";
-            for (unsigned_type j = 0; j < vec[i].size(); ++j)
+            for (size_t j = 0; j < vec[i].size(); ++j)
                 std::cout << " " << vec[i][j];
             std::cout << "\n";
         }
@@ -96,7 +94,7 @@ void test_vecs(unsigned_type vecnum, bool test_rebuild)
     VectorCompare vc(vecnum, vec);
     stxxl::winner_tree<VectorCompare> wt(vecnum, vc);
 
-    for (unsigned_type i = 0; i < vecnum; ++i)
+    for (size_t i = 0; i < vecnum; ++i)
     {
         if (vec[i].size())
             wt.activate_player(i);
@@ -107,7 +105,7 @@ void test_vecs(unsigned_type vecnum, bool test_rebuild)
     while (!wt.empty())
     {
         // get winner
-        unsigned_type top = wt.top();
+        size_t top = wt.top();
 
         // copy winner's item to output
         output.push_back(vec[top][vc.m_vecp[top]]);
@@ -130,7 +128,7 @@ void test_vecs(unsigned_type vecnum, bool test_rebuild)
 
     if (debug)
     {
-        for (unsigned_type i = 0; i < output.size(); ++i)
+        for (size_t i = 0; i < output.size(); ++i)
             std::cout << output[i] << " ";
     }
 
@@ -140,7 +138,7 @@ void test_vecs(unsigned_type vecnum, bool test_rebuild)
 int main()
 {
     // run winner tree tests for 2..20 players
-    for (unsigned_type i = 2; i <= 20; ++i) {
+    for (size_t i = 2; i <= 20; ++i) {
         test_vecs(i, false);
         test_vecs(i, true);
     }

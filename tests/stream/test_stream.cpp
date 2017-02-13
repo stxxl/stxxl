@@ -161,7 +161,7 @@ int main()
     typedef make_tuple<input_stream_type, counter_stream_type> tuple_stream_type;
     tuple_stream_type tuple_stream(input_stream, counter_stream);
 
-    const stxxl::unsigned_type sorter_memory = 128 * 1024;
+    const uint64_t sorter_memory = 128 * 1024;
 #ifdef USE_FORMRUNS_N_MERGE
     // sort tuples by character
     // 1. form runs

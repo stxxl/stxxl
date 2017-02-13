@@ -19,11 +19,8 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
-using stxxl::LOG2;
-using stxxl::unsigned_type;
-
-template <unsigned_type i>
-void log_i(unsigned_type floorv, unsigned_type ceilv)
+template <size_t i>
+void log_i(size_t floorv, size_t ceilv)
 {
     std::cout << i << "\t" << (i < 1000000 ? "\t" : "")
               << stxxl::LOG2_floor<i>::value << "\t"
@@ -60,9 +57,9 @@ void log_i(unsigned_type floorv, unsigned_type ceilv)
 #if 0                                        // not many compiler have log2l()
         if (i <= ((stxxl::uint64)(1) << 59)) // does not work for higher powers
         {
-            STXXL_CHECK(stxxl::LOG2_floor<i>::value == (unsigned_type)floorl(log2l(i)));
-            STXXL_CHECK(stxxl::LOG2<i>::floor == (unsigned_type)floorl(log2l(i)));
-            STXXL_CHECK(stxxl::LOG2<i>::ceil == (unsigned_type)ceill(log2l(i)));
+            STXXL_CHECK(stxxl::LOG2_floor<i>::value == (size_t)floorl(log2l(i)));
+            STXXL_CHECK(stxxl::LOG2<i>::floor == (size_t)floorl(log2l(i)));
+            STXXL_CHECK(stxxl::LOG2<i>::ceil == (size_t)ceill(log2l(i)));
         }
 #endif
     }
@@ -70,8 +67,8 @@ void log_i(unsigned_type floorv, unsigned_type ceilv)
     std::cout << "\n";
 }
 
-template <unsigned_type i>
-void log_ipm1(unsigned_type p)
+template <size_t i>
+void log_ipm1(size_t p)
 {
     log_i<i - 1>(p - 1, p);
     log_i<i>(p, p);
