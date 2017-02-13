@@ -74,7 +74,7 @@ protected:
 
 public:
 
-    const unsigned_type invalid_key = std::numeric_limits<unsigned_type>::max();
+    const unsigned_type invalid_key;
 
     /**
      * Constructor. Reserves space, registers free slots. No games are played
@@ -87,7 +87,7 @@ public:
      * corresponding values and return the index of one with the smaller value.
      */
     winner_tree(unsigned_type num_players, Comparator& less)
-        : m_less(less)
+        : m_less(less), invalid_key(std::numeric_limits<unsigned_type>::max())
     {
         STXXL_ASSERT(num_players > 0 && num_players <= invalid_key);
 
