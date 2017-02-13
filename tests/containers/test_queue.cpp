@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 // stxxl::queue contains deprecated funtions
 #define STXXL_NO_DEPRECATED 1
 
@@ -74,10 +76,10 @@ int main()
         check(xqueue, squeue);
     }
     STXXL_MSG("Testing other cases ");
-    cnt = 100 * stxxl::queue<my_type>::block_type::size;
+    cnt = 20 * stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
-        if ((cnt % 1000000) == 0)
+        if ((cnt % 1000) == 0)
             STXXL_MSG("Operations left: " << cnt << " queue size " << squeue.size());
 
         int rndtmp = rnd() % 3;
@@ -97,7 +99,7 @@ int main()
     }
     while (!squeue.empty())
     {
-        if ((cnt++ % 1000000) == 0)
+        if ((cnt++ % 1000) == 0)
             STXXL_MSG("Operations: " << cnt << " queue size " << squeue.size());
 
         int rndtmp = rnd() % 4;
@@ -118,7 +120,7 @@ int main()
     cnt = 10 * stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
-        if ((cnt % 1000000) == 0)
+        if ((cnt % 1000) == 0)
             STXXL_MSG("Operations left: " << cnt << " queue size " << squeue.size());
 
         int rndtmp = rnd() % 3;
@@ -144,7 +146,7 @@ int main()
     cnt = 10 * stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
-        if ((cnt % 1000000) == 0)
+        if ((cnt % 1000) == 0)
             STXXL_MSG("Operations left: " << cnt << " queue size " << squeue1.size());
 
         int rndtmp = rnd() % 3;
