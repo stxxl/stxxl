@@ -17,6 +17,7 @@
  */
 
 #include <limits>
+#include <cstdint>
 #include <stxxl/cmdline>
 #include <stxxl/vector>
 #include <stxxl/sort>
@@ -25,14 +26,13 @@
 #include <stxxl/bits/common/tuple.h>
 
 using stxxl::timestamp;
-using stxxl::uint32;
 using stxxl::uint64;
 using stxxl::unsigned_type;
 
 #define MB (1024 * 1024)
 
-// pair of uint32 = 8 bytes
-typedef stxxl::tuple<uint32, uint32> pair32_type;
+// pair of uint32_t = 8 bytes
+typedef stxxl::tuple<uint32_t, uint32_t> pair32_type;
 
 // pair of uint64 = 16 bytes
 typedef stxxl::tuple<uint64, uint64> pair64_type;
@@ -216,7 +216,7 @@ int benchmark_sort(int argc, char* argv[])
         return -1;
 
     BenchmarkSort<pair32_type, stxxl::random_number32>
-        ("pair of uint32", length, (unsigned_type)memsize);
+        ("pair of uint32_t", length, (unsigned_type)memsize);
 
     BenchmarkSort<pair64_type, stxxl::random_number32>
         ("pair of uint64", length, (unsigned_type)memsize);

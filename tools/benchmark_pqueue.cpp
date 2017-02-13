@@ -21,6 +21,7 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
+#include <cstdint>
 #include <limits>
 #include <iomanip>
 #include <stxxl/priority_queue>
@@ -29,7 +30,6 @@ static const char* description =
 #include <stxxl/cmdline>
 #include <stxxl/bits/common/tuple.h>
 
-using stxxl::uint32;
 using stxxl::uint64;
 using stxxl::internal_size_type;
 
@@ -38,7 +38,7 @@ using stxxl::internal_size_type;
 
 // *** Integer Pair Types
 
-typedef stxxl::tuple<uint32, uint32> uint32_pair_type;
+typedef stxxl::tuple<uint32_t, uint32_t> uint32_pair_type;
 
 typedef stxxl::tuple<uint64, uint64> uint64_pair_type;
 
@@ -48,7 +48,7 @@ typedef stxxl::tuple<uint64, uint64> uint64_pair_type;
 
 struct my_type : public uint32_pair_type
 {
-    typedef uint32 key_type;
+    typedef uint32_t key_type;
 
     char data[MY_TYPE_SIZE - sizeof(uint32_pair_type)];
     my_type() { }
@@ -309,7 +309,7 @@ int benchmark_pqueue(int argc, char* argv[])
     unsigned type = 2;
     cp.add_uint('t', "type", type,
                 "Value type of tested priority queue:\n"
-                " 1 = pair of uint32,\n"
+                " 1 = pair of uint32_t,\n"
                 " 2 = pair of uint64 (default),\n"
                 " 3 = 24 byte struct\n"
                 " 0 = all of the above");
