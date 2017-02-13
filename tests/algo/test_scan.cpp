@@ -10,6 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example algo/test_scan.cpp
 //! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
 
@@ -59,8 +61,10 @@ struct fill_value
 int main()
 {
     stxxl::vector<int64>::size_type i;
-    stxxl::vector<int64> v(64 * int64(1024 * 1024));
+    stxxl::vector<int64> v(128 * STXXL_DEFAULT_BLOCK_SIZE(T));
     double b, e;
+
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     STXXL_MSG("write " << (v.end() - v.begin()) << " elements ...");
 
@@ -99,6 +103,8 @@ int main()
     {
         STXXL_CHECK2(v[i] == 555, "Error at position " << i);
     }
+
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     return 0;
 }
