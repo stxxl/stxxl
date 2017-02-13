@@ -23,7 +23,7 @@
 
 struct MyType
 {
-    int integer;
+    size_t integer;
     //char chars[4];
     ~MyType() { }
 };
@@ -54,7 +54,7 @@ int main()
     STXXL_MSG("Allocated block address    : " << (stxxl::unsigned_type)(block));
     STXXL_MSG("Allocated block address + 1: " << (stxxl::unsigned_type)(block + 1));
     STXXL_MSG(std::dec);
-    unsigned i = 0;
+    size_t i = 0;
     for (i = 0; i < block_type::size; ++i)
     {
         block->elem[i].integer = i;
