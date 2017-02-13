@@ -267,19 +267,19 @@ void test_vector_buf(uint64 size)
 
 int main(int argc, char* argv[])
 {
-    int size = (argc > 1) ? atoi(argv[1]) : 16;
+    int size = (argc > 1) ? atoi(argv[1]) : 1;
 
     STXXL_MSG("Testing stxxl::vector<int> with even size");
-    test_vector_buf<int>(size * 1024 * 1024);
+    test_vector_buf<int>(size * 32 * 1024);
 
     STXXL_MSG("Testing stxxl::vector<int> with odd size");
-    test_vector_buf<int>(size * 1024 * 1024 + 501 + 42);
+    test_vector_buf<int>(size * 32 * 1024 + 501 + 42);
 
     STXXL_MSG("Testing stxxl::vector<uint64>");
-    test_vector_buf<uint64>(size * 1024 * 1024 + 501 + 42);
+    test_vector_buf<uint64>(size * 32 * 1024 + 501 + 42);
 
     STXXL_MSG("Testing stxxl::vector<my_type>");
-    test_vector_buf<my_type>(size * 1024 * 1024);
+    test_vector_buf<my_type>(size * 32 * 1024);
 
     return 0;
 }

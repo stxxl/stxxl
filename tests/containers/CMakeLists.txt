@@ -70,3 +70,6 @@ stxxl_test(test_map_random 2000)
 
 #-tb longer test for map
 stxxl_extra_test(test_map 16)
+
+set_property(SOURCE test_vector_buf.cpp
+  PROPERTY COMPILE_FLAGS "-DSTXXL_DEFAULT_BLOCK_SIZE\\(T\\)=4096")
