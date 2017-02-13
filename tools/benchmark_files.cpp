@@ -35,8 +35,7 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
-using stxxl::unsigned_type;
-using stxxl::uint64;
+using stxxl::external_size_type;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -53,18 +52,17 @@ const char* default_file_type = "syscall";
 #endif
 
 #ifdef WATCH_TIMES
-void watch_times(request_ptr reqs[], unsigned n, double* out)
+void watch_times(request_ptr reqs[], size_t n, double* out)
 {
     bool* finished = new bool[n];
-    unsigned count = 0;
-    for (unsigned i = 0; i < n; i++)
+    size_t count = 0;
+    for (size_t i = 0; i < n; i++)
         finished[i] = false;
 
     while (count != n)
     {
         usleep(POLL_DELAY);
-        unsigned i = 0;
-        for (i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             if (!finished[i])
                 if (reqs[i]->poll())
@@ -78,9 +76,9 @@ void watch_times(request_ptr reqs[], unsigned n, double* out)
     delete[] finished;
 }
 
-void out_stat(double start, double end, double* times, unsigned n, const std::vector<std::string>& names)
+void out_stat(double start, double end, double* times, size_t n, const std::vector<std::string>& names)
 {
-    for (unsigned i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
         std::cout << i << " " << names[i] << " took " <<
             100. * (times[i] - start) / (end - start) << " %" << std::endl;
@@ -91,7 +89,7 @@ void out_stat(double start, double end, double* times, unsigned n, const std::ve
 #define MB (1024 * 1024)
 
 // returns throughput in MiB/s
-static inline double throughput(stxxl::int64 bytes, double seconds)
+static inline double throughput(external_size_type bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
@@ -100,16 +98,16 @@ static inline double throughput(stxxl::int64 bytes, double seconds)
 
 int benchmark_files(int argc, char* argv[])
 {
-    uint64 offset = 0, length = 0;
+    external_size_type offset = 0, length = 0;
 
     bool no_direct_io = false;
     bool sync_io = false;
     bool resize_after_open = false;
     std::string file_type = default_file_type;
-    unsigned_type block_size = 0;
+    size_t block_size = 0;
     unsigned int batch_size = 1;
     std::string opstr = "wv";
-    unsigned pattern = 0;
+    uint32_t pattern = 0;
 
     std::vector<std::string> files_arr;
 
@@ -163,7 +161,7 @@ int benchmark_files(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    uint64 endpos = offset + length;
+    external_size_type endpos = offset + length;
 
     if (block_size == 0)
         block_size = 8 * MB;
@@ -205,11 +203,11 @@ int benchmark_files(int argc, char* argv[])
     const size_t nfiles = files_arr.size();
     bool verify_failed = false;
 
-    const unsigned_type step_size = block_size * batch_size;
-    const unsigned_type block_size_int = block_size / sizeof(int);
-    const uint64 step_size_int = step_size / sizeof(int);
+    const size_t step_size = block_size * batch_size;
+    const size_t block_size_int = block_size / sizeof(uint32_t);
+    const size_t step_size_int = step_size / sizeof(uint32_t);
 
-    unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);
+    uint32_t* buffer = (uint32_t*)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);
     file** files = new file*[nfiles];
     request_ptr* reqs = new request_ptr[nfiles * batch_size];
 
@@ -219,14 +217,14 @@ int benchmark_files(int argc, char* argv[])
 #endif
 
     double totaltimeread = 0, totaltimewrite = 0;
-    stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
+    external_size_type totalsizeread = 0, totalsizewrite = 0;
 
     // fill buffer with pattern
-    for (unsigned i = 0; i < nfiles * step_size_int; i++)
-        buffer[i] = (pattern ? pattern : i);
+    for (size_t i = 0; i < nfiles * step_size_int; i++)
+        buffer[i] = (pattern ? pattern : static_cast<uint32_t>(i));
 
     // open files
-    for (unsigned i = 0; i < nfiles; i++)
+    for (size_t i = 0; i < nfiles; i++)
     {
         int openmode = file::CREAT | file::RDWR;
         if (!no_direct_io) {
@@ -236,7 +234,7 @@ int benchmark_files(int argc, char* argv[])
             openmode |= file::SYNC;
         }
 
-        files[i] = stxxl::create_file(file_type, files_arr[i], openmode, i);
+        files[i] = stxxl::create_file(file_type, files_arr[i], openmode, static_cast<int>(i));
         if (resize_after_open)
             files[i]->set_size(endpos);
     }
@@ -252,11 +250,11 @@ int benchmark_files(int argc, char* argv[])
 
     stxxl::timer t_total(true);
     try {
-        while (offset + uint64(step_size) <= endpos || length == 0)
+        while (offset + step_size <= endpos || length == 0)
         {
-            const uint64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
-            const uint64 current_step_size_int = current_step_size / sizeof(int);
-            const unsigned_type current_num_blocks = (unsigned_type)stxxl::div_ceil(current_step_size, block_size);
+            const size_t current_step_size = (length == 0) ? step_size : static_cast<size_t>(std::min<external_size_type>(step_size, endpos - offset));
+            const size_t current_step_size_int = current_step_size / sizeof(uint32_t);
+            const size_t current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
 
             std::cout << "File offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
@@ -264,20 +262,20 @@ int benchmark_files(int argc, char* argv[])
 
             if (do_write)
             {
-                // write block number (512 byte blocks) into each block at position 42 * sizeof(unsigned)
-                for (uint64 j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
+                // write block number (512 byte blocks) into each block at position 42 * sizeof(uint32_t)
+                for (size_t j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(uint32_t), ++b)
                 {
-                    for (unsigned i = 0; i < nfiles; i++)
-                        buffer[current_step_size_int * i + j] = (unsigned int)b;
+                    for (size_t i = 0; i < nfiles; i++)
+                        buffer[current_step_size_int * i + j] = (uint32_t)b;
                 }
 
-                for (unsigned i = 0; i < nfiles; i++)
+                for (size_t i = 0; i < nfiles; i++)
                 {
-                    for (unsigned_type j = 0; j < current_num_blocks; j++)
+                    for (size_t j = 0; j < current_num_blocks; j++)
                         reqs[i * current_num_blocks + j] =
                             files[i]->awrite(buffer + current_step_size_int * i + j * block_size_int,
                                              offset + j * block_size,
-                                             (unsigned_type)block_size);
+                                             block_size);
                 }
 
  #ifdef WATCH_TIMES
@@ -317,13 +315,13 @@ int benchmark_files(int argc, char* argv[])
 
             if (do_read || do_verify)
             {
-                for (unsigned i = 0; i < nfiles; i++)
+                for (size_t i = 0; i < nfiles; i++)
                 {
-                    for (unsigned j = 0; j < current_num_blocks; j++)
+                    for (size_t j = 0; j < current_num_blocks; j++)
                         reqs[i * current_num_blocks + j] =
                             files[i]->aread(buffer + current_step_size_int * i + j * block_size_int,
                                             offset + j * block_size,
-                                            (unsigned_type)block_size);
+                                            block_size);
                 }
 
  #ifdef WATCH_TIMES
@@ -362,11 +360,11 @@ int benchmark_files(int argc, char* argv[])
 
             if (do_verify)
             {
-                for (unsigned d = 0; d < nfiles; ++d)
+                for (size_t d = 0; d < nfiles; ++d)
                 {
-                    for (unsigned s = 0; s < (current_step_size >> 9); ++s) {
-                        uint64 i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
-                        uint64 b = (offset >> 9) + s;
+                    for (size_t s = 0; s < (current_step_size >> 9); ++s) {
+                        size_t i = d * current_step_size_int + s * (512 / sizeof(uint32_t)) + 42;
+                        external_size_type b = (offset >> 9) + s;
                         if (buffer[i] != b)
                         {
                             verify_failed = true;
@@ -374,19 +372,19 @@ int benchmark_files(int argc, char* argv[])
                                       << " got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << b
                                       << std::dec << std::endl;
                         }
-                        buffer[i] = (pattern ? pattern : (unsigned int)i);
+                        buffer[i] = (pattern ? pattern : (uint32_t)i);
                     }
                 }
 
-                for (uint64 i = 0; i < nfiles * current_step_size_int; i++)
+                for (size_t i = 0; i < nfiles * current_step_size_int; i++)
                 {
                     if (buffer[i] != (pattern ? pattern : i))
                     {
-                        stxxl::int64 ibuf = i / current_step_size_int;
-                        uint64 pos = i % current_step_size_int;
+                        size_t ibuf = i / current_step_size_int;
+                        size_t pos = i % current_step_size_int;
 
                         std::cout << std::endl
-                                  << "Error on file " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
+                                  << "Error on file " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(uint32_t)
                                   << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i
                                   << std::dec << std::endl;
 
@@ -450,7 +448,7 @@ int benchmark_files(int argc, char* argv[])
     delete[] w_finish_times;
 #endif
     delete[] reqs;
-    for (unsigned i = 0; i < nfiles; i++)
+    for (size_t i = 0; i < nfiles; i++)
         delete files[i];
     delete[] files;
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
