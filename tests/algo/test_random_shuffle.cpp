@@ -12,6 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 // TODO: test both vector and non-vector variant of random_shuffle
 // TODO: test recursion, improve verboseness
 
@@ -37,7 +39,7 @@ struct counter
 void long_test()
 {
     typedef stxxl::vector<int> ext_vec_type;
-    ext_vec_type STXXLVector(1024 * 1024 * 256 / sizeof(int));
+    ext_vec_type STXXLVector(128 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
 
     STXXL_MSG("Filling vector with increasing values...");
     stxxl::generate(STXXLVector.begin(), STXXLVector.end(),
@@ -54,7 +56,7 @@ void long_test()
         STXXL_MSG(STXXLVector[i]);
 
     STXXL_MSG("Permute randomly...");
-    stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 1024 * 1024 * 128);
+    stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 64 * STXXL_DEFAULT_BLOCK_SIZE(T));
 
     STXXL_MSG("Begin: ");
     for (i = 0; i < 10; i++)
