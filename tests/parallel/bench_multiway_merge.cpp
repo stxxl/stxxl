@@ -76,7 +76,7 @@ enum benchmark_type {
 };
 
 template <typename ValueType, benchmark_type Method>
-void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
+void test_multiway_merge(size_t seq_count, const size_t seq_size)
 {
     // we allocate a list of blocks, each block being a sequence of items.
     static const size_t item_size = sizeof(ValueType);
@@ -109,7 +109,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
 #else
             stxxl::random_number32_r rnd(1234);
 #endif
-            for (long i = 0; i < seq_count; ++i)
+            for (long i = 0; i < (long)seq_count; ++i)
             {
                 for (size_t j = 0; j < seq_items; ++j)
                     seqs[i][j] = ValueType(rnd());
@@ -284,7 +284,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
             << " inner_repeats=" << g_inner_repeat
             << " outer_repeats=" << g_outer_repeat
             << " time/item[ns]="
-            << spt.timer().seconds() / g_inner_repeat / total_size * 1e9
+            << spt.timer().seconds() / (double)g_inner_repeat / (double)total_size * 1e9
             << std::endl;
     }
 
@@ -292,7 +292,7 @@ void test_multiway_merge(unsigned int seq_count, const size_t seq_size)
 }
 
 template <typename ValueType, benchmark_type Method>
-void test_repeat(unsigned int seq_count, const size_t seq_size)
+void test_repeat(size_t seq_count, const size_t seq_size)
 {
     for (unsigned int r = 0; r < g_outer_repeat; ++r)
         test_multiway_merge<ValueType, Method>(seq_count, seq_size);

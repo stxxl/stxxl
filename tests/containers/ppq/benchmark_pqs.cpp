@@ -52,8 +52,8 @@ static const bool g_progress = false;
 static const int64 g_printmod = 16 * MiB;
 
 // constant values for STXXL PQ
-const int64 _RAM = 16 * GiB;
-const int64 _volume = 1024 * GiB;
+const int64 _RAM = 1 * GiB;
+const int64 _volume = 4 * GiB;
 const unsigned _value_size = 8;
 const uint64 _num_elements = _volume / _value_size;
 const int64 _mem_for_queue = _RAM / 2;
@@ -377,7 +377,7 @@ public:
     CStxxlParallePQ()
         : PQBase("Parallel PQ", "ppq"),
           pq_type(my_type_cmp_greater<ValueType>(),
-                  RAM, num_prefetchers, num_write_buffers,
+                  RAM, (float)num_prefetchers, num_write_buffers,
                   g_max_threads, single_heap_ram, extract_buffer_ram)
     { }
 

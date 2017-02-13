@@ -36,7 +36,7 @@ struct VectorCompare
     { }
 
     //! perform a game with player v1 and v2.
-    inline bool operator () (int v1, int v2) const
+    inline bool operator () (unsigned_type v1, unsigned_type v2) const
     {
         return m_vec[v1][m_vecp[v1]] < m_vec[v2][m_vecp[v2]];
     }
