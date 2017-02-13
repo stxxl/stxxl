@@ -71,7 +71,7 @@ if(STXXL_BUILD_TESTS)
   set(STXXL_BUILD_EXAMPLES ON)
 endif()
 
-option(BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
+option(STXXL_BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
 
 if(MSVC_VERSION LESS 1700)
   # require boost for Visual C++ versions older than VC11 = MSVS 2012
@@ -658,18 +658,18 @@ endmacro(stxxl_test)
 # macro for building stxxl extra program
 macro(stxxl_build_extra_tool)
 
-  if(BUILD_EXTRAS)
+  if(STXXL_BUILD_EXTRAS)
     stxxl_build_tool(${ARGN})
-  endif(BUILD_EXTRAS)
+  endif(STXXL_BUILD_EXTRAS)
 
 endmacro(stxxl_build_extra_tool)
 
 # macro for registering extra stxxl tests
 macro(stxxl_extra_test)
 
-  if(BUILD_EXTRAS)
+  if(STXXL_BUILD_EXTRAS)
     stxxl_test(${ARGN})
-  endif(BUILD_EXTRAS)
+  endif(STXXL_BUILD_EXTRAS)
 
 endmacro(stxxl_extra_test)
 

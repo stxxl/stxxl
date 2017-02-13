@@ -235,7 +235,7 @@ $ cmake -DSTXXL_BUILD_TESTS=ON ...
 <compile>
 $ make test
 \endverbatim
-Defining STXXL_BUILD_TESTS also builds everything in \c examples/. There is also a \c BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
+Defining STXXL_BUILD_TESTS also builds everything in \c examples/. There is also a \c STXXL_BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
 
 - CMake can be instructed to use other compilers, by setting, for example
 \verbatim

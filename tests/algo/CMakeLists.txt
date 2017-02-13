@@ -31,7 +31,7 @@ stxxl_test(test_scan)
 stxxl_test(test_sort)
 stxxl_test(test_stable_ksort)
 
-if(NOT CYGWIN AND NOT MINGW AND BUILD_EXTRAS) #-tb too big to build on cygwin
+if(NOT CYGWIN AND NOT MINGW AND STXXL_BUILD_EXTRAS) #-tb too big to build on cygwin
 
   stxxl_build_test(test_ksort_all_parameters)
   stxxl_build_test(test_stable_ksort_all_parameters)
@@ -65,7 +65,7 @@ if(NOT CYGWIN AND NOT MINGW AND BUILD_EXTRAS) #-tb too big to build on cygwin
     endforeach(RAM)
   endforeach(DATA)
 
-  if(NOT BUILD_EXTRAS)
+  if(NOT STXXL_BUILD_EXTRAS)
 
     foreach(STRATEGY 0 1 2 3)
       stxxl_test(test_sort_all_parameters 512 192 ${STRATEGY} 10 42)
@@ -74,7 +74,7 @@ if(NOT CYGWIN AND NOT MINGW AND BUILD_EXTRAS) #-tb too big to build on cygwin
       #stxxl_test(test_stable_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
     endforeach(STRATEGY)
 
-  endif(NOT BUILD_EXTRAS)
+  endif(NOT STXXL_BUILD_EXTRAS)
 
 endif()
 
@@ -96,7 +96,7 @@ if(USE_GNU_PARALLEL)
     endforeach(RAM)
   endforeach(DATA)
 
-  if(NOT BUILD_EXTRAS)
+  if(NOT STXXL_BUILD_EXTRAS)
 
     foreach(SORT m q qb s)
       foreach(MERGE p s n)
@@ -104,6 +104,6 @@ if(USE_GNU_PARALLEL)
       endforeach(MERGE)
     endforeach(SORT)
 
-  endif(NOT BUILD_EXTRAS)
+  endif(NOT STXXL_BUILD_EXTRAS)
 
 endif(USE_GNU_PARALLEL)
