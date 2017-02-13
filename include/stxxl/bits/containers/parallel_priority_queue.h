@@ -1963,10 +1963,7 @@ protected:
 
     //! Default limit of the extract buffer ram consumption as share of total
     //! ram
-    // C++11: constexpr static double c_default_extract_buffer_ram_part = 0.05;
-    // C++98 does not allow static const double initialization here.
-    // It's located in global scope instead.
-    static const double c_default_extract_buffer_ram_part;
+    static constexpr double c_default_extract_buffer_ram_part = 0.05;
 
     /*!
      * Limit the size of the extract buffer to an absolute value.
@@ -4680,18 +4677,6 @@ protected:
 
     stats_type m_stats;
 };
-
-// For C++98 compatibility:
-template <
-    class ValueType,
-    class CompareType,
-    class AllocStrategy,
-    size_t BlockSize,
-    size_t DefaultMemSize,
-    external_size_type MaxItems
-    >
-const double parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize,
-                                     DefaultMemSize, MaxItems>::c_default_extract_buffer_ram_part = 0.05;
 
 STXXL_END_NAMESPACE
 
