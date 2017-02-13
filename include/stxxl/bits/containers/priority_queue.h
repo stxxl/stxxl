@@ -116,8 +116,7 @@ public:
     //! Comparison object.
     typedef typename Config::comparator_type comparator_type;
     typedef typename Config::alloc_strategy_type alloc_strategy_type;
-    //! An unsigned integral type (64 bit).
-    typedef stxxl::uint64 size_type;
+    typedef external_size_type size_type;
     //! Type of the block used in disk-memory transfers
     typedef typed_block<BlockSize, value_type> block_type;
     typedef read_write_pool<block_type> pool_type;

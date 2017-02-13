@@ -1859,9 +1859,9 @@ template <
     class ValueType,
     class CompareType = std::less<ValueType>,
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY,
-    uint64 BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    uint64 DefaultMemSize = 1* 1024L* 1024L* 1024L,
-    uint64 MaxItems = 0
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    size_t DefaultMemSize = 1* 1024L* 1024L* 1024L,
+    external_size_type MaxItems = 0
     >
 class parallel_priority_queue : private noncopyable
 {
@@ -1872,8 +1872,8 @@ public:
     typedef ValueType value_type;
     typedef CompareType compare_type;
     typedef AllocStrategy alloc_strategy;
-    static const uint64 block_size = BlockSize;
-    typedef uint64 size_type;
+    static const size_t block_size = BlockSize;
+    typedef external_size_type size_type;
 
     typedef typed_block<block_size, value_type> block_type;
     typedef std::vector<BID<block_size> > bid_vector;
@@ -1934,7 +1934,7 @@ protected:
 
     //! Defines if statistics are gathered: dummy_custom_stats_counter or
     //! custom_stats_counter
-    typedef dummy_custom_stats_counter<uint64> stats_counter;
+    typedef dummy_custom_stats_counter<uint64_t> stats_counter;
 
     //! Defines if statistics are gathered: fake_timer or timer
     typedef fake_timer stats_timer;
@@ -2919,7 +2919,7 @@ public:
             sequences[i] = std::make_pair(begin, end);
         }
 
-        output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
+        output_size = std::accumulate(sizes.begin(), sizes.end(), 0ull);
         if (output_size > max_size) {
             output_size = max_size;
             has_full_range = false;
@@ -3322,7 +3322,7 @@ protected:
 
         // put items from insertion heaps into an internal array
         unsigned_type back_sum = std::accumulate(
-            back_size.begin(), back_size.end(), (uint64)0);
+            back_size.begin(), back_size.end(), 0u);
 
         STXXL_DEBUG("flush_insertion_heaps_with_limit(): back_sum = " << back_sum);
 
@@ -3833,12 +3833,12 @@ protected:
                 limiting_ea_index = calculate_merge_sequences(
                     sizes, sequences, reuse_lower_bounds);
 
-                output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
+                output_size = std::accumulate(sizes.begin(), sizes.end(), 0u);
             }
         }
         else {
             calculate_merge_sequences(sizes, sequences);
-            output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
+            output_size = std::accumulate(sizes.begin(), sizes.end(), 0u);
         }
 
         if (c_limit_extract_buffer) {
@@ -4364,7 +4364,7 @@ protected:
 
                 // === merge ===
 
-                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
+                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0u);
 
                 out_iter = potentially_parallel::multiway_merge(
                     sequences.begin(), sequences.end(),
@@ -4686,9 +4686,9 @@ template <
     class ValueType,
     class CompareType,
     class AllocStrategy,
-    uint64 BlockSize,
-    uint64 DefaultMemSize,
-    uint64 MaxItems
+    size_t BlockSize,
+    size_t DefaultMemSize,
+    external_size_type MaxItems
     >
 const double parallel_priority_queue<ValueType, CompareType, AllocStrategy, BlockSize,
                                      DefaultMemSize, MaxItems>::c_default_extract_buffer_ram_part = 0.05;

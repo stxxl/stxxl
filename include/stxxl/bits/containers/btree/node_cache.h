@@ -61,7 +61,7 @@ private:
         size_t operator () (const bid_type& bid) const
         {
             size_t result =
-                longhash1(bid.offset + reinterpret_cast<uint64>(bid.storage));
+                longhash1(bid.offset + reinterpret_cast<intptr_t>(bid.storage));
             return result;
         }
 #if STXXL_MSVC

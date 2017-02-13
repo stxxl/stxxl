@@ -46,8 +46,8 @@ public:
 
     typedef PDAllocStrategy alloc_strategy_type;
 
-    typedef stxxl::uint64 size_type;
-    typedef stxxl::int64 difference_type;
+    typedef external_size_type size_type;
+    typedef external_diff_type difference_type;
     typedef std::pair<const key_type, data_type> value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
@@ -344,7 +344,7 @@ private:
         {
             key_bid_vector_type parent_bids;
 
-            stxxl::uint64 nparents = div_ceil(bids.size(), max_node_elements);
+            size_t nparents = div_ceil(bids.size(), max_node_elements);
             assert(nparents >= 2);
             STXXL_VERBOSE1("btree bulk construct"
                            << " bids.size=" << bids.size()

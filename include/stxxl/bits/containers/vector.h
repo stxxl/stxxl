@@ -823,7 +823,7 @@ template <
     typename PagerType = lru_pager<8>,
     unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-    typename SizeType = stxxl::uint64       // will be deprecated soon
+    typename SizeType = external_size_type
     >
 class vector
 {
@@ -921,25 +921,24 @@ private:
     block_manager* m_bm;
     bool m_exported;
 
-    size_type size_from_file_length(stxxl::uint64 file_length) const
+    size_type size_from_file_length(external_size_type file_length) const
     {
-        stxxl::uint64 blocks_fit = file_length / stxxl::uint64(block_type::raw_size);
-        size_type cur_size = blocks_fit * stxxl::uint64(block_type::size);
-        stxxl::uint64 rest = file_length - blocks_fit * stxxl::uint64(block_type::raw_size);
-        return (cur_size + rest / stxxl::uint64(sizeof(value_type)));
+        size_t blocks_fit = file_length / external_size_type(block_type::raw_size);
+        size_type cur_size = blocks_fit * external_size_type(block_type::size);
+        external_size_type rest = file_length - blocks_fit * external_size_type(block_type::raw_size);
+        return (cur_size + rest / external_size_type(sizeof(value_type)));
     }
 
-    stxxl::uint64 file_length() const
+    size_type file_length() const
     {
-        typedef stxxl::uint64 file_size_type;
         size_type cur_size = size();
         size_type num_full_blocks = cur_size / block_type::size;
         if (cur_size % block_type::size != 0)
         {
             size_type rest = cur_size - num_full_blocks * block_type::size;
-            return file_size_type(num_full_blocks) * block_type::raw_size + rest * sizeof(value_type);
+            return external_size_type(num_full_blocks) * block_type::raw_size + rest * sizeof(value_type);
         }
-        return file_size_type(num_full_blocks) * block_type::raw_size;
+        return external_size_type(num_full_blocks) * block_type::raw_size;
     }
 
 public:

@@ -929,7 +929,7 @@ protected:
      * Bucket-index for values with given key. The total number of buckets has
      * to be specified as well.  The bucket number is determined by \f$
      * bucket_num = (hash/max_hash)*n_buckets \f$ max_hash is in fact 2^63-1
-     * (internal_size_type=uint64 (or uint32)) but we rather divide by 2^64, so
+     * (internal_size_type=uint64_t (or uint32_t)) but we rather divide by 2^64, so
      * we can use plain integer arithmetic easily (there should be only a small
      * difference): this way we must only calculate the upper 64 bits of the
      * product hash*n_buckets and we're done. See
