@@ -17,24 +17,23 @@
 #include <iostream>
 #include <limits>
 
-using stxxl::int_type;
-using stxxl::unsigned_type;
+using stxxl::external_size_type;
 
 // forced instantiation
-template class stxxl::block_scheduler<stxxl::swappable_block<int_type, 1024> >;
+template class stxxl::block_scheduler<stxxl::swappable_block<size_t, 1024> >;
 
 template <class IBT>
 void set_pattern_A(IBT& ib)
 {
-    for (int_type i = 0; i < ib.size; ++i)
+    for (size_t i = 0; i < ib.size; ++i)
         ib[i] = i;
 }
 
 template <class IBT>
-int_type test_pattern_A(IBT& ib)
+size_t test_pattern_A(IBT& ib)
 {
-    int_type num_err = 0;
-    for (int_type i = 0; i < ib.size; ++i)
+    size_t num_err = 0;
+    for (size_t i = 0; i < ib.size; ++i)
         num_err += (ib[i] != i);
     return num_err;
 }
@@ -42,23 +41,23 @@ int_type test_pattern_A(IBT& ib)
 template <class IBT>
 void set_pattern_B(IBT& ib)
 {
-    for (int_type i = 0; i < ib.size; ++i)
+    for (size_t i = 0; i < ib.size; ++i)
         ib[i] = ib.size - i;
 }
 
 template <class IBT>
-int_type test_pattern_B(IBT& ib)
+size_t test_pattern_B(IBT& ib)
 {
-    int_type num_err = 0;
-    for (int_type i = 0; i < ib.size; ++i)
+    size_t num_err = 0;
+    for (size_t i = 0; i < ib.size; ++i)
         num_err += (ib[i] != ib.size - i);
     return num_err;
 }
 
-const int block_size = 1024;
-typedef int_type value_type;
+const size_t block_size = 1024;
+typedef size_t value_type;
 
-unsigned_type internal_memory = 0;
+size_t internal_memory = 0;
 
 typedef stxxl::block_scheduler<stxxl::swappable_block<value_type, block_size> > block_scheduler_type;
 typedef stxxl::swappable_block<value_type, block_size> swappable_block_type;
@@ -95,8 +94,8 @@ void test1()
         internal_block_type& ib = bs.acquire(sbi1);
 
         // read from the swappable_block. it should contain pattern A
-        int_type num_err = 0;
-        for (int_type i = 0; i < block_size; ++i)
+        size_t num_err = 0;
+        for (size_t i = 0; i < block_size; ++i)
             num_err += (ib[i] != i);
         STXXL_CHECK2(num_err == 0,
                      "previously initialized block had " << num_err << " errors.");
@@ -106,7 +105,7 @@ void test1()
         internal_block_type& ib = bs.get_internal_block(sbi1);
 
         // write pattern B
-        for (int_type i = 0; i < block_size; ++i)
+        for (size_t i = 0; i < block_size; ++i)
             ib[i] = block_size - i;
 
         // release the swappable_block. changes have to be stored. it may now be swapped out.
@@ -124,7 +123,7 @@ void test1()
         internal_block_type& ib2 = bs.acquire(sbi2);
 
         // copy pattern B
-        for (int_type i = 0; i < block_size; ++i)
+        for (size_t i = 0; i < block_size; ++i)
             ib2[i] = ib1[i];
 
         // release the swappable_block. no changes happened.
@@ -228,7 +227,7 @@ void test2()
 {
     // ---------- force swapping ---------------------
     STXXL_MSG("next test: force swapping");
-    const int_type num_sb = 5;
+    const size_t num_sb = 5;
 
     // only 3 internal_blocks allowed
     block_scheduler_type* bs_ptr = new block_scheduler_type(block_size * sizeof(value_type) * 3);
@@ -236,7 +235,7 @@ void test2()
 
     // allocate blocks
     swappable_block_identifier_type sbi[num_sb];
-    for (int_type i = 0; i < num_sb; ++i)
+    for (size_t i = 0; i < num_sb; ++i)
         sbi[i] = bs.allocate_swappable_block();
 
     // fill 3 blocks
@@ -271,7 +270,7 @@ void test2()
     bs.release(sbi[3], false);
 
     // free blocks
-    for (int_type i = 0; i < num_sb; ++i)
+    for (size_t i = 0; i < num_sb; ++i)
         bs.free_swappable_block(sbi[i]);
 
     delete bs_ptr;
@@ -361,7 +360,7 @@ int main(int argc, char** argv)
     if (!cp.process(argc, argv))
         return -1;
 
-    internal_memory = unsigned_type(internal_memory_megabytes) * 1048576;
+    internal_memory = external_size_type(internal_memory_megabytes) * 1048576;
 
     // run individual tests
 
