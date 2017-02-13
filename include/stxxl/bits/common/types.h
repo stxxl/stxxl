@@ -16,28 +16,19 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
+#include <cstdint>
 
 STXXL_BEGIN_NAMESPACE
 
-#if STXXL_MSVC
-typedef __int8 int8;
-typedef unsigned __int8 uint8;
-typedef __int16 int16;
-typedef unsigned __int16 uint16;
-typedef __int32 int32;
-typedef unsigned __int32 uint32;
-typedef __int64 int64;
-typedef unsigned __int64 uint64;
-#else
-typedef char int8;
-typedef unsigned char uint8;
-typedef short int16;
-typedef unsigned short uint16;
-typedef int int32;
-typedef unsigned int uint32;
-typedef long long int int64;
-typedef unsigned long long int uint64;
-#endif
+// will be deprecated soon
+typedef int8_t int8;
+typedef uint8_t uint8;
+typedef int16_t int16;
+typedef uint16_t uint16;
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
 
 // integer types declarations
 enum { my_pointer_size = sizeof(void*) };
@@ -64,7 +55,9 @@ typedef choose_int_types<my_pointer_size>::int_type int_type;
 typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
 
 typedef unsigned_type internal_size_type;  // fits in internal memory
-typedef uint64 external_size_type;         // may require external memory
+
+typedef uint64_t external_size_type;         // may require external memory
+typedef int64_t  external_diff_type;         // may require external memory
 
 STXXL_END_NAMESPACE
 
