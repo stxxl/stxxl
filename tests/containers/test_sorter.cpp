@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 //! \example containers/test_sorter.cpp
 //! This is an example of how to use \c stxxl::sorter() container
 
@@ -17,7 +18,6 @@
 #include <stxxl/sorter>
 
 #define RECORD_SIZE 16
-#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
 struct my_type
 {
@@ -85,7 +85,7 @@ struct Comparator : public std::less<my_type>
 };
 
 // forced instantiation
-template class stxxl::sorter<my_type, Comparator, 4096>;
+template class stxxl::sorter<my_type, Comparator>;
 
 int main()
 {
@@ -93,7 +93,7 @@ int main()
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
     unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(T);
-    enum { block_size = 4096 };
+    enum { block_size = STXXL_DEFAULT_BLOCK_SIZE(T) };
 
     // comparator object used for sorters
     Comparator cmp;
