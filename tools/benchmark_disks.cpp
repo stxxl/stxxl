@@ -34,8 +34,7 @@
 #include <stxxl/bits/common/cmdline.h>
 
 using stxxl::timestamp;
-using stxxl::unsigned_type;
-using stxxl::uint64;
+using stxxl::external_size_type;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -50,14 +49,14 @@ using stxxl::uint64;
 #define KiB (1024)
 #define MiB (1024 * 1024)
 
-template <unsigned_type RawBlockSize, typename AllocStrategy>
-int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 batch_size,
+template <size_t RawBlockSize, typename AllocStrategy>
+int benchmark_disks_blocksize_alloc(external_size_type length, external_size_type start_offset, size_t batch_size,
                                     std::string optrw)
 {
-    uint64 endpos = start_offset + length;
+    external_size_type endpos = start_offset + length;
 
     if (length == 0)
-        endpos = std::numeric_limits<uint64>::max();
+        endpos = std::numeric_limits<external_size_type>::max();
 
     bool do_read = (optrw.find('r') != std::string::npos);
     bool do_write = (optrw.find('w') != std::string::npos);
@@ -67,10 +66,10 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
 
     // construct block type
 
-    const unsigned_type raw_block_size = RawBlockSize;
-    const unsigned_type block_size = raw_block_size / sizeof(int);
+    const size_t raw_block_size = RawBlockSize;
+    const size_t block_size = raw_block_size / sizeof(uint32_t);
 
-    typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
+    typedef stxxl::typed_block<raw_block_size, uint32_t> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
     if (batch_size == 0)
@@ -79,14 +78,14 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
     // calculate total bytes processed in a batch
     batch_size = raw_block_size * batch_size;
 
-    unsigned_type num_blocks_per_batch = (unsigned_type)stxxl::div_ceil(batch_size, raw_block_size);
+    size_t num_blocks_per_batch = stxxl::div_ceil(batch_size, raw_block_size);
     batch_size = num_blocks_per_batch * raw_block_size;
 
     block_type* buffer = new block_type[num_blocks_per_batch];
     stxxl::request_ptr* reqs = new stxxl::request_ptr[num_blocks_per_batch];
     std::vector<BID_type> blocks;
     double totaltimeread = 0, totaltimewrite = 0;
-    uint64 totalsizeread = 0, totalsizewrite = 0;
+    external_size_type totalsizeread = 0, totalsizewrite = 0;
 
     std::cout << "# Batch size: "
               << stxxl::add_IEC_binary_multiplier(batch_size, "B") << " ("
@@ -96,23 +95,23 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
               << std::endl;
 
     // touch data, so it is actually allcoated
-    for (unsigned j = 0; j < num_blocks_per_batch; ++j)
-        for (unsigned i = 0; i < block_size; ++i)
-            buffer[j][i] = (unsigned)(j * block_size + i);
+    for (size_t j = 0; j < num_blocks_per_batch; ++j)
+        for (size_t i = 0; i < block_size; ++i)
+            buffer[j][i] = (uint32_t)(j * block_size + i);
 
     try {
         AllocStrategy alloc;
-        uint64 current_batch_size;
+        size_t current_batch_size;
 
-        for (uint64 offset = 0; offset < endpos; offset += current_batch_size)
+        for (external_size_type offset = 0; offset < endpos; offset += current_batch_size)
         {
-            current_batch_size = std::min<uint64>(batch_size, endpos - offset);
+            current_batch_size = static_cast<size_t>(std::min<external_size_type>(batch_size, endpos - offset));
 #if CHECK_AFTER_READ
-            const uint64 current_batch_size_int = current_batch_size / sizeof(int);
+            const size_t current_batch_size_int = current_batch_size / sizeof(uint32_t);
 #endif
-            const unsigned_type current_num_blocks_per_batch = (unsigned_type)stxxl::div_ceil(current_batch_size, raw_block_size);
+            const size_t current_num_blocks_per_batch = stxxl::div_ceil(current_batch_size, raw_block_size);
 
-            unsigned_type num_total_blocks = blocks.size();
+            size_t num_total_blocks = blocks.size();
             blocks.resize(num_total_blocks + current_num_blocks_per_batch);
             stxxl::block_manager::get_instance()->new_blocks(alloc, blocks.begin() + num_total_blocks, blocks.end());
 
@@ -125,7 +124,7 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
 
             if (do_write)
             {
-                for (unsigned j = 0; j < current_num_blocks_per_batch; j++)
+                for (size_t j = 0; j < current_num_blocks_per_batch; j++)
                     reqs[j] = buffer[j].write(blocks[num_total_blocks + j]);
 
                 wait_all(reqs, current_num_blocks_per_batch);
@@ -144,7 +143,7 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
 
             if (do_read)
             {
-                for (unsigned j = 0; j < current_num_blocks_per_batch; j++)
+                for (size_t j = 0; j < current_num_blocks_per_batch; j++)
                     reqs[j] = buffer[j].read(blocks[num_total_blocks + j]);
 
                 wait_all(reqs, current_num_blocks_per_batch);
@@ -160,16 +159,16 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
             std::cout << std::setw(5) << std::setprecision(1) << (double(current_batch_size) / MiB / elapsed) << " MiB/s read" << std::endl;
 
 #if CHECK_AFTER_READ
-            for (unsigned j = 0; j < current_num_blocks_per_batch; j++)
+            for (size_t j = 0; j < current_num_blocks_per_batch; j++)
             {
-                for (unsigned i = 0; i < block_size; i++)
+                for (size_t i = 0; i < block_size; i++)
                 {
-                    if (buffer[j][i] != j * block_size + i)
+                    if (buffer[j][i] != static_cast<uint32_t>(j * block_size + i))
                     {
-                        int ibuf = i / current_batch_size_int;
-                        int pos = i % current_batch_size_int;
+                        size_t ibuf = i / current_batch_size_int;
+                        size_t pos = i % current_batch_size_int;
 
-                        std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
+                        std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(uint32_t)
                                   << "  got: " << std::hex << std::setw(8) << buffer[j][i] << " wanted: " << std::hex << std::setw(8) << (j * block_size + i)
                                   << std::dec << std::endl;
 
@@ -198,8 +197,8 @@ int benchmark_disks_blocksize_alloc(uint64 length, uint64 start_offset, uint64 b
 }
 
 template <typename AllocStrategy>
-int benchmark_disks_alloc(uint64 length, uint64 offset, uint64 batch_size,
-                          unsigned_type block_size, std::string optrw)
+int benchmark_disks_alloc(external_size_type length, external_size_type offset, size_t batch_size,
+                          size_t block_size, std::string optrw)
 {
 #define run(bs) benchmark_disks_blocksize_alloc<bs, AllocStrategy>(length, offset, batch_size, optrw)
     if (block_size == 4 * KiB)
@@ -249,9 +248,9 @@ int benchmark_disks(int argc, char* argv[])
 
     stxxl::cmdline_parser cp;
 
-    uint64 length = 0, offset = 0;
+    external_size_type length = 0, offset = 0;
     unsigned int batch_size = 0;
-    unsigned_type block_size = 8 * MiB;
+    size_t block_size = 8 * MiB;
     std::string optrw = "rw", allocstr;
 
     cp.add_param_bytes("size", length,
