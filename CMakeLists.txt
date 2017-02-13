@@ -576,6 +576,19 @@ configure_file(${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in ${PROJECT_BI
 # CXX_FLAGS required for compilation
 set(STXXL_CXX_FLAGS ${OpenMP_CXX_FLAGS})
 
+# Custom build type "ReleaseWithAssert".
+string(REGEX REPLACE "[/-][dD][^/-]*NDEBUG" "" CMAKE_C_FLAGS_RELWITHASSERT_INIT "${CMAKE_C_FLAGS_RELWITHDEBINFO_INIT}")
+string(REGEX REPLACE "[/-][dD][^/-]*NDEBUG" "" CMAKE_CXX_FLAGS_RELWITHASSERT_INIT "${CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT}")
+set(CMAKE_C_FLAGS_RELWITHASSERT "${CMAKE_C_FLAGS_RELWITHASSERT_INIT}"
+  CACHE STRING "C flags for release with assert builds.")
+set(CMAKE_CXX_FLAGS_RELWITHASSERT "${CMAKE_CXX_FLAGS_RELWITHASSERT_INIT}"
+  CACHE STRING "C++ flags for release with assert builds.")
+set(CMAKE_EXE_LINKER_FLAGS_RELWITHASSERT ""
+  CACHE STRING "Linker flags for release with assert builds.")
+mark_as_advanced( CMAKE_CXX_FLAGS_RELWITHASSERT CMAKE_C_FLAGS_RELWITHASSERT CMAKE_EXE_LINKER_FLAGS_RELWITHASSERT)
+# add possible values of CMAKE_BUILD_TYPE type: RelWithAssert
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "RelWithDebInfo" "MinSizeRel" "RelWithAssert")
+
 # globally adds top-level include directories
 set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
 include_directories(${STXXL_INCLUDE_DIRS})
