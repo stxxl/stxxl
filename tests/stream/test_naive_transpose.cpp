@@ -10,6 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example stream/test_naive_transpose.cpp
 //! This is an example of how to use some basic algorithms from the
 //! stream package. The example transposes a 2D-matrix which is serialized
@@ -96,8 +98,8 @@ void dump_upper_left(const Vector& v, unsigned rows, unsigned cols, unsigned nx,
 
 int main()
 {
-    unsigned num_cols = 10000;
-    unsigned num_rows = 5000;
+    unsigned num_cols = 1000;
+    unsigned num_rows = 500;
 
     // buffers for streamify and materialize,
     // block size matches the block size of the input/output vector
