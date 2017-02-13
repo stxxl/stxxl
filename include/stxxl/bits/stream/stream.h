@@ -202,38 +202,30 @@ public:
 //! which equals to (2 * number_of_disks)
 //! \return an instance of a stream object
 
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize>
 vector_iterator2stream<
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize>
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
     >
 streamify(
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize> begin,
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize> end,
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> begin,
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> end,
     unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for vector_iterator range is called");
     return vector_iterator2stream<
-        stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                               DiffType, BlockSize, PagerType, PageSize>
+        stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
         >(begin, end, nbuffers);
 }
 
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize>
 struct streamify_traits<
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize>
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
     >
 {
     typedef vector_iterator2stream<
-            stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                                   DiffType, BlockSize, PagerType, PageSize>
+            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
             > stream_type;
 };
 
@@ -245,38 +237,30 @@ struct streamify_traits<
 //! which equals to (2 * number_of_disks)
 //! \return an instance of a stream object
 
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize>
 vector_iterator2stream<
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize>
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
     >
 streamify(
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize> begin,
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize> end,
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> begin,
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> end,
     unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
     return vector_iterator2stream<
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                     DiffType, BlockSize, PagerType, PageSize>
+        stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
         >(begin, end, nbuffers);
 }
 
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize>
 struct streamify_traits<
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize>
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
     >
 {
     typedef vector_iterator2stream<
-            stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                         DiffType, BlockSize, PagerType, PageSize>
+            stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
             > stream_type;
 };
 
@@ -370,47 +354,37 @@ public:
 
 //! Version of \c streamify. Switches from \c vector_iterator2stream to \c
 //! iterator2stream for small ranges.
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize>
 vector_iterator2stream_sr<
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize>
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
     >
 streamify_sr(
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize> begin,
-    stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                           DiffType, BlockSize, PagerType, PageSize> end,
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> begin,
+    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> end,
     unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
     return vector_iterator2stream_sr<
-        stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                               DiffType, BlockSize, PagerType, PageSize>
+        stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
         >(begin, end, nbuffers);
 }
 
 //! Version of \c streamify. Switches from \c vector_iterator2stream to \c
 //! iterator2stream for small ranges.
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize>
 vector_iterator2stream_sr<
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize>
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
     >
 streamify_sr(
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize> begin,
-    stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                 DiffType, BlockSize, PagerType, PageSize> end,
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> begin,
+    stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> end,
     unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
     return vector_iterator2stream_sr<
-        stxxl::const_vector_iterator<ValueType, AllocStr, SizeType,
-                                     DiffType, BlockSize, PagerType, PageSize>
+        stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
         >(begin, end, nbuffers);
 }
 
@@ -471,21 +445,17 @@ OutputIterator materialize(StreamAlgorithm& in,
 //! \pre Output range is large enough to hold the all elements in the input stream
 //!
 //! This function is useful when you do not know the length of the stream beforehand.
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize, class StreamAlgorithm>
-stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                       DiffType, BlockSize, PagerType, PageSize>
+stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
 materialize(StreamAlgorithm& in,
-            stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                                   DiffType, BlockSize, PagerType, PageSize> outbegin,
-            stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                                   DiffType, BlockSize, PagerType, PageSize> outend,
+            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> outbegin,
+            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> outend,
             unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> ExtIterator;
-    typedef stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> ConstExtIterator;
+    typedef stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ExtIterator;
+    typedef stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     while (outbegin.block_offset())     //  go to the beginning of the block
@@ -553,19 +523,16 @@ materialize(StreamAlgorithm& in,
 //! \return value of the output iterator after all increments,
 //! i.e. points to the first unwritten value
 //! \pre Output (range) is large enough to hold the all elements in the input stream
-template <typename ValueType, typename AllocStr, typename SizeType,
-          typename DiffType, unsigned BlockSize, typename PagerType,
+template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType,
           unsigned PageSize, class StreamAlgorithm>
-stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                       DiffType, BlockSize, PagerType, PageSize>
+stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
 materialize(StreamAlgorithm& in,
-            stxxl::vector_iterator<ValueType, AllocStr, SizeType,
-                                   DiffType, BlockSize, PagerType, PageSize> out,
+            stxxl::vector_iterator<ValueType, AllocStr,BlockSize, PagerType, PageSize> out,
             unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> ExtIterator;
-    typedef stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> ConstExtIterator;
+    typedef stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ExtIterator;
+    typedef stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     // on the I/O complexity of "materialize":

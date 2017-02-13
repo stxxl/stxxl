@@ -187,17 +187,17 @@ void random_shuffle(ExtIterator first,
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
 //! \param M number of bytes for internal use
-template <typename Type, typename AllocStrategy, typename SizeType, typename DiffType,
+template <typename Type, typename AllocStrategy,
           unsigned BlockSize, typename PageType, unsigned PageSize, typename RandomNumberGenerator>
 void random_shuffle(
-    stxxl::vector_iterator<Type, AllocStrategy, SizeType, DiffType,
+    stxxl::vector_iterator<Type, AllocStrategy,
                            BlockSize, PageType, PageSize> first,
-    stxxl::vector_iterator<Type, AllocStrategy, SizeType, DiffType,
+    stxxl::vector_iterator<Type, AllocStrategy,
                            BlockSize, PageType, PageSize> last,
     RandomNumberGenerator& rand,
     unsigned_type M)
 {
-    typedef stxxl::vector_iterator<Type, AllocStrategy, SizeType, DiffType, BlockSize, PageType, PageSize> ExtIterator;
+    typedef stxxl::vector_iterator<Type, AllocStrategy, BlockSize, PageType, PageSize> ExtIterator;
     typedef typename ExtIterator::value_type value_type;
     typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
     typedef typename stxxl::STACK_GENERATOR<value_type, stxxl::external,
@@ -363,14 +363,12 @@ void random_shuffle(
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param M number of bytes for internal use
-template <typename Type, typename AllocStrategy, typename SizeType, typename DiffType,
+template <typename Type, typename AllocStrategy,
           unsigned BlockSize, typename PageType, unsigned PageSize>
 inline
 void random_shuffle(
-    stxxl::vector_iterator<Type, AllocStrategy, SizeType, DiffType,
-                           BlockSize, PageType, PageSize> first,
-    stxxl::vector_iterator<Type, AllocStrategy, SizeType, DiffType,
-                           BlockSize, PageType, PageSize> last,
+    stxxl::vector_iterator<Type, AllocStrategy, BlockSize, PageType, PageSize> first,
+    stxxl::vector_iterator<Type, AllocStrategy, BlockSize, PageType, PageSize> last,
     unsigned_type M)
 {
     stxxl::random_number<> rand;
