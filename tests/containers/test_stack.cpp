@@ -22,10 +22,10 @@
 #include <stxxl/stack>
 
 // forced instantiation
-template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::normal, 4, STXXL_DEFAULT_BLOCK_SIZE(T)>;
-template class stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, STXXL_DEFAULT_BLOCK_SIZE(T)>;
-template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink, 4, STXXL_DEFAULT_BLOCK_SIZE(T)>;
-template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink2, 1, STXXL_DEFAULT_BLOCK_SIZE(T)>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::normal, 4>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink, 4>;
+template class stxxl::STACK_GENERATOR<size_t, stxxl::external, stxxl::grow_shrink2, 1>;
 
 template <typename stack_type>
 void test_lvalue_correctness(stack_type& stack, int a, int b)
@@ -116,16 +116,16 @@ void simple_test(stack_type& my_stack, size_t test_size)
 int main(int argc, char* argv[])
 {
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::external, stxxl::normal, 4, STXXL_DEFAULT_BLOCK_SIZE(T)
+        size_t, stxxl::external, stxxl::normal, 4
         >::result ext_normal_stack_type;
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::migrating, stxxl::normal, 4, STXXL_DEFAULT_BLOCK_SIZE(T)
+        size_t, stxxl::migrating, stxxl::normal, 4
         >::result ext_migrating_stack_type;
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::external, stxxl::grow_shrink, 4, STXXL_DEFAULT_BLOCK_SIZE(T)
+        size_t, stxxl::external, stxxl::grow_shrink
         >::result ext_stack_type;
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::external, stxxl::grow_shrink2, 1, STXXL_DEFAULT_BLOCK_SIZE(T)
+        size_t, stxxl::external, stxxl::grow_shrink2
         >::result ext_stack_type2;
 
     if (argc < 2)
@@ -135,22 +135,22 @@ int main(int argc, char* argv[])
     }
     {
         ext_normal_stack_type my_stack;
-        simple_test(my_stack, atoi(argv[1]) * 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+        simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
     }
     {
         ext_migrating_stack_type my_stack;
-        //simple_test(my_stack, atoi(argv[1]) * 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+        //simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
     }
     {
         ext_stack_type my_stack;
-        simple_test(my_stack, atoi(argv[1]) * 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+        simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
     }
     {
         // prefetch/write pool with 10 blocks prefetching and 10 block write cache (> D is recommended)
         stxxl::read_write_pool<ext_stack_type2::block_type> pool(10, 10);
         // create a stack that does not prefetch (level of prefetch aggressiveness 0)
         ext_stack_type2 my_stack(pool, 0);
-        size_t test_size = atoi(argv[1]) * 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int);
+        size_t test_size = atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int);
 
         for (size_t i = 0; i < test_size; i++)
         {

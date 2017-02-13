@@ -127,7 +127,7 @@ void test_vector1()
 
     stxxl::ran32State = 0xdeadbeef + 10;
 
-    v.resize(32 * 1024 * 1024 / sizeof(element));
+    v.resize(32 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(element));
 
     STXXL_MSG("write " << v.size() << " elements");
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
