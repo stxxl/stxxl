@@ -10,6 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #include <iostream>
 #include <algorithm>
 #include <stxxl/vector>

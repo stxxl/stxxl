@@ -107,6 +107,3 @@ if(USE_GNU_PARALLEL)
   endif(NOT BUILD_EXTRAS)
 
 endif(USE_GNU_PARALLEL)
-
-set_property(SOURCE test_parallel_sort.cpp
-  PROPERTY COMPILE_FLAGS "-DSTXXL_DEFAULT_BLOCK_SIZE\\(T\\)=4096")
