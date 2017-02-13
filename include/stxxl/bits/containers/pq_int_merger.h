@@ -54,7 +54,7 @@ public:
     typedef value_type* sequence_type;
 
     //! size type of total number of item in merger
-    typedef internal_size_type size_type;
+    typedef size_t size_type;
 
 protected:
     //! loser tree instance

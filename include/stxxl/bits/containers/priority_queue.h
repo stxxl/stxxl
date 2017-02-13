@@ -869,8 +869,7 @@ struct dummy
     typedef dummy result;
 };
 
-template <internal_size_type ElementSize, internal_size_type IntMem,
-          external_size_type MaxItems, internal_size_type BlockSize,
+template <size_t ElementSize, size_t IntMem, external_size_type MaxItems, size_t BlockSize,
           unsigned_type m_, bool stop = false>
 struct find_B_m
 {
@@ -878,24 +877,24 @@ struct find_B_m
                      MaxItems, BlockSize, m_, stop> self_type;
 
     //! element size
-    static const internal_size_type element_size = ElementSize;
+    static constexpr size_t element_size = ElementSize;
     //! internal memory size of PQ
-    static const internal_size_type intmem = IntMem;
+    static constexpr size_t intmem = IntMem;
     //! block size (iterates from 8 MiB downwards)
-    static const internal_size_type B = BlockSize;
+    static constexpr size_t B = BlockSize;
 
     //! number of blocks that fit into internal memory (M)
-    static const internal_size_type k = IntMem / BlockSize;
+    static constexpr size_t k = IntMem / BlockSize;
     //! number of blocks fitting into buffers of mergers (arity of both
     //! mergers), increased from 1 to 2048 ?-tb
-    static const internal_size_type m = m_;
+    static constexpr size_t m = m_;
     //! remaining blocks, (freely moving, not necessarily unused) ?-tb
-    static const int_type c = k - m_;
+    static constexpr int_type c = k - m_;
 
     // memory occupied by block must be at least 10 times larger than size of ext sequence
 
     //! calculated boolean whether the configuration fits into internal memory.
-    static const external_size_type fits =
+    static constexpr external_size_type fits =
         // need some temporary constant-size internal blocks
         (c > 10) &&
         // satisfy items requirement
@@ -903,7 +902,7 @@ struct find_B_m
         // if we have two ext mergers their degree must be at least 64=m/2
         ((MaxItems < ((k - m) * m / (2 * ElementSize)) * 1024) || m >= 128);
 
-    static const unsigned_type step = 1;
+    static constexpr unsigned_type step = 1;
 
     //! if not fits, recurse into configuration with +step more internal buffers
     typedef typename find_B_m<ElementSize, IntMem, MaxItems, B,
@@ -917,8 +916,7 @@ struct find_B_m
 };
 
 // specialization for the case when no valid parameters are found
-template <internal_size_type ElementSize, internal_size_type IntMem,
-          external_size_type MaxItems, bool stop>
+template <size_t ElementSize, size_t IntMem, external_size_type MaxItems, bool stop>
 struct find_B_m<ElementSize, IntMem, MaxItems, 2048, 1, stop>
 {
     enum { fits = false };
@@ -926,7 +924,7 @@ struct find_B_m<ElementSize, IntMem, MaxItems, 2048, 1, stop>
 };
 
 // to speedup search
-template <internal_size_type ElementSize, internal_size_type IntMem,
+template <size_t ElementSize, size_t IntMem,
           external_size_type MaxItems, unsigned_type BlockSize,
           unsigned_type m_>
 struct find_B_m<ElementSize, IntMem, MaxItems, BlockSize, m_, true>
@@ -936,7 +934,7 @@ struct find_B_m<ElementSize, IntMem, MaxItems, BlockSize, m_, true>
 };
 
 // start search
-template <internal_size_type ElementSize, internal_size_type IntMem,
+template <size_t ElementSize, size_t IntMem,
           external_size_type MaxItems>
 struct find_settings
 {
@@ -998,7 +996,7 @@ struct compute_N<1, X_, CriticalSize_>
 //! values.
 template <class ValueType,
           class CompareType,
-          internal_size_type IntMemory,
+          size_t IntMemory,
           external_size_type MaxItems,
           unsigned Tune = 6>
 class PRIORITY_QUEUE_GENERATOR

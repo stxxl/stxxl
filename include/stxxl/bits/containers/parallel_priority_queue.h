@@ -903,8 +903,8 @@ protected:
                m_blocks[block_index] != reinterpret_cast<block_type*>(1));
 
         // calculate minimum and maximum values
-        const internal_size_type this_block_items =
-            std::min<internal_size_type>(block_items, m_capacity - block_index * (external_size_type)block_items);
+        const size_t this_block_items =
+            std::min<size_t>(block_items, m_capacity - block_index * (external_size_type)block_items);
 
         STXXL_DEBUG("ea[" << this << "]: write_block index=" << block_index <<
                     " this_block_items=" << this_block_items);
@@ -1352,14 +1352,14 @@ public:
 
         //! index of the current element's block in the external array's block
         //! list. undefined while m_live is false.
-        internal_size_type m_block_index;
+        size_t m_block_index;
 
         //! pointer to the referenced block. undefined while m_live is false.
         block_type* m_block;
 
         //! pointer to the current element inside the referenced block.
         //! undefined while m_live is false.
-        internal_size_type m_current;
+        size_t m_current;
 
     public:
         //! default constructor (should not be used directly)
@@ -3381,7 +3381,7 @@ public:
 
     //! Free up memory by flushing internal arrays and combining external
     //! arrays until enough bytes are free.
-    void flush_ia_ea_until_memory_free(internal_size_type mem_free)
+    void flush_ia_ea_until_memory_free(size_t mem_free)
     {
         if (m_mem_left >= mem_free) return;
 

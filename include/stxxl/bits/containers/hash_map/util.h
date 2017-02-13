@@ -69,10 +69,10 @@ struct bucket
 
     //! index of first block's bid (to be used as index for hash_map's
     //! bids_-array
-    internal_size_type i_block_;
+    size_t i_block_;
 
     //! index of first subblock
-    internal_size_type i_subblock_;
+    size_t i_subblock_;
 
     bucket()
         : list_(NULL),
@@ -82,7 +82,7 @@ struct bucket
     { }
 
     bucket(NodeType* list, external_size_type n_external,
-           internal_size_type i_block, internal_size_type i_subblock)
+           size_t i_block, size_t i_subblock)
         : list_(list),
           n_external_(n_external),
           i_block_(i_block),
@@ -142,7 +142,7 @@ public:
     //! \param prefetch Enable/Disable prefetching
     buffered_reader(bid_iterator seq_begin, bid_iterator seq_end,
                     cache_type& cache,
-                    internal_size_type i_subblock = 0, bool prefetch = true)
+                    size_t i_subblock = 0, bool prefetch = true)
         : i_value_(0),
           begin_bid_(seq_begin),
           curr_bid_(seq_begin),
@@ -262,7 +262,7 @@ public:
     }
 
     //! Continue reading at given block and subblock.
-    void skip_to(bid_iterator bid, internal_size_type i_subblock)
+    void skip_to(bid_iterator bid, size_t i_subblock)
     {
         if (curr_bid_ == end_bid_)
             return;
@@ -366,7 +366,7 @@ public:
     //! Write given value.
     void append(const value_type& value)
     {
-        internal_size_type i_subblock = (i_value_ / subblock_size);
+        const size_t i_subblock = (i_value_ / subblock_size);
         (*block_)[i_subblock][i_value_ % subblock_size] = value;
 
         if (i_value_ + 1 < block_size * subblock_size)
@@ -415,10 +415,14 @@ public:
     }
 
     //! Index of current block.
-    internal_size_type i_block() { return i_block_; }
+    const size_t& i_block() const {
+        return i_block_;
+    }
 
     //! Index of current subblock.
-    internal_size_type i_subblock() { return i_value_ / subblock_size; }
+    size_t i_subblock() const {
+        return i_value_ / subblock_size;
+    }
 };
 
 /*!
