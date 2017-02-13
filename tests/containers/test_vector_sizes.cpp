@@ -19,48 +19,48 @@ typedef int my_type;
 typedef stxxl::VECTOR_GENERATOR<my_type>::result vector_type;
 typedef vector_type::block_type block_type;
 
-void test_write(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
+void test_write(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
     stxxl::file* f = stxxl::create_file(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         vector_type v(f);
         v.resize(sz);
         STXXL_MSG("writing " << v.size() << " elements");
-        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
+        for (size_t i = 0; i < v.size(); ++i)
             v[i] = ofs + (int)i;
     }
     delete f;
 }
 
 template <typename Vector>
-void test_rdwr(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
+void test_rdwr(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
     stxxl::file* f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
         STXXL_CHECK(v.size() == sz);
-        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
+        for (size_t i = 0; i < v.size(); ++i)
             STXXL_CHECK(v[i] == ofs + my_type(i));
     }
     delete f;
 }
 
 template <typename Vector>
-void test_rdonly(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
+void test_rdonly(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
     stxxl::file* f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
         STXXL_CHECK(v.size() == sz);
-        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
+        for (size_t i = 0; i < v.size(); ++i)
             STXXL_CHECK(v[i] == ofs + my_type(i));
     }
     delete f;
 }
 
-void test(const char* fn, const char* ft, stxxl::unsigned_type sz, my_type ofs)
+void test(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
     test_write(fn, ft, sz, ofs);
     test_rdwr<const vector_type>(fn, ft, sz, ofs);
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
     const char* fn = argv[1];
     const char* ft = (argc >= 3) ? argv[2] : "syscall";
 
-    stxxl::unsigned_type start_elements = 42 * block_type::size;
+    size_t start_elements = 42 * block_type::size;
 
     STXXL_MSG("using " << ft << " file");
 

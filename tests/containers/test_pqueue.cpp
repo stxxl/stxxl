@@ -22,12 +22,11 @@
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 
-using stxxl::uint64;
 using stxxl::scoped_print_timer;
 
 #define RECORD_SIZE 128
 
-const uint64 volume = 128 * 1024; // in KiB
+const size_t volume = 128 * 1024; // in KiB
 
 struct my_type
 {
@@ -101,7 +100,7 @@ int main()
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
-    uint64 nelements = 1024 * volume / sizeof(my_type);
+    size_t nelements = 1024 * volume / sizeof(my_type);
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Max elements: " << nelements);
 
@@ -109,7 +108,7 @@ int main()
         scoped_print_timer timer("Filling PQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < nelements; i++)
+        for (size_t i = 0; i < nelements; i++)
         {
             if ((i % (1024 * 1024)) == 0)
                 STXXL_MSG("Inserting element " << i);
@@ -117,7 +116,7 @@ int main()
         }
     }
 
-    STXXL_CHECK(p.size() == (stxxl::uint64)nelements);
+    STXXL_CHECK(p.size() == (size_t)nelements);
 
 #if 0
     // test swap
@@ -132,7 +131,7 @@ int main()
         scoped_print_timer timer("Emptying PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < nelements; ++i)
+        for (size_t i = 0; i < nelements; ++i)
         {
             STXXL_CHECK(!p.empty());
             //STXXL_MSG( p.top() );

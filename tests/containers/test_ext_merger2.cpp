@@ -117,9 +117,9 @@ int main()
         merger.multi_merge(output.begin(), output.begin());
 
         while (merger.size() > 0) {
-            stxxl::unsigned_type l =
-                std::min<stxxl::unsigned_type>(
-                    (stxxl::unsigned_type)merger.size(), output.size()
+            size_t l =
+                std::min<size_t>(
+                    (size_t)merger.size(), output.size()
                     );
 
             merger.multi_merge(output.begin(), output.begin() + l);

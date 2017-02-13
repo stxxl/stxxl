@@ -31,8 +31,6 @@
 #include <stxxl/scan>
 #include <stxxl/sort>
 
-using stxxl::unsigned_type;
-
 const unsigned long long megabyte = 1024 * 1024;
 
 const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
@@ -40,8 +38,8 @@ const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 #define RECORD_SIZE 20
 #define MAGIC 123
 
-unsigned_type run_size;
-unsigned_type buffer_size;
+size_t run_size;
+size_t buffer_size;
 
 struct my_type
 {
@@ -90,17 +88,17 @@ struct cmp_less_key : public std::less<my_type>
 
 typedef stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> vector_type;
 
-unsigned_type checksum(vector_type& input)
+my_type::key_type checksum(vector_type& input)
 {
-    unsigned_type sum = 0;
+    my_type::key_type sum = 0;
     for (vector_type::const_iterator i = input.begin(); i != input.end(); ++i)
-        sum += (unsigned_type)((*i).m_key);
+        sum += (my_type::key_type)((*i).m_key);
     return sum;
 }
 
 void linear_sort_normal(vector_type& input)
 {
-    unsigned_type sum1 = checksum(input);
+    my_type::key_type sum1 = checksum(input);
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
@@ -110,7 +108,7 @@ void linear_sort_normal(vector_type& input)
     double stop = stxxl::timestamp();
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
-    unsigned_type sum2 = checksum(input);
+    my_type::key_type sum2 = checksum(input);
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
 
@@ -121,7 +119,7 @@ void linear_sort_normal(vector_type& input)
 
 void linear_sort_streamed(vector_type& input, vector_type& output)
 {
-    unsigned_type sum1 = checksum(input);
+    my_type::key_type sum1 = checksum(input);
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
@@ -143,7 +141,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     double stop = stxxl::timestamp();
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
-    unsigned_type sum2 = checksum(output);
+    my_type::key_type sum2 = checksum(output);
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
     if (sum1 != sum2)
@@ -168,7 +166,7 @@ int main(int argc, const char** argv)
 #endif
     unsigned long megabytes_to_process = atoi(argv[1]);
     int p = atoi(argv[2]);
-    unsigned_type memory_to_use = (unsigned_type)(atoi(argv[3]) * megabyte);
+    size_t memory_to_use = (size_t)(atoi(argv[3]) * megabyte);
     run_size = memory_to_use;
     buffer_size = memory_to_use / 16;
 #ifdef STXXL_PARALLEL_MODE

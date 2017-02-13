@@ -21,7 +21,6 @@
 #include <stxxl/vector>
 #include <stxxl/scan>
 
-using stxxl::int64;
 using stxxl::timestamp;
 
 template <typename type>
@@ -60,26 +59,26 @@ struct fill_value
 
 int main()
 {
-    stxxl::vector<int64>::size_type i;
-    stxxl::vector<int64> v(128 * STXXL_DEFAULT_BLOCK_SIZE(T));
+    stxxl::vector<int64_t>::size_type i;
+    stxxl::vector<int64_t> v(128 * STXXL_DEFAULT_BLOCK_SIZE(T));
     double b, e;
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     STXXL_MSG("write " << (v.end() - v.begin()) << " elements ...");
 
-    stxxl::generate(v.begin(), v.end(), counter<int64>(), 4);
+    stxxl::generate(v.begin(), v.end(), counter<int64_t>(), 4);
 
     STXXL_MSG("for_each_m ...");
     b = timestamp();
-    stxxl::for_each_m(v.begin(), v.end(), square<int64>(), 4);
+    stxxl::for_each_m(v.begin(), v.end(), square<int64_t>(), 4);
     e = timestamp();
     STXXL_MSG("for_each_m time: " << (e - b));
 
     STXXL_MSG("check");
     for (i = 0; i < v.size(); ++i)
     {
-        STXXL_CHECK2(v[i] == int64(i * i), "Error at position " << i);
+        STXXL_CHECK2(v[i] == int64_t(i * i), "Error at position " << i);
     }
 
     STXXL_MSG("Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin()));
@@ -89,14 +88,14 @@ int main()
     STXXL_MSG("generate ...");
     b = timestamp();
 
-    stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64>(555), 4);
+    stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64_t>(555), 4);
     e = timestamp();
     STXXL_MSG("generate: " << (e - b));
 
     STXXL_MSG("check");
     STXXL_CHECK2(v[0] == 0, "Error at position " << 0);
 
-    STXXL_CHECK2(v[v.size() - 1] == int64((v.size() - 1) * (v.size() - 1)),
+    STXXL_CHECK2(v[v.size() - 1] == int64_t((v.size() - 1) * (v.size() - 1)),
                  "Error at position " << v.size() - 1);
 
     for (i = 1; i < v.size() - 1; ++i)

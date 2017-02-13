@@ -20,14 +20,14 @@ template class stxxl::typed_block<BLOCK_SIZE, int>; // forced instantiation
 
 int main()
 {
-    stxxl::int64 totalsize = 0;
+    size_t totalsize = 0;
     stxxl::config* config = stxxl::config::get_instance();
 
     for (size_t i = 0; i < config->disks_number(); ++i)
         totalsize += config->disk_size(i);
 
-    stxxl::unsigned_type totalblocks =
-        (stxxl::unsigned_type)(totalsize / block_type::raw_size);
+    size_t totalblocks =
+        (size_t)(totalsize / block_type::raw_size);
 
     STXXL_MSG("external memory: " << totalsize << " bytes  ==  " << totalblocks << " blocks");
 

@@ -44,8 +44,8 @@ void testIO()
 
     block_type* block = new block_type;
     STXXL_MSG(std::hex);
-    STXXL_MSG("Allocated block address    : " << (stxxl::unsigned_type)(block));
-    STXXL_MSG("Allocated block address + 1: " << (stxxl::unsigned_type)(block + 1));
+    STXXL_MSG("Allocated block address    : " << (size_t)(block));
+    STXXL_MSG("Allocated block address + 1: " << (size_t)(block + 1));
     STXXL_MSG(std::dec);
     size_t i = 0;
     for (i = 0; i < block_type::size; ++i)
