@@ -26,6 +26,9 @@ install:
   - if [ "$USE_BOOST" == "ON" ]; then sudo apt-get install libboost-all-dev; fi
 
 before_script:
+  # run on ramdisk
+  - echo "disk=/dev/shm/stxxl.###.tmp,2G,syscall unlink" > ~/.stxxl
+
   - mkdir build
   - cd build
   - cmake -DCMAKE_C_COMPILER=$CMAKE_CC -DCMAKE_CXX_COMPILER=$CMAKE_CXX
