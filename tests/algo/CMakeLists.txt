@@ -100,10 +100,13 @@ if(USE_GNU_PARALLEL)
 
     foreach(SORT m q qb s)
       foreach(MERGE p s n)
-        stxxl_test(test_parallel_sort 256 4 96 ${SORT} ${MERGE})
+        stxxl_test(test_parallel_sort 2 4 96 ${SORT} ${MERGE})
       endforeach(MERGE)
     endforeach(SORT)
 
   endif(NOT BUILD_EXTRAS)
 
 endif(USE_GNU_PARALLEL)
+
+set_property(SOURCE test_parallel_sort.cpp
+  PROPERTY COMPILE_FLAGS "-DSTXXL_DEFAULT_BLOCK_SIZE\\(T\\)=4096")
