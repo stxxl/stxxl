@@ -31,15 +31,16 @@
 
 using stxxl::request_ptr;
 using stxxl::timestamp;
+using stxxl::external_size_type;
 
 #define KiB (1024)
 #define MiB (1024 * 1024)
 
 struct print_number
 {
-    int n;
+    size_t n;
 
-    print_number(int n) : n(n) { }
+    print_number(size_t n) : n(n) { }
 
     void operator () (stxxl::request_ptr)
     {
@@ -47,18 +48,16 @@ struct print_number
     }
 };
 
-template <unsigned BlockSize, typename AllocStrategy>
-void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_read, bool do_write)
+template <size_t BlockSize, typename AllocStrategy>
+void run_test(external_size_type span, external_size_type worksize, bool do_init, bool do_read, bool do_write)
 {
-    const unsigned raw_block_size = BlockSize;
+    const size_t raw_block_size = BlockSize;
 
-    typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
+    typedef stxxl::typed_block<raw_block_size, size_t> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
-    stxxl::unsigned_type num_blocks =
-        (stxxl::unsigned_type)stxxl::div_ceil(worksize, raw_block_size);
-    stxxl::unsigned_type num_blocks_in_span =
-        (stxxl::unsigned_type)stxxl::div_ceil(span, raw_block_size);
+    external_size_type num_blocks = stxxl::div_ceil(worksize, raw_block_size);
+    external_size_type num_blocks_in_span = stxxl::div_ceil(span, raw_block_size);
 
     num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
     if (num_blocks == 0) num_blocks = num_blocks_in_span;
@@ -70,7 +69,7 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
     std::vector<BID_type> blocks;
 
     //touch data, so it is actually allocated
-    for (unsigned i = 0; i < block_type::size; ++i)
+    for (size_t i = 0; i < block_type::size; ++i)
         (*buffer)[i] = i;
 
     try {
@@ -95,7 +94,7 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
         {
             begin = timestamp();
             std::cout << "First fill up space by writing sequentially..." << std::endl;
-            for (unsigned j = 0; j < num_blocks_in_span; j++)
+            for (external_size_type j = 0; j < num_blocks_in_span; j++)
                 reqs[j] = buffer->write(blocks[j]);
             wait_all(reqs, num_blocks_in_span);
             end = timestamp();
@@ -114,7 +113,7 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
         begin = timestamp();
         if (do_read)
         {
-            for (unsigned j = 0; j < num_blocks; j++)
+            for (external_size_type j = 0; j < num_blocks; j++)
                 reqs[j] = buffer->read(blocks[j], print_number(j));
             wait_all(reqs, num_blocks);
 
@@ -130,7 +129,7 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
         begin = timestamp();
         if (do_write)
         {
-            for (unsigned j = 0; j < num_blocks; j++)
+            for (external_size_type j = 0; j < num_blocks; j++)
                 reqs[j] = buffer->write(blocks[j], print_number(j));
             wait_all(reqs, num_blocks);
 
@@ -154,7 +153,7 @@ void run_test(stxxl::int64 span, stxxl::int64 worksize, bool do_init, bool do_re
 }
 
 template <typename AllocStrategy>
-int benchmark_disks_random_alloc(stxxl::uint64 span, stxxl::uint64 block_size, stxxl::uint64 worksize,
+int benchmark_disks_random_alloc(external_size_type span, size_t block_size, external_size_type worksize,
                                  const std::string& optirw)
 {
     bool do_init = (optirw.find('i') != std::string::npos);
@@ -208,7 +207,8 @@ int benchmark_disks_random(int argc, char* argv[])
 
     stxxl::cmdline_parser cp;
 
-    stxxl::uint64 span, block_size = 8 * MiB, worksize = 0;
+    external_size_type span, worksize = 0;
+    size_t block_size = 8 * MiB;
     std::string optirw = "irw", allocstr;
 
     cp.add_param_bytes(
