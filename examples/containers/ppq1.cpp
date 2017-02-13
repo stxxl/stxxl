@@ -49,10 +49,16 @@ int main()
     STXXL_MSG("Bulk-pushing values 0 to 10000...");
 
     ppq.bulk_push_begin(10000);
+#if STXXL_PARALLEL
     #pragma omp parallel for
+#endif
     for (int i = 0; i < 10000; ++i)
     {
+#if STXXL_PARALLEL
         const unsigned thread_id = omp_get_thread_num();
+#else
+        const unsigned thread_id = 0;
+#endif
         ppq.bulk_push(i, thread_id);
     }
     ppq.bulk_push_end();
@@ -70,7 +76,9 @@ int main()
     std::vector<unsigned> out1;
     ppq.bulk_pop(out1, 500);
     
+#if STXXL_PARALLEL
     #pragma omp parallel for
+#endif
     for (int64_t i = 0; i < (int64_t)out1.size(); ++i)
     {
         // process out[i]
@@ -92,7 +100,9 @@ int main()
     unsigned limit_item = 8000;
     ppq.bulk_pop_limit(out2, limit_item);
     
+#if STXXL_PARALLEL
     #pragma omp parallel for
+#endif
     for (int64_t i = 0; i < (int64_t)out2.size(); ++i)
     {
         // process out[i]
