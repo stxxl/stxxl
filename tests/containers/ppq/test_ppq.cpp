@@ -147,19 +147,21 @@ void test_bulk_pop()
         scoped_print_timer timer("Emptying PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < stxxl::div_ceil(nelements, bulk_size); ++i)
+        for (uint64 i = 0; i < nelements; )
         {
             STXXL_CHECK(!ppq.empty());
 
             std::vector<my_type> out;
             ppq.bulk_pop(out, bulk_size);
 
+            STXXL_CHECK(!out.empty());
+
             for (uint64 j = 0; j < out.size(); ++j) {
-                const uint64 index = i * bulk_size + j;
                 //STXXL_MSG( ppq.top() );
-                STXXL_CHECK_EQUAL(out[j].key, int(index + 1));
-                if ((index % (64 * 1024)) == 0)
-                    STXXL_MSG("Element " << index << " popped");
+                if ((i % (128 * 1024)) == 0)
+                    STXXL_MSG("Element " << i << " popped");
+                ++i;
+                STXXL_CHECK_EQUAL(out[j].key, int(i));
             }
         }
     }
