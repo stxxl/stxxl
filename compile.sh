@@ -16,7 +16,7 @@ set -ex
 git submodule init
 git submodule update
 
-CMAKE_OPTS="-DSTXXL_BUILD_TESTS=ON -DSTXXL_BUILD_EXAMPLES=ON"
+CMAKE_OPTS="-DCMAKE_BUILD_TYPE=RelWithAssert -DSTXXL_BUILD_TESTS=ON -DSTXXL_BUILD_EXAMPLES=ON"
 
 # try to find a modern C++ compiler
 set +x
