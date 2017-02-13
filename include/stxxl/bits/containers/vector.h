@@ -249,11 +249,11 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 class vector;
 
-template <typename ValueType, typename AllocStr, unsigned BlockSize, typename PagerType, unsigned PageSize>
+template <typename ValueType, typename AllocStr, size_t BlockSize, typename PagerType, unsigned PageSize>
 class const_vector_iterator;
 
 template <typename VectorIteratorType>
@@ -269,7 +269,7 @@ class vector_bufwriter;
 
 //! External vector iterator, model of \c ext_random_access_iterator concept.
 template <typename ValueType, typename AllocStr,
-          unsigned BlockSize, typename PagerType, unsigned PageSize>
+          size_t BlockSize, typename PagerType, unsigned PageSize>
 class vector_iterator
 {
     typedef vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> self_type;
@@ -542,7 +542,7 @@ public:
 
 //! Const external vector iterator, model of \c ext_random_access_iterator concept.
 template <typename ValueType, typename AllocStr,
-          unsigned BlockSize, typename PagerType, unsigned PageSize>
+          size_t BlockSize, typename PagerType, unsigned PageSize>
 class const_vector_iterator
 {
     typedef const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> self_type;
@@ -813,7 +813,7 @@ template <
     typename ValueType,
     unsigned PageSize = 4,
     typename PagerType = lru_pager<8>,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
 class vector
 {
@@ -1771,7 +1771,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 inline bool operator == (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
                                        AllocStr>& a,
@@ -1785,7 +1785,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 inline bool operator != (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
                                        AllocStr>& a,
@@ -1799,7 +1799,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 inline bool operator < (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
                                       AllocStr>& a,
@@ -1813,7 +1813,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 inline bool operator > (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
                                       AllocStr>& a,
@@ -1827,7 +1827,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 inline bool operator <= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
                                        AllocStr>& a,
@@ -1841,7 +1841,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& a,
                          stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& b)
@@ -1853,7 +1853,7 @@ inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize
 
 // specialization for stxxl::vector, to use only const_iterators
 template <typename ValueType, typename AllocStr,
-          unsigned BlockSize, typename PagerType, unsigned PageSize>
+          size_t BlockSize, typename PagerType, unsigned PageSize>
 bool is_sorted(
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> first,
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> last)
@@ -1864,7 +1864,7 @@ bool is_sorted(
 }
 
 template <typename ValueType, typename AllocStr,
-          unsigned BlockSize, typename PagerType, unsigned PageSize, typename StrictWeakOrdering>
+          size_t BlockSize, typename PagerType, unsigned PageSize, typename StrictWeakOrdering>
 bool is_sorted(
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> first,
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> last,
@@ -2576,7 +2576,7 @@ template <
     typename ValueType,
     unsigned PageSize = 4,
     unsigned CachePages = 8,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
     pager_type Pager = lru
     >
@@ -2598,7 +2598,7 @@ template <
     typename ValueType,
     unsigned PageSize,
     typename PagerType,
-    unsigned BlockSize,
+    size_t BlockSize,
     typename AllocStr>
 void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& a,
           stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& b)

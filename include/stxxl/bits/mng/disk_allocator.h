@@ -118,17 +118,17 @@ public:
         return disk_bytes;
     }
 
-    template <unsigned BlockSize>
+    template <size_t BlockSize>
     void new_blocks(BIDArray<BlockSize>& bids)
     {
         new_blocks(bids.begin(), bids.end());
     }
 
-    template <unsigned BlockSize>
+    template <size_t BlockSize>
     void new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end);
 
 #if 0
-    template <unsigned BlockSize>
+    template <size_t BlockSize>
     void delete_blocks(const BIDArray<BlockSize>& bids)
     {
         for (unsigned i = 0; i < bids.size(); ++i)
@@ -136,7 +136,7 @@ public:
     }
 #endif
 
-    template <unsigned BlockSize>
+    template <size_t BlockSize>
     void delete_block(const BID<BlockSize>& bid)
     {
         scoped_mutex_lock lock(mutex);
@@ -149,7 +149,7 @@ public:
     }
 };
 
-template <unsigned BlockSize>
+template <size_t BlockSize>
 void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 {
     stxxl::int64 requested_size = 0;

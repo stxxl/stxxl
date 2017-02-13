@@ -39,7 +39,7 @@ STXXL_BEGIN_NAMESPACE
 //! - PageSize page size in blocks to use for external memory data structures
 template <typename ExtIterator,
           typename RandomNumberGenerator,
-          unsigned BlockSize,
+          size_t BlockSize,
           unsigned PageSize,
           typename AllocStrategy>
 void random_shuffle(ExtIterator first,
@@ -188,7 +188,7 @@ void random_shuffle(ExtIterator first,
 //! \param rand random number generator object (functor)
 //! \param M number of bytes for internal use
 template <typename Type, typename AllocStrategy,
-          unsigned BlockSize, typename PageType, unsigned PageSize, typename RandomNumberGenerator>
+          size_t BlockSize, typename PageType, unsigned PageSize, typename RandomNumberGenerator>
 void random_shuffle(
     stxxl::vector_iterator<Type, AllocStrategy,
                            BlockSize, PageType, PageSize> first,
@@ -364,7 +364,7 @@ void random_shuffle(
 //! \param last end of the range to shuffle
 //! \param M number of bytes for internal use
 template <typename Type, typename AllocStrategy,
-          unsigned BlockSize, typename PageType, unsigned PageSize>
+          size_t BlockSize, typename PageType, unsigned PageSize>
 inline
 void random_shuffle(
     stxxl::vector_iterator<Type, AllocStrategy, BlockSize, PageType, PageSize> first,

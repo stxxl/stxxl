@@ -37,7 +37,7 @@ STXXL_BEGIN_NAMESPACE
 
 template <class ValueType,
           unsigned BlocksPerPage = 4,
-          unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+          size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SizeType = external_size_type>
 struct stack_config_generator
@@ -1000,7 +1000,7 @@ template <
     stack_externality Externality = external,
     stack_behaviour Behaviour = normal,
     unsigned BlocksPerPage = 4,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
 
     class IntStackType = std::stack<ValueType>,
     unsigned_type MigrCritSize = (2* BlocksPerPage* BlockSize),

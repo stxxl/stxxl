@@ -44,7 +44,7 @@ template <
     unsigned N_ = 512,                             // length of group 1 sequences
     unsigned IntKMAX_ = 64,                        // maximal arity for internal mergers
     unsigned IntLevels_ = 4,                       // number of internal groups
-    unsigned BlockSize_ = (2* 1024* 1024),         // external block size
+    size_t BlockSize_ = (2* 1024* 1024),         // external block size
     unsigned ExtKMAX_ = 64,                        // maximal arity for external mergers
     unsigned ExtLevels_ = 2,                       // number of external groups
     class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
@@ -1027,7 +1027,7 @@ public:
         unsigned N_ = 512,          // bandwidth
         unsigned IntKMAX_ = 64,     // maximal arity for internal mergers
         unsigned IntLevels_ = 4,
-        unsigned BlockSize = (2*1024*1024),
+        size_t BlockSize = (2*1024*1024),
         unsigned ExtKMAX_ = 64,     // maximal arity for external mergers
         unsigned ExtLevels_ = 2,
      */

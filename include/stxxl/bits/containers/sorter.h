@@ -59,7 +59,7 @@ STXXL_BEGIN_NAMESPACE
  */
 template <typename ValueType,
           typename CompareType,
-          unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+          size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY>
 class sorter : private noncopyable
 {

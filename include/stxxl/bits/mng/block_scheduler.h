@@ -32,7 +32,7 @@ STXXL_BEGIN_NAMESPACE
 //! \tparam ValueType type of contained objects (POD with no references to internal memory).
 //! \tparam BlockSize Number of objects in one block.
 //!         BlockSize*sizeof(ValueType) must be divisible by 4096.
-template <typename ValueType, unsigned BlockSize>
+template <typename ValueType, size_t BlockSize>
 class swappable_block
 {
 protected:
@@ -228,7 +228,7 @@ public:
     }
 };
 
-template <typename ValueType, unsigned BlockSize>
+template <typename ValueType, size_t BlockSize>
 unsigned_type swappable_block<ValueType, BlockSize>::disk_allocation_offset = 0;
 
 template <class SwappableBlockType>

@@ -46,14 +46,14 @@ namespace stream {
 template <
     class Input,
     class CompareType,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
 class basic_runs_creator : private noncopyable
 {
 public:
     typedef Input input_type;
     typedef CompareType cmp_type;
-    static const unsigned block_size = BlockSize;
+    static const size_t block_size = BlockSize;
     typedef AllocStr allocation_strategy_type;
 
 public:
@@ -164,7 +164,7 @@ public:
 //! Finish the results, i. e. create all runs.
 //!
 //! This is the main routine of this class.
-template <class Input, class CompareType, unsigned BlockSize, class AllocStr>
+template <class Input, class CompareType, size_t BlockSize, class AllocStr>
 void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result()
 {
     unsigned_type i = 0;
@@ -356,7 +356,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
 template <
     class Input,
     class CompareType,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY
     >
 class runs_creator : public basic_runs_creator<Input, CompareType, BlockSize, AllocStr>
@@ -408,7 +408,7 @@ struct use_push
 template <
     class ValueType,
     class CompareType,
-    unsigned BlockSize,
+    size_t BlockSize,
     class AllocStr
     >
 class runs_creator<
@@ -716,7 +716,7 @@ struct from_sorted_sequences
 template <
     class ValueType,
     class CompareType,
-    unsigned BlockSize,
+    size_t BlockSize,
     class AllocStr
     >
 class runs_creator<
@@ -1082,13 +1082,13 @@ private:
         else
         {
 // begin of native merging procedure
-            m_losers->multi_merge(m_buffer_block->elem, m_buffer_block->elem + STXXL_MIN<size_type>(out_block_type::size, m_elements_remaining));
+            m_losers->multi_merge(m_buffer_block->elem, m_buffer_block->elem + STXXL_MIN<size_type>(size_t(out_block_type::size), m_elements_remaining));
 // end of native merging procedure
         }
         STXXL_VERBOSE1("current block filled");
 
         m_current_ptr = m_buffer_block->elem;
-        m_current_end = m_buffer_block->elem + STXXL_MIN<size_type>(out_block_type::size, m_elements_remaining);
+        m_current_end = m_buffer_block->elem + STXXL_MIN<size_type>(size_t(out_block_type::size), m_elements_remaining);
 
         if (m_elements_remaining <= out_block_type::size)
             deallocate_prefetcher();
@@ -1530,7 +1530,7 @@ public:
 template <
     class Input,
     class CompareType,
-    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
     class RunsCreatorType = runs_creator<Input, CompareType, BlockSize, AllocStr>
     >
@@ -1604,7 +1604,7 @@ public:
 //! \tparam BlockSize size of blocks where sorted runs stored
 template <
     class ValueType,
-    unsigned BlockSize
+    size_t BlockSize
     >
 class compute_sorted_runs_type
 {
@@ -1634,7 +1634,7 @@ public:
 //! The \c BlockSize template parameter defines the block size to use (in bytes)
 //! \warning Slower than External Iterator Sort
 template <
-    unsigned BlockSize,
+    size_t BlockSize,
     class RandomAccessIterator,
     class CmpType,
     class AllocStr

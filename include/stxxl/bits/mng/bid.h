@@ -37,14 +37,11 @@ STXXL_BEGIN_NAMESPACE
 //! Block identifier class.
 //!
 //! Stores block identity, given by file and offset within the file
-template <unsigned Size>
+template <size_t Size>
 struct BID
 {
-    enum
-    {
-        size = Size,         //!< Block size
-        t_size = Size        //!< Blocks size, given by the parameter
-    };
+    static constexpr size_t size = Size;   //!< Block size
+    static constexpr size_t t_size = Size; //!< Blocks size, given by the parameter
 
     file* storage;           //!< pointer to the file of the block
     stxxl::int64 offset;     //!< offset within the file of the block
@@ -63,12 +60,12 @@ struct BID
     BID(const BID& obj) : storage(obj.storage), offset(obj.offset)
     { }
 
-    template <unsigned BlockSize>
+    template <size_t BlockSize>
     explicit BID(const BID<BlockSize>& obj)
         : storage(obj.storage), offset(obj.offset)
     { }
 
-    template <unsigned BlockSize>
+    template <size_t BlockSize>
     BID& operator = (const BID<BlockSize>& obj)
     {
         storage = obj.storage;
@@ -92,10 +89,7 @@ struct BID<0>
     stxxl::int64 offset;     //!< offset within the file of the block
     unsigned size;           //!< size of the block in bytes
 
-    enum
-    {
-        t_size = 0           //!< Blocks size, given by the parameter
-    };
+    static constexpr size_t t_size = 0;  //!< Blocks size, given by the parameter
 
     BID() : storage(NULL), offset(0), size(0)
     { }
@@ -109,19 +103,19 @@ struct BID<0>
     }
 };
 
-template <unsigned BlockSize>
+template <size_t BlockSize>
 bool operator == (const BID<BlockSize>& a, const BID<BlockSize>& b)
 {
     return (a.storage == b.storage) && (a.offset == b.offset) && (a.size == b.size);
 }
 
-template <unsigned BlockSize>
+template <size_t BlockSize>
 bool operator != (const BID<BlockSize>& a, const BID<BlockSize>& b)
 {
     return (a.storage != b.storage) || (a.offset != b.offset) || (a.size != b.size);
 }
 
-template <unsigned BlockSize>
+template <size_t BlockSize>
 std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
 {
     // [0x12345678|0]0x00100000/0x00010000
@@ -141,7 +135,7 @@ std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
     return s;
 }
 
-template <unsigned BlockSize>
+template <size_t BlockSize>
 class BIDArray : public simple_vector<BID<BlockSize> >
 {
 public:

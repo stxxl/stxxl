@@ -146,7 +146,7 @@ public:
     //! \param functor object of model of \b allocation_strategy concept
     //! \param bid BID to store the block identifier
     //! \param offset advance for \b functor to line up partial allocations
-    template <typename DiskAssignFunctor, unsigned BLK_SIZE>
+    template <typename DiskAssignFunctor, size_t BLK_SIZE>
     void new_block(const DiskAssignFunctor& functor, BID<BLK_SIZE>& bid, unsigned_type offset = 0)
     {
         new_blocks_int<BID<BLK_SIZE> >(1, functor, offset, &bid);
@@ -162,7 +162,7 @@ public:
 
     //! Deallocates a block.
     //! \param bid block identifier
-    template <unsigned BLK_SIZE>
+    template <size_t BLK_SIZE>
     void delete_block(const BID<BLK_SIZE>& bid);
 
     ~block_manager();
@@ -235,7 +235,7 @@ void block_manager::new_blocks_int(
 #endif // STXXL_MNG_COUNT_ALLOCATION
 }
 
-template <unsigned BlockSize>
+template <size_t BlockSize>
 void block_manager::delete_block(const BID<BlockSize>& bid)
 {
     if (!bid.valid()) {

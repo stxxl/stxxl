@@ -20,7 +20,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-template <unsigned BlockSize, typename RunType, class PosType = int_type>
+template <size_t BlockSize, typename RunType, class PosType = int_type>
 struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
 {
     typedef runs2bid_array_adaptor<BlockSize, RunType, PosType> self_type;
@@ -73,7 +73,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
 
 BLOCK_ADAPTOR_OPERATORS(runs2bid_array_adaptor)
 
-template <unsigned BlockSize, typename RunType, class PosType = int_type>
+template <size_t BlockSize, typename RunType, class PosType = int_type>
 struct runs2bid_array_adaptor2
     : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
 {

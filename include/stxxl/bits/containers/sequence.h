@@ -56,7 +56,7 @@ STXXL_BEGIN_NAMESPACE
  * \tparam SizeType size data type, default is \c external_size_type
  */
 template <class ValueType,
-          unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+          size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SizeType = external_size_type>
 class sequence : private noncopyable
