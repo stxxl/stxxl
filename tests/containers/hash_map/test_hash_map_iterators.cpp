@@ -57,11 +57,11 @@ void cmp_with_internal_map()
     typedef std::pair<int, int> value_type;
     const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned_type n_values = 15000;
-    const unsigned_type n_tests = 7500;
+    const unsigned_type n_values = 6000;
+    const unsigned_type n_tests = 3000;
 
     // make sure all changes will be buffered
-    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type buffer_size = n_values * (value_size + sizeof(int*));
     const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
     const unsigned_type subblock_raw_size = 4 * 1024;
@@ -144,11 +144,11 @@ void basic_iterator_test()
     typedef std::pair<int, int> value_type;
     const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned_type n_values = 15000;
-    const unsigned_type n_tests = 7500;
+    const unsigned_type n_values = 2000;
+    const unsigned_type n_tests = 1000;
 
     // make sure all changes will be buffered
-    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type buffer_size = n_values * (value_size + sizeof(int*));
 
     const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
@@ -310,10 +310,10 @@ void more_iterator_test()
     typedef std::pair<int, int> value_type;
     const unsigned_type value_size = sizeof(value_type);
 
-    const unsigned_type n_values = 15000;
+    const unsigned_type n_values = 6000;
 
     // make sure all changes will be buffered
-    const unsigned_type buffer_size = 5 * n_values * (value_size + sizeof(int*));
+    const unsigned_type buffer_size = n_values * (value_size + sizeof(int*));
     const unsigned_type mem_to_sort = 32 * 1024 * 1024;
 
     const unsigned_type subblock_raw_size = 4 * 1024;
