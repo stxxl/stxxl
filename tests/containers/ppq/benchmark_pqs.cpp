@@ -738,16 +738,16 @@ void do_pop_rand_check(ContainerType& c, unsigned int seed)
 }
 
 template <typename ContainerType>
-void do_bulk_push_asc(ContainerType& c, bool parallel)
+void do_bulk_push_asc(ContainerType& c, bool do_parallel)
 {
     typedef typename ContainerType::value_type value_type;
 
-    std::string parallel_str = parallel ? " in parallel" : " sequentially";
+    std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
     scoped_stats stats(c, g_testset + "|bulk-push-asc",
                        "Filling " + c.name() + " with bulks" + parallel_str);
 
-    if (parallel && !c.supports_threaded_bulks()) {
+    if (do_parallel && !c.supports_threaded_bulks()) {
         STXXL_ERRMSG("Container " + c.name() +
                      " does not support parallel bulks operations");
         abort();
@@ -758,10 +758,10 @@ void do_bulk_push_asc(ContainerType& c, bool parallel)
         c.bulk_push_begin(bulk_size);
 
 #if STXXL_PARALLEL
-        #pragma omp parallel if(parallel) num_threads(g_max_threads)
+        #pragma omp parallel if(do_parallel) num_threads(g_max_threads)
 #endif
         {
-            const unsigned thread_id = parallel ? get_thread_num() : 0;
+            const unsigned thread_id = do_parallel ? get_thread_num() : 0;
 
 #if STXXL_PARALLEL
             #pragma omp for schedule(static)
@@ -780,10 +780,10 @@ void do_bulk_push_asc(ContainerType& c, bool parallel)
     c.bulk_push_begin(num_elements % bulk_size);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel)
+#pragma omp parallel if(do_parallel)
 #endif
     {
-        const unsigned thread_id = parallel ? get_thread_num() : 0;
+        const unsigned thread_id = do_parallel ? get_thread_num() : 0;
 
 #if STXXL_PARALLEL
         #pragma omp for schedule(static)
@@ -806,16 +806,16 @@ void do_bulk_push_asc(ContainerType& c, bool parallel)
 
 template <typename ContainerType>
 void do_bulk_push_rand(ContainerType& c,
-                       unsigned int _seed, bool parallel)
+                       unsigned int _seed, bool do_parallel)
 {
     typedef typename ContainerType::value_type value_type;
 
-    std::string parallel_str = parallel ? " in parallel" : " sequentially";
+    std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
     scoped_stats stats(c, g_testset + "|bulk-push-rand",
                        "Filling " + c.name() + " with bulks" + parallel_str);
 
-    if (parallel && !c.supports_threaded_bulks()) {
+    if (do_parallel && !c.supports_threaded_bulks()) {
         STXXL_ERRMSG("Container " + c.name() +
                      " does not support parallel bulks operations");
         abort();
@@ -831,10 +831,10 @@ void do_bulk_push_rand(ContainerType& c,
         c.bulk_push_begin(bulk_size);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel) num_threads(g_max_threads)
+#pragma omp parallel if(do_parallel) num_threads(g_max_threads)
 #endif
         {
-            const unsigned thread_id = parallel ? get_thread_num() : 0;
+            const unsigned thread_id = do_parallel ? get_thread_num() : 0;
 
 #if STXXL_PARALLEL
             #pragma omp for schedule(static)
@@ -858,10 +858,10 @@ void do_bulk_push_rand(ContainerType& c,
     c.bulk_push_begin(bulk_remain);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel)
+#pragma omp parallel if(do_parallel)
 #endif
     {
-        const unsigned thread_id = parallel ? get_thread_num() : 0;
+        const unsigned thread_id = do_parallel ? get_thread_num() : 0;
 
 #if STXXL_PARALLEL
         #pragma omp for schedule(static)
@@ -940,11 +940,11 @@ void do_bulk_pop_check_asc(ContainerType& c)
 
 template <typename ContainerType>
 void do_bulk_pop_check_rand(ContainerType& c,
-                            unsigned int _seed, bool parallel)
+                            unsigned int _seed, bool do_parallel)
 {
     typedef typename ContainerType::value_type value_type;
 
-    std::string parallel_str = parallel ? " in parallel" : " sequentially";
+    std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
     stxxl::sorter<uint64, less_min_max<uint64> >
     sorted_vals(less_min_max<uint64>(), RAM / 2);
@@ -961,10 +961,10 @@ void do_bulk_pop_check_rand(ContainerType& c,
         for (uint64 i = 0; i < num_elements / bulk_size; ++i)
         {
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel) num_threads(g_max_threads)
+#pragma omp parallel if(do_parallel) num_threads(g_max_threads)
 #endif
             {
-                const unsigned thread_id = parallel ? get_thread_num() : 0;
+                const unsigned thread_id = do_parallel ? get_thread_num() : 0;
 
 #if STXXL_PARALLEL
                 #pragma omp for schedule(static)
@@ -988,10 +988,10 @@ void do_bulk_pop_check_rand(ContainerType& c,
         int64 bulk_remain = num_elements % bulk_size;
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel)
+#pragma omp parallel if(do_parallel)
 #endif
         {
-            const unsigned thread_id = parallel ? get_thread_num() : 0;
+            const unsigned thread_id = do_parallel ? get_thread_num() : 0;
 
 #if STXXL_PARALLEL
             #pragma omp for schedule(static)
@@ -1254,7 +1254,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 // Bulk Limit and Pop/Push Operations
 
 template <typename ContainerType>
-void do_bulk_prefill(ContainerType& c, bool parallel,
+void do_bulk_prefill(ContainerType& c, bool do_parallel,
                      typename ContainerType::value_type::key_type& windex)
 {
     typedef typename ContainerType::value_type value_type;
@@ -1266,11 +1266,11 @@ void do_bulk_prefill(ContainerType& c, bool parallel,
     c.bulk_push_begin(num_elements / 2);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel)
+#pragma omp parallel if(do_parallel)
 #endif
     {
         const unsigned int thread_num =
-            parallel ? get_thread_num() : 0;
+                do_parallel ? get_thread_num() : 0;
 #if STXXL_PARALLEL
 #pragma omp for
 #endif
@@ -1314,7 +1314,7 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
 }
 
 template <bool RandomizeBulkSize, typename ContainerType>
-void do_bulk_limit(ContainerType& c, bool parallel)
+void do_bulk_limit(ContainerType& c, bool do_parallel)
 {
     typedef typename ContainerType::value_type value_type;
     typedef typename value_type::key_type key_type;
@@ -1322,7 +1322,7 @@ void do_bulk_limit(ContainerType& c, bool parallel)
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
 
-    do_bulk_prefill(c, parallel, windex);
+    do_bulk_prefill(c, do_parallel, windex);
 
     // extract bulk_size items, and reinsert them with higher indexes
     {
@@ -1381,11 +1381,11 @@ void do_bulk_limit(ContainerType& c, bool parallel)
     STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
     STXXL_CHECK_EQUAL(c.size(), num_elements);
 
-    do_bulk_postempty(c, parallel, rindex);
+    do_bulk_postempty(c, do_parallel, rindex);
 }
 
 template <bool RandomizeBulkSize, typename ContainerType>
-void do_bulk_pop_push(ContainerType& c, bool parallel)
+void do_bulk_pop_push(ContainerType& c, bool do_parallel)
 {
     typedef typename ContainerType::value_type value_type;
     typedef typename value_type::key_type key_type;
@@ -1393,7 +1393,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
 
-    do_bulk_prefill(c, parallel, windex);
+    do_bulk_prefill(c, do_parallel, windex);
 
     // extract bulk_size items, and reinsert them with higher indexes
     {
@@ -1415,7 +1415,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
             c.bulk_pop(work, this_bulk_size);
             c.bulk_push_begin(this_bulk_size);
 
-            if (!parallel)
+            if (!do_parallel)
             {
                 for (uint64 i = 0; i < work.size(); ++i)
                 {
@@ -1452,7 +1452,7 @@ void do_bulk_pop_push(ContainerType& c, bool parallel)
     STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
     STXXL_CHECK_EQUAL(c.size(), num_elements);
 
-    do_bulk_postempty(c, parallel, rindex);
+    do_bulk_postempty(c, do_parallel, rindex);
 }
 
 /*
