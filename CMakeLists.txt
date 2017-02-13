@@ -64,11 +64,11 @@ endif()
 
 # please document all build options in doc/install.doc:install_build_options
 
-option(BUILD_EXAMPLES "Build all stxxl examples" OFF)
+option(STXXL_BUILD_EXAMPLES "Build all stxxl examples" OFF)
 
-option(BUILD_TESTS "Build all stxxl test programs" OFF)
-if(BUILD_TESTS)
-  set(BUILD_EXAMPLES ON)
+option(STXXL_BUILD_TESTS "Build all stxxl test programs" OFF)
+if(STXXL_BUILD_TESTS)
+  set(STXXL_BUILD_EXAMPLES ON)
 endif()
 
 option(BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
@@ -606,25 +606,25 @@ endmacro(stxxl_build_tool)
 # macro for building stxxl examples
 macro(stxxl_build_example TESTNAME)
 
-  if(BUILD_EXAMPLES)
+  if(STXXL_BUILD_EXAMPLES)
     stxxl_build_tool(${TESTNAME} ${ARGN})
-  endif(BUILD_EXAMPLES)
+  endif(STXXL_BUILD_EXAMPLES)
 
 endmacro(stxxl_build_example)
 
 # macro for building stxxl tests
 macro(stxxl_build_test TESTNAME)
 
-  if(BUILD_TESTS)
+  if(STXXL_BUILD_TESTS)
     stxxl_build_tool(${TESTNAME} ${ARGN})
-  endif(BUILD_TESTS)
+  endif(STXXL_BUILD_TESTS)
 
 endmacro(stxxl_build_test)
 
 # macro for registering stxxl tests
 macro(stxxl_test TESTNAME)
 
-  if(BUILD_TESTS)
+  if(STXXL_BUILD_TESTS)
     set(TESTFULLNAME ${TESTNAME} ${ARGN})
     string(REPLACE ";" "_" TESTFULLNAME "${TESTFULLNAME}") # stringify list
 
@@ -637,7 +637,7 @@ macro(stxxl_test TESTNAME)
       set_tests_properties(${TESTFULLNAME} PROPERTIES TIMEOUT 3600)
     endif()
 
-  endif(BUILD_TESTS)
+  endif(STXXL_BUILD_TESTS)
 
 endmacro(stxxl_test)
 
@@ -665,9 +665,9 @@ macro(add_define PROGNAME)
   if(TARGET ${PROGNAME})
     set_property(TARGET ${PROGNAME} APPEND PROPERTY COMPILE_DEFINITIONS ${ARGN})
   else()
-    if(BUILD_TESTS)
+    if(STXXL_BUILD_TESTS)
       message("Ignoring add_define(${PROGNAME} ${ARGN}) for unknown target ${PROGNAME}")
-    endif(BUILD_TESTS)
+    endif(STXXL_BUILD_TESTS)
   endif()
 
 endmacro(add_define TESTNAME)
@@ -703,7 +703,7 @@ endif(TRY_COMPILE_HEADERS)
 ###############################################################################
 # figure out STXXL_TMPDIR for tests
 
-if(BUILD_TESTS)
+if(STXXL_BUILD_TESTS)
 
   if(DEFINED ENV{STXXL_TMPDIR})
     set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
@@ -713,7 +713,7 @@ if(BUILD_TESTS)
 
   message(STATUS "Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 
-endif(BUILD_TESTS)
+endif(STXXL_BUILD_TESTS)
 
 ###############################################################################
 # install header files

@@ -14,6 +14,6 @@ stable interface. If TPIE was detected, the cmake script will search for
 BerkeleyDB on the system and attempt to compile with it.
 
 All benchmarks not depending on external libraries are build with
--DBUILD_TESTS=ON.
+-DSTXXL_BUILD_TESTS=ON.
 
 2013-10-07 Timo Bingmann

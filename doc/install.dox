@@ -67,7 +67,7 @@ $ ./test1
 
 For your own prototype project you can immediately start modifying \c test1.cpp or create a new .cpp in \c local/. The CMake scripts will automatically compile and link all .cpp files in \c local/ correctly with STXXL.
 
-The CMake file has many build options (see \ref install_build_options). Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By setting them with <tt>"-DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON"</tt> on the CMake line, additional subprojects are added to the build.
+The CMake file has many build options (see \ref install_build_options). Maybe the most important are \c STXXL_BUILD_TESTS and \c STXXL_BUILD_EXAMPLES. By setting them with <tt>"-DSTXXL_BUILD_EXAMPLES=ON -DSTXXL_BUILD_TESTS=ON"</tt> on the CMake line, additional subprojects are added to the build.
 
 By default, STXXL compiles in <tt>Debug</tt> mode and includes many assertions and run-time checks, which typically slow down performance dramatically. To use STXXL at **full speed**, please set the build type to <tt>Release</tt> by adding <tt>-DCMAKE_BUILD_TYPE=Release</tt> to the cmake line. 
 
@@ -226,16 +226,16 @@ $ cmake -DUSE_BOOST=ON ...
 
 - STXXL contains many small example programs, which can be built by defining
 \verbatim
-$ cmake -DBUILD_EXAMPLES=ON ...
+$ cmake -DSTXXL_BUILD_EXAMPLES=ON ...
 \endverbatim
 
 - STXXL contains a set of unit tests in \c tests/, which verify most of the libraries functionality. These programs are not built by default, because this makes it easier for STXXL to be used as CMake subproject (\ref install_unix_subproject). The test suite can be built and run using
 \verbatim
-$ cmake -DBUILD_TESTS=ON ...
+$ cmake -DSTXXL_BUILD_TESTS=ON ...
 <compile>
 $ make test
 \endverbatim
-Defining BUILD_TESTS also builds everything in \c examples/. There is also a \c BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
+Defining STXXL_BUILD_TESTS also builds everything in \c examples/. There is also a \c BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
 
 - CMake can be instructed to use other compilers, by setting, for example
 \verbatim
@@ -305,7 +305,7 @@ The gcov coverage report can be automatically created using the additional targe
 
 \image html install_windows_cmake.png
 
-- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
+- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c STXXL_BUILD_TESTS and \c STXXL_BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
 
 ## Use Visual Studio to Build STXXL
 
@@ -316,7 +316,7 @@ The gcov coverage report can be automatically created using the additional targe
 
 - You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
 - Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
-- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>BUILD_EXAMPLES</tt></b> or <b><tt>BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
+- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>STXXL_BUILD_EXAMPLES</tt></b> or <b><tt>STXXL_BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
 
 \note For instruction on configuring disks on Windows, see \ref install_config
 
@@ -368,7 +368,7 @@ In summary, CMake only looks for Boost at a few locations: C:\\Boost for headers
 
 - If you get any error about CMake not being able to find Boost, refer to the previous section on the directories which CMake considers!
 
-- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
+- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c STXXL_BUILD_TESTS and \c STXXL_BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
 
 ## Use Visual Studio to Build STXXL
 
@@ -379,7 +379,7 @@ In summary, CMake only looks for Boost at a few locations: C:\\Boost for headers
 
 - You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
 - Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
-- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>BUILD_EXAMPLES</tt></b> or <b><tt>BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
+- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>STXXL_BUILD_EXAMPLES</tt></b> or <b><tt>STXXL_BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
 
 \note For instruction on configuring disks on Windows, see \ref install_config
 
