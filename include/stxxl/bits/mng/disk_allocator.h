@@ -131,7 +131,7 @@ public:
     template <size_t BlockSize>
     void delete_blocks(const BIDArray<BlockSize>& bids)
     {
-        for (unsigned i = 0; i < bids.size(); ++i)
+        for (size_t i = 0; i < bids.size(); ++i)
             delete_block(bids[i]);
     }
 #endif
@@ -152,7 +152,7 @@ public:
 template <size_t BlockSize>
 void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 {
-    stxxl::int64 requested_size = 0;
+    size_t requested_size = 0;
 
     for (typename BIDArray<BlockSize>::iterator cur = begin; cur != end; ++cur)
     {
@@ -169,7 +169,7 @@ void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
                    " end: " << static_cast<void*>(end) <<
                    ", requested_size=" << requested_size);
 
-    if (free_bytes < requested_size)
+    if (free_bytes < static_cast<int64_t>(requested_size))
     {
         if (!autogrow) {
             STXXL_THROW(bad_ext_alloc,
@@ -215,7 +215,7 @@ void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
         stxxl::int64 region_pos = (*space).first;
         stxxl::int64 region_size = (*space).second;
         free_space.erase(space);
-        if (region_size > requested_size)
+        if (region_size > static_cast<int64_t>(requested_size))
             free_space[region_pos + requested_size] = region_size - requested_size;
 
         for (stxxl::int64 pos = region_pos; begin != end; ++begin)

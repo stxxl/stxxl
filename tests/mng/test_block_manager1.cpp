@@ -23,8 +23,8 @@ int main()
     std::vector<block_type, stxxl::new_alloc<block_type> > blocks(32);
     int vIndex;
     for (vIndex = 0; vIndex < 32; ++vIndex) {
-        for (int vIndex2 = 0; vIndex2 < block_type::size; ++vIndex2) {
-            blocks[vIndex][vIndex2] = vIndex2;
+        for (size_t vIndex2 = 0; vIndex2 < block_type::size; ++vIndex2) {
+            blocks[vIndex][vIndex2] = static_cast<double>(vIndex2);
         }
     }
     for (vIndex = 0; vIndex < 32; ++vIndex) {

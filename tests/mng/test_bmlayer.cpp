@@ -85,7 +85,7 @@ void testIO2()
     block_type* blocks = new block_type[32];
     int vIndex;
     for (vIndex = 0; vIndex < 32; ++vIndex) {
-        for (int vIndex2 = 0; vIndex2 < block_type::size; ++vIndex2) {
+        for (size_t vIndex2 = 0; vIndex2 < block_type::size; ++vIndex2) {
             blocks[vIndex][vIndex2] = vIndex2;
         }
     }

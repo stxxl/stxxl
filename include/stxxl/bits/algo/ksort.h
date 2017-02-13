@@ -126,7 +126,7 @@ inline void write_out(
     BlockType*& cur_blk,
     const BlockType* end_blk,
     int_type& out_block,
-    int_type& out_pos,
+    size_t& out_pos,
     RunType& run,
     write_completion_handler<BlockType, typename BlockType::bid_type>*& next_read,
     typename BlockType::bid_type*& bids,
@@ -252,7 +252,7 @@ create_runs(
                  offset, shift1);
 
         int_type out_block = 0;
-        int_type out_pos = 0;
+        size_t out_pos = 0;
         unsigned_type next_run_size = (k < nruns - 1) ? (runs[k + 1]->size()) : 0;
 
         // recurse on each bucket

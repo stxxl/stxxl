@@ -27,8 +27,8 @@
 
 #define MB (1024 * 1024)
 
-template <typename T, typename alloc_strategy_type, unsigned block_size>
-void test(stxxl::uint64 data_mem, unsigned memory_to_use)
+template <typename T, typename alloc_strategy_type, size_t block_size>
+void test(stxxl::uint64 data_mem, size_t memory_to_use)
 {
     stxxl::uint64 records_to_sort = data_mem / sizeof(T);
     typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
@@ -63,7 +63,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     STXXL_MSG("Total:   " << *stxxl::stats::get_instance());
 }
 
-template <typename T, unsigned block_size>
+template <typename T, size_t block_size>
 void test_all_strategies(
     stxxl::uint64 data_mem,
     unsigned memory_to_use,

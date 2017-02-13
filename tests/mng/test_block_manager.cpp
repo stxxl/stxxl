@@ -70,7 +70,7 @@ int main()
     {
         reqs[i] = block->read(bids[i], my_handler());
         reqs[i]->wait();
-        for (int j = 0; j < block_type::size; ++j)
+        for (size_t j = 0; j < block_type::size; ++j)
         {
             STXXL_CHECK2(j == block->elem[j].integer,
                          "Error in block " << std::hex << i << " pos: " << j

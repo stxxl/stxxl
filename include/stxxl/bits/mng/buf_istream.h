@@ -43,7 +43,7 @@ private:
 protected:
     typedef block_prefetcher<block_type, bid_iterator_type> prefetcher_type;
     prefetcher_type* prefetcher;
-    int_type current_elem;
+    size_t current_elem;
     block_type* current_blk;
     int_type* prefetch_seq;
 #ifdef BUF_ISTREAM_CHECK_END
