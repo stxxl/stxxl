@@ -16,13 +16,13 @@
 int main()
 {
     // template parameter <data_type, externality, behaviour, blocks_per_page, block_size, internal_stack_type, migrating_critical_size, allocation_strategy, size_type>
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 2*1024*1024>::result simple_stack;
+    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink>::result simple_stack;
 
     // create stack instance
     simple_stack a_stack;
 
     stxxl::random_number<> random;
-    stxxl::uint64 number_of_elements = 16 * 1024 * 1024;
+    stxxl::uint64 number_of_elements = 1024 * 1024;
 
     // routine: 1) push random values on stack and 2) pop all except the lowest value and start again
     for (int k = 0; k < 5; k++) {

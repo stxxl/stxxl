@@ -10,13 +10,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #include <iterator>
 #include <stxxl/sequence>
 #include <stxxl/random>
 
 int main(int argc, char* argv[])
 {
-    stxxl::uint64 ops = (argc >= 2) ? stxxl::atouint64(argv[1]) : 32 * 1024 * 1024;
+    stxxl::uint64 ops = (argc >= 2)
+        ? stxxl::atouint64(argv[1]) : 16 * STXXL_DEFAULT_BLOCK_SIZE(T);
 
     stxxl::random_number32 random;
     stxxl::sequence<int> XXLDeque;
@@ -63,7 +66,7 @@ int main(int argc, char* argv[])
             STXXL_CHECK(XXLDeque.front() == STDDeque.front());
         }
 
-        if (!(i % 1000000))
+        if (!(i % 1000))
         {
             std::cout << "Complete check of sequence/deque (size " << XXLDeque.size() << ")\n";
             stxxl::sequence<int>::stream stream = XXLDeque.get_stream();
@@ -80,7 +83,7 @@ int main(int argc, char* argv[])
             STXXL_CHECK(b == STDDeque.end());
         }
 
-        if (!(i % 1000000))
+        if (!(i % 1000))
         {
             std::cout << "Complete check of reverse sequence/deque (size " << XXLDeque.size() << ")\n";
             stxxl::sequence<int>::reverse_stream stream = XXLDeque.get_reverse_stream();

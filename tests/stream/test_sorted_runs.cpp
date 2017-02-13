@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example stream/test_sorted_runs.cpp
 //! This is an example of how to use some basic algorithms from
 //! stream package. This example shows how to create
@@ -21,7 +23,6 @@
 #include <stxxl/stream>
 
 const unsigned long long megabyte = 1024 * 1024;
-const int block_size = 1 * megabyte;
 
 typedef unsigned value_type;
 
@@ -52,7 +53,7 @@ int main()
     typedef stxxl::stream::runs_creator<InputType, Cmp, 4096, stxxl::RC> CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
-    unsigned input_size = (50 * megabyte / sizeof(value_type));
+    unsigned input_size = (10 * megabyte / sizeof(value_type));
 
     Cmp c;
     CreateRunsAlg SortedRuns(c, 10 * megabyte);
@@ -82,7 +83,7 @@ int main()
     STXXL_CHECK(check_sorted_runs(Runs, Cmp()));
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 10 * megabyte);
-    stxxl::vector<value_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> array;
+    stxxl::vector<value_type, 4, stxxl::lru_pager<8> > array;
     STXXL_MSG(input_size << " " << Runs->elements);
     STXXL_MSG("checksum before: " << checksum_before);
     value_type checksum_after(0);

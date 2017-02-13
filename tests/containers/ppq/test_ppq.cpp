@@ -12,6 +12,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 #include <limits>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/random>
@@ -60,7 +61,7 @@ template class stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
         STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
-        1* 1024L* 1024L* 1024L,              /* RamSize */
+        1* 64L * 1024L* 1024L,              /* RamSize */
         0                                    /* MaxItems */
         >;
 
@@ -68,14 +69,14 @@ typedef stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
         STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
-        512* 1024L* 1024L                    /* RamSize */
+        512* 64L* 1024L                    /* RamSize */
         > ppq_type;
 
 void test_simple()
 {
-    ppq_type ppq(my_cmp(), 1024L * 1024L * 1024L, 4);
+    ppq_type ppq(my_cmp(), 128L * 1024L * 1024L, 4);
 
-    const uint64 volume = 512L * 1024 * 1024;
+    const uint64 volume = 128L * 1024 * 1024;
 
     uint64 nelements = volume / sizeof(my_type);
 
@@ -85,7 +86,7 @@ void test_simple()
 
         for (uint64 i = 0; i < nelements; i++)
         {
-            if ((i % (1024 * 1024)) == 0)
+            if ((i % (128 * 1024)) == 0)
                 STXXL_MSG("Inserting element " << i);
 
             ppq.push(my_type(int(nelements - i)));
@@ -106,7 +107,7 @@ void test_simple()
             STXXL_CHECK_EQUAL(ppq.top().key, int(i + 1));
 
             ppq.pop();
-            if ((i % (1024 * 1024)) == 0)
+            if ((i % (128 * 1024)) == 0)
                 STXXL_MSG("Element " << i << " popped");
         }
     }
@@ -117,9 +118,9 @@ void test_simple()
 
 void test_bulk_pop()
 {
-    ppq_type ppq(my_cmp(), 1024L * 1024L * 1024L, 4);
+    ppq_type ppq(my_cmp(), 128L * 1024L * 1024L, 4);
 
-    const uint64 volume = 512L * 1024 * 1024;
+    const uint64 volume = 128L * 1024L * 1024L;
     const uint64 bulk_size = 1024;
 
     uint64 nelements = volume / sizeof(my_type);
@@ -132,7 +133,7 @@ void test_bulk_pop()
 
         for (uint64 i = 0; i < nelements; i++)
         {
-            if ((i % (1024 * 1024)) == 0)
+            if ((i % (256 * 1024)) == 0)
                 STXXL_MSG("Inserting element " << i);
 
             ppq.push(my_type(int(nelements - i)));
@@ -146,19 +147,21 @@ void test_bulk_pop()
         scoped_print_timer timer("Emptying PPQ",
                                  nelements * sizeof(my_type));
 
-        for (uint64 i = 0; i < stxxl::div_ceil(nelements, bulk_size); ++i)
+        for (uint64 i = 0; i < nelements; )
         {
             STXXL_CHECK(!ppq.empty());
 
             std::vector<my_type> out;
             ppq.bulk_pop(out, bulk_size);
 
+            STXXL_CHECK(!out.empty());
+
             for (uint64 j = 0; j < out.size(); ++j) {
-                const uint64 index = i * bulk_size + j;
                 //STXXL_MSG( ppq.top() );
-                STXXL_CHECK_EQUAL(out[j].key, int(index + 1));
-                if ((index % (1024 * 1024)) == 0)
-                    STXXL_MSG("Element " << index << " popped");
+                if ((i % (128 * 1024)) == 0)
+                    STXXL_MSG("Element " << i << " popped");
+                ++i;
+                STXXL_CHECK_EQUAL(out[j].key, int(i));
             }
         }
     }
@@ -169,7 +172,7 @@ void test_bulk_pop()
 
 void test_bulk_limit(const size_t bulk_size)
 {
-    ppq_type ppq(my_cmp(), 1024L * 1024L * 1024L, 4);
+    ppq_type ppq(my_cmp(), 256L * 1024L * 1024L, 4);
 
     STXXL_MSG("Running test_bulk_limit(" << bulk_size << ")");
 
@@ -177,13 +180,13 @@ void test_bulk_limit(const size_t bulk_size)
     int rindex = 0;     // continuous pop index
     stxxl::random_number32_r prng;
 
-    const size_t repeats = 16;
+    const size_t repeats = 8;
 
     // first insert 2 * bulk_size items (which are put into insertion heaps)
     // TODO: fix simple push() interface!?
 
-    ppq.bulk_push_begin(2 * bulk_size);
-    for (size_t i = 0; i < 2 * bulk_size; ++i)
+    ppq.bulk_push_begin(4L * bulk_size);
+    for (size_t i = 0; i < 4L * bulk_size; ++i)
         ppq.bulk_push(my_type(windex++));
     ppq.bulk_push_end();
 
@@ -239,10 +242,10 @@ void test_bulk_limit(const size_t bulk_size)
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), windex - rindex);
+    STXXL_CHECK_EQUAL(ppq.size(), static_cast<size_t>(windex - rindex));
 
     // extract last items
-    for (size_t i = 0; i < 2 * bulk_size; ++i)
+    for (size_t i = 0; i < 4L * bulk_size; ++i)
     {
         my_type top = ppq.top();
         ppq.pop();
@@ -255,9 +258,18 @@ void test_bulk_limit(const size_t bulk_size)
 
 int main()
 {
+    stxxl::stats * stats = stxxl::stats::get_instance();
+    stxxl::stats_data stats_begin(*stats);
     test_simple();
+    std::cout << "Stats after test_simple :" << (stxxl::stats_data(*stats) - stats_begin);
+    stats_begin = *stxxl::stats::get_instance();
     test_bulk_pop();
+    std::cout << "Stats after bulk_pop :" << (stxxl::stats_data(*stats) - stats_begin);
+    stats_begin = *stxxl::stats::get_instance();
     test_bulk_limit(1000);
-    test_bulk_limit(1000000);
+    std::cout << "Stats after bulk_limit_1000 :" << (stxxl::stats_data(*stats) - stats_begin);
+    stats_begin = *stxxl::stats::get_instance();
+    test_bulk_limit(1024 * 1024);
+    std::cout << "Stats after bulk_limit_1M: " << (stxxl::stats_data(*stats) - stats_begin);
     return 0;
 }

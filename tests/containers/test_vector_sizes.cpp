@@ -10,6 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #include <stxxl/io>
 #include <stxxl/vector>
 
@@ -95,15 +97,15 @@ int main(int argc, char** argv)
 
     // multiple of block size
     STXXL_MSG("running test with " << start_elements << " items");
-    test(fn, ft, start_elements, 100000000);
+    test(fn, ft, start_elements, 100000);
 
     // multiple of page size, but not block size
     STXXL_MSG("running test with " << start_elements << " + 4096 items");
-    test(fn, ft, start_elements + 4096, 200000000);
+    test(fn, ft, start_elements + 4096, 200000);
 
     // multiple of neither block size nor page size
     STXXL_MSG("running test with " << start_elements << " + 4096 + 23 items");
-    test(fn, ft, start_elements + 4096 + 23, 300000000);
+    test(fn, ft, start_elements + 4096 + 23, 300000);
 
     // truncate 1 byte
     {
@@ -114,7 +116,7 @@ int main(int argc, char** argv)
     }
 
     // will truncate after the last complete element
-    test_rdwr<vector_type>(fn, ft, start_elements + 4096 + 23 - 1, 300000000);
+    test_rdwr<vector_type>(fn, ft, start_elements + 4096 + 23 - 1, 300000);
 
     // truncate 1 more byte
     {
@@ -126,7 +128,7 @@ int main(int argc, char** argv)
 
     // will not truncate
     //-tb: vector already writes data! TODO
-    //test_rdonly<vector_type>(fn, ft, start_elements + 4096 + 23 - 2, 300000000);
+    //test_rdonly<vector_type>(fn, ft, start_elements + 4096 + 23 - 2, 300000);
 
     // check final size
     {

@@ -142,7 +142,7 @@ public:
 const int small_block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
 const int block_order = 32;       // must be a multiple of 32, assuming at least 4 bytes element size
 
-unsigned_type internal_memory = 256 * 1024 * 1024;
+unsigned_type internal_memory = 16 * 1024 * 1024;
 
 void test1(int rank)
 {
@@ -343,7 +343,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
 int main(int argc, char** argv)
 {
     int test_case = -1;
-    int rank = 500;
+    int rank = 200;
     int mult_algo_num = 2;
     int sched_algo_num = 1;
 
@@ -385,6 +385,8 @@ int main(int argc, char** argv)
     if (!cp.process(argc, argv))
         return 0;
 
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+
     switch (test_case)
     {
     default:
@@ -407,5 +409,8 @@ int main(int argc, char** argv)
     }
 
     STXXL_MSG("end of test");
+
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+
     return 0;
 }

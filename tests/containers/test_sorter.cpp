@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 //! \example containers/test_sorter.cpp
 //! This is an example of how to use \c stxxl::sorter() container
 
@@ -84,15 +85,15 @@ struct Comparator : public std::less<my_type>
 };
 
 // forced instantiation
-template class stxxl::sorter<my_type, Comparator, 8192>;
+template class stxxl::sorter<my_type, Comparator>;
 
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = 128 * 1024 * 1024;
-    enum { block_size = 8192 };
+    unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(T);
+    enum { block_size = STXXL_DEFAULT_BLOCK_SIZE(T) };
 
     // comparator object used for sorters
     Comparator cmp;
@@ -123,15 +124,15 @@ int main()
     }
 
     {
-        // large test with 384 MiB items
+        // large test with 192 * 4 KiB items
 
-        const stxxl::uint64 n_records = stxxl::int64(384) * stxxl::int64(1024 * 1024) / sizeof(my_type);
+        const stxxl::uint64 n_records = stxxl::int64(192) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
 
         sorter_type s(cmp, memory_to_use);
 
         stxxl::random_number32 rnd;
 
-        STXXL_MSG("Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 20) << " MiB)");
+        STXXL_MSG("Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)");
 
         for (stxxl::uint64 i = 0; i < n_records; i++)
         {

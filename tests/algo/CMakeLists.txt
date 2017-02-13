@@ -39,7 +39,7 @@ if(NOT CYGWIN AND NOT MINGW AND BUILD_EXTRAS) #-tb too big to build on cygwin
 
   add_define(test_ksort_all_parameters "STXXL_VERBOSE_STABLE_KSORT=STXXL_VERBOSE0" "STXXL_VERBOSE_LEVEL=0" "STXXL_CHECK_ORDER_IN_SORTS")
 
-  if(MSVC AND BUILD_TESTS)
+  if(MSVC AND STXXL_BUILD_TESTS)
     # requires /bigobj flag to build
     set_target_properties(test_ksort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
     set_target_properties(test_sort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
@@ -100,7 +100,7 @@ if(USE_GNU_PARALLEL)
 
     foreach(SORT m q qb s)
       foreach(MERGE p s n)
-        stxxl_test(test_parallel_sort 256 4 96 ${SORT} ${MERGE})
+        stxxl_test(test_parallel_sort 2 4 96 ${SORT} ${MERGE})
       endforeach(MERGE)
     endforeach(SORT)
 

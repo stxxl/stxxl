@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example containers/test_vector.cpp
 //! This is an example of use of \c stxxl::vector and
 //! \c stxxl::VECTOR_GENERATOR. Vector type is configured
@@ -70,14 +72,15 @@ void test_const_iterator(const my_vec_type& x)
 void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (1024* 1024), stxxl::striping>::result vector_type;
-    vector_type v(32 * 1024 * 1024 / sizeof(element));
+    typedef stxxl::VECTOR_GENERATOR<
+        element, 2, 2, STXXL_DEFAULT_BLOCK_SIZE(T), stxxl::striping>::result vector_type;
+    vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(element));
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
     STXXL_UNUSED(c_it);
 
-    unsigned int big_size = 2 * 32 * 1024 * 1024;
+    unsigned int big_size = 2 * 32 * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::vector<double> vec_big;
     vec_big my_vec(big_size);
 
@@ -124,7 +127,7 @@ void test_vector1()
 
     stxxl::ran32State = 0xdeadbeef + 10;
 
-    v.resize(32 * 1024 * 1024 / sizeof(element));
+    v.resize(32 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(element));
 
     STXXL_MSG("write " << v.size() << " elements");
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);

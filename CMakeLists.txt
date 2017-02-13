@@ -64,11 +64,11 @@ endif()
 
 # please document all build options in doc/install.doc:install_build_options
 
-option(BUILD_EXAMPLES "Build all stxxl examples" OFF)
+option(STXXL_BUILD_EXAMPLES "Build all stxxl examples" OFF)
 
-option(BUILD_TESTS "Build all stxxl test programs" OFF)
-if(BUILD_TESTS)
-  set(BUILD_EXAMPLES ON)
+option(STXXL_BUILD_TESTS "Build all stxxl test programs" OFF)
+if(STXXL_BUILD_TESTS)
+  set(STXXL_BUILD_EXAMPLES ON)
 endif()
 
 option(BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
@@ -184,11 +184,12 @@ endif()
 # enable warnings
 
 if(MSVC)
-  # Force to always compile with W4
+  # Force to always compile with W3
+  # This is the highest level recommended for production purposes
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/W[0-4]" "/W2" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2")
   endif()
   ### disable verbose warnings:
   # warning C4127: conditional expression is constant
@@ -208,7 +209,7 @@ if(MSVC)
   # disable lots of warnings about "unsecure" STL functions
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -pedantic -Wno-long-long")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -pedantic -Wno-long-long -Wconversion")
   # detect -Wextra
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-Wextra CXX_HAS_FLAGS_WEXTRA)
@@ -576,6 +577,19 @@ configure_file(${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in ${PROJECT_BI
 # CXX_FLAGS required for compilation
 set(STXXL_CXX_FLAGS ${OpenMP_CXX_FLAGS})
 
+# Custom build type "ReleaseWithAssert".
+string(REGEX REPLACE "[/-][dD][^/-]*NDEBUG" "" CMAKE_C_FLAGS_RELWITHASSERT_INIT "${CMAKE_C_FLAGS_RELWITHDEBINFO_INIT}")
+string(REGEX REPLACE "[/-][dD][^/-]*NDEBUG" "" CMAKE_CXX_FLAGS_RELWITHASSERT_INIT "${CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT}")
+set(CMAKE_C_FLAGS_RELWITHASSERT "${CMAKE_C_FLAGS_RELWITHASSERT_INIT}"
+  CACHE STRING "C flags for release with assert builds.")
+set(CMAKE_CXX_FLAGS_RELWITHASSERT "${CMAKE_CXX_FLAGS_RELWITHASSERT_INIT}"
+  CACHE STRING "C++ flags for release with assert builds.")
+set(CMAKE_EXE_LINKER_FLAGS_RELWITHASSERT ""
+  CACHE STRING "Linker flags for release with assert builds.")
+mark_as_advanced( CMAKE_CXX_FLAGS_RELWITHASSERT CMAKE_C_FLAGS_RELWITHASSERT CMAKE_EXE_LINKER_FLAGS_RELWITHASSERT)
+# add possible values of CMAKE_BUILD_TYPE type: RelWithAssert
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "RelWithDebInfo" "MinSizeRel" "RelWithAssert")
+
 # globally adds top-level include directories
 set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
 include_directories(${STXXL_INCLUDE_DIRS})
@@ -606,25 +620,25 @@ endmacro(stxxl_build_tool)
 # macro for building stxxl examples
 macro(stxxl_build_example TESTNAME)
 
-  if(BUILD_EXAMPLES)
+  if(STXXL_BUILD_EXAMPLES)
     stxxl_build_tool(${TESTNAME} ${ARGN})
-  endif(BUILD_EXAMPLES)
+  endif(STXXL_BUILD_EXAMPLES)
 
 endmacro(stxxl_build_example)
 
 # macro for building stxxl tests
 macro(stxxl_build_test TESTNAME)
 
-  if(BUILD_TESTS)
+  if(STXXL_BUILD_TESTS)
     stxxl_build_tool(${TESTNAME} ${ARGN})
-  endif(BUILD_TESTS)
+  endif(STXXL_BUILD_TESTS)
 
 endmacro(stxxl_build_test)
 
 # macro for registering stxxl tests
 macro(stxxl_test TESTNAME)
 
-  if(BUILD_TESTS)
+  if(STXXL_BUILD_TESTS)
     set(TESTFULLNAME ${TESTNAME} ${ARGN})
     string(REPLACE ";" "_" TESTFULLNAME "${TESTFULLNAME}") # stringify list
 
@@ -637,7 +651,7 @@ macro(stxxl_test TESTNAME)
       set_tests_properties(${TESTFULLNAME} PROPERTIES TIMEOUT 3600)
     endif()
 
-  endif(BUILD_TESTS)
+  endif(STXXL_BUILD_TESTS)
 
 endmacro(stxxl_test)
 
@@ -665,9 +679,9 @@ macro(add_define PROGNAME)
   if(TARGET ${PROGNAME})
     set_property(TARGET ${PROGNAME} APPEND PROPERTY COMPILE_DEFINITIONS ${ARGN})
   else()
-    if(BUILD_TESTS)
+    if(STXXL_BUILD_TESTS)
       message("Ignoring add_define(${PROGNAME} ${ARGN}) for unknown target ${PROGNAME}")
-    endif(BUILD_TESTS)
+    endif(STXXL_BUILD_TESTS)
   endif()
 
 endmacro(add_define TESTNAME)
@@ -703,7 +717,7 @@ endif(TRY_COMPILE_HEADERS)
 ###############################################################################
 # figure out STXXL_TMPDIR for tests
 
-if(BUILD_TESTS)
+if(STXXL_BUILD_TESTS)
 
   if(DEFINED ENV{STXXL_TMPDIR})
     set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
@@ -713,7 +727,7 @@ if(BUILD_TESTS)
 
   message(STATUS "Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 
-endif(BUILD_TESTS)
+endif(STXXL_BUILD_TESTS)
 
 ###############################################################################
 # install header files

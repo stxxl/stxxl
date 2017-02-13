@@ -10,6 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example algo/test_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
@@ -80,9 +82,10 @@ int main()
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = 32 * 1024 * 1024;
+    unsigned memory_to_use = 16 * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::VECTOR_GENERATOR<my_type, 4, 4>::result vector_type;
-    const stxxl::int64 n_records = 3 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
+    const stxxl::int64 n_records =
+        3 * 16 * stxxl::int64(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;

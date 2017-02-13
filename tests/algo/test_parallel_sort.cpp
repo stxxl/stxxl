@@ -16,6 +16,8 @@
 //! Setting all the parameters in optional, just compiling with parallel mode
 //! suffices.
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
 #endif

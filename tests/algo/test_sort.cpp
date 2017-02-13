@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
@@ -89,8 +91,10 @@ int main()
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = 128 * 1024 * 1024;
+    unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::vector<my_type> vector_type;
+
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     {
         // test small vector that can be sorted internally
@@ -106,7 +110,7 @@ int main()
     }
 
     const stxxl::int64 n_records =
-        stxxl::int64(384) * stxxl::int64(1024 * 1024) / sizeof(my_type);
+        stxxl::int64(192) * stxxl::int64(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;
@@ -124,6 +128,8 @@ int main()
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
 
     STXXL_MSG("Done, output size=" << v.size());
+
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     return 0;
 }

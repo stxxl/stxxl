@@ -18,7 +18,7 @@ stxxl_build_test(stack_benchmark)
 
 add_define(benchmark_naive_matrix "STXXL_VERBOSE_LEVEL=0")
 
-if(USE_TPIE AND BUILD_TESTS)
+if(USE_TPIE AND STXXL_BUILD_TESTS)
   file(GLOB TPIE_DIR_GLOB RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tpie_*")
 
   foreach(TPIE_TEST ${TPIE_DIR_GLOB})
@@ -72,4 +72,4 @@ if(USE_TPIE AND BUILD_TESTS)
   else()
     message(SEND_ERROR "Could not find TPIE for extra benchmarks.")
   endif()
-endif(USE_TPIE AND BUILD_TESTS)
+endif(USE_TPIE AND STXXL_BUILD_TESTS)

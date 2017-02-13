@@ -12,6 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example containers/test_pqueue.cpp
 //! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
 //! and \c stxxl::priority_queue
@@ -25,7 +27,7 @@ using stxxl::scoped_print_timer;
 
 #define RECORD_SIZE 128
 
-const uint64 volume = 1024 * 1024; // in KiB
+const uint64 volume = 128 * 1024; // in KiB
 
 struct my_type
 {
@@ -79,7 +81,7 @@ int main()
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
 
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<
-            my_type, my_cmp, 32* 1024* 1024, volume / sizeof(my_type)
+        my_type, my_cmp, 700* 1024, volume / sizeof(my_type)
             > gen;
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;
@@ -97,7 +99,9 @@ int main()
         );
     pq_type p(pool);
 
-    uint64 nelements = volume * 1024 / sizeof(my_type);
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+
+    uint64 nelements = 1024 * volume / sizeof(my_type);
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Max elements: " << nelements);
 
@@ -143,6 +147,8 @@ int main()
     STXXL_CHECK(p.empty());
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     return 0;
 }

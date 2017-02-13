@@ -10,6 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #include <stxxl/io>
 #include <stxxl/vector>
 
@@ -19,7 +21,7 @@ int main()
 {
     stxxl::config* config = stxxl::config::get_instance();
 
-    stxxl::disk_config disk1("/tmp/stxxl-###.tmp", 16 * 1024 * 1024,
+    stxxl::disk_config disk1("/tmp/stxxl-###.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(T),
                              "syscall autogrow=no");
     disk1.unlink_on_open = true;
     disk1.direct = stxxl::disk_config::DIRECT_OFF;

@@ -308,7 +308,7 @@ public:
           m_block_pointers(1)
     {
         std::swap(m_values, values);
-        STXXL_ASSERT(values.size() > 0);
+        STXXL_ASSERT(m_values.size() > 0);
         m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.begin()) + m_values.size());
     }
 
@@ -527,10 +527,9 @@ public:
      * \param size The total number of elements. Cannot be changed after
      * construction.
      *
-     * \param num_prefetch_blocks Number of blocks to prefetch from hard disk
+     * \param pool A pool (read_write_pool<block_type>) of read and write buffer blocks
      *
-     * \param num_write_buffer_blocks Size of the write buffer in number of
-     * blocks
+     * \param level Level index in the merge hierarchy
      */
     external_array(external_size_type size, pool_type* pool, unsigned_type level = 0)
         :   // constants
@@ -1168,7 +1167,7 @@ protected:
             return (m_requests[block_index] && m_requests[block_index]->poll());
         }
         else {
-            return (bool)m_blocks[block_index];
+            return ( m_blocks[block_index] != 0 );
         }
     }
 
@@ -1214,9 +1213,9 @@ protected:
  * with operator*() we cannot know if the value is going to be written or read,
  * when going to live mode, the block must be read from EM. This read overhead,
  * however, is optimized by marking blocks as uninitialized in external_array,
- * and skipping reads for then. In a full performance build, no block needs to
+ * and skipping reads for them. In a full performance build, no block needs to
  * be read from disk. Reads only occur in debug mode, when the results are
- * verify.
+ * verified.
  *
  * The iterator's normal/live mode only stays active for the individual
  * iterator object. When an iterator is copied/assigned/calculated with the
@@ -1607,7 +1606,7 @@ protected:
               m_compare(compare)
         { }
 
-        const value_type & get_value(int input) const
+        const value_type & get_value(unsigned_type input) const
         {
             switch (input) {
             case HEAP:
@@ -1623,7 +1622,7 @@ protected:
             }
         }
 
-        bool operator () (const int a, const int b) const
+        bool operator () (const unsigned_type a, const unsigned_type b) const
         {
             return m_compare(get_value(a), get_value(b));
         }
@@ -1639,12 +1638,12 @@ protected:
             : m_proc(proc), m_compare(compare)
         { }
 
-        const value_type & get_value(int index) const
+        const value_type & get_value(unsigned_type index) const
         {
             return m_proc[index]->insertion_heap[0];
         }
 
-        bool operator () (const int a, const int b) const
+        bool operator () (const unsigned_type a, const unsigned_type b) const
         {
             return m_compare(get_value(a), get_value(b));
         }
@@ -1660,7 +1659,7 @@ protected:
             : m_ias(ias), m_compare(compare)
         { }
 
-        bool operator () (const int a, const int b) const
+        bool operator () (const unsigned_type a, const unsigned_type b) const
         {
             return m_compare(m_ias[a].get_min(), m_ias[b].get_min());
         }
@@ -1710,7 +1709,7 @@ public:
     //! Return smallest items of head winner tree.
     std::pair<unsigned, unsigned> top()
     {
-        unsigned type = m_head.top();
+        unsigned_type type = m_head.top();
         switch (type)
         {
         case HEAP:
@@ -1725,7 +1724,7 @@ public:
     }
 
     //! Update minima tree after an item from the heap index was removed.
-    void update_heap(int_type index)
+    void update_heap(unsigned_type index)
     {
         m_heaps.notify_change(index);
         m_head.notify_change(HEAP);
@@ -1738,21 +1737,21 @@ public:
     }
 
     //! Update minima tree after an item from an internal array was removed.
-    void update_internal_array(unsigned index)
+    void update_internal_array(unsigned_type index)
     {
         m_ia.notify_change(index);
         m_head.notify_change(IA);
     }
 
     //! Add a newly created internal array to the minima tree.
-    void add_internal_array(unsigned index)
+    void add_internal_array(unsigned_type index)
     {
         m_ia.activate_player(index);
         m_head.notify_change(IA);
     }
 
     //! Remove an insertion heap from the minima tree.
-    void deactivate_heap(unsigned index)
+    void deactivate_heap(unsigned_type index)
     {
         m_heaps.deactivate_player(index);
         if (!m_heaps.empty())
@@ -1768,7 +1767,7 @@ public:
     }
 
     //! Remove an internal array from the minima tree.
-    void deactivate_internal_array(unsigned index)
+    void deactivate_internal_array(unsigned_type index)
     {
         m_ia.deactivate_player(index);
         if (!m_ia.empty())
@@ -1994,10 +1993,10 @@ protected:
     //! \name Parameters and Sizes for Memory Allocation Policy
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
-    const long m_num_insertion_heaps;
+    const unsigned_type m_num_insertion_heaps;
 
     //! Capacity of one inserion heap
-    const unsigned m_insertion_heap_capacity;
+    const size_type m_insertion_heap_capacity;
 
     //! Return size of insertion heap reservation in bytes
     size_type insertion_heap_int_memory() const
@@ -2327,7 +2326,7 @@ public:
         size_type total_ram = DefaultMemSize,
         float num_read_blocks_per_ea = 1.5f,
         unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
-        unsigned_type num_insertion_heaps = 0,
+        unsigned num_insertion_heaps = 0,
         size_type single_heap_ram = c_default_single_heap_ram,
         size_type extract_buffer_ram = 0)
         : c_max_internal_level_size(64),
@@ -2383,11 +2382,19 @@ public:
         STXXL_ERRMSG("This is probably not what you want, so check the "
                      "compilation settings.");
 #endif
+        if (m_num_read_blocks_per_ea < 1.0) {
+            STXXL_ERRMSG("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
+                         " it is " << m_num_read_blocks_per_ea);
+            abort();
+        }
 
         if (c_limit_extract_buffer) {
-            m_extract_buffer_limit = (extract_buffer_ram > 0)
-                                     ? extract_buffer_ram / sizeof(value_type)
-                                     : static_cast<size_type>(((double)(m_mem_total) * c_default_extract_buffer_ram_part / sizeof(value_type)));
+            m_extract_buffer_limit =
+                (extract_buffer_ram > 0)
+                ? extract_buffer_ram / sizeof(value_type)
+                : static_cast<size_type>(
+                    (double)(m_mem_total) *
+                    c_default_extract_buffer_ram_part / sizeof(value_type));
         }
 
         for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
@@ -2405,7 +2412,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-        for (long p = 0; p < m_num_insertion_heaps; ++p)
+        for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
         {
             m_proc[p] = new ProcessorData;
             m_proc[p]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -2448,7 +2455,7 @@ public:
     {
         // clean up data structures
 
-        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
         {
             delete m_proc[p];
         }
@@ -2491,7 +2498,7 @@ protected:
 
         size_type heaps_size = 0;
 
-        for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+        for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
         {
             // check that each insertion heap is a heap
 
@@ -2620,7 +2627,7 @@ public:
         }
 
         // zero bulk insertion counters
-        for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+        for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
             m_proc[p]->heap_add_size = 0;
     }
 
@@ -2726,7 +2733,7 @@ public:
 
         if (!m_is_very_large_bulk && 0)
         {
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 m_heaps_size += m_proc[p]->heap_add_size;
 
@@ -2739,7 +2746,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
                 for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
@@ -2754,7 +2761,7 @@ public:
                 m_heaps_size += m_proc[p]->heap_add_size;
             }
 
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -2765,7 +2772,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (m_proc[p]->insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
@@ -2793,7 +2800,7 @@ public:
                 }
             }
 
-            for (int_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -2811,7 +2818,7 @@ public:
     //! Extract up to max_size values at once.
     void bulk_pop(std::vector<value_type>& out, size_t max_size)
     {
-        STXXL_DEBUG("bulk_pop_size with max_size=" << max_size);
+        STXXL_DEBUG("bulk_pop() max_size=" << max_size);
 
         const size_t n_elements = std::min<size_t>(max_size, size());
         assert(n_elements < m_extract_buffer_limit);
@@ -2859,14 +2866,14 @@ public:
         std::vector<iterator_pair_type> sequences(eas + ias);
         size_type output_size = 0;
 
-        int limiting_ea_index = m_external_min_tree.top();
+        unsigned_type limiting_ea_index = m_external_min_tree.top();
 
         // pop limit may have to change due to memory limit
         value_type this_limit = limit;
         bool has_full_range = true;
 
         // get all relevant blocks
-        while (limiting_ea_index > -1)
+        while (limiting_ea_index != m_external_min_tree.invalid_key)
         {
             const value_type& ea_limit =
                 m_external_arrays[limiting_ea_index].get_next_block_min();
@@ -2886,7 +2893,7 @@ public:
             wait_next_ea_blocks(limiting_ea_index);
             // consider next limiting EA
             limiting_ea_index = m_external_min_tree.top();
-            STXXL_ASSERT(limiting_ea_index < (int)eas);
+            STXXL_ASSERT(limiting_ea_index < eas);
         }
 
         // build sequences
@@ -2906,13 +2913,13 @@ public:
                 end = m_internal_arrays[j].end();
             }
 
-            end = std::lower_bound(begin, end, this_limit, m_inv_compare);
+            end = std::upper_bound(begin, end, this_limit, m_inv_compare);
 
             sizes[i] = std::distance(begin, end);
             sequences[i] = std::make_pair(begin, end);
         }
 
-        output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+        output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
         if (output_size > max_size) {
             output_size = max_size;
             has_full_range = false;
@@ -3284,7 +3291,7 @@ protected:
 //#if STXXL_PARALLEL
 //#pragma omp parallel for
 //#endif
-        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+        for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
         {
             heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -3315,7 +3322,7 @@ protected:
 
         // put items from insertion heaps into an internal array
         unsigned_type back_sum = std::accumulate(
-            back_size.begin(), back_size.end(), unsigned_type(0));
+            back_size.begin(), back_size.end(), (uint64)0);
 
         STXXL_DEBUG("flush_insertion_heaps_with_limit(): back_sum = " << back_sum);
 
@@ -3328,7 +3335,7 @@ protected:
 
             // copy items into values vector
             typename std::vector<value_type>::iterator vi = values.begin();
-            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
+            for (unsigned p = 0; p < m_num_insertion_heaps; ++p)
             {
                 heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -3393,7 +3400,7 @@ public:
     void resize_read_pool()
     {
         unsigned_type new_num_read_blocks =
-            m_num_read_blocks_per_ea * m_external_arrays.size();
+            (unsigned_type)(m_num_read_blocks_per_ea * (float)m_external_arrays.size());
 
         STXXL_DEBUG("resize_read_pool:" <<
                     " m_num_read_blocks=" << m_num_read_blocks <<
@@ -3467,9 +3474,9 @@ public:
             m_pool.free_size_prefetch() + m_num_hinted_blocks;
         m_num_hinted_blocks = 0;
 
-        int gmin_index;
+        unsigned_type gmin_index;
         while (free_prefetch_blocks > 0 &&
-               (gmin_index = m_hint_tree.top()) >= 0)
+               (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
@@ -3538,9 +3545,9 @@ public:
         STXXL_DEBUG("hint_external_arrays()"
                     " for free_size_prefetch=" << m_pool.free_size_prefetch());
 
-        int gmin_index;
+        unsigned_type gmin_index;
         while (m_pool.free_size_prefetch() > 0 &&
-               (gmin_index = m_hint_tree.top()) >= 0)
+               (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
@@ -3590,16 +3597,21 @@ public:
 protected:
     //! Calculates the sequences vector needed by the multiway merger,
     //! considering inaccessible data from external arrays.
-    //! The sizes vector stores the size of each sequence.
-    //! \param reuse_previous_lower_bounds Reuse upper bounds from previous runs.
-    //!             sequences[i].second must be valid upper bound iterator from a previous run!
+    //! \param sizes The sizes vector stores the size of each sequence. (output parameter)
+    //! \param sequences Result vector which stores the begin and end iterators of the
+    //!     merge sequences (also input parameter if reuse_previous_lower_bounds is true)
+    //! \param reuse_previous_lower_bounds If true, the method reuses upper bounds from
+    //!     previous runs.sequences[i].second must then be valid upper bound iterator
+    //! from a previous run!
     //! \returns the index of the external array which is limiting factor
     //!             or m_external_arrays.size() if not limited.
     size_t calculate_merge_sequences(std::vector<size_type>& sizes,
                                      std::vector<iterator_pair_type>& sequences,
                                      bool reuse_previous_lower_bounds = false)
     {
-        STXXL_DEBUG("calculate merge sequences");
+        STXXL_DEBUG(
+            "calculate_merge_sequences() " <<
+            "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds);
 
         static const bool debug = false;
 
@@ -3613,14 +3625,17 @@ protected:
          * determine minimum of each first block
          */
 
-        int gmin_index = m_external_min_tree.top();
-        bool needs_limit = (gmin_index >= 0) ? true : false;
+        unsigned_type gmin_index = m_external_min_tree.top();
+        bool needs_limit = (gmin_index != m_external_min_tree.invalid_key);
+
+        STXXL_DEBUG("calculate_merge_sequences() gmin_index=" << gmin_index
+                    << " needs_limit=" << needs_limit);
 
 // test correctness of external block min tree
 #ifdef STXXL_DEBUG_ASSERTIONS
 
         bool test_needs_limit = false;
-        int test_gmin_index = 0;
+        unsigned_type test_gmin_index = 0;
         value_type test_gmin_value;
 
         m_stats.refill_minmax_time.start();
@@ -3658,6 +3673,7 @@ protected:
 
 #if STXXL_PARALLEL
 //        #pragma omp parallel for if(eas + ias > m_num_insertion_heaps)
+//  ATTENTION: change type of i to long if pragma is activated!
 #endif
         for (size_type i = 0; i < eas + ias; ++i) {
             iterator begin, end;
@@ -3686,6 +3702,9 @@ protected:
                 }
                 else
                 {
+                    STXXL_DEBUG("lower_bound [" << begin << "," << end << ")" <<
+                                " gmin_value " << gmin_value);
+
                     end = std::lower_bound(begin, end,
                                            gmin_value, m_inv_compare);
                 }
@@ -3751,7 +3770,7 @@ protected:
     inline void refill_extract_buffer(size_t minimum_size = 0,
                                       size_t maximum_size = 0)
     {
-        STXXL_DEBUG("refilling extract buffer" <<
+        STXXL_DEBUG("refill_extract_buffer()" <<
                     " ia_size=" << m_internal_arrays.size() <<
                     " ea_size=" << m_external_arrays.size());
 
@@ -3796,6 +3815,8 @@ protected:
                             " limiting_ea_index=" << limiting_ea_index);
 
                 if (limiting_ea_index < eas) {
+                    STXXL_DEBUG("refill: limiting_ea_index");
+
                     if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0)
                         break;
 
@@ -3812,12 +3833,12 @@ protected:
                 limiting_ea_index = calculate_merge_sequences(
                     sizes, sequences, reuse_lower_bounds);
 
-                output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+                output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
             }
         }
         else {
             calculate_merge_sequences(sizes, sequences);
-            output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+            output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
         }
 
         if (c_limit_extract_buffer) {
@@ -3855,6 +3876,8 @@ protected:
     //! the winner trees and hints accordingly.
     inline void wait_next_ea_blocks(unsigned_type ea_index)
     {
+        STXXL_DEBUG("wait_next_ea_blocks() ea_index=" << ea_index);
+
         unsigned_type used_blocks =
             m_external_arrays[ea_index].wait_next_blocks();
 
@@ -3988,7 +4011,7 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (long i = 0; i < m_num_insertion_heaps; ++i)
+        for (long i = 0; i < (long)m_num_insertion_heaps; ++i)
         {
             heap_type& insheap = m_proc[i]->insertion_heap;
 
@@ -4013,7 +4036,7 @@ protected:
 
             add_as_internal_array(merged_array);
 
-            for (int_type i = 0; i < m_num_insertion_heaps; ++i)
+            for (unsigned_type i = 0; i < m_num_insertion_heaps; ++i)
             {
                 m_proc[i]->insertion_heap.clear();
                 m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -4077,7 +4100,7 @@ protected:
         // must release more RAM in IAs than the EA takes, otherwise: merge
         // external and internal arrays!
         if (int_memory < external_array_type::int_memory(size)
-            + ceil(m_num_read_blocks_per_ea) * block_size)
+            + (size_t)ceil(m_num_read_blocks_per_ea) * block_size)
         {
             return merge_external_arrays();
         }
@@ -4096,7 +4119,7 @@ protected:
                 external_array_writer.begin(), size, m_inv_compare);
         }
 
-        STXXL_DEBUG("Merge done of new ea " << &ea);
+        STXXL_DEBUG("Merge done of new ea " << &ea << " size " << size);
 
         m_external_arrays.swap_back(ea);
 
@@ -4222,7 +4245,7 @@ protected:
 
             // =================================================
 
-            int_type num_arrays_done = 0;
+            unsigned_type num_arrays_done = 0;
 
             while (num_arrays_to_merge != num_arrays_done)
             {
@@ -4230,7 +4253,7 @@ protected:
 
                 // === build hints ===
 
-                for (int_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     if (m_external_arrays[ea_index[i]].has_unhinted_em_data()) {
                         min_tree.activate_without_replay(i);
                     }
@@ -4260,9 +4283,9 @@ protected:
                     m_pool.free_size_prefetch() + m_num_hinted_blocks;
                 m_num_hinted_blocks = 0;
 
-                int gmin_index_index; // index in ea_index
+                unsigned_type gmin_index_index; // index in ea_index
                 while (free_prefetch_blocks > 0 &&
-                       (gmin_index_index = min_tree.top()) >= 0)
+                       (gmin_index_index = min_tree.top()) != min_tree.invalid_key)
                 {
                     const unsigned_type gmin_index = ea_index[gmin_index_index];
                     assert(gmin_index < m_external_arrays.size());
@@ -4297,7 +4320,7 @@ protected:
                 // ================================ end build hints ======
 
                 // === wait for data ===
-                for (size_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     const unsigned_type index = ea_index[i];
 
                     unsigned_type used_blocks =
@@ -4313,9 +4336,9 @@ protected:
                 std::vector<size_type> sizes(num_arrays_to_merge);
 
                 gmin_index_index = min_tree.top();
-                bool needs_limit = (gmin_index_index >= 0) ? true : false;
+                bool needs_limit = (gmin_index_index != min_tree.invalid_key) ? true : false;
 
-                for (size_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
                     const unsigned_type index = ea_index[i];
                     iterator begin = m_external_arrays[index].begin();
                     iterator end = m_external_arrays[index].end();
@@ -4341,7 +4364,7 @@ protected:
 
                 // === merge ===
 
-                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), 0);
+                size_type output_size = std::accumulate(sizes.begin(), sizes.end(), (uint64)0);
 
                 out_iter = potentially_parallel::multiway_merge(
                     sequences.begin(), sequences.end(),

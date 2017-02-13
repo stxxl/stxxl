@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -131,10 +133,10 @@ int main()
         check_42_fill(v, _42.len());
     }
     {
-        forty_two _42mill(42 * 1000000);
+        forty_two _42mill(42 * 10000);
 
         // materialize into larger stxxl vector (to cross block boundaries)
-        stxxl::VECTOR_GENERATOR<int>::result v(60 * 1000000);
+        stxxl::VECTOR_GENERATOR<int>::result v(60 * 10000);
         stxxl::generate(v.begin(), v.end(), generate_0, 42);
 
         stxxl::stream::materialize(_42mill.reset(), v.begin());

@@ -190,6 +190,9 @@ public:
      * \return \c true if there was a free block to do prefetch and
      * prefetching was scheduled, \c false otherwise
      *
+     * \param w_pool The corresponding write pool; so the method can check
+     * if the block is maybe still in RAM.
+     *
      * \note If there are no free blocks available (all blocks are already in
      * reading or read but not retrieved by user calling \c read method)
      * calling \c hint function has no effect

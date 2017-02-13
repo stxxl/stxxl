@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 //! \example algo/test_bad_cmp.cpp
 //! This is an example of how NOT to use \c stxxl::sort() algorithm.
 //! Here min_value and max_value are used as keys which is forbidden.
@@ -81,11 +83,11 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    stxxl::unsigned_type memory_to_use = SIZE * 1024 * 1024;
+    stxxl::unsigned_type memory_to_use = SIZE * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::vector<my_type> vector_type;
 
     const stxxl::int64 n_records =
-        stxxl::int64(SIZE * 2 + SIZE / 2) * stxxl::int64(1024 * 1024) / sizeof(my_type);
+        stxxl::int64(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::int64 aliens, not_stable;
