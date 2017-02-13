@@ -19,7 +19,7 @@
 
 struct MyType
 {
-    int integer;
+    size_t integer;
     char chars[5];
 };
 
@@ -47,7 +47,7 @@ void testIO()
     STXXL_MSG("Allocated block address    : " << (stxxl::unsigned_type)(block));
     STXXL_MSG("Allocated block address + 1: " << (stxxl::unsigned_type)(block + 1));
     STXXL_MSG(std::dec);
-    unsigned i = 0;
+    size_t i = 0;
     for (i = 0; i < block_type::size; ++i)
     {
         block->elem[i].integer = i;
@@ -63,7 +63,7 @@ void testIO()
     {
         reqs[i] = block->read(bids[i], my_handler());
         reqs[i]->wait();
-        for (int j = 0; j < block_type::size; ++j)
+        for (size_t j = 0; j < block_type::size; ++j)
         {
             STXXL_CHECK(j == block->elem[j].integer);
         }
@@ -86,7 +86,7 @@ void testIO2()
     int vIndex;
     for (vIndex = 0; vIndex < 32; ++vIndex) {
         for (size_t vIndex2 = 0; vIndex2 < block_type::size; ++vIndex2) {
-            blocks[vIndex][vIndex2] = vIndex2;
+            blocks[vIndex][vIndex2] = double(vIndex2);
         }
     }
     for (vIndex = 0; vIndex < 32; ++vIndex) {
