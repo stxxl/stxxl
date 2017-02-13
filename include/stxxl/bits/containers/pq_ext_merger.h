@@ -462,7 +462,7 @@ protected:
         if (begin == end)
             return;
 
-        typedef stxxl::int64 diff_type;
+        typedef external_diff_type diff_type;
 
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
 

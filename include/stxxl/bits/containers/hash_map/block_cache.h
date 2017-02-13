@@ -182,12 +182,12 @@ protected:
     pager_type pager_;
 
     /* statistics */
-    int64 n_found;
-    int64 n_not_found;
-    int64 n_read;
-    int64 n_written;
-    int64 n_clean_forced;
-    int64 n_wrong_subblock;
+    uint64_t n_found {0};
+    uint64_t n_not_found {0};
+    uint64_t n_read {0};
+    uint64_t n_written {0};
+    uint64_t n_clean_forced {0};
+    uint64_t n_wrong_subblock {0};
 
 public:
     //! Construct a new block-cache.
@@ -201,13 +201,7 @@ public:
           valid_subblock_(cache_size),
           free_blocks_(cache_size),
           reqs_(cache_size),
-          pager_(cache_size),
-          n_found(0),
-          n_not_found(0),
-          n_read(0),
-          n_written(0),
-          n_clean_forced(0),
-          n_wrong_subblock(0)
+          pager_(cache_size)
     {
         for (unsigned_type i = 0; i < cache_size; i++)
         {

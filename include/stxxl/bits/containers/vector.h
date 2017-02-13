@@ -1449,7 +1449,9 @@ public:
             if (non_free_slots[i])
             {
                 STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address " <<
-                                     (int64(page_no) * int64(block_type::size) * int64(page_size)));
+                                     (static_cast<uint64_t>(page_no)
+                                      * static_cast<uint64_t>(block_type::size)
+                                      * static_cast<uint64_t>(page_size)));
                 write_page(page_no, i);
 
                 m_page_to_slot[page_no] = on_disk;
@@ -1510,7 +1512,7 @@ public:
     //! files will be numbered ascending.
     void export_files(std::string filename_prefix)
     {
-        int64 no = 0;
+        size_t no = 0;
         for (bids_container_iterator i = m_bids.begin(); i != m_bids.end(); ++i) {
             std::ostringstream number;
             number << std::setw(9) << std::setfill('0') << no;

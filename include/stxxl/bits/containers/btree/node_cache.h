@@ -46,16 +46,6 @@ private:
     btree_type* m_btree;
     key_compare m_cmp;
 
-/*
-        struct bid_comp
-        {
-            bool operator ()  (const bid_type & a, const bid_type & b) const
-            {
-                return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
-            }
-        };
-*/
-
     struct bid_hash
     {
         size_t operator () (const bid_type& bid) const
@@ -92,13 +82,13 @@ private:
     block_manager* m_bm;
     alloc_strategy_type m_alloc_strategy;
 
-    int64 n_found;
-    int64 n_not_found;
-    int64 n_created;
-    int64 n_deleted;
-    int64 n_read;
-    int64 n_written;
-    int64 n_clean_forced;
+    uint64_t n_found {0};
+    uint64_t n_not_found {0};
+    uint64_t n_created {0};
+    uint64_t n_deleted {0};
+    uint64_t n_read {0};
+    uint64_t n_written {0};
+    uint64_t n_clean_forced {0};
 
     // changes btree pointer in all contained iterators
     void change_btree_pointers(btree_type* b)
@@ -116,14 +106,7 @@ public:
                key_compare cmp)
         : m_btree(btree),
           m_cmp(cmp),
-          m_bm(block_manager::get_instance()),
-          n_found(0),
-          n_not_found(0),
-          n_created(0),
-          n_deleted(0),
-          n_read(0),
-          n_written(0),
-          n_clean_forced(0)
+          m_bm(block_manager::get_instance())
     {
         const unsigned_type nnodes = cache_size_in_bytes / block_type::raw_size;
         STXXL_BTREE_CACHE_VERBOSE("btree::node_cache constructor nodes=" << nnodes);
