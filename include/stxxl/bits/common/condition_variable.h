@@ -50,27 +50,27 @@ class condition_variable : private noncopyable
 
 public:
     //! initialize condition variable
-    condition_variable()
+    condition_variable() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_init(&cond, NULL));
     }
     //! destroy condition variable
-    ~condition_variable()
+    ~condition_variable() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_destroy(&cond));
     }
     //! notify one waiting thread
-    void notify_one()
+    void notify_one() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_signal(&cond));
     }
     //! notify all waiting threads
-    void notify_all()
+    void notify_all() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_broadcast(&cond));
     }
     //! wait for a signal on the condition variable
-    void wait(scoped_mutex_lock& lock)
+    void wait(scoped_mutex_lock& lock) throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_wait(&cond, &lock.native_handle()));
     }

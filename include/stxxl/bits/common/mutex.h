@@ -54,12 +54,12 @@ class mutex : private noncopyable
 
 public:
     //! construct unlocked mutex
-    mutex()
+    mutex() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
     //! destroy mutex handle
-    ~mutex()
+    ~mutex() throw()
     {
         // try simple delete first
         int res = pthread_mutex_destroy(&m_mutex);
@@ -78,12 +78,12 @@ public:
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_destroy(&m_mutex));
     }
     //! lock mutex, may block
-    void lock()
+    void lock() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_lock(&m_mutex));
     }
     //! unlock mutex
-    void unlock()
+    void unlock() throw()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
     }
