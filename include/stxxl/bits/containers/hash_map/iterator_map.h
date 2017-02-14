@@ -14,11 +14,11 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_ITERATOR_MAP_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_ITERATOR_MAP_HEADER
 
-#include <map>
-
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/compat/hash_map.h>
 #include <stxxl/bits/containers/hash_map/iterator.h>
+
+#include <map>
+#include <unordered_map>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -61,9 +61,8 @@ private:
 #endif
     };
     // store iterators by bucket-index
-    typedef typename compat_hash_multimap<
-            internal_size_type, iterator_base*, hasher
-            >::result multimap_type;
+    typedef typename std::unordered_multimap<
+            internal_size_type, iterator_base*, hasher> multimap_type;
 #endif
 
     //! bucket-index and pointer to iterator_base

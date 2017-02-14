@@ -21,7 +21,8 @@
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/vector>
-#include <stxxl/bits/compat/unique_ptr.h>
+
+#include <memory>
 
 #ifndef STXXL_VERBOSE_MATERIALIZE
 #define STXXL_VERBOSE_MATERIALIZE STXXL_VERBOSE3
@@ -114,7 +115,7 @@ class vector_iterator2stream
     typedef buf_istream<typename InputIterator::block_type,
                         typename InputIterator::bids_container_iterator> buf_istream_type;
 
-    typedef typename stxxl::compat_unique_ptr<buf_istream_type>::result buf_istream_unique_ptr_type;
+    typedef std::unique_ptr<buf_istream_type> buf_istream_unique_ptr_type;
     mutable buf_istream_unique_ptr_type in;
 
     void delete_stream()

@@ -14,12 +14,13 @@
 #define STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/compat/hash_map.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/common/error_handling.h>
+
+#include <unordered_map>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -72,9 +73,7 @@ private:
     std::vector<bool> m_fixed;
     std::vector<bool> m_dirty;
     std::vector<size_t> m_free_nodes;
-    typedef typename compat_hash_map<bid_type, size_t, bid_hash>::result hash_map_type;
-
-    typedef hash_map_type bid2node_type;
+    typedef std::unordered_map<bid_type, size_t, bid_hash> bid2node_type;
 
     bid2node_type m_bid2node;
     pager_type m_pager;

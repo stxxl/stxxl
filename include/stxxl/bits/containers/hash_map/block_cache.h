@@ -19,12 +19,12 @@
 #endif
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/compat/hash_map.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
 
 #include <vector>
 #include <list>
+#include <unordered_map>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -155,8 +155,8 @@ protected:
     typedef stxxl::lru_pager<> pager_type;
     typedef block_cache_write_buffer<block_type> write_buffer_type;
 
-    typedef typename compat_hash_map<bid_type, unsigned_type,
-                                     bid_hash>::result bid_map_type;
+    typedef typename std::unordered_map<
+        bid_type, unsigned_type, bid_hash> bid_map_type;
 
     enum { valid_all = block_type::size };
 

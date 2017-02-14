@@ -217,7 +217,7 @@ public:
     sa_index_stream_type(InputStream& input) : m_counter(0), m_input(input)
     {
         if (!m_input.empty())
-            m_curr = value_type(*m_input, m_counter++, 0);
+            m_curr = value_type(*m_input, offset_type(m_counter++), 0);
     }
 
     const value_type& operator * () const
@@ -229,7 +229,7 @@ public:
     {
         ++m_input;
         if (!m_input.empty())
-            m_curr = value_type(*m_input, m_counter++, m_curr.first);
+            m_curr = value_type(*m_input, offset_type(m_counter++), m_curr.first);
         return *this;
     }
 
@@ -307,7 +307,7 @@ void lcparray_stxxl_kasai(const StringContainer& string,
                        stringRAM[i + h] == stringRAM[j + h])
                     h++;
 
-                lcp_sorter.push(offset_pair_type(k, h));
+                lcp_sorter.push(offset_pair_type(k, offset_type(h)));
             }
             if (h > 0) h--;
 
@@ -1210,7 +1210,7 @@ public:
         // compute numberOfPages and their page-size (span)
         void initialize(offset_type lengthOfVector)
         {
-            offset_type M = (offset_type(ram_use / 2) / sizeof(offset_type));
+            offset_type M = offset_type(ram_use / 2 / sizeof(offset_type));
             span = end_part = 0;
 
             assert(lengthOfVector > offset_type(0));
@@ -1496,7 +1496,8 @@ public:
                 pairDeqStream rmqStream = l2RMQ.get_stream();
 
                 sparseTableAlgo<build_lcp, pairDeqStream> sp_algo;
-                sp_algo.initialize(lcpn_ptr->size()); // |lcpn| == |lcp12|
+                sp_algo.initialize(
+                    static_cast<unsigned>(lcpn_ptr->size())); // |lcpn| == |lcp12|
                 sp_algo.splitAndSortRMQ(rmqStream);
                 sp_algo.answerTuple(*lcp12_ptr);
                 sp_algo.answerRMQ(l2Deq);
@@ -1550,7 +1551,8 @@ public:
                 simpleDeqStream lcpnStream = lcpn_ptr->get_stream();
 
                 sparseTableAlgo<simpleDeqStream, pairDeqStream> sp_algo;
-                sp_algo.initialize(lcpn_ptr->size()); // |lcpn| == |lcp12|
+                sp_algo.initialize(
+                    static_cast<unsigned>(lcpn_ptr->size())); // |lcpn| == |lcp12|
                 sp_algo.splitAndSortRMQ(rmqStream);
                 sp_algo.answerTuple(lcpnStream);
                 sp_algo.answerRMQ(l3Deq);
@@ -1668,7 +1670,8 @@ public:
                 simpleDeqStream lcpnStream = lcpn_ptr->get_stream();
 
                 sparseTableAlgo<simpleDeqStream, pairDeqStream> sp_algo;
-                sp_algo.initialize(lcpn_ptr->size());
+                sp_algo.initialize(
+                    static_cast<unsigned>(lcpn_ptr->size()));
                 sp_algo.splitAndSortRMQ(rmqStream);
                 sp_algo.answerTuple(lcpnStream);
                 sp_algo.answerRMQ(l3Deq);
@@ -2630,7 +2633,7 @@ template <typename alphabet_type>
 static inline std::string dumpC(alphabet_type c)
 {
     std::ostringstream oss;
-    if (isalnum(c)) oss << '\'' << (char)c << '\'';
+    if (isalnum(static_cast<int>(c))) oss << '\'' << (char)c << '\'';
     else oss << (int)c;
     return oss.str();
 }

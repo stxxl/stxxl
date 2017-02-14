@@ -17,7 +17,6 @@
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/containers/hash_map/hash_map.h>
-#include <stxxl/bits/compat/hash_map.h>
 
 struct rand_pairs
 {
@@ -69,7 +68,7 @@ void cmp_with_internal_map()
                                       subblock_raw_size, block_size> hash_map;
     typedef hash_map::const_iterator const_iterator;
 
-    typedef stxxl::compat_hash_map<int, int>::result int_hash_map;
+    typedef std::unordered_map<int, int> int_hash_map;
 
     stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 
