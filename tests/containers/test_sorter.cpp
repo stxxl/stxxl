@@ -126,7 +126,7 @@ int main()
     {
         // large test with 192 * 4 KiB items
 
-        const stxxl::uint64 n_records = stxxl::int64(192) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
+        const size_t n_records = size_t(192) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
 
         sorter_type s(cmp, memory_to_use);
 
@@ -134,7 +134,7 @@ int main()
 
         STXXL_MSG("Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)");
 
-        for (stxxl::uint64 i = 0; i < n_records; i++)
+        for (size_t i = 0; i < n_records; i++)
         {
             STXXL_CHECK(s.size() == i);
 
@@ -152,7 +152,7 @@ int main()
         my_type prev = *s;      // get first item
         ++s;
 
-        stxxl::uint64 count = n_records - 1;
+        size_t count = n_records - 1;
 
         while (!s.empty())
         {

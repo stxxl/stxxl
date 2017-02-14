@@ -30,7 +30,7 @@ void dotest(unsigned int nbytes)
     uint b = 0xFFFFFF00;
     uint b_save = b;
 
-    stxxl::uint64 b64 = b;
+    uint64_t b64 = b;
     for (unsigned int i = 0; i < 1024; ++i)
     {
         STXXL_CHECK(b.u64() == b64);

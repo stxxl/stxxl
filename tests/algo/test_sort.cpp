@@ -109,7 +109,7 @@ int main()
         STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
     }
 
-    const stxxl::int64 n_records =
+    const size_t n_records =
         stxxl::int64(192) * stxxl::int64(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
     vector_type v(n_records);
 

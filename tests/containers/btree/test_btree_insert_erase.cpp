@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
     btree_type BTree(1024 * 128, 1024 * 128);
 
-    const stxxl::uint64 nins = 1ULL << log_nins;
+    const size_t nins = 1ULL << log_nins;
 
     stxxl::ran32State = (unsigned int)time(NULL);
 

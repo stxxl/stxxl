@@ -45,7 +45,7 @@ void long_test()
     stxxl::generate(STXXLVector.begin(), STXXLVector.end(),
                     counter<int>(), 4);
 
-    stxxl::uint64 i;
+    size_t i;
 
     STXXL_MSG("Begin: ");
     for (i = 0; i < 10; i++)

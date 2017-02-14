@@ -86,12 +86,12 @@ int main(int argc, char* argv[])
     size_t memory_to_use = SIZE * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::vector<my_type> vector_type;
 
-    const stxxl::int64 n_records =
-        stxxl::int64(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
+    const size_t n_records =
+        size_t(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
     vector_type v(n_records);
 
-    stxxl::int64 aliens, not_stable;
-    int bs = vector_type::block_type::size;
+    uint64_t aliens, not_stable;
+    size_t bs = vector_type::block_type::size;
 
     STXXL_MSG("Filling vector with min_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++) {

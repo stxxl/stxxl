@@ -46,7 +46,7 @@ struct my_cmp : public std::greater<my_type>
     }
 };
 
-my_type * make_sequence(dummy_merger& dummy, int l)
+my_type * make_sequence(dummy_merger& dummy, size_t l)
 {
     my_type* seq = new my_type[l + 1];  // + sentinel
     dummy.multi_merge(seq, seq + l);
@@ -55,20 +55,20 @@ my_type * make_sequence(dummy_merger& dummy, int l)
 }
 
 // forced instantiation
-const unsigned volume = 3 * 1024 * 1024; // in KiB
-const unsigned mem_for_queue = 256 * 1024 * 1024;
+const size_t volume = 3 * 1024 * 1024; // in KiB
+const size_t mem_for_queue = 256 * 1024 * 1024;
 template class stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>;
 template class stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5>;
 
 int main()
 {
     stxxl::config::get_instance();
-    const int B = block_type::size;
+    const size_t B = block_type::size;
     dummy_merger dummy;
 
     if (1) {
-        const unsigned volume = 3 * 1024 * 1024; // in KiB
-        const unsigned mem_for_queue = 256 * 1024 * 1024;
+        const size_t volume = 3 * 1024 * 1024; // in KiB
+        const size_t mem_for_queue = 256 * 1024 * 1024;
         typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result pq_type;
         pq_type pq(mem_for_queue, mem_for_queue);
         pq.push(42);
@@ -176,7 +176,7 @@ int main()
         merger.multi_merge(out, out);
 
         while (merger.size() > 0) {
-            stxxl::uint64 l = std::min<stxxl::uint64>(merger.size(), B + B / 2 + 1);
+            size_t l = std::min<size_t>(merger.size(), B + B / 2 + 1);
             merger.multi_merge(out, out + l);
             STXXL_CHECK(stxxl::is_sorted(out, out + l));
             STXXL_MSG("merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")");

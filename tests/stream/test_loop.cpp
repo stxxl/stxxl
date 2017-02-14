@@ -31,14 +31,14 @@
 using std::cout;
 using std::endl;
 
-const stxxl::uint64 memory_to_use = 128ul * 1024 * 1024;
+const size_t memory_to_use = 128ul * 1024 * 1024;
 
 bool verbose;
 
 struct random_generator
 {
     typedef stxxl::random_number32::value_type value_type;
-    typedef stxxl::uint64 size_type;
+    typedef size_t size_type;
     value_type current;
     size_type count;
     stxxl::random_number32 rnd;
@@ -90,7 +90,7 @@ template <typename Input>
 struct filter
 {
     typedef typename Input::value_type value_type;
-    typedef stxxl::uint64 size_type;
+    typedef size_t size_type;
     Input& input;
     value_type filter_value;
     size_type& counter;
@@ -163,7 +163,7 @@ struct shuffle
     bool even, is_empty;
 
     // from http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
-    int count_bits(stxxl::uint64 v)
+    int count_bits(uint64_t v)
     {
         int c;
         for (c = 0; v; c++) {
@@ -180,7 +180,7 @@ struct shuffle
             ++input;
             if (!input.empty()) {
                 STXXL_STATIC_ASSERT(sizeof(value_type) == 4);
-                stxxl::uint64 combined = current;
+                uint64_t combined = current;
                 combined = combined << 32 | *input;
                 combined = (1ul << count_bits(combined)) - 1;
                 current = (value_type)(combined >> 32);
@@ -245,7 +245,7 @@ int main(int argc, char** argv)
 
     verbose = (argc == 3) && !strcmp(argv[2], "-v");
 
-    stxxl::uint64 total = stxxl::atouint64(argv[1]);
+    size_t total = stxxl::atouint64(argv[1]);
 
     input_generator_type input_stream(total);
 
@@ -253,7 +253,7 @@ int main(int argc, char** argv)
 
     sorted_runs_type sorted_runs = runs_creator.result();
 
-    stxxl::uint64 counter = 0;
+    size_t counter = 0;
     int i;
 
     for (i = 0; counter < total - 1; ++i) {

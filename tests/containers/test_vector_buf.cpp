@@ -18,15 +18,13 @@
 #include <stxxl/scan>
 #include <stxxl/stream>
 
-using stxxl::uint64;
-
 struct my_type  // 24 bytes, not a power of 2 intentionally
 {
-    uint64 key;
-    uint64 load0;
-    uint64 load1;
+    uint64_t key;
+    uint64_t load0;
+    uint64_t load1;
 
-    my_type(uint64 i = 0)
+    my_type(uint64_t i = 0)
         : key(i),
           load0(i + 1),
           load1(1 + 42)
@@ -44,7 +42,7 @@ void check_vector(const VectorType& v)
 {
     typedef typename VectorType::value_type value_type;
 
-    for (uint64 i = 0; i < v.size(); ++i)
+    for (size_t i = 0; i < v.size(); ++i)
     {
         STXXL_CHECK(v[i] == value_type(i));
     }
@@ -54,7 +52,7 @@ void check_vector(const VectorType& v)
 template <typename ValueType>
 class MyStream
 {
-    uint64 i;
+    uint64_t i;
 
 public:
     typedef ValueType value_type;
@@ -81,7 +79,7 @@ public:
 };
 
 template <typename ValueType>
-void test_vector_buf(uint64 size)
+void test_vector_buf(size_t size)
 {
     typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
 
@@ -92,7 +90,7 @@ void test_vector_buf(uint64 size)
 
         vector_type vec(size);
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
             vec[i] = ValueType(i);
 
         check_vector(vec);
@@ -104,7 +102,7 @@ void test_vector_buf(uint64 size)
 
         vector_iterator_type vi = vec.begin();
 
-        for (uint64 i = 0; i < size; ++i, ++vi)
+        for (size_t i = 0; i < size; ++i, ++vi)
             *vi = ValueType(i);
 
         check_vector(vec);
@@ -116,7 +114,7 @@ void test_vector_buf(uint64 size)
 
         typename vector_type::bufwriter_type writer(vec.begin());
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
             writer << ValueType(i);
 
         writer.finish();
@@ -130,7 +128,7 @@ void test_vector_buf(uint64 size)
 
         typename vector_type::bufwriter_type writer(vec);
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
             writer << ValueType(i);
 
         writer.finish();
@@ -155,7 +153,7 @@ void test_vector_buf(uint64 size)
 
         typename vector_type::bufreader_type reader(cvec.begin(), cvec.end());
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
         {
             STXXL_CHECK(!reader.empty());
             STXXL_CHECK(reader.size() == size - i);
@@ -175,7 +173,7 @@ void test_vector_buf(uint64 size)
         // rewind reader and read again
         reader.rewind();
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
         {
             STXXL_CHECK(!reader.empty());
             STXXL_CHECK(reader.size() == size - i);
@@ -199,7 +197,7 @@ void test_vector_buf(uint64 size)
 
         typename vector_type::bufreader_reverse_type reader(cvec.begin(), cvec.end());
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
         {
             STXXL_CHECK(!reader.empty());
             STXXL_CHECK(reader.size() == size - i);
@@ -219,7 +217,7 @@ void test_vector_buf(uint64 size)
         // rewind reader and read again
         reader.rewind();
 
-        for (uint64 i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
         {
             STXXL_CHECK(!reader.empty());
             STXXL_CHECK(reader.size() == size - i);
@@ -240,7 +238,7 @@ void test_vector_buf(uint64 size)
     {   // read vector using C++11 for loop construct
         stxxl::scoped_print_timer tm("C++11 for loop");
 
-        uint64 i = 0;
+        uint64_t i = 0;
 
         for (auto it : vec)
         {
@@ -254,7 +252,7 @@ void test_vector_buf(uint64 size)
         stxxl::scoped_print_timer tm("C++11 bufreader for loop");
         typedef typename vector_type::bufreader_type bufreader_type;
 
-        uint64 i = 0;
+        uint64_t i = 0;
 
         for (auto it : bufreader_type(vec))
         {
@@ -277,8 +275,8 @@ int main(int argc, char* argv[])
     STXXL_MSG("Testing stxxl::vector<int> with odd size");
     test_vector_buf<int>(size * STXXL_DEFAULT_BLOCK_SIZE(X) / 64 + 501 + 42);
 
-    STXXL_MSG("Testing stxxl::vector<uint64>");
-    test_vector_buf<uint64>(size * STXXL_DEFAULT_BLOCK_SIZE(X) / 64 + 501 + 42);
+    STXXL_MSG("Testing stxxl::vector<uint64_t>");
+    test_vector_buf<uint64_t>(size * STXXL_DEFAULT_BLOCK_SIZE(X) / 64 + 501 + 42);
 
     STXXL_MSG("Testing stxxl::vector<my_type>");
     test_vector_buf<my_type>(size * STXXL_DEFAULT_BLOCK_SIZE(X) / 64);

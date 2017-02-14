@@ -19,7 +19,7 @@
 
 #include <stxxl/queue>
 
-typedef stxxl::uint64 my_type;
+typedef uint64_t my_type;
 
 // forced instantiation
 template class stxxl::queue<my_type>;
@@ -32,10 +32,10 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    stxxl::int64 mega = 1 << 20;
-    stxxl::int64 megabytes = atoi(argv[1]);
-    stxxl::int64 nelements = megabytes * mega / sizeof(my_type);
-    stxxl::int64 i;
+    size_t mega = 1 << 20;
+    size_t megabytes = atoi(argv[1]);
+    size_t nelements = megabytes * mega / sizeof(my_type);
+    size_t i;
     my_type in = 0, out = 0;
 
     stxxl::queue<my_type> q;

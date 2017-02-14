@@ -18,14 +18,14 @@
 
 int main(int argc, char* argv[])
 {
-    stxxl::uint64 ops = (argc >= 2)
+    uint64_t ops = (argc >= 2)
         ? stxxl::atouint64(argv[1]) : 16 * STXXL_DEFAULT_BLOCK_SIZE(T);
 
     stxxl::random_number32 random;
     stxxl::sequence<int> XXLDeque;
     std::deque<int> STDDeque;
 
-    for (stxxl::uint64 i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         unsigned curOP = random() % 6;
         unsigned value = random();

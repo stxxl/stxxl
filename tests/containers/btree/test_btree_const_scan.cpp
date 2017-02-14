@@ -28,7 +28,7 @@ struct comp_type : public std::less<int>
 
 struct my_type
 {
-    stxxl::uint64 data;
+    uint64_t data;
     char filler[24];
 };
 
@@ -54,11 +54,11 @@ template class stxxl::btree::btree<int, my_type, comp_type,
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (6 * LEAF_BLOCK_SIZE)
 
-stxxl::uint64 checksum = 0;
+uint64_t checksum = 0;
 
 void NC(btree_type& BTree)
 {
-    stxxl::uint64 sum = 0;
+    uint64_t sum = 0;
     stxxl::timer Timer1;
     Timer1.start();
     btree_type::iterator it = BTree.begin(), end = BTree.end();
@@ -72,7 +72,7 @@ void NC(btree_type& BTree)
 
 void C(btree_type& BTree)
 {
-    stxxl::uint64 sum = 0;
+    uint64_t sum = 0;
     stxxl::timer Timer1;
     Timer1.start();
     btree_type::const_iterator it = BTree.begin(), end = BTree.end();

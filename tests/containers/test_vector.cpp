@@ -25,11 +25,11 @@
 
 struct element  // 24 bytes, not a power of 2 intentionally
 {
-    stxxl::int64 key;
-    stxxl::int64 load0;
-    stxxl::int64 load1;
+    uint64_t key;
+    uint64_t load0;
+    uint64_t load1;
 
-    element& operator = (stxxl::int64 i)
+    element& operator = (uint64_t i)
     {
         key = i;
         load0 = i + 42;
@@ -101,7 +101,7 @@ void test_vector1()
     for (i = 0; i < v.size(); ++i)
     {
         v[i].key = i + offset;
-        STXXL_CHECK(v[i].key == stxxl::int64(i + offset));
+        STXXL_CHECK(v[i].key == uint64_t(i + offset));
     }
 
     // fill the vector with random numbers

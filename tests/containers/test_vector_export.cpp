@@ -18,13 +18,11 @@
 #include <stxxl/vector>
 #include <stxxl/scan>
 
-typedef stxxl::int64 int64;
-
 int main()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::VECTOR_GENERATOR<int64, 2, 2, (2* 1024* 1024), stxxl::striping>::result vector_type;
-    vector_type v(int64(64 * 1024 * 1024) / sizeof(int64));
+    typedef stxxl::VECTOR_GENERATOR<int64_t, 2, 2, (2* 1024* 1024), stxxl::striping>::result vector_type;
+    vector_type v(size_t(64 * 1024 * 1024) / sizeof(int64_t));
 
     stxxl::random_number32 rnd;
     int offset = rnd();
@@ -38,7 +36,7 @@ int main()
     for (i = 0; i < v.size(); ++i)
     {
         v[i] = i + offset;
-        STXXL_CHECK(v[i] == int64(i + offset));
+        STXXL_CHECK(v[i] == int64_t(i + offset));
     }
 
     v.flush();

@@ -29,9 +29,9 @@
 #define MB (1024 * 1024)
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
-void test(stxxl::uint64 data_mem, unsigned memory_to_use)
+void test(size_t data_mem, unsigned memory_to_use)
 {
-    stxxl::uint64 records_to_sort = data_mem / sizeof(T);
+    size_t records_to_sort = data_mem / sizeof(T);
     typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
 
     memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
@@ -66,7 +66,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
 
 template <typename T, unsigned block_size>
 void test_all_strategies(
-    stxxl::uint64 data_mem,
+    size_t data_mem,
     unsigned memory_to_use,
     int strategy)
 {
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    stxxl::uint64 data_mem = stxxl::atouint64(argv[1]) * MB;
+    size_t data_mem = stxxl::atouint64(argv[1]) * MB;
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 
-    typedef my_type<stxxl::uint64, 8> my_default_type;
+    typedef my_type<uint64_t, 8> my_default_type;
 
     switch (block_size)
     {
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
         test_all_strategies<my_default_type, 896* 1024>(data_mem, sort_mem, strategy);
         break;
     case 11:
-        test_all_strategies<my_type<stxxl::uint64, 12>, 2* MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_type<uint64_t, 12>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     case 12:
         test_all_strategies<my_type<unsigned, 12>, 2* MB + 4096>(data_mem, sort_mem, strategy);
