@@ -104,6 +104,7 @@ void test_vecs(unsigned int vecnum)
 
     // construct vector of input iterator ranges
     typedef typename std::vector<ValueType>::iterator input_iterator;
+    typedef typename std::iterator_traits<input_iterator>::difference_type difference_type;
 
     std::vector<std::pair<input_iterator, input_iterator> > sequences(vecnum);
 
@@ -118,21 +119,21 @@ void test_vecs(unsigned int vecnum)
         if (!Stable)
             stxxl::potentially_parallel::multiway_merge(
                 sequences.begin(), sequences.end(),
-                output.begin(), totalsize, std::less<ValueType>());
+                output.begin(), static_cast<difference_type>(totalsize), std::less<ValueType>());
         else
             stxxl::potentially_parallel::multiway_merge_stable(
                 sequences.begin(), sequences.end(),
-                output.begin(), totalsize, std::less<ValueType>());
+                output.begin(), static_cast<difference_type>(totalsize), std::less<ValueType>());
     }
     else {
         if (!Stable)
             stxxl::potentially_parallel::multiway_merge_sentinels(
                 sequences.begin(), sequences.end(),
-                output.begin(), totalsize, std::less<ValueType>());
+                output.begin(), static_cast<difference_type>(totalsize), std::less<ValueType>());
         else
             stxxl::potentially_parallel::multiway_merge_stable_sentinels(
                 sequences.begin(), sequences.end(),
-                output.begin(), totalsize, std::less<ValueType>());
+                output.begin(), static_cast<difference_type>(totalsize), std::less<ValueType>());
     }
 
 #ifdef TODO
@@ -141,12 +142,12 @@ void test_vecs(unsigned int vecnum)
     if (!Sentinels) {
         stxxl::parallel::sequential_multiway_merge<Stable, false>(
             sequences.begin(), sequences.end(),
-            output.begin(), totalsize, std::less<ValueType>());
+            output.begin(), static_cast<difference_type>(totalsize), std::less<ValueType>());
     }
     else {
         stxxl::parallel::sequential_multiway_merge<Stable, true>(
             sequences.begin(), sequences.end(),
-            output.begin(), totalsize, std::less<ValueType>());
+            output.begin(), static_cast<difference_type>(totalsize), std::less<ValueType>());
     }
 #endif
 
