@@ -784,6 +784,8 @@ add_subdirectory(local)
 
 if(STXXL_TRY_COMPILE_HEADERS)
 
+  file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/try_compile")
+
   file(GLOB_RECURSE header_files
     RELATIVE "${PROJECT_SOURCE_DIR}/include" FOLLOW_SYMLINKS "include/*")
   list(REMOVE_ITEM header_files "stxxl/bits/config.h.in")
@@ -794,7 +796,7 @@ if(STXXL_TRY_COMPILE_HEADERS)
     string(REPLACE "." "_" compile_name "${compile_name}")
 
     set(target_name "try_compile_${compile_name}")
-    set(source_name "${PROJECT_BINARY_DIR}/${target_name}.cpp")
+    set(source_name "${PROJECT_BINARY_DIR}/try_compile/${target_name}.cpp")
 
     file(WRITE ${source_name}
       "#include <${header_file}>
@@ -802,6 +804,8 @@ if(STXXL_TRY_COMPILE_HEADERS)
 
     add_executable(${target_name} ${source_name})
     target_link_libraries(${target_name} ${STXXL_LIBRARIES})
+    set_property(TARGET ${target_name}
+      PROPERTY RUNTIME_OUTPUT_DIRECTORY "try_compile/")
 
   endforeach()
 
