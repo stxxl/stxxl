@@ -52,10 +52,10 @@ int main()
 #if STXXL_PARALLEL
     #pragma omp parallel for
 #endif
-    for (int i = 0; i < 10000; ++i)
+    for (unsigned i = 0; i < 10000; ++i)
     {
 #if STXXL_PARALLEL
-        const unsigned thread_id = omp_get_thread_num();
+        const unsigned thread_id = static_cast<unsigned>(omp_get_thread_num());
 #else
         const unsigned thread_id = 0;
 #endif
