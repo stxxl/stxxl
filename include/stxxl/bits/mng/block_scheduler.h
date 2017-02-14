@@ -1432,7 +1432,9 @@ protected:
             case block_scheduler_type::op_release_dirty:
                 break;
             case block_scheduler_type::op_deinitialize:
-                if (swappable_blocks[schedule_meta->first].is_dirty()) return true; break;
+                if (swappable_blocks[schedule_meta->first].is_dirty())
+                    return true;
+                break;
             case block_scheduler_type::op_initialize:
             case block_scheduler_type::op_extract_external_block:
                 break;
