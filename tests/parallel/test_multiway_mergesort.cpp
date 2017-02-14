@@ -21,7 +21,7 @@ struct Something
 {
     int a, b;
 
-    Something(int x = 0)
+    explicit Something(int x = 0)
         : a(x), b(x * x)
     { }
 
@@ -47,7 +47,7 @@ void test_size(unsigned int size)
     stxxl::random_number32 rnd;
 
     for (unsigned int i = 0; i < size; ++i)
-        v[i] = rnd();
+        v[i] = Something(rnd());
 
     stxxl::parallel::parallel_sort_mwms<Stable>(v.begin(), v.end(), cmp, 8);
 

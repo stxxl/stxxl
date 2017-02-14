@@ -150,7 +150,7 @@ typedef my_key bkey_t;
 struct el_t {
     bkey_t key_;
     my_data data_;
-    el_t(bkey_t k) : key_(k) { }
+    explicit el_t(bkey_t k) : key_(k) { }
     el_t() { }
 };
 struct key_from_el {
@@ -556,7 +556,7 @@ class key2pair
 public:
     typedef std::pair<my_key, my_data> value_type;
 
-    key2pair(InputType& in_) : in(in_)
+    explicit key2pair(InputType& in_) : in(in_)
     {
         if (!in.empty())
             current.first = *in;

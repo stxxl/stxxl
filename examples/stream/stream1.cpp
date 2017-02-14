@@ -69,7 +69,7 @@ private:
 
 public:
     // A constructor taking another stream of integers as input.
-    squaring_object(InputStream& input_stream)
+    explicit squaring_object(InputStream& input_stream)
         : m_input_stream(input_stream)
     {
         if (!m_input_stream.empty())

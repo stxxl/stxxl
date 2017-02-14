@@ -27,7 +27,7 @@ template <typename type>
 struct counter
 {
     type value;
-    counter(type v = type(0)) : value(v) { }
+    explicit counter(type v = type(0)) : value(v) { }
     type operator () ()
     {
         type old_val = value;

@@ -114,7 +114,7 @@ struct my_type
     my_type()
     { }
 
-    my_type(const key_type& _key)
+    explicit my_type(const key_type& _key)
         : key(_key)
     {
 #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS

@@ -43,7 +43,7 @@ struct random_generator
     size_type count;
     stxxl::random_number32 rnd;
 
-    random_generator(size_type _count) : count(_count)
+    explicit random_generator(size_type _count) : count(_count)
     {
         if (verbose) cout << "Random Stream: ";
         current = rnd();
@@ -132,7 +132,7 @@ struct output
     typedef typename Input::value_type value_type;
     Input& input;
 
-    output(Input& _input) : input(_input) { }
+    explicit output(Input& _input) : input(_input) { }
 
     const value_type operator * () const
     {
@@ -190,7 +190,7 @@ struct shuffle
         }
     }
 
-    shuffle(Input& _input)
+    explicit shuffle(Input& _input)
         : input(_input), current(0), next(0), even(true), is_empty(false)
     {
         apply_shuffle();

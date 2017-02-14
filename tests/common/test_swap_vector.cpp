@@ -22,7 +22,7 @@ public:
     {
         STXXL_MSG("Construct Test " << m_i);
     }
-    Test(int i) : m_i(i)
+    explicit Test(int i) : m_i(i)
     {
         STXXL_MSG("Construct Test " << m_i);
     }

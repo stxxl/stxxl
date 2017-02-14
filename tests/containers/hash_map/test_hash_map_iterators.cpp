@@ -22,7 +22,7 @@ struct rand_pairs
 {
     stxxl::random_number32& rand_;
 
-    rand_pairs(stxxl::random_number32& rand)
+    explicit rand_pairs(stxxl::random_number32& rand)
         : rand_(rand)
     { }
 

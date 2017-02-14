@@ -46,7 +46,7 @@ struct element  // 24 bytes, not a power of 2 intentionally
 struct counter
 {
     int value;
-    counter(int v) : value(v) { }
+    explicit counter(int v) : value(v) { }
     int operator () ()
     {
         int old_val = value;

@@ -1100,7 +1100,7 @@ public:
         buildSA_type* out_sa;
 
     public:
-        algorithm(Input& data_in)
+        explicit algorithm(Input& data_in)
             : finished(false), rec_depth(0)
         {
             // (t_i) -> (i,t_i)

@@ -35,7 +35,7 @@ struct my_type
     }
 
     my_type() { }
-    my_type(key_type k) : m_key(k) { }
+    explicit my_type(key_type k) : m_key(k) { }
 
     static my_type min_value()
     {

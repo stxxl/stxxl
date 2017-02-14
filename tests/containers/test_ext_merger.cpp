@@ -21,7 +21,7 @@ typedef stxxl::typed_block<4096, my_type> block_type;
 struct dummy_merger
 {
     int& cnt;
-    dummy_merger(int& c) : cnt(c) { }
+    explicit dummy_merger(int& c) : cnt(c) { }
     template <class OutputIterator>
     void multi_merge(OutputIterator b, OutputIterator e)
     {
