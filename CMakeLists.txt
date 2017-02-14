@@ -73,6 +73,8 @@ endif()
 
 option(STXXL_BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
 
+option(STXXL_RUN_SLOW_TESTS "Run slow tests of extra stxxl tests and tool programs" ON)
+
 if(MSVC_VERSION LESS 1700)
   # require boost for Visual C++ versions older than VC11 = MSVS 2012
   set(USE_BOOST ON)
@@ -668,9 +670,9 @@ endmacro(stxxl_build_extra_tool)
 # macro for registering extra stxxl tests
 macro(stxxl_extra_test)
 
-  if(STXXL_BUILD_EXTRAS)
+  if(STXXL_BUILD_EXTRAS AND STXXL_RUN_SLOW_TESTS)
     stxxl_test(${ARGN})
-  endif(STXXL_BUILD_EXTRAS)
+  endif(STXXL_BUILD_EXTRAS AND STXXL_RUN_SLOW_TESTS)
 
 endmacro(stxxl_extra_test)
 
