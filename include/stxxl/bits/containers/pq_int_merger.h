@@ -87,6 +87,7 @@ public:
     //! is this array invalid? here: empty and prefixed with sentinel?
     bool is_array_empty(unsigned_type slot) const
     {
+        assert(slot < MaxArity);
         return tree.is_sentinel(*(current[slot]));
     }
 
