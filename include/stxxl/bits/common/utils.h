@@ -16,6 +16,11 @@
 #ifndef STXXL_COMMON_UTILS_HEADER
 #define STXXL_COMMON_UTILS_HEADER
 
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/msvc_compatibility.h>
+
 #include <vector>
 #include <string>
 #include <cmath>
@@ -23,12 +28,7 @@
 #include <algorithm>
 #include <sstream>
 #include <limits>
-
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
-#include <stxxl/bits/common/types.h>
-#include <stxxl/bits/compat/type_traits.h>
-#include <stxxl/bits/msvc_compatibility.h>
+#include <type_traits>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -195,7 +195,7 @@ unsigned int ilog2_ceil(const IntegerType& i)
 
 template <typename Integral, typename Integral2>
 inline
-typename compat::remove_const<Integral>::type
+typename std::remove_const<Integral>::type
 div_ceil(Integral n, Integral2 d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
