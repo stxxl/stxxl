@@ -105,7 +105,7 @@ void test_vector()
 
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == stxxl::int64(i + offset));
+        STXXL_CHECK(v[i].get()->key == uint64_t(i + offset));
     }
 
     // fill the vector with random numbers

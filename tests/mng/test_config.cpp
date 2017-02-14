@@ -22,7 +22,7 @@ void test1()
     cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 GiB , syscall unlink direct=on");
 
     STXXL_CHECK_EQUAL(cfg.path, "/var/tmp/stxxl.tmp");
-    STXXL_CHECK_EQUAL(cfg.size, 100 * 1024 * 1024 * stxxl::uint64(1024));
+    STXXL_CHECK_EQUAL(cfg.size, 100 * 1024 * 1024 * uint64_t(1024));
     STXXL_CHECK_EQUAL(cfg.fileio_string(), "syscall direct=on unlink_on_open");
 
     // test disk_config parser:
@@ -30,7 +30,7 @@ void test1()
     cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 , wincall queue=5 delete_on_exit direct=on");
 
     STXXL_CHECK_EQUAL(cfg.path, "/var/tmp/stxxl.tmp");
-    STXXL_CHECK_EQUAL(cfg.size, 100 * 1024 * stxxl::uint64(1024));
+    STXXL_CHECK_EQUAL(cfg.size, 100 * 1024 * uint64_t(1024));
     STXXL_CHECK_EQUAL(cfg.fileio_string(), "wincall delete_on_exit direct=on queue=5");
     STXXL_CHECK_EQUAL(cfg.queue, 5);
     STXXL_CHECK_EQUAL(cfg.direct, stxxl::disk_config::DIRECT_ON);
@@ -62,7 +62,7 @@ void test2()
         disk1.direct = stxxl::disk_config::DIRECT_OFF;
 
         STXXL_CHECK_EQUAL(disk1.path, "/tmp/stxxl-1.tmp");
-        STXXL_CHECK_EQUAL(disk1.size, 100 * 1024 * stxxl::uint64(1024));
+        STXXL_CHECK_EQUAL(disk1.size, 100 * 1024 * uint64_t(1024));
         STXXL_CHECK_EQUAL(disk1.autogrow, 1);
         STXXL_CHECK_EQUAL(disk1.fileio_string(),
                           "syscall direct=off unlink_on_open");
@@ -74,7 +74,7 @@ void test2()
         disk2.unlink_on_open = true;
 
         STXXL_CHECK_EQUAL(disk2.path, "/tmp/stxxl-2.tmp");
-        STXXL_CHECK_EQUAL(disk2.size, 200 * 1024 * stxxl::uint64(1024));
+        STXXL_CHECK_EQUAL(disk2.size, 200 * 1024 * uint64_t(1024));
         STXXL_CHECK_EQUAL(disk2.fileio_string(),
                           "syscall autogrow=no direct=off unlink_on_open");
         STXXL_CHECK_EQUAL(disk2.direct, 0);
