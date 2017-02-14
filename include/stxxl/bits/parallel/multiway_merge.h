@@ -379,11 +379,12 @@ prepare_unguarded_sentinel(RandomAccessIteratorIterator seqs_begin,
 template <template <typename RAI, typename C> class Iterator,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_3_variant(RandomAccessIteratorIterator seqs_begin,
                          RandomAccessIteratorIterator seqs_end,
-                         RandomAccessIterator3 target, DiffType length,
+                         RandomAccessIterator3 target,
+                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                          Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -465,13 +466,19 @@ finish:
 
 template <typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_3_combined(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIteratorIterator seqs_end,
-                          RandomAccessIterator3 target, DiffType length,
+                          RandomAccessIterator3 target,
+                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                           Comparator comp)
 {
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type::first_type RandomAccessIterator;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
+
     STXXL_PARALLEL_PCALL(length);
     STXXL_ASSERT(seqs_end - seqs_begin == 3);
 
@@ -557,11 +564,12 @@ multiway_merge_3_combined(RandomAccessIteratorIterator seqs_begin,
 template <template <typename RAI, typename C> class iterator,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_4_variant(RandomAccessIteratorIterator seqs_begin,
                          RandomAccessIteratorIterator seqs_end,
-                         RandomAccessIterator3 target, DiffType length,
+                         RandomAccessIterator3 target,
+                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                          Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -674,11 +682,12 @@ finish:
 
 template <typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIteratorIterator seqs_end,
-                          RandomAccessIterator3 target, DiffType length,
+                          RandomAccessIterator3 target,
+                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                           Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -686,6 +695,8 @@ multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type RandomAccessIteratorPair;
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::difference_type DiffType;
 
     int min_seq;
     RandomAccessIterator3 target_end;
@@ -742,12 +753,12 @@ multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
  */
 template <bool Stable,
           typename RandomAccessIteratorIterator,
-          typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename RandomAccessIterator3, typename Comparator>
 RandomAccessIterator3
 multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
                       RandomAccessIteratorIterator seqs_end,
-                      RandomAccessIterator3 target, DiffType length,
+                      RandomAccessIterator3 target,
+                      typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                       Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -756,6 +767,8 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
         ::value_type::first_type RandomAccessIterator;
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::value_type value_type;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
 
     // num remaining pieces
     int k = static_cast<int>(seqs_end - seqs_begin), nrp;
@@ -925,24 +938,28 @@ multiway_merge_bubble(RandomAccessIteratorIterator seqs_begin,
 template <typename LoserTreeType,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_loser_tree(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIteratorIterator seqs_end,
-                          RandomAccessIterator3 target, DiffType length,
+                          RandomAccessIterator3 target,
+                          typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                           Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
 
     typedef typename LoserTreeType::source_type source_type;
+    typedef typename LoserTreeType::size_type size_type;
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type::first_type RandomAccessIterator;
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::value_type value_type;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
 
     source_type k = static_cast<source_type>(seqs_end - seqs_begin);
 
-    LoserTreeType lt(k, comp);
+    LoserTreeType lt(static_cast<size_type>(k), comp);
 
     DiffType total_length = 0;
 
@@ -1005,25 +1022,34 @@ multiway_merge_loser_tree(RandomAccessIteratorIterator seqs_begin,
 template <typename LoserTreeType,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType,
           typename Comparator>
 RandomAccessIterator3
 multiway_merge_loser_tree_unguarded(
     RandomAccessIteratorIterator seqs_begin,
     RandomAccessIteratorIterator seqs_end,
-    RandomAccessIterator3 target, DiffType length,
+    RandomAccessIterator3 target,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
     Comparator comp)
 {
+    typedef typename LoserTreeType::source_type source_type;
+    typedef typename LoserTreeType::size_type size_type;
+    typedef typename std::iterator_traits<RandomAccessIteratorIterator>
+        ::value_type RandomAccessIteratorPair;
+    typedef typename RandomAccessIteratorPair
+        ::first_type RandomAccessIterator;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
+
     STXXL_PARALLEL_PCALL(length);
 
-    int k = (int)(seqs_end - seqs_begin);
+    source_type k = static_cast<source_type>(seqs_end - seqs_begin);
 
     // sentinel is item at end of first sequence.
-    LoserTreeType lt(k, *(seqs_begin->second - 1), comp);
+    LoserTreeType lt(static_cast<size_type>(k), *(seqs_begin->second - 1), comp);
 
     DiffType total_length = 0;
 
-    for (int t = 0; t < k; ++t)
+    for (source_type t = 0; t < k; ++t)
     {
         assert(seqs_begin[t].first != seqs_begin[t].second);
 
@@ -1126,12 +1152,13 @@ STXXL_NO_POINTER_UNGUARDED(long long)
 template <bool Stable,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_loser_tree_combined(
     RandomAccessIteratorIterator seqs_begin,
     RandomAccessIteratorIterator seqs_end,
-    RandomAccessIterator3 target, DiffType length,
+    RandomAccessIterator3 target,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -1140,6 +1167,8 @@ multiway_merge_loser_tree_combined(
         ::value_type::first_type RandomAccessIterator;
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::value_type value_type;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
 
     int min_seq;
     RandomAccessIterator3 target_end;
@@ -1180,12 +1209,13 @@ multiway_merge_loser_tree_combined(
 template <bool Stable,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_loser_tree_sentinel(
     RandomAccessIteratorIterator seqs_begin,
     RandomAccessIteratorIterator seqs_end,
-    RandomAccessIterator3 target, DiffType length,
+    RandomAccessIterator3 target,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -1231,11 +1261,12 @@ multiway_merge_loser_tree_sentinel(
 template <bool Stable, bool Sentinels,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIteratorIterator seqs_end,
-                          RandomAccessIterator3 target, DiffType length,
+                          RandomAccessIterator3 target,
+                          typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                           Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -1355,13 +1386,14 @@ sequential_multiway_merge(RandomAccessIteratorIterator seqs_begin,
  */
 template <bool Stable,
           typename RandomAccessIteratorIterator,
-          typename DiffType,
           typename Comparator>
 void
 parallel_multiway_merge_sampling_splitting(
     const RandomAccessIteratorIterator& seqs_begin,
     const RandomAccessIteratorIterator& seqs_end,
-    DiffType length, DiffType total_length, Comparator comp,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type total_length,
+    Comparator comp,
     std::vector<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type>* chunks,
     const thread_index_t num_threads)
 {
@@ -1369,9 +1401,11 @@ parallel_multiway_merge_sampling_splitting(
         ::value_type::first_type RandomAccessIterator;
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::value_type value_type;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
 
     const DiffType num_seqs = seqs_end - seqs_begin;
-    const DiffType num_samples = num_threads * SETTINGS::merge_oversampling;
+    const DiffType num_samples = num_threads * static_cast<DiffType>(SETTINGS::merge_oversampling);
 
     // pick samples
     value_type* samples = new value_type[num_seqs * num_samples];
@@ -1401,24 +1435,24 @@ parallel_multiway_merge_sampling_splitting(
         for (DiffType seq = 0; seq < num_seqs; ++seq)
         {
             if (slab > 0) {
-                chunks[slab][seq].first =
+                chunks[slab][static_cast<size_t>(seq)].first =
                     std::upper_bound(
                         seqs_begin[seq].first, seqs_begin[seq].second,
                         samples[num_samples * num_seqs * slab / num_threads],
                         comp);
             }
             else    // absolute beginning
-                chunks[slab][seq].first = seqs_begin[seq].first;
+                chunks[slab][static_cast<size_t>(seq)].first = seqs_begin[seq].first;
 
             if ((slab + 1) < num_threads) {
-                chunks[slab][seq].second =
+                chunks[slab][static_cast<size_t>(seq)].second =
                     std::upper_bound(
                         seqs_begin[seq].first, seqs_begin[seq].second,
                         samples[num_samples * num_seqs * (slab + 1) / num_threads],
                         comp);
             }
             else    // absolute ending
-                chunks[slab][seq].second = seqs_begin[seq].second;
+                chunks[slab][static_cast<size_t>(seq)].second = seqs_begin[seq].second;
         }
     }
 
@@ -1441,13 +1475,13 @@ parallel_multiway_merge_sampling_splitting(
  */
 template <bool Stable,
           typename RandomAccessIteratorIterator,
-          typename DiffType,
           typename Comparator>
 void
 parallel_multiway_merge_exact_splitting(
     const RandomAccessIteratorIterator& seqs_begin,
     const RandomAccessIteratorIterator& seqs_end,
-    DiffType length, DiffType total_length, Comparator comp,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
+    typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type total_length, Comparator comp,
     std::vector<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type>* chunks,
     const thread_index_t num_threads)
 {
@@ -1455,21 +1489,23 @@ parallel_multiway_merge_exact_splitting(
         ::value_type RandomAccessIteratorPair;
     typedef typename RandomAccessIteratorPair
         ::first_type RandomAccessIterator;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
 
-    const size_t num_seqs = seqs_end - seqs_begin;
+    const size_t num_seqs = static_cast<size_t>(seqs_end - seqs_begin);
     const bool tight = (total_length == length);
 
     std::vector<RandomAccessIterator>* offsets
         = new std::vector<RandomAccessIterator>[num_threads];
 
-    std::vector<DiffType> ranks(num_threads + 1);
+    std::vector<DiffType> ranks(static_cast<size_t>(num_threads + 1));
     equally_split(length, num_threads, ranks.begin());
 
     for (thread_index_t s = 0; s < (num_threads - 1); ++s)
     {
         offsets[s].resize(num_seqs);
         multiseq_partition(seqs_begin, seqs_end,
-                           ranks[s + 1], offsets[s].begin(), comp);
+                           ranks[static_cast<size_t>(s + 1)], offsets[s].begin(), comp);
 
         if (!tight) // last one also needed and available
         {
@@ -1486,14 +1522,14 @@ parallel_multiway_merge_exact_splitting(
         for (size_t s = 0; s < num_seqs; ++s)
         {
             if (slab == 0) // absolute beginning
-                chunks[slab][s].first = seqs_begin[s].first;
+                chunks[slab][s].first = seqs_begin[static_cast<DiffType>(s)].first;
             else
                 chunks[slab][s].first = offsets[slab - 1][s];
 
             if (!tight || slab < (num_threads - 1))
                 chunks[slab][s].second = offsets[slab][s];
             else    // slab == num_threads - 1
-                chunks[slab][s].second = seqs_begin[s].second;
+                chunks[slab][s].second = seqs_begin[static_cast<DiffType>(s)].second;
         }
     }
 
@@ -1518,25 +1554,29 @@ parallel_multiway_merge_exact_splitting(
 template <bool Stable,
           typename RandomAccessIteratorIterator,
           typename RandomAccessIterator3,
-          typename DiffType,
           typename Comparator>
 RandomAccessIterator3
 parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                         RandomAccessIteratorIterator seqs_end,
-                        RandomAccessIterator3 target, const DiffType length,
+                        RandomAccessIterator3 target,
+                        const typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                         Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
 
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
         ::value_type RandomAccessIteratorPair;
+    typedef typename RandomAccessIteratorPair
+        ::first_type RandomAccessIterator;
+    typedef typename std::iterator_traits<RandomAccessIterator>
+        ::difference_type DiffType;
 
     for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; ++rii)
         STXXL_DEBUG_ASSERT(stxxl::is_sorted((*rii).first, (*rii).second, comp));
 
     // leave only non-empty sequences
     std::vector<RandomAccessIteratorPair> seqs_ne;
-    seqs_ne.reserve(seqs_end - seqs_begin);
+    seqs_ne.reserve(static_cast<size_t>(seqs_end - seqs_begin));
     DiffType total_length = 0;
 
     for (RandomAccessIteratorIterator raii = seqs_begin; raii != seqs_end; ++raii)
@@ -1579,14 +1619,14 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
             {
                 parallel_multiway_merge_sampling_splitting<Stable>(
                     seqs_ne.begin(), seqs_ne.end(),
-                    length, total_length, comp,
+                    static_cast<DiffType>(length), total_length, comp,
                     chunks, num_threads);
             }
             else // (SETTINGS::multiway_merge_splitting == SETTINGS::EXACT)
             {
                 parallel_multiway_merge_exact_splitting<Stable>(
                     seqs_ne.begin(), seqs_ne.end(),
-                    length, total_length, comp,
+                    static_cast<DiffType>(length), total_length, comp,
                     chunks, num_threads);
             }
         }
@@ -1605,7 +1645,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
         sequential_multiway_merge<Stable, false>(
             chunks[iam].begin(), chunks[iam].end(),
             target + target_position,
-            std::min(local_length, length - target_position),
+            std::min(local_length, static_cast<DiffType>(length) - target_position),
             comp);
 
         t[iam].tic();
@@ -1649,11 +1689,12 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
  */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
                RandomAccessIteratorPairIterator seqs_end,
-               RandomAccessIterator3 target, DiffType length,
+               RandomAccessIterator3 target,
+               typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                Comparator comp)
 {
     STXXL_PARALLEL_PCALL(seqs_end - seqs_begin);
@@ -1687,11 +1728,12 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
  */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_stable(RandomAccessIteratorPairIterator seqs_begin,
                       RandomAccessIteratorPairIterator seqs_end,
-                      RandomAccessIterator3 target, DiffType length,
+                      RandomAccessIterator3 target,
+                      typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                       Comparator comp)
 {
     STXXL_PARALLEL_PCALL(seqs_end - seqs_begin);
@@ -1730,11 +1772,12 @@ multiway_merge_stable(RandomAccessIteratorPairIterator seqs_begin,
  */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_sentinels(RandomAccessIteratorPairIterator seqs_begin,
                          RandomAccessIteratorPairIterator seqs_end,
-                         RandomAccessIterator3 target, DiffType length,
+                         RandomAccessIterator3 target,
+                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                          Comparator comp)
 {
     if (seqs_begin == seqs_end)
@@ -1770,11 +1813,12 @@ multiway_merge_sentinels(RandomAccessIteratorPairIterator seqs_begin,
  */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3,
-          typename DiffType, typename Comparator>
+          typename Comparator>
 RandomAccessIterator3
 multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
                                 RandomAccessIteratorPairIterator seqs_end,
-                                RandomAccessIterator3 target, DiffType length,
+                                RandomAccessIterator3 target,
+                                typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                                 Comparator comp)
 {
     if (seqs_begin == seqs_end)

@@ -139,11 +139,12 @@ using std::random_shuffle;
  * \return End iterator of output sequence.
  */
 template <typename RandomAccessIteratorPairIterator,
-          typename RandomAccessIterator3, typename DiffType, typename Comparator>
+          typename RandomAccessIterator3, typename Comparator>
 RandomAccessIterator3
 multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
                RandomAccessIteratorPairIterator seqs_end,
-               RandomAccessIterator3 target, DiffType length,
+               RandomAccessIterator3 target,
+               typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                Comparator comp)
 {
 #if STXXL_PARALLEL
@@ -164,11 +165,12 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
  * \return End iterator of output sequence.
  */
 template <typename RandomAccessIteratorPairIterator,
-          typename RandomAccessIterator3, typename DiffType, typename Comparator>
+          typename RandomAccessIterator3, typename Comparator>
 RandomAccessIterator3
 multiway_merge_stable(RandomAccessIteratorPairIterator seqs_begin,
                       RandomAccessIteratorPairIterator seqs_end,
-                      RandomAccessIterator3 target, DiffType length,
+                      RandomAccessIterator3 target,
+                      typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                       Comparator comp)
 {
 #if STXXL_PARALLEL
@@ -190,11 +192,12 @@ multiway_merge_stable(RandomAccessIteratorPairIterator seqs_begin,
  * \pre For each \c i, \c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element.
  */
 template <typename RandomAccessIteratorPairIterator,
-          typename RandomAccessIterator3, typename DiffType, typename Comparator>
+          typename RandomAccessIterator3, typename Comparator>
 RandomAccessIterator3
 multiway_merge_sentinels(RandomAccessIteratorPairIterator seqs_begin,
                          RandomAccessIteratorPairIterator seqs_end,
-                         RandomAccessIterator3 target, DiffType length,
+                         RandomAccessIterator3 target,
+                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                          Comparator comp)
 {
 #if STXXL_PARALLEL
@@ -216,11 +219,12 @@ multiway_merge_sentinels(RandomAccessIteratorPairIterator seqs_begin,
  * \pre For each \c i, \c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element.
  */
 template <typename RandomAccessIteratorPairIterator,
-          typename RandomAccessIterator3, typename DiffType, typename Comparator>
+          typename RandomAccessIterator3, typename Comparator>
 RandomAccessIterator3
 multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
                                 RandomAccessIteratorPairIterator seqs_end,
-                                RandomAccessIterator3 target, DiffType length,
+                                RandomAccessIterator3 target,
+                                typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorPairIterator>::value_type::first_type>::difference_type length,
                                 Comparator comp)
 {
 #if STXXL_PARALLEL
