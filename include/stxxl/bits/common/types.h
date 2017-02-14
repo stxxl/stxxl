@@ -18,6 +18,7 @@
 #include <stxxl/bits/namespace.h>
 #include <cstdint>
 #include <type_traits>
+#include <cstddef>
 
 STXXL_BEGIN_NAMESPACE
 
