@@ -22,10 +22,9 @@
 #endif
 #include <cstdlib>
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/unused.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! Access to some useful malloc statistics.
 
@@ -145,6 +144,6 @@ inline std::ostream& operator << (std::ostream& s, const malloc_stats& st)
 class malloc_setup
 { };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_UTILS_MALLOC_HEADER

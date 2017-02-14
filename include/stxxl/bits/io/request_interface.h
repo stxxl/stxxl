@@ -17,11 +17,10 @@
 
 #include <ostream>
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -80,7 +79,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_INTERFACE_HEADER
 // vim: et:ts=4:sw=4

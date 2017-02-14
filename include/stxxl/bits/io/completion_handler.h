@@ -16,12 +16,11 @@
 #ifndef STXXL_IO_COMPLETION_HANDLER_HEADER
 #define STXXL_IO_COMPLETION_HANDLER_HEADER
 
-#include <stxxl/bits/namespace.h>
 
 #include <cstdlib>
 #include <memory>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 class request;
 
@@ -95,7 +94,7 @@ public:
     }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_COMPLETION_HANDLER_HEADER
 // vim: et:ts=4:sw=4

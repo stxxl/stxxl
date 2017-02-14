@@ -13,9 +13,8 @@
 #ifndef STXXL_COMMON_SEED_HEADER
 #define STXXL_COMMON_SEED_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! set the global stxxl seed value
 void set_seed(unsigned seed);
@@ -24,6 +23,6 @@ void set_seed(unsigned seed);
 //! sequence of different values
 unsigned get_next_seed();
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_SEED_HEADER

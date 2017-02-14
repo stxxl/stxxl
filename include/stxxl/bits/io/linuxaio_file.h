@@ -22,7 +22,7 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 class linuxaio_queue;
 
@@ -74,7 +74,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_LINUXAIO_FILE
 

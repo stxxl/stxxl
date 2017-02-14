@@ -14,7 +14,6 @@
 #define STXXL_CONTAINERS_BTREE_BTREE_HEADER
 
 #include <limits>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/iterator_map.h>
 #include <stxxl/bits/containers/btree/leaf.h>
@@ -23,7 +22,7 @@
 #include <stxxl/bits/containers/btree/node.h>
 #include <stxxl/vector>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace btree {
 
@@ -1196,7 +1195,7 @@ inline bool operator >=
 
 } // namespace btree
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

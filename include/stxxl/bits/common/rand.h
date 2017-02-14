@@ -20,7 +20,6 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/seed.h>
-#include <stxxl/bits/namespace.h>
 
 #if STXXL_STD_RANDOM
  #include <random>
@@ -35,7 +34,7 @@
 // 3. stxxl::srandom_number32(); // seed the global state of stxxl::random_number32
 // 4. create all the other prngs used.
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 extern unsigned ran32State;
 
@@ -287,6 +286,6 @@ struct random_number64
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_RAND_HEADER

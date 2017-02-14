@@ -18,7 +18,7 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/condition_variable.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 class semaphore : private noncopyable
 {
@@ -78,6 +78,6 @@ public:
 #endif
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_SEMAPHORE_HEADER

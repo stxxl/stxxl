@@ -32,12 +32,11 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/libstxxl.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup iolayer
 //! \{
@@ -224,7 +223,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_FILE_HEADER
 // vim: et:ts=4:sw=4

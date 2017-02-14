@@ -21,7 +21,7 @@
 #include <stxxl/bits/algo/adaptor.h>
 #include <stxxl/bits/common/counting_ptr.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace stream {
 
@@ -122,7 +122,7 @@ private:
 
 } // namespace stream
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_STREAM_SORTED_RUNS_HEADER
 // vim: et:ts=4:sw=4

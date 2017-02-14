@@ -20,7 +20,7 @@
 #include "ufs_platform.h"
 #include <sys/mman.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
                       request::request_type type)
@@ -68,7 +68,7 @@ const char* mmap_file::io_type() const
     return "mmap";
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif  // #if STXXL_HAVE_MMAP_FILE
 // vim: et:ts=4:sw=4

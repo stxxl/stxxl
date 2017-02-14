@@ -30,7 +30,7 @@
 #include <stxxl/bits/io/wfs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup fileimpl
 //! \{
@@ -62,7 +62,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_WINCALL_FILE
 

@@ -16,7 +16,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/buf_writer.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup schedlayer
 //! \{
@@ -122,6 +122,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BUF_OSTREAM_HEADER

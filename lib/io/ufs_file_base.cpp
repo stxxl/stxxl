@@ -22,7 +22,7 @@
 #include <stxxl/bits/verbose.h>
 #include "ufs_platform.h"
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 const char* ufs_file_base::io_type() const
 {
@@ -284,5 +284,5 @@ bool ufs_file_base::is_device() const
     return m_is_device;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

@@ -15,7 +15,6 @@
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/mng/disk_allocator.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/verbose.h>
 
 #include <cassert>
@@ -23,7 +22,7 @@
 #include <ostream>
 #include <utility>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void disk_allocator::dump() const
 {
@@ -159,5 +158,5 @@ void disk_allocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_
     //dump();
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

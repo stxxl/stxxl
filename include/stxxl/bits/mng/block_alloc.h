@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <random>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \defgroup alloc Allocation Functors
 //! \ingroup mnglayer
@@ -257,7 +257,7 @@ struct offset_allocator
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BLOCK_ALLOC_HEADER
 // vim: et:ts=4:sw=4

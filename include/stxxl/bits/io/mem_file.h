@@ -18,7 +18,7 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup fileimpl
 //! \{
@@ -57,6 +57,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_MEM_FILE_HEADER

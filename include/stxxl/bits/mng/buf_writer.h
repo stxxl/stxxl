@@ -20,7 +20,7 @@
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/noncopyable.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \defgroup schedlayer Block Scheduling Sublayer
 //! \ingroup mnglayer
@@ -217,6 +217,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BUF_WRITER_HEADER

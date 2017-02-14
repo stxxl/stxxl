@@ -37,7 +37,7 @@
 
 #define OPT_MERGING
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stllayer
 
@@ -1077,7 +1077,7 @@ void ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_KSORT_HEADER
 // vim: et:ts=4:sw=4

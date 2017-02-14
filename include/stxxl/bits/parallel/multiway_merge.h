@@ -37,7 +37,7 @@
 typedef SSIZE_T ssize_t;
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -1841,6 +1841,6 @@ multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_MULTIWAY_MERGE_HEADER

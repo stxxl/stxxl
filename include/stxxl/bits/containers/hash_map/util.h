@@ -21,7 +21,7 @@
 #include <stxxl/bits/containers/hash_map/tuning.h>
 #include <stxxl/bits/containers/hash_map/block_cache.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace hash_map {
 
@@ -582,6 +582,6 @@ struct HashedValuesStream
 
 } // namespace hash_map
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_UTIL_HEADER

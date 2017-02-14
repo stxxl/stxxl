@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void linuxaio_request::completed(bool posted, bool canceled)
 {
@@ -123,7 +123,7 @@ bool linuxaio_request::cancel_aio()
     return result == 0;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_LINUXAIO_FILE
 // vim: et:ts=4:sw=4

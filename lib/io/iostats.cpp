@@ -18,13 +18,12 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/namespace.h>
 
 #include <string>
 #include <sstream>
 #include <iomanip>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 stats::stats()
     : reads(0),
@@ -405,5 +404,5 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
 #undef hr
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

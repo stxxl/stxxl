@@ -19,14 +19,13 @@
 #define STXXL_PARALLEL_SETTINGS_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel/types.h>
 
 #if STXXL_PARALLEL
   #include <omp.h>
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -190,6 +189,6 @@ NumberOfThreads Settings<must_be_int>::num_threads;
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_SETTINGS_HEADER

@@ -13,11 +13,10 @@
 #ifndef STXXL_COMMON_IS_HEAP_HEADER
 #define STXXL_COMMON_IS_HEAP_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <iterator>
 #include <functional>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename RandomAccessIterator, typename StrictWeakOrdering>
 bool is_heap(
@@ -46,6 +45,6 @@ bool is_heap(
     return true;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_IS_HEAP_HEADER

@@ -27,7 +27,7 @@
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE2
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup mnglayer
 //! \{
@@ -352,7 +352,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_TYPED_BLOCK_HEADER
 // vim: et:ts=4:sw=4

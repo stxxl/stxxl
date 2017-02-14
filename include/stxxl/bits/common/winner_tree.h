@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 /*!
  * The class winner_tree is a binary tournament tree. There are n=2^k so
@@ -362,6 +362,6 @@ public:
     }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_WINNER_TREE_HEADER

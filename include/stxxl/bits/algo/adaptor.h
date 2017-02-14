@@ -18,7 +18,7 @@
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/adaptor.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <size_t BlockSize, typename RunType, class PosType = int_type>
 struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
@@ -241,6 +241,6 @@ make_bid_iterator(Iterator iter)
     return trigger_entry_iterator<Iterator>(iter);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_ADAPTOR_HEADER

@@ -19,7 +19,6 @@
 #ifndef STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 #define STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel/types.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
 
@@ -28,7 +27,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -581,6 +580,6 @@ ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER

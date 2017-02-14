@@ -18,9 +18,8 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 /** Print a demangled stack backtrace of the caller function to FILE* out. */
 static inline void
@@ -104,6 +103,6 @@ print_stacktrace(FILE* out = stderr, unsigned int max_frames = 64)
     free(symbollist);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_UTILS_STACKTRACE_HEADER

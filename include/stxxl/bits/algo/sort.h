@@ -39,7 +39,7 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlalgo
 //! \{
@@ -994,7 +994,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_HEADER
 // vim: et:ts=4:sw=4

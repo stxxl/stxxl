@@ -13,12 +13,11 @@
 #ifndef STXXL_COMMON_TUPLE_HEADER
 #define STXXL_COMMON_TUPLE_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <limits>
 #include <ostream>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 struct Plug { };
 
@@ -733,6 +732,6 @@ public:
 
 } // namespace stream
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_TUPLE_HEADER

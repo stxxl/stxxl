@@ -21,9 +21,8 @@
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void compute_prefetch_schedule(
     const int_type* first,
@@ -72,7 +71,7 @@ void compute_prefetch_schedule(
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_ASYNC_SCHEDULE_HEADER
 // vim: et:ts=4:sw=4

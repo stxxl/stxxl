@@ -25,7 +25,7 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #ifndef STXXL_VERBOSE_SEQUENCE
 #define STXXL_VERBOSE_SEQUENCE STXXL_VERBOSE2
@@ -829,7 +829,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_SEQUENCE_HEADER
 // vim: et:ts=4:sw=4

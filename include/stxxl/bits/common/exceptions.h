@@ -18,9 +18,8 @@
 #include <string>
 #include <stdexcept>
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 class io_error : public std::ios_base::failure
 {
@@ -82,7 +81,7 @@ public:
     { }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_EXCEPTIONS_HEADER
 // vim: et:ts=4:sw=4

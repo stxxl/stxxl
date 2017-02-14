@@ -28,7 +28,7 @@
 #define STXXL_VERBOSE_WBTL STXXL_VERBOSE2
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 wbtl_file::wbtl_file(
     file* backend_file,
@@ -349,7 +349,7 @@ const char* wbtl_file::io_type() const
     return "wbtl";
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif  // #if STXXL_HAVE_WBTL_FILE
 // vim: et:ts=4:sw=4

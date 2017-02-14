@@ -11,7 +11,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/exithandler.h>
-#include <stxxl/bits/namespace.h>
 
 // 1. do nothing for default handler
 // 2. #define STXXL_NON_DEFAULT_EXIT_HANDLER for a handler that does not use atexit()
@@ -22,7 +21,7 @@
 
 #include <cstdlib>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 // default exit handler
 int register_exit_handler(void (* function)(void))
@@ -36,14 +35,14 @@ void run_exit_handlers()
     // nothing to do
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #else // STXXL_NON_DEFAULT_EXIT_HANDLER
 
 #include <vector>
 #include <stxxl/bits/common/mutex.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 mutex exit_handler_mutex;
 std::vector<void (*)(void)> exit_handlers;
@@ -65,7 +64,7 @@ void run_exit_handlers()
     }
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // STXXL_NON_DEFAULT_EXIT_HANDLER
 #endif // STXXL_EXTERNAL_EXIT_HANDLER

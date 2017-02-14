@@ -30,7 +30,7 @@
 #define STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION 1
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 linuxaio_queue::linuxaio_queue(int desired_queue_length)
     : num_waiting_requests(0), num_free_events(0), num_posted_requests(0),
@@ -287,7 +287,7 @@ void* linuxaio_queue::wait_async(void* arg)
 #endif
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_LINUXAIO_FILE
 // vim: et:ts=4:sw=4

@@ -25,10 +25,9 @@
 #include <string>
 #include <vector>
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup support
 //! \{
@@ -645,6 +644,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_BINARY_BUFFER_HEADER

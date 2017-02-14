@@ -17,7 +17,6 @@
 #define STXXL_COMMON_UINT_TYPES_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/types.h>
 
@@ -25,7 +24,7 @@
 #include <ostream>
 #include <cassert>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 /*!
  * Construct an 40-bit or 48-bit unsigned integer stored in five or six bytes.
@@ -255,7 +254,7 @@ typedef uint_pair<uint16> uint48;
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

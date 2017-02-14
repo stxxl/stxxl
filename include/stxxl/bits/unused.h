@@ -14,15 +14,14 @@
 #ifndef STXXL_UNUSED_HEADER
 #define STXXL_UNUSED_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename U>
 inline void STXXL_UNUSED(const U&)
 { }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_UNUSED_HEADER
 // vim: et:ts=4:sw=4

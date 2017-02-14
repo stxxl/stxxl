@@ -13,10 +13,9 @@
 
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/seed.h>
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 unsigned ran32State = get_next_seed();
 
-STXXL_END_NAMESPACE
+} // namespace stxxl

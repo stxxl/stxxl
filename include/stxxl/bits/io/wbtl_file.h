@@ -26,7 +26,7 @@
 
 #include <stxxl/bits/io/disk_queued_file.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup fileimpl
 //! \{
@@ -106,7 +106,7 @@ protected:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_WBTL_FILE
 

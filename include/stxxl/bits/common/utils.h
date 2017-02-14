@@ -17,7 +17,6 @@
 #define STXXL_COMMON_UTILS_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
@@ -30,7 +29,7 @@
 #include <limits>
 #include <type_traits>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -309,7 +308,7 @@ inline typename Container::value_type pop_begin(Container& c)
 
 ////////////////////////////////////////////////////////////////////////////
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_UTILS_HEADER
 // vim: et:ts=4:sw=4

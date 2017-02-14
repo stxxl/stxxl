@@ -19,7 +19,7 @@
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/parallel.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename TypeKey>
 static void
@@ -362,6 +362,6 @@ void classify_block(Type* begin, Type* end, TypeKey*& out, int_type* bucket, typ
     STXXL_UNUSED(K);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_INTKSORT_HEADER

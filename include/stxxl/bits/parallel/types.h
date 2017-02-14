@@ -17,11 +17,10 @@
 #ifndef STXXL_PARALLEL_TYPES_HEADER
 #define STXXL_PARALLEL_TYPES_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 #include <cstdlib>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -50,6 +49,6 @@ static const lcas_t lcas_t_mask = (((lcas_t)1 << (lcas_t_bits / 2)) - 1);
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_TYPES_HEADER

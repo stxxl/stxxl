@@ -17,13 +17,12 @@
 #ifndef STXXL_PARALLEL_LOSERTREE_HEADER
 #define STXXL_PARALLEL_LOSERTREE_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/base.h>
 #include <functional>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -1098,6 +1097,6 @@ public:
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_LOSERTREE_HEADER

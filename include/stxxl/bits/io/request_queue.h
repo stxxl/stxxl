@@ -17,7 +17,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/io/request.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -37,7 +37,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_QUEUE_HEADER
 // vim: et:ts=4:sw=4

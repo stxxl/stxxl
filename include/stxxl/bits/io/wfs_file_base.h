@@ -24,7 +24,7 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup fileimpl
 //! \{
@@ -56,7 +56,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // STXXL_WINDOWS
 

@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename RunCursorType,
           typename RunCursorCmpType>
@@ -241,7 +241,7 @@ public:
     }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

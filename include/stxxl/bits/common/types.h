@@ -15,12 +15,11 @@
 #define STXXL_COMMON_TYPES_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 #include <cstdint>
 #include <type_traits>
 #include <cstddef>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 // will be deprecated soon
 typedef int8_t int8;
@@ -73,6 +72,6 @@ typename std::make_signed<Integral>::type as_signed(Integral value) {
     return static_cast<typename std::make_signed<Integral>::type>(value);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_TYPES_HEADER

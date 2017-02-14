@@ -18,7 +18,6 @@
 
 #include <map>
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request.h>
@@ -27,7 +26,7 @@
 #include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/serving_request.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -122,7 +121,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_DISK_QUEUES_HEADER
 // vim: et:ts=4:sw=4

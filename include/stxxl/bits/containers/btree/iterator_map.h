@@ -19,7 +19,7 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/common/error_handling.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace btree {
 
@@ -152,7 +152,7 @@ public:
 
 } // namespace btree
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

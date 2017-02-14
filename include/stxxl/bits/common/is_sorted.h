@@ -14,11 +14,10 @@
 #ifndef STXXL_COMMON_IS_SORTED_HEADER
 #define STXXL_COMMON_IS_SORTED_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <iterator>
 #include <functional>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <class ForwardIterator, class StrictWeakOrdering>
 bool is_sorted(ForwardIterator first, ForwardIterator last,
@@ -45,6 +44,6 @@ bool is_sorted(ForwardIterator first, ForwardIterator last)
                   ::value_type>());
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_IS_SORTED_HEADER

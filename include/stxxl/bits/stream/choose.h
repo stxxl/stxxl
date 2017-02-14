@@ -14,9 +14,8 @@
 #ifndef STXXL_STREAM_CHOOSE_HEADER
 #define STXXL_STREAM_CHOOSE_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! Stream package subnamespace.
 namespace stream {
@@ -303,7 +302,7 @@ public:
 
 } // namespace stream
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #include <stxxl/bits/stream/unique.h>
 

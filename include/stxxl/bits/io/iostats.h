@@ -19,7 +19,6 @@
  #define STXXL_IO_STATS 1
 #endif
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
@@ -31,7 +30,7 @@
 #include <iostream>
 #include <string>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup iolayer
 //!
@@ -641,7 +640,7 @@ inline std::string add_SI_multiplier(uint64 number, const char* unit = "")
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_IOSTATS_HEADER
 // vim: et:ts=4:sw=4

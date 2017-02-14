@@ -19,7 +19,7 @@
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/verbose.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \internal
 namespace sort_helper {
@@ -147,7 +147,7 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
 
 } // namespace sort_helper
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_HELPER_HEADER
 // vim: et:ts=4:sw=4

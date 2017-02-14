@@ -18,14 +18,13 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/disk_allocator.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/verbose.h>
 
 #include <cstddef>
 #include <fstream>
 #include <string>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 class io_error;
 
@@ -119,5 +118,5 @@ uint64 block_manager::get_free_bytes() const
     return total;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

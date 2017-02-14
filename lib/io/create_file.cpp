@@ -22,7 +22,7 @@
 #include <ostream>
 #include <stdexcept>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 file * create_file(const std::string& io_impl,
                    const std::string& filename,
@@ -236,5 +236,5 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
                 "Unsupported disk I/O implementation '" << cfg.io_impl << "'.");
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

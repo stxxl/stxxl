@@ -16,7 +16,6 @@
 #define STXXL_COMMON_MUTEX_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 
 #if STXXL_STD_THREADS && STXXL_WINDOWS && STXXL_MSVC >= 1700
 #include <atomic>
@@ -35,7 +34,7 @@
  #error "Thread implementation not detected."
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #if STXXL_STD_THREADS
 
@@ -198,6 +197,6 @@ private:
 };
 
 #endif
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_MUTEX_HEADER

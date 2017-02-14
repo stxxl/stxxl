@@ -16,7 +16,7 @@
 #include <string>
 #include <stxxl/bits/io/disk_queued_file.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup fileimpl
 //! \{
@@ -75,6 +75,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_FILEPERBLOCK_FILE_HEADER

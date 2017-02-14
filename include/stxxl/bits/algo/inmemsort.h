@@ -14,7 +14,6 @@
 #ifndef STXXL_ALGO_INMEMSORT_HEADER
 #define STXXL_ALGO_INMEMSORT_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/algo/adaptor.h>
@@ -23,7 +22,7 @@
 
 #include <algorithm>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename ExtIterator, typename StrictWeakOrdering>
 void stl_in_memory_sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp)
@@ -55,6 +54,6 @@ void stl_in_memory_sort(ExtIterator first, ExtIterator last, StrictWeakOrdering 
     wait_all(reqs.begin(), nblocks);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_INMEMSORT_HEADER

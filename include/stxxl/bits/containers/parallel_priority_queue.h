@@ -49,13 +49,12 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/types>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace ppq_local {
 
@@ -4678,6 +4677,6 @@ protected:
     stats_type m_stats;
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_PARALLEL_PRIORITY_QUEUE_HEADER

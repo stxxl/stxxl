@@ -19,7 +19,7 @@
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/utils.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 /*!
  * This class provides a statistical counter that can easily be deactivated
@@ -145,6 +145,6 @@ public:
     }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_CUSTOM_STATS_HEADER

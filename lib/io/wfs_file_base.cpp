@@ -22,7 +22,7 @@
 #endif
 #include <windows.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 const char* wfs_file_base::io_type() const
 {
@@ -234,7 +234,7 @@ void wfs_file_base::close_remove()
     ::DeleteFileA(filename.c_str());
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // STXXL_WINDOWS
 // vim: et:ts=4:sw=4

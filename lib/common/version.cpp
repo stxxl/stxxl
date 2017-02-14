@@ -12,10 +12,9 @@
  **************************************************************************/
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/version.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 int version_major()
 {
@@ -47,6 +46,6 @@ const char * get_library_version_string_long()
     return get_version_string_long();
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 // vim: et:ts=4:sw=4

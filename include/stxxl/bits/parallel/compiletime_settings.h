@@ -17,12 +17,11 @@
 #ifndef STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 #define STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/settings.h>
 #include <cstdio>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -58,6 +57,6 @@ namespace parallel {
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER

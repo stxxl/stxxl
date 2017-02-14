@@ -13,9 +13,8 @@
 #ifndef STXXL_COMMON_EXITHANDLER_HEADER
 #define STXXL_COMMON_EXITHANDLER_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 // There are several possibilities for the exit handlers.  To use the default
 // implementation (which uses atexit()), nothing special has to be done.
@@ -32,7 +31,7 @@ STXXL_BEGIN_NAMESPACE
 int register_exit_handler(void (* function)(void));
 void run_exit_handlers();
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_EXITHANDLER_HEADER
 // vim: et:ts=4:sw=4

@@ -70,7 +70,7 @@
 
 #define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2_THIS("priority_queue::" << msg)
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \defgroup stlcontinternals internals
 //! \ingroup stlcont
@@ -343,7 +343,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_PQ_HELPERS_HEADER
 // vim: et:ts=4:sw=4

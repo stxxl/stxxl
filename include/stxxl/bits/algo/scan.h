@@ -15,12 +15,11 @@
 #ifndef STXXL_ALGO_SCAN_HEADER
 #define STXXL_ALGO_SCAN_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlalgo
 //! \{
@@ -325,7 +324,7 @@ ExtIterator find(ExtIterator begin, ExtIterator end,
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_SCAN_HEADER
 // vim: et:ts=4:sw=4

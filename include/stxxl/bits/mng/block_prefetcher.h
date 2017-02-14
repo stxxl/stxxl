@@ -23,7 +23,7 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/noncopyable.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup schedlayer
 //! \{
@@ -224,6 +224,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BLOCK_PREFETCHER_HEADER

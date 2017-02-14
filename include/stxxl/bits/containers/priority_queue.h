@@ -25,7 +25,7 @@
 #include <stxxl/bits/containers/pq_int_merger.h>
 #include <stxxl/bits/containers/pq_ext_merger.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 /*
    KNBufferSize1 = 32;
@@ -67,7 +67,7 @@ struct priority_queue_config
     };
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 
@@ -89,7 +89,7 @@ void swap(stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX
 
 } // namespace std
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! External priority queue data structure \n
 //! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
@@ -1036,7 +1036,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

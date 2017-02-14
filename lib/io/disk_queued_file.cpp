@@ -16,10 +16,9 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/io/serving_request.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 request_ptr disk_queued_file::aread(
     void* buffer,
@@ -49,5 +48,5 @@ request_ptr disk_queued_file::awrite(
     return req;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

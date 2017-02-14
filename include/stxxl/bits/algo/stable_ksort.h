@@ -29,7 +29,7 @@
 #define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlalgo
 //! \{
@@ -462,6 +462,6 @@ void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_STABLE_KSORT_HEADER

@@ -30,7 +30,7 @@
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \weakgroup fileimpl
 //! \{
@@ -143,7 +143,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_SIMDISK_FILE
 

@@ -26,7 +26,7 @@
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/stream/sorted_runs.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace stream {
 
@@ -1655,7 +1655,7 @@ void sort(RandomAccessIterator begin,
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_STREAM_SORT_STREAM_HEADER
 // vim: et:ts=4:sw=4

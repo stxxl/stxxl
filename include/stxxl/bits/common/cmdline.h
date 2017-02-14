@@ -21,10 +21,9 @@
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup support
 //! \{
@@ -806,6 +805,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_CMDLINE_HEADER

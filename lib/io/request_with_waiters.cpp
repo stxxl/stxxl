@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <functional>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 bool request_with_waiters::add_waiter(onoff_switch* sw)
 {
@@ -60,5 +60,5 @@ size_t request_with_waiters::num_waiters()
     return m_waiters.size();
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

@@ -20,7 +20,6 @@
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
@@ -32,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace async_schedule_local {
 
@@ -203,6 +202,6 @@ void compute_prefetch_schedule(
     STXXL_UNUSED(w_steps);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 // vim: et:ts=4:sw=4

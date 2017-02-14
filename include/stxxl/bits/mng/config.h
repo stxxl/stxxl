@@ -24,7 +24,7 @@
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/common/log.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup mnglayer
 //! \{
@@ -270,7 +270,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_CONFIG_HEADER
 // vim: et:ts=4:sw=4

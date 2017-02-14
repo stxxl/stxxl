@@ -33,11 +33,11 @@
 #define _STXXL_PRINT_FLAGS_ERROR    (_STXXL_PRNT_CERR | _STXXL_PRNT_ERRLOG)
 #define _STXXL_PRINT_FLAGS_VERBOSE  (_STXXL_PRINT_FLAGS_DEFAULT | _STXXL_PRNT_TIMESTAMP | _STXXL_PRNT_THREAD_ID)
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void print_msg(const char* label, const std::string& msg, unsigned flags);
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #define _STXXL_PRINT(label, message, flags)                                  \
     do {                                                                     \

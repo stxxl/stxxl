@@ -18,9 +18,8 @@
  * Provides a static class to store runtime tuning parameters.
  */
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename MustBeInt = int>
 class settings
@@ -34,6 +33,6 @@ bool settings<MustBeInt>::native_merge = false;
 
 typedef settings<> SETTINGS;
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_SETTINGS_HEADER

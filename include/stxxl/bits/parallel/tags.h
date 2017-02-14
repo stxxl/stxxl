@@ -17,9 +17,8 @@
 #ifndef STXXL_PARALLEL_TAGS_HEADER
 #define STXXL_PARALLEL_TAGS_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -32,6 +31,6 @@ class inactive_tag
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_TAGS_HEADER

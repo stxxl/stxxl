@@ -33,7 +33,7 @@
 
 #include <stxxl/bits/common/types.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void*>(this) << "]::" << msg)
 
@@ -2587,7 +2587,7 @@ struct VECTOR_GENERATOR
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

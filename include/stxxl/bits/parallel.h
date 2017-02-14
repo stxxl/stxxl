@@ -23,7 +23,6 @@
  #include <omp.h>
 #endif
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/verbose.h>
 
@@ -68,7 +67,7 @@
 
 #include <stxxl/bits/parallel/multiway_merge.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 inline unsigned sort_memory_usage_factor()
 {
@@ -238,7 +237,7 @@ multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
 
 } // namespace potentially_parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_HEADER
 // vim: et:ts=4:sw=4

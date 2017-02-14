@@ -13,11 +13,11 @@
 #include <stxxl/bits/io/file.h>
 #include "ufs_platform.h"
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 int file::unlink(const char* path)
 {
     return ::unlink(path);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl

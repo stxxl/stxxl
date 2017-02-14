@@ -16,10 +16,9 @@
 
 #include <fstream>
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 class logger : public singleton<logger>
 {
@@ -49,6 +48,6 @@ public:
     }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_LOG_HEADER

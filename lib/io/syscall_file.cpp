@@ -21,7 +21,7 @@
 #include <stxxl/bits/io/syscall_file.h>
 #include "ufs_platform.h"
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)
@@ -116,5 +116,5 @@ const char* syscall_file::io_type() const
     return "syscall";
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

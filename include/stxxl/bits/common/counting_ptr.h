@@ -21,7 +21,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup support
 //! \{
@@ -523,6 +523,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_COUNTING_PTR_HEADER

@@ -17,10 +17,9 @@
 #ifndef STXXL_COMMON_TMETA_HEADER
 #define STXXL_COMMON_TMETA_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! IF template metaprogramming statement.
 //!
@@ -158,6 +157,6 @@ public:
     };
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_TMETA_HEADER

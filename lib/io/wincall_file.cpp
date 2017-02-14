@@ -23,7 +23,7 @@
 #endif
 #include <windows.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)
@@ -97,7 +97,7 @@ const char* wincall_file::io_type() const
     return "wincall";
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif  // #if STXXL_HAVE_WINCALL_FILE
 // vim: et:ts=4:sw=4

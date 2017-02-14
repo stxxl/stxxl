@@ -17,7 +17,7 @@
 #include <stxxl/mng>
 #include <stxxl/bits/singleton.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace hash_map {
 
@@ -45,6 +45,6 @@ private:
 
 } // namespace hash_map
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_TUNING_HEADER

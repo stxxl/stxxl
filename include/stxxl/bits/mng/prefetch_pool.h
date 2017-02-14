@@ -20,7 +20,7 @@
 #include <list>
 #include <unordered_map>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup schedlayer
 //! \{
@@ -370,7 +370,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

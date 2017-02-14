@@ -17,9 +17,8 @@
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_with_waiters.h>
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -58,7 +57,7 @@ protected:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_WITH_STATE_HEADER
 // vim: et:ts=4:sw=4

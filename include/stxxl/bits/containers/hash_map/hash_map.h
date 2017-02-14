@@ -17,7 +17,6 @@
 #include <functional>
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/stream.h>
@@ -28,7 +27,7 @@
 #include <stxxl/bits/containers/hash_map/block_cache.h>
 #include <stxxl/bits/containers/hash_map/util.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #define STXXL_VERBOSE_HASH_MAP(m) \
     STXXL_VERBOSE1("hash_map[" << static_cast<const void*>(this) << "]::" << m)
@@ -1588,7 +1587,7 @@ public:
 
 } // namespace hash_map
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

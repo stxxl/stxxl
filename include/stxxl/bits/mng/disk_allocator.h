@@ -23,7 +23,6 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
@@ -35,7 +34,7 @@
 #include <ostream>
 #include <utility>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \ingroup mnglayer
 //! \{
@@ -245,7 +244,7 @@ void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_DISK_ALLOCATOR_HEADER
 // vim: et:ts=4:sw=4

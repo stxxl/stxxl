@@ -26,7 +26,7 @@
 # endif
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 static const double program_start_time_stamp = timestamp();
 
@@ -72,6 +72,6 @@ void print_msg(const char* label, const std::string& msg, unsigned flags)
         logger_instance->errlog_stream() << s << std::flush;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 // vim: et:ts=4:sw=4

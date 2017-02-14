@@ -17,11 +17,10 @@
 #ifndef STXXL_PARALLEL_EQUALLY_SPLIT_HEADER
 #define STXXL_PARALLEL_EQUALLY_SPLIT_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel/base.h>
 #include <stxxl/bits/parallel/types.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -54,6 +53,6 @@ DiffTypeOutputIterator equally_split(DiffType n, thread_index_t p,
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_EQUALLY_SPLIT_HEADER

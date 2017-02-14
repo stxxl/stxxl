@@ -15,7 +15,6 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/common/tuple.h>
@@ -28,7 +27,7 @@
 #define STXXL_VERBOSE_MATERIALIZE STXXL_VERBOSE3
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! Stream package subnamespace.
 namespace stream {
@@ -1495,7 +1494,7 @@ public:
 
 } // namespace stream
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #include <stxxl/bits/stream/choose.h>
 #include <stxxl/bits/stream/unique.h>

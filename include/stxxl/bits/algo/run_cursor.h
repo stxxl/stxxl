@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <stxxl/bits/common/types.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename BlockType>
 struct run_cursor
@@ -120,7 +120,7 @@ struct run_cursor_cmp
 };
 #endif
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_RUN_CURSOR_HEADER
 // vim: et:ts=4:sw=4

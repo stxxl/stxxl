@@ -20,7 +20,7 @@
 #include "ufs_platform.h"
 #include <sys/mman.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 const double simdisk_geometry::s_average_speed = (15 * 1024 * 1024);
 
@@ -224,7 +224,7 @@ void sim_disk_file::set_size(offset_type newsize)
     }
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif  // #if STXXL_HAVE_SIMDISK_FILE
 // vim: et:ts=4:sw=4

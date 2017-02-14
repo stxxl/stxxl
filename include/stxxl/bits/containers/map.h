@@ -17,7 +17,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/btree/btree.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace btree {
 
@@ -487,7 +487,7 @@ inline bool operator >= (const map<KeyType, DataType, CompareType, RawNodeSize, 
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

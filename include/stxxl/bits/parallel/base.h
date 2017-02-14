@@ -17,13 +17,12 @@
 #ifndef STXXL_PARALLEL_BASE_HEADER
 #define STXXL_PARALLEL_BASE_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/parallel/types.h>
 
 #include <functional>
 #include <iterator>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -146,6 +145,6 @@ struct less : std::binary_function<T1, T2, bool>
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_BASE_HEADER

@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/containers/pq_helpers.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlcontinternals
 //!
@@ -975,7 +975,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_PQ_MERGERS_HEADER
 // vim: et:ts=4:sw=4

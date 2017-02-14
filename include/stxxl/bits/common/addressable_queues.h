@@ -17,9 +17,8 @@
 #include <list>
 #include <map>
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! An internal fifo queue that allows removing elements addressed with (a copy
 //! of) themselves.
@@ -198,6 +197,6 @@ public:
     }
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER

@@ -20,7 +20,7 @@
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -64,7 +64,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_QUEUE_IMPL_1Q_HEADER
 // vim: et:ts=4:sw=4

@@ -17,12 +17,11 @@
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/io/request_with_state.h>
 #include <stxxl/bits/io/serving_request.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/verbose.h>
 
 #include <iomanip>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 serving_request::serving_request(
     const completion_handler& on_cmpl,
@@ -71,5 +70,5 @@ const char* serving_request::io_type() const
     return m_file->io_type();
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

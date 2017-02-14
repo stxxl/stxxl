@@ -20,7 +20,7 @@
 #include <map>
 #include <unordered_map>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace hash_map {
 
@@ -261,7 +261,7 @@ public:
 
 } // namespace hash_map
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

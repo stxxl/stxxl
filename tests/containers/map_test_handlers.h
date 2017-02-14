@@ -18,9 +18,7 @@
 #ifndef STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_
 #define STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_
 
-#include <stxxl/bits/namespace.h>
-
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 // ***********************************************
 // THERE
@@ -112,6 +110,6 @@ bool is_size(const MAPTYPE& map_, const typename MAPTYPE::size_type size)
     return map_.size() == size;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_

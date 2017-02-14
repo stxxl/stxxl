@@ -18,7 +18,7 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/noncopyable.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup support
 //! \{
@@ -282,7 +282,7 @@ ForwardIterator swap_remove_if(ForwardIterator first, ForwardIterator last, Unar
 
 // \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

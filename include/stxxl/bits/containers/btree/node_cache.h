@@ -22,7 +22,7 @@
 
 #include <unordered_map>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #define STXXL_BTREE_CACHE_VERBOSE STXXL_VERBOSE2
 
@@ -589,7 +589,7 @@ public:
 
 } // namespace btree
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

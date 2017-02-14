@@ -15,12 +15,11 @@
 #ifndef STXXL_IO_REQUEST_OPERATIONS_HEADER
 #define STXXL_IO_REQUEST_OPERATIONS_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/onoff_switch.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -153,7 +152,7 @@ inline size_t wait_any(request_ptr req_array[], size_t count)
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_OPERATIONS_HEADER
 // vim: et:ts=4:sw=4

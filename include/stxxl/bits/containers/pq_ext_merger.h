@@ -19,7 +19,7 @@
 #include <stxxl/bits/containers/pq_mergers.h>
 #include <deque>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlcontinternals
 //!
@@ -656,7 +656,7 @@ protected:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 // vim: et:ts=4:sw=4

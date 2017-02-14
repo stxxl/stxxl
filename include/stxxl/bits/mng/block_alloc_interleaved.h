@@ -19,7 +19,7 @@
 #include <random>
 #include <vector>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #define CHECK_RUN_BOUNDS(pos)
 
@@ -160,7 +160,7 @@ struct interleaved_alloc_traits<single_disk>
     typedef first_disk_only strategy;
 };
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
 // vim: et:ts=4:sw=4

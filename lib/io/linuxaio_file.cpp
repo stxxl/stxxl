@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/disk_queues.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 request_ptr linuxaio_file::aread(
     void* buffer,
@@ -60,7 +60,7 @@ const char* linuxaio_file::io_type() const
     return "linuxaio";
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_LINUXAIO_FILE
 // vim: et:ts=4:sw=4

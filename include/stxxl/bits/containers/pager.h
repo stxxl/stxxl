@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/simple_vector.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlcont_vector
 //! \{
@@ -105,7 +105,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

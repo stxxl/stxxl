@@ -13,9 +13,8 @@
 #ifndef STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER
 #define STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace btree {
 
@@ -27,6 +26,6 @@ class root_node
 
 } // namespace btree
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER

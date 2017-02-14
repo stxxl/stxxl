@@ -22,11 +22,10 @@
 #include <cerrno>
 #include <cstring>
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/config.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #if STXXL_MSVC
  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
@@ -154,6 +153,6 @@ STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_ERROR_HANDLING_HEADER

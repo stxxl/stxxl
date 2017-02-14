@@ -18,7 +18,6 @@
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_queue_impl_worker.h>
-#include <stxxl/bits/namespace.h>
 
 #include <cassert>
 #include <cstddef>
@@ -30,7 +29,7 @@
  #include <windows.h>
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void request_queue_impl_worker::start_thread(void* (*worker)(void*), void* arg, thread_type& t, state<thread_state>& s)
 {
@@ -80,5 +79,5 @@ void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>&
     s.set_to(NOT_RUNNING);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

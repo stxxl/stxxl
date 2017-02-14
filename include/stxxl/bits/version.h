@@ -14,11 +14,10 @@
 #ifndef STXXL_VERSION_HEADER
 #define STXXL_VERSION_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/verbose.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 // STXXL_VERSION_{MAJOR,MINOR,PATCH} are defined in cmake generated config.h
 
@@ -95,6 +94,6 @@ inline void print_library_version_mismatch()
     }
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_VERSION_HEADER

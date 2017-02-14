@@ -16,9 +16,8 @@
 
 #include <memory>
 #include <limits>
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <class Type>
 class new_alloc;
@@ -137,7 +136,7 @@ inline bool operator != (const new_alloc<Type1>&,
     return false;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_NEW_ALLOC_HEADER
 // vim: et:ts=4:sw=4

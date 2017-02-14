@@ -23,7 +23,7 @@
 #include <stxxl/scan>
 #include <stxxl/stack>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup stlalgo
 //! \{
@@ -377,7 +377,7 @@ void random_shuffle(
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_RANDOM_SHUFFLE_HEADER
 // vim: et:ts=4:sw=4

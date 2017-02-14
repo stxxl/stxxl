@@ -23,7 +23,7 @@
 
 #include <cassert>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 request_with_state::~request_with_state()
 {
@@ -90,6 +90,6 @@ void request_with_state::completed(bool canceled)
     m_state.set_to(READY2DIE);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 // vim: et:ts=4:sw=4

@@ -32,7 +32,7 @@
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/state.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -60,7 +60,7 @@ protected:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 // vim: et:ts=4:sw=4

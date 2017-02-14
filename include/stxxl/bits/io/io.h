@@ -28,11 +28,10 @@
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/namespace.h>
 
 //! \c STXXL library namespace
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
-    STXXL_END_NAMESPACE
+    } // namespace stxxl
 
 #endif // !STXXL_IO_IO_HEADER

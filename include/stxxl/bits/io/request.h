@@ -15,7 +15,6 @@
 #ifndef STXXL_IO_REQUEST_HEADER
 #define STXXL_IO_REQUEST_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
@@ -26,7 +25,7 @@
 #include <memory>
 
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -115,7 +114,7 @@ typedef counting_ptr<request> request_ptr;
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_REQUEST_HEADER
 // vim: et:ts=4:sw=4

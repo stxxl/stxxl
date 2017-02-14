@@ -22,7 +22,7 @@
 
 #define STXXL_VERBOSE_WPOOL(msg) STXXL_VERBOSE1("write_pool[" << static_cast<void*>(this) << "]" << msg)
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup schedlayer
 //! \{
@@ -272,7 +272,7 @@ protected:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

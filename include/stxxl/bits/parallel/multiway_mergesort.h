@@ -29,7 +29,7 @@
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/timing.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #if STXXL_PARALLEL
 
@@ -383,6 +383,6 @@ parallel_sort_mwms(RandomAccessIterator begin,
 
 #endif // STXXL_PARALLEL
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER

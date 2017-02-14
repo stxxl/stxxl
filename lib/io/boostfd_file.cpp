@@ -24,7 +24,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/version.hpp>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)
@@ -200,7 +200,7 @@ void boostfd_file::lock()
     // FIXME: is there no locking possible/needed/... for boostfd?
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif  // #if STXXL_HAVE_BOOSTFD_FILE
 // vim: et:ts=4:sw=4

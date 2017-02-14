@@ -16,13 +16,12 @@
 #define STXXL_NONCOPYABLE_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 
 #if STXXL_BOOST_CONFIG
   #include <boost/noncopyable.hpp>
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #if STXXL_BOOST_CONFIG
 
@@ -43,6 +42,6 @@ private:
 
 #endif
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_NONCOPYABLE_HEADER

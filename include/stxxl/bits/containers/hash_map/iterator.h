@@ -14,12 +14,11 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_ITERATOR_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_ITERATOR_HEADER
 
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/mng/block_manager.h>
 
 #include <stxxl/bits/containers/hash_map/util.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace hash_map {
 
@@ -582,6 +581,6 @@ public:
 
 } // namespace hash_map
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_ITERATOR_HEADER

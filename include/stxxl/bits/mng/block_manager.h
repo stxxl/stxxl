@@ -45,7 +45,7 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/simple_vector.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #ifndef STXXL_MNG_COUNT_ALLOCATION
 #define STXXL_MNG_COUNT_ALLOCATION 1
@@ -272,7 +272,7 @@ void block_manager::delete_blocks(
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BLOCK_MANAGER_HEADER
 // vim: et:ts=4:sw=4

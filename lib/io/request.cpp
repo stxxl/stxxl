@@ -16,7 +16,7 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 request::request(
     const completion_handler& on_compl,
@@ -87,5 +87,5 @@ std::ostream& request::print(std::ostream& out) const
     return out;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 // vim: et:ts=4:sw=4

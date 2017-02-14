@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/exithandler.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <typename INSTANCE, bool destroy_on_exit = true>
 class singleton : private noncopyable
@@ -71,6 +71,6 @@ template <typename INSTANCE, bool destroy_on_exit>
 typename singleton<INSTANCE, destroy_on_exit>::volatile_instance_pointer
 singleton<INSTANCE, destroy_on_exit>::instance = NULL;
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_SINGLETON_HEADER

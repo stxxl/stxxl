@@ -34,7 +34,7 @@
 #define STXXL_L2_SIZE  (512 * 1024)
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 // Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) runs at once
 inline unsigned_type optimal_merge_factor(unsigned_type num_runs, unsigned_type max_concurrent_runs)
@@ -42,7 +42,7 @@ inline unsigned_type optimal_merge_factor(unsigned_type num_runs, unsigned_type 
     return unsigned_type(ceil(pow(double(num_runs), 1. / ceil(log(double(num_runs)) / log(double(max_concurrent_runs))))));
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_BASE_HEADER
 // vim: et:ts=4:sw=4

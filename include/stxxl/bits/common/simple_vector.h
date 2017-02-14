@@ -22,7 +22,7 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup support
 //! \{
@@ -165,7 +165,7 @@ public:
 
 // \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

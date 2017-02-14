@@ -12,12 +12,11 @@
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/namespace.h>
 
 #include <sstream>
 #include <iomanip>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! Parse a string like "343KB" or "  44 GiB  " into the corresponding size in
 //! bytes.
@@ -125,4 +124,4 @@ std::string format_IEC_size(uint64 number)
     return out.str();
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl

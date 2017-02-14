@@ -425,10 +425,6 @@ See the file common/uint_types.h
 
 /** \page common_misc_macros Miscellaneous Macros
 
-\section namespaces STXXL_BEGIN_NAMESPACE
-
-A long, long time ago, not all compilers supported C++ namespaces, thus STXXL uses the macros \ref STXXL_BEGIN_NAMESPACE and \ref STXXL_END_NAMESPACE, which open and close the \c "namespace stxxl".
-
 \section unused STXXL_UNUSED
 
 \ref STXXL_UNUSED is not actually a macro. It is a remedy against "unused variable" warnings, for whatever reason. Usage:

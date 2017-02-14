@@ -17,7 +17,6 @@
 #define STXXL_COMMON_TIMER_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
@@ -34,7 +33,7 @@
   #include <sys/time.h>
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup support
 //! \{
@@ -274,7 +273,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_TIMER_HEADER
 // vim: et:ts=4:sw=4

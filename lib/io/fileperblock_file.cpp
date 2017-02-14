@@ -34,12 +34,11 @@
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/wincall_file.h>
-#include <stxxl/bits/namespace.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
 #include "ufs_platform.h"
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 template <class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
@@ -163,4 +162,4 @@ template class fileperblock_file<wincall_file>;
 template class fileperblock_file<boostfd_file>;
 #endif
 
-STXXL_END_NAMESPACE
+} // namespace stxxl

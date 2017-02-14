@@ -15,11 +15,10 @@
 #define STXXL_IO_CREATE_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/namespace.h>
 
 #include <string>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! create fileio object from io_impl string and a few parameters
 file * create_file(const std::string& io_impl,
@@ -35,7 +34,7 @@ class disk_config;
 file * create_file(disk_config& config, int mode,
                    int disk_allocator_id = file::NO_ALLOCATOR);
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_IO_CREATE_FILE_HEADER
 // vim: et:ts=4:sw=4

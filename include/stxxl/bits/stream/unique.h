@@ -14,9 +14,8 @@
 #ifndef STXXL_STREAM_UNIQUE_HEADER
 #define STXXL_STREAM_UNIQUE_HEADER
 
-#include <stxxl/bits/namespace.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! Stream package subnamespace.
 namespace stream {
@@ -130,7 +129,7 @@ public:
 
 } // namespace stream
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_STREAM_UNIQUE_HEADER
 // vim: et:ts=4:sw=4

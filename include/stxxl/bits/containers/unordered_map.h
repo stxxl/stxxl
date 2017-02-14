@@ -17,7 +17,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace hash_map {
 
@@ -471,7 +471,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 namespace std {
 

@@ -18,7 +18,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/algo/async_schedule.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup schedlayer
 //! \{
@@ -152,6 +152,6 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_MNG_BUF_ISTREAM_HEADER

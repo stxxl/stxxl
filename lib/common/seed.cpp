@@ -14,7 +14,6 @@
 #include <cassert>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/namespace.h>
 
 #if STXXL_WINDOWS
   #ifndef NOMINMAX
@@ -27,7 +26,7 @@
   #include <sys/time.h>
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 inline unsigned initial_seed();
 
@@ -76,4 +75,4 @@ unsigned get_next_seed()
     return seed_generator().seed++;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl

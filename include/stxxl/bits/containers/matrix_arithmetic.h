@@ -16,7 +16,7 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/matrix_low_level.h>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 #ifndef STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS
 #define STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS 3
@@ -2059,6 +2059,6 @@ const int_type matrix_operations<ValueType, BlockSideLength>::strassen_winograd_
 
 } // namespace matrix_local
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER

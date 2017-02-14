@@ -28,7 +28,7 @@
   #include <omp.h>
 #endif
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 namespace parallel {
 
@@ -196,6 +196,6 @@ const char* Timing<inactive_tag, must_be_int>::empty_string = "";
 
 } // namespace parallel
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // !STXXL_PARALLEL_TIMING_HEADER

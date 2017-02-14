@@ -23,7 +23,7 @@
 
 #define STXXL_VERBOSE_LINUXAIO(msg) STXXL_VERBOSE2(msg)
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 //! \addtogroup reqlayer
 //! \{
@@ -66,7 +66,7 @@ public:
 
 //! \}
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
 
 #endif // #if STXXL_HAVE_LINUXAIO_FILE
 

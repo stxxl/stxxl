@@ -12,12 +12,11 @@
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/namespace.h>
 
 #include <iomanip>
 #include <cstring>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 void cmdline_parser::output_wrap(std::ostream& os, const std::string& text, size_t wraplen,
                                  size_t indent_first, size_t indent_rest,
@@ -353,4 +352,4 @@ void cmdline_parser::print_result(std::ostream& os)
     os.copyfmt(state);
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl

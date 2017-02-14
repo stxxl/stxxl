@@ -13,11 +13,10 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/log.h>
-#include <stxxl/bits/namespace.h>
 
 #include <cstdlib>
 
-STXXL_BEGIN_NAMESPACE
+namespace stxxl {
 
 logger::logger() : waitlog_stream_(NULL)
 {
@@ -39,4 +38,4 @@ logger::~logger()
     delete waitlog_stream_;
 }
 
-STXXL_END_NAMESPACE
+} // namespace stxxl
