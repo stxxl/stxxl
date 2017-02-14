@@ -41,6 +41,7 @@ matrix:
             - llvm-toolchain-precise-3.9
           packages:
             - clang-3.9
+            - libomp-dev
 
 before_script:
   # run on ramdisk
