@@ -29,11 +29,11 @@
 
 struct actual_element   // 24 bytes, not a power of 2 intentionally
 {
-    stxxl::int64 key;
-    stxxl::int64 load0;
-    stxxl::int64 load1;
+    int64_t key;
+    int64_t load0;
+    int64_t load1;
 
-    actual_element& operator = (stxxl::int64 i)
+    actual_element& operator = (int64_t i)
     {
         key = i;
         load0 = i + 42;

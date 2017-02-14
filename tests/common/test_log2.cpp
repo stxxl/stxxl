@@ -55,7 +55,7 @@ void log_i(size_t floorv, size_t ceilv)
         STXXL_CHECK(stxxl::LOG2<i>::ceil == ceilv);
 
 #if 0                                        // not many compiler have log2l()
-        if (i <= ((stxxl::uint64)(1) << 59)) // does not work for higher powers
+        if (i <= ((uint64_t)(1) << 59)) // does not work for higher powers
         {
             STXXL_CHECK(stxxl::LOG2_floor<i>::value == (size_t)floorl(log2l(i)));
             STXXL_CHECK(stxxl::LOG2<i>::floor == (size_t)floorl(log2l(i)));

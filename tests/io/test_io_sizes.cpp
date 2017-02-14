@@ -25,10 +25,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    using stxxl::uint64;
-
-    uint64_t max_size = atoi(argv[3]);
-    uint64* buffer = (uint64*)stxxl::aligned_alloc<4096>(max_size);
+    size_t max_size = atoi(argv[3]);
+    size_t* buffer = (size_t*)stxxl::aligned_alloc<4096>(max_size);
 
     try
     {
@@ -41,10 +39,10 @@ int main(int argc, char** argv)
 
         stxxl::request_ptr req;
         stxxl::stats_data stats1(*stxxl::stats::get_instance());
-        for (uint64_t size = 4096; size < max_size; size *= 2)
+        for (size_t size = 4096; size < max_size; size *= 2)
         {
             //generate data
-            for (uint64 i = 0; i < size / sizeof(uint64); ++i)
+            for (size_t i = 0; i < size / sizeof(size_t); ++i)
                 buffer[i] = i;
 
             //write
@@ -53,7 +51,7 @@ int main(int argc, char** argv)
             wait_all(&req, 1);
 
             //fill with wrong data
-            for (uint64 i = 0; i < size / sizeof(uint64); ++i)
+            for (size_t i = 0; i < size / sizeof(size_t); ++i)
                 buffer[i] = 0xFFFFFFFFFFFFFFFFull;
 
             //read again
@@ -63,10 +61,10 @@ int main(int argc, char** argv)
 
             //check
             bool wrong = false;
-            for (uint64 i = 0; i < size / sizeof(uint64); ++i)
+            for (size_t i = 0; i < size / sizeof(size_t); ++i)
                 if (buffer[i] != i)
                 {
-                    STXXL_ERRMSG("Read inconsistent data at position " << i * sizeof(uint64));
+                    STXXL_ERRMSG("Read inconsistent data at position " << i * sizeof(size_t));
                     wrong = true;
                     break;
                 }

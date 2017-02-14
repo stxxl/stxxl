@@ -24,7 +24,7 @@ using stxxl::timestamp;
 
 int main()
 {
-    const stxxl::int64 disk_size = stxxl::int64(1024 * 1024) * 1024 * 40;
+    const stxxl::file::offset_type disk_size = 1024ULL * 1024ULL * 1024ULL * 40ULL;
     std::cout << sizeof(void*) << std::endl;
     const int block_size = 4 * 1024 * 1024;
     char* buffer = static_cast<char*>(stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size));
@@ -38,7 +38,7 @@ int main()
 
     unsigned i = 0;
 
-    stxxl::int64 pos = 0;
+    stxxl::file::offset_type pos = 0;
 
     stxxl::request_ptr req;
 
@@ -63,7 +63,7 @@ int main()
     std::default_random_engine rnd(std::random_device { } ());
     for (i = 0; i < times; i++)
     {
-        pos = (stxxl::int64)(rnd() % (disk_size / block_size)) * block_size;
+        pos = (stxxl::file::offset_type)(rnd() % (disk_size / block_size)) * block_size;
         double begin = timestamp();
         req = file1.awrite(buffer, pos, block_size);
         req->wait();

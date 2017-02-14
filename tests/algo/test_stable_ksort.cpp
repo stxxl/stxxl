@@ -57,8 +57,8 @@ int main()
 #endif
     unsigned memory_to_use = 22 * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::vector<my_type> vector_type;
-    const stxxl::int64 n_records =
-        2 * 16 * stxxl::int64(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
+    const size_t n_records =
+        2 * 16 * size_t(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;

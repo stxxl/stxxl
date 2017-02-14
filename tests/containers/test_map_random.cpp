@@ -93,12 +93,12 @@ int main(int argc, char* argv[])
         STXXL_MSG("Note, that STEP must be > 1000");
         return -1;
     }
-    stxxl::uint64 MAX_STEP = atoi(argv[1]);
+    uint64_t MAX_STEP = atoi(argv[1]);
     STXXL_CHECK(MAX_STEP > 1000);
     std_map_type stdmap;
     xxl_map_type xxlmap(NODE_BLOCK_SIZE * 4, LEAF_BLOCK_SIZE * 3);
 
-    for (stxxl::uint64 i = 0; i < MAX_STEP; i++)
+    for (uint64_t i = 0; i < MAX_STEP; i++)
     {
         // ***************************************************
         // A random number is created to determine which kind

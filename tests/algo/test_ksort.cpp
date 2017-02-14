@@ -21,7 +21,7 @@
 
 struct my_type
 {
-    typedef stxxl::uint64 key_type1;
+    typedef uint64_t key_type1;
 
     key_type1 m_key;
     key_type1 m_key_copy;
@@ -84,8 +84,8 @@ int main()
 #endif
     unsigned memory_to_use = 16 * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::VECTOR_GENERATOR<my_type, 4, 4>::result vector_type;
-    const stxxl::int64 n_records =
-        3 * 16 * stxxl::int64(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
+    const size_t n_records =
+        3 * 16 * size_t(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;
