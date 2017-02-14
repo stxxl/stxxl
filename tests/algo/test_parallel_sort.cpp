@@ -33,8 +33,6 @@
 
 const unsigned long long megabyte = 1024 * 1024;
 
-const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
-
 #define RECORD_SIZE 20
 #define MAGIC 123
 
@@ -61,6 +59,8 @@ struct my_type
         m_load = mt.m_load;
     }
 };
+
+const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 
 bool operator < (const my_type& a, const my_type& b);
 

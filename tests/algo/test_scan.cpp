@@ -60,7 +60,7 @@ struct fill_value
 int main()
 {
     stxxl::vector<int64_t>::size_type i;
-    stxxl::vector<int64_t> v(128 * STXXL_DEFAULT_BLOCK_SIZE(T));
+    stxxl::vector<int64_t> v(128 * STXXL_DEFAULT_BLOCK_SIZE(int64_t));
     double b, e;
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());

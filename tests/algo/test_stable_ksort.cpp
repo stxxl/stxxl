@@ -55,10 +55,9 @@ int main()
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = 22 * STXXL_DEFAULT_BLOCK_SIZE(T);
+    unsigned memory_to_use = 22 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     typedef stxxl::vector<my_type> vector_type;
-    const uint64_t n_records =
-        2 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
+    const uint64_t n_records = 2 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(uint64_t)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;

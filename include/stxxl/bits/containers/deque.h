@@ -463,12 +463,12 @@ public:
     //! \{
 
     deque()
-        : m_vector((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(value_type)),
+        : m_vector((STXXL_DEFAULT_BLOCK_SIZE(value_type)) / sizeof(value_type)),
           m_begin(0), m_end(0), m_size(0)
     { }
 
     deque(size_type n)
-        : m_vector(std::max<size_type>(STXXL_DEFAULT_BLOCK_SIZE(ValueType) / sizeof(value_type), 2 * n)),
+        : m_vector(std::max<size_type>(STXXL_DEFAULT_BLOCK_SIZE(value_type) / sizeof(value_type), 2 * n)),
           m_begin(0), m_end(n), m_size(n)
     { }
 
@@ -656,7 +656,7 @@ public:
     void clear()
     {
         m_vector.clear();
-        m_vector.resize((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(value_type));
+        m_vector.resize((STXXL_DEFAULT_BLOCK_SIZE(value_type)) / sizeof(value_type));
         m_begin = 0;
         m_end = 0;
         m_size = 0;

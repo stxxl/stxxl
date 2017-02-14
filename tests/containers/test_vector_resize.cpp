@@ -21,7 +21,7 @@ int main()
 {
     stxxl::config* config = stxxl::config::get_instance();
 
-    stxxl::disk_config disk1("/tmp/stxxl-###.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(T),
+    stxxl::disk_config disk1("/tmp/stxxl-###.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(int),
                              "syscall autogrow=no");
     disk1.unlink_on_open = true;
     disk1.direct = stxxl::disk_config::DIRECT_OFF;

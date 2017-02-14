@@ -68,7 +68,7 @@ size_t extract_buffer_ram = 0;
 unsigned num_write_buffers = 14;
 double num_prefetchers = 2.0;
 unsigned num_read_blocks = 1;
-size_t block_size = STXXL_DEFAULT_BLOCK_SIZE(value_type);
+size_t block_size = STXXL_DEFAULT_BLOCK_SIZE(void *);
 
 #if STXXL_PARALLEL
 const unsigned g_max_threads = omp_get_max_threads();

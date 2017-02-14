@@ -19,7 +19,7 @@
 int main(int argc, char* argv[])
 {
     uint64_t ops = (argc >= 2)
-                   ? stxxl::atouint64(argv[1]) : 16 * STXXL_DEFAULT_BLOCK_SIZE(T);
+                   ? stxxl::atouint64(argv[1]) : 16 * STXXL_DEFAULT_BLOCK_SIZE(int);
 
     stxxl::random_number32 random;
     stxxl::sequence<int> XXLDeque;

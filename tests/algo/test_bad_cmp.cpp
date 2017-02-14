@@ -83,11 +83,10 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    size_t memory_to_use = SIZE * STXXL_DEFAULT_BLOCK_SIZE(T);
+    size_t memory_to_use = SIZE * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     typedef stxxl::vector<my_type> vector_type;
 
-    const uint64_t n_records =
-            uint64_t(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
+    const uint64_t n_records = uint64_t(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(my_type) / sizeof(my_type);
     vector_type v(n_records);
 
     uint64_t aliens, not_stable;

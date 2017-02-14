@@ -39,7 +39,7 @@ struct counter
 void long_test()
 {
     typedef stxxl::vector<int> ext_vec_type;
-    ext_vec_type STXXLVector(128 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+    ext_vec_type STXXLVector(128 * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int));
 
     STXXL_MSG("Filling vector with increasing values...");
     stxxl::generate(STXXLVector.begin(), STXXLVector.end(),
@@ -56,7 +56,7 @@ void long_test()
         STXXL_MSG(STXXLVector[i]);
 
     STXXL_MSG("Permute randomly...");
-    stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 64 * STXXL_DEFAULT_BLOCK_SIZE(T));
+    stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 64 * STXXL_DEFAULT_BLOCK_SIZE(int));
 
     STXXL_MSG("Begin: ");
     for (i = 0; i < 10; i++)

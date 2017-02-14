@@ -58,7 +58,7 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 template class stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
-        STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
+        STXXL_DEFAULT_BLOCK_SIZE(my_type),   /* BlockSize */
         1* 64L* 1024L* 1024L,                /* RamSize */
         0                                    /* MaxItems */
         >;
@@ -66,7 +66,7 @@ template class stxxl::parallel_priority_queue<
 typedef stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
-        STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
+        STXXL_DEFAULT_BLOCK_SIZE(my_type),   /* BlockSize */
         512* 64L* 1024L                      /* RamSize */
         > ppq_type;
 

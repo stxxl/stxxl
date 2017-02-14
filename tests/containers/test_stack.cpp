@@ -110,7 +110,7 @@ void simple_test(stack_type& my_stack, size_t test_size)
 
     STXXL_MSG("Test 1 passed.");
 
-    test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / 4 * 2 * 20);
+    test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2 * 20);
 }
 
 int main(int argc, char* argv[])
@@ -135,22 +135,22 @@ int main(int argc, char* argv[])
     }
     {
         ext_normal_stack_type my_stack;
-        simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+        simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int));
     }
     {
         ext_migrating_stack_type my_stack;
-        //simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+        //simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int));
     }
     {
         ext_stack_type my_stack;
-        simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int));
+        simple_test(my_stack, atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int));
     }
     {
         // prefetch/write pool with 10 blocks prefetching and 10 block write cache (> D is recommended)
         stxxl::read_write_pool<ext_stack_type2::block_type> pool(10, 10);
         // create a stack that does not prefetch (level of prefetch aggressiveness 0)
         ext_stack_type2 my_stack(pool, 0);
-        size_t test_size = atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(int);
+        size_t test_size = atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int);
 
         for (size_t i = 0; i < test_size; i++)
         {
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 
         STXXL_MSG("Test 2 passed.");
 
-        test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(T) / 4 * 2 * 20);
+        test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2 * 20);
     }
 
     return 0;

@@ -92,8 +92,8 @@ int main()
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(T);
-    enum { block_size = STXXL_DEFAULT_BLOCK_SIZE(T) };
+    unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
+    enum { block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type) };
 
     // comparator object used for sorters
     Comparator cmp;
@@ -126,7 +126,7 @@ int main()
     {
         // large test with 192 * 4 KiB items
 
-        const uint64_t n_records = uint64_t(192) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
+        const uint64_t n_records = uint64_t(192) * STXXL_DEFAULT_BLOCK_SIZE(my_type) / sizeof(my_type);
 
         sorter_type s(cmp, memory_to_use);
 

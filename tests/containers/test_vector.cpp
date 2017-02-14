@@ -73,14 +73,14 @@ void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
     typedef stxxl::VECTOR_GENERATOR<
-            element, 2, 2, STXXL_DEFAULT_BLOCK_SIZE(T), stxxl::striping>::result vector_type;
-    vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(element));
+            element, 2, 2, STXXL_DEFAULT_BLOCK_SIZE(element), stxxl::striping>::result vector_type;
+    vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
     STXXL_UNUSED(c_it);
 
-    unsigned int big_size = 2 * 32 * STXXL_DEFAULT_BLOCK_SIZE(T);
+    unsigned int big_size = 2 * 32 * STXXL_DEFAULT_BLOCK_SIZE(double);
     typedef stxxl::vector<double> vec_big;
     vec_big my_vec(big_size);
 
@@ -127,7 +127,7 @@ void test_vector1()
 
     stxxl::ran32State = 0xdeadbeef + 10;
 
-    v.resize(32 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(element));
+    v.resize(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
     STXXL_MSG("write " << v.size() << " elements");
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
