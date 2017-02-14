@@ -133,7 +133,7 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
 
 #if !STXXL_WINDOWS
     //TODO: implement on Windows
-    if (::truncate(filename.c_str(), length) != 0) {
+    if (::truncate(filename.c_str(), as_signed(length)) != 0) {
         STXXL_THROW_ERRNO(io_error, "Error doing truncate()");
     }
 #else
