@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
     size_t data_mem = stxxl::atouint64(argv[1]) * MB;
-    unsigned sort_mem = strtoul(argv[2]) * MB;
+    unsigned sort_mem = strtoul(argv[2], NULL, 0) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
     stxxl::set_seed((unsigned)strtoul(argv[5], NULL, 10));
