@@ -247,7 +247,7 @@ class block_scheduler_algorithm_online_lru;
 //! In execute mode, it does caching, prefetching, and possibly other optimizations.
 //! \tparam SwappableBlockType Type of swappable_blocks to manage. Can be some specialized subclass.
 template <class SwappableBlockType>
-class block_scheduler : private noncopyable
+class block_scheduler
 {
 protected:
     // tuning-parameter: To acquire blocks, internal memory has to be allocated.
@@ -359,6 +359,11 @@ public:
     {
         algo = new block_scheduler_algorithm_online_lru<SwappableBlockType>(*this);
     }
+
+    //! non-copyable: delete copy-constructor
+    block_scheduler(const block_scheduler &) = delete;
+    //! non-copyable: delete assignment operator
+    block_scheduler & operator = (const block_scheduler &) = delete;
 
     ~block_scheduler()
     {
@@ -518,7 +523,7 @@ const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at
 
 //! Interface of a block scheduling algorithm.
 template <class SwappableBlockType>
-class block_scheduler_algorithm : private noncopyable
+class block_scheduler_algorithm
 {
 protected:
     typedef block_scheduler<SwappableBlockType> block_scheduler_type;
@@ -557,6 +562,11 @@ public:
         : bs(old->bs),
           swappable_blocks(bs.swappable_blocks)
     { }
+
+    //! non-copyable: delete copy-constructor
+    block_scheduler_algorithm(const block_scheduler_algorithm &) = delete;
+    //! non-copyable: delete assignment operator
+    block_scheduler_algorithm & operator = (const block_scheduler_algorithm &) = delete;
 
     virtual ~block_scheduler_algorithm() { }
 

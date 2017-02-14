@@ -95,7 +95,7 @@ namespace stxxl {
 //! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
 //! <b> Design and Internals </b> of priority queue container: see \ref design_pqueue.
 template <class ConfigType>
-class priority_queue : private noncopyable
+class priority_queue
 {
 public:
     typedef ConfigType Config;
@@ -208,6 +208,11 @@ public:
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
     priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
+
+    //! non-copyable: delete copy-constructor
+    priority_queue(const priority_queue &) = delete;
+    //! non-copyable: delete assignment operator
+    priority_queue & operator = (const priority_queue &) = delete;
 
     virtual ~priority_queue();
 

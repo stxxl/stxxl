@@ -16,14 +16,13 @@
 #include <cstdlib>
 
 #include <stxxl/types>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/exithandler.h>
 
 namespace stxxl {
 
 template <typename INSTANCE, bool destroy_on_exit = true>
-class singleton : private noncopyable
+class singleton
 {
     typedef INSTANCE instance_type;
     typedef instance_type* instance_pointer;
@@ -35,6 +34,14 @@ class singleton : private noncopyable
     static void destroy_instance();
 
 public:
+
+    singleton() = default;
+
+    //! non-copyable: delete copy-constructor
+    singleton(const singleton &) = delete;
+    //! non-copyable: delete assignment operator
+    singleton & operator = (const singleton &) = delete;
+
     inline static instance_pointer get_instance()
     {
         if (!instance)

@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <cstring>
 #include <cassert>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
@@ -36,7 +35,7 @@ namespace stxxl {
  * is less error prone to copying and other problems..
  */
 template <typename ValueType>
-class simple_vector : private noncopyable
+class simple_vector
 {
 public:
     typedef ValueType value_type;
@@ -69,6 +68,12 @@ public:
         if (m_size > 0)
             m_array = new value_type[m_size];
     }
+
+    //! non-copyable: delete copy-constructor
+    simple_vector(const simple_vector &) = delete;
+    //! non-copyable: delete assignment operator
+    simple_vector & operator = (const simple_vector &) = delete;
+
     //! swap vector with another one
     void swap(simple_vector& obj)
     {

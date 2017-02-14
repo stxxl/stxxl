@@ -19,13 +19,12 @@
 
 #include <stxxl/bits/config.h>
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/condition_variable.h>
 
 namespace stxxl {
 
-class onoff_switch : private noncopyable
+class onoff_switch
 {
     //! mutex for condition variable
     mutex m_mutex;
@@ -41,6 +40,12 @@ public:
     onoff_switch(bool flag = false)
         : m_on(flag)
     { }
+
+    //! non-copyable: delete copy-constructor
+    onoff_switch(const onoff_switch &) = delete;
+    //! non-copyable: delete assignment operator
+    onoff_switch & operator = (const onoff_switch &) = delete;
+
     //! turn switch ON and notify one waiter
     void on()
     {

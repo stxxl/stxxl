@@ -17,7 +17,6 @@
 
 #include <ostream>
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
 
 namespace stxxl {
@@ -32,7 +31,7 @@ class onoff_switch;
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status:
 //! e.g. whether an I/O operation completed or not.
-class request_interface : private noncopyable
+class request_interface
 {
 public:
     typedef stxxl::external_size_type offset_type;
@@ -50,6 +49,13 @@ protected:
     virtual void completed(bool canceled) = 0;
 
 public:
+    request_interface() = default;
+
+    //! non-copyable: delete copy-constructor
+    request_interface(const request_interface &) = delete;
+    //! non-copyable: delete assignment operator
+    request_interface & operator = (const request_interface &) = delete;
+
     //! Suspends calling thread until completion of the request.
     virtual void wait(bool measure_time = true) = 0;
 

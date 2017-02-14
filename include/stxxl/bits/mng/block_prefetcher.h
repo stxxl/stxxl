@@ -21,7 +21,6 @@
 #include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/noncopyable.h>
 
 namespace stxxl {
 
@@ -52,7 +51,7 @@ public:
 //! \c block_prefetcher overlaps I/Os with consumption of read data.
 //! Utilizes optimal asynchronous prefetch scheduling (by Peter Sanders et.al.)
 template <typename BlockType, typename BidIteratorType>
-class block_prefetcher : private noncopyable
+class block_prefetcher
 {
 public:
     typedef BlockType block_type;
@@ -148,6 +147,12 @@ public:
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    block_prefetcher(const block_prefetcher &) = delete;
+    //! non-copyable: delete assignment operator
+    block_prefetcher & operator = (const block_prefetcher &) = delete;
+
     //! Pulls next unconsumed block from the consumption sequence.
     //! \return Pointer to the already prefetched block from the internal buffer pool
     block_type * pull_block()

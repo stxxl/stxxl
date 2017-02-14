@@ -58,7 +58,7 @@ struct stack_config_generator
 //! To gain full bandwidth of disks \c StackConfig::BlocksPerPage must >= number of disks <BR>
 //! \internal
 template <class StackConfig>
-class normal_stack : private noncopyable
+class normal_stack
 {
 public:
     typedef StackConfig cfg;
@@ -151,6 +151,11 @@ public:
         for (size_t i = 0; i < sz; ++i)
             push(tmp[i]);
     }
+
+    //! non-copyable: delete copy-constructor
+    normal_stack(const normal_stack &) = delete;
+    //! non-copyable: delete assignment operator
+    normal_stack & operator = (const normal_stack &) = delete;
 
     virtual ~normal_stack()
     {
@@ -299,7 +304,7 @@ private:
 //! For semantics of the methods see documentation of the STL \c std::stack.
 //! \warning The amortized complexity of operation is not O(1/DB), rather O(DB)
 template <class StackConfig>
-class grow_shrink_stack : private noncopyable
+class grow_shrink_stack
 {
 public:
     typedef StackConfig cfg;
@@ -399,6 +404,12 @@ public:
         for (size_t i = 0; i < sz; ++i)
             push(tmp[i]);
     }
+
+    //! non-copyable: delete copy-constructor
+    grow_shrink_stack(const grow_shrink_stack &) = delete;
+    //! non-copyable: delete assignment operator
+    grow_shrink_stack & operator = (const grow_shrink_stack &) = delete;
+
     virtual ~grow_shrink_stack()
     {
         STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
@@ -537,7 +548,7 @@ public:
 //! Efficient implementation that uses prefetching and overlapping using (shared) buffers pools.
 //! \warning This is a single buffer stack! Each direction change (push() followed by pop() or vice versa) may cause one I/O.
 template <class StackConfig>
-class grow_shrink_stack2 : private noncopyable
+class grow_shrink_stack2
 {
 public:
     typedef StackConfig cfg;
@@ -609,6 +620,11 @@ public:
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
+
+    //! non-copyable: delete copy-constructor
+    grow_shrink_stack2(const grow_shrink_stack2 &) = delete;
+    //! non-copyable: delete assignment operator
+    grow_shrink_stack2 & operator = (const grow_shrink_stack2 &) = delete;
 
     //! \}
 
@@ -814,7 +830,7 @@ private:
 //!
 //! For semantics of the methods see documentation of the STL \c std::stack.
 template <unsigned_type CritSize, class ExternalStack, class InternalStack>
-class migrating_stack : private noncopyable
+class migrating_stack
 {
 public:
     typedef typename ExternalStack::cfg cfg;
@@ -849,6 +865,11 @@ public:
     migrating_stack()
         : int_impl(new int_stack_type()), ext_impl(NULL)
     { }
+
+    //! non-copyable: delete copy-constructor
+    migrating_stack(const migrating_stack &) = delete;
+    //! non-copyable: delete assignment operator
+    migrating_stack & operator = (const migrating_stack &) = delete;
 
     virtual ~migrating_stack()
     {

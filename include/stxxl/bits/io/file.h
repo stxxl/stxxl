@@ -32,7 +32,6 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/libstxxl.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
 
@@ -52,7 +51,7 @@ class completion_handler;
 //!
 //! It is a base class for different implementations that might
 //! base on various file systems or even remote storage interfaces
-class file : private noncopyable
+class file
 {
 public:
     //! the offset of a request, also the size of the file
@@ -87,6 +86,11 @@ public:
     file(unsigned int device_id = DEFAULT_DEVICE_ID)
         : m_device_id(device_id)
     { }
+
+    //! non-copyable: delete copy-constructor
+    file(const file &) = delete;
+    //! non-copyable: delete assignment operator
+    file & operator = (const file &) = delete;
 
     //! Schedules an asynchronous read request to the file.
     //! \param buffer pointer to memory buffer to read into

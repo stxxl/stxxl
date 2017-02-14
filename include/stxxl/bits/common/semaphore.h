@@ -14,13 +14,12 @@
 #ifndef STXXL_COMMON_SEMAPHORE_HEADER
 #define STXXL_COMMON_SEMAPHORE_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/condition_variable.h>
 
 namespace stxxl {
 
-class semaphore : private noncopyable
+class semaphore
 {
     //! value of the semaphore
     int v;
@@ -36,6 +35,12 @@ public:
     semaphore(int init_value = 1)
         : v(init_value)
     { }
+
+    //! non-copyable: delete copy-constructor
+    semaphore(const semaphore &) = delete;
+    //! non-copyable: delete assignment operator
+    semaphore & operator = (const semaphore &) = delete;
+
     //! function increments the semaphore and signals any threads that are
     //! blocked waiting a change in the semaphore
     int operator ++ (int)

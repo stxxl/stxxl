@@ -28,7 +28,6 @@
 #elif STXXL_POSIX_THREADS
  #include <pthread.h>
 
- #include <stxxl/bits/noncopyable.h>
  #include <stxxl/bits/common/error_handling.h>
 #else
  #error "Thread implementation not detected."
@@ -46,7 +45,7 @@ typedef boost::mutex mutex;
 
 #elif STXXL_POSIX_THREADS
 
-class mutex : private noncopyable
+class mutex
 {
     //! mutex handle
     pthread_mutex_t m_mutex;
@@ -57,6 +56,12 @@ public:
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
+
+    //! non-copyable: delete copy-constructor
+    mutex(const mutex &) = delete;
+    //! non-copyable: delete assignment operator
+    mutex & operator = (const mutex &) = delete;
+
     //! destroy mutex handle
     ~mutex() throw()
     {

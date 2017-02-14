@@ -34,7 +34,7 @@ namespace stream {
 
 //! All sorted runs of a sort operation.
 template <typename TriggerEntryType, typename CompareType>
-struct sorted_runs : private noncopyable, public counted_object
+struct sorted_runs : public counted_object
 {
     typedef TriggerEntryType trigger_entry_type;
     typedef typename trigger_entry_type::block_type block_type;
@@ -66,6 +66,11 @@ public:
     sorted_runs()
         : elements(0)
     { }
+
+    //! non-copyable: delete copy-constructor
+    sorted_runs(const sorted_runs &) = delete;
+    //! non-copyable: delete assignment operator
+    sorted_runs & operator = (const sorted_runs &) = delete;
 
     ~sorted_runs()
     {

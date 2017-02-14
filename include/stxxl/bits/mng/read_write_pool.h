@@ -23,7 +23,7 @@ namespace stxxl {
 
 //! Implements dynamically resizable buffered writing and prefetched reading pool.
 template <typename BlockType>
-class read_write_pool : private noncopyable
+class read_write_pool
 {
 public:
     typedef BlockType block_type;
@@ -52,6 +52,11 @@ public:
     STXXL_DEPRECATED(read_write_pool(prefetch_pool_type& p_pool, write_pool_type& w_pool))
         : w_pool(&w_pool), p_pool(&p_pool), delete_pools(false)
     { }
+
+    //! non-copyable: delete copy-constructor
+    read_write_pool(const read_write_pool &) = delete;
+    //! non-copyable: delete assignment operator
+    read_write_pool & operator = (const read_write_pool &) = delete;
 
     void swap(read_write_pool& obj)
     {

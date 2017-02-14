@@ -98,7 +98,7 @@ struct bucket
 
 //! Used to scan external memory with prefetching.
 template <class CacheType, class BidIterator>
-class buffered_reader : private noncopyable
+class buffered_reader
 {
 public:
     typedef CacheType cache_type;
@@ -169,6 +169,11 @@ public:
         // will (amongst other things) set subblock_ and retain current block
         skip_to(seq_begin, i_subblock);
     }
+
+    //! non-copyable: delete copy-constructor
+    buffered_reader(const buffered_reader &) = delete;
+    //! non-copyable: delete assignment operator
+    buffered_reader & operator = (const buffered_reader &) = delete;
 
     ~buffered_reader()
     {
@@ -305,7 +310,7 @@ public:
 
 //! Buffered writing of values. New Blocks are allocated as needed.
 template <class BlockType, class BidContainer>
-class buffered_writer : private noncopyable
+class buffered_writer
 {
 public:
     typedef BlockType block_type;
@@ -352,6 +357,11 @@ public:
     {
         block_ = writer_.get_free_block();
     }
+
+    //! non-copyable: delete copy-constructor
+    buffered_writer(const buffered_writer &) = delete;
+    //! non-copyable: delete assignment operator
+    buffered_writer & operator = (const buffered_writer &) = delete;
 
     ~buffered_writer()
     {

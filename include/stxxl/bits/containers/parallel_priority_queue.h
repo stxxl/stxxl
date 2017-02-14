@@ -49,7 +49,6 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/types>
@@ -271,7 +270,7 @@ private:
  * they overflow.
  */
 template <class ValueType>
-class internal_array : private noncopyable
+class internal_array
 {
 public:
     typedef ValueType value_type;
@@ -310,6 +309,11 @@ public:
         STXXL_ASSERT(m_values.size() > 0);
         m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.begin()) + m_values.size());
     }
+
+    //! non-copyable: delete copy-constructor
+    internal_array(const internal_array &) = delete;
+    //! non-copyable: delete assignment operator
+    internal_array & operator = (const internal_array &) = delete;
 
     //! Swap internal_array with another one.
     void swap(internal_array& o)
@@ -438,7 +442,7 @@ template <
     unsigned_type BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
     >
-class external_array : private noncopyable
+class external_array
 {
 public:
     typedef ValueType value_type;
@@ -621,6 +625,11 @@ public:
     {
         a.swap(b);
     }
+
+    //! non-copyable: delete copy-constructor
+    external_array(const external_array &) = delete;
+    //! non-copyable: delete assignment operator
+    external_array & operator = (const external_array &) = delete;
 
     //! Destructor
     ~external_array()
@@ -1223,7 +1232,7 @@ protected:
  * heavily depends on the behavior of multiway_merge() and is optimized for it.
  */
 template <class ExternalArrayType>
-class external_array_writer : public noncopyable
+class external_array_writer
 {
 public:
     typedef ExternalArrayType ea_type;
@@ -1544,6 +1553,11 @@ public:
         }
     }
 
+    //! non-copyable: delete copy-constructor
+    external_array_writer(const external_array_writer &) = delete;
+    //! non-copyable: delete assignment operator
+    external_array_writer & operator = (const external_array_writer &) = delete;
+
     ~external_array_writer()
     {
         m_live_boundary.clear(); // release block boundaries
@@ -1862,7 +1876,7 @@ template <
     size_t DefaultMemSize = 1* 1024L* 1024L* 1024L,
     external_size_type MaxItems = 0
     >
-class parallel_priority_queue : private noncopyable
+class parallel_priority_queue
 {
     //! \name Types
     //! \{
@@ -2445,6 +2459,11 @@ public:
 
         check_invariants();
     }
+
+    //! non-copyable: delete copy-constructor
+    parallel_priority_queue(const parallel_priority_queue &) = delete;
+    //! non-copyable: delete assignment operator
+    parallel_priority_queue & operator = (const parallel_priority_queue &) = delete;
 
     //! Destructor.
     ~parallel_priority_queue()

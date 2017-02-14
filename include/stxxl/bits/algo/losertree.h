@@ -16,7 +16,6 @@
 #define STXXL_ALGO_LOSERTREE_HEADER
 
 #include <algorithm>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
@@ -24,7 +23,7 @@ namespace stxxl {
 
 template <typename RunCursorType,
           typename RunCursorCmpType>
-class loser_tree : private noncopyable
+class loser_tree
 {
     int logK;
     int_type k;
@@ -96,6 +95,12 @@ public:
 
         entry[0] = init_winner(1);
     }
+
+    //! non-copyable: delete copy-constructor
+    loser_tree(const loser_tree &) = delete;
+    //! non-copyable: delete assignment operator
+    loser_tree & operator = (const loser_tree &) = delete;
+
     ~loser_tree()
     {
         delete[] current;

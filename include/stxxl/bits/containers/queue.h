@@ -48,7 +48,7 @@ template <class ValueType,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SizeType = external_size_type>
-class queue : private noncopyable
+class queue
 {
 public:
     typedef ValueType value_type;
@@ -155,6 +155,11 @@ public:
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
         init(blocks2prefetch_);
     }
+
+    //! non-copyable: delete copy-constructor
+    queue(const queue &) = delete;
+    //! non-copyable: delete assignment operator
+    queue & operator = (const queue &) = delete;
 
     //! \}
 

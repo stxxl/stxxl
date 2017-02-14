@@ -15,7 +15,6 @@
 
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/block_prefetcher.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/algo/async_schedule.h>
 
 namespace stxxl {
@@ -31,7 +30,7 @@ namespace stxxl {
 //! Reads data records from the stream of blocks.
 //! \remark Reading performed in the background, i.e. with overlapping of I/O and computation
 template <typename BlockType, typename BidIteratorType>
-class buf_istream : private noncopyable
+class buf_istream
 {
 public:
     typedef BlockType block_type;
@@ -82,6 +81,11 @@ public:
 
         current_blk = prefetcher->pull_block();
     }
+
+    //! non-copyable: delete copy-constructor
+    buf_istream(const buf_istream &) = delete;
+    //! non-copyable: delete assignment operator
+    buf_istream & operator = (const buf_istream &) = delete;
 
     //! Input stream operator, reads in \c record.
     //! \param record reference to the block record type,

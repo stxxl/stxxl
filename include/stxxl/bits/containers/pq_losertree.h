@@ -35,7 +35,7 @@ namespace priority_queue_local {
  * \param  MaxArity  maximum arity of loser tree, has to be a power of two
  */
 template <class ValueType, class CompareType, unsigned MaxArity>
-class loser_tree : private noncopyable
+class loser_tree
 {
 public:
     typedef ValueType value_type;
@@ -166,7 +166,14 @@ public:
 
 public:
     loser_tree();
+
+    //! non-copyable: delete copy-constructor
+    loser_tree(const loser_tree &) = delete;
+    //! non-copyable: delete assignment operator
+    loser_tree & operator = (const loser_tree &) = delete;
+
     ~loser_tree();
+
     void init();
 
     void swap(loser_tree& obj)

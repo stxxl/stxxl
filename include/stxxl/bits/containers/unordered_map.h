@@ -14,7 +14,6 @@
 #ifndef STXXL_CONTAINERS_UNORDERED_MAP_HEADER
 #define STXXL_CONTAINERS_UNORDERED_MAP_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 
 namespace stxxl {
@@ -61,7 +60,7 @@ template <
     unsigned SubBlocksPerBlock = 256,
     class AllocType = std::allocator<std::pair<const KeyType, MappedType> >
     >
-class unordered_map : private noncopyable
+class unordered_map
 {
     typedef hash_map::hash_map<KeyType, MappedType, HashType, CompareType,
                                SubBlockSize, SubBlocksPerBlock, AllocType> impl_type;
@@ -147,6 +146,11 @@ public:
                   const allocator_type& a = allocator_type())
         : impl(begin, end, mem_to_sort, n, hf, cmp, buffer_size, a)
     { }
+
+    //! non-copyable: delete copy-constructor
+    unordered_map(const unordered_map &) = delete;
+    //! non-copyable: delete assignment operator
+    unordered_map & operator = (const unordered_map &) = delete;
 
     //! \}
 

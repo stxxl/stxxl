@@ -23,7 +23,6 @@
 #include <stxxl/vector>
 
 namespace stxxl {
-
 namespace btree {
 
 template <class KeyType,
@@ -33,7 +32,7 @@ template <class KeyType,
           unsigned RawLeafSize,
           class PDAllocStrategy
           >
-class btree : private noncopyable
+class btree
 {
 public:
     typedef KeyType key_type;
@@ -468,6 +467,11 @@ public:
 
         create_empty_leaf();
     }
+
+    //! non-copyable: delete copy-constructor
+    btree(const btree &) = delete;
+    //! non-copyable: delete assignment operator
+    btree & operator = (const btree &) = delete;
 
     virtual ~btree()
     {
@@ -1194,7 +1198,6 @@ inline bool operator >=
 }
 
 } // namespace btree
-
 } // namespace stxxl
 
 namespace std {

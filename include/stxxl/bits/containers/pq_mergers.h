@@ -248,7 +248,7 @@ void merge4_iterator(
  * \tparam Arity  maximum arity of merger, does not need to be a power of 2
  */
 template <class ArraysType, class CompareType, unsigned Arity>
-class loser_tree : private noncopyable
+class loser_tree
 {
 public:
     //! type of arrays container linked with loser tree
@@ -301,6 +301,11 @@ public:
         // verify strict weak ordering
         assert(!cmp(cmp.min_value(), cmp.min_value()));
     }
+
+    //! non-copyable: delete copy-constructor
+    loser_tree(const loser_tree &) = delete;
+    //! non-copyable: delete assignment operator
+    loser_tree & operator = (const loser_tree &) = delete;
 
     void initialize()
     {
@@ -775,7 +780,7 @@ public:
  * \tparam Arity  maximum arity of merger, does not need to be a power of 2
  */
 template <class ArraysType, class CompareType, unsigned Arity>
-class parallel_merger_adapter : private noncopyable
+class parallel_merger_adapter
 {
 public:
     //! type of arrays container linked with loser tree
@@ -814,6 +819,11 @@ public:
         // verify strict weak ordering
         assert(!cmp(cmp.min_value(), cmp.min_value()));
     }
+
+    //! non-copyable: delete copy-constructor
+    parallel_merger_adapter(const parallel_merger_adapter &) = delete;
+    //! non-copyable: delete assignment operator
+    parallel_merger_adapter & operator = (const parallel_merger_adapter &) = delete;
 
     void initialize()
     {

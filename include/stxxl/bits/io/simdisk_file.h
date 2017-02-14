@@ -35,7 +35,7 @@ namespace stxxl {
 //! \weakgroup fileimpl
 //! \{
 
-class simdisk_geometry : private noncopyable
+class simdisk_geometry
 {
     struct Zone
     {
@@ -93,12 +93,14 @@ protected:
                   int sec_per_track, int& first_sect);
 
 public:
-    inline simdisk_geometry()
-    { }
-    double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
+    simdisk_geometry() = default;
 
-    inline ~simdisk_geometry()
-    { }
+    //! non-copyable: delete copy-constructor
+    simdisk_geometry(const simdisk_geometry &) = delete;
+    //! non-copyable: delete assignment operator
+    simdisk_geometry & operator = (const simdisk_geometry &) = delete;
+
+    double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
 
     static const double s_average_speed;
 };

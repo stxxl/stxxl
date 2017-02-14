@@ -21,7 +21,6 @@
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/noncopyable.h>
 
 namespace stxxl {
 
@@ -41,7 +40,7 @@ namespace stxxl {
  * Maybe most important it will nicely format the options and parameters
  * description using word wrapping.
  */
-class cmdline_parser : private noncopyable
+class cmdline_parser
 {
 protected:
     //! base class of all options and parameters
@@ -444,6 +443,11 @@ public:
           m_verbose_process(true),
           m_linewrap(80)
     { }
+
+    //! non-copyable: delete copy-constructor
+    cmdline_parser(const cmdline_parser &) = delete;
+    //! non-copyable: delete assignment operator
+    cmdline_parser & operator = (const cmdline_parser &) = delete;
 
     //! Delete all added arguments
     ~cmdline_parser()

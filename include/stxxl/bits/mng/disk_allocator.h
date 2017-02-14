@@ -23,7 +23,6 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 
@@ -39,7 +38,7 @@ namespace stxxl {
 //! \ingroup mnglayer
 //! \{
 
-class disk_allocator : private noncopyable
+class disk_allocator
 {
     typedef std::pair<stxxl::int64, stxxl::int64> place;
 
@@ -94,6 +93,11 @@ public:
         // initial growth to configured file size
         grow_file(cfg.size);
     }
+
+    //! non-copyable: delete copy-constructor
+    disk_allocator(const disk_allocator &) = delete;
+    //! non-copyable: delete assignment operator
+    disk_allocator & operator = (const disk_allocator &) = delete;
 
     ~disk_allocator()
     {

@@ -17,7 +17,6 @@
 #include <list>
 #include <cassert>
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/simple_vector.h>
 
@@ -63,7 +62,7 @@ public:
 
 //! Pager with \b LRU replacement strategy
 template <unsigned npages_ = 0>
-class lru_pager : private noncopyable
+class lru_pager
 {
     enum { n_pages = npages_ };
 
@@ -79,6 +78,11 @@ public:
         for (size_type i = 0; i < size(); ++i)
             history_entry[i] = history.insert(history.end(), i);
     }
+
+    //! non-copyable: delete copy-constructor
+    lru_pager(const lru_pager &) = delete;
+    //! non-copyable: delete assignment operator
+    lru_pager & operator = (const lru_pager &) = delete;
 
     size_type kick()
     {

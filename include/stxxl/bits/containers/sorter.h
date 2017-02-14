@@ -61,7 +61,7 @@ template <typename ValueType,
           typename CompareType,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY>
-class sorter : private noncopyable
+class sorter
 {
 public:
     // *** Template Parameters
@@ -116,6 +116,11 @@ public:
           m_runs_merger(cmp, merger_memory_to_use)
 
     { }
+
+    //! non-copyable: delete copy-constructor
+    sorter(const sorter &) = delete;
+    //! non-copyable: delete assignment operator
+    sorter & operator = (const sorter &) = delete;
 
     //! \}
 

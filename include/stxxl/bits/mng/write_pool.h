@@ -16,7 +16,6 @@
 
 #include <list>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
 
@@ -29,7 +28,7 @@ namespace stxxl {
 
 //! Implements dynamically resizable buffered writing pool.
 template <class BlockType>
-class write_pool : private noncopyable
+class write_pool
 {
 public:
     typedef BlockType block_type;
@@ -69,6 +68,11 @@ public:
             STXXL_VERBOSE_WPOOL("  create block=" << free_blocks.back());
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    write_pool(const write_pool &) = delete;
+    //! non-copyable: delete assignment operator
+    write_pool & operator = (const write_pool &) = delete;
 
     void swap(write_pool& obj)
     {

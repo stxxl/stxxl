@@ -24,7 +24,7 @@ template <class NodeType, class BTreeType>
 class node_cache;
 
 template <class KeyType, class KeyCmp, unsigned RawSize, class BTreeType>
-class normal_node : private noncopyable
+class normal_node
 {
 public:
     typedef normal_node<KeyType, KeyCmp, RawSize, BTreeType> self_type;
@@ -214,6 +214,11 @@ public:
         // extra space for an overflow
         assert(unsigned(block_type::size) >= nelements + 1);
     }
+
+    //! non-copyable: delete copy-constructor
+    normal_node(const normal_node &) = delete;
+    //! non-copyable: delete assignment operator
+    normal_node & operator = (const normal_node &) = delete;
 
     block_type & block()
     {

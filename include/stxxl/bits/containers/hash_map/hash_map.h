@@ -16,7 +16,6 @@
 
 #include <functional>
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/stream.h>
@@ -56,7 +55,7 @@ template <class KeyType,
           unsigned SubBlocksPerBlock = 256,
           class AllocatorType = std::allocator<std::pair<const KeyType, MappedType> >
           >
-class hash_map : private noncopyable
+class hash_map
 {
 protected:
     typedef hash_map<KeyType, MappedType, HashType, KeyCompareType,
@@ -228,6 +227,11 @@ public:
         max_buffer_size_ = buffer_size / sizeof(node_type);
         insert(begin, end, mem_to_sort);
     }
+
+    //! non-copyable: delete copy-constructor
+    hash_map(const hash_map &) = delete;
+    //! non-copyable: delete assignment operator
+    hash_map & operator = (const hash_map &) = delete;
 
     ~hash_map()
     {

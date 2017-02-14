@@ -27,7 +27,7 @@ namespace stxxl {
 
 //! Implements dynamically resizable prefetching pool.
 template <class BlockType>
-class prefetch_pool : private noncopyable
+class prefetch_pool
 {
 public:
     typedef BlockType block_type;
@@ -79,6 +79,11 @@ public:
         for ( ; i < init_size; ++i)
             free_blocks.push_back(new block_type);
     }
+
+    //! non-copyable: delete copy-constructor
+    prefetch_pool(const prefetch_pool &) = delete;
+    //! non-copyable: delete assignment operator
+    prefetch_pool & operator = (const prefetch_pool &) = delete;
 
     void swap(prefetch_pool& obj)
     {

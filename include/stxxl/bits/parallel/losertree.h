@@ -17,7 +17,6 @@
 #ifndef STXXL_PARALLEL_LOSERTREE_HEADER
 #define STXXL_PARALLEL_LOSERTREE_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/base.h>
 #include <functional>
@@ -723,7 +722,7 @@ public:
  * This is a very fast variant.
  */
 template <typename ValueType, typename Comparator = std::less<ValueType> >
-class LoserTreeCopyUnguardedBase : private noncopyable
+class LoserTreeCopyUnguardedBase
 {
 public:
     //! size of counters and array indexes
@@ -763,6 +762,11 @@ public:
             losers[i].key = _sentinel;
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    LoserTreeCopyUnguardedBase(const LoserTreeCopyUnguardedBase &) = delete;
+    //! non-copyable: delete assignment operator
+    LoserTreeCopyUnguardedBase & operator = (const LoserTreeCopyUnguardedBase &) = delete;
 
     ~LoserTreeCopyUnguardedBase()
     {
@@ -913,7 +917,7 @@ public:
  * This is a very fast variant.
  */
 template <typename ValueType, typename Comparator = std::less<ValueType> >
-class LoserTreePointerUnguardedBase : private noncopyable
+class LoserTreePointerUnguardedBase
 {
 public:
     //! size of counters and array indexes
@@ -953,6 +957,11 @@ public:
             losers[i + k].keyp = &_sentinel;
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    LoserTreePointerUnguardedBase(const LoserTreePointerUnguardedBase &) = delete;
+    //! non-copyable: delete assignment operator
+    LoserTreePointerUnguardedBase & operator = (const LoserTreePointerUnguardedBase &) = delete;
 
     ~LoserTreePointerUnguardedBase()
     {

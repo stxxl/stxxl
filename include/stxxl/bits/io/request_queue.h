@@ -14,7 +14,6 @@
 #ifndef STXXL_IO_REQUEST_QUEUE_HEADER
 #define STXXL_IO_REQUEST_QUEUE_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/io/request.h>
 
 namespace stxxl {
@@ -23,12 +22,19 @@ namespace stxxl {
 //! \{
 
 //! Interface of a request_queue to which requests can be added and canceled.
-class request_queue : private noncopyable
+class request_queue
 {
 public:
     enum priority_op { READ, WRITE, NONE };
 
 public:
+    request_queue() = default;
+
+    //! non-copyable: delete copy-constructor
+    request_queue(const request_queue &) = delete;
+    //! non-copyable: delete assignment operator
+    request_queue & operator = (const request_queue &) = delete;
+
     virtual void add_request(request_ptr& req) = 0;
     virtual bool cancel_request(request_ptr& req) = 0;
     virtual ~request_queue() { }

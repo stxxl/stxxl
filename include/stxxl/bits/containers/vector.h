@@ -1897,7 +1897,7 @@ class vector_bufreader_iterator;
  * See \ref tutorial_vector_buf
  */
 template <typename VectorIterator>
-class vector_bufreader : public noncopyable
+class vector_bufreader
 {
 public:
     //! template parameter: the vector iterator type
@@ -1999,6 +1999,11 @@ public:
         for ( ; curr != m_begin; ++curr)
             ++(*m_bufin);
     }
+
+    //! non-copyable: delete copy-constructor
+    vector_bufreader(const vector_bufreader &) = delete;
+    //! non-copyable: delete assignment operator
+    vector_bufreader & operator = (const vector_bufreader &) = delete;
 
     //! Finish reading and free buffered reader.
     ~vector_bufreader()
@@ -2168,7 +2173,7 @@ public:
  * See \ref tutorial_vector_buf
  */
 template <typename VectorIterator>
-class vector_bufreader_reverse : public noncopyable
+class vector_bufreader_reverse
 {
 public:
     //! template parameter: the vector iterator type
@@ -2242,6 +2247,11 @@ public:
 
         rewind();
     }
+
+    //! non-copyable: delete copy-constructor
+    vector_bufreader_reverse(const vector_bufreader_reverse &) = delete;
+    //! non-copyable: delete assignment operator
+    vector_bufreader_reverse & operator = (const vector_bufreader_reverse &) = delete;
 
     //! Rewind stream back to begin. Note that this recreates the buffered
     //! reader and is thus not cheap.
@@ -2343,7 +2353,7 @@ public:
  * See \ref tutorial_vector_buf
  */
 template <typename VectorIterator>
-class vector_bufwriter : public noncopyable
+class vector_bufwriter
 {
 public:
     //! template parameter: the vector iterator type
@@ -2422,6 +2432,11 @@ public:
 
         assert(m_iter <= m_end);
     }
+
+    //! non-copyable: delete copy-constructor
+    vector_bufwriter(const vector_bufwriter &) = delete;
+    //! non-copyable: delete assignment operator
+    vector_bufwriter & operator = (const vector_bufwriter &) = delete;
 
     //! Finish writing and flush output back to vector.
     ~vector_bufwriter()

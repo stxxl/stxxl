@@ -418,7 +418,7 @@ public:
 //! \tparam VectorType the type of the underlying vector container,
 //! the default is \c stxxl::vector<ValueType>
 template <class ValueType, class VectorType = stxxl::vector<ValueType> >
-class deque : private noncopyable
+class deque
 {
     typedef deque<ValueType, VectorType> self_type;
 
@@ -470,6 +470,11 @@ public:
         : m_vector(STXXL_MAX<size_type>(STXXL_DEFAULT_BLOCK_SIZE(ValueType) / sizeof(value_type), 2 * n)),
           m_begin(0), m_end(n), m_size(n)
     { }
+
+    //! non-copyable: delete copy-constructor
+    deque(const deque &) = delete;
+    //! non-copyable: delete assignment operator
+    deque & operator = (const deque &) = delete;
 
     ~deque()      // empty so far
     { }

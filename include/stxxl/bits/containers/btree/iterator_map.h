@@ -15,7 +15,6 @@
 
 #include <map>
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/common/error_handling.h>
 
@@ -24,7 +23,7 @@ namespace stxxl {
 namespace btree {
 
 template <class BTreeType>
-class iterator_map : private noncopyable
+class iterator_map
 {
 public:
     typedef BTreeType btree_type;
@@ -80,6 +79,11 @@ public:
     iterator_map(btree_type* b)
         : m_btree(b)
     { }
+
+    //! non-copyable: delete copy-constructor
+    iterator_map(const iterator_map &) = delete;
+    //! non-copyable: delete assignment operator
+    iterator_map & operator = (const iterator_map &) = delete;
 
     void register_iterator(iterator_base& it)
     {

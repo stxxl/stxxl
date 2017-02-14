@@ -18,7 +18,6 @@
  #include <boost/config.hpp>
 #endif
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
 
@@ -32,7 +31,7 @@ namespace hash_map {
 
 //! Used inside block_cache for buffering write requests of cached blocks.
 template <class BlockType>
-class block_cache_write_buffer : private noncopyable
+class block_cache_write_buffer
 {
 public:
     typedef BlockType block_type;
@@ -56,6 +55,11 @@ public:
             free_blocks_.push_back(i);
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    block_cache_write_buffer(const block_cache_write_buffer &) = delete;
+    //! non-copyable: delete assignment operator
+    block_cache_write_buffer & operator = (const block_cache_write_buffer &) = delete;
 
     //! Writes the given block back to disk;
     //! callers have to exchange the passed block with the returned one!
@@ -115,7 +119,7 @@ public:
 //! Cache of blocks contained in an external memory hash map. Uses the
 //! stxxl::lru_pager as eviction algorithm.
 template <class BlockType>
-class block_cache : private noncopyable
+class block_cache
 {
 public:
     typedef BlockType block_type;
@@ -209,6 +213,11 @@ public:
             free_blocks_[i] = i;
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    block_cache(const block_cache &) = delete;
+    //! non-copyable: delete assignment operator
+    block_cache & operator = (const block_cache &) = delete;
 
     //! Return cache-size
     unsigned_type size() const

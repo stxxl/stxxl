@@ -15,14 +15,13 @@
 #ifndef STXXL_COMMON_STATE_HEADER
 #define STXXL_COMMON_STATE_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/condition_variable.h>
 
 namespace stxxl {
 
 template <typename ValueType = int>
-class state : private noncopyable
+class state
 {
     typedef ValueType value_type;
 
@@ -39,6 +38,11 @@ public:
     state(const value_type& s)
         : m_state(s)
     { }
+
+    //! non-copyable: delete copy-constructor
+    state(const state &) = delete;
+    //! non-copyable: delete assignment operator
+    state & operator = (const state &) = delete;
 
     void set_to(const value_type& new_state)
     {

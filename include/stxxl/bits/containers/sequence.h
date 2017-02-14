@@ -59,7 +59,7 @@ template <class ValueType,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SizeType = external_size_type>
-class sequence : private noncopyable
+class sequence
 {
 public:
     typedef ValueType value_type;
@@ -170,6 +170,11 @@ public:
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(pool)");
         init(blocks2prefetch);
     }
+
+    //! non-copyable: delete copy-constructor
+    sequence(const sequence &) = delete;
+    //! non-copyable: delete assignment operator
+    sequence & operator = (const sequence &) = delete;
 
     //! \}
 

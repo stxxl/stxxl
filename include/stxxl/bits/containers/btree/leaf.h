@@ -24,7 +24,7 @@ template <class NodeType, class BTreeType>
 class node_cache;
 
 template <class KeyType, class DataType, class KeyCmp, unsigned RawSize, class BTreeType>
-class normal_leaf : private noncopyable
+class normal_leaf
 {
 public:
     typedef normal_leaf<KeyType, DataType, KeyCmp, RawSize, BTreeType> self_type;
@@ -176,6 +176,11 @@ public:
         assert(max_nelements() <= nelements);
         assert(unsigned(block_type::size) >= nelements + 1);                       // extra space for an overflow
     }
+
+    //! non-copyable: delete copy-constructor
+    normal_leaf(const normal_leaf &) = delete;
+    //! non-copyable: delete assignment operator
+    normal_leaf & operator = (const normal_leaf &) = delete;
 
     bool overflows() const { return m_block->info.cur_size > max_nelements(); }
     bool underflows() const { return m_block->info.cur_size < min_nelements(); }

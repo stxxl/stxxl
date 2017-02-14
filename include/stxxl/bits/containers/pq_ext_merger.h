@@ -35,7 +35,7 @@ namespace priority_queue_local {
  */
 template <class BlockType, class CompareType, unsigned Arity,
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
-class ext_merger : private noncopyable
+class ext_merger
 {
 public:
     //! class is parameterized by the block of the external arrays
@@ -69,7 +69,7 @@ public:
     typedef external_size_type size_type;
 
 public:
-    struct sequence_state : private noncopyable
+    struct sequence_state
     {
         block_type* block;          //!< current block
         unsigned_type current;      //!< current index in current block
@@ -89,6 +89,11 @@ public:
               merger(NULL),
               allocated(false)
         { }
+
+        //! non-copyable: delete copy-constructor
+        sequence_state(const sequence_state &) = delete;
+        //! non-copyable: delete assignment operator
+        sequence_state & operator = (const sequence_state &) = delete;
 
         ~sequence_state()
         {
@@ -197,6 +202,11 @@ public:
 
         tree.initialize();
     }
+
+    //! non-copyable: delete copy-constructor
+    ext_merger(const ext_merger &) = delete;
+    //! non-copyable: delete assignment operator
+    ext_merger & operator = (const ext_merger &) = delete;
 
     virtual ~ext_merger()
     {

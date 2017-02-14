@@ -18,7 +18,6 @@
 
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/disk_queues.h>
-#include <stxxl/bits/noncopyable.h>
 
 namespace stxxl {
 
@@ -33,7 +32,7 @@ namespace stxxl {
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
 template <typename BlockType>
-class buffered_writer : private noncopyable
+class buffered_writer
 {
     typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
@@ -85,6 +84,12 @@ public:
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
     }
+
+    //! non-copyable: delete copy-constructor
+    buffered_writer(const buffered_writer &) = delete;
+    //! non-copyable: delete assignment operator
+    buffered_writer & operator = (const buffered_writer &) = delete;
+
     //! Returns free block from the internal buffer pool.
     //! \return pointer to the block from the internal buffer pool
     block_type * get_free_block()

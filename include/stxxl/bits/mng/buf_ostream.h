@@ -13,7 +13,6 @@
 #ifndef STXXL_MNG_BUF_OSTREAM_HEADER
 #define STXXL_MNG_BUF_OSTREAM_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/buf_writer.h>
 
 namespace stxxl {
@@ -26,7 +25,7 @@ namespace stxxl {
 //! Writes data records to the stream of blocks.
 //! \remark Writing performed in the background, i.e. with overlapping of I/O and computation
 template <typename BlockType, typename BidIteratorType>
-class buf_ostream : private noncopyable
+class buf_ostream
 {
 public:
     typedef BlockType block_type;
@@ -52,6 +51,11 @@ public:
     {
         current_blk = writer.get_free_block();
     }
+
+    //! non-copyable: delete copy-constructor
+    buf_ostream(const buf_ostream &) = delete;
+    //! non-copyable: delete assignment operator
+    buf_ostream & operator = (const buf_ostream &) = delete;
 
     //! Output stream operator, writes out \c record.
     //! \param record const reference to block record type, containing a value of record to write to the stream

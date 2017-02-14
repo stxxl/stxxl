@@ -24,7 +24,6 @@
  #include <pthread.h>
  #include <cerrno>
 
- #include <stxxl/bits/noncopyable.h>
  #include <stxxl/bits/common/error_handling.h>
 #else
  #error "Thread implementation not detected."
@@ -42,7 +41,7 @@ typedef boost::condition condition_variable;
 
 #elif STXXL_POSIX_THREADS
 
-class condition_variable : private noncopyable
+class condition_variable
 {
     //! pthread handle to condition
     pthread_cond_t cond;
@@ -53,6 +52,10 @@ public:
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_init(&cond, NULL));
     }
+    //! non-copyable: delete copy-constructor
+    condition_variable(const condition_variable &) = delete;
+    //! non-copyable: delete assignment operator
+    condition_variable & operator = (const condition_variable &) = delete;
     //! destroy condition variable
     ~condition_variable() throw()
     {

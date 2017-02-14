@@ -16,7 +16,6 @@
 #include <algorithm>
 #include <cassert>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/noncopyable.h>
 
 namespace stxxl {
 
@@ -31,7 +30,7 @@ namespace stxxl {
  * implementation is located above these lines.
  */
 template <typename ValueType>
-class swap_vector : private noncopyable
+class swap_vector
 {
 public:
     typedef ValueType value_type;
@@ -60,6 +59,7 @@ public:
     swap_vector()
         : m_size(0), m_capacity(0), m_array(NULL)
     { }
+
     //! Create a vector with the spezified size.
     swap_vector(size_type size)
         : m_size(size), m_capacity(size), m_array(NULL)
@@ -67,6 +67,7 @@ public:
         if (m_size > 0)
             m_array = new value_type[m_size];
     }
+
     //! Create a vector with the spezified size and reserve (possibly more)
     //! space.
     swap_vector(size_type size, size_type capacity)
@@ -75,6 +76,12 @@ public:
         if (m_capacity > 0)
             m_array = new value_type[m_capacity];
     }
+
+    //! non-copyable: delete copy-constructor
+    swap_vector(const swap_vector &) = delete;
+    //! non-copyable: delete assignment operator
+    swap_vector & operator = (const swap_vector &) = delete;
+
     //! Swap the vector with another one.
     void swap(swap_vector& obj)
     {

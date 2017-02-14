@@ -31,7 +31,7 @@ namespace stxxl {
 namespace btree {
 
 template <class NodeType, class BTreeType>
-class node_cache : private noncopyable
+class node_cache
 {
 public:
     typedef BTreeType btree_type;
@@ -126,6 +126,11 @@ public:
         pager_type tmp_pager(nnodes);
         std::swap(m_pager, tmp_pager);
     }
+
+    //! non-copyable: delete copy-constructor
+    node_cache(const node_cache &) = delete;
+    //! non-copyable: delete assignment operator
+    node_cache & operator = (const node_cache &) = delete;
 
     unsigned_type size() const
     {

@@ -14,7 +14,6 @@
 #ifndef STXXL_CONTAINERS_MAP_HEADER
 #define STXXL_CONTAINERS_MAP_HEADER
 
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/btree/btree.h>
 
 namespace stxxl {
@@ -79,7 +78,7 @@ template <class KeyType,
           unsigned RawLeafSize = 128* 1024,     // 128 KBytes default
           class PDAllocStrategy = stxxl::SR
           >
-class map : private noncopyable
+class map
 {
     typedef btree::btree<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> impl_type;
 
@@ -224,6 +223,11 @@ public:
         ) : impl(b, e, c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
                  range_sorted, node_fill_factor, leaf_fill_factor)
     { }
+
+    //! non-copyable: delete copy-constructor
+    map(const map &) = delete;
+    //! non-copyable: delete assignment operator
+    map & operator = (const map &) = delete;
 
     //! \}
 

@@ -29,7 +29,7 @@ namespace stxxl {
 namespace priority_queue_local {
 
 template <class ValueType, class CompareType, unsigned MaxArity>
-class int_merger : private noncopyable
+class int_merger
 {
 public:
     //! type of values in merger
@@ -162,6 +162,11 @@ public:
         // of supremum
         tree.initialize();
     }
+
+    //! non-copyable: delete copy-constructor
+    int_merger(const int_merger &) = delete;
+    //! non-copyable: delete assignment operator
+    int_merger & operator = (const int_merger &) = delete;
 
     ~int_merger()
     {

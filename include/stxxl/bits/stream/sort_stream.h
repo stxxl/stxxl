@@ -48,7 +48,7 @@ template <
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
-class basic_runs_creator : private noncopyable
+class basic_runs_creator
 {
 public:
     typedef Input input_type;
@@ -143,6 +143,11 @@ public:
         }
         assert(m_memsize > 0);
     }
+
+    //! non-copyable: delete copy-constructor
+    basic_runs_creator(const basic_runs_creator &) = delete;
+    //! non-copyable: delete assignment operator
+    basic_runs_creator & operator = (const basic_runs_creator &) = delete;
 
     //! Returns the sorted runs object.
     //! \return Sorted runs object. The result is computed lazily, i.e. on the first call
@@ -416,7 +421,7 @@ class runs_creator<
         CompareType,
         BlockSize,
         AllocStr
-        >: private noncopyable
+        >
 {
 public:
     typedef CompareType cmp_type;
@@ -561,6 +566,11 @@ public:
 
         allocate();
     }
+
+    //! non-copyable: delete copy-constructor
+    runs_creator(const runs_creator &) = delete;
+    //! non-copyable: delete assignment operator
+    runs_creator & operator = (const runs_creator &) = delete;
 
     ~runs_creator()
     {
@@ -724,7 +734,7 @@ class runs_creator<
         CompareType,
         BlockSize,
         AllocStr
-        >: private noncopyable
+        >
 {
 public:
     typedef ValueType value_type;
@@ -778,6 +788,11 @@ public:
                                 "please increase parameter 'memory_to_use'");
         }
     }
+
+    //! non-copyable: delete copy-constructor
+    runs_creator(const runs_creator &) = delete;
+    //! non-copyable: delete assignment operator
+    runs_creator & operator = (const runs_creator &) = delete;
 
     //! Adds new element to the current run.
     //! \param val value to be added to the current run
@@ -931,7 +946,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 template <class RunsType,
           class CompareType,
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
-class basic_runs_merger : private noncopyable
+class basic_runs_merger
 {
 public:
     typedef RunsType sorted_runs_type;
@@ -1116,6 +1131,11 @@ public:
     {
         sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
     }
+
+    //! non-copyable: delete copy-constructor
+    basic_runs_merger(const basic_runs_merger &) = delete;
+    //! non-copyable: delete assignment operator
+    basic_runs_merger & operator = (const basic_runs_merger &) = delete;
 
     //! Set memory amount to use for the merger in bytes.
     void set_memory_to_use(unsigned_type memory_to_use)
@@ -1534,7 +1554,7 @@ template <
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
     class RunsCreatorType = runs_creator<Input, CompareType, BlockSize, AllocStr>
     >
-class sort : public noncopyable
+class sort
 {
     typedef RunsCreatorType runs_creator_type;
     typedef typename runs_creator_type::sorted_runs_type sorted_runs_type;
@@ -1570,6 +1590,11 @@ public:
     {
         sort_helper::verify_sentinel_strict_weak_ordering(c);
     }
+
+    //! non-copyable: delete copy-constructor
+    sort(const sort &) = delete;
+    //! non-copyable: delete assignment operator
+    sort & operator = (const sort &) = delete;
 
     //! Standard stream method.
     bool empty() const

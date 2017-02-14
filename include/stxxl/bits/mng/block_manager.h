@@ -36,7 +36,6 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/create_file.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/disk_allocator.h>
