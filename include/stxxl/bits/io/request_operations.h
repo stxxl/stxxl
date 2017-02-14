@@ -92,7 +92,7 @@ RequestIterator poll_any(RequestIterator reqs_begin, RequestIterator reqs_end)
 inline bool poll_any(request_ptr req_array[], size_t count, size_t& index)
 {
     request_ptr* res = poll_any(req_array, req_array + count);
-    index = res - req_array;
+    index = static_cast<size_t>(res - req_array);
     return res != (req_array + count);
 }
 
@@ -148,7 +148,7 @@ RequestIterator wait_any(RequestIterator reqs_begin, RequestIterator reqs_end)
 //! \return index in req_array pointing to the \b first completed request
 inline size_t wait_any(request_ptr req_array[], size_t count)
 {
-    return wait_any(req_array, req_array + count) - req_array;
+    return static_cast<size_t>(wait_any(req_array, req_array + count) - req_array);
 }
 
 //! \}
