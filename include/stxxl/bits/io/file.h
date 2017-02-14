@@ -87,7 +87,8 @@ public:
 
     //! Construct a new file, usually called by a subclass.
     file(unsigned int device_id = DEFAULT_DEVICE_ID)
-        : m_device_id(device_id), m_file_stats(stats::get_instance()->add_file_stats(device_id))
+        : m_device_id(device_id),
+          m_file_stats(stats::get_instance()->create_file_stats(device_id))
     { }
 
     //! Schedules an asynchronous read request to the file.
@@ -170,7 +171,10 @@ protected:
     //! The file's physical device id (e.g. used for prefetching sequence
     //! calculation)
     unsigned int m_device_id;
-    file_stats& m_file_stats;
+
+    //! pointer to file's stats inside of iostats. Because the stats can live
+    //! longer than the file, the iostats keeps ownership.
+    file_stats* m_file_stats;
 
 public:
     //! Returns the file's physical device id
@@ -179,7 +183,7 @@ public:
         return m_device_id;
     }
 
-    file_stats& get_file_stats() const
+    file_stats* get_file_stats() const
     {
         return m_file_stats;
     }

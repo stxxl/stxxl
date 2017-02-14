@@ -154,21 +154,18 @@ void stats::p_read_finished(double now)
     }
 }
 
-
-
-file_stats& stats::add_file_stats(unsigned int device_id)
+file_stats* stats::create_file_stats(unsigned int device_id)
 {
-    file_stats* File_Stats = new file_stats(device_id);
-    file_stats_list.push_back(File_Stats);
-    return *File_Stats;
+    file_stats_list.emplace_back(device_id);
+    return &file_stats_list.back();
 }
 
-std::list<file_stats_data> stats::get_file_stats_data_list() const
+std::vector<file_stats_data> stats::deepcopy_file_stats_data_list() const
 {
-    std::list<file_stats_data> fsdl = {};
+    std::vector<file_stats_data> fsdl;
     for(auto it = file_stats_list.begin(); it != file_stats_list.end(); it++)
     {
-        fsdl.push_back(file_stats_data(**it));
+        fsdl.push_back(file_stats_data(*it));
     }
 
     return fsdl;

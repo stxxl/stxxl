@@ -33,7 +33,6 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-#include <functional>
 #include <limits>
 
 STXXL_BEGIN_NAMESPACE
@@ -64,15 +63,15 @@ public:
     class scoped_read_write_timer
     {
         typedef unsigned_type size_type;
-        file_stats& File_Stats;
+        file_stats& file_stats_;
         bool is_write;
 #if STXXL_IO_STATS
         bool running;
 #endif
 
     public:
-        scoped_read_write_timer(file_stats& File_Stats, size_type size, bool is_write = false)
-                : File_Stats(File_Stats), is_write(is_write)
+        scoped_read_write_timer(file_stats* file_stats, size_type size, bool is_write = false)
+                : file_stats_(*file_stats), is_write(is_write)
 #if STXXL_IO_STATS
                 , running(false)
 #endif
@@ -91,9 +90,9 @@ public:
             if (!running) {
                 running = true;
                 if (is_write)
-                    File_Stats.write_started(size);
+                    file_stats_.write_started(size);
                 else
-                    File_Stats.read_started(size);
+                    file_stats_.read_started(size);
             }
 #else
             STXXL_UNUSED(size);
@@ -105,9 +104,9 @@ public:
 #if STXXL_IO_STATS
             if (running) {
                 if (is_write)
-                    File_Stats.write_finished();
+                    file_stats_.write_finished();
                 else
-                    File_Stats.read_finished();
+                    file_stats_.read_finished();
                 running = false;
             }
 #endif
@@ -117,14 +116,14 @@ public:
     class scoped_write_timer
     {
         typedef unsigned_type size_type;
-        file_stats& File_Stats;
+        file_stats& file_stats_;
 #if STXXL_IO_STATS
         bool running;
 #endif
 
     public:
-        scoped_write_timer(file_stats& File_Stats, size_type size)
-                : File_Stats(File_Stats)
+        scoped_write_timer(file_stats* file_stats, size_type size)
+                : file_stats_(*file_stats)
 #if STXXL_IO_STATS
                 , running(false)
 #endif
@@ -142,7 +141,7 @@ public:
 #if STXXL_IO_STATS
             if (!running) {
                 running = true;
-                File_Stats.write_started(size);
+                file_stats_.write_started(size);
             }
 #else
             STXXL_UNUSED(size);
@@ -153,7 +152,7 @@ public:
         {
 #if STXXL_IO_STATS
             if (running) {
-                File_Stats.write_finished();
+                file_stats_.write_finished();
                 running = false;
             }
 #endif
@@ -163,14 +162,14 @@ public:
     class scoped_read_timer
     {
         typedef unsigned_type size_type;
-        file_stats& File_Stats;
+        file_stats& file_stats_;
 #if STXXL_IO_STATS
         bool running;
 #endif
 
     public:
-        scoped_read_timer(file_stats& File_Stats, size_type size)
-                : File_Stats(File_Stats)
+        scoped_read_timer(file_stats* file_stats, size_type size)
+                : file_stats_(*file_stats)
 #if STXXL_IO_STATS
                 , running(false)
 #endif
@@ -188,7 +187,7 @@ public:
 #if STXXL_IO_STATS
             if (!running) {
                 running = true;
-                File_Stats.read_started(size);
+                file_stats_.read_started(size);
             }
 #else
             STXXL_UNUSED(size);
@@ -199,7 +198,7 @@ public:
         {
 #if STXXL_IO_STATS
             if (running) {
-                File_Stats.read_finished();
+                file_stats_.read_finished();
                 running = false;
             }
 #endif
@@ -443,7 +442,10 @@ class stats : public singleton<stats>
     friend class file_stats;
 
     const double creation_time;
-    std::list<file_stats*> file_stats_list;
+
+    //! need std::list here, because the io::file objects keep a pointer to the
+    //! enclosed file_stats objects and this list may grow.
+    std::list<file_stats> file_stats_list;
 
     // parallel times have to be counted globally
     double p_reads, p_writes;                   // seconds spent in parallel operations
@@ -469,15 +471,6 @@ class stats : public singleton<stats>
     stats() : creation_time(timestamp()) { }
 
 public:
-
-    ~stats()
-    {
-        while(!file_stats_list.empty())
-        {
-            delete file_stats_list.back();
-            file_stats_list.pop_back();
-        }
-    }
 
     enum wait_op_type {
         WAIT_OP_ANY,
@@ -529,15 +522,17 @@ public:
     };
 
 public:
-    std::list<file_stats_data> get_file_stats_data_list() const;
+    //! return list of file's stats data (deeply copied from each file_stats)
+    std::vector<file_stats_data> deepcopy_file_stats_data_list() const;
 
     double get_creation_time() const
     {
         return creation_time;
     }
 
-    // for library use
-    file_stats& add_file_stats(unsigned device_id);
+    //! create new instance of a file_stats for an io::file to collect
+    //! statistics. (for internal library use.)
+    file_stats* create_file_stats(unsigned device_id);
 
     //! I/O wait time counter.
     //! \return number of seconds spent in I/O waiting functions \link
@@ -628,10 +623,11 @@ class stats_data
 
     double elapsed;
 
-    std::list<file_stats_data> m_file_stats_data_list;
+    //! list of individual file statistics.
+    std::vector<file_stats_data> m_file_stats_data_list;
 
-    template<typename T>
-    T fetch_sum(std::function<T(const file_stats_data& )> get_value) const
+    template <typename T, typename Functor>
+    T fetch_sum(const Functor& get_value) const
     {
         T sum = 0;
         for(auto it = m_file_stats_data_list.begin(); it != m_file_stats_data_list.end(); it++)
@@ -651,7 +647,9 @@ public:
         double avg, med;
         std::vector<std::pair<T,unsigned>> values_per_device;
 
-        measurement_summary(const std::list<file_stats_data>& fs, std::function<T( const file_stats_data& )> get_value)
+        template <typename Functor>
+        measurement_summary(const std::vector<file_stats_data>& fs,
+                            const Functor& get_value)
             : total(0)
         {
             values_per_device.reserve(fs.size());
@@ -687,9 +685,7 @@ public:
           t_wait_read(0.0),
           t_wait_write(0.0),
           elapsed(0.0)
-    {
-        m_file_stats_data_list = std::list<file_stats_data>();
-    }
+    { }
 
     stats_data(const stats& s)
         : p_reads(s.get_pread_time()),
@@ -699,7 +695,7 @@ public:
           t_wait_read(s.get_wait_read_time()),
           t_wait_write(s.get_wait_write_time()),
           elapsed(timestamp() - s.get_creation_time()),
-          m_file_stats_data_list(s.get_file_stats_data_list())
+          m_file_stats_data_list(s.deepcopy_file_stats_data_list())
     { }
 
     stats_data operator + (const stats_data& a) const

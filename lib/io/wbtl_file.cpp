@@ -219,7 +219,7 @@ void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
         // block is in current write buffer
         assert(physical_offset + bytes <= buffer_address[curbuf] + write_block_size);
         memcpy(buffer, write_buffer[curbuf] + (physical_offset - buffer_address[curbuf]), bytes);
-        m_file_stats.read_cached(bytes);
+        m_file_stats->read_cached(bytes);
         cached = curbuf;
     }
     else if (buffer_address[1 - curbuf] <= physical_offset &&
@@ -228,7 +228,7 @@ void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
         // block is in previous write buffer
         assert(physical_offset + bytes <= buffer_address[1 - curbuf] + write_block_size);
         memcpy(buffer, write_buffer[1 - curbuf] + (physical_offset - buffer_address[1 - curbuf]), bytes);
-        m_file_stats.read_cached(bytes);
+        m_file_stats->read_cached(bytes);
         cached = curbuf;
     }
     else if (physical_offset == 0xffffffff) {
@@ -290,7 +290,7 @@ void wbtl_file::swrite(void* buffer, offset_type offset, size_type bytes)
 
     // write block into buffer
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
-    m_file_stats.write_cached(bytes);
+    m_file_stats->write_cached(bytes);
 
     scoped_mutex_lock mapping_lock(mapping_mutex);
     address_mapping[offset] = buffer_address[curbuf] + curpos;
