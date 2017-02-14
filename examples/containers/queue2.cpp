@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/queue>
+#include <stxxl/random>
 #include <iostream>
 
 int main()

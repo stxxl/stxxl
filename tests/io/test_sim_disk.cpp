@@ -13,10 +13,11 @@
 // Tests sim_disk file implementation
 // must be run on in-memory swap partition !
 
-#include <cmath>
 #include <stxxl/io>
-#include <stxxl/random>
 #include <stxxl/aligned_alloc>
+
+#include <random>
+#include <cmath>
 
 using stxxl::file;
 using stxxl::timestamp;
@@ -59,10 +60,10 @@ int main()
     double sum2 = 0.;
     STXXL_MSG("Random write");
     const unsigned int times = 80;
-    stxxl::random_number<> rnd;
+    std::default_random_engine rnd(std::random_device { } ());
     for (i = 0; i < times; i++)
     {
-        pos = (stxxl::int64)rnd(disk_size / block_size) * block_size;
+        pos = (stxxl::int64)(rnd() % (disk_size / block_size)) * block_size;
         double begin = timestamp();
         req = file1.awrite(buffer, pos, block_size);
         req->wait();

@@ -14,10 +14,10 @@
 #ifndef STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
 #define STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
 
-#include <vector>
-
 #include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/common/rand.h>
+
+#include <random>
+#include <vector>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -47,30 +47,28 @@ public:
 
 struct interleaved_FR : public interleaved_striping
 {
-    typedef random_number<random_uniform_fast> rnd_type;
-    rnd_type rnd;
+    mutable std::default_random_engine rng_ { std::random_device { } () };
 
     interleaved_FR(int_type _nruns, const FR& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     { }
 
-    unsigned_type operator () (unsigned_type /*i*/) const
+    unsigned_type operator () (unsigned_type /* i */) const
     {
-        return begindisk + rnd(rnd_type::value_type(diff));
+        return begindisk + rng_() % diff;
     }
 };
 
 struct interleaved_SR : public interleaved_striping
 {
-    typedef random_number<random_uniform_fast> rnd_type;
-    std::vector<int> offsets;
+    std::vector<size_t> offsets;
 
     interleaved_SR(int_type _nruns, const SR& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     {
-        rnd_type rnd;
+        std::default_random_engine rng { std::random_device { } () };
         for (int_type i = 0; i < nruns; i++)
-            offsets.push_back(rnd(rnd_type::value_type(diff)));
+            offsets.push_back(rng() % diff);
     }
 
     unsigned_type operator () (unsigned_type i) const
@@ -92,8 +90,7 @@ struct interleaved_RC : public interleaved_striping
             for (unsigned_type j = 0; j < diff; j++)
                 perms[i][j] = j;
 
-            random_number<random_uniform_fast> rnd;
-            std::random_shuffle(perms[i].begin(), perms[i].end(), rnd _STXXL_FORCE_SEQUENTIAL);
+            std::random_shuffle(perms[i].begin(), perms[i].end());
         }
     }
 

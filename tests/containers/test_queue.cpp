@@ -18,6 +18,7 @@
 
 #include <queue>
 #include <stxxl/queue>
+#include <stxxl/random>
 
 typedef unsigned my_type;
 

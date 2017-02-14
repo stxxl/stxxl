@@ -11,10 +11,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <cstdlib>
 #include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/random>
+
+#include <cstdlib>
+#include <random>
 
 // Test async schedule algorithm
 
@@ -28,7 +29,7 @@ int main(int argc, char* argv[])
     const int D = atoi(argv[1]);
     const int L = atoi(argv[2]);
     const stxxl::int_type m = atoi(argv[3]);
-    stxxl::ran32State = atoi(argv[4]);
+    uint32_t seed = atoi(argv[4]);
     stxxl::int_type* disks = new stxxl::int_type[L];
     stxxl::int_type* prefetch_order = new stxxl::int_type[L];
     int* count = new int[D];
@@ -36,10 +37,10 @@ int main(int argc, char* argv[])
     for (int i = 0; i < D; i++)
         count[i] = 0;
 
-    stxxl::random_number32 rnd;
+    std::default_random_engine rnd(seed);
     for (int i = 0; i < L; i++)
     {
-        disks[i] = rnd(D);
+        disks[i] = rnd() % D;
         count[disks[i]]++;
     }
 

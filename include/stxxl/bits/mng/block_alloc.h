@@ -14,10 +14,11 @@
 #ifndef STXXL_MNG_BLOCK_ALLOC_HEADER
 #define STXXL_MNG_BLOCK_ALLOC_HEADER
 
-#include <algorithm>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/config.h>
+
+#include <algorithm>
+#include <random>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -67,8 +68,7 @@ public:
 struct FR : public striping
 {
 private:
-    typedef random_number<random_uniform_fast> rnd_type;
-    rnd_type rnd;
+    mutable std::default_random_engine rng_ { std::random_device { } () };
 
 public:
     FR(unsigned_type b, unsigned_type e) : striping(b, e)
@@ -79,7 +79,7 @@ public:
 
     unsigned_type operator () (unsigned_type /*i*/) const
     {
-        return begin + rnd(rnd_type::value_type(diff));
+        return begin + rng_() % diff;
     }
 
     static const char * name()
@@ -95,12 +95,10 @@ struct SR : public striping
 private:
     unsigned_type offset;
 
-    typedef random_number<random_uniform_fast> rnd_type;
-
     void init()
     {
-        rnd_type rnd;
-        offset = rnd(rnd_type::value_type(diff));
+        std::default_random_engine rng { std::random_device { } () };
+        offset = rng() % diff;
     }
 
 public:
@@ -137,8 +135,7 @@ private:
         for (unsigned_type i = 0; i < diff; i++)
             perm[i] = i;
 
-        stxxl::random_number<random_uniform_fast> rnd;
-        std::random_shuffle(perm.begin(), perm.end(), rnd _STXXL_FORCE_SEQUENTIAL);
+        std::random_shuffle(perm.begin(), perm.end());
     }
 
 public:

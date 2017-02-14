@@ -12,6 +12,7 @@
 
 #include <stack>
 #include <stxxl/stack>
+#include <stxxl/random>
 
 int main()
 {
