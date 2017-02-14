@@ -26,6 +26,8 @@
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/stream/sorted_runs.h>
 
+#include <algorithm>
+
 namespace stxxl {
 
 namespace stream {
@@ -1060,7 +1062,7 @@ private:
                     }
                 }
 
-                diff_type output_size = STXXL_MIN(num_currently_mergeable, rest);         // at most rest elements
+                diff_type output_size = std::min(num_currently_mergeable, rest);         // at most rest elements
 
                 STXXL_VERBOSE1("before merge " << output_size);
 
@@ -1097,13 +1099,18 @@ private:
         else
         {
 // begin of native merging procedure
-            m_losers->multi_merge(m_buffer_block->elem, m_buffer_block->elem + STXXL_MIN<size_type>(size_t(out_block_type::size), m_elements_remaining));
+            m_losers->multi_merge(m_buffer_block->elem,
+                                  m_buffer_block->elem +
+                                          std::min<size_type>(
+                                          static_cast<size_type>(out_block_type::size),
+                                          m_elements_remaining));
 // end of native merging procedure
         }
         STXXL_VERBOSE1("current block filled");
 
         m_current_ptr = m_buffer_block->elem;
-        m_current_end = m_buffer_block->elem + STXXL_MIN<size_type>(size_t(out_block_type::size), m_elements_remaining);
+        m_current_end = m_buffer_block->elem + std::min<size_type>(
+                static_cast<size_type>(out_block_type::size), m_elements_remaining);
 
         if (m_elements_remaining <= out_block_type::size)
             deallocate_prefetcher();
@@ -1231,7 +1238,7 @@ public:
         std::stable_sort(m_consume_seq.begin(), m_consume_seq.end(),
                          sort_helper::trigger_entry_cmp<trigger_entry_type, value_cmp>(m_cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
-        const unsigned_type n_prefetch_buffers = STXXL_MAX(min_prefetch_buffers, input_buffers - nruns);
+        const unsigned_type n_prefetch_buffers = std::max(min_prefetch_buffers, input_buffers - nruns);
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
         // heuristic
@@ -1251,7 +1258,7 @@ public:
             m_consume_seq.begin(),
             m_consume_seq.end(),
             m_prefetch_seq,
-            STXXL_MIN(nruns + n_prefetch_buffers, prefetch_seq_size));
+            std::min(nruns + n_prefetch_buffers, prefetch_seq_size));
 
         if (do_parallel_merge())
         {
@@ -1327,7 +1334,7 @@ public:
             fill_buffer_block();
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-            assert(stxxl::is_sorted(m_buffer_block->elem, m_buffer_block->elem + STXXL_MIN<size_type>(m_elements_remaining, m_buffer_block->size), m_cmp));
+            assert(stxxl::is_sorted(m_buffer_block->elem, m_buffer_block->elem + std::min<size_type>(m_elements_remaining, m_buffer_block->size), m_cmp));
 #endif          //STXXL_CHECK_ORDER_IN_SORTS
         }
 
@@ -1398,7 +1405,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 
         while (runs_left > 0)
         {
-            unsigned_type runs2merge = STXXL_MIN(runs_left, merge_factor);
+            unsigned_type runs2merge = std::min(runs_left, merge_factor);
             STXXL_MSG("Merging " << runs2merge << " runs");
 
             if (runs2merge > 1)     // non-trivial merge

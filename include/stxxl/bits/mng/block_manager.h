@@ -230,7 +230,7 @@ void block_manager::new_blocks_int(
 #if STXXL_MNG_COUNT_ALLOCATION
     m_total_allocation += nblocks * BIDType::size;
     m_current_allocation += nblocks * BIDType::size;
-    m_maximum_allocation = STXXL_MAX(m_maximum_allocation, m_current_allocation);
+    m_maximum_allocation = std::max(m_maximum_allocation, m_current_allocation);
 #endif // STXXL_MNG_COUNT_ALLOCATION
 }
 

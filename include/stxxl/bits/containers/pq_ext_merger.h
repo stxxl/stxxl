@@ -19,7 +19,10 @@
 #include <stxxl/bits/containers/pq_mergers.h>
 #include <deque>
 
+#include <algorithm>
+
 namespace stxxl {
+
 
 //! \addtogroup stlcontinternals
 //!
@@ -328,7 +331,7 @@ protected:
 public:
     unsigned_type mem_cons() const // only rough estimation
     {
-        return (STXXL_MIN<unsigned_type>(arity + 1, max_arity) * block_type::raw_size);
+        return (std::min<unsigned_type>(arity + 1, max_arity) * block_type::raw_size);
     }
 
     //! Whether there is still space for new array
@@ -567,7 +570,7 @@ protected:
             }
 
             // at most rest elements
-            diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);
+            diff_type output_size = std::min(less_equal_than_min_last, rest);
 
             STXXL_VERBOSE1("output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")");
 

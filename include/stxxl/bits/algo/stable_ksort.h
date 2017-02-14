@@ -17,6 +17,8 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
+#include <algorithm>
+
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
@@ -292,7 +294,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 
         for (i = 0; i < nbuckets; i++)
         {
-            max_bucket_size_act = STXXL_MAX(bucket_sizes[i], max_bucket_size_act);
+            max_bucket_size_act = std::max(bucket_sizes[i], max_bucket_size_act);
             if (bucket_sizes[i] > max_bucket_size_rec)
             {
                 STXXL_ERRMSG("Bucket " << i << " is too large: " << bucket_sizes[i] <<
@@ -347,7 +349,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
             reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
 
         key_type offset = 0;
-        const unsigned log_k1 = STXXL_MAX<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+        const unsigned log_k1 = std::max<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
         unsigned_type k1 = unsigned_type(1) << log_k1;
         int_type* bucket1 = new int_type[k1];
 
@@ -360,7 +362,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
             nbucket_blocks = (unsigned_type)div_ceil(bucket_sizes[k], block_type::size);
-            const unsigned log_k1_k = STXXL_MAX<unsigned>(ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+            const unsigned log_k1_k = std::max<unsigned>(ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
             k1 = (unsigned_type)(1) << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);

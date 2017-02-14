@@ -81,7 +81,7 @@ public:
         prefetch_seq = new int_type[bids_.size()];
 
         // optimal schedule
-        nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
+        nbuffers = std::max(2 * ndisks, unsigned_type(nbuffers - 1));
         compute_prefetch_schedule(bids_.begin(), bids_.end(), prefetch_seq,
                                   nbuffers, mdevid);
 

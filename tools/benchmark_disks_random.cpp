@@ -29,6 +29,8 @@
 #include <stxxl/mng>
 #include <stxxl/cmdline>
 
+#include <algorithm>
+
 using stxxl::request_ptr;
 using stxxl::timestamp;
 using stxxl::external_size_type;
@@ -59,7 +61,7 @@ void run_test(external_size_type span, external_size_type worksize, bool do_init
     external_size_type num_blocks = stxxl::div_ceil(worksize, raw_block_size);
     external_size_type num_blocks_in_span = stxxl::div_ceil(span, raw_block_size);
 
-    num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
+    num_blocks = std::min(num_blocks, num_blocks_in_span);
     if (num_blocks == 0) num_blocks = num_blocks_in_span;
 
     worksize = num_blocks * raw_block_size;

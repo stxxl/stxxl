@@ -17,6 +17,7 @@
 #define STXXL_ALGO_SORT_HEADER
 
 #include <functional>
+#include <algorithm>
 
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/rand.h>
@@ -38,6 +39,8 @@
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
+
+#include <algorithm>
 
 namespace stxxl {
 
@@ -224,7 +227,7 @@ bool check_sorted_runs(RunType** runs,
 
         for (unsigned_type off = 0; off < nblocks_per_run; off += m)
         {
-            const unsigned_type nblocks = STXXL_MIN(blocks_left, m);
+            const unsigned_type nblocks = std::min(blocks_left, m);
             const unsigned_type nelements = nblocks * block_type::size;
             blocks_left -= nblocks;
 
@@ -337,8 +340,8 @@ void merge_runs(RunType** in_runs, int_type nruns,
 #ifdef PLAY_WITH_OPT_PREF
     const int_type n_write_buffers = 4 * disks_number;
 #else
-    const int_type n_prefetch_buffers = STXXL_MAX(2 * disks_number, (3 * (int_type(_m) - nruns) / 4));
-    const int_type n_write_buffers = STXXL_MAX(2 * disks_number, int_type(_m) - nruns - n_prefetch_buffers);
+    const int_type n_prefetch_buffers = std::max(2 * disks_number, (3 * (int_type(_m) - nruns) / 4));
+    const int_type n_write_buffers = std::max(2 * disks_number, int_type(_m) - nruns - n_prefetch_buffers);
  #if STXXL_SORT_OPTIMAL_PREFETCHING
     // heuristic
     const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
@@ -415,7 +418,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
                     }
                 }
 
-                diff_type output_size = STXXL_MIN(num_currently_mergeable, rest);       // at most rest elements
+                diff_type output_size = std::min(num_currently_mergeable, rest);       // at most rest elements
 
                 STXXL_VERBOSE1("before merge " << output_size);
 
@@ -577,7 +580,7 @@ sort_blocks(InputBidIterator input_bids,
 
         while (runs_left > 0)
         {
-            int_type runs2merge = STXXL_MIN(runs_left, merge_factor);
+            int_type runs2merge = std::min(runs_left, merge_factor);
             blocks_in_new_run = 0;
             for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
                 blocks_in_new_run += runs[i]->size();
@@ -622,7 +625,7 @@ sort_blocks(InputBidIterator input_bids,
         cur_out_run = 0;
         while (runs_left > 0)
         {
-            int_type runs2merge = STXXL_MIN(runs_left, merge_factor);
+            int_type runs2merge = std::min(runs_left, merge_factor);
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_sorted_runs<block_type, run_type, value_cmp>(runs + nruns - runs_left, runs2merge, m2, cmp)));
 #endif

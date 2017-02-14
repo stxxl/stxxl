@@ -15,6 +15,7 @@
 
 #include <iomanip>
 #include <cstring>
+#include <algorithm>
 
 namespace stxxl {
 
@@ -307,7 +308,7 @@ void cmdline_parser::print_result(std::ostream& os)
     std::ios state(NULL);
     state.copyfmt(os);
 
-    int maxlong = STXXL_MAX(m_param_maxlong, m_opt_maxlong);
+    int maxlong = std::max(m_param_maxlong, m_opt_maxlong);
 
     if (m_paramlist.size())
     {

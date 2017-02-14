@@ -151,7 +151,7 @@ public:
             value_type* tmp = m_array;
             m_array = new value_type[newsize];
             memcpy((void*)m_array, (void*)tmp,
-                   sizeof(value_type) * STXXL_MIN(m_size, newsize));
+                   sizeof(value_type) * std::min(m_size, newsize));
             delete[] tmp;
             m_size = newsize;
         }

@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <cstring>
 #include <vector>
+#include <algorithm>
 
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
@@ -408,7 +409,7 @@ int benchmark_files(int argc, char* argv[])
 
     std::cout << "=============================================================================================" << std::endl;
     // the following line of output is parsed by misc/filebench-avgplot.sh
-    std::cout << "# Average over " << std::setw(8) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
+    std::cout << "# Average over " << std::setw(8) << std::max(totalsizewrite, totalsizeread) / MB << " MiB: ";
     std::cout << std::setw(2) << nfiles << " * "
               << std::setw(8) << std::setprecision(3)
               << (throughput(totalsizewrite, totaltimewrite)) << " = "

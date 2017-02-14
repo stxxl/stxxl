@@ -73,7 +73,7 @@ public:
         //      prefetch_seq[i] = i;
 
         // optimal schedule
-        nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
+        nbuffers = std::max(2 * ndisks, unsigned_type(nbuffers - 1));
         compute_prefetch_schedule(begin, end, prefetch_seq,
                                   nbuffers, mdevid);
 

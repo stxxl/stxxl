@@ -15,6 +15,8 @@
 #include <cstdio>
 #include <cinttypes>
 
+#include <algorithm>
+
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/timer>
@@ -153,7 +155,7 @@ int main(int argc, char* argv[])
     const int ndisks = 1;
 
     std::cout << "=============================================================================================" << std::endl;
-    std::cout << "# Average over " << std::setw(8) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
+    std::cout << "# Average over " << std::setw(8) << std::max(totalsizewrite, totalsizeread) / MB << " MiB: ";
     std::cout << std::setw(8) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " MiB/s read, ";
     std::cout << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite)) << " MiB/s write" << std::endl;
     if (totaltimeread != 0.0)

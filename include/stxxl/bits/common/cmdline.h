@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
@@ -414,14 +415,14 @@ private:
     //! update maximum formatting width for new option
     void calc_opt_max(const argument* arg)
     {
-        m_opt_maxlong = STXXL_MAX((int)arg->option_text().size() + 2,
+        m_opt_maxlong = std::max((int)arg->option_text().size() + 2,
                                   m_opt_maxlong);
     }
 
     //! update maximum formatting width for new parameter
     void calc_param_max(const argument* arg)
     {
-        m_param_maxlong = STXXL_MAX((int)arg->param_text().size() + 2,
+        m_param_maxlong = std::max((int)arg->param_text().size() + 2,
                                     m_param_maxlong);
     }
 

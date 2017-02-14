@@ -17,6 +17,7 @@
 
 #include <limits>
 #include <stxxl/vector>
+#include <algorithm>
 
 namespace stxxl {
 
@@ -467,7 +468,7 @@ public:
     { }
 
     deque(size_type n)
-        : m_vector(STXXL_MAX<size_type>(STXXL_DEFAULT_BLOCK_SIZE(ValueType) / sizeof(value_type), 2 * n)),
+        : m_vector(std::max<size_type>(STXXL_DEFAULT_BLOCK_SIZE(ValueType) / sizeof(value_type), 2 * n)),
           m_begin(0), m_end(n), m_size(n)
     { }
 
