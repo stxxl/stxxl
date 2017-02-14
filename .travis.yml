@@ -1,11 +1,11 @@
 language: cpp
-sudo: false
+sudo: required
 
 env:
   global:
     # limit parallel threads (default is 32!)
     - OMP_NUM_THREADS=4
-    - STXXL_TMPDIR=/tmp
+    - STXXL_TMPDIR=/dev/shm
 
 matrix:
   # gcc-4.8 builds
@@ -45,7 +45,7 @@ matrix:
 
 before_script:
   # run on ramdisk
-  - echo "disk=/tmp/stxxl.###.tmp,2G,syscall unlink" > ~/.stxxl
+  - echo "disk=/dev/shm/stxxl.###.tmp,2G,syscall unlink" > ~/.stxxl
   - df -h
 
   - mkdir build
@@ -57,4 +57,4 @@ before_script:
     #-DCMAKE_C_FLAGS="-Wconversion $CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="-Wconversion $CMAKE_FLAGS"
 
 script:
-  - make && ./tools/stxxl_tool info && ctest -V
+  - make -j2 && ./tools/stxxl_tool info && ctest -V
