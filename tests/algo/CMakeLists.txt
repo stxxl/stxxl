@@ -65,16 +65,12 @@ if(NOT CYGWIN AND NOT MINGW AND STXXL_BUILD_EXTRAS) #-tb too big to build on cyg
     endforeach(RAM)
   endforeach(DATA)
 
-  if(NOT STXXL_BUILD_EXTRAS)
-
     foreach(STRATEGY 0 1 2 3)
-      stxxl_test(test_sort_all_parameters 512 192 ${STRATEGY} 10 42)
-      stxxl_test(test_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
+      stxxl_test(test_sort_all_parameters 256 96 ${STRATEGY} 10 42)
+      stxxl_test(test_ksort_all_parameters 256 96 ${STRATEGY} 10 42)
       #-tb not fully implemented
       #stxxl_test(test_stable_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
     endforeach(STRATEGY)
-
-  endif(NOT STXXL_BUILD_EXTRAS)
 
 endif()
 
@@ -96,14 +92,10 @@ if(USE_GNU_PARALLEL)
     endforeach(RAM)
   endforeach(DATA)
 
-  if(NOT STXXL_BUILD_EXTRAS)
-
     foreach(SORT m q qb s)
       foreach(MERGE p s n)
-        stxxl_test(test_parallel_sort 2 4 96 ${SORT} ${MERGE})
+        stxxl_test(test_parallel_sort 256 4 96 ${SORT} ${MERGE})
       endforeach(MERGE)
     endforeach(SORT)
-
-  endif(NOT STXXL_BUILD_EXTRAS)
 
 endif(USE_GNU_PARALLEL)
