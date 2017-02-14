@@ -264,7 +264,7 @@ $ cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ..
 
 - On Unix the pthreads library is used for threading, on Windows the Boost or STL thread library is used. For testing compilation, the STL thread library can optionally also be used on Unix/Linux by setting the \c -DUSE_STD_THREADS=ON switch.
 
-- For build testing, the CMake script can check that all header files in \c include/ compile by themselves. This is required since each header must be self-sufficient and include other headers appropriately. These test compiles are trigged with \c -DTRY_COMPILE_HEADERS=ON.
+- For build testing, the CMake script can check that all header files in \c include/ compile by themselves. This is required since each header must be self-sufficient and include other headers appropriately. These test compiles are trigged with \c -DSTXXL_TRY_COMPILE_HEADERS=ON.
 
 - Again for testing, the CMake script can be instructed to run all tests and examples
 \verbatim

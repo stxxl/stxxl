@@ -94,7 +94,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
   endif()
 endif()
 
-option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
+option(STXXL_TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
 if(NOT MSVC)
   option(USE_STD_THREADS "Force usage of C++ standard library thread support." OFF)
@@ -690,34 +690,6 @@ macro(add_define PROGNAME)
 endmacro(add_define TESTNAME)
 
 ###############################################################################
-# cmake script TRY_COMPILE all stxxl header files
-
-if(TRY_COMPILE_HEADERS)
-
-  include(CheckCXXSourceCompiles)
-  set(CMAKE_REQUIRED_INCLUDES ${STXXL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-  set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-
-  file(GLOB_RECURSE header_files FOLLOW_SYMLINKS "include/*")
-  list(REMOVE_ITEM header_files "${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in")
-  list(SORT header_files)
-
-  foreach(file ${header_files})
-    string(REPLACE "/" "_" compilename "${file}") # replace / to _ to fix warnings
-    string(REPLACE "." "_" compilename "${compilename}")
-
-    check_cxx_source_compiles(
-      "#include \"${file}\"
-      int main() { return 0; }" IsSelfContained${compilename})
-
-    if(NOT IsSelfContained${compilename})
-      message(SEND_ERROR "Compilation FAILED for ${file}\n\nCompiler output:\n${OUTPUT}")
-    endif()
-  endforeach()
-
-endif(TRY_COMPILE_HEADERS)
-
-###############################################################################
 # figure out STXXL_TMPDIR for tests
 
 if(STXXL_BUILD_TESTS)
@@ -806,3 +778,33 @@ add_subdirectory(tools)
 add_subdirectory(examples)
 add_subdirectory(tests)
 add_subdirectory(local)
+
+###############################################################################
+# cmake script STXXL_TRY_COMPILE all stxxl header files
+
+if(STXXL_TRY_COMPILE_HEADERS)
+
+  file(GLOB_RECURSE header_files
+    RELATIVE "${PROJECT_SOURCE_DIR}/include" FOLLOW_SYMLINKS "include/*")
+  list(REMOVE_ITEM header_files "stxxl/bits/config.h.in")
+
+  foreach(header_file ${header_files})
+    # replace / and . with _ to get a valid target and file name
+    string(REPLACE "/" "_" compile_name "${header_file}")
+    string(REPLACE "." "_" compile_name "${compile_name}")
+
+    set(target_name "try_compile_${compile_name}")
+    set(source_name "${PROJECT_BINARY_DIR}/${target_name}.cpp")
+
+    file(WRITE ${source_name}
+      "#include <${header_file}>
+       int main() { return 0; }")
+
+    add_executable(${target_name} ${source_name})
+    target_link_libraries(${target_name} ${STXXL_LIBRARIES})
+
+  endforeach()
+
+endif(STXXL_TRY_COMPILE_HEADERS)
+
+################################################################################
