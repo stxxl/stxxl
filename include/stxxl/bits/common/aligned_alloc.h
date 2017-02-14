@@ -77,7 +77,7 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     #endif
     char* reserve_buffer = buffer + sizeof(char*) + meta_info_size;
     char* result = reserve_buffer + Alignment -
-                   (((unsigned_type)reserve_buffer) % (Alignment)) - meta_info_size;
+                   (((size_t)reserve_buffer) % (Alignment)) - meta_info_size;
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << Alignment << ">() address " << (void*)result << " lost " << (result - buffer) << " bytes");
     //-tb: check that there is space for one char* before the "result" pointer
     // delivered to the user. this char* is set below to the beginning of the
@@ -86,7 +86,7 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
 
     // free unused memory behind the data area
     // so access behind the requested size can be recognized
-    size_t realloc_size = (result - buffer) + meta_info_size + size;
+    size_t realloc_size = static_cast<size_t>(result - buffer) + meta_info_size + size;
     if (realloc_size < alloc_size && aligned_alloc_settings<int>::may_use_realloc) {
         char* realloced = (char*)std::realloc(buffer, realloc_size);
         if (buffer != realloced) {
