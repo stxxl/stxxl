@@ -42,6 +42,7 @@
 #include <stxxl/sequence>
 #include <stxxl/algorithm>
 #include <stxxl/bits/common/uint_types.h>
+#include <stxxl/bits/common/utils.h>
 
 using stxxl::internal_size_type;
 using stxxl::external_size_type;
@@ -50,7 +51,7 @@ using stxxl::external_size_type;
 
 // limits max ram used by external data structures to 1.0 GiB the conservative
 // way
-internal_size_type ram_use = 0.8 * 1024 * 1024 * 1024;
+size_t ram_use = size_t(0.8 * 1024 * 1024 * 1024);
 
 // alphabet data type
 typedef unsigned char alphabet_type;
@@ -1099,7 +1100,7 @@ public:
         sparseTable(std::vector<offset_type>& fieldVector)
         {
             std::size_t dimI = fieldVector.size();    // y-Dimension of QTable
-            std::size_t dimK = floor(log2(dimI)) + 1; // x-Dimension of QTable
+            std::size_t dimK = stxxl::log2_floor(dimI) + 1;  // x-Dimension of QTable
             createQTable(fieldVector, dimI, dimK);
         }
 
@@ -1141,7 +1142,7 @@ public:
         {
             std::size_t i = I;
             std::size_t j = J;
-            std::size_t k = floor(log2(j - i + 1));
+            std::size_t k = stxxl::log2_floor(j - i + 1);
             offset_type r = QTable[k][i];
             offset_type s = QTable[k][j - (1 << k) + 1];
 
