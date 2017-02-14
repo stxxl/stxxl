@@ -19,7 +19,7 @@ int main()
 {
     typedef std::greater<unsigned> comparator_type;
     typedef stxxl::parallel_priority_queue<unsigned, comparator_type> ppq_type;
-    ppq_type ppq(comparator_type(), 2 * 1024L * 1024L * 1024L);
+    ppq_type ppq(comparator_type(), 128L * 1024L * 1024L);
 
     // sequential access
 
