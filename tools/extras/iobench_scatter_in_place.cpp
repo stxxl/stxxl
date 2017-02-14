@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <vector>
 #include <cstdio>
+#include <cinttypes>
 
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
@@ -112,12 +113,12 @@ int main(int argc, char* argv[])
             timer t_write(true);
             for (stxxl::unsigned_type i = blocks_per_round; i-- > 0; )
             {
-                const uint64 offset = (r * blocks_per_round + i) * block_size;
+                const uint64_t offset = (r * blocks_per_round + i) * block_size;
                 timer t_op(true);
                 // write a block
                 {
                     char cfn[4096]; // PATH_MAX
-                    snprintf(cfn, sizeof(cfn), "%s_%012llX", filebase, offset);
+                    snprintf(cfn, sizeof(cfn), "%s_%012" PRIu64, filebase, offset);
                     file_type chunk_file(cfn, file::CREAT | file::RDWR | file::DIRECT, 0);
                     chunk_file.awrite(buffer + i * block_size, 0, block_size)->wait();
                 }
