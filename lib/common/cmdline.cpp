@@ -105,7 +105,7 @@ void cmdline_parser::print_usage(std::ostream& os)
             os << "  " << std::setw(m_param_maxlong) << std::left
                << arg->param_text();
             output_wrap(os, arg->m_desc, m_linewrap,
-                        0, m_param_maxlong + 2, m_param_maxlong + 2, 8);
+                        0, as_unsigned(m_param_maxlong + 2), as_unsigned(m_param_maxlong + 2), 8);
         }
     }
 
@@ -121,7 +121,7 @@ void cmdline_parser::print_usage(std::ostream& os)
             os << "  " << std::setw(m_opt_maxlong) << std::left
                << arg->option_text();
             output_wrap(os, arg->m_desc, m_linewrap,
-                        0, m_opt_maxlong + 2, m_opt_maxlong + 2, 8);
+                        0, as_unsigned(m_opt_maxlong + 2), as_unsigned(m_opt_maxlong + 2), 8);
         }
     }
 
