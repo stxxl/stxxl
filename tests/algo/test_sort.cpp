@@ -95,9 +95,9 @@ int main()
     {
         // test small vector that can be sorted internally
         vector_type v(3);
-        v[0] = 42;
-        v[1] = 0;
-        v[2] = 23;
+        v[0] = my_type(42);
+        v[1] = my_type(0);
+        v[2] = my_type(23);
         STXXL_MSG("small vector unsorted " << v[0] << " " << v[1] << " " << v[2]);
         //stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
         stxxl::stl_in_memory_sort(v.begin(), v.end(), cmp());

@@ -106,18 +106,18 @@ int main()
         sorter_type s(cmp, memory_to_use);
 
         // put in some items
-        s.push(42);
-        s.push(0);
-        s.push(23);
+        s.push(my_type(42));
+        s.push(my_type(0));
+        s.push(my_type(23));
 
         // finish input, switch to sorting stage.
         s.sort();
 
-        STXXL_CHECK(*s == 0);
+        STXXL_CHECK(*s == my_type(0));
         ++s;
-        STXXL_CHECK(*s == 23);
+        STXXL_CHECK(*s == my_type(23));
         ++s;
-        STXXL_CHECK(*s == 42);
+        STXXL_CHECK(*s == my_type(42));
         ++s;
         STXXL_CHECK(s.empty());
     }
@@ -137,7 +137,7 @@ int main()
         {
             STXXL_CHECK(s.size() == i);
 
-            s.push(1 + (rnd() % 0xfffffff));
+            s.push(my_type(1 + (rnd() % 0xfffffff)));
         }
 
         // finish input, switch to sorting stage.

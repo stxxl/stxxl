@@ -63,10 +63,10 @@ class BenchmarkSort
         }
 
         static value_type min_value()
-        { return value_type::min_value(); }
+        { return value_type(value_type::min_value()); }
 
         static value_type max_value()
-        { return value_type::max_value(); }
+        { return value_type(value_type::max_value()); }
     };
 
     struct value_key_second
@@ -77,10 +77,10 @@ class BenchmarkSort
         { return p.second; }
 
         static value_type min_value()
-        { return value_type::min_value(); }
+        { return value_type(value_type::min_value()); }
 
         static value_type max_value()
-        { return value_type::max_value(); }
+        { return value_type(value_type::max_value()); }
     };
 
     struct random_stream
