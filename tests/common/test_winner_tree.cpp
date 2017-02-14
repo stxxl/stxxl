@@ -92,7 +92,7 @@ void test_vecs(size_t vecnum, bool test_rebuild)
     std::sort(correct.begin(), correct.end());
 
     VectorCompare vc(vecnum, vec);
-    stxxl::winner_tree<VectorCompare> wt(vecnum, vc);
+    stxxl::winner_tree<VectorCompare> wt(1, vc);
 
     for (size_t i = 0; i < vecnum; ++i)
     {
