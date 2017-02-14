@@ -189,12 +189,12 @@ void multiseq_partition(
         }
     }
 
-    diff_type localrank = rank / l;
+    size_t localrank = static_cast<size_t>(rank / l);
 
-    diff_type j;
+    size_t j;
     for (j = 0; j < localrank && ((n + 1) <= seqlen[sample[j].second]); ++j)
         a[sample[j].second] += n + 1;
-    for ( ; j < m; ++j)
+    for ( ; j < static_cast<size_t>(m); ++j)
         b[sample[j].second] -= n + 1;
 
     // further refinement
@@ -416,12 +416,12 @@ ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
             sample.push_back(sample_pair(S(i)[0] /*dummy element*/, i));
     }
 
-    diff_type localrank = rank / l;
+    size_t localrank = static_cast<size_t>(rank / l);
 
-    diff_type j;
+    size_t j;
     for (j = 0; j < localrank && ((n + 1) <= seqlen[sample[j].second]); ++j)
         a[sample[j].second] += n + 1;
-    for ( ; j < m; ++j)
+    for ( ; j < static_cast<size_t>(m); ++j)
         b[sample[j].second] -= n + 1;
 
     // further refinement
