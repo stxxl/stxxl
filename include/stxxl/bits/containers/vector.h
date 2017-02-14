@@ -74,12 +74,7 @@ class double_blocked_index
     }
 
 public:
-    double_blocked_index()
-    {
-        set(0);
-    }
-
-    double_blocked_index(size_type pos)
+    explicit double_blocked_index(size_type pos = 0)
     {
         set(pos);
     }
