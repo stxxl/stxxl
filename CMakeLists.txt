@@ -82,7 +82,8 @@ endif()
 
 option(USE_OPENMP "Use OpenMP for multi-core parallelism" ON)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # FIXME: autodetect, n/a with libc++
   option(USE_GNU_PARALLEL "Use GNU parallel extensions for multi-core parallelism" ON)
 
   # GNU parallel mode but NOT OpenMP is impossible.
