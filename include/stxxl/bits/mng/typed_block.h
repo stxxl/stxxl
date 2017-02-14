@@ -247,7 +247,8 @@ public:
 
     typed_block()
     {
-        STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
+        static_assert(sizeof(typed_block) == raw_size,
+                      "sizeof(typed_block) == raw_size");
         STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] typed_block is constructed");
 #if 0
         assert(((long)this) % STXXL_BLOCK_ALIGN == 0);
@@ -257,7 +258,8 @@ public:
 #if 0
     typed_block(const typed_block& tb)
     {
-        STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
+        static_assert(sizeof(typed_block) == raw_size,
+                      "sizeof(typed_block) == raw_size");
         STXXL_MSG("[" << (void*)this << "] typed_block is copy constructed from [" << (void*)&tb << "]");
         STXXL_UNUSED(tb);
     }

@@ -41,14 +41,6 @@ namespace stxxl {
 
 ////////////////////////////////////////////////////////////////////////////
 
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
-#define STXXL_STATIC_ASSERT(x) static_assert(x, #x)
-#else
-#define STXXL_STATIC_ASSERT(x) { typedef int static_assert_dummy_type[(x) ? 1 : -1] STXXL_ATTRIBUTE_UNUSED; }
-#endif
-
-////////////////////////////////////////////////////////////////////////////
-
 //! Split a string by given separator string. Returns a vector of strings with
 //! at least min_fields and at most limit_fields
 static inline std::vector<std::string>

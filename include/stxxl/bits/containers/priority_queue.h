@@ -235,7 +235,7 @@ public:
             for (unsigned_type i2 = 0; i2 < (N + 1); ++i2)
                 std::swap(group_buffers[i1][i2], obj.group_buffers[i1][i2]);
 
-        STXXL_STATIC_ASSERT(false);
+        static_assert(false, "false, this method does not work!");
         // Shoot yourself in the foot: group_buffer_current_mins contains pointers into group_buffers ...
         // either recompute them or add/subtract (&this->group_buffers[0][0] - &obj->group_buffers[0][0])
         swap_1D_arrays(group_buffer_current_mins, obj.group_buffer_current_mins, total_num_groups);

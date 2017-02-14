@@ -300,15 +300,6 @@ A method used by some submodule authors to create their own levels of verbosity 
 
 There are quite a bunch of macros for testing assertions. You must be careful to pick the right one depending on when and what you want to assert on.
 
-# Compile-time Assertions: STXXL_STATIC_ASSERT
-
-To check specific conditions at compile time use \ref STXXL_STATIC_ASSERT.
-
-\code
-struct item { int a,b,c,d; }
-STXXL_STATIC_ASSERT(sizeof(item) == 4 * sizeof(int));
-\endcode
-
 # Assertions in Unit Tests: STXXL_CHECK
 
 Assertions in unit tests must use the following macros to ensure that the condition is also checked in release builds (where a plain \c "assert()" is void). These \c CHECK function should NOT be used to test return values, since we try to throw exceptions instead of aborting the program.

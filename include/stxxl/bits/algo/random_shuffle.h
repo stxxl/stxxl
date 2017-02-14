@@ -57,7 +57,8 @@ void random_shuffle(ExtIterator first,
     typedef typename stack_type::block_type block_type;
 
     STXXL_VERBOSE1("random_shuffle: Plain Version");
-    STXXL_STATIC_ASSERT(int(BlockSize) < 0 && "This implementation was never tested. Please report to the stxxl developers if you have an ExtIterator that works with this implementation.");
+    static_assert(int(BlockSize) < 0,
+                  "This implementation was never tested. Please report to the stxxl developers if you have an ExtIterator that works with this implementation.");
 
     int64 n = last - first; // the number of input elements
 

@@ -179,7 +179,8 @@ struct shuffle
             current = *input;
             ++input;
             if (!input.empty()) {
-                STXXL_STATIC_ASSERT(sizeof(value_type) == 4);
+                static_assert(sizeof(value_type) == 4,
+                              "sizeof(value_type) == 4");
                 uint64_t combined = current;
                 combined = combined << 32 | *input;
                 combined = (1ul << count_bits(combined)) - 1;

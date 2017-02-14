@@ -91,12 +91,15 @@ public:
     inline uint_pair()
     {
         // compile-time assertions about size of low_type
-        STXXL_STATIC_ASSERT(8 * sizeof(low_type) == 32);
+        static_assert(8 * sizeof(low_type) == 32,
+                      "8 * sizeof(low_type) == 32");
         // compile-time assertions about size of our data structure, this tests
         // packing of structures by the compiler
-        STXXL_STATIC_ASSERT(sizeof(uint_pair) == bytes);
-        STXXL_STATIC_ASSERT(sizeof(uint_pair) == digits / 8);
-        STXXL_STATIC_ASSERT(digits / 8 == bytes);
+        static_assert(sizeof(uint_pair) == bytes,
+                      "sizeof(uint_pair) == bytes");
+        static_assert(sizeof(uint_pair) == digits / 8,
+                      "sizeof(uint_pair) == digits / 8");
+        static_assert(digits / 8 == bytes, "digits / 8 == bytes");
     }
 
     //! construct unit pair from lower and higher parts.
