@@ -54,4 +54,4 @@ before_script:
     #-DCMAKE_C_FLAGS="-Wconversion $CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="-Wconversion $CMAKE_FLAGS"
 
 script:
-  - make -j4 && ./tools/stxxl_tool info && ctest -V
+  - make -j2 && ./tools/stxxl_tool info && ctest -V
