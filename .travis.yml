@@ -31,6 +31,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.8-multilib
+            - linux-libc-dev:i386
       # clang build
     - env: CMAKE_CC="clang"   CMAKE_CXX="clang++" CMAKE_FLAGS="-Wno-sign-conversion" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_GNU_PARALLEL=OFF"
       addons:
