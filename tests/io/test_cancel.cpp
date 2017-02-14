@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const stxxl::uint64 size = 16 * 1024 * 1024, num_blocks = 16;
+    const size_t size = 16 * 1024 * 1024, num_blocks = 16;
     char* buffer = (char*)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 

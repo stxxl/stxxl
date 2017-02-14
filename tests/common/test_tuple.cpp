@@ -17,7 +17,6 @@
 #include <sstream>
 
 using stxxl::uint40;
-using stxxl::uint64;
 
 // force instantiation of some tuple types
 template struct stxxl::tuple<int>;
@@ -28,12 +27,12 @@ template struct stxxl::tuple<int, int, int, int, int>;
 template struct stxxl::tuple<int, int, int, int, int, int>;
 
 // force instantiation of more tuple types
-template struct stxxl::tuple<uint64>;
-template struct stxxl::tuple<uint64, uint64>;
-template struct stxxl::tuple<uint64, uint64, uint64>;
-template struct stxxl::tuple<uint64, uint64, uint64, uint64>;
-template struct stxxl::tuple<uint64, uint64, uint64, uint64, uint64>;
-template struct stxxl::tuple<uint64, uint64, uint64, uint64, uint64, uint64>;
+template struct stxxl::tuple<uint64_t>;
+template struct stxxl::tuple<uint64_t, uint64_t>;
+template struct stxxl::tuple<uint64_t, uint64_t, uint64_t>;
+template struct stxxl::tuple<uint64_t, uint64_t, uint64_t, uint64_t>;
+template struct stxxl::tuple<uint64_t, uint64_t, uint64_t, uint64_t, uint64_t>;
+template struct stxxl::tuple<uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t>;
 
 // force instantiation of even more tuple types
 template struct stxxl::tuple<uint40>;
