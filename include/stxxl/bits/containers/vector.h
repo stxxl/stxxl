@@ -103,11 +103,11 @@ public:
     {
         ++pos;
         ++offset;
-        if (offset == modulo1)
+        if (UNLIKELY(offset == modulo1))
         {
             offset = 0;
             ++block1;
-            if (block1 == modulo2)
+            if (UNLIKELY(block1 == modulo2))
             {
                 block1 = 0;
                 ++block2;
@@ -133,10 +133,10 @@ public:
     double_blocked_index& operator -- ()
     {
         --pos;
-        if (offset == 0)
+        if (UNLIKELY(offset == 0))
         {
             offset = modulo1;
-            if (block1 == 0)
+            if (UNLIKELY(block1 == 0))
             {
                 block1 = modulo2;
                 --block2;
@@ -842,8 +842,8 @@ public:
     static constexpr size_t page_size = PageSize;
     static constexpr size_t block_size = BlockSize;
 
-    //static constexpr ptrdiff_t on_disk = -1; //FIX-ME: why is does not working?
-    enum { on_disk = -1 };
+    enum {on_disk = -1};
+
 
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
     typedef vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size> iterator;
