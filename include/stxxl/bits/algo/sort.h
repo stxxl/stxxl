@@ -18,6 +18,7 @@
 
 #include <functional>
 #include <algorithm>
+#include <iterator>
 
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/rand.h>
@@ -380,7 +381,8 @@ void merge_runs(RunType** in_runs, int_type nruns,
 
 // begin of STL-style merging
 
-        typedef stxxl::int64 diff_type;
+        // this is only for internal elements, no EM involved - internal difference is enough
+        typedef typename std::iterator_traits<typename block_type::iterator>::difference_type diff_type;
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
         std::vector<sequence> seqs(nruns);
         std::vector<block_type*> buffers(nruns);
