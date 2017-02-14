@@ -28,20 +28,19 @@ void linuxaio_request::completed(bool posted, bool canceled)
 {
     STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "] completed(" <<
                            posted << "," << canceled << ")");
-
     if (!canceled)
     {
         if (m_type == READ)
-            stats::get_instance()->read_finished();
+            m_file->get_file_stats()->read_finished();
         else
-            stats::get_instance()->write_finished();
+            m_file->get_file_stats()->write_finished();
     }
     else if (posted)
     {
         if (m_type == READ)
-            stats::get_instance()->read_canceled(m_bytes);
+            m_file->get_file_stats()->read_canceled(m_bytes);
         else
-            stats::get_instance()->write_canceled(m_bytes);
+            m_file->get_file_stats()->write_canceled(m_bytes);
     }
     request_with_state::completed(canceled);
 }
@@ -79,9 +78,9 @@ bool linuxaio_request::post()
     if (success == 1)
     {
         if (m_type == READ)
-            stats::get_instance()->read_started(m_bytes, now);
+            m_file->get_file_stats()->read_started(m_bytes, now);
         else
-            stats::get_instance()->write_started(m_bytes, now);
+            m_file->get_file_stats()->write_started(m_bytes, now);
     }
     else if (success == -1 && errno != EAGAIN)
         STXXL_THROW_ERRNO(io_error, "linuxaio_request::post"
