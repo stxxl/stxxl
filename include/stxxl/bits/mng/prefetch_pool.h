@@ -14,10 +14,11 @@
 #ifndef STXXL_MNG_PREFETCH_POOL_HEADER
 #define STXXL_MNG_PREFETCH_POOL_HEADER
 
-#include <list>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/mng/write_pool.h>
-#include <stxxl/bits/compat/hash_map.h>
+
+#include <list>
+#include <unordered_map>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -55,15 +56,15 @@ protected:
 #endif
     };
     typedef std::pair<block_type*, request_ptr> busy_entry;
-    typedef typename compat_hash_map<bid_type, busy_entry, bid_hash>::result hash_map_type;
+    typedef typename std::unordered_map<bid_type, busy_entry, bid_hash> unordered_map_type;
     typedef typename std::list<block_type*>::iterator free_blocks_iterator;
-    typedef typename hash_map_type::iterator busy_blocks_iterator;
+    typedef typename unordered_map_type::iterator busy_blocks_iterator;
 
     //! contains free prefetch blocks
     std::list<block_type*> free_blocks;
 
     //! blocks that are in reading or already read but not retrieved by user
-    hash_map_type busy_blocks;
+    unordered_map_type busy_blocks;
 
     //! count number of free blocks, since traversing the std::list is slow.
     unsigned_type free_blocks_size;
