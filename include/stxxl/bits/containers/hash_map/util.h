@@ -36,24 +36,30 @@ struct node
     //! check if the next node is deleted.
     bool deleted()
     {
-        return ((int_type)next_and_del_ & 0x01) == 1;
+        return (reinterpret_cast<uintptr_t>(next_and_del_) & 0x01) == 1;
     }
     //! change deleted flag on the next node
     bool set_deleted(bool d)
     {
-        next_and_del_ = (node<ValueType>*)(((int_type)next_and_del_ & ~0x01) | (int_type)d);
+        next_and_del_ = reinterpret_cast<node<ValueType>*>(
+                    (reinterpret_cast<uintptr_t>(next_and_del_) & ~uintptr_t(0x01u)) | static_cast<uintptr_t>(d)
+        );
         return d;
     }
 
     //! return the next node, without the "next" flag.
     node<ValueType> * next()
     {
-        return (node<ValueType>*)((int_type)next_and_del_ & ~0x01);
+        return reinterpret_cast<node<ValueType>*>(
+            reinterpret_cast<uintptr_t>(next_and_del_) & ~uintptr_t(0x01u));
     }
     //! change the "next" value of next node pointer
     node<ValueType> * set_next(node<ValueType>* n)
     {
-        next_and_del_ = (node<ValueType>*)(((int_type)next_and_del_ & 0x01) | (int_type)n);
+        next_and_del_ = reinterpret_cast<node<ValueType>*>(
+                (reinterpret_cast<uintptr_t>(next_and_del_) & 0x01u) | reinterpret_cast<uintptr_t>(n)
+        );
+
         return n;
     }
 };
@@ -337,7 +343,7 @@ public:
     //! \param buffer_size Number of write-buffers to use
     //! \param batch_size bulk buffered writing
     buffered_writer(bid_container_type* c,
-                    int_type buffer_size, int_type batch_size)
+                    size_t buffer_size, size_t batch_size)
         : writer_(buffer_size, batch_size),
           bids_(c),
           i_block_(0),

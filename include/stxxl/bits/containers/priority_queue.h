@@ -40,13 +40,13 @@ STXXL_BEGIN_NAMESPACE
 template <
     class ValueType,
     class CompareType,
-    unsigned BufferSize1_ = 32,                    // equalize procedure call overheads etc.
-    unsigned N_ = 512,                             // length of group 1 sequences
-    unsigned IntKMAX_ = 64,                        // maximal arity for internal mergers
-    unsigned IntLevels_ = 4,                       // number of internal groups
+    size_t BufferSize1_ = 32,                    // equalize procedure call overheads etc.
+    size_t N_ = 512,                             // length of group 1 sequences
+    size_t IntKMAX_ = 64,                        // maximal arity for internal mergers
+    size_t IntLevels_ = 4,                       // number of internal groups
     size_t BlockSize_ = (2* 1024* 1024),         // external block size
-    unsigned ExtKMAX_ = 64,                        // maximal arity for external mergers
-    unsigned ExtLevels_ = 2,                       // number of external groups
+    size_t ExtKMAX_ = 64,                        // maximal arity for external mergers
+    size_t ExtLevels_ = 2,                       // number of external groups
     class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
     >
 struct priority_queue_config
@@ -301,10 +301,10 @@ public:
         unsigned_type dynam_alloc_mem = 0;
         //dynam_alloc_mem += w_pool.mem_cons();
         //dynam_alloc_mem += p_pool.mem_cons();
-        for (int i = 0; i < num_int_groups; ++i)
+        for (size_t i = 0; i < num_int_groups; ++i)
             dynam_alloc_mem += int_mergers[i].mem_cons();
 
-        for (int i = 0; i < num_ext_groups; ++i)
+        for (size_t i = 0; i < num_ext_groups; ++i)
             dynam_alloc_mem += ext_mergers[i]->mem_cons();
 
         return (sizeof(*this) +
@@ -803,7 +803,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
     // by inserting them into tree 0 (which is almost empty in this case)
     if (freeLevel > 0)
     {
-        for (int_type i = freeLevel; i >= 0; i--)
+        for (size_t i = freeLevel + 1; i-- > 0;)
         {
             // reverse order not needed
             // but would allow immediate refill
@@ -888,8 +888,8 @@ struct find_B_m
     //! number of blocks fitting into buffers of mergers (arity of both
     //! mergers), increased from 1 to 2048 ?-tb
     static constexpr size_t m = m_;
-    //! remaining blocks, (freely moving, not necessarily unused) ?-tb
-    static constexpr int_type c = k - m_;
+    //! remaining blocks
+    static constexpr ptrdiff_t c = k - m_;
 
     // memory occupied by block must be at least 10 times larger than size of ext sequence
 

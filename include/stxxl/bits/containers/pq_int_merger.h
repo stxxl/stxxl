@@ -350,8 +350,8 @@ protected:
         }
         default: {
             std::vector<std::pair<value_type*, value_type*> > seqs;
-            std::vector<int_type> orig_seq_index;
-            for (unsigned int i = 0; i < k; ++i)
+            std::vector<size_t> orig_seq_index;
+            for (size_t i = 0; i < k; ++i)
             {
                 if (current[i] != current_end[i] && !is_sentinel(*current[i]))
                 {
@@ -363,13 +363,13 @@ protected:
             parallel::multiway_merge_sentinels(
                 seqs.begin(), seqs.end(), target, length, inv_cmp);
 
-            for (unsigned int i = 0; i < seqs.size(); ++i)
+            for (size_t i = 0; i < seqs.size(); ++i)
             {
-                int_type seg = orig_seq_index[i];
+                const size_t& seg = orig_seq_index[i];
                 current[seg] = seqs[i].first;
             }
 
-            for (unsigned int i = 0; i < k; ++i)
+            for (size_t i = 0; i < k; ++i)
             {
                 if (is_array_empty(i) && is_array_allocated(i))
                 {

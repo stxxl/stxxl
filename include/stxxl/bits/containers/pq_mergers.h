@@ -666,7 +666,7 @@ public:
     template <class OutputIterator>
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
-        int_type length = end - begin;
+        const size_t length = end - begin;
 
         STXXL_VERBOSE3("multi_merge(length=" << length << ") from sequences k=" << k);
 
@@ -685,11 +685,8 @@ public:
             assert(entry[0].index == 0);
             assert(free_slots.empty());
 
-            // in int_merger:
-            // memcpy(target, states[0], length * sizeof(value_type));
-
             sequence_type& seq = arrays.get_array(0);
-            for (int_type i = 0; i < length; ++i, ++seq, ++begin)
+            for (size_t i = 0; i < length; ++i, ++seq, ++begin)
                 *begin = *seq;
             entry[0].key = *seq;
 

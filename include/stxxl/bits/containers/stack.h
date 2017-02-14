@@ -637,14 +637,14 @@ public:
         try
         {
             STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()");
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
-            int_type i;
-            for (i = bids_size - 1; i >= last_pref; --i)
-            {
-                // clean the prefetch buffer
-                pool->invalidate(bids[i]);
+            if (!bids.empty()) {
+                const size_t last_pref = (bids.size() > pref_aggr) ? (bids.size() - pref_aggr) : 0u;
+                for (size_t i = bids.size(); i > last_pref; --i) {
+                    // clean the prefetch buffer
+                    pool->invalidate(bids[i - 1]);
+                }
             }
+
             typename std::vector<bid_type>::iterator cur = bids.begin();
             typename std::vector<bid_type>::const_iterator end = bids.end();
             for ( ; cur != end; ++cur)
@@ -702,12 +702,14 @@ public:
             block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
             pool->write(cache, bids.back());
             cache = pool->steal();
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr) - 1, (int_type)0);
-            for (int_type i = bids_size - 2; i >= last_pref; --i)
-            {
-                // clean prefetch buffers
-                pool->invalidate(bids[i]);
+
+            const size_t bids_size = bids.size();
+            if (bids_size > 1) {
+                const size_t last_pref = (bids_size > pref_aggr) ? (bids_size - pref_aggr - 1) : 0u;
+                for (size_t i = bids_size - 1; i > last_pref; --i) {
+                    // clean prefetch buffers
+                    pool->invalidate(bids[i - 1]);
+                }
             }
             cache_offset = 0;
         }
@@ -773,14 +775,12 @@ public:
     //! \param new_p new value for the prefetch aggressiveness
     void set_prefetch_aggr(unsigned_type new_p)
     {
-        if (pref_aggr > new_p)
+        if (pref_aggr > new_p && bids.size() > new_p)
         {
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
-            for (int_type i = bids_size - new_p - 1; i >= last_pref; --i)
-            {
+            const size_t last_pref = (bids.size() > pref_aggr) ? (bids.size() - pref_aggr) : 0u;
+            for (size_t i = bids.size() - new_p; i > last_pref; --i) {
                 // clean prefetch buffers
-                pool->invalidate(bids[i]);
+                pool->invalidate(bids[i - 1]);
             }
         }
         pref_aggr = new_p;
@@ -799,11 +799,13 @@ private:
     //! hint the last pref_aggr external blocks.
     void rehint()
     {
-        const int_type bids_size = bids.size();
-        const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
-        for (int_type i = bids_size - 1; i >= last_pref; --i)
-        {
-            pool->hint(bids[i]);  // prefetch
+        if (bids.empty())
+            return;
+
+        const size_t last_pref = (bids.size() > pref_aggr) ? (bids.size() - pref_aggr) : 0u;
+
+        for (size_t i = bids.size(); i > last_pref; --i) {
+            pool->hint(bids[i - 1]);  // prefetch
         }
     }
 };

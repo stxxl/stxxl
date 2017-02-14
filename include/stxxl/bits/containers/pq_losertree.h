@@ -625,8 +625,8 @@ multi_merge(Element* target, unsigned_type length)
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         {
             std::vector<std::pair<Element*, Element*> > seqs;
-            std::vector<int_type> orig_seq_index;
-            for (unsigned int i = 0; i < k; ++i)
+            std::vector<size_t> orig_seq_index;
+            for (size_t i = 0; i < k; ++i)
             {
                 if (current[i] != current_end[i] && !is_sentinel(*current[i]))
                 {
@@ -638,13 +638,13 @@ multi_merge(Element* target, unsigned_type length)
             parallel::multiway_merge_sentinels(
                 seqs.begin(), seqs.end(), target, length, inv_cmp);
 
-            for (unsigned int i = 0; i < seqs.size(); ++i)
+            for (size_t i = 0; i < seqs.size(); ++i)
             {
-                int_type seg = orig_seq_index[i];
+                const size_t& seg = orig_seq_index[i];
                 current[seg] = seqs[i].first;
             }
 
-            for (unsigned int i = 0; i < k; ++i)
+            for (size_t i = 0; i < k; ++i)
                 if (is_segment_empty(i))
                 {
                     STXXL_VERBOSE3("deallocated " << i);

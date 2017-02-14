@@ -122,15 +122,18 @@ public:
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
     //!           memory consumption will be 2 * D + 2 blocks
     //!           (first and last block, D blocks as write cache, D block for prefetching)
-    explicit sequence(int_type D = -1)
+    explicit sequence(const int D = -1)
         : m_size(0),
           m_owns_pool(true),
           m_alloc_count(0),
           m_bm(block_manager::get_instance())
     {
-        if (D < 1) D = config::get_instance()->disks_number();
+        const size_t disks = (D < 1)
+                        ? config::get_instance()->disks_number()
+                        : static_cast<size_t>(D);
+
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(D)");
-        m_pool = new pool_type(D, D + 2);
+        m_pool = new pool_type(disks, disks + 2);
         init();
     }
 
@@ -223,7 +226,7 @@ public:
     //! This method should be called whenever the prefetch pool is resized
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side),
     //!                         a negative value means to use the number of blocks in the prefetch pool
-    void set_prefetch_aggr(int_type blocks2prefetch)
+    void set_prefetch_aggr(int blocks2prefetch)
     {
         if (blocks2prefetch < 0)
             m_blocks2prefetch = m_pool->size_prefetch();

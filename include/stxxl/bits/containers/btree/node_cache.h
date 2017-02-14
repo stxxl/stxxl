@@ -71,10 +71,9 @@ private:
     std::vector<request_ptr> m_reqs;
     std::vector<bool> m_fixed;
     std::vector<bool> m_dirty;
-    std::vector<int_type> m_free_nodes;
-    typedef typename compat_hash_map<bid_type, int_type, bid_hash>::result hash_map_type;
+    std::vector<size_t> m_free_nodes;
+    typedef typename compat_hash_map<bid_type, size_t, bid_hash>::result hash_map_type;
 
-    //typedef std::map<bid_type,int_type,bid_comp> BID2node_type;
     typedef hash_map_type bid2node_type;
 
     bid2node_type m_bid2node;
@@ -173,7 +172,7 @@ public:
         if (m_free_nodes.empty())
         {
             // need to kick a node
-            int_type node2kick;
+            size_t node2kick;
             unsigned_type i = 0;
             const unsigned_type max_tries = size() + 1;
             do
@@ -222,7 +221,7 @@ public:
             return &node;
         }
 
-        int_type free_node = m_free_nodes.back();
+        const size_t free_node = m_free_nodes.back();
         m_free_nodes.pop_back();
         assert(m_fixed[free_node] == false);
 
@@ -252,7 +251,7 @@ public:
         if (it != m_bid2node.end())
         {
             // the node is in cache
-            const int_type nodeindex = it->second;
+            const size_t nodeindex = it->second;
             STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
             m_fixed[nodeindex] = fix;
             m_pager.hit(nodeindex);
@@ -271,7 +270,7 @@ public:
         if (m_free_nodes.empty())
         {
             // need to kick a node
-            int_type node2kick;
+            size_t node2kick;
             unsigned_type i = 0;
             const unsigned_type max_tries = size() + 1;
             do
@@ -317,7 +316,7 @@ public:
             return &node;
         }
 
-        int_type free_node = m_free_nodes.back();
+        const size_t free_node = m_free_nodes.back();
         m_free_nodes.pop_back();
         assert(m_fixed[free_node] == false);
 
@@ -346,7 +345,7 @@ public:
         if (it != m_bid2node.end())
         {
             // the node is in cache
-            const int_type nodeindex = it->second;
+            const size_t nodeindex = it->second;
             STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
             m_fixed[nodeindex] = fix;
             m_pager.hit(nodeindex);
@@ -364,7 +363,7 @@ public:
         if (m_free_nodes.empty())
         {
             // need to kick a node
-            int_type node2kick;
+            size_t node2kick;
             unsigned_type i = 0;
             const unsigned_type max_tries = size() + 1;
             do
@@ -409,7 +408,7 @@ public:
             return &node;
         }
 
-        int_type free_node = m_free_nodes.back();
+        const size_t free_node = m_free_nodes.back();
         m_free_nodes.pop_back();
         assert(m_fixed[free_node] == false);
 
@@ -438,7 +437,7 @@ public:
             if (it != m_bid2node.end())
             {
                 // the node is in the cache
-                const int_type nodeindex = it->second;
+                const size_t nodeindex = it->second;
                 STXXL_BTREE_CACHE_VERBOSE("btree::node_cache delete_node " << nodeindex << " from cache.");
                 if (m_reqs[nodeindex].valid())
                     m_reqs[nodeindex]->wait();
@@ -466,7 +465,7 @@ public:
         if (m_free_nodes.empty())
         {
             // need to kick a node
-            int_type node2kick;
+            size_t node2kick;
             unsigned_type i = 0;
             const unsigned_type max_tries = size() + 1;
             do
@@ -512,7 +511,7 @@ public:
             return;
         }
 
-        int_type free_node = m_free_nodes.back();
+        const size_t free_node = m_free_nodes.back();
         m_free_nodes.pop_back();
         assert(m_fixed[free_node] == false);
 

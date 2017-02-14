@@ -38,7 +38,7 @@ class random_pager
 {
     enum { n_pages = npages_ };
 
-    typedef unsigned_type size_type;
+    typedef size_t size_type;
 
     size_type num_pages;
     random_number<random_uniform_fast> rnd;
@@ -67,7 +67,7 @@ class lru_pager : private noncopyable
 {
     enum { n_pages = npages_ };
 
-    typedef unsigned_type size_type;
+    typedef size_t size_type;
     typedef std::list<size_type> list_type;
 
     list_type history;

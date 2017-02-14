@@ -1116,7 +1116,7 @@ protected:
         typedef HashedValuesStream<self_type, reader_type> values_stream_type;
         typedef HashingStream<values_stream_type, HashedValueExtractor> hashing_stream_type;
 
-        const int_type write_buffer_size = config::get_instance()->disks_number() * 4;
+        const size_t write_buffer_size = config::get_instance()->disks_number() * 4;
 
         // determine new number of buckets from desired load_factor ...
         internal_size_type n_new;
@@ -1315,7 +1315,7 @@ public:
 
         typedef buffered_writer<block_type, bid_container_type> writer_type;
 
-        int_type write_buffer_size = config::get_instance()->disks_number() * 2;
+        const size_t write_buffer_size = config::get_instance()->disks_number() * 2;
 
         // calculate new number of buckets
         external_size_type num_total_new = num_total_ + (l - f);         // estimated number of elements

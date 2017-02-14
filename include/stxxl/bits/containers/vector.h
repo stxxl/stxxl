@@ -31,6 +31,8 @@
 #include <stxxl/bits/mng/buf_istream_reverse.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
+#include <stxxl/bits/common/types.h>
+
 STXXL_BEGIN_NAMESPACE
 
 #define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void*>(this) << "]::" << msg)
@@ -52,17 +54,19 @@ class double_blocked_index
     static const size_type modulo12 = modulo1 * modulo2;
 
     size_type pos;
-    unsigned_type block1, block2, offset;
+    unsigned_type block1;
+    unsigned_type block2;
+    unsigned_type offset;
 
     //! \invariant block2 * modulo12 + block1 * modulo1 + offset == pos && 0 <= block1 &lt; modulo2 && 0 <= offset &lt; modulo1
 
     void set(size_type pos)
     {
         this->pos = pos;
-        block2 = (int_type)(pos / modulo12);
+        block2 = pos / modulo12;
         pos -= block2 * modulo12;
-        block1 = (int_type)(pos / modulo1);
-        offset = (int_type)(pos - block1 * modulo1);
+        block1 = pos / modulo1;
+        offset = pos - block1 * modulo1;
 
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
         assert(/* 0 <= block1 && */ block1 < modulo2);
@@ -838,11 +842,11 @@ public:
     typedef PagerType pager_type;
     typedef AllocStr alloc_strategy_type;
 
-    enum constants {
-        block_size = BlockSize,
-        page_size = PageSize,
-        on_disk = -1
-    };
+    static constexpr size_t page_size = PageSize;
+    static constexpr size_t block_size = BlockSize;
+
+    //static constexpr ptrdiff_t on_disk = -1; //FIX-ME: why is does not working?
+    enum {on_disk = -1};
 
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
     typedef vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size> iterator;
@@ -898,13 +902,19 @@ private:
     mutable pager_type m_pager;
 
     // enum specifying status of a page of the vector
-    enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
+    enum page_status {
+        valid_on_disk = 0,
+        uninitialized = 1,
+        dirty = 2
+    };
+
     //! status of each page (valid_on_disk, uninitialized or dirty)
-    mutable std::vector<unsigned char> m_page_status;
-    mutable std::vector<int_type> m_page_to_slot;
-    mutable simple_vector<int_type> m_slot_to_page;
-    mutable std::queue<int_type> m_free_slots;
+    mutable std::vector<page_status> m_page_status;
+    mutable std::vector<ptrdiff_t> m_page_to_slot;
+    mutable simple_vector<size_t> m_slot_to_page;
+    mutable std::queue<size_t> m_free_slots;
     mutable simple_vector<block_type>* m_cache;
+
     file* m_from;
     block_manager* m_bm;
     bool m_exported;
@@ -941,8 +951,8 @@ public:
         : m_size(n),
           m_bids((size_t)div_ceil(n, block_type::size)),
           m_pager(npages),
-          m_page_status(div_ceil(m_bids.size(), page_size)),
-          m_page_to_slot(div_ceil(m_bids.size(), page_size)),
+          m_page_status(div_ceil(m_bids.size(), page_size), uninitialized),
+          m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
           m_cache(NULL),
           m_from(NULL),
@@ -951,12 +961,6 @@ public:
         m_bm = block_manager::get_instance();
 
         allocate_page_cache();
-
-        for (size_t i = 0; i < m_page_status.size(); ++i)
-        {
-            m_page_status[i] = uninitialized;
-            m_page_to_slot[i] = on_disk;
-        }
 
         for (unsigned_type i = 0; i < numpages(); ++i)
             m_free_slots.push(i);
@@ -1146,7 +1150,7 @@ private:
 
             // clear dirty flag, so these pages will be never written
             std::fill(m_page_status.begin() + new_pages_size,
-                      m_page_status.end(), (unsigned char)valid_on_disk);
+                      m_page_status.end(), valid_on_disk);
         }
 
         m_size = n;
@@ -1232,8 +1236,8 @@ public:
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
           m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
-          m_page_status(div_ceil(m_bids.size(), page_size)),
-          m_page_to_slot(div_ceil(m_bids.size(), page_size)),
+          m_page_status(div_ceil(m_bids.size(), page_size), valid_on_disk),
+          m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
           m_cache(NULL),
           m_from(from),
@@ -1251,12 +1255,6 @@ public:
         m_bm = block_manager::get_instance();
 
         allocate_page_cache();
-
-        for (size_t i = 0; i < m_page_status.size(); ++i)
-        {
-            m_page_status[i] = valid_on_disk;
-            m_page_to_slot[i] = on_disk;
-        }
 
         for (unsigned_type i = 0; i < numpages(); ++i)
             m_free_slots.push(i);
@@ -1277,8 +1275,8 @@ public:
         : m_size(obj.size()),
           m_bids((size_t)div_ceil(obj.size(), block_type::size)),
           m_pager(obj.numpages()),
-          m_page_status(div_ceil(m_bids.size(), page_size)),
-          m_page_to_slot(div_ceil(m_bids.size(), page_size)),
+          m_page_status(div_ceil(m_bids.size(), page_size), uninitialized),
+          m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(obj.numpages()),
           m_cache(NULL),
           m_from(NULL),
@@ -1288,12 +1286,6 @@ public:
         m_bm = block_manager::get_instance();
 
         allocate_page_cache();
-
-        for (size_t i = 0; i < m_page_status.size(); ++i)
-        {
-            m_page_status[i] = uninitialized;
-            m_page_to_slot[i] = on_disk;
-        }
 
         for (unsigned_type i = 0; i < numpages(); ++i)
             m_free_slots.push(i);
@@ -1445,7 +1437,7 @@ public:
         for (unsigned_type i = 0; i < numpages(); i++)
         {
             m_free_slots.push(i);
-            int_type page_no = m_slot_to_page[i];
+            const size_t& page_no = m_slot_to_page[i];
             if (non_free_slots[i])
             {
                 STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address " <<
@@ -1585,43 +1577,51 @@ private:
                 (offset.get_block2() * PageSize + offset.get_block1()));
     }
 
-    void read_page(int_type page_no, int_type cache_slot) const
+    void read_page(const size_t& page_no, const size_t& cache_slot) const
     {
-        assert(page_no < (int_type)m_page_status.size());
+        assert(page_no < m_page_status.size());
+
         if (m_page_status[page_no] == uninitialized)
             return;
+
         STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
-        request_ptr* reqs = new request_ptr[page_size];
-        int_type block_no = page_no * page_size;
-        int_type last_block = STXXL_MIN(block_no + page_size, int_type(m_bids.size()));
-        int_type i = cache_slot * page_size, j = 0;
-        for ( ; block_no < last_block; ++block_no, ++i, ++j)
-        {
-            reqs[j] = (*m_cache)[i].read(m_bids[block_no]);
+        std::vector<request_ptr> reqs;
+        reqs.reserve(page_size);
+
+        size_t block_no = page_no * page_size;
+        const size_t last_block = std::min<size_t>(block_no + page_size, m_bids.size());
+        for (size_t i = cache_slot * page_size; block_no < last_block; ++block_no, ++i) {
+            reqs.push_back( (*m_cache)[i].read(m_bids[block_no]) );
         }
+
         assert(last_block - page_no * page_size > 0);
-        wait_all(reqs, last_block - page_no * page_size);
-        delete[] reqs;
+        wait_all(reqs.data(), last_block - page_no * page_size);
     }
-    void write_page(int_type page_no, int_type cache_slot) const
+
+    void write_page(const size_t& page_no, const size_t& cache_slot) const
     {
-        assert(page_no < (int_type)m_page_status.size());
+        assert(page_no < m_page_status.size());
+
         if (!(m_page_status[page_no] & dirty))
             return;
+
         STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
-        request_ptr* reqs = new request_ptr[page_size];
-        int_type block_no = page_no * page_size;
-        int_type last_block = STXXL_MIN(block_no + page_size, int_type(m_bids.size()));
+
+        std::vector<request_ptr> reqs;
+        reqs.reserve(page_size);
+
+        size_t block_no = page_no * page_size;
+
+        const size_t last_block = std::min<size_t>(block_no + page_size, m_bids.size());
         assert(block_no < last_block);
-        int_type i = cache_slot * page_size, j = 0;
-        for ( ; block_no < last_block; ++block_no, ++i, ++j)
-        {
-            reqs[j] = (*m_cache)[i].write(m_bids[block_no]);
+        for (size_t i = cache_slot * page_size ; block_no < last_block; ++block_no, ++i) {
+            reqs.push_back( (*m_cache)[i].write(m_bids[block_no]) );
         }
+
         m_page_status[page_no] = valid_on_disk;
         assert(last_block - page_no * page_size > 0);
-        wait_all(reqs, last_block - page_no * page_size);
-        delete[] reqs;
+
+        wait_all(reqs.data(), last_block - page_no * page_size);
     }
 
     reference element(size_type offset)
@@ -1639,14 +1639,14 @@ private:
 #endif
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
-        int_type cache_slot = m_page_to_slot[page_no];
+        const auto cache_slot = m_page_to_slot[page_no];
         if (cache_slot < 0)                        // == on_disk
         {
             if (m_free_slots.empty())              // has to kick
             {
-                int_type kicked_slot = m_pager.kick();
+                const size_t kicked_slot = m_pager.kick();
                 m_pager.hit(kicked_slot);
-                int_type old_page_no = m_slot_to_page[kicked_slot];
+                const size_t old_page_no = m_slot_to_page[kicked_slot];
                 m_page_to_slot[page_no] = kicked_slot;
                 m_page_to_slot[old_page_no] = on_disk;
                 m_slot_to_page[kicked_slot] = page_no;
@@ -1660,7 +1660,7 @@ private:
             }
             else
             {
-                int_type free_slot = m_free_slots.front();
+                const size_t free_slot = m_free_slots.front();
                 m_free_slots.pop();
                 m_pager.hit(free_slot);
                 m_page_to_slot[page_no] = free_slot;
@@ -1688,7 +1688,7 @@ private:
         assert(page_no < m_page_status.size());
         // "A dirty page has been marked as newly initialized. The page content will be lost."
         assert(!(m_page_status[page_no] & dirty));
-        if (m_page_to_slot[page_no] != on_disk) {
+        if (m_page_to_slot[page_no] >= 0) { // != on_disk
             // remove page from cache
             m_free_slots.push(m_page_to_slot[page_no]);
             m_page_to_slot[page_no] = on_disk;
@@ -1721,14 +1721,14 @@ private:
     {
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
-        int_type cache_slot = m_page_to_slot[page_no];
+        const auto cache_slot = m_page_to_slot[page_no];
         if (cache_slot < 0)                        // == on_disk
         {
             if (m_free_slots.empty())              // has to kick
             {
-                int_type kicked_slot = m_pager.kick();
+                const size_t kicked_slot = m_pager.kick();
                 m_pager.hit(kicked_slot);
-                int_type old_page_no = m_slot_to_page[kicked_slot];
+                const size_t old_page_no = m_slot_to_page[kicked_slot];
                 m_page_to_slot[page_no] = kicked_slot;
                 m_page_to_slot[old_page_no] = on_disk;
                 m_slot_to_page[kicked_slot] = page_no;
@@ -1740,7 +1740,7 @@ private:
             }
             else
             {
-                int_type free_slot = m_free_slots.front();
+                const size_t free_slot = m_free_slots.front();
                 m_free_slots.pop();
                 m_pager.hit(free_slot);
                 m_page_to_slot[page_no] = free_slot;
@@ -1762,8 +1762,7 @@ private:
     {
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
-        int_type cache_slot = m_page_to_slot[page_no];
-        return (cache_slot >= 0);                  // on_disk == -1
+        return m_page_to_slot[page_no] >= 0; // != on_disk;
     }
 };
 
@@ -2249,9 +2248,11 @@ public:
     void rewind()
     {
         m_iter = m_end;
-        if (empty()) return;
+        if (empty())
+            return;
 
-        if (m_bufin) delete m_bufin;
+        if (m_bufin)
+            delete m_bufin;
 
         // find last bid to read
         bids_container_iterator end_bid = m_end.bid() + (m_end.block_offset() ? 1 : 0);
@@ -2260,13 +2261,9 @@ public:
         m_bufin = new buf_istream_type(m_begin.bid(), end_bid, m_nbuffers);
 
         // skip to beginning of reverse sequence.
-        stxxl::int_type endoff = m_end.block_offset();
-        if (endoff == 0) {
-            // nothing to skip
-        }
-        else {
-            // else, let ifstream_reverse skip last elements at end of block,
-            // up to real end
+        size_t endoff = m_end.block_offset();
+        if (endoff != 0) {
+            // let ifstream_reverse skip last elements at end of block, up to real end
             for ( ; endoff != block_type::size; endoff++)
                 ++(*m_bufin);
         }
