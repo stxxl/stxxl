@@ -132,22 +132,6 @@ inline uint64_t atouint64(const char* s)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Type>
-inline const Type&
-STXXL_MIN(const Type& a, const Type& b)
-{
-    return std::min<Type>(a, b);
-}
-
-template <typename Type>
-inline const Type&
-STXXL_MAX(const Type& a, const Type& b)
-{
-    return std::max<Type>(a, b);
-}
-
-////////////////////////////////////////////////////////////////////////////
-
 //! calculate the log2 floor of an integral type using math.h
 template <typename Integral>
 inline Integral log2_ceil(Integral i)
