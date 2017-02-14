@@ -17,8 +17,9 @@
 #define STXXL_IO_COMPLETION_HANDLER_HEADER
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/compat/unique_ptr.h>
+
 #include <cstdlib>
+#include <memory>
 
 STXXL_BEGIN_NAMESPACE
 
@@ -60,7 +61,7 @@ public:
 //! \c stxxl::file::aread and \c stxxl::file::awrite .
 class completion_handler
 {
-    compat_unique_ptr<completion_handler_impl>::result m_ptr;
+    std::unique_ptr<completion_handler_impl> m_ptr;
 
 public:
     //! Construct default, no operation completion handler.

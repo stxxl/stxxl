@@ -15,15 +15,16 @@
 #ifndef STXXL_IO_REQUEST_HEADER
 #define STXXL_IO_REQUEST_HEADER
 
-#include <cassert>
-
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/io/completion_handler.h>
-#include <stxxl/bits/compat/unique_ptr.h>
 #include <stxxl/bits/verbose.h>
+
+#include <cassert>
+#include <memory>
+
 
 STXXL_BEGIN_NAMESPACE
 
@@ -41,7 +42,7 @@ class request : virtual public request_interface, public atomic_counted_object
 
 protected:
     completion_handler m_on_complete;
-    compat_unique_ptr<stxxl::io_error>::result m_error;
+    std::unique_ptr<stxxl::io_error> m_error;
 
 protected:
     file* m_file;
