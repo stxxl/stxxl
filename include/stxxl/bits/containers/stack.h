@@ -16,6 +16,7 @@
 
 #include <stack>
 #include <vector>
+#include <cstdint>
 
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
@@ -78,7 +79,7 @@ public:
 
 private:
     size_type m_size;
-    unsigned_type cache_offset;
+    size_t cache_offset;
     value_type* current_element;
     simple_vector<block_type> cache;
     typename simple_vector<block_type>::iterator front_page;
@@ -288,12 +289,12 @@ public:
     //! \}
 
 private:
-    value_type * element(unsigned_type offset)
+    value_type * element(const size_t offset)
     {
         if (offset < blocks_per_page * block_type::size)
             return &((*(back_page + offset / block_type::size))[offset % block_type::size]);
 
-        unsigned_type unbiased_offset = offset - blocks_per_page * block_type::size;
+        const size_t unbiased_offset = offset - blocks_per_page * block_type::size;
         return &((*(front_page + unbiased_offset / block_type::size))[unbiased_offset % block_type::size]);
     }
 };
@@ -324,7 +325,7 @@ public:
 
 private:
     size_type m_size;
-    unsigned_type cache_offset;
+    size_t cache_offset;
     value_type* current_element;
     simple_vector<block_type> cache;
     typename simple_vector<block_type>::iterator cache_buffers;
@@ -538,7 +539,7 @@ public:
         }
 
         --m_size;
-        unsigned_type cur_offset = (--cache_offset) - 1;
+        const size_t cur_offset = (--cache_offset) - 1;
         current_element = &((*(cache_buffers + cur_offset / block_type::size))[cur_offset % block_type::size]);
     }
 
@@ -570,11 +571,11 @@ private:
     typedef read_write_pool<block_type> pool_type;
 
     size_type m_size;
-    unsigned_type cache_offset;
+    size_t cache_offset;
     block_type* cache;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
-    unsigned_type pref_aggr;
+    size_t pref_aggr;
     pool_type* owned_pool;
     pool_type* pool;
 
@@ -587,7 +588,7 @@ public:
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     grow_shrink_stack2(pool_type& pool_,
-                       unsigned_type prefetch_aggressiveness = 0)
+                       const size_t prefetch_aggressiveness = 0)
         : m_size(0),
           cache_offset(0),
           cache(new block_type),
@@ -609,7 +610,7 @@ public:
     STXXL_DEPRECATED(
         grow_shrink_stack2(prefetch_pool<block_type>& p_pool_,
                            write_pool<block_type>& w_pool_,
-                           unsigned_type prefetch_aggressiveness = 0)
+                           const size_t prefetch_aggressiveness = 0)
         )
         : m_size(0),
           cache_offset(0),
@@ -789,7 +790,7 @@ public:
     //! Sets level of prefetch aggressiveness (number of blocks from the
     //! prefetch pool used for prefetching).
     //! \param new_p new value for the prefetch aggressiveness
-    void set_prefetch_aggr(unsigned_type new_p)
+    void set_prefetch_aggr(const size_t new_p)
     {
         if (pref_aggr > new_p && bids.size() > new_p)
         {
@@ -804,7 +805,7 @@ public:
     }
 
     //! Returns number of blocks used for prefetching.
-    unsigned_type get_prefetch_aggr() const
+    const size_t& get_prefetch_aggr() const
     {
         return pref_aggr;
     }
@@ -829,7 +830,7 @@ private:
 //! A stack that migrates from internal memory to external when its size exceeds a certain threshold.
 //!
 //! For semantics of the methods see documentation of the STL \c std::stack.
-template <unsigned_type CritSize, class ExternalStack, class InternalStack>
+template <size_t CritSize, class ExternalStack, class InternalStack>
 class migrating_stack
 {
 public:
@@ -1026,7 +1027,7 @@ template <
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
 
     class IntStackType = std::stack<ValueType>,
-    unsigned_type MigrCritSize = (2* BlocksPerPage* BlockSize),
+    size_t MigrCritSize = (2* BlocksPerPage* BlockSize),
 
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
     class SizeType = external_size_type
@@ -1073,7 +1074,7 @@ void swap(stxxl::grow_shrink_stack2<StackConfig>& a,
     a.swap(b);
 }
 
-template <stxxl::unsigned_type CritSize, class ExternalStack, class InternalStack>
+template <size_t CritSize, class ExternalStack, class InternalStack>
 void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack>& a,
           stxxl::migrating_stack<CritSize, ExternalStack, InternalStack>& b)
 {

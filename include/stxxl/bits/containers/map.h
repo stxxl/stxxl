@@ -164,8 +164,8 @@ public:
     //! A constructor
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
-    map(unsigned_type node_cache_size_in_bytes,
-        unsigned_type leaf_cache_size_in_bytes
+    map(const size_t node_cache_size_in_bytes,
+        const size_t leaf_cache_size_in_bytes
         ) : impl(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     { }
 
@@ -174,8 +174,8 @@ public:
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
     map(const key_compare& c_,
-        unsigned_type node_cache_size_in_bytes,
-        unsigned_type leaf_cache_size_in_bytes
+        const size_t node_cache_size_in_bytes,
+        const size_t leaf_cache_size_in_bytes
         ) : impl(c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     { }
 
@@ -191,11 +191,11 @@ public:
     template <class InputIterator>
     map(InputIterator b,
         InputIterator e,
-        unsigned_type node_cache_size_in_bytes,
-        unsigned_type leaf_cache_size_in_bytes,
-        bool range_sorted = false,
-        double node_fill_factor = 0.75,
-        double leaf_fill_factor = 0.6
+        const size_t node_cache_size_in_bytes,
+        const size_t leaf_cache_size_in_bytes,
+        const bool range_sorted = false,
+        const double node_fill_factor = 0.75,
+        const double leaf_fill_factor = 0.6
         ) : impl(b, e, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
                  range_sorted, node_fill_factor, leaf_fill_factor)
     { }
@@ -214,11 +214,11 @@ public:
     map(InputIterator b,
         InputIterator e,
         const key_compare& c_,
-        unsigned_type node_cache_size_in_bytes,
-        unsigned_type leaf_cache_size_in_bytes,
-        bool range_sorted = false,
-        double node_fill_factor = 0.75,
-        double leaf_fill_factor = 0.6
+        const size_t node_cache_size_in_bytes,
+        const size_t leaf_cache_size_in_bytes,
+        const bool range_sorted = false,
+        const double node_fill_factor = 0.75,
+        const double leaf_fill_factor = 0.6
         ) : impl(b, e, c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
                  range_sorted, node_fill_factor, leaf_fill_factor)
     { }

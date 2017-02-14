@@ -72,10 +72,10 @@ private:
     value_type* front_element;
     value_type* back_element;
     alloc_strategy_type alloc_strategy;
-    unsigned_type alloc_count;
+    size_t alloc_count;
     std::deque<bid_type> bids;
     block_manager* bm;
-    unsigned_type blocks2prefetch;
+    size_t blocks2prefetch;
 
 public:
     //! \name Constructors/Destructors
@@ -108,7 +108,7 @@ public:
     //! \param p_pool_size  number of blocks in the prefetch pool, recommended at least 1
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of block in the prefetch pool
-    explicit queue(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch_ = -1)
+    explicit queue(const size_t w_pool_size, const size_t p_pool_size, int blocks2prefetch_ = -1)
         : m_size(0),
           delete_pool(true),
           alloc_count(0),
@@ -225,7 +225,7 @@ public:
     }
 
     //! Returns the number of blocks prefetched from the \c front side.
-    unsigned_type get_prefetch_aggr() const
+    size_t get_prefetch_aggr() const
     {
         return blocks2prefetch;
     }
@@ -331,7 +331,7 @@ public:
             STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << FMT_BID(bids.front()));
 
             // give prefetching hints
-            for (unsigned_type i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
+            for (size_t i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {
                 STXXL_VERBOSE1("queue::pop Case Hints");
                 pool->hint(bids[i + 1]);

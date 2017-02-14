@@ -103,14 +103,14 @@ public:
     //! \{
 
     //! Constructor allocation memory_to_use bytes in ram for sorted runs.
-    sorter(const cmp_type& cmp, unsigned_type memory_to_use)
+    sorter(const cmp_type& cmp, size_t memory_to_use)
         : m_state(STATE_INPUT),
           m_runs_creator(cmp, memory_to_use),
           m_runs_merger(cmp, memory_to_use)
     { }
 
     //! Constructor variant with differently sizes runs_creator and runs_merger
-    sorter(const cmp_type& cmp, unsigned_type creator_memory_to_use, unsigned_type merger_memory_to_use)
+    sorter(const cmp_type& cmp, size_t creator_memory_to_use, size_t merger_memory_to_use)
         : m_state(STATE_INPUT),
           m_runs_creator(cmp, creator_memory_to_use),
           m_runs_merger(cmp, merger_memory_to_use)
@@ -191,7 +191,7 @@ public:
     }
 
     //! Switch to output state, rewind() in case the output was already sorted.
-    void sort(unsigned_type merger_memory_to_use)
+    void sort(size_t merger_memory_to_use)
     {
         m_runs_merger.set_memory_to_use(merger_memory_to_use);
         sort();
@@ -225,7 +225,7 @@ public:
     //! \}
 
     //! Change runs_merger memory usage
-    void set_merger_memory_to_use(unsigned_type merger_memory_to_use)
+    void set_merger_memory_to_use(size_t merger_memory_to_use)
     {
         m_runs_merger.set_memory_to_use(merger_memory_to_use);
     }

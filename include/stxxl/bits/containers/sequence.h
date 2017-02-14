@@ -102,7 +102,7 @@ private:
     alloc_strategy_type m_alloc_strategy;
 
     /// block allocation counter
-    unsigned_type m_alloc_count;
+    size_t m_alloc_count;
 
     /// allocated block identifiers
     bid_deque_type m_bids;
@@ -111,7 +111,7 @@ private:
     block_manager* m_bm;
 
     /// number of blocks to prefetch
-    unsigned_type m_blocks2prefetch;
+    size_t m_blocks2prefetch;
 
 public:
     //! \name Constructors/Destructors
@@ -143,7 +143,7 @@ public:
     //! \param p_pool_size  number of blocks in the prefetch pool, recommended at least 1
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of block in the prefetch pool
-    explicit sequence(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch = -1)
+    explicit sequence(const size_t w_pool_size, const size_t p_pool_size, int blocks2prefetch = -1)
         : m_size(0),
           m_owns_pool(true),
           m_alloc_count(0),
@@ -240,7 +240,7 @@ public:
     }
 
     //! Returns the number of blocks prefetched from the \c front side
-    unsigned_type get_prefetch_aggr() const
+    const size_t& get_prefetch_aggr() const
     {
         return m_blocks2prefetch;
     }
@@ -420,7 +420,7 @@ public:
             STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_front block  " << m_front_block << " @ " << FMT_BID(m_bids.front()));
 
             // give prefetching hints
-            for (unsigned_type i = 0; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
+            for (size_t i = 0; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
             {
                 STXXL_VERBOSE1("sequence::pop_front Case Hints");
                 m_pool->hint(m_bids[i + 1]);
@@ -479,7 +479,7 @@ public:
             STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_back block  " << m_back_block << " @ " << FMT_BID(m_bids.back()));
 
             // give prefetching hints
-            for (unsigned_type i = 1; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
+            for (size_t i = 1; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
             {
                 STXXL_VERBOSE1("sequence::pop_front Case Hints");
                 m_pool->hint(m_bids[m_bids.size() - 1 - i]);
@@ -669,7 +669,7 @@ public:
 
                 // give prefetching hints
                 bid_iter_type bid = m_next_bid + 1;
-                for (unsigned_type i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.end(); ++i, ++bid)
+                for (size_t i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.end(); ++i, ++bid)
                 {
                     STXXL_VERBOSE1("sequence::stream::operator++ giving prefetch hints");
                     m_sequence.m_pool->hint(*bid);
@@ -800,7 +800,7 @@ public:
 
                 // give prefetching hints
                 bid_iter_type bid = m_next_bid + 1;
-                for (unsigned_type i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.rend(); ++i, ++bid)
+                for (size_t i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.rend(); ++i, ++bid)
                 {
                     STXXL_VERBOSE1("sequence::reverse_stream::operator++ giving prefetch hints");
                     m_sequence.m_pool->hint(*bid);
