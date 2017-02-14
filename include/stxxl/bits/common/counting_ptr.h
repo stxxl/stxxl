@@ -329,9 +329,10 @@ void swap(const_counting_ptr<A>& a1, const_counting_ptr<A>& a2)
 class counted_object
 {
 private:
+    using reference_count_t = size_t;
     //! the reference count is kept mutable to all const_counting_ptr() to
     //! change the reference count.
-    mutable unsigned_type m_reference_count;
+    mutable reference_count_t m_reference_count;
 
 public:
     //! new objects have zero reference count
@@ -365,7 +366,7 @@ public:
     { return (m_reference_count == 1); }
 
     //! Return the number of references to this object (for debugging)
-    unsigned_type get_reference_count() const
+    reference_count_t get_reference_count() const
     { return m_reference_count; }
 };
 
@@ -385,13 +386,14 @@ public:
 class atomic_counted_object
 {
 private:
+#if STXXL_MSVC
+    using reference_count_t = long;
+#else
+    using reference_count_t =  size_t;
+#endif
     //! the reference count is kept mutable to all const_counting_ptr() to
     //! change the reference count.
-#if STXXL_MSVC
-    mutable long m_reference_count;
-#else
-    mutable unsigned_type m_reference_count;
-#endif
+    mutable reference_count_t m_reference_count;
 
 public:
     //! new objects have zero reference count
@@ -428,7 +430,7 @@ public:
 #if STXXL_MSVC
         return (_InterlockedDecrement(&m_reference_count) == 0);
 #else
-        return (__sync_add_and_fetch(&m_reference_count, -1) == 0);
+        return (__sync_add_and_fetch(&m_reference_count, reference_count_t(-1)) == 0);
 #endif
     }
 
@@ -439,7 +441,7 @@ public:
     }
 
     //! Return the number of references to this object (for debugging)
-    unsigned_type get_reference_count() const
+    reference_count_t get_reference_count() const
     {
         return m_reference_count;
     }
@@ -461,9 +463,10 @@ public:
 class atomic_counted_object
 {
 private:
+    using reference_count_t = size_t;
     //! the reference count is kept mutable to all const_counting_ptr() to
     //! change the reference count.
-    mutable unsigned_type m_reference_count;
+    mutable reference_count_t m_reference_count;
 
     //! the mutex used to synchronize access to the reference counter.
     mutable mutex m_reference_count_mutex;
@@ -509,7 +512,7 @@ public:
     }
 
     //! Return the number of references to this object (for debugging)
-    unsigned_type get_reference_count() const
+    reference_count_t get_reference_count() const
     {
         scoped_mutex_lock lock(m_reference_count_mutex);
         return m_reference_count;
