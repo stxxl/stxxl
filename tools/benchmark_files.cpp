@@ -264,7 +264,7 @@ int benchmark_files(int argc, char* argv[])
             if (do_write)
             {
                 // write block number (512 byte blocks) into each block at position 42 * sizeof(uint32_t)
-                for (size_t j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(uint32_t), ++b)
+                for (external_size_type j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(uint32_t), ++b)
                 {
                     for (size_t i = 0; i < nfiles; i++)
                         buffer[current_step_size_int * i + j] = (uint32_t)b;
