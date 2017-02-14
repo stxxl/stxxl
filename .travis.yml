@@ -20,7 +20,7 @@ install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -qq update
   - if [ "$CMAKE_CXX" == "g++-4.8" ]; then sudo apt-get install g++-4.8; fi
-  - if [ "$CMAKE_FLAGS" == "-m32" ]; then sudo apt-get install g++-multilib; fi
+  - if [ "$CMAKE_FLAGS" == "-m32" ]; then sudo apt-get install g++-4.8-multilib; fi
   - if [ "$USE_BOOST" == "ON" ]; then sudo apt-get install libboost-all-dev; fi
 
 before_script:
