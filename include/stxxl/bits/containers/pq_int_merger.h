@@ -282,6 +282,7 @@ protected:
         invert_order<CompareType, value_type, value_type> inv_cmp(cmp);
         switch (logK) {
         case 0: {
+            assert(MaxArity >= 1);
             assert(k == 1);
 
             memcpy(target, current[0], length * sizeof(value_type));
@@ -293,6 +294,7 @@ protected:
             break;
         }
         case 1: {
+            assert(MaxArity >= 2);
             assert(k == 2);
 
             std::pair<value_type*, value_type*> seqs[2] =
@@ -316,6 +318,7 @@ protected:
             break;
         }
         case 2: {
+            assert(MaxArity >= 4);
             assert(k == 4);
 
             std::pair<value_type*, value_type*> seqs[4] =
@@ -349,6 +352,7 @@ protected:
             break;
         }
         default: {
+            assert(MaxArity >= 8);
             std::vector<std::pair<value_type*, value_type*> > seqs;
             std::vector<size_t> orig_seq_index;
             for (size_t i = 0; i < k; ++i)
