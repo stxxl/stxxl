@@ -1,6 +1,5 @@
 language: cpp
 sudo: false
-os: linux
 
 env:
   global:
