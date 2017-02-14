@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
     size_t memory_to_use = SIZE * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::vector<my_type> vector_type;
 
-    const size_t n_records =
-        size_t(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
+    const uint64_t n_records =
+            uint64_t(SIZE * 2 + SIZE / 2) * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(my_type);
     vector_type v(n_records);
 
     uint64_t aliens, not_stable;

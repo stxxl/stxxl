@@ -227,8 +227,8 @@ int main(int argc, const char** argv)
               << p << " thread(s), block size "
               << block_size << ", element size " << sizeof(my_type) << std::endl;
 
-    const size_t n_records =
-        size_t(megabytes_to_process) * size_t(megabyte) / sizeof(my_type);
+    const uint64_t n_records =
+        uint64_t(megabytes_to_process) * uint64_t(megabyte) / sizeof(my_type);
     vector_type input(n_records);
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());

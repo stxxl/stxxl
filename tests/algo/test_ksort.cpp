@@ -84,8 +84,8 @@ int main()
 #endif
     unsigned memory_to_use = 16 * STXXL_DEFAULT_BLOCK_SIZE(T);
     typedef stxxl::VECTOR_GENERATOR<my_type, 4, 4>::result vector_type;
-    const size_t n_records =
-        3 * 16 * size_t(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
+    const uint64_t n_records =
+        3 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;
