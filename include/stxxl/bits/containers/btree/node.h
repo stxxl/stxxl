@@ -17,7 +17,6 @@
 #include <stxxl/bits/containers/btree/node_cache.h>
 
 namespace stxxl {
-
 namespace btree {
 
 template <class NodeType, class BTreeType>
@@ -216,9 +215,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    normal_node(const normal_node &) = delete;
+    normal_node(const normal_node&) = delete;
     //! non-copyable: delete assignment operator
-    normal_node & operator = (const normal_node &) = delete;
+    normal_node& operator = (const normal_node&) = delete;
 
     block_type & block()
     {
@@ -760,7 +759,6 @@ public:
 };
 
 } // namespace btree
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_BTREE_NODE_HEADER

@@ -146,7 +146,6 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
 }
 
 } // namespace sort_helper
-
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_HELPER_HEADER

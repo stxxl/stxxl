@@ -34,13 +34,12 @@ class singleton
     static void destroy_instance();
 
 public:
-
     singleton() = default;
 
     //! non-copyable: delete copy-constructor
-    singleton(const singleton &) = delete;
+    singleton(const singleton&) = delete;
     //! non-copyable: delete assignment operator
-    singleton & operator = (const singleton &) = delete;
+    singleton& operator = (const singleton&) = delete;
 
     inline static instance_pointer get_instance()
     {

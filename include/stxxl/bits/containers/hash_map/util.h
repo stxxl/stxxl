@@ -22,7 +22,6 @@
 #include <stxxl/bits/containers/hash_map/block_cache.h>
 
 namespace stxxl {
-
 namespace hash_map {
 
 // For internal memory chaining: struct to compose next-pointer and delete-flag
@@ -42,8 +41,8 @@ struct node
     bool set_deleted(bool d)
     {
         next_and_del_ = reinterpret_cast<node<ValueType>*>(
-                    (reinterpret_cast<uintptr_t>(next_and_del_) & ~uintptr_t(0x01u)) | static_cast<uintptr_t>(d)
-        );
+            (reinterpret_cast<uintptr_t>(next_and_del_) & ~uintptr_t(0x01u)) | static_cast<uintptr_t>(d)
+            );
         return d;
     }
 
@@ -57,8 +56,8 @@ struct node
     node<ValueType> * set_next(node<ValueType>* n)
     {
         next_and_del_ = reinterpret_cast<node<ValueType>*>(
-                (reinterpret_cast<uintptr_t>(next_and_del_) & 0x01u) | reinterpret_cast<uintptr_t>(n)
-        );
+            (reinterpret_cast<uintptr_t>(next_and_del_) & 0x01u) | reinterpret_cast<uintptr_t>(n)
+            );
 
         return n;
     }
@@ -171,9 +170,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    buffered_reader(const buffered_reader &) = delete;
+    buffered_reader(const buffered_reader&) = delete;
     //! non-copyable: delete assignment operator
-    buffered_reader & operator = (const buffered_reader &) = delete;
+    buffered_reader& operator = (const buffered_reader&) = delete;
 
     ~buffered_reader()
     {
@@ -359,9 +358,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    buffered_writer(const buffered_writer &) = delete;
+    buffered_writer(const buffered_writer&) = delete;
     //! non-copyable: delete assignment operator
-    buffered_writer & operator = (const buffered_writer &) = delete;
+    buffered_writer& operator = (const buffered_writer&) = delete;
 
     ~buffered_writer()
     {
@@ -431,12 +430,14 @@ public:
     }
 
     //! Index of current block.
-    const size_t& i_block() const {
+    const size_t & i_block() const
+    {
         return i_block_;
     }
 
     //! Index of current subblock.
-    size_t i_subblock() const {
+    size_t i_subblock() const
+    {
         return i_value_ / subblock_size;
     }
 };
@@ -591,7 +592,6 @@ struct HashedValuesStream
 };
 
 } // namespace hash_map
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_UTIL_HEADER

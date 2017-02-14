@@ -361,9 +361,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    block_scheduler(const block_scheduler &) = delete;
+    block_scheduler(const block_scheduler&) = delete;
     //! non-copyable: delete assignment operator
-    block_scheduler & operator = (const block_scheduler &) = delete;
+    block_scheduler& operator = (const block_scheduler&) = delete;
 
     ~block_scheduler()
     {
@@ -564,9 +564,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    block_scheduler_algorithm(const block_scheduler_algorithm &) = delete;
+    block_scheduler_algorithm(const block_scheduler_algorithm&) = delete;
     //! non-copyable: delete assignment operator
-    block_scheduler_algorithm & operator = (const block_scheduler_algorithm &) = delete;
+    block_scheduler_algorithm& operator = (const block_scheduler_algorithm&) = delete;
 
     virtual ~block_scheduler_algorithm() { }
 

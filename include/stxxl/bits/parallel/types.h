@@ -21,7 +21,6 @@
 #include <cstdlib>
 
 namespace stxxl {
-
 namespace parallel {
 
 /**
@@ -48,7 +47,6 @@ static const size_t lcas_t_bits = sizeof(lcas_t) * 8;
 static const lcas_t lcas_t_mask = (((lcas_t)1 << (lcas_t_bits / 2)) - 1);
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_TYPES_HEADER

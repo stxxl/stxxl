@@ -73,7 +73,7 @@ void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
     typedef stxxl::VECTOR_GENERATOR<
-        element, 2, 2, STXXL_DEFAULT_BLOCK_SIZE(T), stxxl::striping>::result vector_type;
+            element, 2, 2, STXXL_DEFAULT_BLOCK_SIZE(T), stxxl::striping>::result vector_type;
     vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(element));
 
     // test assignment const_iterator = iterator

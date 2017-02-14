@@ -54,7 +54,6 @@
 #include <stxxl/types>
 
 namespace stxxl {
-
 namespace ppq_local {
 
 /*!
@@ -311,9 +310,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    internal_array(const internal_array &) = delete;
+    internal_array(const internal_array&) = delete;
     //! non-copyable: delete assignment operator
-    internal_array & operator = (const internal_array &) = delete;
+    internal_array& operator = (const internal_array&) = delete;
 
     //! Swap internal_array with another one.
     void swap(internal_array& o)
@@ -627,9 +626,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    external_array(const external_array &) = delete;
+    external_array(const external_array&) = delete;
     //! non-copyable: delete assignment operator
-    external_array & operator = (const external_array &) = delete;
+    external_array& operator = (const external_array&) = delete;
 
     //! Destructor
     ~external_array()
@@ -1175,7 +1174,7 @@ protected:
             return (m_requests[block_index] && m_requests[block_index]->poll());
         }
         else {
-            return ( m_blocks[block_index] != 0 );
+            return (m_blocks[block_index] != 0);
         }
     }
 
@@ -1554,9 +1553,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    external_array_writer(const external_array_writer &) = delete;
+    external_array_writer(const external_array_writer&) = delete;
     //! non-copyable: delete assignment operator
-    external_array_writer & operator = (const external_array_writer &) = delete;
+    external_array_writer& operator = (const external_array_writer&) = delete;
 
     ~external_array_writer()
     {
@@ -2461,9 +2460,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    parallel_priority_queue(const parallel_priority_queue &) = delete;
+    parallel_priority_queue(const parallel_priority_queue&) = delete;
     //! non-copyable: delete assignment operator
-    parallel_priority_queue & operator = (const parallel_priority_queue &) = delete;
+    parallel_priority_queue& operator = (const parallel_priority_queue&) = delete;
 
     //! Destructor.
     ~parallel_priority_queue()
@@ -3643,8 +3642,8 @@ protected:
         unsigned_type gmin_index = m_external_min_tree.top();
         bool needs_limit = (gmin_index != m_external_min_tree.invalid_key);
 
-        STXXL_DEBUG("calculate_merge_sequences() gmin_index=" << gmin_index
-                    << " needs_limit=" << needs_limit);
+        STXXL_DEBUG("calculate_merge_sequences() gmin_index=" << gmin_index <<
+                    " needs_limit=" << needs_limit);
 
 // test correctness of external block min tree
 #ifdef STXXL_DEBUG_ASSERTIONS

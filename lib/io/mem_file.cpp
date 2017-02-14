@@ -90,3 +90,5 @@ void mem_file::discard(offset_type offset, offset_type size)
 }
 
 } // namespace stxxl
+
+/******************************************************************************/

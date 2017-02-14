@@ -70,9 +70,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    write_pool(const write_pool &) = delete;
+    write_pool(const write_pool&) = delete;
     //! non-copyable: delete assignment operator
-    write_pool & operator = (const write_pool &) = delete;
+    write_pool& operator = (const write_pool&) = delete;
 
     void swap(write_pool& obj)
     {

@@ -202,5 +202,5 @@ void boostfd_file::lock()
 
 } // namespace stxxl
 
-#endif  // #if STXXL_HAVE_BOOSTFD_FILE
+#endif // #if STXXL_HAVE_BOOSTFD_FILE
 // vim: et:ts=4:sw=4

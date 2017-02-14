@@ -19,3 +19,5 @@ namespace stxxl {
 unsigned ran32State = get_next_seed();
 
 } // namespace stxxl
+
+/******************************************************************************/

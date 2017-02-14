@@ -52,18 +52,18 @@ class mutex
 
 public:
     //! construct unlocked mutex
-    mutex() throw()
+    mutex() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
 
     //! non-copyable: delete copy-constructor
-    mutex(const mutex &) = delete;
+    mutex(const mutex&) = delete;
     //! non-copyable: delete assignment operator
-    mutex & operator = (const mutex &) = delete;
+    mutex& operator = (const mutex&) = delete;
 
     //! destroy mutex handle
-    ~mutex() throw()
+    ~mutex() throw ()
     {
         // try simple delete first
         int res = pthread_mutex_destroy(&m_mutex);
@@ -82,12 +82,12 @@ public:
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_destroy(&m_mutex));
     }
     //! lock mutex, may block
-    void lock() throw()
+    void lock() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_lock(&m_mutex));
     }
     //! unlock mutex
-    void unlock() throw()
+    void unlock() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
     }
@@ -202,6 +202,7 @@ private:
 };
 
 #endif
+
 } // namespace stxxl
 
 #endif // !STXXL_COMMON_MUTEX_HEADER

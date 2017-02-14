@@ -416,14 +416,14 @@ private:
     void calc_opt_max(const argument* arg)
     {
         m_opt_maxlong = std::max((int)arg->option_text().size() + 2,
-                                  m_opt_maxlong);
+                                 m_opt_maxlong);
     }
 
     //! update maximum formatting width for new parameter
     void calc_param_max(const argument* arg)
     {
         m_param_maxlong = std::max((int)arg->param_text().size() + 2,
-                                    m_param_maxlong);
+                                   m_param_maxlong);
     }
 
 public:
@@ -446,9 +446,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    cmdline_parser(const cmdline_parser &) = delete;
+    cmdline_parser(const cmdline_parser&) = delete;
     //! non-copyable: delete assignment operator
-    cmdline_parser & operator = (const cmdline_parser &) = delete;
+    cmdline_parser& operator = (const cmdline_parser&) = delete;
 
     //! Delete all added arguments
     ~cmdline_parser()

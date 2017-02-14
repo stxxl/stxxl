@@ -14,7 +14,6 @@
 #ifndef STXXL_UNUSED_HEADER
 #define STXXL_UNUSED_HEADER
 
-
 namespace stxxl {
 
 template <typename U>

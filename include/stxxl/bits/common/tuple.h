@@ -731,7 +731,6 @@ public:
 };
 
 } // namespace stream
-
 } // namespace stxxl
 
 #endif // !STXXL_COMMON_TUPLE_HEADER

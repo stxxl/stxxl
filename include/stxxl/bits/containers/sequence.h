@@ -129,8 +129,8 @@ public:
           m_bm(block_manager::get_instance())
     {
         const size_t disks = (D < 1)
-                        ? config::get_instance()->disks_number()
-                        : static_cast<size_t>(D);
+                             ? config::get_instance()->disks_number()
+                             : static_cast<size_t>(D);
 
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(D)");
         m_pool = new pool_type(disks, disks + 2);
@@ -172,9 +172,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    sequence(const sequence &) = delete;
+    sequence(const sequence&) = delete;
     //! non-copyable: delete assignment operator
-    sequence & operator = (const sequence &) = delete;
+    sequence& operator = (const sequence&) = delete;
 
     //! \}
 

@@ -66,7 +66,7 @@ private:
     // upper levels of loser trees
     // entry[0] contains the winner info
     Entry entry[MaxArity];
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
     // leaf information
     // note that Knuth uses indices k..k-1
@@ -152,7 +152,7 @@ private:
         regEntry[0].index = winnerIndex;
         regEntry[0].key = winnerKey;
     }
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
 public:
     bool is_sentinel(const Element& a)
@@ -168,9 +168,9 @@ public:
     loser_tree();
 
     //! non-copyable: delete copy-constructor
-    loser_tree(const loser_tree &) = delete;
+    loser_tree(const loser_tree&) = delete;
     //! non-copyable: delete assignment operator
-    loser_tree & operator = (const loser_tree &) = delete;
+    loser_tree& operator = (const loser_tree&) = delete;
 
     ~loser_tree();
 
@@ -186,7 +186,7 @@ public:
         std::swap(sentinel, obj.sentinel);
 #if STXXL_PQ_INTERNAL_LOSER_TREE
         swap_1D_arrays(entry, obj.entry, MaxArity);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
         swap_1D_arrays(current, obj.current, MaxArity);
         swap_1D_arrays(current_end, obj.current_end, MaxArity);
         swap_1D_arrays(segment, obj.segment, MaxArity);
@@ -235,7 +235,7 @@ void loser_tree<ValueType, CompareType, MaxArity>::init()
     rebuildLoserTree();
 #if STXXL_PQ_INTERNAL_LOSER_TREE
     assert(current[entry[0].index] == &sentinel);
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 }
 
 // rebuild loser tree information from the values in current
@@ -248,7 +248,7 @@ void loser_tree<ValueType, CompareType, MaxArity>::rebuildLoserTree()
     unsigned_type winner = initWinner(1);
     entry[0].index = winner;
     entry[0].key = *(current[winner]);
-#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 }
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
@@ -384,7 +384,7 @@ void loser_tree<ValueType, CompareType, MaxArity>::compactTree()
             current_end[last_empty] = current_end[pos];
             segment[last_empty] = segment[pos];
             last_empty++;
-        }     /*
+        }       /*
                 else
                 {
                 if(segment[pos])
@@ -437,7 +437,7 @@ insert_segment(Element* target, unsigned_type length)
 
         // get a free slot
         if (free_slots.empty())
-        {       // tree is too small
+        {           // tree is too small
             doubleK();
         }
         assert(!free_slots.empty());
@@ -458,7 +458,7 @@ insert_segment(Element* target, unsigned_type length)
         unsigned_type dummyMask;
         update_on_insert((index + k) >> 1, *target, index,
                          &dummyKey, &dummyIndex, &dummyMask);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
     }
     else {
         // immediately deallocate
@@ -534,14 +534,14 @@ multi_merge(Element* target, unsigned_type length)
         assert(k == 1);
 #if STXXL_PQ_INTERNAL_LOSER_TREE
         assert(entry[0].index == 0);
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
         assert(free_slots.empty());
         memcpy(target, current[0], length * sizeof(Element));
         //std::copy(current[0], current[0] + length, target);
         current[0] += length;
 #if STXXL_PQ_INTERNAL_LOSER_TREE
         entry[0].key = **current;
-#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
         if (is_segment_empty(0))
             deallocate_segment(0);
 

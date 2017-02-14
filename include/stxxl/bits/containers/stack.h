@@ -153,9 +153,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    normal_stack(const normal_stack &) = delete;
+    normal_stack(const normal_stack&) = delete;
     //! non-copyable: delete assignment operator
-    normal_stack & operator = (const normal_stack &) = delete;
+    normal_stack& operator = (const normal_stack&) = delete;
 
     virtual ~normal_stack()
     {
@@ -406,9 +406,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    grow_shrink_stack(const grow_shrink_stack &) = delete;
+    grow_shrink_stack(const grow_shrink_stack&) = delete;
     //! non-copyable: delete assignment operator
-    grow_shrink_stack & operator = (const grow_shrink_stack &) = delete;
+    grow_shrink_stack& operator = (const grow_shrink_stack&) = delete;
 
     virtual ~grow_shrink_stack()
     {
@@ -622,9 +622,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    grow_shrink_stack2(const grow_shrink_stack2 &) = delete;
+    grow_shrink_stack2(const grow_shrink_stack2&) = delete;
     //! non-copyable: delete assignment operator
-    grow_shrink_stack2 & operator = (const grow_shrink_stack2 &) = delete;
+    grow_shrink_stack2& operator = (const grow_shrink_stack2&) = delete;
 
     //! \}
 
@@ -867,9 +867,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    migrating_stack(const migrating_stack &) = delete;
+    migrating_stack(const migrating_stack&) = delete;
     //! non-copyable: delete assignment operator
-    migrating_stack & operator = (const migrating_stack &) = delete;
+    migrating_stack& operator = (const migrating_stack&) = delete;
 
     virtual ~migrating_stack()
     {

@@ -846,7 +846,7 @@ public:
     static constexpr size_t block_size = BlockSize;
 
     //static constexpr ptrdiff_t on_disk = -1; //FIX-ME: why is does not working?
-    enum {on_disk = -1};
+    enum { on_disk = -1 };
 
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
     typedef vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size> iterator;
@@ -1591,7 +1591,7 @@ private:
         size_t block_no = page_no * page_size;
         const size_t last_block = std::min<size_t>(block_no + page_size, m_bids.size());
         for (size_t i = cache_slot * page_size; block_no < last_block; ++block_no, ++i) {
-            reqs.push_back( (*m_cache)[i].read(m_bids[block_no]) );
+            reqs.push_back((*m_cache)[i].read(m_bids[block_no]));
         }
 
         assert(last_block - page_no * page_size > 0);
@@ -1614,8 +1614,8 @@ private:
 
         const size_t last_block = std::min<size_t>(block_no + page_size, m_bids.size());
         assert(block_no < last_block);
-        for (size_t i = cache_slot * page_size ; block_no < last_block; ++block_no, ++i) {
-            reqs.push_back( (*m_cache)[i].write(m_bids[block_no]) );
+        for (size_t i = cache_slot * page_size; block_no < last_block; ++block_no, ++i) {
+            reqs.push_back((*m_cache)[i].write(m_bids[block_no]));
         }
 
         m_page_status[page_no] = valid_on_disk;
@@ -1761,8 +1761,8 @@ private:
     bool is_page_cached(const blocked_index_type& offset) const
     {
         unsigned_type page_no = offset.get_block2();
-        assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
-        return m_page_to_slot[page_no] >= 0; // != on_disk;
+        assert(page_no < m_page_to_slot.size()); // fails if offset is too large, out of bound access
+        return m_page_to_slot[page_no] >= 0;     // != on_disk;
     }
 };
 
@@ -2001,9 +2001,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    vector_bufreader(const vector_bufreader &) = delete;
+    vector_bufreader(const vector_bufreader&) = delete;
     //! non-copyable: delete assignment operator
-    vector_bufreader & operator = (const vector_bufreader &) = delete;
+    vector_bufreader& operator = (const vector_bufreader&) = delete;
 
     //! Finish reading and free buffered reader.
     ~vector_bufreader()
@@ -2249,9 +2249,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    vector_bufreader_reverse(const vector_bufreader_reverse &) = delete;
+    vector_bufreader_reverse(const vector_bufreader_reverse&) = delete;
     //! non-copyable: delete assignment operator
-    vector_bufreader_reverse & operator = (const vector_bufreader_reverse &) = delete;
+    vector_bufreader_reverse& operator = (const vector_bufreader_reverse&) = delete;
 
     //! Rewind stream back to begin. Note that this recreates the buffered
     //! reader and is thus not cheap.
@@ -2434,9 +2434,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    vector_bufwriter(const vector_bufwriter &) = delete;
+    vector_bufwriter(const vector_bufwriter&) = delete;
     //! non-copyable: delete assignment operator
-    vector_bufwriter & operator = (const vector_bufwriter &) = delete;
+    vector_bufwriter& operator = (const vector_bufwriter&) = delete;
 
     //! Finish writing and flush output back to vector.
     ~vector_bufwriter()

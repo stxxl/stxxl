@@ -95,9 +95,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    disk_allocator(const disk_allocator &) = delete;
+    disk_allocator(const disk_allocator&) = delete;
     //! non-copyable: delete assignment operator
-    disk_allocator & operator = (const disk_allocator &) = delete;
+    disk_allocator& operator = (const disk_allocator&) = delete;
 
     ~disk_allocator()
     {

@@ -28,7 +28,6 @@
 #include <algorithm>
 
 namespace stxxl {
-
 namespace parallel {
 
 //! Compare a pair of types lexcigraphically, ascending.
@@ -579,7 +578,6 @@ ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
 #undef S
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER

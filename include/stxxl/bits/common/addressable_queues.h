@@ -17,7 +17,6 @@
 #include <list>
 #include <map>
 
-
 namespace stxxl {
 
 //! An internal fifo queue that allows removing elements addressed with (a copy

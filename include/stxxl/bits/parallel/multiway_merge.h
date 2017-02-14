@@ -38,7 +38,6 @@ typedef SSIZE_T ssize_t;
 #endif
 
 namespace stxxl {
-
 namespace parallel {
 
 //! Length of a sequence described by a pair of iterators.
@@ -471,7 +470,7 @@ RandomAccessIterator3
 multiway_merge_3_combined(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIteratorIterator seqs_end,
                           RandomAccessIterator3 target,
-                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
+                          typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                           Comparator comp)
 {
     typedef typename std::iterator_traits<RandomAccessIteratorIterator>
@@ -687,7 +686,7 @@ RandomAccessIterator3
 multiway_merge_4_combined(RandomAccessIteratorIterator seqs_begin,
                           RandomAccessIteratorIterator seqs_end,
                           RandomAccessIterator3 target,
-                         typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
+                          typename std::iterator_traits<typename std::iterator_traits<RandomAccessIteratorIterator>::value_type::first_type>::difference_type length,
                           Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
@@ -1441,7 +1440,7 @@ parallel_multiway_merge_sampling_splitting(
                         samples[num_samples * num_seqs * slab / num_threads],
                         comp);
             }
-            else    // absolute beginning
+            else        // absolute beginning
                 chunks[slab][static_cast<size_t>(seq)].first = seqs_begin[seq].first;
 
             if ((slab + 1) < num_threads) {
@@ -1451,7 +1450,7 @@ parallel_multiway_merge_sampling_splitting(
                         samples[num_samples * num_seqs * (slab + 1) / num_threads],
                         comp);
             }
-            else    // absolute ending
+            else        // absolute ending
                 chunks[slab][static_cast<size_t>(seq)].second = seqs_begin[seq].second;
         }
     }
@@ -1528,7 +1527,7 @@ parallel_multiway_merge_exact_splitting(
 
             if (!tight || slab < (num_threads - 1))
                 chunks[slab][s].second = offsets[slab][s];
-            else    // slab == num_threads - 1
+            else        // slab == num_threads - 1
                 chunks[slab][s].second = seqs_begin[static_cast<DiffType>(s)].second;
         }
     }
@@ -1622,7 +1621,7 @@ parallel_multiway_merge(RandomAccessIteratorIterator seqs_begin,
                     static_cast<DiffType>(length), total_length, comp,
                     chunks, num_threads);
             }
-            else // (SETTINGS::multiway_merge_splitting == SETTINGS::EXACT)
+            else    // (SETTINGS::multiway_merge_splitting == SETTINGS::EXACT)
             {
                 parallel_multiway_merge_exact_splitting<Stable>(
                     seqs_ne.begin(), seqs_ne.end(),
@@ -1840,7 +1839,6 @@ multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
 #endif // STXXL_PARALLEL
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_MULTIWAY_MERGE_HEADER

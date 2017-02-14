@@ -18,7 +18,6 @@
  * Provides a static class to store runtime tuning parameters.
  */
 
-
 namespace stxxl {
 
 template <typename MustBeInt = int>

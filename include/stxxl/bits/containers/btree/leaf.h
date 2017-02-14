@@ -17,7 +17,6 @@
 #include <stxxl/bits/containers/btree/node_cache.h>
 
 namespace stxxl {
-
 namespace btree {
 
 template <class NodeType, class BTreeType>
@@ -178,9 +177,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    normal_leaf(const normal_leaf &) = delete;
+    normal_leaf(const normal_leaf&) = delete;
     //! non-copyable: delete assignment operator
-    normal_leaf & operator = (const normal_leaf &) = delete;
+    normal_leaf& operator = (const normal_leaf&) = delete;
 
     bool overflows() const { return m_block->info.cur_size > max_nelements(); }
     bool underflows() const { return m_block->info.cur_size < min_nelements(); }
@@ -698,7 +697,6 @@ public:
 };
 
 } // namespace btree
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_BTREE_LEAF_HEADER

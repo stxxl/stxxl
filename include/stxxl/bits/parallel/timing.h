@@ -29,7 +29,6 @@
 #endif
 
 namespace stxxl {
-
 namespace parallel {
 
 /** Type of of point in time, used for the Timing classes. */
@@ -195,7 +194,6 @@ template <typename must_be_int>
 const char* Timing<inactive_tag, must_be_int>::empty_string = "";
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_TIMING_HEADER

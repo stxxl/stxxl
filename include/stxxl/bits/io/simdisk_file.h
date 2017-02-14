@@ -96,9 +96,9 @@ public:
     simdisk_geometry() = default;
 
     //! non-copyable: delete copy-constructor
-    simdisk_geometry(const simdisk_geometry &) = delete;
+    simdisk_geometry(const simdisk_geometry&) = delete;
     //! non-copyable: delete assignment operator
-    simdisk_geometry & operator = (const simdisk_geometry &) = delete;
+    simdisk_geometry& operator = (const simdisk_geometry&) = delete;
 
     double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
 

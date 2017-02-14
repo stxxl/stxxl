@@ -77,9 +77,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    iterator_map(const iterator_map &) = delete;
+    iterator_map(const iterator_map&) = delete;
     //! non-copyable: delete assignment operator
-    iterator_map & operator = (const iterator_map &) = delete;
+    iterator_map& operator = (const iterator_map&) = delete;
 
     ~iterator_map()
     {

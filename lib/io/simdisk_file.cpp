@@ -226,5 +226,5 @@ void sim_disk_file::set_size(offset_type newsize)
 
 } // namespace stxxl
 
-#endif  // #if STXXL_HAVE_SIMDISK_FILE
+#endif // #if STXXL_HAVE_SIMDISK_FILE
 // vim: et:ts=4:sw=4

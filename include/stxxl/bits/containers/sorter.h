@@ -118,9 +118,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    sorter(const sorter &) = delete;
+    sorter(const sorter&) = delete;
     //! non-copyable: delete assignment operator
-    sorter & operator = (const sorter &) = delete;
+    sorter& operator = (const sorter&) = delete;
 
     //! \}
 

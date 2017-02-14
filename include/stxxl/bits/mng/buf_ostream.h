@@ -53,9 +53,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    buf_ostream(const buf_ostream &) = delete;
+    buf_ostream(const buf_ostream&) = delete;
     //! non-copyable: delete assignment operator
-    buf_ostream & operator = (const buf_ostream &) = delete;
+    buf_ostream& operator = (const buf_ostream&) = delete;
 
     //! Output stream operator, writes out \c record.
     //! \param record const reference to block record type, containing a value of record to write to the stream

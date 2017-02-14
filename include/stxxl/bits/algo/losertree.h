@@ -97,9 +97,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    loser_tree(const loser_tree &) = delete;
+    loser_tree(const loser_tree&) = delete;
     //! non-copyable: delete assignment operator
-    loser_tree & operator = (const loser_tree &) = delete;
+    loser_tree& operator = (const loser_tree&) = delete;
 
     ~loser_tree()
     {

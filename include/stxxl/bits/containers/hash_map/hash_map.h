@@ -229,9 +229,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    hash_map(const hash_map &) = delete;
+    hash_map(const hash_map&) = delete;
     //! non-copyable: delete assignment operator
-    hash_map & operator = (const hash_map &) = delete;
+    hash_map& operator = (const hash_map&) = delete;
 
     ~hash_map()
     {
@@ -1587,10 +1587,9 @@ public:
         o << "Blocks allocated     : " << bids_.size() << " => " << (bids_.size() * block_type::raw_size) << " bytes" << std::endl;
         o << "Bytes per value      : " << ((double)(bids_.size() * block_type::raw_size) / (double)num_total_) << std::endl;
     }
-};     /* end of class hash_map */
+};      /* end of class hash_map */
 
 } // namespace hash_map
-
 } // namespace stxxl
 
 namespace std {

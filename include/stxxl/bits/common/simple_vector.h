@@ -70,9 +70,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    simple_vector(const simple_vector &) = delete;
+    simple_vector(const simple_vector&) = delete;
     //! non-copyable: delete assignment operator
-    simple_vector & operator = (const simple_vector &) = delete;
+    simple_vector& operator = (const simple_vector&) = delete;
 
     //! swap vector with another one
     void swap(simple_vector& obj)

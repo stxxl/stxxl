@@ -19,7 +19,6 @@
 #include <stxxl/bits/common/types.h>
 
 namespace stxxl {
-
 namespace btree {
 
 template <class BTreeType>
@@ -376,7 +375,6 @@ inline bool operator != (const btree_iterator<BTreeType>& a,
 }
 
 } // namespace btree
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_BTREE_ITERATOR_HEADER

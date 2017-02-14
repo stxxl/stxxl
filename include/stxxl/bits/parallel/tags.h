@@ -17,9 +17,7 @@
 #ifndef STXXL_PARALLEL_TAGS_HEADER
 #define STXXL_PARALLEL_TAGS_HEADER
 
-
 namespace stxxl {
-
 namespace parallel {
 
 /** Makes the parametrized class actually do work, i. e. actives it. */
@@ -30,7 +28,6 @@ class inactive_tag
 { };
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_TAGS_HEADER

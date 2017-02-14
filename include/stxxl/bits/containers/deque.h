@@ -473,9 +473,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    deque(const deque &) = delete;
+    deque(const deque&) = delete;
     //! non-copyable: delete assignment operator
-    deque & operator = (const deque &) = delete;
+    deque& operator = (const deque&) = delete;
 
     ~deque()      // empty so far
     { }

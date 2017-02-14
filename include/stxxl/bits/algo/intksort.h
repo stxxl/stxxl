@@ -233,8 +233,8 @@ insertion_sort(Type* a, Type* aEnd)
         // Invariant a..p-1 is sorted;
         Type t = *p;
         if (t < *a)
-        {   // new minimum
-            // move stuff to the right
+        {
+            // new minimum -> move stuff to the right
             for (pp = p; pp != a; pp--)
             {
                 *pp = *(pp - 1);

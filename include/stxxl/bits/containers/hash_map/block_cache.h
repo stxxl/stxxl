@@ -26,7 +26,6 @@
 #include <unordered_map>
 
 namespace stxxl {
-
 namespace hash_map {
 
 //! Used inside block_cache for buffering write requests of cached blocks.
@@ -57,9 +56,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    block_cache_write_buffer(const block_cache_write_buffer &) = delete;
+    block_cache_write_buffer(const block_cache_write_buffer&) = delete;
     //! non-copyable: delete assignment operator
-    block_cache_write_buffer & operator = (const block_cache_write_buffer &) = delete;
+    block_cache_write_buffer& operator = (const block_cache_write_buffer&) = delete;
 
     //! Writes the given block back to disk;
     //! callers have to exchange the passed block with the returned one!
@@ -160,7 +159,7 @@ protected:
     typedef block_cache_write_buffer<block_type> write_buffer_type;
 
     typedef typename std::unordered_map<
-        bid_type, unsigned_type, bid_hash> bid_map_type;
+            bid_type, unsigned_type, bid_hash> bid_map_type;
 
     enum { valid_all = block_type::size };
 
@@ -186,12 +185,12 @@ protected:
     pager_type pager_;
 
     /* statistics */
-    uint64_t n_found {0};
-    uint64_t n_not_found {0};
-    uint64_t n_read {0};
-    uint64_t n_written {0};
-    uint64_t n_clean_forced {0};
-    uint64_t n_wrong_subblock {0};
+    uint64_t n_found { 0 };
+    uint64_t n_not_found { 0 };
+    uint64_t n_read { 0 };
+    uint64_t n_written { 0 };
+    uint64_t n_clean_forced { 0 };
+    uint64_t n_wrong_subblock { 0 };
 
 public:
     //! Construct a new block-cache.
@@ -215,9 +214,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    block_cache(const block_cache &) = delete;
+    block_cache(const block_cache&) = delete;
     //! non-copyable: delete assignment operator
-    block_cache & operator = (const block_cache &) = delete;
+    block_cache& operator = (const block_cache&) = delete;
 
     //! Return cache-size
     unsigned_type size() const
@@ -554,7 +553,7 @@ public:
         std::swap(n_wrong_subblock, obj.n_wrong_subblock);
     }
 
-#if 0   // for debugging, requires data items to be ostream-able.
+#if 0       // for debugging, requires data items to be ostream-able.
 
     //! Show currently cached blocks
     void dump_cache(std::ostream& os) const
@@ -591,7 +590,6 @@ public:
 };
 
 } // namespace hash_map
-
 } // namespace stxxl
 
 namespace std {

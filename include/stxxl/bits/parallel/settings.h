@@ -26,7 +26,6 @@
 #endif
 
 namespace stxxl {
-
 namespace parallel {
 
 /** The extensible condition on whether the parallel variant of an algorithm sould be called.
@@ -46,7 +45,7 @@ public:
         num_threads = omp_get_max_threads();
 #else
         num_threads = 1;
-#endif      // STXXL_PARALLEL
+#endif // STXXL_PARALLEL
         if (num_threads < 1)
             num_threads = 1;
     }
@@ -188,7 +187,6 @@ template <typename must_be_int>
 NumberOfThreads Settings<must_be_int>::num_threads;
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_SETTINGS_HEADER

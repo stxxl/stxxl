@@ -94,9 +94,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    buf_istream_reverse(const buf_istream_reverse &) = delete;
+    buf_istream_reverse(const buf_istream_reverse&) = delete;
     //! non-copyable: delete assignment operator
-    buf_istream_reverse & operator = (const buf_istream_reverse &) = delete;
+    buf_istream_reverse& operator = (const buf_istream_reverse&) = delete;
 
     //! Input stream operator, reads in \c record.
     //! \param record reference to the block record type,

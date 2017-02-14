@@ -19,7 +19,6 @@
 #include <stxxl/bits/containers/hash_map/util.h>
 
 namespace stxxl {
-
 namespace hash_map {
 
 template <class HashMap>
@@ -580,7 +579,6 @@ public:
 };
 
 } // namespace hash_map
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_ITERATOR_HEADER

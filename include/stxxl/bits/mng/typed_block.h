@@ -239,8 +239,8 @@ public:
     typedef const value_type* const_pointer;
     typedef const_pointer const_iterator;
 
-    static constexpr size_t raw_size = RawSize; //!< size of block in bytes
-    static constexpr size_t size = Base::size;  //!< number of elements in block
+    static constexpr size_t raw_size = RawSize;                                      //!< size of block in bytes
+    static constexpr size_t size = Base::size;                                       //!< number of elements in block
     static constexpr bool has_only_data = (raw_size == (size * sizeof(value_type))); //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
 
     typedef BID<raw_size> bid_type;

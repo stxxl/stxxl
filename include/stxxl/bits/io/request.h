@@ -24,7 +24,6 @@
 #include <cassert>
 #include <memory>
 
-
 namespace stxxl {
 
 //! \addtogroup reqlayer

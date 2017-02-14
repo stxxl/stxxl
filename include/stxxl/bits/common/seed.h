@@ -13,7 +13,6 @@
 #ifndef STXXL_COMMON_SEED_HEADER
 #define STXXL_COMMON_SEED_HEADER
 
-
 namespace stxxl {
 
 //! set the global stxxl seed value

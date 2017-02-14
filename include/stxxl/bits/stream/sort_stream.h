@@ -29,7 +29,6 @@
 #include <algorithm>
 
 namespace stxxl {
-
 namespace stream {
 
 //! \addtogroup streampack Stream Package
@@ -147,9 +146,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    basic_runs_creator(const basic_runs_creator &) = delete;
+    basic_runs_creator(const basic_runs_creator&) = delete;
     //! non-copyable: delete assignment operator
-    basic_runs_creator & operator = (const basic_runs_creator &) = delete;
+    basic_runs_creator& operator = (const basic_runs_creator&) = delete;
 
     //! Returns the sorted runs object.
     //! \return Sorted runs object. The result is computed lazily, i.e. on the first call
@@ -162,7 +161,7 @@ public:
             m_result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
             STXXL_MSG(*stats::get_instance());
-#endif          //STXXL_PRINT_STAT_AFTER_RF
+#endif //STXXL_PRINT_STAT_AFTER_RF
         }
         return m_result;
     }
@@ -207,7 +206,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
         potentially_parallel::sort(m_result->small_run.begin(), m_result->small_run.end(), cmp);
         return;
     }
-#endif  //STXXL_SMALL_INPUT_PSORT_OPT
+#endif //STXXL_SMALL_INPUT_PSORT_OPT
 
     // the first block may be there already, now fetch until memsize is filled.
     blocks1_length = fetch(Blocks1, blocks1_length, el_in_run);
@@ -570,9 +569,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    runs_creator(const runs_creator &) = delete;
+    runs_creator(const runs_creator&) = delete;
     //! non-copyable: delete assignment operator
-    runs_creator & operator = (const runs_creator &) = delete;
+    runs_creator& operator = (const runs_creator&) = delete;
 
     ~runs_creator()
     {
@@ -679,7 +678,7 @@ public:
             m_result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
             STXXL_MSG(*stats::get_instance());
-#endif          //STXXL_PRINT_STAT_AFTER_RF
+#endif //STXXL_PRINT_STAT_AFTER_RF
         }
         return m_result;
     }
@@ -792,9 +791,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    runs_creator(const runs_creator &) = delete;
+    runs_creator(const runs_creator&) = delete;
     //! non-copyable: delete assignment operator
-    runs_creator & operator = (const runs_creator &) = delete;
+    runs_creator& operator = (const runs_creator&) = delete;
 
     //! Adds new element to the current run.
     //! \param val value to be added to the current run
@@ -1016,7 +1015,7 @@ private:
 #if STXXL_CHECK_ORDER_IN_SORTS
     //! previous element to ensure the current output ordering
     value_type m_last_element;
-#endif  //STXXL_CHECK_ORDER_IN_SORTS
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
     ////////////////////////////////////////////////////////////////////
 
@@ -1089,28 +1088,28 @@ private:
                     }
                 assert(false);
             }
-#endif          //STXXL_CHECK_ORDER_IN_SORTS
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
 // end of STL-style merging
 #else
             STXXL_THROW_UNREACHABLE();
-#endif          //STXXL_PARALLEL_MULTIWAY_MERGE
+#endif //STXXL_PARALLEL_MULTIWAY_MERGE
         }
         else
         {
 // begin of native merging procedure
             m_losers->multi_merge(m_buffer_block->elem,
                                   m_buffer_block->elem +
-                                          std::min<size_type>(
-                                          static_cast<size_type>(out_block_type::size),
-                                          m_elements_remaining));
+                                  std::min<size_type>(
+                                      static_cast<size_type>(out_block_type::size),
+                                      m_elements_remaining));
 // end of native merging procedure
         }
         STXXL_VERBOSE1("current block filled");
 
         m_current_ptr = m_buffer_block->elem;
         m_current_end = m_buffer_block->elem + std::min<size_type>(
-                static_cast<size_type>(out_block_type::size), m_elements_remaining);
+            static_cast<size_type>(out_block_type::size), m_elements_remaining);
 
         if (m_elements_remaining <= out_block_type::size)
             deallocate_prefetcher();
@@ -1134,15 +1133,15 @@ public:
 #endif
 #if STXXL_CHECK_ORDER_IN_SORTS
           , m_last_element(m_cmp.min_value())
-#endif  //STXXL_CHECK_ORDER_IN_SORTS
+#endif //STXXL_CHECK_ORDER_IN_SORTS
     {
         sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
     }
 
     //! non-copyable: delete copy-constructor
-    basic_runs_merger(const basic_runs_merger &) = delete;
+    basic_runs_merger(const basic_runs_merger&) = delete;
     //! non-copyable: delete assignment operator
-    basic_runs_merger & operator = (const basic_runs_merger &) = delete;
+    basic_runs_merger& operator = (const basic_runs_merger&) = delete;
 
     //! Set memory amount to use for the merger in bytes.
     void set_memory_to_use(unsigned_type memory_to_use)
@@ -1173,7 +1172,7 @@ public:
 
 #if STXXL_CHECK_ORDER_IN_SORTS
         assert(check_sorted_runs(m_sruns, m_cmp));
-#endif      //STXXL_CHECK_ORDER_IN_SORTS
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
         // *** test whether recursive merging is necessary
 
@@ -1252,7 +1251,7 @@ public:
 #else
         for (unsigned_type i = 0; i < prefetch_seq_size; ++i)
             m_prefetch_seq[i] = i;
-#endif      //STXXL_SORT_OPTIMAL_PREFETCHING
+#endif //STXXL_SORT_OPTIMAL_PREFETCHING
 
         m_prefetcher = new prefetcher_type(
             m_consume_seq.begin(),
@@ -1275,7 +1274,7 @@ public:
 // end of STL-style merging
 #else
             STXXL_THROW_UNREACHABLE();
-#endif          //STXXL_PARALLEL_MULTIWAY_MERGE
+#endif //STXXL_PARALLEL_MULTIWAY_MERGE
         }
         else
         {
@@ -1335,7 +1334,7 @@ public:
 
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert(stxxl::is_sorted(m_buffer_block->elem, m_buffer_block->elem + std::min<size_type>(m_elements_remaining, m_buffer_block->size), m_cmp));
-#endif          //STXXL_CHECK_ORDER_IN_SORTS
+#endif //STXXL_CHECK_ORDER_IN_SORTS
         }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -1344,7 +1343,7 @@ public:
             assert(!m_cmp(operator * (), m_last_element));
             m_last_element = operator * ();
         }
-#endif      //STXXL_CHECK_ORDER_IN_SORTS
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
         return *this;
     }
@@ -1448,7 +1447,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                 merger(m_cmp, m_memory_to_use - memory_for_write_buffers);
                 merger.initialize(cur_runs);
 
-                {       // make sure everything is being destroyed in right time
+                {           // make sure everything is being destroyed in right time
                     buf_ostream<block_type, typename run_type::iterator> out(
                         new_runs.runs[cur_out_run].begin(),
                         nwrite_buffers);
@@ -1599,9 +1598,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    sort(const sort &) = delete;
+    sort(const sort&) = delete;
     //! non-copyable: delete assignment operator
-    sort & operator = (const sort &) = delete;
+    sort& operator = (const sort&) = delete;
 
     //! Standard stream method.
     bool empty() const

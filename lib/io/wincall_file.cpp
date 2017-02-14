@@ -99,5 +99,5 @@ const char* wincall_file::io_type() const
 
 } // namespace stxxl
 
-#endif  // #if STXXL_HAVE_WINCALL_FILE
+#endif // #if STXXL_HAVE_WINCALL_FILE
 // vim: et:ts=4:sw=4

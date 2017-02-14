@@ -70,5 +70,5 @@ const char* mmap_file::io_type() const
 
 } // namespace stxxl
 
-#endif  // #if STXXL_HAVE_MMAP_FILE
+#endif // #if STXXL_HAVE_MMAP_FILE
 // vim: et:ts=4:sw=4

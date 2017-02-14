@@ -164,9 +164,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    int_merger(const int_merger &) = delete;
+    int_merger(const int_merger&) = delete;
     //! non-copyable: delete assignment operator
-    int_merger & operator = (const int_merger &) = delete;
+    int_merger& operator = (const int_merger&) = delete;
 
     ~int_merger()
     {
@@ -393,7 +393,7 @@ protected:
 
         tree.maybe_compact();
     }
-#endif  // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#endif // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 };
 
 } // namespace priority_queue_local

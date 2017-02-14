@@ -43,8 +43,8 @@ struct BID
     static constexpr size_t size = Size;   //!< Block size
     static constexpr size_t t_size = Size; //!< Blocks size, given by the parameter
 
-    file* storage;           //!< pointer to the file of the block
-    stxxl::int64 offset;     //!< offset within the file of the block
+    file* storage;                         //!< pointer to the file of the block
+    stxxl::int64 offset;                   //!< offset within the file of the block
 
     BID() : storage(NULL), offset(0)
     { }
@@ -85,11 +85,11 @@ struct BID
 template <>
 struct BID<0>
 {
-    file* storage;           //!< pointer to the file of the block
-    stxxl::int64 offset;     //!< offset within the file of the block
-    unsigned size;           //!< size of the block in bytes
+    file* storage;                      //!< pointer to the file of the block
+    stxxl::int64 offset;                //!< offset within the file of the block
+    unsigned size;                      //!< size of the block in bytes
 
-    static constexpr size_t t_size = 0;  //!< Blocks size, given by the parameter
+    static constexpr size_t t_size = 0; //!< Blocks size, given by the parameter
 
     BID() : storage(NULL), offset(0), size(0)
     { }

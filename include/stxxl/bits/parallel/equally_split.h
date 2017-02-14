@@ -21,7 +21,6 @@
 #include <stxxl/bits/parallel/types.h>
 
 namespace stxxl {
-
 namespace parallel {
 
 /*!
@@ -52,7 +51,6 @@ DiffTypeOutputIterator equally_split(DiffType n, thread_index_t p,
 }
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_EQUALLY_SPLIT_HEADER

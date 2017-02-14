@@ -1201,8 +1201,8 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
             else
             {
                 size_t this_bulk_size = (num_inserts + bulk_size > num_elements)
-                                       ? num_elements % bulk_size
-                                       : bulk_size;
+                                        ? num_elements % bulk_size
+                                        : bulk_size;
 
                 c.bulk_push_begin(this_bulk_size);
 #if STXXL_PARALLEL
@@ -1266,7 +1266,7 @@ void do_bulk_prefill(ContainerType& c, bool do_parallel,
 #endif
     {
         const unsigned int thread_num =
-                do_parallel ? get_thread_num() : 0;
+            do_parallel ? get_thread_num() : 0;
 #if STXXL_PARALLEL
 #pragma omp for
 #endif

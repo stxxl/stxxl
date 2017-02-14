@@ -1099,8 +1099,8 @@ public:
     public:
         sparseTable(std::vector<offset_type>& fieldVector)
         {
-            std::size_t dimI = fieldVector.size();    // y-Dimension of QTable
-            std::size_t dimK = stxxl::log2_floor(dimI) + 1;  // x-Dimension of QTable
+            std::size_t dimI = fieldVector.size();          // y-Dimension of QTable
+            std::size_t dimK = stxxl::log2_floor(dimI) + 1; // x-Dimension of QTable
             createQTable(fieldVector, dimI, dimK);
         }
 

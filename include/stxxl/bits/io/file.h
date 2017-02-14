@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/config.h>
 
-#if defined (__linux__)
+#if defined(__linux__)
  #define STXXL_CHECK_BLOCK_ALIGNING
 #endif
 
@@ -88,9 +88,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    file(const file &) = delete;
+    file(const file&) = delete;
     //! non-copyable: delete assignment operator
-    file & operator = (const file &) = delete;
+    file& operator = (const file&) = delete;
 
     //! Schedules an asynchronous read request to the file.
     //! \param buffer pointer to memory buffer to read into

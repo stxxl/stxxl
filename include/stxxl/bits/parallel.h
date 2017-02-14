@@ -236,7 +236,6 @@ multiway_merge_stable_sentinels(RandomAccessIteratorPairIterator seqs_begin,
 }
 
 } // namespace potentially_parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_HEADER

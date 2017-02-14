@@ -17,7 +17,6 @@
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 
 namespace stxxl {
-
 namespace hash_map {
 
 template <
@@ -148,9 +147,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    unordered_map(const unordered_map &) = delete;
+    unordered_map(const unordered_map&) = delete;
     //! non-copyable: delete assignment operator
-    unordered_map & operator = (const unordered_map &) = delete;
+    unordered_map& operator = (const unordered_map&) = delete;
 
     //! \}
 

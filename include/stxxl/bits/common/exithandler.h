@@ -13,7 +13,6 @@
 #ifndef STXXL_COMMON_EXITHANDLER_HEADER
 #define STXXL_COMMON_EXITHANDLER_HEADER
 
-
 namespace stxxl {
 
 // There are several possibilities for the exit handlers.  To use the default

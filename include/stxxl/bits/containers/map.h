@@ -17,7 +17,6 @@
 #include <stxxl/bits/containers/btree/btree.h>
 
 namespace stxxl {
-
 namespace btree {
 
 template <class KeyType,
@@ -225,9 +224,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    map(const map &) = delete;
+    map(const map&) = delete;
     //! non-copyable: delete assignment operator
-    map & operator = (const map &) = delete;
+    map& operator = (const map&) = delete;
 
     //! \}
 

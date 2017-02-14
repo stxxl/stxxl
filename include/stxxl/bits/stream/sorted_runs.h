@@ -22,7 +22,6 @@
 #include <stxxl/bits/common/counting_ptr.h>
 
 namespace stxxl {
-
 namespace stream {
 
 //! \addtogroup streampack Stream Package
@@ -68,9 +67,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    sorted_runs(const sorted_runs &) = delete;
+    sorted_runs(const sorted_runs&) = delete;
     //! non-copyable: delete assignment operator
-    sorted_runs & operator = (const sorted_runs &) = delete;
+    sorted_runs& operator = (const sorted_runs&) = delete;
 
     ~sorted_runs()
     {
@@ -126,7 +125,6 @@ private:
 //! \}
 
 } // namespace stream
-
 } // namespace stxxl
 
 #endif // !STXXL_STREAM_SORTED_RUNS_HEADER

@@ -16,7 +16,6 @@
 #ifndef STXXL_IO_COMPLETION_HANDLER_HEADER
 #define STXXL_IO_COMPLETION_HANDLER_HEADER
 
-
 #include <cstdlib>
 #include <memory>
 

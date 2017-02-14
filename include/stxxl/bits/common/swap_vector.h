@@ -78,9 +78,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    swap_vector(const swap_vector &) = delete;
+    swap_vector(const swap_vector&) = delete;
     //! non-copyable: delete assignment operator
-    swap_vector & operator = (const swap_vector &) = delete;
+    swap_vector& operator = (const swap_vector&) = delete;
 
     //! Swap the vector with another one.
     void swap(swap_vector& obj)

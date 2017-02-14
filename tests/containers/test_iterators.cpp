@@ -131,7 +131,7 @@ void test_comparison(IteratorA a, IteratorB b)
     STXXL_CHECK((b == a));
     STXXL_CHECK(! (b != a));
 
-    test_comparison_lt_gt<IteratorA, IteratorB, typename std::iterator_traits<IteratorA>::iterator_category>() (a, b);
+    test_comparison_lt_gt<IteratorA, IteratorB, typename std::iterator_traits<IteratorA>::iterator_category>()(a, b);
 }
 
 template <typename Iterator>
@@ -154,14 +154,14 @@ void test(svt& sv)
 
     typename svt::iterator svi = sv.begin();
     dump_iterator_info(svi);
-    modify<value_type>() (*svi);
+    modify<value_type>()(*svi);
 
     typename svt::const_iterator svci = sv.begin();
     dump_iterator_info(svci);
     //modify<value_type>()(*svci);      // read-only
 
     typename csvt::iterator xsvi = sv.begin();
-    modify<value_type>() (*xsvi);
+    modify<value_type>()(*xsvi);
 
     // test assignment
     svci = xsvi;
@@ -229,14 +229,14 @@ void test_reverse(svt& sv)
 
     typename svt::reverse_iterator svi = sv.rbegin();
     dump_iterator_info(svi);
-    modify<value_type>() (*svi);
+    modify<value_type>()(*svi);
 
     typename svt::const_reverse_iterator svci = sv.rbegin();
     dump_iterator_info(svci);
     //modify<value_type>()(*svci);      // read-only
 
     typename csvt::reverse_iterator xsvi = sv.rbegin();
-    modify<value_type>() (*xsvi);
+    modify<value_type>()(*xsvi);
 
     // test assignment
     svci = xsvi;

@@ -23,7 +23,6 @@
 
 namespace stxxl {
 
-
 //! \addtogroup stlcontinternals
 //!
 //! \{
@@ -94,9 +93,9 @@ public:
         { }
 
         //! non-copyable: delete copy-constructor
-        sequence_state(const sequence_state &) = delete;
+        sequence_state(const sequence_state&) = delete;
         //! non-copyable: delete assignment operator
-        sequence_state & operator = (const sequence_state &) = delete;
+        sequence_state& operator = (const sequence_state&) = delete;
 
         ~sequence_state()
         {
@@ -207,9 +206,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    ext_merger(const ext_merger &) = delete;
+    ext_merger(const ext_merger&) = delete;
     //! non-copyable: delete assignment operator
-    ext_merger & operator = (const ext_merger &) = delete;
+    ext_merger& operator = (const ext_merger&) = delete;
 
     virtual ~ext_merger()
     {
@@ -455,7 +454,7 @@ public:
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         multi_merge_parallel(begin, end);
-#else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#else           // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         tree.multi_merge(begin, end);
         m_size -= end - begin;
 #endif
@@ -648,7 +647,7 @@ protected:
                     }
                 }
             }
-        }   //while (rest > 1)
+        }       // while (rest > 1)
 
         for (unsigned_type i = 0; i < seqs.size(); ++i)
         {
@@ -662,8 +661,8 @@ protected:
 
         tree.maybe_compact();
     }
-#endif  // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-}; // class ext_merger
+#endif // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+};     // class ext_merger
 
 } // namespace priority_queue_local
 

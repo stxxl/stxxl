@@ -43,7 +43,6 @@ int main()
     STXXL_MSG("Size: " << ppq.size());
     STXXL_MSG("Smallest value: " << ppq.top());
 
-
     // bulk push
 
     STXXL_MSG("Bulk-pushing values 0 to 10000...");
@@ -68,14 +67,13 @@ int main()
     STXXL_MSG("Size: " << ppq.size());
     STXXL_MSG("Smallest value: " << ppq.top());
 
-
     // bulk pop
 
     STXXL_MSG("Bulk-extracting 500 values...");
 
     std::vector<unsigned> out1;
     ppq.bulk_pop(out1, 500);
-    
+
 #if STXXL_PARALLEL
     #pragma omp parallel for
 #endif
@@ -86,11 +84,10 @@ int main()
 
     assert(out1.size() == 500);
     assert(ppq.size() == 9503);
-    assert(ppq.top() == 500-3); // -3 because of items 5, 4, and 19.
+    assert(ppq.top() == 500 - 3); // -3 because of items 5, 4, and 19.
     STXXL_MSG("Output size: " << out1.size());
     STXXL_MSG("Size: " << ppq.size());
     STXXL_MSG("Smallest value: " << ppq.top());
-
 
     // bulk limit
 
@@ -99,7 +96,7 @@ int main()
     std::vector<unsigned> out2;
     unsigned limit_item = 8000;
     ppq.bulk_pop_limit(out2, limit_item);
-    
+
 #if STXXL_PARALLEL
     #pragma omp parallel for
 #endif

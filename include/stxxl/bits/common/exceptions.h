@@ -18,7 +18,6 @@
 #include <string>
 #include <stdexcept>
 
-
 namespace stxxl {
 
 class io_error : public std::ios_base::failure

@@ -389,7 +389,7 @@ private:
 #if STXXL_MSVC
     using reference_count_t = long;
 #else
-    using reference_count_t =  size_t;
+    using reference_count_t = size_t;
 #endif
     //! the reference count is kept mutable to all const_counting_ptr() to
     //! change the reference count.

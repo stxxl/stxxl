@@ -13,9 +13,7 @@
 #ifndef STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER
 #define STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER
 
-
 namespace stxxl {
-
 namespace btree {
 
 template <class KeyType, class BIDType>
@@ -25,7 +23,6 @@ class root_node
 };
 
 } // namespace btree
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_BTREE_ROOT_NODE_HEADER

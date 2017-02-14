@@ -149,9 +149,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    block_prefetcher(const block_prefetcher &) = delete;
+    block_prefetcher(const block_prefetcher&) = delete;
     //! non-copyable: delete assignment operator
-    block_prefetcher & operator = (const block_prefetcher &) = delete;
+    block_prefetcher& operator = (const block_prefetcher&) = delete;
 
     //! Pulls next unconsumed block from the consumption sequence.
     //! \return Pointer to the already prefetched block from the internal buffer pool

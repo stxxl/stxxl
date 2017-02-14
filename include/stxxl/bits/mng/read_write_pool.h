@@ -54,9 +54,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    read_write_pool(const read_write_pool &) = delete;
+    read_write_pool(const read_write_pool&) = delete;
     //! non-copyable: delete assignment operator
-    read_write_pool & operator = (const read_write_pool &) = delete;
+    read_write_pool& operator = (const read_write_pool&) = delete;
 
     void swap(read_write_pool& obj)
     {

@@ -86,9 +86,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    buffered_writer(const buffered_writer &) = delete;
+    buffered_writer(const buffered_writer&) = delete;
     //! non-copyable: delete assignment operator
-    buffered_writer & operator = (const buffered_writer &) = delete;
+    buffered_writer& operator = (const buffered_writer&) = delete;
 
     //! Returns free block from the internal buffer pool.
     //! \return pointer to the block from the internal buffer pool

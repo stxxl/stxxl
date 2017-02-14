@@ -18,7 +18,6 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 
-
 namespace stxxl {
 
 /** Print a demangled stack backtrace of the caller function to FILE* out. */

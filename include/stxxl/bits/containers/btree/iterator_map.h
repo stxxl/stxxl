@@ -19,7 +19,6 @@
 #include <stxxl/bits/common/error_handling.h>
 
 namespace stxxl {
-
 namespace btree {
 
 template <class BTreeType>
@@ -81,9 +80,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    iterator_map(const iterator_map &) = delete;
+    iterator_map(const iterator_map&) = delete;
     //! non-copyable: delete assignment operator
-    iterator_map & operator = (const iterator_map &) = delete;
+    iterator_map& operator = (const iterator_map&) = delete;
 
     void register_iterator(iterator_base& it)
     {
@@ -155,7 +154,6 @@ public:
 };
 
 } // namespace btree
-
 } // namespace stxxl
 
 namespace std {

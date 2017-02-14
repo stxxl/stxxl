@@ -22,7 +22,6 @@
 #include <cassert>
 
 namespace stxxl {
-
 namespace parallel {
 
 /*!
@@ -232,7 +231,6 @@ parallel_merge_advance(
 }
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_MERGE_HEADER

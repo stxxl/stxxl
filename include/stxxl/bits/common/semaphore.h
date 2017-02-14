@@ -37,9 +37,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    semaphore(const semaphore &) = delete;
+    semaphore(const semaphore&) = delete;
     //! non-copyable: delete assignment operator
-    semaphore & operator = (const semaphore &) = delete;
+    semaphore& operator = (const semaphore&) = delete;
 
     //! function increments the semaphore and signals any threads that are
     //! blocked waiting a change in the semaphore

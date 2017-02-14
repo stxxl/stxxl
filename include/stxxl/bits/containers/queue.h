@@ -92,7 +92,8 @@ public:
           alloc_count(0),
           bm(block_manager::get_instance())
     {
-        const size_t disks = (D < 1)
+        const size_t disks =
+            (D < 1)
             ? config::get_instance()->disks_number()
             : static_cast<size_t>(D);
 
@@ -157,9 +158,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    queue(const queue &) = delete;
+    queue(const queue&) = delete;
     //! non-copyable: delete assignment operator
-    queue & operator = (const queue &) = delete;
+    queue& operator = (const queue&) = delete;
 
     //! \}
 

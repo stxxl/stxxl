@@ -14,7 +14,6 @@
 #ifndef STXXL_STREAM_CHOOSE_HEADER
 #define STXXL_STREAM_CHOOSE_HEADER
 
-
 namespace stxxl {
 
 //! Stream package subnamespace.
@@ -301,7 +300,6 @@ public:
 //! \}
 
 } // namespace stream
-
 } // namespace stxxl
 
 #include <stxxl/bits/stream/unique.h>

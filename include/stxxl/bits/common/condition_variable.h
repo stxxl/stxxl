@@ -48,31 +48,31 @@ class condition_variable
 
 public:
     //! initialize condition variable
-    condition_variable() throw()
+    condition_variable() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_init(&cond, NULL));
     }
     //! non-copyable: delete copy-constructor
-    condition_variable(const condition_variable &) = delete;
+    condition_variable(const condition_variable&) = delete;
     //! non-copyable: delete assignment operator
-    condition_variable & operator = (const condition_variable &) = delete;
+    condition_variable& operator = (const condition_variable&) = delete;
     //! destroy condition variable
-    ~condition_variable() throw()
+    ~condition_variable() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_destroy(&cond));
     }
     //! notify one waiting thread
-    void notify_one() throw()
+    void notify_one() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_signal(&cond));
     }
     //! notify all waiting threads
-    void notify_all() throw()
+    void notify_all() throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_broadcast(&cond));
     }
     //! wait for a signal on the condition variable
-    void wait(scoped_mutex_lock& lock) throw()
+    void wait(scoped_mutex_lock& lock) throw ()
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_wait(&cond, &lock.native_handle()));
     }

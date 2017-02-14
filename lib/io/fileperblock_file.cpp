@@ -163,3 +163,5 @@ template class fileperblock_file<boostfd_file>;
 #endif
 
 } // namespace stxxl
+
+/******************************************************************************/

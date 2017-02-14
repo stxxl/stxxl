@@ -80,13 +80,13 @@ private:
     block_manager* m_bm;
     alloc_strategy_type m_alloc_strategy;
 
-    uint64_t n_found {0};
-    uint64_t n_not_found {0};
-    uint64_t n_created {0};
-    uint64_t n_deleted {0};
-    uint64_t n_read {0};
-    uint64_t n_written {0};
-    uint64_t n_clean_forced {0};
+    uint64_t n_found { 0 };
+    uint64_t n_not_found { 0 };
+    uint64_t n_created { 0 };
+    uint64_t n_deleted { 0 };
+    uint64_t n_read { 0 };
+    uint64_t n_written { 0 };
+    uint64_t n_clean_forced { 0 };
 
     // changes btree pointer in all contained iterators
     void change_btree_pointers(btree_type* b)
@@ -128,9 +128,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    node_cache(const node_cache &) = delete;
+    node_cache(const node_cache&) = delete;
     //! non-copyable: delete assignment operator
-    node_cache & operator = (const node_cache &) = delete;
+    node_cache& operator = (const node_cache&) = delete;
 
     unsigned_type size() const
     {
@@ -593,7 +593,6 @@ public:
 };
 
 } // namespace btree
-
 } // namespace stxxl
 
 namespace std {

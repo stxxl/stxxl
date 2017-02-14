@@ -116,17 +116,17 @@ void simple_test(stack_type& my_stack, size_t test_size)
 int main(int argc, char* argv[])
 {
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::external, stxxl::normal, 4
-        >::result ext_normal_stack_type;
+            size_t, stxxl::external, stxxl::normal, 4
+            >::result ext_normal_stack_type;
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::migrating, stxxl::normal, 4
-        >::result ext_migrating_stack_type;
+            size_t, stxxl::migrating, stxxl::normal, 4
+            >::result ext_migrating_stack_type;
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::external, stxxl::grow_shrink
-        >::result ext_stack_type;
+            size_t, stxxl::external, stxxl::grow_shrink
+            >::result ext_stack_type;
     typedef stxxl::STACK_GENERATOR<
-        size_t, stxxl::external, stxxl::grow_shrink2
-        >::result ext_stack_type2;
+            size_t, stxxl::external, stxxl::grow_shrink2
+            >::result ext_stack_type2;
 
     if (argc < 2)
     {

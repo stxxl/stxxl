@@ -22,7 +22,6 @@
 #include <functional>
 
 namespace stxxl {
-
 namespace parallel {
 
 /**
@@ -729,6 +728,7 @@ public:
     typedef unsigned int size_type;
     //! type of the source field
     typedef int source_type;
+
 protected:
     //! Internal representation of a loser tree player/node
     struct Loser
@@ -764,9 +764,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    LoserTreeCopyUnguardedBase(const LoserTreeCopyUnguardedBase &) = delete;
+    LoserTreeCopyUnguardedBase(const LoserTreeCopyUnguardedBase&) = delete;
     //! non-copyable: delete assignment operator
-    LoserTreeCopyUnguardedBase & operator = (const LoserTreeCopyUnguardedBase &) = delete;
+    LoserTreeCopyUnguardedBase& operator = (const LoserTreeCopyUnguardedBase&) = delete;
 
     ~LoserTreeCopyUnguardedBase()
     {
@@ -832,6 +832,7 @@ public:
 
     typedef typename base_type::size_type size_type;
     typedef typename base_type::source_type source_type;
+
 protected:
     using base_type::k;
     using base_type::losers;
@@ -874,6 +875,7 @@ public:
 
     typedef typename base_type::size_type size_type;
     typedef typename base_type::source_type source_type;
+
 protected:
     using base_type::k;
     using base_type::losers;
@@ -924,6 +926,7 @@ public:
     typedef unsigned int size_type;
     //! type of the source field
     typedef int source_type;
+
 protected:
     //! Internal representation of a loser tree player/node
     struct Loser
@@ -959,9 +962,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    LoserTreePointerUnguardedBase(const LoserTreePointerUnguardedBase &) = delete;
+    LoserTreePointerUnguardedBase(const LoserTreePointerUnguardedBase&) = delete;
     //! non-copyable: delete assignment operator
-    LoserTreePointerUnguardedBase & operator = (const LoserTreePointerUnguardedBase &) = delete;
+    LoserTreePointerUnguardedBase& operator = (const LoserTreePointerUnguardedBase&) = delete;
 
     ~LoserTreePointerUnguardedBase()
     {
@@ -1026,8 +1029,8 @@ public:
 
     typedef typename base_type::size_type size_type;
     typedef typename base_type::source_type source_type;
-protected:
 
+protected:
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
@@ -1069,8 +1072,8 @@ public:
 
     typedef typename base_type::size_type size_type;
     typedef typename base_type::source_type source_type;
-protected:
 
+protected:
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
@@ -1105,7 +1108,6 @@ public:
 };
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_LOSERTREE_HEADER

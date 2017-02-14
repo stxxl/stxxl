@@ -32,7 +32,6 @@
 #include <vector>
 
 namespace stxxl {
-
 namespace async_schedule_local {
 
 // only one type of event: WRITE COMPLETED

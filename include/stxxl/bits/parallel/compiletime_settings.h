@@ -22,7 +22,6 @@
 #include <cstdio>
 
 namespace stxxl {
-
 namespace parallel {
 
 /** STXXL_PARALLEL_PCALL Macro to produce log message when entering a
@@ -56,7 +55,6 @@ namespace parallel {
 #define STXXL_MULTIWAY_MERGESORT_COPY_LAST 0
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER

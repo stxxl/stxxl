@@ -40,9 +40,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    state(const state &) = delete;
+    state(const state&) = delete;
     //! non-copyable: delete assignment operator
-    state & operator = (const state &) = delete;
+    state& operator = (const state&) = delete;
 
     void set_to(const value_type& new_state)
     {

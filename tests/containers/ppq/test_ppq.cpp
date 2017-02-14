@@ -59,7 +59,7 @@ template class stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
         STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
-        1* 64L * 1024L* 1024L,              /* RamSize */
+        1* 64L* 1024L* 1024L,                /* RamSize */
         0                                    /* MaxItems */
         >;
 
@@ -67,7 +67,7 @@ typedef stxxl::parallel_priority_queue<
         my_type, my_cmp,
         STXXL_DEFAULT_ALLOC_STRATEGY,
         STXXL_DEFAULT_BLOCK_SIZE(ValueType), /* BlockSize */
-        512* 64L* 1024L                    /* RamSize */
+        512* 64L* 1024L                      /* RamSize */
         > ppq_type;
 
 void test_simple()
@@ -256,7 +256,7 @@ void test_bulk_limit(const size_t bulk_size)
 
 int main()
 {
-    stxxl::stats * stats = stxxl::stats::get_instance();
+    stxxl::stats* stats = stxxl::stats::get_instance();
     stxxl::stats_data stats_begin(*stats);
     test_simple();
     std::cout << "Stats after test_simple :" << (stxxl::stats_data(*stats) - stats_begin);

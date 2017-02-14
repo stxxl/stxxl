@@ -32,6 +32,8 @@
 //! \c STXXL library namespace
 namespace stxxl {
 
-    } // namespace stxxl
+// ...
+
+} // namespace stxxl
 
 #endif // !STXXL_IO_IO_HEADER

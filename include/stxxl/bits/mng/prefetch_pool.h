@@ -81,9 +81,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    prefetch_pool(const prefetch_pool &) = delete;
+    prefetch_pool(const prefetch_pool&) = delete;
     //! non-copyable: delete assignment operator
-    prefetch_pool & operator = (const prefetch_pool &) = delete;
+    prefetch_pool& operator = (const prefetch_pool&) = delete;
 
     void swap(prefetch_pool& obj)
     {

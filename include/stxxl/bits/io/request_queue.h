@@ -31,9 +31,9 @@ public:
     request_queue() = default;
 
     //! non-copyable: delete copy-constructor
-    request_queue(const request_queue &) = delete;
+    request_queue(const request_queue&) = delete;
     //! non-copyable: delete assignment operator
-    request_queue & operator = (const request_queue &) = delete;
+    request_queue& operator = (const request_queue&) = delete;
 
     virtual void add_request(request_ptr& req) = 0;
     virtual bool cancel_request(request_ptr& req) = 0;

@@ -73,7 +73,6 @@ protected:
     stats_type m_stats;
 
 public:
-
     const unsigned_type invalid_key;
 
     /**
@@ -253,7 +252,7 @@ public:
         m_tree.resize(tree_size, invalid_key);
 
         for (unsigned_type i = old_tree_size; i > 0; --i) {
-            size_t old_index = i-1;
+            size_t old_index = i - 1;
             size_t old_level = ilog2_floor(old_index + 1);
             size_t new_index = old_index + (1 << old_level);
             m_tree[new_index] = m_tree[old_index];

@@ -83,9 +83,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    buf_istream(const buf_istream &) = delete;
+    buf_istream(const buf_istream&) = delete;
     //! non-copyable: delete assignment operator
-    buf_istream & operator = (const buf_istream &) = delete;
+    buf_istream& operator = (const buf_istream&) = delete;
 
     //! Input stream operator, reads in \c record.
     //! \param record reference to the block record type,

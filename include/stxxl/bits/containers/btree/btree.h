@@ -469,9 +469,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    btree(const btree &) = delete;
+    btree(const btree&) = delete;
     //! non-copyable: delete assignment operator
-    btree & operator = (const btree &) = delete;
+    btree& operator = (const btree&) = delete;
 
     virtual ~btree()
     {

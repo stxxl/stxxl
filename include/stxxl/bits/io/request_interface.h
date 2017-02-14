@@ -52,9 +52,9 @@ public:
     request_interface() = default;
 
     //! non-copyable: delete copy-constructor
-    request_interface(const request_interface &) = delete;
+    request_interface(const request_interface&) = delete;
     //! non-copyable: delete assignment operator
-    request_interface & operator = (const request_interface &) = delete;
+    request_interface& operator = (const request_interface&) = delete;
 
     //! Suspends calling thread until completion of the request.
     virtual void wait(bool measure_time = true) = 0;

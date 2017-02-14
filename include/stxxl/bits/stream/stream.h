@@ -527,7 +527,7 @@ template <typename ValueType, typename AllocStr, size_t BlockSize, typename Page
           unsigned PageSize, class StreamAlgorithm>
 stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
 materialize(StreamAlgorithm& in,
-            stxxl::vector_iterator<ValueType, AllocStr,BlockSize, PagerType, PageSize> out,
+            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> out,
             unsigned_type nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
@@ -1493,7 +1493,6 @@ public:
 //! \}
 
 } // namespace stream
-
 } // namespace stxxl
 
 #include <stxxl/bits/stream/choose.h>

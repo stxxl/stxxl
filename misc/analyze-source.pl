@@ -40,8 +40,10 @@ use strict;
 use warnings;
 use Text::Diff;
 use File::stat;
+use List::Util qw(min);
 
-my %includemap;
+my %include_list;
+my %include_map;
 my %authormap;
 
 sub expect_error($$$$) {
@@ -54,19 +56,35 @@ sub expect_error($$$$) {
     system("emacsclient -n $path") if $launch_emacs;
 }
 
-sub expect($$\$$) {
-    my ($path,$ln,$str,$expect) = @_;
+sub expect($$\@$) {
+    my ($path,$ln,$data,$expect) = @_;
 
-    if ($$str ne $expect) {
-        expect_error($path,$ln,$$str,$expect);
-        $$str = $expect;
+    if ($$data[$ln] ne $expect) {
+        expect_error($path,$ln,$$data[$ln],$expect);
+        # insert line with expected value
+        splice(@$data, $ln, 0, $expect);
     }
 }
-sub expect_re($$\$$) {
-    my ($path,$ln,$str,$expect) = @_;
 
-    if ($$str !~ m/$expect/) {
-        expect_error($path,$ln,$$str,"/$expect/");
+sub expectr($$\@$$) {
+    my ($path,$ln,$data,$expect,$replace_regex) = @_;
+
+    if ($$data[$ln] ne $expect) {
+        expect_error($path,$ln,$$data[$ln],$expect);
+        # replace line with expected value if like regex
+        if ($$data[$ln] =~ m/$replace_regex/) {
+            $$data[$ln] = $expect;
+        } else {
+            splice(@$data, $ln, 0, $expect);
+        }
+    }
+}
+
+sub expect_re($$\@$) {
+    my ($path,$ln,$data,$expect) = @_;
+
+    if ($$data[$ln] !~ m/$expect/) {
+        expect_error($path, $ln, $$data[$ln], "/$expect/");
     }
 }
 
@@ -133,11 +151,12 @@ sub process_cpp {
 
     my @origdata = @data;
 
-    # put all #include lines into the includemap
+    # put all #include lines into the include_map
     foreach my $ln (@data)
     {
         if ($ln =~ m!\s*#\s*include\s*([<"]\S+[">])!) {
-            $includemap{$1}{$path} = 1;
+            $include_list{$1} = 1;
+            $include_map{$1}{$path} = 1;
         }
     }
 
@@ -158,7 +177,7 @@ sub process_cpp {
     {
         foreach my $ln (@data)
         {
-            if ($ln =~ m!assert\(!) {
+            if ($ln =~ m!\bassert\(!) {
                 print("found assert() in test $path\n");
             }
         }
@@ -204,39 +223,39 @@ sub process_cpp {
     # check source header
     my $i = 0;
     if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # skip emacs mode line
-    expect($path, $i, $data[$i], "/".('*'x75)."\n"); ++$i;
-    expect($path, $i, $data[$i], " *  $path\n"); ++$i;
-    expect($path, $i, $data[$i], " *\n"); ++$i;
+    expect($path, $i, @data, "/".('*'x75)."\n"); ++$i;
+    expect($path, $i, @data, " *  $path\n"); ++$i;
+    expect($path, $i, @data, " *\n"); ++$i;
 
     # skip over comment
     while ($data[$i] !~ /^ \*  Part of the STXXL/) {
-        expect_re($path, $i, $data[$i], '^ \*(  .*)?\n$');
-        return unless ++$i < @data;
+        expect_re($path, $i, @data, '^ \*(  .*)?\n$');
+        die unless ++$i < @data;
     }
 
     # check "Part of STXXL"
-    expect($path, $i-1, $data[$i-1], " *\n");
-    expect($path, $i, $data[$i], " *  Part of the STXXL. See http://stxxl.sourceforge.net\n"); ++$i;
-    expect($path, $i, $data[$i], " *\n"); ++$i;
+    expect($path, $i-1, @data, " *\n");
+    expect($path, $i, @data, " *  Part of the STXXL. See http://stxxl.sourceforge.net\n"); ++$i;
+    expect($path, $i, @data, " *\n"); ++$i;
 
     # read authors
     while ($data[$i] =~ /^ \*  Copyright \(C\) ([0-9-]+(, [0-9-]+)*) (?<name>[^0-9<]+)( <(?<mail>[^>]+)>)?\n/) {
         #print "Author: $+{name} - $+{mail}\n";
         $authormap{$+{name}}{$+{mail} || ""} = 1;
-        return unless ++$i < @data;
+        die unless ++$i < @data;
     }
 
     # otherwise check license
-    expect($path, $i, $data[$i], " *\n"); ++$i;
-    expect($path, $i, $data[$i], " *  Distributed under the Boost Software License, Version 1.0.\n"); ++$i;
-    expect($path, $i, $data[$i], " *  (See accompanying file LICENSE_1_0.txt or copy at\n"); ++$i;
-    expect($path, $i, $data[$i], " *  http://www.boost.org/LICENSE_1_0.txt)\n"); ++$i;
-    expect($path, $i, $data[$i], " ".('*'x74)."/\n"); ++$i;
+    expect($path, $i, @data, " *\n"); ++$i;
+    expect($path, $i, @data, " *  Distributed under the Boost Software License, Version 1.0.\n"); ++$i;
+    expect($path, $i, @data, " *  (See accompanying file LICENSE_1_0.txt or copy at\n"); ++$i;
+    expect($path, $i, @data, " *  http://www.boost.org/LICENSE_1_0.txt)\n"); ++$i;
+    expect($path, $i, @data, " ".('*'x74)."/\n"); ++$i;
 
     # check include guard name
     if ($path =~ m!^include/stxxl/bits/.*\.(h|h.in)$!)
     {
-        expect($path, $i, $data[$i], "\n"); ++$i;
+        expect($path, $i, @data, "\n"); ++$i;
 
         # construct include guard macro name: STXXL_FILE_NAME_HEADER
         my $guard = $path;
@@ -246,48 +265,82 @@ sub process_cpp {
         $guard = uc($guard)."_HEADER";
         #print $guard."\n";
 
-        expect($path, $i, $data[$i], "#ifndef $guard\n"); ++$i;
-        expect($path, $i, $data[$i], "#define $guard\n"); ++$i;
+        expect($path, $i, @data, "#ifndef $guard\n"); ++$i;
+        expect($path, $i, @data, "#define $guard\n"); ++$i;
 
         my $n = scalar(@data)-1;
         if ($data[$n] =~ m!// vim:!) { --$n; } # skip vim
-        expect($path, $n, $data[$n], "#endif // !$guard\n");
+        expect($path, $n, @data, "#endif // !$guard\n");
     }
 
     # run uncrustify if in filter
     if (filter_uncrustify($path))
     {
         my $data = join("", @data);
-        my @uncrust = filter_program($data, "uncrustify", "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
+        @data = filter_program($data, "uncrustify", "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
 
         # manually add blank line after "namespace xyz {" and before "} // namespace xyz"
-        my $namespace = 0;
-        for(my $i = 0; $i < @uncrust-1; ++$i)
+        my @namespace;
+        for(my $i = 0; $i < @data-1; ++$i)
         {
-            if ($uncrust[$i] =~ m!^namespace \S+ \{!) {
-                splice(@uncrust, $i+1, 0, "\n");
-                ++$namespace;
+            if ($data[$i] =~ m!^namespace (\S+) \{!) {
+                push(@namespace, $1);
+                if ($data[$i+1] !~ m!^namespace!) {
+                    splice(@data, $i+1, 0, "\n"); ++$i;
+                }
             }
-            if ($uncrust[$i] =~ m!^} +// namespace!) {
-                splice(@uncrust, $i, 0, "\n"); ++$i;
-                --$namespace;
+            elsif ($data[$i] =~ m!^namespace \{!) {
+                push(@namespace, "");
+            }
+            elsif ($data[$i] =~ m!^}\s+//\s+namespace\s+(\S+)\s*$!) {
+                if (@namespace == 0) {
+                    print "$path\n";
+                    print "    NAMESPACE UNBALANCED! @ $i\n";
+                }
+                else {
+                    # quiets wrong uncrustify indentation
+                    $data[$i] =~ s!}\s+//\s+namespace!} // namespace!;
+                    expectr($path, $i, @data, "} // namespace ".$namespace[-1]."\n",
+                            qr!^}\s+//\s+namespace!);
+                }
+                if ($data[$i-1] !~ m!^}\s+// namespace!) {
+                    splice(@data, $i, 0, "\n"); ++$i;
+                }
+                pop(@namespace);
+            }
+            elsif ($data[$i] =~ m!^}\s+//\s+namespace\s*$!) {
+                if (@namespace == 0) {
+                    print "$path\n";
+                    print "    NAMESPACE UNBALANCED! @ $i\n";
+                }
+                else {
+                    # quiets wrong uncrustify indentation
+                    $data[$i] =~ s!}\s+//\s+namespace!} // namespace!;
+                    expectr($path, $i, @data, "} // namespace\n",
+                            qr!^}\s+//\s+namespace!);
+                }
+                if ($data[$i-1] !~ m!^}\s+// namespace!) {
+                    splice(@data, $i, 0, "\n"); ++$i;
+                }
+                pop(@namespace);
+            }
+            # no indentation after #endif
+            elsif ($data[$i] =~ m!^#endif\s+(//.*)$!) {
+                splice(@data, $i, 1, "#endif $1\n");
             }
         }
-        if ($namespace != 0) {
+        if (@namespace != 0) {
             print "$path\n";
-            print "    NAMESPACE MISMATCH!\n";
-            system("emacsclient -n $path") if $launch_emacs;
-        }
-
-        if (!array_equal(\@data,\@uncrust)) {
-            print "$path\n";
-            print diff(\@data, \@uncrust);
-            @data = @uncrust;
-            system("emacsclient -n $path") if $launch_emacs;
+            print "    NAMESPACE UNBALANCED!\n";
         }
     }
 
-    if ($write_changes && !array_equal(\@data,\@origdata))
+    return if array_equal(\@data, \@origdata);
+
+    print "$path\n";
+    print diff(\@origdata, \@data);
+
+    if ($write_changes)
     {
         open(F, "> $path") or die("Cannot write $path: $!");
         print(F join("", @data));
@@ -317,34 +370,34 @@ sub process_pl_cmake {
     # check source header
     my $i = 0;
     if ($data[$i] =~ m/#!/) { ++$i; } # bash line
-    expect($path, $i, $data[$i], ('#'x76)."\n"); ++$i;
-    expect($path, $i, $data[$i], "#  $path\n"); ++$i;
-    expect($path, $i, $data[$i], "#\n"); ++$i;
+    expect($path, $i, @data, ('#'x76)."\n"); ++$i;
+    expect($path, $i, @data, "#  $path\n"); ++$i;
+    expect($path, $i, @data, "#\n"); ++$i;
 
     # skip over comment
     while ($data[$i] !~ /^#  Part of the STXXL/) {
-        expect_re($path, $i, $data[$i], '^#(  .*)?\n$');
-        return unless ++$i < @data;
+        expect_re($path, $i, @data, '^#(  .*)?\n$');
+        die unless ++$i < @data;
     }
 
     # check "Part of STXXL"
-    expect($path, $i-1, $data[$i-1], "#\n");
-    expect($path, $i, $data[$i], "#  Part of the STXXL. See http://stxxl.sourceforge.net\n"); ++$i;
-    expect($path, $i, $data[$i], "#\n"); ++$i;
+    expect($path, $i-1, @data, "#\n");
+    expect($path, $i, @data, "#  Part of the STXXL. See http://stxxl.sourceforge.net\n"); ++$i;
+    expect($path, $i, @data, "#\n"); ++$i;
 
     # read authors
     while ($data[$i] =~ /^#  Copyright \(C\) ([0-9-]+(, [0-9-]+)*) (?<name>[^0-9<]+)( <(?<mail>[^>]+)>)?\n/) {
         #print "Author: $+{name} - $+{mail}\n";
         $authormap{$+{name}}{$+{mail} || ""} = 1;
-        return unless ++$i < @data;
+        die unless ++$i < @data;
     }
 
     # otherwise check license
-    expect($path, $i, $data[$i], "#\n"); ++$i;
-    expect($path, $i, $data[$i], "#  Distributed under the Boost Software License, Version 1.0.\n"); ++$i;
-    expect($path, $i, $data[$i], "#  (See accompanying file LICENSE_1_0.txt or copy at\n"); ++$i;
-    expect($path, $i, $data[$i], "#  http://www.boost.org/LICENSE_1_0.txt)\n"); ++$i;
-    expect($path, $i, $data[$i], ('#'x76)."\n"); ++$i;
+    expect($path, $i, @data, "#\n"); ++$i;
+    expect($path, $i, @data, "#  Distributed under the Boost Software License, Version 1.0.\n"); ++$i;
+    expect($path, $i, @data, "#  (See accompanying file LICENSE_1_0.txt or copy at\n"); ++$i;
+    expect($path, $i, @data, "#  http://www.boost.org/LICENSE_1_0.txt)\n"); ++$i;
+    expect($path, $i, @data, ('#'x76)."\n"); ++$i;
 }
 
 ### Main ###
@@ -361,6 +414,11 @@ foreach my $arg (@ARGV) {
 (-e "include/stxxl.h")
     or die("Please run this script in the STXXL source base directory.");
 
+# check uncrustify's version:
+my ($uncrustver) = filter_program("", "uncrustify", "--version");
+($uncrustver eq "uncrustify 0.62\n")
+    or die("Requires uncrustify 0.62 to run correctly. Got: $uncrustver");
+
 use File::Find;
 my @filelist;
 find(sub { !-d && push(@filelist, $File::Find::name) }, ".");
@@ -369,7 +427,13 @@ foreach my $file (@filelist)
 {
     $file =~ s!./!! or die("File does not start ./");
 
-    if ($file =~ /\.(h|cpp|h.in)$/) {
+    if ($file =~ m!^(b[0-9]*|build.*)(\/|$)!) {
+        # skip common build directory names
+    }
+    elsif ($file =~ m!^extlib/!) {
+        # skip external libraries
+    }
+    elsif ($file =~ /\.(h|cpp|h.in)$/) {
         process_cpp($file);
     }
     elsif ($file =~ m!^doc/[^/]*\.dox$!) {
@@ -407,18 +471,7 @@ foreach my $file (@filelist)
     }
 }
 
-# print includes to includemap.txt
-if (0)
-{
-    print "Writing includemap:\n";
-    foreach my $inc (sort keys %includemap)
-    {
-        print "$inc => ".scalar(keys %{$includemap{$inc}})." [";
-        print join(",", sort keys %{$includemap{$inc}}). "]\n";
-    }
-}
-
-# check includemap for C-style headers
+# check include_map for C-style headers
 {
 
     my @cheaders = qw(assert.h ctype.h errno.h fenv.h float.h inttypes.h
@@ -427,10 +480,82 @@ if (0)
 
     foreach my $ch (@cheaders)
     {
-        $ch = "<$ch>";
-        next if !$includemap{$ch};
+        next if !$include_list{$ch};
         print "Replace c-style header $ch in\n";
-        print "    [".join(",", sort keys %{$includemap{$ch}}). "]\n";
+        print "    [".join(",", sort keys %{$include_list{$ch}}). "]\n";
+    }
+}
+
+# print includes to include_map.txt
+if (0)
+{
+    print "Writing include_map:\n";
+    foreach my $inc (sort keys %include_map)
+    {
+        print "$inc => ".scalar(keys %{$include_map{$inc}})." [";
+        print join(",", sort keys %{$include_map{$inc}}). "]\n";
+    }
+}
+
+# try to find cycles in includes
+if (1)
+{
+    my %graph = %include_map;
+
+    # Tarjan's Strongly Connected Components Algorithm
+    # https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+
+    my $index = 0;
+    my @S = [];
+    my %vi; # vertex info
+
+    sub strongconnect {
+        my ($v) = @_;
+
+        # Set the depth index for v to the smallest unused index
+        $vi{$v}{index} = $index;
+        $vi{$v}{lowlink} = $index++;
+        push(@S, $v);
+        $vi{$v}{onStack} = 1;
+
+        # Consider successors of v
+        foreach my $w (keys %{$graph{$v}}) {
+            if (!defined $vi{$w}{index}) {
+                # Successor w has not yet been visited; recurse on it
+                strongconnect($w);
+                $vi{$w}{lowlink} = min($vi{$v}{lowlink}, $vi{$w}{lowlink});
+            }
+            elsif ($vi{$w}{onStack}) {
+                # Successor w is in stack S and hence in the current SCC
+                $vi{$v}{lowlink} = min($vi{$v}{lowlink}, $vi{$w}{index})
+            }
+        }
+
+        # If v is a root node, pop the stack and generate an SCC
+        if ($vi{$v}{lowlink} == $vi{$v}{index}) {
+            # start a new strongly connected component
+            my @SCC;
+            my $w;
+            do {
+                $w = pop(@S);
+                $vi{$w}{onStack} = 0;
+                # add w to current strongly connected component
+                push(@SCC, $w);
+            } while ($w ne $v);
+            # output the current strongly connected component (only if it is not
+            # a singleton)
+            if (@SCC != 1) {
+                print "-------------------------------------------------";
+                print "Found cycle:\n";
+                print "    $_\n" foreach @SCC;
+                print "end cycle\n";
+            }
+        }
+    }
+
+    foreach my $v (keys %graph) {
+        next if defined $vi{$v}{index};
+        strongconnect($v);
     }
 }
 

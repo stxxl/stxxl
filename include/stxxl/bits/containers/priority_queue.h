@@ -210,9 +210,9 @@ public:
     priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
 
     //! non-copyable: delete copy-constructor
-    priority_queue(const priority_queue &) = delete;
+    priority_queue(const priority_queue&) = delete;
     //! non-copyable: delete assignment operator
-    priority_queue & operator = (const priority_queue &) = delete;
+    priority_queue& operator = (const priority_queue&) = delete;
 
     virtual ~priority_queue();
 
@@ -808,7 +808,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
     // by inserting them into tree 0 (which is almost empty in this case)
     if (freeLevel > 0)
     {
-        for (size_t i = freeLevel + 1; i-- > 0;)
+        for (size_t i = freeLevel + 1; i-- > 0; )
         {
             // reverse order not needed
             // but would allow immediate refill

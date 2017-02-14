@@ -18,7 +18,6 @@
 #include <stxxl/bits/singleton.h>
 
 namespace stxxl {
-
 namespace hash_map {
 
 //! Tuning parameters for external memory hash map.
@@ -44,7 +43,6 @@ private:
 };
 
 } // namespace hash_map
-
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_HASH_MAP_TUNING_HEADER

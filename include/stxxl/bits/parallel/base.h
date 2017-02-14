@@ -23,7 +23,6 @@
 #include <iterator>
 
 namespace stxxl {
-
 namespace parallel {
 
 /*!
@@ -144,7 +143,6 @@ struct less : std::binary_function<T1, T2, bool>
 };
 
 } // namespace parallel
-
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_BASE_HEADER

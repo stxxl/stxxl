@@ -354,3 +354,5 @@ void cmdline_parser::print_result(std::ostream& os)
 }
 
 } // namespace stxxl
+
+/******************************************************************************/

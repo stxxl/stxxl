@@ -80,9 +80,9 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    lru_pager(const lru_pager &) = delete;
+    lru_pager(const lru_pager&) = delete;
     //! non-copyable: delete assignment operator
-    lru_pager & operator = (const lru_pager &) = delete;
+    lru_pager& operator = (const lru_pager&) = delete;
 
     size_type kick()
     {

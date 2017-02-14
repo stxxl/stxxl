@@ -42,9 +42,9 @@ public:
     { }
 
     //! non-copyable: delete copy-constructor
-    onoff_switch(const onoff_switch &) = delete;
+    onoff_switch(const onoff_switch&) = delete;
     //! non-copyable: delete assignment operator
-    onoff_switch & operator = (const onoff_switch &) = delete;
+    onoff_switch& operator = (const onoff_switch&) = delete;
 
     //! turn switch ON and notify one waiter
     void on()
