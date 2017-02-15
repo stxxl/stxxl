@@ -408,14 +408,25 @@ sub process_pl_cmake {
 
 ### Main ###
 
+my @dirs_to_search = ();
+my $disable_authors = 0;
+
+my $expect_pattern = 0;
 foreach my $arg (@ARGV) {
-    if ($arg eq "-w") { $write_changes = 1; }
+    if ($expect_pattern) {
+      push(@dirs_to_search, $arg);
+      $expect_pattern = 0;
+      $disable_authors = 1;
+    } elsif ($arg eq "-w") { $write_changes = 1; }
     elsif ($arg eq "-e") { $launch_emacs = 1; }
     elsif ($arg eq "-m") { $email_multimap = 1; }
+    elsif ($arg eq "-f") { $expect_pattern = 1; }
     else {
         print "Unknown parameter: $arg\n";
     }
 }
+
+@dirs_to_search = ("doc", "examples", "include", "lib", "misc", "tests", "tools") unless @dirs_to_search;
 
 (-e "include/stxxl.h")
     or die("Please run this script in the STXXL source base directory.");
@@ -437,9 +448,7 @@ if ($@) {
 
 use File::Find;
 my @filelist;
-for my $d ("doc", "examples", "include", "lib", "misc", "tests", "tools") {
-    find(sub { !-d && push(@filelist, $File::Find::name) }, $d);
-}
+find(sub { !-d && push(@filelist, $File::Find::name) }, @dirs_to_search);
 
 foreach my $file (@filelist)
 {
@@ -575,23 +584,27 @@ if (1)
 }
 
 # print authors to AUTHORS
-print "Writing AUTHORS:\n";
-open(A, "> AUTHORS");
-foreach my $a (sort keys %authormap)
-{
-    my $mail = $authormap{$a};
-    if ($email_multimap) {
-        $mail = join(",", sort keys %{$mail});
-    }
-    else {
-        $mail = (sort keys(%{$mail}))[0]; # pick first
-    }
-    $mail = $mail ? " <$mail>" : "";
-
-    print "  $a$mail\n";
-    print A "$a$mail\n";
+if ($disable_authors) {
+   print "Skip writing authors\n";
+} else {
+   print "Writing AUTHORS:\n";
+   open(A, "> AUTHORS");
+   foreach my $a (sort keys %authormap)
+   {
+       my $mail = $authormap{$a};
+       if ($email_multimap) {
+           $mail = join(",", sort keys %{$mail});
+       }
+       else {
+           $mail = (sort keys(%{$mail}))[0]; # pick first
+       }
+       $mail = $mail ? " <$mail>" : "";
+   
+       print "  $a$mail\n";
+       print A "$a$mail\n";
+   }
+   close(A);
 }
-close(A);
 
 # run cpplint.py
 {
