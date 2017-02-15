@@ -10,11 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iomanip>
-#include <vector>
-
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
+
+#include <iomanip>
+#include <vector>
 
 using stxxl::request_ptr;
 using stxxl::file;
