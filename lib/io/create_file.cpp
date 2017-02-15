@@ -187,22 +187,6 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         return result;
     }
 #endif
-#if STXXL_HAVE_WBTL_FILE
-    else if (cfg.io_impl == "wbtl")
-    {
-        ufs_file_base* backend =
-            new syscall_file(cfg.path, mode, -1, -1); // FIXME: ID
-        wbtl_file* result =
-            new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, cfg.queue,
-                                 disk_allocator_id);
-        result->lock();
-
-        if (cfg.unlink_on_open)
-            backend->unlink();
-
-        return result;
-    }
-#endif
 
     STXXL_THROW(std::runtime_error,
                 "Unsupported disk I/O implementation '" << cfg.io_impl << "'.");

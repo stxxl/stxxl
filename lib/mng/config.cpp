@@ -435,7 +435,7 @@ void disk_config::parse_fileio()
         else if (*p == "unlink" || *p == "unlink_on_open")
         {
             if (!(io_impl == "syscall" || io_impl == "linuxaio" ||
-                  io_impl == "mmap" || io_impl == "wbtl"))
+                  io_impl == "mmap"))
             {
                 STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
             }

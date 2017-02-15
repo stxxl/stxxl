@@ -38,7 +38,6 @@ set(LIBSTXXL_SOURCES
   io/serving_request.cpp
   io/syscall_file.cpp
   io/ufs_file_base.cpp
-  io/wbtl_file.cpp
   io/wfs_file_base.cpp
   io/wincall_file.cpp
 

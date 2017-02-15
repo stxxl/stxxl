@@ -385,8 +385,6 @@ Description of the parameters:
 
   - \c fileperblock_syscall, \c fileperblock_mmap : same as above, but take a single file per block, using full_disk_filename as file name prefix.  Usually provide worse performance than the standard variants, but release freed blocks to the file system immediately.
 
-  - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs), based on \c syscall
-
 - <b><tt>\<options></tt></b> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
 
   - \c **autogrow**, \c noautogrow, \c autogrow=[off/on] : enables automatic growth of the file beyond the specified capacity, enabled by default except if raw_device.

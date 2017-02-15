@@ -27,8 +27,6 @@ if(STXXL_HAVE_LINUXAIO_FILE)
   stxxl_test(test_cancel linuxaio "${STXXL_TMPDIR}/testdisk1")
 endif(STXXL_HAVE_LINUXAIO_FILE)
 stxxl_test(test_cancel memory "${STXXL_TMPDIR}/testdisk1")
-# TODO: asserts!
-#stxxl_test(test_cancel wbtl "${STXXL_TMPDIR}/testdisk1")
 
 stxxl_test(test_io_sizes syscall "${STXXL_TMPDIR}/testdisk1" 1073741824)
 if(STXXL_HAVE_MMAP_FILE)
