@@ -12,7 +12,9 @@
 
 //! [example]
 #include <stxxl/parallel_priority_queue>
+#if STXXL_PARALLEL
 #include <omp.h>
+#endif
 #include <iostream>
 
 int main()
