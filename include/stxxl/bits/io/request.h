@@ -18,12 +18,12 @@
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/verbose.h>
 
 #include <string>
 #include <cassert>
 #include <memory>
+#include <functional>
 
 namespace stxxl {
 
@@ -33,6 +33,9 @@ namespace stxxl {
 #define STXXL_BLOCK_ALIGN 4096
 
 class file;
+class request;
+
+using completion_handler = std::function<void(request*)>;
 
 //! Request object encapsulating basic properties like file and offset.
 class request : virtual public request_interface, public atomic_counted_object
@@ -51,7 +54,7 @@ protected:
     request_type m_type;
 
 public:
-    request(const completion_handler& on_compl,
+    request(const completion_handler& on_complete,
             file* file,
             void* buffer,
             offset_type offset,

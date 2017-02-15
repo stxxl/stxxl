@@ -31,18 +31,19 @@ namespace stxxl {
 class set_switch_handler
 {
     onoff_switch& switch_;
-    completion_handler on_compl;
+    completion_handler on_complete_;
 
 public:
-    set_switch_handler(onoff_switch& _switch, const completion_handler& on_compl)
-        : switch_(_switch), on_compl(on_compl)
-    { }
+    set_switch_handler(
+        onoff_switch& _switch, const completion_handler& on_complete)
+        : switch_(_switch), on_complete_(on_complete) { }
 
     void operator () (request* req)
     {
         // call before setting switch to on, otherwise, user has no way to wait
         // for the completion handler to be executed
-        on_compl(req);
+        if (on_complete_)
+            on_complete_(req);
         switch_.on();
     }
 };

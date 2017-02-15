@@ -23,8 +23,6 @@ namespace stxxl {
 //! \addtogroup fileimpl
 //! \{
 
-class completion_handler;
-
 //! Implementation of some file methods based on serving_request.
 class disk_queued_file : public virtual file
 {

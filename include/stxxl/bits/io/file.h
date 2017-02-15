@@ -45,8 +45,6 @@ namespace stxxl {
 //! operating systems.
 //! \{
 
-class completion_handler;
-
 //! Defines interface of file.
 //!
 //! It is a base class for different implementations that might

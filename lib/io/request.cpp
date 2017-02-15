@@ -19,13 +19,13 @@
 namespace stxxl {
 
 request::request(
-    const completion_handler& on_compl,
+    const completion_handler& on_complete,
     file* file,
     void* buffer,
     offset_type offset,
     size_type bytes,
     request_type type)
-    : m_on_complete(on_compl),
+    : m_on_complete(on_complete),
       m_file(file),
       m_buffer(buffer),
       m_offset(offset),

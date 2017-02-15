@@ -82,8 +82,10 @@ void request_with_state::completed(bool canceled)
 {
     STXXL_VERBOSE3_THIS("request_with_state::completed()");
     m_state.set_to(DONE);
-    if (!canceled)
-        m_on_complete(this);
+    if (!canceled) {
+        if (m_on_complete)
+            m_on_complete(this);
+    }
     notify_waiters();
     m_file->delete_request_ref();
     m_file = 0;

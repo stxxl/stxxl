@@ -16,7 +16,6 @@
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
