@@ -20,13 +20,13 @@
 
 #if STXXL_HAVE_MLOCK_PROTO
 
+#include <unistd.h>
+#include <sys/mman.h>
+
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <unistd.h>
-
-#include <sys/mman.h>
 
 int do_mlock(int argc, char* argv[])
 {

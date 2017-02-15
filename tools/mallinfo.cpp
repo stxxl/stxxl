@@ -18,12 +18,13 @@
 
 #if STXXL_HAVE_MALLINFO_PROTO
 
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-
 #include <malloc.h>
 #include <unistd.h>
+
+#include <cstdlib>
+#include <cstring>
+
+#include <iostream>
 
 void print_malloc_stats()
 {
