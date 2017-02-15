@@ -1386,6 +1386,7 @@ int main(int argc, char* argv[])
         return process<stxxl::uint32>(
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);
+#if 0
     else if (wordsize == 40)
         return process<stxxl::uint40>(
             input_filename, output_filename, sizelimit,
@@ -1394,6 +1395,7 @@ int main(int argc, char* argv[])
         return process<stxxl::uint64>(
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);
+#endif
     else
         std::cerr << "Invalid wordsize for suffix array: 32, 40 or 64 are allowed." << std::endl;
 
