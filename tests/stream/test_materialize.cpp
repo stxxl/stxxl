@@ -21,6 +21,8 @@
 
 struct forty_two
 {
+    typedef int value_type;
+
     unsigned counter, length;
 
     explicit forty_two(unsigned l) : counter(0), length(l) { }
@@ -29,7 +31,7 @@ struct forty_two
 
     unsigned len() const { return length; }
 
-    int operator * ()
+    value_type operator * ()
     {
         STXXL_CHECK(!empty());
         return counter;
@@ -50,26 +52,28 @@ struct forty_two
 };
 
 /*
-    template <class OutputIterator_, class StreamAlgorithm_>
-    OutputIterator_ materialize(StreamAlgorithm_ & in, OutputIterator_ out);
+    template <typename OutputIterator, typename StreamAlgorithm>
+    OutputIterator
+    materialize(StreamAlgorithm& in, OutputIterator out);
 
-    template <class OutputIterator_, class StreamAlgorithm_>
-    OutputIterator_ materialize(StreamAlgorithm_ & in, OutputIterator_ outbegin, OutputIterator_ outend);
+    template <typename OutputIterator, typename StreamAlgorithm>
+    OutputIterator
+    materialize(StreamAlgorithm& in, OutputIterator outbegin, OutputIterator outend);
 
-    template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-              unsigned BlkSize_, typename PgTp_, unsigned PgSz_, class StreamAlgorithm_>
-    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>
-    materialize(StreamAlgorithm_ & in,
-                stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> outbegin,
-                stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> outend,
-                unsigned_type nbuffers = 0);
+    template <typename..., typename StreamAlgorithm>
+    stxxl::vector_iterator<...>
+    materialize(
+            StreamAlgorithm& in,
+            stxxl::vector_iterator<...> outbegin,
+            stxxl::vector_iterator<...> outend,
+            size_t nbuffers = 0);
 
-    template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-              unsigned BlkSize_, typename PgTp_, unsigned PgSz_, class StreamAlgorithm_>
-    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>
-    materialize(StreamAlgorithm_ & in,
-                stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> out,
-                unsigned_type nbuffers = 0);
+    template <..., typename StreamAlgorithm>
+    stxxl::vector_iterator<...>
+    materialize(
+            StreamAlgorithm& in,
+            stxxl::vector_iterator<...> out,
+            size_t nbuffers = 0);
 */
 
 int generate_0()
@@ -78,23 +82,26 @@ int generate_0()
 }
 
 template <typename VectorType>
-void check_42_fill(VectorType& v, unsigned length)
+void check_42_fill(VectorType& v, typename VectorType::size_type length)
 {
-    typename VectorType::const_iterator ci = v.begin();
+    using value_type = typename VectorType::value_type;
+    using size_type = typename VectorType::size_type;
 
-    for (unsigned i = 0; i < length; ++i)
+    auto ci = v.cbegin();
+
+    for (size_type i = 0; i < length; ++i)
     {
-        STXXL_CHECK(*ci == (int)i);
+        STXXL_CHECK(*ci == value_type(i));
         ++ci;
     }
 
-    for (unsigned i = length; i < v.size(); ++i)
+    for (size_type i = length; i < v.size(); ++i)
     {
-        STXXL_CHECK(*ci == 0);
+        STXXL_CHECK(*ci == value_type(0));
         ++ci;
     }
 
-    std::fill(v.begin(), v.end(), 0);
+    std::fill(v.begin(), v.end(), value_type(0));
 }
 
 int main()
