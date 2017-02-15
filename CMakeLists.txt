@@ -216,7 +216,7 @@ else()
 endif()
 
 ###############################################################################
-# enable C++11 and more compiler features
+# enable C++14 and more compiler features
 
 # more template depth for some tests and compilers
 include(CheckCXXCompilerFlag)
@@ -225,23 +225,23 @@ if(CXX_HAS_TEMPLATE_DEPTH)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
 endif()
 
-# enable C++11
+# enable C++14
 if(MSVC)
   # MSVC 11 or greater has C++11 automatically enabled
 elseif(CYGWIN)
   # C++11 is very restrictive on Cygwin
 else()
-  # try -std= flags to enable C++11
-  check_cxx_compiler_flag(-std=c++11 CXX_HAS_STD_CXX11)
+  # try -std= flags to enable C++14
+  check_cxx_compiler_flag(-std=c++14 CXX_HAS_STD_CXX11)
   if(CXX_HAS_STD_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
   else()
     check_cxx_compiler_flag(-std=c++0x CXX_HAS_STD_CXX0X)
     if(CXX_HAS_STD_CXX0X)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
     endif()
   endif()
-  # on MacOSX with clang we need to use libc++ for C++11 headers
+  # on MacOSX with clang we need to use libc++ for C++14 headers
   if(APPLE)
     if (CMAKE_CXX_COMPILER MATCHES ".*clang[+][+]"
         OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
