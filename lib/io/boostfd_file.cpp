@@ -29,7 +29,7 @@ namespace stxxl {
 void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)
 {
-    scoped_mutex_lock fd_lock(m_fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(m_fd_mutex);
 
     try
     {
@@ -171,7 +171,7 @@ boostfd_file::boostfd_file(
 
 boostfd_file::~boostfd_file()
 {
-    scoped_mutex_lock fd_lock(m_fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(m_fd_mutex);
     m_file_des.close();
 }
 
@@ -182,13 +182,13 @@ inline file::offset_type boostfd_file::_size()
 
 file::offset_type boostfd_file::size()
 {
-    scoped_mutex_lock fd_lock(m_fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(m_fd_mutex);
     return _size();
 }
 
 void boostfd_file::set_size(offset_type newsize)
 {
-    scoped_mutex_lock fd_lock(m_fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(m_fd_mutex);
     offset_type oldsize = _size();
     m_file_des.seek(newsize, BOOST_IOS::beg);
     m_file_des.seek(0, BOOST_IOS::beg); // not important ?

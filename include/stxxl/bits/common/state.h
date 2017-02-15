@@ -15,8 +15,8 @@
 #ifndef STXXL_COMMON_STATE_HEADER
 #define STXXL_COMMON_STATE_HEADER
 
-#include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/condition_variable.h>
+#include <condition_variable>
+#include <mutex>
 
 namespace stxxl {
 
@@ -26,10 +26,10 @@ class state
     typedef ValueType value_type;
 
     //! mutex for condition variable
-    mutex m_mutex;
+    std::mutex m_mutex;
 
     //! condition variable
-    condition_variable m_cond;
+    std::condition_variable m_cond;
 
     //! current state
     value_type m_state;
@@ -46,7 +46,7 @@ public:
 
     void set_to(const value_type& new_state)
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         m_state = new_state;
         lock.unlock();
         m_cond.notify_all();
@@ -54,14 +54,14 @@ public:
 
     void wait_for(const value_type& needed_state)
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         while (needed_state != m_state)
             m_cond.wait(lock);
     }
 
     value_type operator () ()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         return m_state;
     }
 };

@@ -16,8 +16,8 @@
 
 #include <stxxl/types>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/common/mutex.h>
 
+#include <mutex>
 #include <cassert>
 #include <cstdlib>
 #include <algorithm>
@@ -473,7 +473,7 @@ private:
     mutable reference_count_t m_reference_count;
 
     //! the mutex used to synchronize access to the reference counter.
-    mutable mutex m_reference_count_mutex;
+    mutable std::mutex m_reference_count_mutex;
 
 public:
     //! new objects have zero reference count
@@ -495,7 +495,7 @@ public:
     //! Call whenever setting a pointer to the object
     void inc_reference() const
     {
-        scoped_mutex_lock lock(m_reference_count_mutex);
+        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
         ++m_reference_count;
     }
 
@@ -504,21 +504,21 @@ public:
     //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
     bool dec_reference() const
     {
-        scoped_mutex_lock lock(m_reference_count_mutex);
+        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
         return (--m_reference_count == 0);
     }
 
     //! Test if the counted_object is referenced by only one counting_ptr.
     bool unique() const
     {
-        scoped_mutex_lock lock(m_reference_count_mutex);
+        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
         return (m_reference_count == 1);
     }
 
     //! Return the number of references to this object (for debugging)
     reference_count_t get_reference_count() const
     {
-        scoped_mutex_lock lock(m_reference_count_mutex);
+        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
         return m_reference_count;
     }
 };

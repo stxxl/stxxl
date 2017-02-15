@@ -16,7 +16,6 @@
 #ifndef STXXL_MNG_DISK_ALLOCATOR_HEADER
 #define STXXL_MNG_DISK_ALLOCATOR_HEADER
 
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/error_handling.h>
@@ -26,6 +25,7 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 
+#include <mutex>
 #include <algorithm>
 #include <cassert>
 #include <functional>
@@ -54,7 +54,7 @@ class disk_allocator
 
     typedef std::map<stxxl::int64, stxxl::int64> sortseq;
 
-    stxxl::mutex mutex;
+    std::mutex mutex;
     sortseq free_space;
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
@@ -142,7 +142,7 @@ public:
     template <size_t BlockSize>
     void delete_block(const BID<BlockSize>& bid)
     {
-        scoped_mutex_lock lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
 
         STXXL_VERBOSE2("disk_allocator::delete_block<" << BlockSize <<
                        ">(pos=" << bid.offset << ", size=" << bid.size <<
@@ -163,7 +163,7 @@ void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
         requested_size += cur->size;
     }
 
-    scoped_mutex_lock lock(mutex);
+    std::unique_lock<std::mutex> lock(mutex);
 
     STXXL_VERBOSE2("disk_allocator::new_blocks<BlockSize>,  BlockSize = " << BlockSize <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<

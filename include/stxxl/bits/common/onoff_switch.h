@@ -19,18 +19,18 @@
 
 #include <stxxl/bits/config.h>
 
-#include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/condition_variable.h>
+#include <condition_variable>
+#include <mutex>
 
 namespace stxxl {
 
 class onoff_switch
 {
     //! mutex for condition variable
-    mutex m_mutex;
+    std::mutex m_mutex;
 
     //! condition variable
-    condition_variable m_cond;
+    std::condition_variable m_cond;
 
     //! the switch's state
     bool m_on;
@@ -49,7 +49,7 @@ public:
     //! turn switch ON and notify one waiter
     void on()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         m_on = true;
         lock.unlock();
         m_cond.notify_one();
@@ -57,7 +57,7 @@ public:
     //! turn switch OFF and notify one waiter
     void off()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         m_on = false;
         lock.unlock();
         m_cond.notify_one();
@@ -65,21 +65,21 @@ public:
     //! wait for switch to turn ON
     void wait_for_on()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         if (!m_on)
             m_cond.wait(lock);
     }
     //! wait for switch to turn OFF
     void wait_for_off()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         if (m_on)
             m_cond.wait(lock);
     }
     //! return true if switch is ON
     bool is_on()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         return m_on;
     }
 };

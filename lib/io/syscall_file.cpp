@@ -13,7 +13,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request.h>
@@ -21,6 +20,7 @@
 #include <stxxl/bits/io/syscall_file.h>
 #include "ufs_platform.h"
 
+#include <mutex>
 #include <limits>
 
 namespace stxxl {
@@ -28,7 +28,7 @@ namespace stxxl {
 void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
 
     char* cbuffer = static_cast<char*>(buffer);
 

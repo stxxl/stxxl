@@ -61,7 +61,7 @@ void request_queue_impl_1q::add_request(request_ptr& req)
 
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
     {
-        scoped_mutex_lock Lock(m_queue_mutex);
+        std::unique_lock<std::mutex> Lock(m_queue_mutex);
         if (std::find_if(m_queue.begin(), m_queue.end(),
                          bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
             != m_queue.end())
@@ -70,7 +70,7 @@ void request_queue_impl_1q::add_request(request_ptr& req)
         }
     }
 #endif
-    scoped_mutex_lock Lock(m_queue_mutex);
+    std::unique_lock<std::mutex> Lock(m_queue_mutex);
     m_queue.push_back(req);
 
     m_sem++;
@@ -87,7 +87,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr& req)
 
     bool was_still_in_queue = false;
     {
-        scoped_mutex_lock Lock(m_queue_mutex);
+        std::unique_lock<std::mutex> Lock(m_queue_mutex);
         queue_type::iterator pos
             = std::find(m_queue.begin(), m_queue.end(),
                         req _STXXL_FORCE_SEQUENTIAL);
@@ -117,7 +117,7 @@ void* request_queue_impl_1q::worker(void* arg)
         pthis->m_sem--;
 
         {
-            scoped_mutex_lock Lock(pthis->m_queue_mutex);
+            std::unique_lock<std::mutex> Lock(pthis->m_queue_mutex);
             if (!pthis->m_queue.empty())
             {
                 request_ptr req = pthis->m_queue.front();

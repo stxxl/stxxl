@@ -23,7 +23,7 @@ namespace stxxl {
 void mem_file::serve(void* buffer, offset_type offset, size_type bytes,
                      request::request_type type)
 {
-    scoped_mutex_lock lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
 
     if (type == request::READ)
     {
@@ -60,7 +60,7 @@ file::offset_type mem_file::size()
 
 void mem_file::set_size(offset_type newsize)
 {
-    scoped_mutex_lock lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
     assert(newsize <= std::numeric_limits<offset_type>::max());
 
     m_ptr = (char*)realloc(m_ptr, (size_t)newsize);
@@ -69,7 +69,7 @@ void mem_file::set_size(offset_type newsize)
 
 void mem_file::discard(offset_type offset, offset_type size)
 {
-    scoped_mutex_lock lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY
     // overwrite the freed region with uninitialized memory
     STXXL_VERBOSE("discard at " << offset << " len " << size);

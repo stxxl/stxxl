@@ -14,8 +14,8 @@
 #ifndef STXXL_COMMON_SEMAPHORE_HEADER
 #define STXXL_COMMON_SEMAPHORE_HEADER
 
-#include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/condition_variable.h>
+#include <mutex>
+#include <condition_variable>
 
 namespace stxxl {
 
@@ -25,10 +25,10 @@ class semaphore
     int v;
 
     //! mutex for condition variable
-    mutex m_mutex;
+    std::mutex m_mutex;
 
     //! condition variable
-    condition_variable m_cond;
+    std::condition_variable m_cond;
 
 public:
     //! construct semaphore
@@ -45,7 +45,7 @@ public:
     //! blocked waiting a change in the semaphore
     int operator ++ (int)
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         int res = ++v;
         lock.unlock();
         m_cond.notify_one();
@@ -55,7 +55,7 @@ public:
     //! until another thread signals a change
     int operator -- (int)
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         while (v <= 0)
             m_cond.wait(lock);
 
@@ -68,7 +68,7 @@ public:
     //! for synchronization.
     int decrement()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         return --v;
     }
 #if 0
@@ -77,7 +77,7 @@ public:
     //! after the function unlocks the critical section.
     int get_value()
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         return v;
     }
 #endif

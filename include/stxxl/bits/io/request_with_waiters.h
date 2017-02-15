@@ -14,10 +14,10 @@
 #ifndef STXXL_IO_REQUEST_WITH_WAITERS_HEADER
 #define STXXL_IO_REQUEST_WITH_WAITERS_HEADER
 
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request.h>
 
+#include <mutex>
 #include <set>
 
 namespace stxxl {
@@ -28,7 +28,7 @@ namespace stxxl {
 //! Request that is aware of threads waiting for it to complete.
 class request_with_waiters : public request
 {
-    mutex m_waiters_mutex;
+    std::mutex m_waiters_mutex;
     std::set<onoff_switch*> m_waiters;
 
 protected:

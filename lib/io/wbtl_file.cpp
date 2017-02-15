@@ -82,7 +82,7 @@ wbtl_file::offset_type wbtl_file::size()
 
 void wbtl_file::set_size(offset_type newsize)
 {
-    scoped_mutex_lock mapping_lock(mapping_mutex);
+    std::unique_lock<std::mutex> mapping_lock(mapping_mutex);
     assert(sz <= newsize); // may not shrink
     if (sz < newsize) {
         _add_free_region(sz, newsize - sz);
@@ -99,7 +99,7 @@ void wbtl_file::set_size(offset_type newsize)
 // logical address
 void wbtl_file::discard(offset_type offset, offset_type size)
 {
-    scoped_mutex_lock mapping_lock(mapping_mutex);
+    std::unique_lock<std::mutex> mapping_lock(mapping_mutex);
     sortseq::iterator physical = address_mapping.find(offset);
     STXXL_VERBOSE_WBTL("wbtl:discard l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
     if (physical == address_mapping.end()) {
@@ -196,12 +196,12 @@ void wbtl_file::_add_free_region(offset_type offset, offset_type size)
 
 void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
 {
-    scoped_mutex_lock buffer_lock(buffer_mutex);
+    std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
     int cached = -1;
     offset_type physical_offset;
     // map logical to physical address
     {
-        scoped_mutex_lock mapping_lock(mapping_mutex);
+        std::unique_lock<std::mutex> mapping_lock(mapping_mutex);
         sortseq::iterator physical = address_mapping.find(offset);
         if (physical == address_mapping.end()) {
             STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
@@ -249,10 +249,10 @@ void wbtl_file::sread(void* buffer, offset_type offset, size_type bytes)
 
 void wbtl_file::swrite(void* buffer, offset_type offset, size_type bytes)
 {
-    scoped_mutex_lock buffer_lock(buffer_mutex);
+    std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
     // is the block already mapped?
     {
-        scoped_mutex_lock mapping_lock(mapping_mutex);
+        std::unique_lock<std::mutex> mapping_lock(mapping_mutex);
         sortseq::iterator physical = address_mapping.find(offset);
         STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ <= p" <<
                            FMT_A_C(physical != address_mapping.end() ? physical->second : 0xffffffff, address_mapping.size()));
@@ -292,7 +292,7 @@ void wbtl_file::swrite(void* buffer, offset_type offset, size_type bytes)
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
     stats::get_instance()->write_cached(bytes);
 
-    scoped_mutex_lock mapping_lock(mapping_mutex);
+    std::unique_lock<std::mutex> mapping_lock(mapping_mutex);
     address_mapping[offset] = buffer_address[curbuf] + curpos;
     reverse_mapping[buffer_address[curbuf] + curpos] = place(offset, bytes);
     STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ => p" << FMT_A_C(buffer_address[curbuf] + curpos, address_mapping.size()));

@@ -20,13 +20,13 @@
 #endif
 
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/singleton.h>
 
+#include <mutex>
 #include <iostream>
 #include <string>
 
@@ -62,7 +62,7 @@ class stats : public singleton<stats>
     int acc_waits;
     int acc_wait_read, acc_wait_write;
     double last_reset;
-    mutex read_mutex, write_mutex, io_mutex, wait_mutex;
+    std::mutex read_mutex, write_mutex, io_mutex, wait_mutex;
 
     stats();
 

@@ -19,9 +19,10 @@
 #if STXXL_HAVE_LINUXAIO_FILE
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
-#include <stxxl/bits/common/mutex.h>
 
 #include <linux/aio_abi.h>
+
+#include <mutex>
 #include <list>
 
 namespace stxxl {
@@ -47,7 +48,7 @@ private:
 
     // "waiting" request have submitted to this queue, but not yet to the OS,
     // those are "posted"
-    mutex waiting_mtx, posted_mtx;
+    std::mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
 
     //! max number of OS requests

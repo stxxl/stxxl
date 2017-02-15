@@ -25,7 +25,7 @@ namespace stxxl {
 void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
                       request::request_type type)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
 
     //assert(offset + bytes <= _size());
 

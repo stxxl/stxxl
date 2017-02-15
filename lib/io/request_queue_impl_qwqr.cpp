@@ -62,7 +62,7 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
     {
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
-            scoped_mutex_lock Lock(m_write_mutex);
+            std::unique_lock<std::mutex> Lock(m_write_mutex);
             if (std::find_if(m_write_queue.begin(), m_write_queue.end(),
                              bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
                 != m_write_queue.end())
@@ -71,14 +71,14 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
             }
         }
 #endif
-        scoped_mutex_lock Lock(m_read_mutex);
+        std::unique_lock<std::mutex> Lock(m_read_mutex);
         m_read_queue.push_back(req);
     }
     else
     {
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
-            scoped_mutex_lock Lock(m_read_mutex);
+            std::unique_lock<std::mutex> Lock(m_read_mutex);
             if (std::find_if(m_read_queue.begin(), m_read_queue.end(),
                              bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
                 != m_read_queue.end())
@@ -87,7 +87,7 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
             }
         }
 #endif
-        scoped_mutex_lock Lock(m_write_mutex);
+        std::unique_lock<std::mutex> Lock(m_write_mutex);
         m_write_queue.push_back(req);
     }
 
@@ -106,7 +106,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
     bool was_still_in_queue = false;
     if (req.get()->get_type() == request::READ)
     {
-        scoped_mutex_lock Lock(m_read_mutex);
+        std::unique_lock<std::mutex> Lock(m_read_mutex);
         queue_type::iterator pos
             = std::find(m_read_queue.begin(), m_read_queue.end(),
                         req _STXXL_FORCE_SEQUENTIAL);
@@ -119,7 +119,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
     }
     else
     {
-        scoped_mutex_lock Lock(m_write_mutex);
+        std::unique_lock<std::mutex> Lock(m_write_mutex);
         queue_type::iterator pos
             = std::find(m_write_queue.begin(), m_write_queue.end(),
                         req _STXXL_FORCE_SEQUENTIAL);
@@ -150,7 +150,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
         if (write_phase)
         {
-            scoped_mutex_lock WriteLock(pthis->m_write_mutex);
+            std::unique_lock<std::mutex> WriteLock(pthis->m_write_mutex);
             if (!pthis->m_write_queue.empty())
             {
                 request_ptr req = pthis->m_write_queue.front();
@@ -176,7 +176,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
         }
         else
         {
-            scoped_mutex_lock ReadLock(pthis->m_read_mutex);
+            std::unique_lock<std::mutex> ReadLock(pthis->m_read_mutex);
 
             if (!pthis->m_read_queue.empty())
             {

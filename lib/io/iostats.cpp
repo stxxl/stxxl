@@ -15,10 +15,10 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
 
+#include <mutex>
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -62,7 +62,7 @@ stats::stats()
 void stats::reset()
 {
     {
-        scoped_mutex_lock ReadLock(read_mutex);
+        std::unique_lock<std::mutex> ReadLock(read_mutex);
 
         //assert(acc_reads == 0);
         if (acc_reads)
@@ -77,7 +77,7 @@ void stats::reset()
         p_reads = 0.0;
     }
     {
-        scoped_mutex_lock WriteLock(write_mutex);
+        std::unique_lock<std::mutex> WriteLock(write_mutex);
 
         //assert(acc_writes == 0);
         if (acc_writes)
@@ -92,7 +92,7 @@ void stats::reset()
         p_writes = 0.0;
     }
     {
-        scoped_mutex_lock IOLock(io_mutex);
+        std::unique_lock<std::mutex> IOLock(io_mutex);
 
         //assert(acc_ios == 0);
         if (acc_ios)
@@ -102,7 +102,7 @@ void stats::reset()
         p_ios = 0.0;
     }
     {
-        scoped_mutex_lock WaitLock(wait_mutex);
+        std::unique_lock<std::mutex> WaitLock(wait_mutex);
 
         //assert(acc_waits == 0);
         if (acc_waits)
@@ -127,7 +127,7 @@ void stats::write_started(unsigned_type size_, double now)
     if (now == 0.0)
         now = timestamp();
     {
-        scoped_mutex_lock WriteLock(write_mutex);
+        std::unique_lock<std::mutex> WriteLock(write_mutex);
 
         ++writes;
         volume_written += size_;
@@ -137,7 +137,7 @@ void stats::write_started(unsigned_type size_, double now)
         p_writes += (acc_writes++) ? diff : 0.0;
     }
     {
-        scoped_mutex_lock IOLock(io_mutex);
+        std::unique_lock<std::mutex> IOLock(io_mutex);
 
         double diff = now - p_begin_io;
         p_ios += (acc_ios++) ? diff : 0.0;
@@ -148,7 +148,7 @@ void stats::write_started(unsigned_type size_, double now)
 void stats::write_canceled(unsigned_type size_)
 {
     {
-        scoped_mutex_lock WriteLock(write_mutex);
+        std::unique_lock<std::mutex> WriteLock(write_mutex);
 
         --writes;
         volume_written -= size_;
@@ -160,7 +160,7 @@ void stats::write_finished()
 {
     double now = timestamp();
     {
-        scoped_mutex_lock WriteLock(write_mutex);
+        std::unique_lock<std::mutex> WriteLock(write_mutex);
 
         double diff = now - p_begin_write;
         t_writes += double(acc_writes) * diff;
@@ -168,7 +168,7 @@ void stats::write_finished()
         p_writes += (acc_writes--) ? diff : 0.0;
     }
     {
-        scoped_mutex_lock IOLock(io_mutex);
+        std::unique_lock<std::mutex> IOLock(io_mutex);
 
         double diff = now - p_begin_io;
         p_ios += (acc_ios--) ? diff : 0.0;
@@ -178,7 +178,7 @@ void stats::write_finished()
 
 void stats::write_cached(unsigned_type size_)
 {
-    scoped_mutex_lock WriteLock(write_mutex);
+    std::unique_lock<std::mutex> WriteLock(write_mutex);
 
     ++c_writes;
     c_volume_written += size_;
@@ -189,7 +189,7 @@ void stats::read_started(unsigned_type size_, double now)
     if (now == 0.0)
         now = timestamp();
     {
-        scoped_mutex_lock ReadLock(read_mutex);
+        std::unique_lock<std::mutex> ReadLock(read_mutex);
 
         ++reads;
         volume_read += size_;
@@ -199,7 +199,7 @@ void stats::read_started(unsigned_type size_, double now)
         p_reads += (acc_reads++) ? diff : 0.0;
     }
     {
-        scoped_mutex_lock IOLock(io_mutex);
+        std::unique_lock<std::mutex> IOLock(io_mutex);
 
         double diff = now - p_begin_io;
         p_ios += (acc_ios++) ? diff : 0.0;
@@ -210,7 +210,7 @@ void stats::read_started(unsigned_type size_, double now)
 void stats::read_canceled(unsigned_type size_)
 {
     {
-        scoped_mutex_lock ReadLock(read_mutex);
+        std::unique_lock<std::mutex> ReadLock(read_mutex);
 
         --reads;
         volume_read -= size_;
@@ -222,7 +222,7 @@ void stats::read_finished()
 {
     double now = timestamp();
     {
-        scoped_mutex_lock ReadLock(read_mutex);
+        std::unique_lock<std::mutex> ReadLock(read_mutex);
 
         double diff = now - p_begin_read;
         t_reads += double(acc_reads) * diff;
@@ -230,7 +230,7 @@ void stats::read_finished()
         p_reads += (acc_reads--) ? diff : 0.0;
     }
     {
-        scoped_mutex_lock IOLock(io_mutex);
+        std::unique_lock<std::mutex> IOLock(io_mutex);
 
         double diff = now - p_begin_io;
         p_ios += (acc_ios--) ? diff : 0.0;
@@ -240,7 +240,7 @@ void stats::read_finished()
 
 void stats::read_cached(unsigned_type size_)
 {
-    scoped_mutex_lock ReadLock(read_mutex);
+    std::unique_lock<std::mutex> ReadLock(read_mutex);
 
     ++c_reads;
     c_volume_read += size_;
@@ -252,7 +252,7 @@ void stats::wait_started(wait_op_type wait_op)
 {
     double now = timestamp();
     {
-        scoped_mutex_lock WaitLock(wait_mutex);
+        std::unique_lock<std::mutex> WaitLock(wait_mutex);
 
         double diff = now - p_begin_wait;
         t_waits += double(acc_waits) * diff;
@@ -279,7 +279,7 @@ void stats::wait_finished(wait_op_type wait_op)
 {
     double now = timestamp();
     {
-        scoped_mutex_lock WaitLock(wait_mutex);
+        std::unique_lock<std::mutex> WaitLock(wait_mutex);
 
         double diff = now - p_begin_wait;
         t_waits += double(acc_waits) * diff;
@@ -314,7 +314,7 @@ void stats::_reset_io_wait_time()
 {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     {
-        scoped_mutex_lock WaitLock(wait_mutex);
+        std::unique_lock<std::mutex> WaitLock(wait_mutex);
 
         //assert(acc_waits == 0);
         if (acc_waits)

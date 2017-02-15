@@ -14,19 +14,6 @@
 #ifndef STXXL_CONTAINERS_PARALLEL_PRIORITY_QUEUE_HEADER
 #define STXXL_CONTAINERS_PARALLEL_PRIORITY_QUEUE_HEADER
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdlib>
-#include <ctime>
-#include <list>
-#include <utility>
-#include <numeric>
-#include <vector>
-#include <string>
-#include <limits>
-#include <functional>
-
 #if STXXL_PARALLEL
     #include <omp.h>
 #endif
@@ -39,7 +26,6 @@
 
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/common/custom_stats.h>
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/common/swap_vector.h>
@@ -55,6 +41,20 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/types>
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdlib>
+#include <ctime>
+#include <list>
+#include <utility>
+#include <numeric>
+#include <vector>
+#include <string>
+#include <limits>
+#include <functional>
+#include <mutex>
 
 namespace stxxl {
 namespace ppq_local {
@@ -1265,7 +1265,7 @@ protected:
 
     //! mutex for reference counting array (this is actually nicer than
     //! openmp's critical)
-    mutex m_mutex;
+    std::mutex m_mutex;
 
     //! optimization: hold live iterators for the expected boundary blocks of
     //! multiway_merge().
@@ -1276,7 +1276,7 @@ protected:
     //! iterator goes live on the block).
     block_type * get_block_ref(size_t block_index)
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
 
         assert(block_index < m_ea.num_blocks());
         unsigned int ref = m_ref_count[block_index]++;
@@ -1301,7 +1301,7 @@ protected:
     //! (called when an iterator releases live mode).
     void free_block_ref(size_t block_index)
     {
-        scoped_mutex_lock lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
 
         assert(block_index < m_ea.num_blocks());
 #ifndef NDEBUG

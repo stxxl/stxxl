@@ -233,22 +233,6 @@ And the following binary_reader example deserializes the data elements and check
 
 To support multi-threading, some parts of STXXL use synchronization primitives to ensure correct results. The primitives are based either on pthreads or on Boost classes.
 
-\section mutex Mutexes
-
-For simple mutual exclusion contexts, stxxl::mutex objects should be used together with scoped locks:
-
-\code
-class Something
-{
-    stxxl::mutex m_mtx;
-    void critical_function()
-    {
-        stxxl::scoped_mutex_lock lock(m_mtx);
-        // do something requiring locking
-    }
-};
-\endcode
-
 \section semaphore Semaphores
 
 Additionally stxxl::semaphore is available if counting is required.
