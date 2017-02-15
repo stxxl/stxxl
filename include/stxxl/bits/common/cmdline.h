@@ -244,12 +244,12 @@ protected:
     //! parameters
     struct argument_bytes32 : public argument
     {
-        uint32& m_dest;
+        uint32_t& m_dest;
 
         //! contructor filling most attributes
         argument_bytes32(char key, const std::string& longkey,
                          const std::string& keytype,
-                         const std::string& desc, bool required, uint32& dest)
+                         const std::string& desc, bool required, uint32_t& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
         { }
@@ -261,9 +261,9 @@ protected:
         virtual bool process(int& argc, const char* const*& argv)
         {
             if (argc == 0) return false;
-            uint64 dest;
+            uint64_t dest;
             if (parse_SI_IEC_size(argv[0], dest) &&
-                (uint64)(m_dest = (uint32)dest) == dest) {
+                (uint64_t)(m_dest = (uint32_t)dest) == dest) {
                 --argc, ++argv;
                 return true;
             }
@@ -280,12 +280,12 @@ protected:
     //! parameters
     struct argument_bytes64 : public argument
     {
-        uint64& m_dest;
+        uint64_t& m_dest;
 
         //! contructor filling most attributes
         argument_bytes64(char key, const std::string& longkey,
                          const std::string& keytype,
-                         const std::string& desc, bool required, uint64& dest)
+                         const std::string& desc, bool required, uint64_t& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
         { }
@@ -529,7 +529,7 @@ public:
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
     //! store to 64-bit dest
     void add_bytes(char key, const std::string& longkey,
-                   const std::string& keytype, stxxl::uint32& dest,
+                   const std::string& keytype, uint32_t& dest,
                    const std::string& desc)
     {
         m_optlist.push_back(
@@ -540,7 +540,7 @@ public:
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
     //! store to 64-bit dest
     void add_bytes(char key, const std::string& longkey,
-                   const std::string& keytype, stxxl::uint64& dest,
+                   const std::string& keytype, uint64_t& dest,
                    const std::string& desc)
     {
         m_optlist.push_back(
@@ -595,13 +595,13 @@ public:
 
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
     //! store to 32-bit dest
-    void add_bytes(char key, const std::string& longkey, stxxl::uint32& dest,
+    void add_bytes(char key, const std::string& longkey, uint32_t& dest,
                    const std::string& desc)
     { return add_bytes(key, longkey, "", dest, desc); }
 
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and
     //! store to 64-bit dest
-    void add_bytes(char key, const std::string& longkey, stxxl::uint64& dest,
+    void add_bytes(char key, const std::string& longkey, uint64_t& dest,
                    const std::string& desc)
     { return add_bytes(key, longkey, "", dest, desc); }
 
@@ -646,7 +646,7 @@ public:
 
     //! add SI/IEC suffixes byte size parameter [name] with description and
     //! store to dest
-    void add_param_bytes(const std::string& name, uint32& dest,
+    void add_param_bytes(const std::string& name, uint32_t& dest,
                          const std::string& desc)
     {
         m_paramlist.push_back(
@@ -656,7 +656,7 @@ public:
 
     //! add SI/IEC suffixes byte size parameter [name] with description and
     //! store to dest
-    void add_param_bytes(const std::string& name, uint64& dest,
+    void add_param_bytes(const std::string& name, uint64_t& dest,
                          const std::string& desc)
     {
         m_paramlist.push_back(
@@ -718,7 +718,7 @@ public:
 
     //! add optional SI/IEC suffixes byte size parameter [name] with
     //! description and store to dest
-    void add_opt_param_bytes(const std::string& name, uint32& dest,
+    void add_opt_param_bytes(const std::string& name, uint32_t& dest,
                              const std::string& desc)
     {
         m_paramlist.push_back(
@@ -728,7 +728,7 @@ public:
 
     //! add optional SI/IEC suffixes byte size parameter [name] with
     //! description and store to dest
-    void add_opt_param_bytes(const std::string& name, uint64& dest,
+    void add_opt_param_bytes(const std::string& name, uint64_t& dest,
                              const std::string& desc)
     {
         m_paramlist.push_back(

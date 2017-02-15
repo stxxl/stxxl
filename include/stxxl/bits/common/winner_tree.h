@@ -44,13 +44,13 @@ class winner_tree
 {
 protected:
     //! the binary tree of size 2^(k+1)-1
-    std::vector<unsigned_type> m_tree;
+    std::vector<size_t> m_tree;
 
     //! the comparator object of this tree
     Comparator& m_less;
 
     //! number of slots for the players (2^k)
-    unsigned_type m_num_slots;
+    size_t m_num_slots;
 
     //! Defines if statistics are gathered: fake_timer or timer
     typedef fake_timer stats_timer;
@@ -74,7 +74,7 @@ protected:
     stats_type m_stats;
 
 public:
-    const unsigned_type invalid_key;
+    const size_t invalid_key;
 
     /**
      * Constructor. Reserves space, registers free slots. No games are played
@@ -86,18 +86,18 @@ public:
      * \param less The comparator. It should use two given indices, compare the
      * corresponding values and return the index of one with the smaller value.
      */
-    winner_tree(unsigned_type num_players, Comparator& less)
-        : m_less(less), invalid_key(std::numeric_limits<unsigned_type>::max())
+    winner_tree(size_t num_players, Comparator& less)
+        : m_less(less), invalid_key(std::numeric_limits<size_t>::max())
     {
         STXXL_ASSERT(num_players > 0 && num_players <= invalid_key);
 
         m_num_slots = (1 << ilog2_ceil(num_players));
-        unsigned_type treesize = (m_num_slots << 1) - 1;
+        size_t treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, invalid_key);
     }
 
     //! activate one of the static players or add a new one and replay
-    inline void activate_player(unsigned_type index)
+    inline void activate_player(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         while (index >= m_num_slots)
@@ -106,7 +106,7 @@ public:
     }
 
     //! activate a player and resize if necessary
-    inline void activate_without_replay(unsigned_type index)
+    inline void activate_without_replay(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         while (index >= m_num_slots)
@@ -115,7 +115,7 @@ public:
     }
 
     //! deactivate a player
-    inline void deactivate_without_replay(unsigned_type index)
+    inline void deactivate_without_replay(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         STXXL_ASSERT(index < m_num_slots);
@@ -123,7 +123,7 @@ public:
     }
 
     //! deactivate a player and replay.
-    inline void deactivate_player(unsigned_type index)
+    inline void deactivate_player(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         STXXL_ASSERT(index < m_num_slots);
@@ -136,13 +136,13 @@ public:
      * removes you should run deactivate_player_step() for all of them first and
      * afterwards run replay_on_deactivation() for each one of them.
      */
-    inline void deactivate_player_step(unsigned_type index)
+    inline void deactivate_player_step(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         STXXL_ASSERT(index < m_num_slots);
 
         m_stats.remove_player_time.start();
-        unsigned_type p = (m_tree.size() / 2) + index;
+        size_t p = (m_tree.size() / 2) + index;
 
         // Needed for following deactivations...
         while (p > 0 && m_tree[p] == index) {
@@ -158,7 +158,7 @@ public:
     }
 
     //! Replay after the player at index has been deactivated.
-    inline void replay_on_deactivations(unsigned_type index)
+    inline void replay_on_deactivations(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         STXXL_ASSERT(index < m_num_slots);
@@ -166,7 +166,7 @@ public:
     }
 
     //! Notify that the value of the player at index has changed.
-    inline void notify_change(unsigned_type index)
+    inline void notify_change(size_t index)
     {
         STXXL_ASSERT(index != invalid_key);
         replay_on_change(index);
@@ -174,7 +174,7 @@ public:
 
     //! Returns the winner.
     //! Remember running replay_on_pop() if the value of the winner changes.
-    inline unsigned_type top() const
+    inline size_t top() const
     {
         return m_tree[0];
     }
@@ -208,13 +208,13 @@ public:
      * \param done      Set done to true if the player has been deactivated
      *                  or removed. All games will be lost then.
      */
-    inline void replay_on_change(unsigned_type index, bool done = false)
+    inline void replay_on_change(size_t index, bool done = false)
     {
         STXXL_ASSERT(index != invalid_key);
         m_stats.replay_time.start();
 
-        unsigned_type top;
-        unsigned_type p = (m_tree.size() / 2) + index;
+        size_t top;
+        size_t p = (m_tree.size() / 2) + index;
 
         if (!done)
             top = index;
@@ -252,7 +252,7 @@ public:
         size_t tree_size = (m_num_slots << 1) - 1;
         m_tree.resize(tree_size, invalid_key);
 
-        for (unsigned_type i = old_tree_size; i > 0; --i) {
+        for (size_t i = old_tree_size; i > 0; --i) {
             size_t old_index = i - 1;
             size_t old_level = ilog2_floor(old_index + 1);
             size_t new_index = old_index + (1 << old_level);
@@ -280,28 +280,28 @@ public:
         std::fill(m_tree.begin(), m_tree.end(), invalid_key);
     }
 
-    inline void resize(unsigned_type num_players)
+    inline void resize(size_t num_players)
     {
         m_num_slots = (1 << ilog2_ceil(num_players));
-        unsigned_type treesize = (m_num_slots << 1) - 1;
+        size_t treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, invalid_key);
     }
 
     //! Deactivate all players and resize the tree.
-    inline void resize_and_clear(unsigned_type num_players)
+    inline void resize_and_clear(size_t num_players)
     {
         resize(num_players);
         clear();
     }
 
-    inline void resize_and_rebuild(unsigned_type num_players)
+    inline void resize_and_rebuild(size_t num_players)
     {
         //resize(num_players);
         STXXL_ASSERT(num_players > 0);
         resize_and_clear(num_players);
-        for (unsigned_type i = 0; i < num_players; ++i)
+        for (size_t i = 0; i < num_players; ++i)
             activate_without_replay(i);
-        //for (unsigned_type i=num_players; i<m_num_slots; ++i)
+        //for (size_t i=num_players; i<m_num_slots; ++i)
         //    deactivate_without_replay(i);
         rebuild();
     }
@@ -309,16 +309,16 @@ public:
     //! Build from winner tree from scratch.
     inline void rebuild()
     {
-        unsigned_type i = (m_tree.size() / 2);
+        size_t i = (m_tree.size() / 2);
 
         if (i == 0)
             return;
 
         do {
             --i;
-            const unsigned_type lc = i * 2 + 1; // m_tree.size() is uneven -> index OK
-            const unsigned_type rc = i * 2 + 2;
-            unsigned_type winner;
+            const size_t lc = i * 2 + 1; // m_tree.size() is uneven -> index OK
+            const size_t rc = i * 2 + 2;
+            size_t winner;
 
             if (m_tree[lc] == invalid_key)
                 winner = m_tree[rc];
@@ -337,9 +337,9 @@ public:
     std::string to_string() const
     {
         std::ostringstream ss;
-        unsigned_type levelsize = 1;
-        unsigned_type j = 0;
-        for (unsigned_type i = 0; i < m_tree.size(); ++i) {
+        size_t levelsize = 1;
+        size_t j = 0;
+        for (size_t i = 0; i < m_tree.size(); ++i) {
             if (i >= j + levelsize) {
                 ss << "\n";
                 j = i;

@@ -277,32 +277,32 @@ public:
     }
 
     //! Append a varint to the buffer.
-    binary_buffer & put_varint(uint32 v)
+    binary_buffer & put_varint(uint32_t v)
     {
         if (v < 128) {
-            put<uint8>(uint8(v));
+            put<uint8_t>(uint8_t(v));
         }
         else if (v < 128 * 128) {
-            put<uint8>((uint8)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 7) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 7) & 0x7F));
         }
         else if (v < 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 7) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 14) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 7) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 14) & 0x7F));
         }
         else if (v < 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 7) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 21) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 7) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 21) & 0x7F));
         }
         else {
-            put<uint8>((uint8)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 7) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 28) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 7) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 28) & 0x7F));
         }
 
         return *this;
@@ -311,86 +311,86 @@ public:
     //! Append a varint to the buffer.
     binary_buffer & put_varint(int v)
     {
-        return put_varint((uint32)v);
+        return put_varint((uint32_t)v);
     }
 
     //! Append a varint to the buffer.
-    binary_buffer & put_varint(uint64 v)
+    binary_buffer & put_varint(uint64_t v)
     {
         if (v < 128) {
-            put<uint8>(uint8(v));
+            put<uint8_t>(uint8_t(v));
         }
         else if (v < 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 07) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 07) & 0x7F));
         }
         else if (v < 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 14) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 14) & 0x7F));
         }
         else if (v < 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 21) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 21) & 0x7F));
         }
-        else if (v < ((uint64)128) * 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 28) & 0x7F));
+        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128) {
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 28) & 0x7F));
         }
-        else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 35) & 0x7F));
+        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 35) & 0x7F));
         }
-        else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 42) & 0x7F));
+        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 42) & 0x7F));
         }
-        else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 42) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 49) & 0x7F));
+        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 42) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 49) & 0x7F));
         }
-        else if (v < ((uint64)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 42) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 49) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 56) & 0x7F));
+        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 42) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 49) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 56) & 0x7F));
         }
         else {
-            put<uint8>((uint8)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 42) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 49) & 0x7F) | 0x80));
-            put<uint8>((uint8)(((v >> 56) & 0x7F) | 0x80));
-            put<uint8>((uint8)((v >> 63) & 0x7F));
+            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 42) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 49) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)(((v >> 56) & 0x7F) | 0x80));
+            put<uint8_t>((uint8_t)((v >> 63) & 0x7F));
         }
 
         return *this;
@@ -399,7 +399,7 @@ public:
     //! Put a string by saving it's length followed by the data itself.
     binary_buffer & put_string(const char* data, size_t len)
     {
-        return put_varint((uint32)len).append(data, len);
+        return put_varint((uint32_t)len).append(data, len);
     }
 
     //! Put a string by saving it's length followed by the data itself.
@@ -575,18 +575,18 @@ public:
     }
 
     //! Fetch a varint with up to 32-bit from the buffer at the cursor.
-    uint32 get_varint()
+    uint32_t get_varint()
     {
-        uint32 u, v = get<uint8>();
+        uint32_t u, v = get<uint8_t>();
         if (!(v & 0x80)) return v;
         v &= 0x7F;
-        u = get<uint8>(), v |= (u & 0x7F) << 7;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 7;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 14;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 14;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 21;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 21;
         if (!(u & 0x80)) return v;
-        u = get<uint8>();
+        u = get<uint8_t>();
         if (u & 0xF0)
             throw std::overflow_error("Overflow during varint decoding.");
         v |= (u & 0x7F) << 28;
@@ -594,28 +594,28 @@ public:
     }
 
     //! Fetch a 64-bit varint from the buffer at the cursor.
-    uint64 get_varint64()
+    uint64_t get_varint64()
     {
-        uint64 u, v = get<uint8>();
+        uint64_t u, v = get<uint8_t>();
         if (!(v & 0x80)) return v;
         v &= 0x7F;
-        u = get<uint8>(), v |= (u & 0x7F) << 7;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 7;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 14;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 14;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 21;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 21;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 28;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 28;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 35;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 35;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 42;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 42;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 49;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 49;
         if (!(u & 0x80)) return v;
-        u = get<uint8>(), v |= (u & 0x7F) << 56;
+        u = get<uint8_t>(), v |= (u & 0x7F) << 56;
         if (!(u & 0x80)) return v;
-        u = get<uint8>();
+        u = get<uint8_t>();
         if (u & 0xFE)
             throw std::overflow_error("Overflow during varint64 decoding.");
         v |= (u & 0x7F) << 63;
@@ -625,7 +625,7 @@ public:
     //! Fetch a string which was put via put_string().
     std::string get_string()
     {
-        uint32 len = get_varint();
+        uint32_t len = get_varint();
         return read(len);
     }
 
@@ -633,7 +633,7 @@ public:
     //! put_string(). Does NOT copy the data.
     binary_buffer_ref get_binary_buffer_ref()
     {
-        uint32 len = get_varint();
+        uint32_t len = get_varint();
         // save object
         binary_buffer_ref br(m_data + m_curr, len);
         // skip over sub block data

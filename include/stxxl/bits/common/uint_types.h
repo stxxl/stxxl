@@ -52,7 +52,7 @@ class uint_pair
 {
 public:
     //! lower part type, always 32-bit
-    typedef uint32 low_type;
+    typedef uint32_t low_type;
     //! higher part type, currently either 8-bit or 16-bit
     typedef HighType high_type;
 
@@ -63,7 +63,7 @@ private:
     high_type high;
 
     //! return highest value storable in lower part, also used as a mask.
-    static unsigned_type low_max()
+    static low_type low_max()
     {
         return std::numeric_limits<low_type>::max();
     }
@@ -72,7 +72,7 @@ private:
     static const size_t low_bits = 8 * sizeof(low_type);
 
     //! return highest value storable in higher part, also used as a mask.
-    static unsigned_type high_max()
+    static high_type high_max()
     {
         return std::numeric_limits<high_type>::max();
     }
@@ -108,12 +108,12 @@ public:
     { }
 
     //! implicit conversion from a simple 32-bit unsigned integer
-    uint_pair(const uint32& a) // NOLINT
+    uint_pair(const uint32_t& a) // NOLINT
         : low(a), high(0)
     { }
 
     //! implicit conversion from a simple 32-bit signed integer
-    uint_pair(const int32& a) // NOLINT
+    uint_pair(const int32_t& a) // NOLINT
         : low(a), high(0)
     {
         if (a >= 0)
@@ -122,8 +122,8 @@ public:
             low = a, high = (high_type)high_max();
     }
 
-    //! implicit conversion from an uint64 (unsigned long long)
-    uint_pair(const uint64& a) // NOLINT
+    //! implicit conversion from an uint64_t (unsigned long long)
+    uint_pair(const uint64_t& a) // NOLINT
         : low((low_type)(a & low_max())),
           high((high_type)((a >> low_bits) & high_max()))
     {
@@ -131,22 +131,22 @@ public:
         assert((a >> (low_bits + high_bits)) == 0);
     }
 
-    //! return the number as an uint64 (unsigned long long)
-    uint64 ull() const
+    //! return the number as an uint64_t (unsigned long long)
+    uint64_t ull() const
     {
-        return ((uint64)high) << low_bits | (uint64)low;
+        return ((uint64_t)high) << low_bits | (uint64_t)low;
     }
 
     //! implicit cast to an unsigned long long
-    operator uint64 () const
+    operator uint64_t () const
     {
         return ull();
     }
 
-    //! return the number as a uint64
-    uint64 u64() const
+    //! return the number as a uint64_t
+    uint64_t u64() const
     {
-        return ((uint64)high) << low_bits | (uint64)low;
+        return ((uint64_t)high) << low_bits | (uint64_t)low;
     }
 
     //! prefix increment operator (directly manipulates the integer parts)
@@ -172,7 +172,7 @@ public:
     //! addition operator (uses 64-bit arithmetic)
     uint_pair& operator += (const uint_pair& b)
     {
-        uint64 add = (uint64)low + b.low;
+        uint64_t add = (uint64_t)low + b.low;
         low = (low_type)(add & low_max());
         high = (high_type)(high + b.high + ((add >> low_bits) & high_max()));
         return *this;
@@ -245,10 +245,10 @@ __attribute__ ((packed)); // NOLINT
 //! \{
 
 //! Construct a 40-bit unsigned integer stored in five bytes.
-typedef uint_pair<uint8> uint40;
+typedef uint_pair<uint8_t> uint40;
 
 //! Construct a 48-bit unsigned integer stored in six bytes.
-typedef uint_pair<uint16> uint48;
+typedef uint_pair<uint16_t> uint48;
 
 //! \}
 

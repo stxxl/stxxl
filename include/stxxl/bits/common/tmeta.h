@@ -94,7 +94,7 @@ public:
 };
 
 //! \internal, use LOG2 instead
-template <unsigned_type Input>
+template <size_t Input>
 class LOG2_floor
 {
 public:
@@ -124,7 +124,7 @@ public:
     };
 };
 
-template <unsigned_type Input>
+template <size_t Input>
 class LOG2
 {
 public:

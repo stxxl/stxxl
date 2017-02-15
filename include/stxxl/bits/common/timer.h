@@ -233,14 +233,14 @@ protected:
     std::string m_message;
 
     //! bytes processed
-    uint64 m_bytes;
+    uint64_t m_bytes;
 
     //! timer
     stxxl::timer m_timer;
 
 public:
     //! save message and start timer
-    explicit scoped_print_timer(const std::string& message, const uint64 bytes = 0)
+    explicit scoped_print_timer(const std::string& message, const uint64_t bytes = 0)
         : m_message(message),
           m_bytes(bytes),
           m_timer(true)
@@ -263,7 +263,7 @@ public:
                       << m_message
                       << " after " << m_timer.seconds() << " seconds. "
                       << "Processed " << format_IEC_size(m_bytes) << "B"
-                      << " @ " << format_IEC_size((uint64)bps) << "B/s");
+                      << " @ " << format_IEC_size((uint64_t)bps) << "B/s");
         }
     }
 
