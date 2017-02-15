@@ -19,6 +19,7 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
+using stxxl::external_size_type;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -30,7 +31,7 @@ using stxxl::timestamp;
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
 
-void run(char* buffer, file** disks, stxxl::int64 offset, stxxl::int64 length,
+void run(char* buffer, file** disks, external_size_type offset, external_size_type length,
          unsigned hdd_blocks, unsigned hdd_bytes, unsigned ssd_blocks, unsigned ssd_bytes, unsigned repeats)
 {
     unsigned i, j;
@@ -59,13 +60,13 @@ void run(char* buffer, file** disks, stxxl::int64 offset, stxxl::int64 length,
     double volume = 0;
 
     for (unsigned repeat = 0; repeat < repeats; ++repeat) {
-        int r = 0;
+        size_t r = 0;
         char* buf = buffer;
         for (i = 0; i < 2; i++)
         {
             for (j = 0; j < info[i].n; j++) {
                 unsigned bytes = info[i].bytes;
-                stxxl::int64 position = (bytes * (rand() & 0xffff)) % length;
+                external_size_type position = (bytes * (rand() & 0xffff)) % length;
                 reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes);
                 buf += bytes;
                 volume += (double)bytes;
@@ -96,8 +97,8 @@ int main(int argc, char* argv[])
     if (argc < 4)
         usage(argv[0]);
 
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    external_size_type offset = external_size_type(GB) * external_size_type(atoi(argv[1]));
+    external_size_type length = external_size_type(GB) * external_size_type(atoi(argv[2]));
 
     int first_disk_arg = 3;
 
@@ -113,21 +114,21 @@ int main(int argc, char* argv[])
     }
 
     const size_t ndisks = disks_arr.size();
-    stxxl::unsigned_type buffer_size = 1024 * MB;
-    const stxxl::int64 buffer_size_int = buffer_size / sizeof(int);
+    size_t buffer_size = 1024 * MB;
+    const size_t buffer_size_int = buffer_size / sizeof(int);
 
-    unsigned i;
+    size_t i;
 
     file** disks = new file*[ndisks];
     unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size);
 
     for (i = 0; i < buffer_size_int; i++)
-        buffer[i] = i;
+        buffer[i] = unsigned(i);
 
     for (i = 0; i < ndisks; i++)
     {
         disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR | file::DIRECT, i);
+                                           file::CREAT | file::RDWR | file::DIRECT, static_cast<int>(i));
     }
 
     try {
