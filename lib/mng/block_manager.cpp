@@ -19,6 +19,7 @@
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/disk_allocator.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/io/disk_queues.h>
 
 #include <cstddef>
 #include <fstream>
@@ -67,6 +68,9 @@ block_manager::block_manager()
         }
 
         total_size += cfg.size;
+
+        // create queue for the file.
+        disk_queues::get_instance()->make_queue(disk_files[i]);
 
         disk_allocators[i] = new disk_allocator(disk_files[i], cfg);
     }

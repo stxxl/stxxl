@@ -49,6 +49,25 @@ protected:
     }
 
 public:
+    void make_queue(file* file)
+    {
+        int queue_id = file->get_queue_id();
+
+        request_queue_map::iterator qi = queues_.find(queue_id);
+        if (qi != queues_.end())
+            return;
+
+        // create new request queue
+#if STXXL_HAVE_LINUXAIO_FILE
+        if (const linuxaio_file* af =
+            dynamic_cast<const linuxaio_file*>(file)) {
+            queues_[queue_id] = new linuxaio_queue(af->get_desired_queue_length());
+            return;
+        }
+#endif
+        queues_[queue_id] = new request_queue_impl_qwqr();
+    }
+
     void add_request(request_ptr& req, disk_id_type disk)
     {
 #ifdef STXXL_HACK_SINGLE_IO_THREAD
