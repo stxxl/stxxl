@@ -26,10 +26,12 @@ struct comp_type : public std::less<int>
     }
 };
 
-typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
+typedef stxxl::btree::btree<
+        int, double, comp_type, 4096, 4096, stxxl::simple_random> btree_type;
 
 // forced instantiation
-template class stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR>;
+template class stxxl::btree::btree<
+        int, double, comp_type, 4096, 4096, stxxl::simple_random>;
 
 std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {

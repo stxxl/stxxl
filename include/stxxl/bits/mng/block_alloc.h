@@ -66,16 +66,16 @@ public:
 
 //! Fully randomized disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
-struct FR : public striping
+struct fully_random : public striping
 {
 private:
     mutable std::default_random_engine rng_ { std::random_device { } () };
 
 public:
-    FR(unsigned_type b, unsigned_type e) : striping(b, e)
+    fully_random(unsigned_type b, unsigned_type e) : striping(b, e)
     { }
 
-    FR() : striping()
+    fully_random() : striping()
     { }
 
     unsigned_type operator () (unsigned_type /*i*/) const
@@ -91,7 +91,7 @@ public:
 
 //! Simple randomized disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
-struct SR : public striping
+struct simple_random : public striping
 {
 private:
     unsigned_type offset;
@@ -103,12 +103,12 @@ private:
     }
 
 public:
-    SR(unsigned_type b, unsigned_type e) : striping(b, e)
+    simple_random(unsigned_type b, unsigned_type e) : striping(b, e)
     {
         init();
     }
 
-    SR() : striping()
+    simple_random() : striping()
     {
         init();
     }
@@ -126,7 +126,7 @@ public:
 
 //! Randomized cycling disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
-struct RC : public striping
+struct random_cyclic : public striping
 {
 private:
     std::vector<unsigned_type> perm;
@@ -140,12 +140,12 @@ private:
     }
 
 public:
-    RC(unsigned_type b, unsigned_type e) : striping(b, e), perm(diff)
+    random_cyclic(unsigned_type b, unsigned_type e) : striping(b, e), perm(diff)
     {
         init();
     }
 
-    RC() : striping(), perm(diff)
+    random_cyclic() : striping(), perm(diff)
     {
         init();
     }
@@ -161,12 +161,14 @@ public:
     }
 };
 
-struct RC_disk : public RC
+struct random_cyclic_disk : public random_cyclic
 {
-    RC_disk(unsigned_type b, unsigned_type e) : RC(b, e)
+    random_cyclic_disk(unsigned_type b, unsigned_type e) : random_cyclic(b, e)
     { }
 
-    RC_disk() : RC(config::get_instance()->regular_disk_range().first, config::get_instance()->regular_disk_range().second)
+    random_cyclic_disk()
+        : random_cyclic(config::get_instance()->regular_disk_range().first,
+                        config::get_instance()->regular_disk_range().second)
     { }
 
     static const char * name()
@@ -175,12 +177,14 @@ struct RC_disk : public RC
     }
 };
 
-struct RC_flash : public RC
+struct random_cyclic_flash : public random_cyclic
 {
-    RC_flash(unsigned_type b, unsigned_type e) : RC(b, e)
+    random_cyclic_flash(unsigned_type b, unsigned_type e) : random_cyclic(b, e)
     { }
 
-    RC_flash() : RC(config::get_instance()->flash_range().first, config::get_instance()->flash_range().second)
+    random_cyclic_flash()
+        : random_cyclic(config::get_instance()->flash_range().first,
+                        config::get_instance()->flash_range().second)
     { }
 
     static const char * name()
@@ -254,7 +258,7 @@ struct offset_allocator
 };
 
 #ifndef STXXL_DEFAULT_ALLOC_STRATEGY
-    #define STXXL_DEFAULT_ALLOC_STRATEGY stxxl::RC
+    #define STXXL_DEFAULT_ALLOC_STRATEGY stxxl::random_cyclic
 #endif
 
 //! \}

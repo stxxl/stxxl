@@ -263,7 +263,7 @@ int benchmark_disks(int argc, char* argv[])
         "Only read or write blocks (default: both write and read)");
     cp.add_opt_param_string(
         "alloc", allocstr,
-        "Block allocation strategy: RC, SR, FR, striping. (default: RC)");
+        "Block allocation strategy: random_cyclic, simple_random, fully_random, striping. (default: random_cyclic)");
 
     cp.add_uint('b', "batch", batch_size,
                 "Number of blocks written/read in one batch (default: D * B)");
@@ -286,14 +286,14 @@ int benchmark_disks(int argc, char* argv[])
 
     if (allocstr.size())
     {
-        if (allocstr == "RC")
-            return benchmark_disks_alloc<stxxl::RC>(
+        if (allocstr == "random_cyclic")
+            return benchmark_disks_alloc<stxxl::random_cyclic>(
                 length, offset, batch_size, block_size, optrw);
-        if (allocstr == "SR")
-            return benchmark_disks_alloc<stxxl::SR>(
+        if (allocstr == "simple_random")
+            return benchmark_disks_alloc<stxxl::simple_random>(
                 length, offset, batch_size, block_size, optrw);
-        if (allocstr == "FR")
-            return benchmark_disks_alloc<stxxl::FR>(
+        if (allocstr == "fully_random")
+            return benchmark_disks_alloc<stxxl::fully_random>(
                 length, offset, batch_size, block_size, optrw);
         if (allocstr == "striping")
             return benchmark_disks_alloc<stxxl::striping>(

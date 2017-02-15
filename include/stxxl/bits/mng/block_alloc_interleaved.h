@@ -45,11 +45,11 @@ public:
     }
 };
 
-struct interleaved_FR : public interleaved_striping
+struct interleaved_fully_random : public interleaved_striping
 {
     mutable std::default_random_engine rng_ { std::random_device { } () };
 
-    interleaved_FR(int_type _nruns, const FR& strategy)
+    interleaved_fully_random(int_type _nruns, const fully_random& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     { }
 
@@ -59,11 +59,11 @@ struct interleaved_FR : public interleaved_striping
     }
 };
 
-struct interleaved_SR : public interleaved_striping
+struct interleaved_simple_random : public interleaved_striping
 {
     std::vector<size_t> offsets;
 
-    interleaved_SR(int_type _nruns, const SR& strategy)
+    interleaved_simple_random(int_type _nruns, const simple_random& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     {
         std::default_random_engine rng { std::random_device { } () };
@@ -77,11 +77,11 @@ struct interleaved_SR : public interleaved_striping
     }
 };
 
-struct interleaved_RC : public interleaved_striping
+struct interleaved_random_cyclic : public interleaved_striping
 {
     std::vector<std::vector<unsigned_type> > perms;
 
-    interleaved_RC(int_type _nruns, const RC& strategy)
+    interleaved_random_cyclic(int_type _nruns, const random_cyclic& strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff),
           perms(nruns, std::vector<unsigned_type>(diff))
     {
@@ -123,35 +123,35 @@ struct interleaved_alloc_traits<striping>
 };
 
 template <>
-struct interleaved_alloc_traits<FR>
+struct interleaved_alloc_traits<fully_random>
 {
-    typedef interleaved_FR strategy;
+    typedef interleaved_fully_random strategy;
 };
 
 template <>
-struct interleaved_alloc_traits<SR>
+struct interleaved_alloc_traits<simple_random>
 {
-    typedef interleaved_SR strategy;
+    typedef interleaved_simple_random strategy;
 };
 
 template <>
-struct interleaved_alloc_traits<RC>
+struct interleaved_alloc_traits<random_cyclic>
 {
-    typedef interleaved_RC strategy;
+    typedef interleaved_random_cyclic strategy;
 };
 
 template <>
-struct interleaved_alloc_traits<RC_disk>
+struct interleaved_alloc_traits<random_cyclic_disk>
 {
     // FIXME! HACK!
-    typedef interleaved_RC strategy;
+    typedef interleaved_random_cyclic strategy;
 };
 
 template <>
-struct interleaved_alloc_traits<RC_flash>
+struct interleaved_alloc_traits<random_cyclic_flash>
 {
     // FIXME! HACK!
-    typedef interleaved_RC strategy;
+    typedef interleaved_random_cyclic strategy;
 };
 
 template <>

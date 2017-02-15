@@ -45,7 +45,8 @@ struct Cmp : public std::binary_function<value_type, value_type, bool>
 
 // special parameter type
 typedef stxxl::stream::use_push<value_type> InputType;
-typedef stxxl::stream::runs_creator<InputType, Cmp, 4096, stxxl::RC> CreateRunsAlg;
+typedef stxxl::stream::runs_creator<
+        InputType, Cmp, 4096, stxxl::random_cyclic> CreateRunsAlg;
 typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
 // forced instantiation

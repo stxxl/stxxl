@@ -2201,19 +2201,19 @@ public:
     private:
         // Mod1 types
         typedef typename stxxl::stream::use_push<skew_quad_type> mod1_push_type;
-        typedef typename stxxl::stream::runs_creator<mod1_push_type, less_quad_2nd, block_size, stxxl::RC> mod1_runs_type;
+        typedef typename stxxl::stream::runs_creator<mod1_push_type, less_quad_2nd, block_size> mod1_runs_type;
         typedef typename mod1_runs_type::sorted_runs_type sorted_mod1_runs_type;
         typedef typename stxxl::stream::runs_merger<sorted_mod1_runs_type, less_quad_2nd> mod1_rm_type;
 
         // Mod2 types
         typedef typename stxxl::stream::use_push<skew_quint_type> mod2_push_type;
-        typedef typename stxxl::stream::runs_creator<mod2_push_type, less_quint_2nd, block_size, stxxl::RC> mod2_runs_type;
+        typedef typename stxxl::stream::runs_creator<mod2_push_type, less_quint_2nd, block_size> mod2_runs_type;
         typedef typename mod2_runs_type::sorted_runs_type sorted_mod2_runs_type;
         typedef typename stxxl::stream::runs_merger<sorted_mod2_runs_type, less_quint_2nd> mod2_rm_type;
 
         // Mod0 types
         typedef typename stxxl::stream::use_push<skew_quint_type> mod0_push_type;
-        typedef typename stxxl::stream::runs_creator<mod0_push_type, less_mod0, block_size, stxxl::RC> mod0_runs_type;
+        typedef typename stxxl::stream::runs_creator<mod0_push_type, less_mod0, block_size> mod0_runs_type;
         typedef typename mod0_runs_type::sorted_runs_type sorted_mod0_runs_type;
         typedef typename stxxl::stream::runs_merger<sorted_mod0_runs_type, less_mod0> mod0_rm_type;
 

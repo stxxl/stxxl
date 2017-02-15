@@ -607,21 +607,24 @@ sort_blocks(InputBidIterator input_bids,
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(FR(), firstBID);
+                mng->new_block(fully_random(), firstBID);
             }
             bid_type& lastBID = (*new_runs[0])[_n - 1].bid;
             if (lastBID.is_managed())
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(FR(), lastBID);
+                mng->new_block(fully_random(), lastBID);
             }
         }
         else
         {
-            mng->new_blocks(interleaved_alloc_strategy(new_nruns, alloc_strategy()),
-                            runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
-                            runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
+            mng->new_blocks(
+                interleaved_alloc_strategy(new_nruns, alloc_strategy()),
+                runs2bid_array_adaptor2<block_type::raw_size, run_type>(
+                    new_runs, 0, new_nruns, blocks_in_new_run),
+                runs2bid_array_adaptor2<block_type::raw_size, run_type>(
+                    new_runs, _n, new_nruns, blocks_in_new_run));
         }
         // merge all
         runs_left = nruns;
@@ -717,8 +720,8 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(FR(), first_bid);                // try to overlap
-                mng->new_block(FR(), last_bid);
+                mng->new_block(fully_random(), first_bid);                // try to overlap
+                mng->new_block(fully_random(), last_bid);
                 req->wait();
 
                 req = last_block->read(*last.bid());
@@ -826,7 +829,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(FR(), first_bid);                // try to overlap
+                mng->new_block(fully_random(), first_bid);                // try to overlap
                 req->wait();
 
                 unsigned_type i = 0;
@@ -906,7 +909,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 unsigned_type i;
 
                 req = last_block->read(*last.bid());
-                mng->new_block(FR(), last_bid);
+                mng->new_block(fully_random(), last_bid);
                 req->wait();
 
                 for (i = last.block_offset(); i < block_type::size; ++i)
