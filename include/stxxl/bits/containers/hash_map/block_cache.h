@@ -473,10 +473,9 @@ public:
     //! Write all dirty blocks back to disk
     void flush()
     {
-        for (typename bid_map_type::const_iterator i = bid_map_.begin();
-             i != bid_map_.end(); ++i)
+        for (const auto& it : bid_map_)
         {
-            const size_t i_block = (*i).second;
+            const size_t& i_block = it.second;
             if (dirty_[i_block])
             {
                 blocks_[i_block] =
