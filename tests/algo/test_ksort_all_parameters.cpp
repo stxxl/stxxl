@@ -29,9 +29,9 @@
 #define MB (1024 * 1024)
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
-void test(size_t data_mem, unsigned memory_to_use)
+void test(uint64_t data_mem, size_t memory_to_use)
 {
-    size_t records_to_sort = data_mem / sizeof(T);
+    uint64_t records_to_sort = data_mem / sizeof(T);
     typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
 
     memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
@@ -66,8 +66,8 @@ void test(size_t data_mem, unsigned memory_to_use)
 
 template <typename T, unsigned block_size>
 void test_all_strategies(
-    size_t data_mem,
-    unsigned memory_to_use,
+    uint64_t data_mem,
+    size_t memory_to_use,
     int strategy)
 {
     switch (strategy)
@@ -102,17 +102,17 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    size_t data_mem = stxxl::atouint64(argv[1]) * MB;
-    int sort_mem = atoi(argv[2]) * MB;
+    uint64_t data_mem = stxxl::atouint64(argv[1]) * MB;
+    size_t sort_mem = strtoul(argv[2], NULL, 0) * MB;
     int strategy = atoi(argv[3]);
-    int block_size = atoi(argv[4]);
+    int block_size_switch = atoi(argv[4]); // this is no actual block size but a switch to select a block size
     stxxl::set_seed((unsigned)strtoul(argv[5], NULL, 10));
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 
     typedef my_type<uint64_t, 8> my_default_type;
 
-    switch (block_size)
+    switch (block_size_switch)
     {
     case 0:
         test_all_strategies<my_default_type, 128* 1024>(data_mem, sort_mem, strategy);
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
         test_all_strategies<my_type<unsigned, 128>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     default:
-        STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");
+        STXXL_ERRMSG("Unknown block size: " << block_size_switch << ", aborting");
         abort();
     }
 
