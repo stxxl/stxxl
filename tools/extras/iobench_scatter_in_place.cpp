@@ -23,8 +23,7 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timer;
-using stxxl::uint64;
-using stxxl::unsigned_type;
+using stxxl::external_size_type;
 
 #ifndef BLOCK_ALIGN
  #define BLOCK_ALIGN  4096
@@ -57,12 +56,12 @@ int main(int argc, char* argv[])
     if (argc < 5)
         usage(argv[0]);
 
-    unsigned_type num_blocks = (unsigned_type)stxxl::atouint64(argv[1]);
-    unsigned_type blocks_per_round = (unsigned_type)stxxl::atouint64(argv[2]);
-    unsigned_type block_size = (unsigned_type)stxxl::atouint64(argv[3]);
+    size_t num_blocks = (size_t)stxxl::atouint64(argv[1]);
+    size_t blocks_per_round = (size_t)stxxl::atouint64(argv[2]);
+    size_t block_size = (size_t)stxxl::atouint64(argv[3]);
     const char* filebase = argv[4];
 
-    unsigned_type num_rounds = stxxl::div_ceil(num_blocks, blocks_per_round);
+    size_t num_rounds = stxxl::div_ceil(num_blocks, blocks_per_round);
 
     std::cout << "# Splitting '" << filebase << "' into "
               << num_rounds * blocks_per_round << " blocks of size "
@@ -71,9 +70,9 @@ int main(int argc, char* argv[])
 
     char* buffer = (char*)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size * blocks_per_round);
     double totaltimeread = 0, totaltimewrite = 0;
-    stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
+    external_size_type totalsizeread = 0, totalsizewrite = 0;
     double totaltimereadchunk = 0.0, totaltimewritechunk = 0.0;
-    stxxl::int64 totalsizereadchunk = 0, totalsizewritechunk = 0;
+    external_size_type totalsizereadchunk = 0, totalsizewritechunk = 0;
 
     typedef stxxl::syscall_file file_type;
 
@@ -81,13 +80,13 @@ int main(int argc, char* argv[])
 
     timer t_total(true);
     try {
-        for (stxxl::unsigned_type r = num_rounds; r-- > 0; )
+        for (size_t r = num_rounds; r-- > 0; )
         {
             // read a chunk of blocks_per_round blocks
             timer t_read(true);
-            for (stxxl::unsigned_type i = blocks_per_round; i-- > 0; )
+            for (size_t i = blocks_per_round; i-- > 0; )
             {
-                const uint64 offset = (r * blocks_per_round + i) * block_size;
+                const external_size_type offset = static_cast<external_size_type>(r * blocks_per_round + i) * block_size;
                 timer t_op(true);
                 // read a block
                 {
@@ -112,9 +111,9 @@ int main(int argc, char* argv[])
 
             // write the chunk
             timer t_write(true);
-            for (stxxl::unsigned_type i = blocks_per_round; i-- > 0; )
+            for (size_t i = blocks_per_round; i-- > 0; )
             {
-                const uint64_t offset = (r * blocks_per_round + i) * block_size;
+                const external_size_type offset = static_cast<external_size_type>(r * blocks_per_round + i) * block_size;
                 timer t_op(true);
                 // write a block
                 {
@@ -137,7 +136,7 @@ int main(int argc, char* argv[])
             totalsizewritechunk += blocks_per_round * block_size;
             totaltimewritechunk += t_write.seconds();
 
-            const uint64 offset = r * blocks_per_round * block_size;
+            const external_size_type offset = r * blocks_per_round * block_size;
             std::cout << "Input offset   " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
             std::cout << std::setw(8) << std::setprecision(3) << throughput(block_size * blocks_per_round, t_read.seconds()) << " MiB/s read, ";
             std::cout << std::setw(8) << std::setprecision(3) << throughput(block_size * blocks_per_round, t_write.seconds()) << " MiB/s write";
