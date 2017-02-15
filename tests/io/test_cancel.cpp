@@ -22,9 +22,10 @@ using stxxl::file;
 
 struct print_completion
 {
-    void operator () (stxxl::request* ptr)
+    void operator () (stxxl::request* ptr, bool success)
     {
-        std::cout << "Request completed: " << ptr << std::endl;
+        std::cout << "Request completed: " << ptr
+                  << " success: " << success << std::endl;
     }
 };
 

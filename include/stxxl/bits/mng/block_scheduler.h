@@ -1181,7 +1181,7 @@ protected:
         explicit read_after_write(write_read_request* write_read_req)
             : wrr(write_read_req) { }
 
-        void operator () (request*)
+        void operator () (request*, bool /* success */)
         {
             wrr->write_done_soon = true;
             if (wrr->shall_read)

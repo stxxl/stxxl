@@ -58,7 +58,7 @@ struct read_next_after_write_completed
     block_type* block;
     BidType bid;
     request_ptr* req;
-    void operator () (request* /*completed_req*/)
+    void operator () (request* /* completed_req */, bool /* success */)
     {
         * req = block->read(bid);
     }

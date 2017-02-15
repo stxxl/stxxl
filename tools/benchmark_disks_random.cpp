@@ -43,7 +43,7 @@ struct print_number
 
     explicit print_number(size_t n) : n(n) { }
 
-    void operator () (stxxl::request*)
+    void operator () (stxxl::request*, bool /* success */)
     {
         //std::cout << n << " " << std::flush;
     }

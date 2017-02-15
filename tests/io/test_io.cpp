@@ -25,9 +25,9 @@ using stxxl::file;
 
 struct my_handler
 {
-    void operator () (stxxl::request* ptr)
+    void operator () (stxxl::request* ptr, bool success)
     {
-        STXXL_MSG("Request completed: " << ptr);
+        STXXL_MSG("Request completed: " << ptr << " success: " << success);
     }
 };
 

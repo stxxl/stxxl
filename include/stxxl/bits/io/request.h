@@ -41,7 +41,7 @@ using file_ptr = counting_ptr<file>;
 //! A reference counting pointer for \c request.
 using request_ptr = counting_ptr<request>;
 
-using completion_handler = std::function<void(request*)>;
+using completion_handler = std::function<void(request* r, bool success)>;
 
 //! Request object encapsulating basic properties like file and offset.
 class request : virtual public request_interface, public reference_count

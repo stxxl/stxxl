@@ -38,12 +38,12 @@ public:
         onoff_switch& _switch, const completion_handler& on_complete)
         : switch_(_switch), on_complete_(on_complete) { }
 
-    void operator () (request* req)
+    void operator () (request* req, bool success)
     {
         // call before setting switch to on, otherwise, user has no way to wait
         // for the completion handler to be executed
         if (on_complete_)
-            on_complete_(req);
+            on_complete_(req, success);
         switch_.on();
     }
 };

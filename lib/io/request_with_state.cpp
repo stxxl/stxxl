@@ -62,6 +62,8 @@ bool request_with_state::cancel()
     if (disk_queues::get_instance()->cancel_request(rp, file_->get_queue_id()))
     {
         state_.set_to(DONE);
+        if (on_complete_)
+            on_complete_(this, /* success */ false);
         notify_waiters();
         file_->delete_request_ref();
         file_ = nullptr;
@@ -83,12 +85,13 @@ bool request_with_state::poll()
 void request_with_state::completed(bool canceled)
 {
     STXXL_VERBOSE3_THIS("request_with_state::completed()");
+    // change state
     state_.set_to(DONE);
-    if (!canceled) {
-        if (on_complete_)
-            on_complete_(this);
-    }
+    // user callback
+    if (on_complete_)
+        on_complete_(this, !canceled);
     notify_waiters();
+    // delete request
     file_->delete_request_ref();
     file_ = nullptr;
     state_.set_to(READY2DIE);
