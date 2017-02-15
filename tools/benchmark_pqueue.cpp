@@ -30,8 +30,7 @@ static const char* description =
 #include <stxxl/cmdline>
 #include <stxxl/bits/common/tuple.h>
 
-using stxxl::uint64;
-using stxxl::internal_size_type;
+using stxxl::external_size_type;
 
 #define MiB (1024 * 1024)
 #define PRINTMOD (16 * MiB)
@@ -40,7 +39,7 @@ using stxxl::internal_size_type;
 
 typedef stxxl::tuple<uint32_t, uint32_t> uint32_pair_type;
 
-typedef stxxl::tuple<uint64, uint64> uint64_pair_type;
+typedef stxxl::tuple<uint64_t, uint64_t> uint64_pair_type;
 
 // *** Larger Structure Type
 
@@ -82,7 +81,7 @@ struct my_cmp : public std::binary_function<ValueType, ValueType, bool>
     }
 };
 
-static inline void progress(const char* text, uint64 i, uint64 nelements)
+static inline void progress(const char* text, external_size_type i, external_size_type nelements)
 {
     if ((i % PRINTMOD) == 0)
         STXXL_MSG(text << " " << i << " ("
@@ -91,9 +90,10 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
 }
 
 template <typename PQType>
-void run_pqueue_insert_delete(uint64 nelements, internal_size_type mem_for_pools)
+void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools)
 {
     typedef typename PQType::value_type ValueType;
+    typedef typename ValueType::first_type KeyType;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -106,11 +106,11 @@ void run_pqueue_insert_delete(uint64 nelements, internal_size_type mem_for_pools
     {
         stxxl::scoped_print_timer timer("Filling PQ", nelements * sizeof(ValueType));
 
-        for (stxxl::uint64 i = 0; i < nelements; i++)
+        for (external_size_type i = 0; i < nelements; i++)
         {
             progress("Inserting element", i, nelements);
 
-            pq.push(ValueType((int)(nelements - i), 0));
+            pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
         }
     }
 
@@ -126,7 +126,7 @@ void run_pqueue_insert_delete(uint64 nelements, internal_size_type mem_for_pools
     {
         stxxl::scoped_print_timer timer("Reading PQ", nelements * sizeof(ValueType));
 
-        for (stxxl::uint64 i = 0; i < nelements; ++i)
+        for (external_size_type i = 0; i < nelements; ++i)
         {
             STXXL_CHECK(!pq.empty());
             STXXL_CHECK(pq.top().first == i + 1);
@@ -142,9 +142,10 @@ void run_pqueue_insert_delete(uint64 nelements, internal_size_type mem_for_pools
 }
 
 template <typename PQType>
-void run_pqueue_insert_intermixed(uint64 nelements, internal_size_type mem_for_pools)
+void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_pools)
 {
     typedef typename PQType::value_type ValueType;
+    typedef typename ValueType::first_type KeyType;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -157,11 +158,11 @@ void run_pqueue_insert_intermixed(uint64 nelements, internal_size_type mem_for_p
     {
         stxxl::scoped_print_timer timer("Filling PQ", nelements * sizeof(ValueType));
 
-        for (stxxl::uint64 i = 0; i < nelements; i++)
+        for (external_size_type i = 0; i < nelements; i++)
         {
             progress("Inserting element", i, nelements);
 
-            pq.push(ValueType((int)(nelements - i), 0));
+            pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
         }
     }
 
@@ -179,12 +180,12 @@ void run_pqueue_insert_intermixed(uint64 nelements, internal_size_type mem_for_p
     {
         stxxl::scoped_print_timer timer("Intermixed Insert/Delete", nelements * sizeof(ValueType));
 
-        for (stxxl::uint64 i = 0; i < nelements; ++i)
+        for (external_size_type i = 0; i < nelements; ++i)
         {
             int o = rand() % 3;
             if (o == 0)
             {
-                pq.push(ValueType((int)(nelements - i), 0));
+                pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
             }
             else
             {
@@ -204,12 +205,12 @@ void run_pqueue_insert_intermixed(uint64 nelements, internal_size_type mem_for_p
 }
 
 template <typename ValueType,
-          internal_size_type mib_for_queue, internal_size_type mib_for_pools,
-          uint64 maxvolume>
-int do_benchmark_pqueue(uint64 volume, int opseq)
+          size_t mib_for_queue, size_t mib_for_pools,
+          external_size_type maxvolume>
+int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
 {
-    const internal_size_type mem_for_queue = mib_for_queue * MiB;
-    const internal_size_type mem_for_pools = mib_for_pools * MiB;
+    const size_t mem_for_queue = mib_for_queue * MiB;
+    const size_t mem_for_pools = mib_for_pools * MiB;
 
     typedef typename stxxl::PRIORITY_QUEUE_GENERATOR<
             ValueType, my_cmp<ValueType>,
@@ -235,7 +236,7 @@ int do_benchmark_pqueue(uint64 volume, int opseq)
 
     if (volume == 0) volume = 2 * (mem_for_queue + mem_for_pools);
 
-    stxxl::uint64 nelements = volume / sizeof(ValueType);
+    external_size_type nelements = volume / sizeof(ValueType);
 
     STXXL_MSG("Number of elements: " << nelements);
 
@@ -255,7 +256,7 @@ int do_benchmark_pqueue(uint64 volume, int opseq)
 }
 
 template <typename ValueType>
-int do_benchmark_pqueue_config(unsigned pqconfig, uint64 size, unsigned opseq)
+int do_benchmark_pqueue_config(unsigned pqconfig, external_size_type size, unsigned opseq)
 {
     if (pqconfig == 0)
     {
@@ -276,7 +277,7 @@ int do_benchmark_pqueue_config(unsigned pqconfig, uint64 size, unsigned opseq)
         return 0;
 }
 
-int do_benchmark_pqueue_type(unsigned type, unsigned pqconfig, uint64 size, unsigned opseq)
+int do_benchmark_pqueue_type(unsigned type, unsigned pqconfig, external_size_type size, unsigned opseq)
 {
     if (type == 0)
     {
@@ -302,7 +303,7 @@ int benchmark_pqueue(int argc, char* argv[])
 
     cp.set_description(description);
 
-    uint64 size = 0;
+    external_size_type size = 0;
     cp.add_opt_param_bytes("size", size,
                            "Amount of data to insert (e.g. 1GiB)");
 
@@ -310,7 +311,7 @@ int benchmark_pqueue(int argc, char* argv[])
     cp.add_uint('t', "type", type,
                 "Value type of tested priority queue:\n"
                 " 1 = pair of uint32_t,\n"
-                " 2 = pair of uint64 (default),\n"
+                " 2 = pair of uint64_t (default),\n"
                 " 3 = 24 byte struct\n"
                 " 0 = all of the above");
 
