@@ -26,8 +26,7 @@
 #include <stxxl/bits/common/tuple.h>
 
 using stxxl::timestamp;
-using stxxl::uint64;
-using stxxl::unsigned_type;
+using stxxl::external_size_type;
 
 #define MB (1024 * 1024)
 
@@ -35,7 +34,7 @@ using stxxl::unsigned_type;
 typedef stxxl::tuple<uint32_t, uint32_t> pair32_type;
 
 // pair of uint64 = 16 bytes
-typedef stxxl::tuple<uint64, uint64> pair64_type;
+typedef stxxl::tuple<uint64_t, uint64_t> pair64_type;
 
 // larger struct of 64 bytes
 struct struct64_type : public pair64_type
@@ -91,9 +90,9 @@ class BenchmarkSort
 
         value_type m_value;
 
-        stxxl::uint64 m_counter;
+        external_size_type m_counter;
 
-        explicit random_stream(stxxl::uint64 size)
+        explicit random_stream(external_size_type size)
             : m_counter(size)
         {
             m_value.first = m_rng();
@@ -121,7 +120,7 @@ class BenchmarkSort
         }
     };
 
-    static void output_result(double elapsed, uint64 vec_size)
+    static void output_result(double elapsed, external_size_type vec_size)
     {
         std::cout << "finished in " << elapsed << " seconds @ "
                   << ((double)vec_size * sizeof(value_type) / MB / elapsed)
@@ -129,12 +128,12 @@ class BenchmarkSort
     }
 
 public:
-    BenchmarkSort(const char* desc, uint64 length, unsigned_type memsize)
+    BenchmarkSort(const char* desc, external_size_type length, size_t memsize)
     {
         // construct vector
         typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
 
-        uint64 vec_size = stxxl::div_ceil(length, sizeof(ValueType));
+        external_size_type vec_size = stxxl::div_ceil(length, sizeof(ValueType));
 
         vector_type vec(vec_size);
 
@@ -204,11 +203,11 @@ int benchmark_sort(int argc, char* argv[])
         "then a pair 64-bit uint and then a larger structure of 64 bytes.");
     cp.set_author("Timo Bingmann <tb@panthema.net>");
 
-    uint64 length = 0;
+    external_size_type length = 0;
     cp.add_param_bytes("size", length,
                        "Amount of data to sort (e.g. 1GiB)");
 
-    unsigned_type memsize = 256 * MB;
+    size_t memsize = 256 * MB;
     cp.add_bytes('M', "ram", memsize,
                  "Amount of RAM to use when sorting, default: 256 MiB");
 
@@ -216,13 +215,13 @@ int benchmark_sort(int argc, char* argv[])
         return -1;
 
     BenchmarkSort<pair32_type, stxxl::random_number32>
-        ("pair of uint32_t", length, (unsigned_type)memsize);
+        ("pair of uint32_t", length, memsize);
 
     BenchmarkSort<pair64_type, stxxl::random_number32>
-        ("pair of uint64", length, (unsigned_type)memsize);
+        ("pair of uint64_t", length, memsize);
 
     BenchmarkSort<struct64_type, stxxl::random_number32>
-        ("struct of 64 bytes", length, (unsigned_type)memsize);
+        ("struct of 64 bytes", length, memsize);
 
     return 0;
 }
