@@ -440,16 +440,13 @@ if ($@) {
 
 use File::Find;
 my @filelist;
-find(sub { !-d && push(@filelist, $File::Find::name) }, ".");
+for my $d ("doc", "examples", "include", "lib", "misc", "tests", "tools") {
+    find(sub { !-d && push(@filelist, $File::Find::name) }, $d);
+}
 
 foreach my $file (@filelist)
 {
-    $file =~ s!./!! or die("File does not start ./");
-
-    if ($file =~ m!^(b[0-9]*|build.*)(\/|$)!) {
-        # skip common build directory names
-    }
-    elsif ($file =~ m!^extlib/!) {
+    if ($file =~ m!^extlib/!) {
         # skip external libraries
     }
     elsif ($file =~ /\.(h|cpp|h.in)$/) {
@@ -482,6 +479,8 @@ foreach my $file (@filelist)
     elsif ($file =~ m!^doc/[^/]*\.(xml|css|bib)$!) {
     }
     elsif ($file =~ m!^doxygen-html!) {
+    }
+    elsif ($file =~ m!^lib/libstxxl\.symbols$!) {
     }
     elsif ($file =~ m!README$!) {
     }
