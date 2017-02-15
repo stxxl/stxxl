@@ -91,11 +91,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const stxxl::unsigned_type block_size = sizeof(my_type) * 4096;
+    const size_t block_size = sizeof(my_type) * 4096;
 
     if (strcmp(argv[1], "generate") == 0) {
         const my_type::key_type num_elements = 1 * 1024 * 1024;
-        const stxxl::unsigned_type records_in_block = block_size / sizeof(my_type);
+        const size_t records_in_block = block_size / sizeof(my_type);
         stxxl::syscall_file f(argv[2], stxxl::file::CREAT | stxxl::file::RDWR);
         my_type* array = (my_type*)stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
         memset(array, 0, block_size);
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
             for (unsigned j = 0; j < records_in_block; j++)
                 array[j].m_key = cur_key--;
 
-            stxxl::request_ptr req = f.awrite((void*)array, stxxl::int64(i) * block_size, block_size);
+            stxxl::request_ptr req = f.awrite((void*)array, uint64_t(i) * block_size, block_size);
             req->wait();
         }
         stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 
         /*
         STXXL_MSG("Printing...");
-        for(stxxl::int64 i=0; i < v.size(); i++)
+        for(uint64_t i=0; i < v.size(); i++)
             STXXL_MSG(v[i].key());
          */
 

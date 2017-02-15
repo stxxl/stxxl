@@ -68,10 +68,10 @@ int main(int argc, char* argv[])
         return 0;
     }
     stxxl::internal_size_type M = atol(argv[3]) * 1024 * 1024;
-    const stxxl::uint64 ncalls = stxxl::atouint64(argv[1]);
+    const uint64_t ncalls = stxxl::atouint64(argv[1]);
     const long av_calls = atol(argv[2]);
-    const stxxl::uint64 nclients = ncalls / av_calls;
-    stxxl::uint64 calls_made = 0;
+    const uint64_t nclients = ncalls / av_calls;
+    uint64_t calls_made = 0;
 
     time_t now = time(NULL);
 
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     stxxl::random_number64 rnd;
 
-    for (stxxl::uint64 number = 0;
+    for (uint64_t number = 0;
          number < nclients && calls_made < ncalls;
          ++number)
     {

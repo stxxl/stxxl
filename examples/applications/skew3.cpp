@@ -37,7 +37,6 @@
 #include <string>
 #include <vector>
 
-using stxxl::uint64;
 using stxxl::internal_size_type;
 using stxxl::external_size_type;
 namespace stream = stxxl::stream;
@@ -1383,7 +1382,7 @@ int main(int argc, char* argv[])
         return -1;
 
     if (wordsize == 32)
-        return process<stxxl::uint32>(
+        return process<uint32_t>(
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);
 #if 0
@@ -1392,7 +1391,7 @@ int main(int argc, char* argv[])
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 64)
-        return process<stxxl::uint64>(
+        return process<uint64_t>(
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);
 #endif

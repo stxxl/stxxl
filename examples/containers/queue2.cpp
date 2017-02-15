@@ -24,10 +24,10 @@ int main()
 
     unsigned int random;
     stxxl::random_number32 rand32;  // define random number generator
-    stxxl::uint64 number_of_elements = 64 * 1024 * 1024;
+    uint64_t number_of_elements = 64 * 1024 * 1024;
 
     // push random values in the queue
-    for (stxxl::uint64 i = 0; i < number_of_elements; i++)
+    for (uint64_t i = 0; i < number_of_elements; i++)
     {
         random = rand32();  // generate random integers from interval [0,2^32)
         my_queue.push(random);

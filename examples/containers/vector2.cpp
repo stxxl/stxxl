@@ -22,10 +22,10 @@ int main()
     unsigned int counter = 0;
     unsigned int tmp;
     stxxl::random_number<> rand;
-    stxxl::uint64 number_of_elements = 32 * 1024 * 1024;
+    uint64_t number_of_elements = 32 * 1024 * 1024;
 
     // fill vector with random integers
-    for (stxxl::uint64 i = 0; i < number_of_elements; ++i)
+    for (uint64_t i = 0; i < number_of_elements; ++i)
     {
         tmp = rand(123456789);  // generate random number from the interval [0,123456789)
         my_vector.push_back(tmp);
@@ -35,7 +35,7 @@ int main()
     vector_type::const_iterator iter = my_vector.begin();
 
     // use iterator to advance my_vector and calculate number of even elements
-    for (stxxl::uint64 j = 0; j < my_vector.size(); j++)
+    for (uint64_t j = 0; j < my_vector.size(); j++)
     {
         //std::cout << *iter << " ";
         if (*iter % 2 == 0)  // is my_vector's current element even?

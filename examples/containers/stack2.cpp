@@ -24,18 +24,18 @@ int main()
     simple_stack a_stack;
 
     stxxl::random_number<> random;
-    stxxl::uint64 number_of_elements = 1024 * 1024;
+    uint64_t number_of_elements = 1024 * 1024;
 
     // routine: 1) push random values on stack and 2) pop all except the lowest value and start again
     for (int k = 0; k < 5; k++) {
         STXXL_MSG("push...");
-        for (stxxl::uint64 i = 0; i < number_of_elements; i++)
+        for (uint64_t i = 0; i < number_of_elements; i++)
         {
             a_stack.push(random(123456789));
         }
 
         STXXL_MSG("pop...");
-        for (stxxl::uint64 j = 0; j < number_of_elements - 1; j++)
+        for (uint64_t j = 0; j < number_of_elements - 1; j++)
         {
             a_stack.pop();
         }

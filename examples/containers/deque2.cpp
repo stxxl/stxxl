@@ -22,10 +22,10 @@ int main()
     unsigned int smaller_left = 0;
     unsigned int smaller_right = 0;
     stxxl::random_number32 rand32;
-    stxxl::uint64 number_of_elements = 8 * 1024 * 1024;
+    uint64_t number_of_elements = 8 * 1024 * 1024;
 
     // fill deque with random integer values
-    for (stxxl::uint64 i = 0; i < number_of_elements; i++)
+    for (uint64_t i = 0; i < number_of_elements; i++)
     {
         random = rand32();  // produce random integer from intervall [0,2^32)
         my_deque.push_front(random);
@@ -38,7 +38,7 @@ int main()
     x = my_deque[p];
 
     // Count number of smaller elements from the front to p(x) - 1
-    for (stxxl::uint64 j = 0; j < p; j++)
+    for (unsigned int j = 0; j < p; j++)
     {
         if (*deque_iterator < x)
         {
@@ -50,7 +50,7 @@ int main()
     ++deque_iterator;
 
     // Count number of smaller elements from p(x) + 1 to the end
-    for (stxxl::uint64 k = p + 1; k < number_of_elements - 1; k++)
+    for (uint64_t k = p + 1; k < number_of_elements - 1; k++)
     {
         if (*deque_iterator < x)
         {
