@@ -114,6 +114,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
         {
             read_queue_.erase(pos);
             was_still_in_queue = true;
+            lock.unlock();
             sem_.wait();
         }
     }
@@ -126,6 +127,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
         {
             write_queue_.erase(pos);
             was_still_in_queue = true;
+            lock.unlock();
             sem_.wait();
         }
     }
