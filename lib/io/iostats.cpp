@@ -122,7 +122,7 @@ void stats::reset()
 #endif
 
 #if STXXL_IO_STATS
-void stats::write_started(unsigned_type size_, double now)
+void stats::write_started(size_t size_, double now)
 {
     if (now == 0.0)
         now = timestamp();
@@ -145,7 +145,7 @@ void stats::write_started(unsigned_type size_, double now)
     }
 }
 
-void stats::write_canceled(unsigned_type size_)
+void stats::write_canceled(size_t size_)
 {
     {
         std::unique_lock<std::mutex> WriteLock(write_mutex);
@@ -176,7 +176,7 @@ void stats::write_finished()
     }
 }
 
-void stats::write_cached(unsigned_type size_)
+void stats::write_cached(size_t size_)
 {
     std::unique_lock<std::mutex> WriteLock(write_mutex);
 
@@ -184,7 +184,7 @@ void stats::write_cached(unsigned_type size_)
     c_volume_written += size_;
 }
 
-void stats::read_started(unsigned_type size_, double now)
+void stats::read_started(size_t size_, double now)
 {
     if (now == 0.0)
         now = timestamp();
@@ -207,7 +207,7 @@ void stats::read_started(unsigned_type size_, double now)
     }
 }
 
-void stats::read_canceled(unsigned_type size_)
+void stats::read_canceled(size_t size_)
 {
     {
         std::unique_lock<std::mutex> ReadLock(read_mutex);
@@ -238,7 +238,7 @@ void stats::read_finished()
     }
 }
 
-void stats::read_cached(unsigned_type size_)
+void stats::read_cached(size_t size_)
 {
     std::unique_lock<std::mutex> ReadLock(read_mutex);
 
@@ -327,9 +327,9 @@ void stats::_reset_io_wait_time()
 #endif
 }
 
-std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char* unit, int multiplier)
+std::string format_with_SI_IEC_unit_multiplier(uint64_t number, const char* unit, int multiplier)
 {
-    // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
+    // may not overflow, std::numeric_limits<uint64_t>::max() == 16 EB
     static const char* endings[] = { "", "k", "M", "G", "T", "P", "E" };
     static const char* binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     std::ostringstream out;

@@ -43,9 +43,9 @@ class stats : public singleton<stats>
     friend class singleton<stats>;
 
     unsigned reads, writes;                     // number of operations
-    int64 volume_read, volume_written;          // number of bytes read/written
+    external_size_type volume_read, volume_written;          // number of bytes read/written
     unsigned c_reads, c_writes;                 // number of cached operations
-    int64 c_volume_read, c_volume_written;      // number of bytes read/written from/to cache
+    external_size_type c_volume_read, c_volume_written;      // number of bytes read/written from/to cache
     double t_reads, t_writes;                   // seconds spent in operations
     double p_reads, p_writes;                   // seconds spent in parallel operations
     double p_begin_read, p_begin_write;         // start time of parallel operation
@@ -75,7 +75,7 @@ public:
 
     class scoped_read_write_timer
     {
-        typedef unsigned_type size_type;
+        typedef size_t size_type;
 
         bool is_write;
 #if STXXL_IO_STATS
@@ -128,7 +128,7 @@ public:
 
     class scoped_write_timer
     {
-        typedef unsigned_type size_type;
+        typedef size_t size_type;
 
 #if STXXL_IO_STATS
         bool running;
@@ -173,7 +173,7 @@ public:
 
     class scoped_read_timer
     {
-        typedef unsigned_type size_type;
+        typedef size_t size_type;
 
 #if STXXL_IO_STATS
         bool running;
@@ -276,14 +276,14 @@ public:
 
     //! Returns number of bytes read from disks.
     //! \return number of bytes read
-    int64 get_read_volume() const
+    external_size_type get_read_volume() const
     {
         return volume_read;
     }
 
     //! Returns number of bytes written to the disks.
     //! \return number of bytes written
-    int64 get_written_volume() const
+    external_size_type get_written_volume() const
     {
         return volume_written;
     }
@@ -304,14 +304,14 @@ public:
 
     //! Returns number of bytes read from cache.
     //! \return number of bytes read from cache
-    int64 get_cached_read_volume() const
+    external_size_type get_cached_read_volume() const
     {
         return c_volume_read;
     }
 
     //! Returns number of bytes written to the cache.
     //! \return number of bytes written to cache
-    int64 get_cached_written_volume() const
+    external_size_type get_cached_written_volume() const
     {
         return c_volume_written;
     }
@@ -385,35 +385,35 @@ public:
     STXXL_DEPRECATED(void _reset_io_wait_time());
 
     // for library use
-    void write_started(unsigned_type size_, double now = 0.0);
-    void write_canceled(unsigned_type size_);
+    void write_started(size_t size_, double now = 0.0);
+    void write_canceled(size_t size_);
     void write_finished();
-    void write_cached(unsigned_type size_);
-    void read_started(unsigned_type size_, double now = 0.0);
-    void read_canceled(unsigned_type size_);
+    void write_cached(size_t size_);
+    void read_started(size_t size_, double now = 0.0);
+    void read_canceled(size_t size_);
     void read_finished();
-    void read_cached(unsigned_type size_);
+    void read_cached(size_t size_);
     void wait_started(wait_op_type wait_op);
     void wait_finished(wait_op_type wait_op);
 };
 
 #if !STXXL_IO_STATS
-inline void stats::write_started(unsigned_type size_, double now)
+inline void stats::write_started(size_t size_, double now)
 {
     STXXL_UNUSED(size_);
     STXXL_UNUSED(now);
 }
-inline void stats::write_cached(unsigned_type size_)
+inline void stats::write_cached(size_t size_)
 {
     STXXL_UNUSED(size_);
 }
 inline void stats::write_finished() { }
-inline void stats::read_started(unsigned_type size_, double now)
+inline void stats::read_started(size_t size_, double now)
 {
     STXXL_UNUSED(size_);
     STXXL_UNUSED(now);
 }
-inline void stats::read_cached(unsigned_type size_)
+inline void stats::read_cached(size_t size_)
 {
     STXXL_UNUSED(size_);
 }
@@ -429,11 +429,11 @@ class stats_data
     //! number of operations
     unsigned reads, writes;
     //! number of bytes read/written
-    int64 volume_read, volume_written;
+    external_size_type volume_read, volume_written;
     //! number of cached operations
     unsigned c_reads, c_writes;
     //! number of bytes read/written from/to cache
-    int64 c_volume_read, c_volume_written;
+    external_size_type c_volume_read, c_volume_written;
     //! seconds spent in operations
     double t_reads, t_writes;
     //! seconds spent in parallel operations
@@ -542,12 +542,12 @@ public:
         return writes;
     }
 
-    int64 get_read_volume() const
+    external_size_type get_read_volume() const
     {
         return volume_read;
     }
 
-    int64 get_written_volume() const
+    external_size_type get_written_volume() const
     {
         return volume_written;
     }
@@ -562,12 +562,12 @@ public:
         return c_writes;
     }
 
-    int64 get_cached_read_volume() const
+    external_size_type get_cached_read_volume() const
     {
         return c_volume_read;
     }
 
-    int64 get_cached_written_volume() const
+    external_size_type get_cached_written_volume() const
     {
         return c_volume_written;
     }
@@ -626,14 +626,14 @@ inline std::ostream& operator << (std::ostream& o, const stats& s)
     return o;
 }
 
-std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char* unit = "", int multiplier = 1000);
+std::string format_with_SI_IEC_unit_multiplier(uint64_t number, const char* unit = "", int multiplier = 1000);
 
-inline std::string add_IEC_binary_multiplier(uint64 number, const char* unit = "")
+inline std::string add_IEC_binary_multiplier(uint64_t number, const char* unit = "")
 {
     return format_with_SI_IEC_unit_multiplier(number, unit, 1024);
 }
 
-inline std::string add_SI_multiplier(uint64 number, const char* unit = "")
+inline std::string add_SI_multiplier(uint64_t number, const char* unit = "")
 {
     return format_with_SI_IEC_unit_multiplier(number, unit, 1000);
 }
