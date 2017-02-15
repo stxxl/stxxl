@@ -96,8 +96,6 @@ endif()
 
 option(STXXL_TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
-option(NO_CXX11 "Build without C++11 flags" OFF)
-
 option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
 
 option(USE_MALLOC_COUNT "Compile all programs with included malloc_count heap profiler." OFF)
@@ -232,7 +230,7 @@ if(MSVC)
   # MSVC 11 or greater has C++11 automatically enabled
 elseif(CYGWIN)
   # C++11 is very restrictive on Cygwin
-elseif(NOT NO_CXX11)
+else()
   # try -std= flags to enable C++11
   check_cxx_compiler_flag(-std=c++11 CXX_HAS_STD_CXX11)
   if(CXX_HAS_STD_CXX11)
