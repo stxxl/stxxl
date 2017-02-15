@@ -52,7 +52,7 @@ class mutex
 
 public:
     //! construct unlocked mutex
-    mutex() noexcept
+    mutex() noexcept(false)
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
@@ -63,7 +63,7 @@ public:
     mutex& operator = (const mutex&) = delete;
 
     //! destroy mutex handle
-    ~mutex() noexcept
+    ~mutex() noexcept(false)
     {
         // try simple delete first
         int res = pthread_mutex_destroy(&m_mutex);
@@ -82,12 +82,12 @@ public:
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_destroy(&m_mutex));
     }
     //! lock mutex, may block
-    void lock() noexcept
+    void lock() noexcept(false)
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_lock(&m_mutex));
     }
     //! unlock mutex
-    void unlock() noexcept
+    void unlock() noexcept(false)
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
     }
