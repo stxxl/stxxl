@@ -49,24 +49,26 @@ int main(int argc, char** argv)
     memset(buffer, 0, size);
 
 #if STXXL_HAVE_MMAP_FILE
-    stxxl::mmap_file file1(tempfilename[0], file::CREAT | file::RDWR | file::DIRECT, 0);
-    file1.set_size(size * 1024);
+    stxxl::file_ptr file1 = stxxl::make_counting<stxxl::mmap_file>(
+        tempfilename[0], file::CREAT | file::RDWR | file::DIRECT, 0);
+    file1->set_size(size * 1024);
 #endif
 
-    stxxl::syscall_file file2(tempfilename[1], file::CREAT | file::RDWR | file::DIRECT, 1);
+    stxxl::file_ptr file2 = stxxl::make_counting<stxxl::syscall_file>(
+        tempfilename[1], file::CREAT | file::RDWR | file::DIRECT, 1);
 
     stxxl::request_ptr req[16];
     unsigned i;
     for (i = 0; i < 16; i++)
-        req[i] = file2.awrite(buffer, i * size, size, my_handler());
+        req[i] = file2->awrite(buffer, i * size, size, my_handler());
 
     wait_all(req, 16);
 
     // check behaviour of having requests to the same location at the same time
     for (i = 2; i < 16; i++)
-        req[i] = file2.awrite(buffer, 0, size, my_handler());
-    req[0] = file2.aread(buffer, 0, size, my_handler());
-    req[1] = file2.awrite(buffer, 0, size, my_handler());
+        req[i] = file2->awrite(buffer, 0, size, my_handler());
+    req[0] = file2->aread(buffer, 0, size, my_handler());
+    req[1] = file2->awrite(buffer, 0, size, my_handler());
 
     wait_all(req, 16);
 
@@ -87,10 +89,10 @@ int main(int argc, char** argv)
     STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier(std::numeric_limits<uint64_t>::max(), "B") << "<<<");
 
 #if STXXL_HAVE_MMAP_FILE
-    file1.close_remove();
+    file1->close_remove();
 #endif
 
-    file2.close_remove();
+    file2->close_remove();
 
     return 0;
 }

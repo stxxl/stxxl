@@ -55,18 +55,18 @@ bool request_with_state::cancel()
     STXXL_VERBOSE3_THIS("request_with_state::cancel() "
                         << file_ << " " << buffer_ << " " << offset_);
 
-    if (file_)
+    if (!file_) return false;
+
+    // TODO(tb): remove
+    request_ptr rp(this);
+    if (disk_queues::get_instance()->cancel_request(rp, file_->get_queue_id()))
     {
-        request_ptr rp(this);
-        if (disk_queues::get_instance()->cancel_request(rp, file_->get_queue_id()))
-        {
-            state_.set_to(DONE);
-            notify_waiters();
-            file_->delete_request_ref();
-            file_ = 0;
-            state_.set_to(READY2DIE);
-            return true;
-        }
+        state_.set_to(DONE);
+        notify_waiters();
+        file_->delete_request_ref();
+        file_ = nullptr;
+        state_.set_to(READY2DIE);
+        return true;
     }
     return false;
 }
@@ -90,7 +90,7 @@ void request_with_state::completed(bool canceled)
     }
     notify_waiters();
     file_->delete_request_ref();
-    file_ = 0;
+    file_ = nullptr;
     state_.set_to(READY2DIE);
 }
 

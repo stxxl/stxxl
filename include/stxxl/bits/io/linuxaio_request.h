@@ -43,7 +43,7 @@ public:
     linuxaio_request(
         const completion_handler& on_complete,
         file* file, void* buffer, offset_type offset, size_type bytes,
-        read_or_write type)
+        const read_or_write& type)
         : request_with_state(on_complete, file, buffer, offset, bytes, type)
     {
         assert(dynamic_cast<linuxaio_file*>(file));

@@ -26,6 +26,7 @@ class serving_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;
+
     friend class request_queue_impl_qwqr;
     friend class request_queue_impl_1q;
 

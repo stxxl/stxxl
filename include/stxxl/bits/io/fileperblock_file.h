@@ -31,8 +31,7 @@ private:
     std::string filename_prefix_;
     int mode_;
     offset_type current_size_;
-    bool lock_file_created_;
-    base_file_type lock_file_;
+    counting_ptr<base_file_type> lock_file_;
 
 protected:
     //! Constructs a file name for a given block.

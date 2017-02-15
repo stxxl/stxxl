@@ -25,9 +25,9 @@
 
 namespace stxxl {
 
-file * create_file(const std::string& io_impl,
-                   const std::string& filename,
-                   int options, int physical_device_id, int disk_allocator_id)
+file_ptr create_file(const std::string& io_impl,
+                     const std::string& filename,
+                     int options, int physical_device_id, int disk_allocator_id)
 {
     // construct temporary disk_config structure
     disk_config cfg(filename, 0, io_impl);
@@ -40,7 +40,7 @@ file * create_file(const std::string& io_impl,
     return create_file(cfg, options, disk_allocator_id);
 }
 
-file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
+file_ptr create_file(disk_config& cfg, int mode, int disk_allocator_id)
 {
     // apply disk_config settings to open mode
 
@@ -72,15 +72,14 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 
     if (cfg.io_impl == "syscall")
     {
-        ufs_file_base* result =
-            new syscall_file(cfg.path, mode, cfg.queue, disk_allocator_id,
-                             cfg.device_id);
+        counting_ptr<ufs_file_base> result =
+            make_counting<syscall_file>(
+                cfg.path, mode, cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
 
         // if marked as device but file is not -> throw!
         if (cfg.raw_device && !result->is_device())
         {
-            delete result;
             STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be "
                         "a raw block device, but it is a normal file!");
         }
@@ -100,15 +99,16 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     }
     else if (cfg.io_impl == "fileperblock_syscall")
     {
-        fileperblock_file<syscall_file>* result =
-            new fileperblock_file<syscall_file>(cfg.path, mode, cfg.queue,
-                                                disk_allocator_id, cfg.device_id);
+        counting_ptr<fileperblock_file<syscall_file> > result =
+            make_counting<fileperblock_file<syscall_file> >(
+                cfg.path, mode, cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
     else if (cfg.io_impl == "memory")
     {
-        memory_file* result = new memory_file(cfg.queue, disk_allocator_id, cfg.device_id);
+        counting_ptr<memory_file> result = make_counting<memory_file>(
+            cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
@@ -119,16 +119,16 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         // linuxaio_queue is a singleton.
         cfg.queue = file::DEFAULT_LINUXAIO_QUEUE;
 
-        ufs_file_base* result =
-            new linuxaio_file(cfg.path, mode, cfg.queue, disk_allocator_id,
-                              cfg.device_id, cfg.queue_length);
+        counting_ptr<ufs_file_base> result =
+            make_counting<linuxaio_file>(
+                cfg.path, mode, cfg.queue, disk_allocator_id,
+                cfg.device_id, cfg.queue_length);
 
         result->lock();
 
         // if marked as device but file is not -> throw!
         if (cfg.raw_device && !result->is_device())
         {
-            delete result;
             STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be "
                         "a raw block device, but it is a normal file!");
         }
@@ -150,9 +150,8 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 #if STXXL_HAVE_MMAP_FILE
     else if (cfg.io_impl == "mmap")
     {
-        ufs_file_base* result =
-            new mmap_file(cfg.path, mode, cfg.queue, disk_allocator_id,
-                          cfg.device_id);
+        counting_ptr<ufs_file_base> result = make_counting<mmap_file>(
+            cfg.path, mode, cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
 
         if (cfg.unlink_on_open)
@@ -162,9 +161,9 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     }
     else if (cfg.io_impl == "fileperblock_mmap")
     {
-        fileperblock_file<mmap_file>* result =
-            new fileperblock_file<mmap_file>(cfg.path, mode, cfg.queue,
-                                             disk_allocator_id, cfg.device_id);
+        counting_ptr<fileperblock_file<mmap_file> > result =
+            make_counting<fileperblock_file<mmap_file> >(
+                cfg.path, mode, cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
@@ -172,17 +171,16 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 #if STXXL_HAVE_WINCALL_FILE
     else if (cfg.io_impl == "wincall")
     {
-        wfs_file_base* result =
-            new wincall_file(cfg.path, mode, cfg.queue, disk_allocator_id,
-                             cfg.device_id);
+        counting_ptr<wfs_file_base> result = make_counting<wincall_file>(
+            cfg.path, mode, cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }
     else if (cfg.io_impl == "fileperblock_wincall")
     {
-        fileperblock_file<wincall_file>* result =
-            new fileperblock_file<wincall_file>(cfg.path, mode, cfg.queue,
-                                                disk_allocator_id, cfg.device_id);
+        counting_ptr<fileperblock_file<wincall_file> > result =
+            make_counting<fileperblock_file<wincall_file> >(
+                cfg.path, mode, cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }

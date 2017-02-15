@@ -115,10 +115,11 @@ int main(int argc, char** argv)
 #if STXXL_PARALLEL_MULTIWAY_MERGE
         STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-        stxxl::syscall_file f(argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
+        stxxl::file_ptr f = stxxl::make_counting<stxxl::syscall_file>(
+            argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
         unsigned memory_to_use = 50 * 1024 * 1024;
         typedef stxxl::vector<my_type, 1, stxxl::lru_pager<8>, block_size> vector_type;
-        vector_type v(&f);
+        vector_type v(f);
 
         /*
         STXXL_MSG("Printing...");

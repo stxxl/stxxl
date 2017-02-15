@@ -49,7 +49,7 @@ namespace stxxl {
 //!
 //! It is a base class for different implementations that might
 //! base on various file systems or even remote storage interfaces
-class file
+class file : public reference_count
 {
 public:
     //! the offset of a request, also the size of the file
@@ -107,28 +107,28 @@ public:
     //! \param buffer pointer to memory buffer to read into
     //! \param pos file position to start read from
     //! \param bytes number of bytes to transfer
-    //! \param on_cmpl I/O completion handler
+    //! \param on_complete I/O completion handler
     //! \return \c request_ptr request object, which can be used to track the
     //! status of the operation
 
     virtual request_ptr aread(
         void* buffer, offset_type pos, size_type bytes,
-        const completion_handler& on_cmpl = completion_handler()) = 0;
+        const completion_handler& on_complete = completion_handler()) = 0;
 
     //! Schedules an asynchronous write request to the file.
     //! \param buffer pointer to memory buffer to write from
     //! \param pos starting file position to write
     //! \param bytes number of bytes to transfer
-    //! \param on_cmpl I/O completion handler
+    //! \param on_complete I/O completion handler
     //! \return \c request_ptr request object, which can be used to track the
     //! status of the operation
 
     virtual request_ptr awrite(
         void* buffer, offset_type pos, size_type bytes,
-        const completion_handler& on_cmpl = completion_handler()) = 0;
+        const completion_handler& on_complete = completion_handler()) = 0;
 
     virtual void serve(void* buffer, offset_type offset, size_type bytes,
-                       request::read_or_write type) = 0;
+                       request::read_or_write op) = 0;
 
     //! Changes the size of the file.
     //! \param newsize new file size

@@ -36,10 +36,10 @@ block_manager::block_manager()
     // initialize config (may read config files now)
     config->check_initialized();
 
-    // allocate disk_allocators
+    // allocate disk_allocators_
     ndisks = config->disks_number();
-    disk_allocators = new disk_allocator*[ndisks];
-    disk_files = new file*[ndisks];
+    disk_allocators_.resize(ndisks);
+    disk_files_.resize(ndisks);
 
     uint64 total_size = 0;
 
@@ -53,7 +53,7 @@ block_manager::block_manager()
 
         try
         {
-            disk_files[i] = create_file(cfg, file::CREAT | file::RDWR, i);
+            disk_files_[i] = create_file(cfg, file::CREAT | file::RDWR, i);
 
             STXXL_MSG("Disk '" << cfg.path << "' is allocated, space: " <<
                       (cfg.size) / (1024 * 1024) <<
@@ -70,9 +70,9 @@ block_manager::block_manager()
         total_size += cfg.size;
 
         // create queue for the file.
-        disk_queues::get_instance()->make_queue(disk_files[i]);
+        disk_queues::get_instance()->make_queue(disk_files_[i].get());
 
-        disk_allocators[i] = new disk_allocator(disk_files[i], cfg);
+        disk_allocators_[i] = new disk_allocator(disk_files_[i].get(), cfg);
     }
 
     if (ndisks > 1)
@@ -95,11 +95,9 @@ block_manager::~block_manager()
     for (size_t i = ndisks; i > 0; )
     {
         --i;
-        delete disk_allocators[i];
-        delete disk_files[i];
+        delete disk_allocators_[i];
+        disk_files_[i].reset();
     }
-    delete[] disk_allocators;
-    delete[] disk_files;
 }
 
 uint64 block_manager::get_total_bytes() const
@@ -107,7 +105,7 @@ uint64 block_manager::get_total_bytes() const
     uint64 total = 0;
 
     for (unsigned i = 0; i < ndisks; ++i)
-        total += disk_allocators[i]->get_total_bytes();
+        total += disk_allocators_[i]->get_total_bytes();
 
     return total;
 }
@@ -117,7 +115,7 @@ uint64 block_manager::get_free_bytes() const
     uint64 total = 0;
 
     for (unsigned i = 0; i < ndisks; ++i)
-        total += disk_allocators[i]->get_free_bytes();
+        total += disk_allocators_[i]->get_free_bytes();
 
     return total;
 }

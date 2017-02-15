@@ -21,18 +21,18 @@
 namespace stxxl {
 
 //! create fileio object from io_impl string and a few parameters
-file * create_file(const std::string& io_impl,
-                   const std::string& filename,
-                   int options,
-                   int physical_device_id = file::DEFAULT_QUEUE,
-                   int disk_allocator_id = file::NO_ALLOCATOR);
+file_ptr create_file(const std::string& io_impl,
+                     const std::string& filename,
+                     int options,
+                     int physical_device_id = file::DEFAULT_QUEUE,
+                     int disk_allocator_id = file::NO_ALLOCATOR);
 
 // prototype
 class disk_config;
 
 //! create fileio object from disk_config parameter
-file * create_file(disk_config& config, int mode,
-                   int disk_allocator_id = file::NO_ALLOCATOR);
+file_ptr create_file(disk_config& config, int mode,
+                     int disk_allocator_id = file::NO_ALLOCATOR);
 
 } // namespace stxxl
 

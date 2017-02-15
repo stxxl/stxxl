@@ -29,7 +29,7 @@ namespace stxxl {
 //! Implementation of a local request queue having two queues, one for read and
 //! one for write requests, thus having two threads. This is the default
 //! implementation.
-class request_queue_impl_qwqr : public request_queue_impl_worker
+class request_queue_impl_qwqr final : public request_queue_impl_worker
 {
 private:
     typedef request_queue_impl_qwqr self;
@@ -61,8 +61,8 @@ public:
         //_priority_op = op;
         STXXL_UNUSED(op);
     }
-    void add_request(request_ptr& req);
-    bool cancel_request(request_ptr& req);
+    void add_request(request_ptr& req) final;
+    bool cancel_request(request_ptr& req) final;
     ~request_queue_impl_qwqr();
 };
 

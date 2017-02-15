@@ -40,11 +40,9 @@ int main(int argc, char** argv)
     char* buffer = (char*)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
-    std::unique_ptr<stxxl::file> file(
-        stxxl::create_file(
-            argv[1], argv[2],
-            stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT)
-        );
+    stxxl::file_ptr file = stxxl::create_file(
+        argv[1], argv[2],
+        stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT);
 
     file->set_size(num_blocks * size);
     stxxl::request_ptr req[num_blocks];

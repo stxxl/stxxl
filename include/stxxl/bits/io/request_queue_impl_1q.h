@@ -58,8 +58,8 @@ public:
         STXXL_UNUSED(op);
     }
 
-    void add_request(request_ptr& req);
-    bool cancel_request(request_ptr& req);
+    void add_request(request_ptr& req) final;
+    bool cancel_request(request_ptr& req) final;
     ~request_queue_impl_1q();
 };
 

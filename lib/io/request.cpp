@@ -73,7 +73,7 @@ const char* request::io_type() const
 
 std::ostream& request::print(std::ostream& out) const
 {
-    out << "File object address: " << static_cast<void*>(file_);
+    out << "File object address: " << file_;
     out << " Buffer address: " << static_cast<void*>(buffer_);
     out << " File offset: " << offset_;
     out << " Transfer size: " << bytes_ << " bytes";

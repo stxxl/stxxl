@@ -61,8 +61,8 @@ class block_manager : public singleton<block_manager>
 {
     friend class singleton<block_manager>;
 
-    disk_allocator** disk_allocators;
-    file** disk_files;
+    std::vector<disk_allocator*> disk_allocators_;
+    std::vector<file_ptr> disk_files_;
 
     size_t ndisks;
     block_manager();
@@ -201,7 +201,7 @@ void block_manager::new_blocks_int(
     for (unsigned_type i = 0; i < nblocks; ++i)
     {
         unsigned_type disk = functor(offset + i);
-        disk_ptrs[i] = disk_files[disk];
+        disk_ptrs[i] = disk_files_[disk].get();
         bl[disk]++;
     }
 
@@ -212,7 +212,7 @@ void block_manager::new_blocks_int(
         if (bl[i])
         {
             disk_bids[i].resize(bl[i]);
-            disk_allocators[i]->new_blocks(disk_bids[i]);
+            disk_allocators_[i]->new_blocks(disk_bids[i]);
         }
     }
 
@@ -245,8 +245,8 @@ void block_manager::delete_block(const BID<BlockSize>& bid)
         return;  // self managed disk
     STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:delete " << FMT_BID(bid));
     assert(bid.storage->get_allocator_id() >= 0);
-    disk_allocators[bid.storage->get_allocator_id()]->delete_block(bid);
-    disk_files[bid.storage->get_allocator_id()]->discard(bid.offset, bid.size);
+    disk_allocators_[bid.storage->get_allocator_id()]->delete_block(bid);
+    disk_files_[bid.storage->get_allocator_id()]->discard(bid.offset, bid.size);
 
 #if STXXL_MNG_COUNT_ALLOCATION
     m_current_allocation -= BlockSize;

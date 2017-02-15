@@ -162,7 +162,7 @@ public:
                   std::is_convertible<Down*, Type*>::value, void>::type>
     counting_ptr& operator = (counting_ptr<Down, Deleter>&& other) noexcept
     {
-        if (&other == this) return *this;
+        if (get() == this->get()) return *this;
         dec_reference();
         ptr_ = other.ptr_;
         other.ptr_ = nullptr;

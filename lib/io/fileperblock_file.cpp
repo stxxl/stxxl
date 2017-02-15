@@ -48,19 +48,14 @@ fileperblock_file<base_file_type>::fileperblock_file(
       disk_queued_file(queue_id, allocator_id),
       filename_prefix_(filename_prefix),
       mode_(mode),
-      current_size_(0),
-      lock_file_created_(false),
-      lock_file_(filename_prefix_ + "_fpb_lock", mode_, queue_id)
+      current_size_(0)
 { }
 
 template <class base_file_type>
 fileperblock_file<base_file_type>::~fileperblock_file()
 {
-    if (lock_file_created_)
-    {
-        if (::remove((filename_prefix_ + "_fpb_lock").c_str()) != 0)
-            STXXL_ERRMSG("remove() error on path=" << filename_prefix_ << "_fpb_lock error=" << strerror(errno));
-    }
+    if (lock_file_)
+        lock_file_->close_remove();
 }
 
 template <class base_file_type>
@@ -84,21 +79,23 @@ void fileperblock_file<base_file_type>::serve(void* buffer, offset_type offset,
 template <class base_file_type>
 void fileperblock_file<base_file_type>::lock()
 {
-    if (!lock_file_created_)
+    if (!lock_file_)
     {
+        lock_file_ = make_counting<base_file_type>(
+            filename_prefix_ + "_fpb_lock", mode_, get_queue_id());
+
         //create lock file and fill it with one page, an empty file cannot be locked
         const int page_size = STXXL_BLOCK_ALIGN;
         void* one_page = aligned_alloc<STXXL_BLOCK_ALIGN>(page_size);
 #if STXXL_WITH_VALGRIND
         memset(one_page, 0, page_size);
 #endif
-        lock_file_.set_size(page_size);
-        request_ptr r = lock_file_.awrite(one_page, 0, page_size);
+        lock_file_->set_size(page_size);
+        request_ptr r = lock_file_->awrite(one_page, 0, page_size);
         r->wait();
         aligned_dealloc<STXXL_BLOCK_ALIGN>(one_page);
-        lock_file_created_ = true;
     }
-    lock_file_.lock();
+    lock_file_->lock();
 }
 
 template <class base_file_type>

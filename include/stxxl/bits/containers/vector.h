@@ -909,7 +909,7 @@ private:
     mutable std::queue<size_t> m_free_slots;
     mutable simple_vector<block_type>* m_cache;
 
-    file* m_from;
+    file_ptr m_from;
     block_manager* m_bm;
     bool m_exported;
 
@@ -949,7 +949,6 @@ public:
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
           m_cache(NULL),
-          m_from(NULL),
           m_exported(false)
     {
         m_bm = block_manager::get_instance();
@@ -1051,7 +1050,7 @@ public:
         m_page_to_slot.resize(new_pages, on_disk);
 
         m_bids.resize(new_bids_size);
-        if (m_from == NULL)
+        if (!m_from)
         {
             m_bm->new_blocks(m_alloc_strategy,
                              m_bids.begin() + old_bids_size, m_bids.end(),
@@ -1063,11 +1062,11 @@ public:
             for (bids_container_iterator it = m_bids.begin() + old_bids_size;
                  it != m_bids.end(); ++it, offset += size_type(block_type::raw_size))
             {
-                (*it).storage = m_from;
+                (*it).storage = m_from.get();
                 (*it).offset = offset;
             }
             STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " <<
-                                 ((void*)m_from) << " to " << offset);
+                                 m_from << " to " << offset);
             m_from->set_size(offset);
         }
     }
@@ -1131,7 +1130,7 @@ private:
                                  new_pages_size << " pages");
 
             // release blocks
-            if (m_from != NULL)
+            if (m_from)
                 m_from->set_size(new_bids_size * block_type::raw_size);
             else
                 m_bm->delete_blocks(m_bids.begin() + old_bids_size, m_bids.end());
@@ -1159,7 +1158,7 @@ public:
     void clear()
     {
         m_size = 0;
-        if (m_from == NULL)
+        if (!m_from)
             m_bm->delete_blocks(m_bids.begin(), m_bids.end());
 
         m_bids.clear();
@@ -1226,7 +1225,8 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    explicit vector(file* from, const size_type size = size_type(-1), const size_t npages = pager_type().size())
+    explicit vector(file_ptr from, const size_type size = size_type(-1),
+                    const size_t npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
           m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
@@ -1258,7 +1258,7 @@ public:
         for (bids_container_iterator it = m_bids.begin();
              it != m_bids.end(); ++it, offset += size_type(block_type::raw_size))
         {
-            (*it).storage = from;
+            (*it).storage = from.get();
             (*it).offset = offset;
         }
         from->set_size(offset);
@@ -1273,7 +1273,6 @@ public:
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(obj.numpages()),
           m_cache(NULL),
-          m_from(NULL),
           m_exported(false)
     {
         assert(!obj.m_exported);
@@ -1468,13 +1467,13 @@ public:
 
         if (!m_exported)
         {
-            if (m_from == NULL) {
+            if (!m_from) {
                 m_bm->delete_blocks(m_bids.begin(), m_bids.end());
             }
             else // file must be truncated
             {
                 STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " <<
-                                     ((void*)m_from) << " to " << file_length());
+                                     m_from << " to " << file_length());
                 STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
                 try
                 {
@@ -1513,7 +1512,7 @@ public:
     }
 
     //! Get the file associated with this vector, or NULL.
-    file * get_file() const
+    const file_ptr & get_file() const
     {
         return m_from;
     }

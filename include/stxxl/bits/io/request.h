@@ -35,6 +35,9 @@ namespace stxxl {
 class file;
 class request;
 
+//! A reference counting pointer for \c file.
+using file_ptr = counting_ptr<file>;
+
 //! A reference counting pointer for \c request.
 using request_ptr = counting_ptr<request>;
 

@@ -48,12 +48,12 @@ public:
           ptr_(NULL), size_(0)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::read_or_write type) final;
+               request::read_or_write op) final;
     ~memory_file();
-    offset_type size();
+    offset_type size() final;
     void set_size(offset_type newsize) final;
-    void lock();
-    void discard(offset_type offset, offset_type size);
+    void lock() final;
+    void discard(offset_type offset, offset_type size) final;
     const char * io_type() const final;
 };
 
