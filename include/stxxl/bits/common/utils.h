@@ -97,15 +97,15 @@ std::string to_str(const Type& t)
 //! bytes. Returns the number of bytes and sets ok = true if the string could
 //! be parsed correctly. If no units indicator is given, use def_unit in
 //! k/m/g/t/p (powers of ten) or in K/M/G/T/P (power of two).
-bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit = 0);
+bool parse_SI_IEC_size(const std::string& str, uint64_t& size, char def_unit = 0);
 
 //! Format a byte size using SI (K, M, G, T) suffixes (powers of ten). Returns
 //! "123 M" or similar.
-std::string format_SI_size(uint64 number);
+std::string format_SI_size(uint64_t number);
 
 //! Format a byte size using IEC (Ki, Mi, Gi, Ti) suffixes (powers of
 //! two). Returns "123 Ki" or similar.
-std::string format_IEC_size(uint64 number);
+std::string format_IEC_size(uint64_t number);
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -201,7 +201,7 @@ div_ceil(Integral n, Integral2 d)
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline size_t longhash1(uint64 key_)
+inline size_t longhash1(uint64_t key_)
 {
     key_ += ~(key_ << 32);
     key_ ^= (key_ >> 22);
@@ -217,9 +217,9 @@ inline size_t longhash1(uint64 key_)
 ////////////////////////////////////////////////////////////////////////////
 
 template <class Type>
-inline void swap_1D_arrays(Type* a, Type* b, unsigned_type size)
+inline void swap_1D_arrays(Type* a, Type* b, size_t size)
 {
-    for (unsigned_type i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
         std::swap(a[i], b[i]);
 }
 
@@ -237,7 +237,7 @@ static inline Integral round_up_to_power_of_two(Integral n)
 
 //! round n up to next larger multiple of 2^power. example: (48,4) = 64, (48,3) = 48.
 template <typename Integral>
-inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)
+inline Integral round_up_to_power_of_two(Integral n, unsigned power)
 {
     Integral pot = Integral(1) << power, // = 0..0 1 0^power
         mask = pot - 1;                  // = 0..0 0 1^power

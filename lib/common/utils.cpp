@@ -21,7 +21,7 @@ namespace stxxl {
 
 //! Parse a string like "343KB" or "  44 GiB  " into the corresponding size in
 //! bytes.
-bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit)
+bool parse_SI_IEC_size(const std::string& str, uint64_t& size, char def_unit)
 {
     char* endptr;
     size = strtoul(str.c_str(), &endptr, 10);
@@ -91,9 +91,9 @@ bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit)
     return (endptr[0] == 0);
 }
 
-std::string format_SI_size(uint64 number)
+std::string format_SI_size(uint64_t number)
 {
-    // may not overflow, std::numeric_limits<uint64>::max() == 16 EiB
+    // may not overflow, std::numeric_limits<uint64_t>::max() == 16 EiB
     double multiplier = 1000.0;
     static const char* SIendings[] = { "", "k", "M", "G", "T", "P", "E" };
     unsigned int scale = 0;
@@ -108,9 +108,9 @@ std::string format_SI_size(uint64 number)
     return out.str();
 }
 
-std::string format_IEC_size(uint64 number)
+std::string format_IEC_size(uint64_t number)
 {
-    // may not overflow, std::numeric_limits<uint64>::max() == 16 EiB
+    // may not overflow, std::numeric_limits<uint64_t>::max() == 16 EiB
     double multiplier = 1024.0;
     static const char* IECendings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     unsigned int scale = 0;
