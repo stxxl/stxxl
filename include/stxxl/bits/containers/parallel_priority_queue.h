@@ -55,6 +55,7 @@
 #include <limits>
 #include <functional>
 #include <mutex>
+#include <random>
 
 namespace stxxl {
 namespace ppq_local {
@@ -2172,7 +2173,7 @@ protected:
 
     //! Random number generator for randomly selecting a heap in sequential
     //! push()
-    random_number32_r m_rng;
+    std::default_random_engine m_rng;
 
     //! \}
 
@@ -2377,6 +2378,9 @@ public:
           m_external_min_tree(4, m_external_min_comparator),
           m_hint_comparator(m_external_arrays, m_inv_compare),
           m_hint_tree(4, m_hint_comparator),
+#ifndef STXXL_PARALLEL
+          m_rng(get_next_seed()),
+#endif
           // flags
           m_limit_extract(false)
     {
@@ -2735,8 +2739,8 @@ public:
 #if STXXL_PARALLEL
         return bulk_push(element, static_cast<size_t>(omp_get_thread_num()));
 #else
-        const size_t id = m_rng() % m_num_insertion_heaps;
-        return bulk_push(element, id);
+        std::uniform_int_distribution<size_t> distr(0, m_num_insertion_heaps-1);
+        return bulk_push(element, distr(m_rng));
 #endif
     }
 
@@ -2985,9 +2989,9 @@ public:
             }
         }
 #else
-        const unsigned thread_num = m_rng() % m_num_insertion_heaps;
+        std::uniform_int_distribution<size_t> distr(0, m_num_insertion_heaps-1);
         for (size_type i = 0; i < elements.size(); ++i) {
-            bulk_push(elements[i], thread_num);
+            bulk_push(elements[i], distr(m_rng));
         }
 #endif
         bulk_push_end();
