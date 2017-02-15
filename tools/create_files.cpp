@@ -26,7 +26,7 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
-using stxxl::unsigned_type;
+using stxxl::external_size_type;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -88,7 +88,7 @@ void out_stat(double start, double end, double* times, unsigned n, const std::ve
 int create_files(int argc, char* argv[])
 {
     std::vector<std::string> disks_arr;
-    stxxl::uint64 offset = 0, length;
+    external_size_type offset = 0, length;
 
     stxxl::cmdline_parser cp;
     cp.add_param_bytes("filesize", length,
@@ -99,7 +99,7 @@ int create_files(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    stxxl::uint64 endpos = offset + length;
+    external_size_type endpos = offset + length;
 
     for (size_t i = 0; i < disks_arr.size(); ++i)
     {
@@ -110,17 +110,17 @@ int create_files(int argc, char* argv[])
     const size_t ndisks = disks_arr.size();
 
 #if STXXL_WINDOWS
-    unsigned_type buffer_size = 64 * MB;
+    size_t buffer_size = 64 * MB;
 #else
-    unsigned_type buffer_size = 256 * MB;
+    size_t buffer_size = 256 * MB;
 #endif
-    const unsigned_type buffer_size_int = buffer_size / sizeof(int);
+    const size_t buffer_size_int = buffer_size / sizeof(int);
 
     unsigned chunks = 2;
-    const unsigned_type chunk_size = buffer_size / chunks;
-    const unsigned_type chunk_size_int = chunk_size / sizeof(int);
+    const size_t chunk_size = buffer_size / chunks;
+    const size_t chunk_size_int = chunk_size / sizeof(int);
 
-    unsigned i = 0, j = 0;
+    size_t i = 0, j = 0;
 
     int* buffer = (int*)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
     file** disks = new file*[ndisks];
@@ -131,37 +131,37 @@ int create_files(int argc, char* argv[])
 #endif
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
-        buffer[i] = i;
+        buffer[i] = static_cast<int>(i);
 
     for (i = 0; i < ndisks; i++)
     {
 #if STXXL_WINDOWS
  #ifdef RAW_ACCESS
         disks[i] = new stxxl::wincall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR | file::DIRECT, i);
+                                           file::CREAT | file::RDWR | file::DIRECT, static_cast<int>(i));
  #else
         disks[i] = new stxxl::wincall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR, i);
+                                           file::CREAT | file::RDWR, static_cast<int>(i));
  #endif
 #else
  #ifdef RAW_ACCESS
         disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR | file::DIRECT, i);
+                                           file::CREAT | file::RDWR | file::DIRECT, static_cast<int>(i));
  #else
         disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR, i);
+                                           file::CREAT | file::RDWR, static_cast<int>(i));
  #endif
 #endif
     }
 
     while (offset < endpos)
     {
-        const unsigned_type current_block_size =
+        const size_t current_block_size =
             length
-            ? (unsigned_type)std::min<stxxl::int64>(buffer_size, endpos - offset)
+            ? static_cast<size_t>(std::min<external_size_type>(buffer_size, endpos - offset))
             : buffer_size;
 
-        const unsigned_type current_chunk_size = current_block_size / chunks;
+        const size_t current_chunk_size = current_block_size / chunks;
 
         std::cout << "Disk offset " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 
@@ -235,15 +235,15 @@ int create_files(int argc, char* argv[])
 #endif
 
         if (CHECK_AFTER_READ) {
-            for (int i = 0; unsigned(i) < ndisks * buffer_size_int; i++)
+            for (size_t i = 0; i < ndisks * buffer_size_int; i++)
             {
-                if (buffer[i] != i)
+                if (buffer[i] != static_cast<int>(i))
                 {
-                    int ibuf = i / buffer_size_int;
-                    int pos = i % buffer_size_int;
+                    size_t ibuf = i / buffer_size_int;
+                    size_t pos = i % buffer_size_int;
 
                     std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
-                              << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i
+                              << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << static_cast<int>(i)
                               << std::dec << std::endl;
 
                     i = (ibuf + 1) * buffer_size_int; // jump to next
