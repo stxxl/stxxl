@@ -108,7 +108,7 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
     }
     else if (cfg.io_impl == "memory")
     {
-        mem_file* result = new mem_file(cfg.queue, disk_allocator_id, cfg.device_id);
+        memory_file* result = new memory_file(cfg.queue, disk_allocator_id, cfg.device_id);
         result->lock();
         return result;
     }

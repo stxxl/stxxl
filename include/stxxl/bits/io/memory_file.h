@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/mem_file.h
+ *  include/stxxl/bits/io/memory_file.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,6 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#ifndef STXXL_IO_MEMORY_FILE_HEADER
+#define STXXL_IO_MEMORY_FILE_HEADER
 #ifndef STXXL_IO_MEM_FILE_HEADER
 #define STXXL_IO_MEM_FILE_HEADER
 
@@ -24,7 +26,7 @@ namespace stxxl {
 //! \{
 
 //! Implementation of file based on new[] and memcpy.
-class mem_file final : public disk_queued_file
+class memory_file final : public disk_queued_file
 {
     //! pointer to memory area of "file"
     char* ptr_;
@@ -37,7 +39,7 @@ class mem_file final : public disk_queued_file
 
 public:
     //! constructs file object.
-    mem_file(
+    memory_file(
         int queue_id = DEFAULT_QUEUE,
         int allocator_id = NO_ALLOCATOR,
         unsigned int device_id = DEFAULT_DEVICE_ID)
@@ -47,7 +49,7 @@ public:
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
                request::read_or_write type) final;
-    ~mem_file();
+    ~memory_file();
     offset_type size();
     void set_size(offset_type newsize) final;
     void lock();
@@ -59,4 +61,5 @@ public:
 
 } // namespace stxxl
 
+#endif // !STXXL_IO_MEMORY_FILE_HEADER
 #endif // !STXXL_IO_MEM_FILE_HEADER

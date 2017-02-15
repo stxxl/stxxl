@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/io/mem_file.cpp
+ *  lib/io/memory_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -15,13 +15,13 @@
 #include <limits>
 #include <cassert>
 
-#include <stxxl/bits/io/mem_file.h>
+#include <stxxl/bits/io/memory_file.h>
 #include <stxxl/bits/io/iostats.h>
 
 namespace stxxl {
 
-void mem_file::serve(void* buffer, offset_type offset, size_type bytes,
-                     request::read_or_write type)
+void memory_file::serve(void* buffer, offset_type offset, size_type bytes,
+                        request::read_or_write type)
 {
     std::unique_lock<std::mutex> lock(mutex_);
 
@@ -37,28 +37,28 @@ void mem_file::serve(void* buffer, offset_type offset, size_type bytes,
     }
 }
 
-const char* mem_file::io_type() const
+const char* memory_file::io_type() const
 {
     return "memory";
 }
 
-mem_file::~mem_file()
+memory_file::~memory_file()
 {
     free(ptr_);
     ptr_ = NULL;
 }
 
-void mem_file::lock()
+void memory_file::lock()
 {
     // nothing to do
 }
 
-file::offset_type mem_file::size()
+file::offset_type memory_file::size()
 {
     return size_;
 }
 
-void mem_file::set_size(offset_type newsize)
+void memory_file::set_size(offset_type newsize)
 {
     std::unique_lock<std::mutex> lock(mutex_);
     assert(newsize <= std::numeric_limits<offset_type>::max());
@@ -67,7 +67,7 @@ void mem_file::set_size(offset_type newsize)
     size_ = newsize;
 }
 
-void mem_file::discard(offset_type offset, offset_type size)
+void memory_file::discard(offset_type offset, offset_type size)
 {
     std::unique_lock<std::mutex> lock(mutex_);
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY

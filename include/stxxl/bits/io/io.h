@@ -20,7 +20,7 @@
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/simdisk_file.h>
 #include <stxxl/bits/io/wincall_file.h>
-#include <stxxl/bits/io/mem_file.h>
+#include <stxxl/bits/io/memory_file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/wbtl_file.h>
 #include <stxxl/bits/io/linuxaio_file.h>
