@@ -42,16 +42,16 @@ class stats : public singleton<stats>
 {
     friend class singleton<stats>;
 
-    unsigned reads, writes;                     // number of operations
-    external_size_type volume_read, volume_written;          // number of bytes read/written
-    unsigned c_reads, c_writes;                 // number of cached operations
-    external_size_type c_volume_read, c_volume_written;      // number of bytes read/written from/to cache
-    double t_reads, t_writes;                   // seconds spent in operations
-    double p_reads, p_writes;                   // seconds spent in parallel operations
-    double p_begin_read, p_begin_write;         // start time of parallel operation
-    double p_ios;                               // seconds spent in all parallel I/O operations (read and write)
+    unsigned reads, writes;                             // number of operations
+    external_size_type volume_read, volume_written;     // number of bytes read/written
+    unsigned c_reads, c_writes;                         // number of cached operations
+    external_size_type c_volume_read, c_volume_written; // number of bytes read/written from/to cache
+    double t_reads, t_writes;                           // seconds spent in operations
+    double p_reads, p_writes;                           // seconds spent in parallel operations
+    double p_begin_read, p_begin_write;                 // start time of parallel operation
+    double p_ios;                                       // seconds spent in all parallel I/O operations (read and write)
     double p_begin_io;
-    double t_waits, p_waits;                    // seconds spent waiting for completion of I/O operations
+    double t_waits, p_waits;                            // seconds spent waiting for completion of I/O operations
     double p_begin_wait;
     double t_wait_read, p_wait_read;
     double p_begin_wait_read;

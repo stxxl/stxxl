@@ -144,7 +144,7 @@ public:
     size_t nfixed() const
     {
         return std::count_if(m_bid2node.cbegin(), m_bid2node.cend(),
-                             [&] (const auto& it) {return m_fixed[it.second];});
+                             [&](const auto& it) { return m_fixed[it.second]; });
     }
 
     ~node_cache()
@@ -181,7 +181,7 @@ public:
                     node2kick = m_pager.kick();
                     if (i == max_tries) {
                         STXXL_ERRMSG(
-                                "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
+                            "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
                         STXXL_ERRMSG("Returning NULL node.");
                         return NULL;
                     }
@@ -278,7 +278,7 @@ public:
                     node2kick = m_pager.kick();
                     if (i == max_tries) {
                         STXXL_ERRMSG(
-                                "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
+                            "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
                         STXXL_ERRMSG("Returning NULL node.");
                         return NULL;
                     }

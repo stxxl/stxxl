@@ -97,9 +97,9 @@ stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
 materialize(
     StreamAlgorithm& in,
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
-        outbegin,
+    outbegin,
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
-        outend,
+    outend,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
@@ -183,7 +183,7 @@ stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
 materialize(
     StreamAlgorithm& in,
     stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
-        out,
+    out,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
