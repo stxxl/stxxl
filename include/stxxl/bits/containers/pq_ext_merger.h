@@ -425,15 +425,15 @@ public:
 
         assert(pool->size_write() > 0);
 
-        for (typename bid_container_type::iterator curbid = bids.begin(); curbid != bids.end(); ++curbid)
+        for (const auto & curbid : bids)
         {
             block_type* b = pool->steal();
             another_merger.multi_merge(b->begin(), b->end());
-            STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
-            STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
+            STXXL_VERBOSE1("first element of following block " << curbid << " " << *(b->begin()));
+            STXXL_VERBOSE1("last element of following block " << curbid << " " << *(b->end() - 1));
             assert(!tree.cmp(*(b->begin()), *(b->end() - 1)));
-            pool->write(b, *curbid);
-            STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
+            pool->write(b, curbid);
+            STXXL_VERBOSE1("written to block " << curbid << " cached in " << b);
         }
 
         insert_segment(bids, first_block, first_size, index);
