@@ -52,7 +52,7 @@ int do_mallinfo(int argc, char* argv[])
         "Allocate some memory and mlock() it to consume physical memory. "
         "Needs to run as root to block more than 64 KiB in default settings.");
 
-    stxxl::internal_size_type M;
+    size_t M;
     cp.add_param_bytes("size", M,
                        "Amount of memory to allocate (e.g. 1GiB)");
 

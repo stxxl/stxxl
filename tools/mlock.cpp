@@ -38,7 +38,7 @@ int do_mlock(int argc, char* argv[])
         "Needs to run as root to block more than 64 KiB in default settings.");
     cp.set_author("Andreas Beckmann <beckmann@cs.uni-frankfurt.de>");
 
-    stxxl::unsigned_type M;
+    size_t M;
     cp.add_param_bytes("size", M,
                        "Amount of memory to allocate (e.g. 4GiB)");
 
