@@ -137,9 +137,6 @@ sub filter_program {
 sub process_cpp {
     my ($path) = @_;
 
-    # special files
-    return if $path eq "tools/benchmarks/app_config.h";
-
     # check permissions
     my $st = stat($path) or die("Cannot stat() file $path: $!");
     if ($st->mode & 0133) {

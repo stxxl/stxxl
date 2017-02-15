@@ -107,9 +107,6 @@ if(STXXL_DEBUG_ASSERTIONS)
   set(STXXL_DEBUG_ASSERTIONS "1") # change from ON/OFF to 1/0
 endif()
 
-# see tools/benchmarks about older TPIE benchmarks.
-option(USE_TPIE "Try to compile extra benchmarks from the 2007 S&PE paper with an old TPIE version." OFF)
-
 ### building shared and/or static libraries
 
 # by default we currently only build a static library, since we do not aim to
