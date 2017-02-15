@@ -46,9 +46,11 @@ public:
           ufs_file_base(filename, mode),
           disk_queued_file(queue_id, allocator_id)
     { }
+
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
-    const char * io_type() const;
+               request::read_or_write type) final;
+
+    const char * io_type() const final;
 };
 
 //! \}

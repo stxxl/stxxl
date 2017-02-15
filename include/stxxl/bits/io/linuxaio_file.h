@@ -38,7 +38,7 @@ class linuxaio_file : public ufs_file_base, public disk_queued_file
     friend class linuxaio_request;
 
 private:
-    int desired_queue_length;
+    int desired_queue_length_;
 
 public:
     //! Constructs file object
@@ -57,20 +57,25 @@ public:
         : file(device_id),
           ufs_file_base(filename, mode),
           disk_queued_file(queue_id, allocator_id),
-          desired_queue_length(desired_queue_length)
+          desired_queue_length_(desired_queue_length)
     { }
 
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
-    request_ptr aread(void* buffer, offset_type pos, size_type bytes,
-                      const completion_handler& on_cmpl = completion_handler());
-    request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
-                       const completion_handler& on_cmpl = completion_handler());
-    const char * io_type() const;
+               request::read_or_write type) final;
+
+    request_ptr aread(
+        void* buffer, offset_type pos, size_type bytes,
+        const completion_handler& on_cmpl = completion_handler()) final;
+
+    request_ptr awrite(
+        void* buffer, offset_type pos, size_type bytes,
+        const completion_handler& on_cmpl = completion_handler()) final;
+
+    const char * io_type() const final;
 
     int get_desired_queue_length() const
     {
-        return desired_queue_length;
+        return desired_queue_length_;
     }
 };
 

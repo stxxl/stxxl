@@ -25,12 +25,9 @@ namespace stxxl {
 
 serving_request::serving_request(
     const completion_handler& on_cmpl,
-    file* f,
-    void* buf,
-    offset_type off,
-    size_type b,
-    request_type t)
-    : request_with_state(on_cmpl, f, buf, off, b, t)
+    file* file, void* buffer, offset_type offset, size_type bytes,
+    read_or_write op)
+    : request_with_state(on_cmpl, file, buffer, offset, bytes, op)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,
@@ -45,15 +42,15 @@ void serving_request::serve()
     check_nref();
     STXXL_VERBOSE2_THIS(
         "serving_request::serve(): " <<
-            m_buffer << " @ [" <<
-            m_file << "|" << m_file->get_allocator_id() << "]0x" <<
+            buffer_ << " @ [" <<
+            file_ << "|" << file_->get_allocator_id() << "]0x" <<
             std::hex << std::setfill('0') << std::setw(8) <<
-            m_offset << "/0x" << m_bytes <<
-        ((m_type == request::READ) ? " READ" : " WRITE"));
+            offset_ << "/0x" << bytes_ <<
+        (op_ == request::READ ? " READ" : " WRITE"));
 
     try
     {
-        m_file->serve(m_buffer, m_offset, m_bytes, m_type);
+        file_->serve(buffer_, offset_, bytes_, op_);
     }
     catch (const io_error& ex)
     {
@@ -67,7 +64,7 @@ void serving_request::serve()
 
 const char* serving_request::io_type() const
 {
-    return m_file->io_type();
+    return file_->io_type();
 }
 
 } // namespace stxxl

@@ -123,7 +123,7 @@ public:
     //! \param queue_id disk queue identifier
     //! \param allocator_id linked disk_allocator
     //! \param device_id physical device identifier
-    inline sim_disk_file(
+    sim_disk_file(
         const std::string& filename,
         int mode,
         int queue_id = DEFAULT_QUEUE,
@@ -134,13 +134,12 @@ public:
           disk_queued_file(queue_id, allocator_id)
     {
         std::cout << "Please, make sure that '" << filename <<
-            "' is resided on swap memory partition!" <<
-            std::endl;
+            "' is resided on swap memory partition!" << std::endl;
     }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
-    void set_size(offset_type newsize);
-    const char * io_type() const;
+               request::read_or_write type) final;
+    void set_size(offset_type newsize) final;
+    const char * io_type() const final;
 };
 
 //! \}

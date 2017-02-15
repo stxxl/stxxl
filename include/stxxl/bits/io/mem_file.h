@@ -24,16 +24,16 @@ namespace stxxl {
 //! \{
 
 //! Implementation of file based on new[] and memcpy.
-class mem_file : public disk_queued_file
+class mem_file final : public disk_queued_file
 {
     //! pointer to memory area of "file"
-    char* m_ptr;
+    char* ptr_;
 
     //! size of memory area
-    offset_type m_size;
+    offset_type size_;
 
     //! sequentialize function calls
-    std::mutex m_mutex;
+    std::mutex mutex_;
 
 public:
     //! constructs file object.
@@ -43,16 +43,16 @@ public:
         unsigned int device_id = DEFAULT_DEVICE_ID)
         : file(device_id),
           disk_queued_file(queue_id, allocator_id),
-          m_ptr(NULL), m_size(0)
+          ptr_(NULL), size_(0)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
+               request::read_or_write type) final;
     ~mem_file();
     offset_type size();
-    void set_size(offset_type newsize);
+    void set_size(offset_type newsize) final;
     void lock();
     void discard(offset_type offset, offset_type size);
-    const char * io_type() const;
+    const char * io_type() const final;
 };
 
 //! \}

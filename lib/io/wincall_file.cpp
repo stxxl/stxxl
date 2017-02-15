@@ -26,15 +26,15 @@
 namespace stxxl {
 
 void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
-                         request::request_type type)
+                         request::read_or_write type)
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
     if (bytes > 32 * 1024 * 1024) {
         STXXL_ERRMSG("Using a block size larger than 32 MiB may not work with the " << io_type() << " filetype");
     }
 
-    HANDLE handle = file_des;
+    HANDLE handle = file_des_;
     LARGE_INTEGER desired_pos;
     desired_pos.QuadPart = offset;
     if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))

@@ -31,18 +31,15 @@ class serving_request : public request_with_state
 
 public:
     serving_request(
-        const completion_handler& on_cmpl,
-        file* f,
-        void* buf,
-        offset_type off,
-        size_type b,
-        request_type t);
+        const completion_handler& on_complete,
+        file* file, void* buffer, offset_type offset, size_type bytes,
+        read_or_write op);
 
 protected:
     virtual void serve();
 
 public:
-    const char * io_type() const;
+    const char * io_type() const final;
 };
 
 //! \}

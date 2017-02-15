@@ -56,7 +56,7 @@ wbtl_file::~wbtl_file()
 }
 
 void wbtl_file::serve(void* buffer, offset_type offset, size_type bytes,
-                      request::request_type type)
+                      request::read_or_write type)
 {
     if (type == request::READ)
     {

@@ -35,6 +35,9 @@ namespace stxxl {
 class file;
 class request;
 
+//! A reference counting pointer for \c request.
+using request_ptr = counting_ptr<request>;
+
 using completion_handler = std::function<void(request*)>;
 
 //! Request object encapsulating basic properties like file and offset.
@@ -43,58 +46,55 @@ class request : virtual public request_interface, public atomic_counted_object
     friend class linuxaio_queue;
 
 protected:
-    completion_handler m_on_complete;
-    std::unique_ptr<stxxl::io_error> m_error;
+    completion_handler on_complete_;
+    std::unique_ptr<io_error> error_;
 
 protected:
-    file* m_file;
-    void* m_buffer;
-    offset_type m_offset;
-    size_type m_bytes;
-    request_type m_type;
+    file* file_;
+    void* buffer_;
+    offset_type offset_;
+    size_type bytes_;
+    read_or_write op_;
 
 public:
     request(const completion_handler& on_complete,
-            file* file,
-            void* buffer,
-            offset_type offset,
-            size_type bytes,
-            request_type type);
+            file* file, void* buffer, offset_type offset, size_type bytes,
+            read_or_write type);
 
     virtual ~request();
 
-    file * get_file() const { return m_file; }
-    void * get_buffer() const { return m_buffer; }
-    offset_type get_offset() const { return m_offset; }
-    size_type get_size() const { return m_bytes; }
-    request_type get_type() const { return m_type; }
+    file * get_file() const { return file_; }
+    void * get_buffer() const { return buffer_; }
+    offset_type get_offset() const { return offset_; }
+    size_type get_size() const { return bytes_; }
+    read_or_write get_op() const { return op_; }
 
     void check_alignment() const;
 
-    std::ostream & print(std::ostream& out) const;
+    std::ostream & print(std::ostream& out) const final;
 
     //! Inform the request object that an error occurred during the I/O
     //! execution.
     void error_occured(const char* msg)
     {
-        m_error.reset(new stxxl::io_error(msg));
+        error_.reset(new stxxl::io_error(msg));
     }
 
     //! Inform the request object that an error occurred during the I/O
     //! execution.
     void error_occured(const std::string& msg)
     {
-        m_error.reset(new stxxl::io_error(msg));
+        error_.reset(new stxxl::io_error(msg));
     }
 
     //! Rises an exception if there were error with the I/O.
     void check_errors()
     {
-        if (m_error.get())
-            throw *(m_error.get());
+        if (error_.get())
+            throw *(error_.get());
     }
 
-    virtual const char * io_type() const;
+    const char * io_type() const override;
 
 protected:
     void check_nref(bool after = false)
@@ -107,13 +107,7 @@ private:
     void check_nref_failed(bool after);
 };
 
-inline std::ostream& operator << (std::ostream& out, const request& req)
-{
-    return req.print(out);
-}
-
-//! A reference counting pointer for \c request.
-typedef counting_ptr<request> request_ptr;
+std::ostream& operator << (std::ostream& out, const request& req);
 
 //! \}
 

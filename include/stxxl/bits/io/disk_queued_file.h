@@ -26,33 +26,29 @@ namespace stxxl {
 //! Implementation of some file methods based on serving_request.
 class disk_queued_file : public virtual file
 {
-    int m_queue_id, m_allocator_id;
+    int queue_id_, allocator_id_;
 
 public:
     disk_queued_file(int queue_id, int allocator_id)
-        : m_queue_id(queue_id), m_allocator_id(allocator_id)
+        : queue_id_(queue_id), allocator_id_(allocator_id)
     { }
 
     request_ptr aread(
-        void* buffer,
-        offset_type pos,
-        size_type bytes,
-        const completion_handler& on_cmpl = completion_handler());
+        void* buffer, offset_type pos, size_type bytes,
+        const completion_handler& on_complete = completion_handler());
 
     request_ptr awrite(
-        void* buffer,
-        offset_type pos,
-        size_type bytes,
-        const completion_handler& on_cmpl = completion_handler());
+        void* buffer, offset_type pos, size_type bytes,
+        const completion_handler& on_complete = completion_handler());
 
     virtual int get_queue_id() const
     {
-        return m_queue_id;
+        return queue_id_;
     }
 
     virtual int get_allocator_id() const
     {
-        return m_allocator_id;
+        return allocator_id_;
     }
 };
 

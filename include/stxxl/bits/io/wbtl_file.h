@@ -91,9 +91,9 @@ public:
     void set_size(offset_type newsize);
     void lock();
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
+               request::read_or_write type) final;
     void discard(offset_type offset, offset_type size);
-    const char * io_type() const;
+    const char * io_type() const final;
 
 private:
     void _add_free_region(offset_type offset, offset_type size);

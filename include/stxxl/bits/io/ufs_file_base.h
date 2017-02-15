@@ -32,11 +32,11 @@ namespace stxxl {
 class ufs_file_base : public virtual file
 {
 protected:
-    std::mutex fd_mutex;   // sequentialize function calls involving file_des
-    int file_des;          // file descriptor
-    int m_mode;            // open mode
-    const std::string filename;
-    bool m_is_device;      //!< is special device node
+    std::mutex fd_mutex_; // sequentialize function calls involving file_des_
+    int file_des_;        // file descriptor
+    int mode_;            // open mode
+    const std::string filename_;
+    bool is_device_;      //!< is special device node
     ufs_file_base(const std::string& filename, int mode);
     void _after_open();
     offset_type _size();
@@ -48,7 +48,7 @@ public:
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    const char * io_type() const;
+    const char * io_type() const override;
     void close_remove();
     //! unlink file without closing it.
     void unlink();

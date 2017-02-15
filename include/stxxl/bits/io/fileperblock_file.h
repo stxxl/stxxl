@@ -28,11 +28,11 @@ template <class base_file_type>
 class fileperblock_file : public disk_queued_file
 {
 private:
-    std::string filename_prefix;
-    int mode;
-    offset_type current_size;
-    bool lock_file_created;
-    base_file_type lock_file;
+    std::string filename_prefix_;
+    int mode_;
+    offset_type current_size_;
+    bool lock_file_created_;
+    base_file_type lock_file_;
 
 protected:
     //! Constructs a file name for a given block.
@@ -40,8 +40,8 @@ protected:
 
 public:
     //! Constructs file object.
-    //! param filename_prefix  filename prefix, numbering will be appended to it
-    //! param mode open mode, see \c file::open_modes
+    //! param filename_prefix_  filename prefix, numbering will be appended to it
+    //! param mode_ open mode_, see \c file::open_modes
     fileperblock_file(
         const std::string& filename_prefix,
         int mode,
@@ -52,15 +52,15 @@ public:
     virtual ~fileperblock_file();
 
     virtual void serve(void* buffer, offset_type offset, size_type bytes,
-                       request::request_type type);
+                       request::read_or_write type) final;
 
     //! Changes the size of the file.
     //! \param new_size value of the new file size
-    virtual void set_size(offset_type new_size) { current_size = new_size; }
+    virtual void set_size(offset_type new_size) { current_size_ = new_size; }
 
     //! Returns size of the file.
     //! \return file size in length
-    virtual offset_type size() { return current_size; }
+    virtual offset_type size() { return current_size_; }
 
     virtual void lock();
 
@@ -71,7 +71,7 @@ public:
     //! Rename the file corresponding to the offset such that it is out of reach for deleting.
     virtual void export_files(offset_type offset, offset_type length, std::string filename);
 
-    const char * io_type() const;
+    const char * io_type() const final;
 };
 
 //! \}

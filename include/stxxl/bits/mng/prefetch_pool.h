@@ -245,7 +245,7 @@ public:
 
         // cancel request if it is a read request, there might be
         // write requests 'stolen' from a write_pool that may not be canceled
-        if (cache_el->second.second->get_type() == request::READ)
+        if (cache_el->second.second->get_op() == request::READ)
             cache_el->second.second->cancel();
         // finish the request
         cache_el->second.second->wait();

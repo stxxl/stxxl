@@ -33,14 +33,14 @@ private:
     typedef request_queue_impl_1q self;
     typedef std::list<request_ptr> queue_type;
 
-    std::mutex m_queue_mutex;
-    queue_type m_queue;
+    std::mutex queue_mutex_;
+    queue_type queue_;
 
-    shared_state<thread_state> m_thread_state;
-    std::thread m_thread;
-    semaphore m_sem;
+    shared_state<thread_state> thread_state_;
+    std::thread thread_;
+    semaphore sem_;
 
-    static const priority_op m_priority_op = WRITE;
+    static const priority_op priority_op_ = WRITE;
 
     static void * worker(void* arg);
 
@@ -57,6 +57,7 @@ public:
         //_priority_op = op;
         STXXL_UNUSED(op);
     }
+
     void add_request(request_ptr& req);
     bool cancel_request(request_ptr& req);
     ~request_queue_impl_1q();

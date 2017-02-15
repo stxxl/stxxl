@@ -157,15 +157,15 @@ IC35L080AVVA07::IC35L080AVVA07()
 ////////////////////////////////////////////////////////////////////////////
 
 void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes,
-                          request::request_type type)
+                          request::read_or_write type)
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
     double op_start = timestamp();
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-    void* mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
+    void* mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des_, offset);
     if (mem == MAP_FAILED)
     {
         STXXL_THROW_ERRNO
@@ -214,13 +214,13 @@ const char* sim_disk_file::io_type() const
 
 void sim_disk_file::set_size(offset_type newsize)
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     if (newsize > _size())
     {
-        STXXL_THROW_ERRNO_LT_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error,
-                               "lseek() fd=" << file_des << " pos=" << newsize - 1);
-        STXXL_THROW_ERRNO_LT_0(::write(file_des, "", 1), io_error,
-                               "write() fd=" << file_des << " size=1");
+        STXXL_THROW_ERRNO_LT_0(::lseek(file_des_, newsize - 1, SEEK_SET), io_error,
+                               "lseek() fd=" << file_des_ << " pos=" << newsize - 1);
+        STXXL_THROW_ERRNO_LT_0(::write(file_des_, "", 1), io_error,
+                               "write() fd=" << file_des_ << " size=1");
     }
 }
 

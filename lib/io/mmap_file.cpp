@@ -23,23 +23,23 @@
 namespace stxxl {
 
 void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
-                      request::request_type type)
+                      request::read_or_write type)
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
     //assert(offset + bytes <= _size());
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
     int prot = (type == request::READ) ? PROT_READ : PROT_WRITE;
-    void* mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des, offset);
-    // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des, offset);
+    void* mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des_, offset);
+    // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des_, offset);
     // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
     if (mem == MAP_FAILED)
     {
         STXXL_THROW_ERRNO(io_error,
                           " mmap() failed." <<
-                          " path=" << filename <<
+                          " path=" << filename_ <<
                           " bytes=" << bytes <<
                           " Page size: " << sysconf(_SC_PAGESIZE) <<
                           " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));

@@ -32,22 +32,19 @@ class request_with_waiters : public request
     std::set<onoff_switch*> m_waiters;
 
 protected:
-    bool add_waiter(onoff_switch* sw);
-    void delete_waiter(onoff_switch* sw);
-    void notify_waiters();
+    bool add_waiter(onoff_switch* sw) final;
+    void delete_waiter(onoff_switch* sw) final;
+    void notify_waiters() final;
 
     //! returns number of waiters
     size_t num_waiters();
 
 public:
     request_with_waiters(
-        const completion_handler& on_cmpl,
-        file* f,
-        void* buf,
-        offset_type off,
-        size_type b,
-        request_type t)
-        : request(on_cmpl, f, buf, off, b, t)
+        const completion_handler& on_complete,
+        file* file, void* buffer, offset_type offset, size_type bytes,
+        read_or_write op)
+        : request(on_complete, file, buffer, offset, bytes, op)
     { }
 };
 

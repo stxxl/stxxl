@@ -38,7 +38,7 @@ namespace stxxl {
 //! \{
 
 //! Implementation of file based on Windows native I/O calls.
-class wincall_file : public wfs_file_base, public disk_queued_file
+class wincall_file final : public wfs_file_base, public disk_queued_file
 {
 public:
     //! Constructs file object.
@@ -58,8 +58,8 @@ public:
           disk_queued_file(queue_id, allocator_id)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
-    const char * io_type() const;
+               request::read_or_write type) final;
+    const char * io_type() const final;
 };
 
 //! \}

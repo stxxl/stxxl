@@ -35,30 +35,28 @@ class linuxaio_request : public request_with_state
     friend class fileperblock_file;
 
     //! control block of async request
-    iocb cb;
+    iocb cb_;
 
     void fill_control_block();
 
 public:
     linuxaio_request(
-        const completion_handler& on_cmpl,
-        file* file,
-        void* buffer,
-        offset_type offset,
-        size_type bytes,
-        request_type type)
-        : request_with_state(on_cmpl, file, buffer, offset, bytes, type)
+        const completion_handler& on_complete,
+        file* file, void* buffer, offset_type offset, size_type bytes,
+        read_or_write type)
+        : request_with_state(on_complete, file, buffer, offset, bytes, type)
     {
         assert(dynamic_cast<linuxaio_file*>(file));
-        STXXL_VERBOSE_LINUXAIO("linuxaio_request[" << this << "]" <<
-                               " linuxaio_request" <<
-                               "(file=" << file << " buffer=" << buffer <<
-                               " offset=" << offset << " bytes=" << bytes <<
-                               " type=" << type << ")");
+        STXXL_VERBOSE_LINUXAIO(
+            "linuxaio_request[" << this << "]" <<
+                " linuxaio_request" <<
+                "(file=" << file << " buffer=" << buffer <<
+                " offset=" << offset << " bytes=" << bytes <<
+                " type=" << type << ")");
     }
 
     bool post();
-    bool cancel();
+    bool cancel() final;
     bool cancel_aio();
     void completed(bool posted, bool canceled);
     void completed(bool canceled) { completed(true, canceled); }

@@ -35,16 +35,16 @@ private:
     typedef request_queue_impl_qwqr self;
     typedef std::list<request_ptr> queue_type;
 
-    std::mutex m_write_mutex;
-    std::mutex m_read_mutex;
-    queue_type m_write_queue;
-    queue_type m_read_queue;
+    std::mutex write_mutex_;
+    std::mutex read_mutex_;
+    queue_type write_queue_;
+    queue_type read_queue_;
 
-    shared_state<thread_state> m_thread_state;
-    std::thread m_thread;
-    semaphore m_sem;
+    shared_state<thread_state> thread_state_;
+    std::thread thread_;
+    semaphore sem_;
 
-    static const priority_op m_priority_op = WRITE;
+    static const priority_op priority_op_ = WRITE;
 
     static void * worker(void* arg);
 

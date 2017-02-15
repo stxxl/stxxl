@@ -27,29 +27,26 @@ namespace stxxl {
 class request_with_state : public request_with_waiters
 {
 protected:
-    //! states of request
+    //! states of request.
     //! OP - operating, DONE - request served, READY2DIE - can be destroyed
     enum request_state { OP = 0, DONE = 1, READY2DIE = 2 };
 
-    shared_state<request_state> m_state;
+    shared_state<request_state> state_;
 
 protected:
     request_with_state(
-        const completion_handler& on_cmpl,
-        file* f,
-        void* buf,
-        offset_type off,
-        size_type b,
-        request_type t)
-        : request_with_waiters(on_cmpl, f, buf, off, b, t),
-          m_state(OP)
+        const completion_handler& on_complete,
+        file* file, void* buffer, offset_type offset, size_type bytes,
+        read_or_write op)
+        : request_with_waiters(on_complete, file, buffer, offset, bytes, op),
+          state_(OP)
     { }
 
 public:
     virtual ~request_with_state();
-    void wait(bool measure_time = true);
-    bool poll();
-    bool cancel();
+    void wait(bool measure_time = true) final;
+    bool poll() final;
+    bool cancel() override;
 
 protected:
     void completed(bool canceled);

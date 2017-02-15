@@ -37,12 +37,12 @@ class wfs_file_base : public virtual file
 protected:
     typedef void* HANDLE;
 
-    mutex fd_mutex;        // sequentialize function calls involving file_des
-    HANDLE file_des;       // file descriptor
+    mutex fd_mutex_;       // sequentialize function calls involving file_des_
+    HANDLE file_des_;      // file descriptor
     int mode_;             // open mode
-    const std::string filename;
-    offset_type bytes_per_sector;
-    bool locked;
+    const std::string filename_;
+    offset_type bytes_per_sector_;
+    bool locked_;
     wfs_file_base(const std::string& filename, int mode);
     offset_type _size();
     void close();
