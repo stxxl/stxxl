@@ -44,7 +44,7 @@ void usage(const char* argv0)
 }
 
 // returns throughput in MiB/s
-inline double throughput(stxxl::uint64 bytes, double seconds)
+inline double throughput(uint64_t bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;

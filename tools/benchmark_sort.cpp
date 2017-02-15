@@ -34,7 +34,7 @@ using stxxl::external_size_type;
 // pair of uint32_t = 8 bytes
 typedef stxxl::tuple<uint32_t, uint32_t> pair32_type;
 
-// pair of uint64 = 16 bytes
+// pair of uint64_t = 16 bytes
 typedef stxxl::tuple<uint64_t, uint64_t> pair64_type;
 
 // larger struct of 64 bytes
