@@ -252,14 +252,6 @@ else()
   endif(APPLE)
 endif()
 
-# check C++ compiler for C++11 features
-
-include(CheckCXXSourceCompiles)
-check_cxx_source_compiles(
-  "#include <vector>
-  int main() { std::vector<int> v(42); for (auto i : v) { ++i; } return 0; }"
-  STXXL_HAVE_CXX11_RANGE_FOR_LOOP)
-
 ###############################################################################
 # enable gcov coverage analysis with gcc
 

@@ -60,11 +60,6 @@
 // cmake:   detection of ms visual c++ via CMake (contains version number)
 // effect:  enables msvc-specific headers and macros
 
-#cmakedefine STXXL_HAVE_CXX11_RANGE_FOR_LOOP ${STXXL_HAVE_CXX11_RANGE_FOR_LOOP}
-// default: off
-// run-time: detection C++11 support for "for (auto i : obj) { }"
-// effect:  enables some C++11 construct (currently only allowed in examples)
-
 #cmakedefine STXXL_HAVE_SYNC_ADD_AND_FETCH ${STXXL_HAVE_SYNC_ADD_AND_FETCH}
 // default: off
 // cmake:   detection of __sync_add_and_fetch() intrinsic
