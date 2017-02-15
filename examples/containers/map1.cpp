@@ -36,7 +36,7 @@ int main()
     typedef stxxl::map<int, char, CompareGreater, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> map_type;
 
     // Constructor map(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
-    map_type my_map((map_type::node_block_type::raw_size)*3, (map_type::leaf_block_type::raw_size)*3);
+    map_type my_map((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);
 
     my_map.insert(std::pair<int, char>(1, 'a'));
     my_map.insert(std::pair<int, char>(2, 'b'));

@@ -22,11 +22,12 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-#define USE_FORMRUNS_N_MERGE    // comment if you want to use one 'sort' algorithm
-                                // without producing intermediate sorted runs.
+// comment if you want to use one 'sort' algorithm without producing
+// intermediate sorted runs.
+#define USE_FORMRUNS_N_MERGE
 
-#define USE_EXTERNAL_ARRAY      // comment if you want to use internal vectors as
-                                // input/output of the algorithm
+// comment if you want to use internal vectors as input/output of the algorithm
+#define USE_EXTERNAL_ARRAY
 
 #define block_size (8 * 1024)
 

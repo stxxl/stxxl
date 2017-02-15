@@ -23,6 +23,9 @@ my $launch_emacs = 0;
 # write changes to files (dangerous!)
 my $write_changes = 0;
 
+# uncrustify program
+my $uncrustify;
+
 # function testing whether to uncrustify a path
 sub filter_uncrustify($) {
     my ($path) = @_;
@@ -283,7 +286,7 @@ sub process_cpp {
     if (filter_uncrustify($path))
     {
         my $data = join("", @data);
-        @data = filter_program($data, "uncrustify", "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
+        @data = filter_program($data, $uncrustify, "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
 
         # manually add blank line after "namespace xyz {" and before "} // namespace xyz"
         my @namespace;
@@ -421,9 +424,15 @@ foreach my $arg (@ARGV) {
     or die("Please run this script in the STXXL source base directory.");
 
 # check uncrustify's version:
-my ($uncrustver) = filter_program("", "uncrustify", "--version");
-($uncrustver eq "uncrustify 0.62\n")
-    or die("Requires uncrustify 0.62 to run correctly. Got: $uncrustver");
+my ($uncrustver) = filter_program("", "uncrustify-0.64", "--version");
+if ($uncrustver eq "uncrustify 0.64\n") {
+    $uncrustify = "uncrustify-0.64";
+}
+else {
+    my ($uncrustver) = filter_program("", "uncrustify", "--version");
+    ($uncrustver eq "uncrustify 0.64\n")
+        or die("Requires uncrustify 0.64 to run correctly. Got: $uncrustver");
+}
 
 use File::Find;
 my @filelist;
@@ -595,7 +604,8 @@ close(A);
         push(@lintlist, $path);
     }
 
-    system("cpplint.py", "--counting=total", "--extensions=h,c,cc,hpp,cpp", @lintlist);
+    system("cpplint", "--counting=total",
+           "--extensions=h,c,cc,hpp,cpp", "--quiet", @lintlist);
 }
 
 ################################################################################

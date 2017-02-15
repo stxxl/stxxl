@@ -183,7 +183,7 @@ void test1(int rank)
     matrix_stats_before.set();
     stats_before = *stxxl::stats::get_instance();
 
-    *c = *a * *b;
+    *c = (*a) * (*b);
     bs.flush();
 
     stats_after = *stxxl::stats::get_instance();
@@ -221,7 +221,7 @@ void test1(int rank)
     matrix_stats_before.set();
     stats_before = *stxxl::stats::get_instance();
 
-    *c = *a * *b;
+    *c = (*a) * (*b);
     bs.flush();
 
     stats_after = *stxxl::stats::get_instance();
@@ -260,7 +260,7 @@ void test1(int rank)
         i = 0;
         for (row_vector_type::iterator it = w.begin(); it != w.end(); ++it)
             *it = ++i;
-        z = w * *b;
+        z = w * (*b);
         z = z + w;
         z += w;
         z = z - w;

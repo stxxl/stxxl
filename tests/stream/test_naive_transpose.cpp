@@ -113,8 +113,8 @@ int main()
 
     typedef stxxl::VECTOR_GENERATOR<unsigned>::result array_type;
 
-    array_type input(num_rows * num_cols);
-    array_type output(num_cols * num_rows);
+    array_type input(num_rows* num_cols);
+    array_type output(num_cols* num_rows);
 
     // fill the input array with some values
     for (unsigned i = 0; i < num_rows * num_cols; ++i)

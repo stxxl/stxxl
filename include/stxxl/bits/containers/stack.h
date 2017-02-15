@@ -608,8 +608,8 @@ public:
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     STXXL_DEPRECATED(
-        grow_shrink_stack2(prefetch_pool<block_type>& p_pool_,
-                           write_pool<block_type>& w_pool_,
+        grow_shrink_stack2(prefetch_pool<block_type>&p_pool_,
+                           write_pool<block_type>&w_pool_,
                            const size_t prefetch_aggressiveness = 0)
         )
         : m_size(0),

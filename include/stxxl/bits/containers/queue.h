@@ -129,7 +129,7 @@ public:
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
     STXXL_DEPRECATED(
-        queue(write_pool<block_type>& w_pool, prefetch_pool<block_type>& p_pool, int blocks2prefetch_ = -1))
+        queue(write_pool<block_type>&w_pool, prefetch_pool<block_type>&p_pool, int blocks2prefetch_ = -1))
         : m_size(0),
           delete_pool(true),
           alloc_count(0),

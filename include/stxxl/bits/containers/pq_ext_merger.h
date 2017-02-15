@@ -75,9 +75,9 @@ public:
 public:
     struct sequence_state
     {
-        block_type* block;          //!< current block
-        size_t current;      //!< current index in current block
-        bid_container_type bids;    //!< list of blocks forming this sequence
+        block_type* block;       //!< current block
+        size_t current;          //!< current index in current block
+        bid_container_type bids; //!< list of blocks forming this sequence
         compare_type cmp;
         ext_merger* merger;
         bool allocated;
@@ -425,7 +425,7 @@ public:
 
         assert(pool->size_write() > 0);
 
-        for (const auto & curbid : bids)
+        for (const auto& curbid : bids)
         {
             block_type* b = pool->steal();
             another_merger.multi_merge(b->begin(), b->end());

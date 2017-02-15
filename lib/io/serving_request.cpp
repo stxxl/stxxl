@@ -45,10 +45,10 @@ void serving_request::serve()
     check_nref();
     STXXL_VERBOSE2_THIS(
         "serving_request::serve(): " <<
-        m_buffer << " @ [" <<
-        m_file << "|" << m_file->get_allocator_id() << "]0x" <<
-        std::hex << std::setfill('0') << std::setw(8) <<
-        m_offset << "/0x" << m_bytes <<
+            m_buffer << " @ [" <<
+            m_file << "|" << m_file->get_allocator_id() << "]0x" <<
+            std::hex << std::setfill('0') << std::setw(8) <<
+            m_offset << "/0x" << m_bytes <<
         ((m_type == request::READ) ? " READ" : " WRITE"));
 
     try

@@ -286,7 +286,7 @@ protected:
     //! type of nodes in the loser tree
     struct Entry
     {
-        value_type key;          //!< Key of Loser element (winner for 0)
+        value_type key;   //!< Key of Loser element (winner for 0)
         size_t index;     //!< number of losing segment
     };
 
@@ -472,7 +472,7 @@ public:
         STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
-        assert(free_slots.empty());                    // stack was free (probably not needed)
+        assert(free_slots.empty());             // stack was free (probably not needed)
 
         // make all new entries free and push them on the free stack
         for (size_t i = 2 * k - 1; i >= k; i--) //backwards
@@ -743,19 +743,19 @@ public:
                 arrays.free_array(3);
 
             break;
-        case  3: multi_merge_f<3>(begin, end);
+        case 3: multi_merge_f<3>(begin, end);
             break;
-        case  4: multi_merge_f<4>(begin, end);
+        case 4: multi_merge_f<4>(begin, end);
             break;
-        case  5: multi_merge_f<5>(begin, end);
+        case 5: multi_merge_f<5>(begin, end);
             break;
-        case  6: multi_merge_f<6>(begin, end);
+        case 6: multi_merge_f<6>(begin, end);
             break;
-        case  7: multi_merge_f<7>(begin, end);
+        case 7: multi_merge_f<7>(begin, end);
             break;
-        case  8: multi_merge_f<8>(begin, end);
+        case 8: multi_merge_f<8>(begin, end);
             break;
-        case  9: multi_merge_f<9>(begin, end);
+        case 9: multi_merge_f<9>(begin, end);
             break;
         case 10: multi_merge_f<10>(begin, end);
             break;
@@ -881,7 +881,7 @@ public:
         STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < arity);
-        assert(free_slots.empty());                    // stack was free (probably not needed)
+        assert(free_slots.empty());             // stack was free (probably not needed)
 
         // make all new entries free and push them on the free stack
         for (size_t i = 2 * k - 1; i >= k; i--) //backwards

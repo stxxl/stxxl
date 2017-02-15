@@ -2777,7 +2777,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     // write suffix array stream into output vector
     stxxl::stream::materialize(skew, output_vector.begin(), output_vector.end());
 
-    typename algo::skew<offset_type>::build_lcp * lcp = skew.finish_lcp();
+    typename algo::skew<offset_type>::build_lcp* lcp = skew.finish_lcp();
     stxxl::stream::materialize(*lcp, lcparray.begin(), lcparray.end());
 
     std::cout << "output size = " << output_vector.size() << std::endl;

@@ -3628,7 +3628,7 @@ protected:
     {
         STXXL_DEBUG(
             "calculate_merge_sequences() " <<
-            "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds);
+                "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds);
 
         static const bool debug = false;
 
@@ -3960,10 +3960,10 @@ protected:
 
         STXXL_DEBUG0(
             "Flushing insertion heap array p=" << p <<
-            " size=" << insheap.size() <<
-            " capacity=" << insheap.capacity() <<
-            " int_memory=" << internal_array_type::int_memory(insheap.size()) <<
-            " mem_left=" << m_mem_left);
+                " size=" << insheap.size() <<
+                " capacity=" << insheap.capacity() <<
+                " int_memory=" << internal_array_type::int_memory(insheap.size()) <<
+                " mem_left=" << m_mem_left);
 
         m_stats.num_insertion_heap_flushes++;
         stats_timer flush_time(true); // separate timer due to parallel sorting

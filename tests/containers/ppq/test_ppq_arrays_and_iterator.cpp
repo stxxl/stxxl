@@ -256,14 +256,14 @@ int run_multiway_merge(size_t volume)
     ea_type out(size * (NumEAs + 1), &rw_pool2);
 
     {
-        stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume * NumEAs);
+        stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume* NumEAs);
 
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
             fill(*(*ea), 0, size);
     }
 
     {
-        stxxl::scoped_print_timer timer("loading input arrays into RAM and requesting output buffer", volume * NumEAs);
+        stxxl::scoped_print_timer timer("loading input arrays into RAM and requesting output buffer", volume* NumEAs);
 
         if (ealist.size())
             rw_pool1.resize_prefetch(ealist.size() * ealist[0]->num_blocks());
@@ -334,7 +334,7 @@ int run_multiway_merge(size_t volume)
     }
 
     {
-        stxxl::scoped_print_timer timer("checking the order", volume * NumEAs);
+        stxxl::scoped_print_timer timer("checking the order", volume* NumEAs);
 
         // each index is contained (NumEAs + 1) times
         size_t index = 1 * (NumEAs + 1);

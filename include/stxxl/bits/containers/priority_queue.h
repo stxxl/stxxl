@@ -174,15 +174,18 @@ private:
     size_t make_space_available(const size_t level);
     void empty_insert_heap();
 
-    value_type get_supremum() const {
+    value_type get_supremum() const
+    {
         return cmp.min_value();
     }
 
-    size_t current_delete_buffer_size() const {
+    size_t current_delete_buffer_size() const
+    {
         return delete_buffer_end - delete_buffer_current_min;
     }
 
-    size_t current_group_buffer_size(const size_t i) const {
+    size_t current_group_buffer_size(const size_t i) const
+    {
         return (group_buffers[i] + N) - group_buffer_current_mins[i];
     }
 
@@ -207,8 +210,8 @@ public:
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
     STXXL_DEPRECATED(
-        priority_queue(prefetch_pool<block_type>& p_pool_,
-                       write_pool<block_type>& w_pool_));
+        priority_queue(prefetch_pool<block_type>&p_pool_,
+                       write_pool<block_type>&w_pool_));
 
     //! Constructs external priority queue object.
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
@@ -472,10 +475,10 @@ priority_queue<ConfigType>::refill_group_buffer(const size_t group)
     size_type length;
     size_type group_size = (group < kNumIntGroups) ?
                            int_mergers[group].size() :
-                           ext_mergers[group - kNumIntGroups]->size();                         // elements left in segments
+                           ext_mergers[group - kNumIntGroups]->size();                  // elements left in segments
     size_t left_elements = group_buffers[group] + N - group_buffer_current_mins[group]; //elements left in target buffer
     if (group_size + left_elements >= size_type(N))
-    {                                                                                          // buffer will be filled completely
+    {                                                                                   // buffer will be filled completely
         target = group_buffers[group];
         length = N - left_elements;
     }
