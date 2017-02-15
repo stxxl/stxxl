@@ -1700,7 +1700,7 @@ protected:
 
 public:
     //! Entries in the head winner tree.
-    enum Types {
+    enum Types : size_t {
         HEAP = 0,
         IA = 1,
         EB = 2,
@@ -3651,38 +3651,43 @@ protected:
 
 // test correctness of external block min tree
 #ifdef STXXL_DEBUG_ASSERTIONS
-
-        bool test_needs_limit = false;
-        unsigned_type test_gmin_index = 0;
-        value_type test_gmin_value;
-
         m_stats.refill_minmax_time.start();
-        for (size_type i = 0; i < eas; ++i) {
-            if (m_external_arrays[i].has_em_data()) {
-                const value_type& min_value =
-                    m_external_arrays[i].get_next_block_min();
+        {
+            auto find_em = [&](size_t idx) {
+                               for (size_t i = idx; i < m_external_arrays.size(); ++i) {
+                                   if (m_external_arrays[i].has_em_data())
+                                       return i;
+                               }
 
-                if (!test_needs_limit) {
-                    test_needs_limit = true;
-                    test_gmin_value = min_value;
-                    test_gmin_index = i;
-                }
-                else {
+                               return m_external_arrays.size();
+                           };
+
+            size_t test_gmin_index = find_em(0);
+            if (test_gmin_index != eas) {
+                value_type test_gmin_value =
+                    m_external_arrays[test_gmin_index].get_next_block_min();
+
+                for (size_t i = find_em(test_gmin_index + 1); i < eas; i = find_em(i + 1)) {
+                    const value_type& min_value =
+                        m_external_arrays[i].get_next_block_min();
+
                     STXXL_DEBUG("min[" << i << "]: " << min_value <<
                                 " test: " << test_gmin_value <<
                                 ": " << m_inv_compare(min_value, test_gmin_value));
+
                     if (m_inv_compare(min_value, test_gmin_value)) {
                         test_gmin_value = min_value;
                         test_gmin_index = i;
                     }
                 }
+
+                STXXL_ASSERT(gmin_index == test_gmin_index);
+            }
+            else {
+                STXXL_ASSERT(!needs_limit);
             }
         }
         m_stats.refill_minmax_time.stop();
-
-        STXXL_ASSERT(needs_limit == test_needs_limit);
-        STXXL_ASSERT(!needs_limit || gmin_index == test_gmin_index);
-
 #endif
 
         /*
@@ -3765,8 +3770,7 @@ protected:
         // counted
         if (!do_not_flush)
             flush_ia_ea_until_memory_free(
-                internal_array_type::int_memory(m_extract_buffer.size())
-                );
+                internal_array_type::int_memory(m_extract_buffer.size()));
 
         if (m_extract_buffer_size == 0) return;
 
@@ -3973,7 +3977,7 @@ protected:
         std::sort(insheap.begin(), insheap.end(), m_inv_compare);
 
 #if STXXL_PARALLEL
-#pragma omp critical (stxxl_flush_insertion_heap)
+#pragma omp critical(stxxl_flush_insertion_heap)
 #endif
         {
             // test that enough RAM is available for merged internal array:
@@ -4511,13 +4515,8 @@ protected:
             merged_array.begin(), level_size, m_inv_compare);
 
         // release memory of old internal arrays immediately
-        for (unsigned_type i = 0; i < ia_index.size(); ++i)
-        {
-            unsigned_type ia = ia_index[i];
+        for (const size_t& ia : ia_index) {
             m_internal_arrays[ia].make_empty();
-            // this is done in cleanup_internal_arrays()...
-            //if (ia < m_minima.ia_slots())
-            //    m_minima.deactivate_internal_array(ia);
         }
 
         cleanup_internal_arrays();
