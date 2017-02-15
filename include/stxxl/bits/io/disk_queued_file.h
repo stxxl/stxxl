@@ -35,18 +35,18 @@ public:
 
     request_ptr aread(
         void* buffer, offset_type pos, size_type bytes,
-        const completion_handler& on_complete = completion_handler());
+        const completion_handler& on_complete = completion_handler()) override;
 
     request_ptr awrite(
         void* buffer, offset_type pos, size_type bytes,
-        const completion_handler& on_complete = completion_handler());
+        const completion_handler& on_complete = completion_handler()) override;
 
-    virtual int get_queue_id() const
+    int get_queue_id() const override
     {
         return queue_id_;
     }
 
-    virtual int get_allocator_id() const
+    int get_allocator_id() const override
     {
         return allocator_id_;
     }

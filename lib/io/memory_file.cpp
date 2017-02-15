@@ -11,21 +11,21 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/io/memory_file.h>
+#include <stxxl/bits/io/iostats.h>
+
 #include <cstring>
 #include <limits>
 #include <cassert>
 
-#include <stxxl/bits/io/memory_file.h>
-#include <stxxl/bits/io/iostats.h>
-
 namespace stxxl {
 
 void memory_file::serve(void* buffer, offset_type offset, size_type bytes,
-                        request::read_or_write type)
+                        request::read_or_write op)
 {
     std::unique_lock<std::mutex> lock(mutex_);
 
-    if (type == request::READ)
+    if (op == request::READ)
     {
         stats::scoped_read_timer read_timer(bytes);
         memcpy(buffer, ptr_ + offset, bytes);
@@ -61,9 +61,9 @@ file::offset_type memory_file::size()
 void memory_file::set_size(offset_type newsize)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    assert(newsize <= std::numeric_limits<offset_type>::max());
+    assert(newsize <= std::numeric_limits<size_t>::max());
 
-    ptr_ = (char*)realloc(ptr_, (size_t)newsize);
+    ptr_ = static_cast<char*>(realloc(ptr_, static_cast<size_t>(newsize)));
     size_ = newsize;
 }
 
