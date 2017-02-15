@@ -19,7 +19,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_queue.h>
 #include <stxxl/bits/common/semaphore.h>
-#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/shared_state.h>
 
 #include <thread>
 
@@ -39,9 +39,10 @@ protected:
 protected:
     void start_thread(
         void* (*worker)(void*), void* arg,
-        std::thread& t, state<thread_state>& s);
+        std::thread& t, shared_state<thread_state>& s);
 
-    void stop_thread(std::thread& t, state<thread_state>& s, semaphore& sem);
+    void stop_thread(
+        std::thread& t, shared_state<thread_state>& s, semaphore& sem);
 };
 
 //! \}

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/common/state.h
+ *  include/stxxl/bits/common/shared_state.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -20,49 +20,48 @@
 
 namespace stxxl {
 
-template <typename ValueType = int>
-class state
+template <typename ValueType = size_t>
+class shared_state
 {
     typedef ValueType value_type;
 
     //! mutex for condition variable
-    std::mutex m_mutex;
+    std::mutex mutex_;
 
     //! condition variable
-    std::condition_variable m_cond;
+    std::condition_variable cv_;
 
-    //! current state
-    value_type m_state;
+    //! current shared_state
+    value_type state_;
 
 public:
-    explicit state(const value_type& s)
-        : m_state(s)
-    { }
+    explicit shared_state(const value_type& s)
+        : state_(s) { }
 
     //! non-copyable: delete copy-constructor
-    state(const state&) = delete;
+    shared_state(const shared_state&) = delete;
     //! non-copyable: delete assignment operator
-    state& operator = (const state&) = delete;
+    shared_state& operator = (const shared_state&) = delete;
 
     void set_to(const value_type& new_state)
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_state = new_state;
+        std::unique_lock<std::mutex> lock(mutex_);
+        state_ = new_state;
         lock.unlock();
-        m_cond.notify_all();
+        cv_.notify_all();
     }
 
     void wait_for(const value_type& needed_state)
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        while (needed_state != m_state)
-            m_cond.wait(lock);
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (needed_state != state_)
+            cv_.wait(lock);
     }
 
     value_type operator () ()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return m_state;
+        std::unique_lock<std::mutex> lock(mutex_);
+        return state_;
     }
 };
 

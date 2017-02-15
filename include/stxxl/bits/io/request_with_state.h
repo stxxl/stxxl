@@ -14,7 +14,7 @@
 #ifndef STXXL_IO_REQUEST_WITH_STATE_HEADER
 #define STXXL_IO_REQUEST_WITH_STATE_HEADER
 
-#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/shared_state.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_with_waiters.h>
 
@@ -23,7 +23,7 @@ namespace stxxl {
 //! \addtogroup reqlayer
 //! \{
 
-//! Request with completion state.
+//! Request with completion shared_state.
 class request_with_state : public request_with_waiters
 {
 protected:
@@ -31,7 +31,7 @@ protected:
     //! OP - operating, DONE - request served, READY2DIE - can be destroyed
     enum request_state { OP = 0, DONE = 1, READY2DIE = 2 };
 
-    state<request_state> m_state;
+    shared_state<request_state> m_state;
 
 protected:
     request_with_state(

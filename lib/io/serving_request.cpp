@@ -12,7 +12,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/shared_state.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/io/request_with_state.h>

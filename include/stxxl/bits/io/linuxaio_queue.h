@@ -58,7 +58,7 @@ private:
 
     // two threads, one for posting, one for waiting
     std::thread post_thread, wait_thread;
-    state<thread_state> post_thread_state, wait_thread_state;
+    shared_state<thread_state> post_thread_state, wait_thread_state;
 
     // Why do we need two threads, one for posting, and one for waiting?  Is
     // one not enough?

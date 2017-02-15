@@ -40,7 +40,7 @@ private:
     queue_type m_write_queue;
     queue_type m_read_queue;
 
-    state<thread_state> m_thread_state;
+    shared_state<thread_state> m_thread_state;
     std::thread m_thread;
     semaphore m_sem;
 

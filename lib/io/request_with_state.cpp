@@ -12,7 +12,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/shared_state.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/iostats.h>
