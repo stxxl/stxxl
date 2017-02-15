@@ -28,12 +28,12 @@
 #include <stxxl/stats>
 #include <stxxl/timer>
 
-const stxxl::unsigned_type mega = 1024 * 1024;
+const size_t mega = 1024 * 1024;
 
 #define RECORD_SIZE 16
 #define LOAD 0
 
-typedef stxxl::uint64 my_key_type;
+typedef uint64_t my_key_type;
 
 #define MAGIC 123
 
@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
                 >
             > pq_type;
 #else
-    const stxxl::uint64 volume = stxxl::uint64(200000) * mega;     // in bytes
+    const uint64_t volume = uint64_t(200000) * mega;     // in bytes
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1> gen;
     typedef gen::result pq_type;
 //         BufferSize1 = Config::BufferSize1,
@@ -254,11 +254,11 @@ int main(int argc, char* argv[])
     Timer.start();
 
     pq_type p(mem_for_pools / 2, mem_for_pools / 2);
-    stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
+    uint64_t nelements = uint64_t(megabytes) * mega / sizeof(my_type);
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Peak number of elements (n): " << nelements);
-    STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
+    STXXL_MSG("Max number of elements to contain: " << (uint64_t(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
     my_key_type r, sum_input = 0, sum_output = 0;
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
     my_type side_pq_least;
 
     STXXL_MSG("op-sequence(monotonic pq): ( push, pop, push ) * n");
-    for (i = 0; i < nelements; ++i)
+    for (uint64_t i = 0; i < nelements; ++i)
     {
         if ((i % mega) == 0)
             STXXL_MSG(
@@ -325,7 +325,7 @@ int main(int argc, char* argv[])
     Timer.start();
 
     STXXL_MSG("op-sequence(monotonic pq): ( pop, push, pop ) * n");
-    for (i = 0; i < (nelements); ++i)
+    for (uint64_t i = 0; i < nelements; ++i)
     {
         assert(!p.empty());
 
@@ -380,7 +380,7 @@ int main(int argc, char* argv[])
                            << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
     }
-    STXXL_MSG("Last element " << i << " popped");
+    STXXL_MSG("Last element " << nelements << " popped");
     Timer.stop();
 
     if (sum_input != sum_output)

@@ -99,11 +99,9 @@ inline long long unsigned myrand()
 }
 #endif
 
-void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
+void run_stxxl_insert_all_delete_all(uint64_t ops)
 {
     pq_type PQ(PREFETCH_POOL_SIZE, WRITE_POOL_SIZE);
-
-    stxxl::uint64 i;
 
     my_record cur;
 
@@ -112,7 +110,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     stxxl::timer Timer;
     Timer.start();
 
-    for (i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         cur.key = myrand();
         PQ.push(cur);
@@ -121,7 +119,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     Timer.stop();
 
     STXXL_MSG("Records in PQ: " << PQ.size());
-    if (i != PQ.size())
+    if (ops != PQ.size())
     {
         STXXL_MSG("Size does not match");
         abort();
@@ -138,7 +136,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     Timer.reset();
     Timer.start();
 
-    for (i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         PQ.pop();
     }
@@ -158,11 +156,9 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
-void run_stxxl_intermixed(stxxl::uint64 ops)
+void run_stxxl_intermixed(uint64_t ops)
 {
     pq_type PQ(PREFETCH_POOL_SIZE, WRITE_POOL_SIZE);
-
-    stxxl::uint64 i;
 
     my_record cur;
 
@@ -171,7 +167,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     stxxl::timer Timer;
     Timer.start();
 
-    for (i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         cur.key = myrand();
         PQ.push(cur);
@@ -180,7 +176,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     Timer.stop();
 
     STXXL_MSG("Records in PQ: " << PQ.size());
-    if (i != PQ.size())
+    if (ops != PQ.size())
     {
         STXXL_MSG("Size does not match");
         abort();
@@ -197,7 +193,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     Timer.reset();
     Timer.start();
 
-    for (i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         int o = myrand() % 3;
         if (o == 0)
@@ -241,7 +237,7 @@ int main(int argc, char* argv[])
     }
 
     int version = atoi(argv[1]);
-    stxxl::uint64 ops = stxxl::atouint64(argv[2]);
+    uint64_t ops = stxxl::atouint64(argv[2]);
 
     STXXL_MSG("Running version      : " << version);
     STXXL_MSG("Operations to perform: " << ops);

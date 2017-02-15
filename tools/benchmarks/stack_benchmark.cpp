@@ -50,13 +50,13 @@ inline std::ostream& operator << (std::ostream& o, const my_record_<RECORD_SIZE>
 }
 
 template <typename stack_type>
-void benchmark_insert(stack_type& Stack, stxxl::int64 volume)
+void benchmark_insert(stack_type& Stack, uint64_t volume)
 {
     typedef typename stack_type::value_type value_type;
 
     STXXL_MSG("Record size: " << sizeof(value_type) << " bytes");
 
-    stxxl::int64 ops = volume / sizeof(value_type);
+    uint64_t ops = volume / sizeof(value_type);
 
     value_type cur;
 
@@ -70,7 +70,7 @@ void benchmark_insert(stack_type& Stack, stxxl::int64 volume)
     stxxl::timer Timer;
     Timer.start();
 
-    for (stxxl::int64 i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         Stack.push(cur);
     }
@@ -78,7 +78,7 @@ void benchmark_insert(stack_type& Stack, stxxl::int64 volume)
     Timer.stop();
 
     STXXL_MSG("Records in Stack: " << Stack.size());
-    if (ops != stxxl::int64(Stack.size()))
+    if (ops != uint64_t(Stack.size()))
     {
         STXXL_MSG("Size does not match");
         abort();
@@ -92,11 +92,11 @@ void benchmark_insert(stack_type& Stack, stxxl::int64 volume)
 }
 
 template <typename stack_type>
-void benchmark_delete(stack_type& Stack, stxxl::int64 volume)
+void benchmark_delete(stack_type& Stack, uint64_t volume)
 {
     typedef typename stack_type::value_type value_type;
 
-    stxxl::int64 ops = volume / sizeof(value_type);
+    uint64_t ops = volume / sizeof(value_type);
 
     value_type cur;
 
@@ -105,7 +105,7 @@ void benchmark_delete(stack_type& Stack, stxxl::int64 volume)
     stxxl::timer Timer;
     Timer.start();
 
-    for (stxxl::int64 i = 0; i < ops; ++i)
+    for (uint64_t i = 0; i < ops; ++i)
     {
         Stack.pop();
     }
@@ -127,7 +127,7 @@ void benchmark_delete(stack_type& Stack, stxxl::int64 volume)
 }
 
 template <class my_record>
-void run_stxxl_growshrink2_stack(stxxl::int64 volume)
+void run_stxxl_growshrink2_stack(uint64_t volume)
 {
     typedef typename stxxl::STACK_GENERATOR<my_record, stxxl::external,
                                             stxxl::grow_shrink2, DISKS, BLOCK_SIZE>::result stack_type;
@@ -144,7 +144,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 }
 
 template <class my_record>
-void run_stxxl_normal_stack(stxxl::int64 volume)
+void run_stxxl_normal_stack(uint64_t volume)
 {
     typedef typename stxxl::STACK_GENERATOR<my_record, stxxl::external,
                                             stxxl::normal, DISKS, BLOCK_SIZE>::result stack_type;
@@ -156,7 +156,7 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
 }
 
 template <class my_record>
-void run_stl_stack(stxxl::int64 volume)
+void run_stl_stack(uint64_t volume)
 {
     typedef std::stack<my_record> stack_type;
 
@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
     }
 
     int variant = atoi(argv[1]);
-    stxxl::uint64 volume = stxxl::atouint64(argv[2]);
+    uint64_t volume = stxxl::atouint64(argv[2]);
 
     STXXL_MSG("Allocating array with size " <<
               MEM_2_RESERVE << " bytes to prevent file buffering.");
