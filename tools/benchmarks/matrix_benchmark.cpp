@@ -18,8 +18,6 @@
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
 
-using stxxl::uint64;
-using stxxl::unsigned_type;
 using stxxl::int_type;
 using stxxl::internal_size_type;
 

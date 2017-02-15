@@ -21,31 +21,31 @@ template <typename T>
 class matrix2d
 {
     stxxl::vector<T> v;
-    stxxl::unsigned_type width, height;
+    uint64_t width, height;
 
 public:
-    matrix2d(stxxl::unsigned_type width, stxxl::unsigned_type height) : width(width), height(height)
+    matrix2d(uint64_t width, uint64_t height) : width(width), height(height)
     {
         v.resize(width * height);
     }
 
-    stxxl::unsigned_type get_width() const
+    uint64_t get_width() const
     {
         return width;
     }
 
-    stxxl::unsigned_type get_height() const
+    uint64_t get_height() const
     {
         return height;
     }
 
-    T & element(stxxl::unsigned_type x, stxxl::unsigned_type y)
+    T & element(uint64_t x, uint64_t y)
     {
         //row-major
         return v[y * width + x];
     }
 
-    const T & const_element(stxxl::unsigned_type x, stxxl::unsigned_type y) const
+    const T & const_element(uint64_t x, uint64_t y) const
     {
         //row-major
         return v[y * width + x];
@@ -59,25 +59,25 @@ void matrix_multiply(const matrix2d<T>& a, const matrix2d<T>& b, matrix2d<T>& c)
     assert(b.get_height() == c.get_height());
     assert(b.get_width() == c.get_width());
 
-    for (stxxl::unsigned_type y = 0; y < c.get_height(); ++y)
-        for (stxxl::unsigned_type x = 0; x < c.get_width(); ++x)
+    for (uint64_t y = 0; y < c.get_height(); ++y)
+        for (uint64_t x = 0; x < c.get_width(); ++x)
         {
             c.element(x, y) = 0;
-            for (stxxl::unsigned_type t = 0; t < a.get_width(); ++t)
+            for (uint64_t t = 0; t < a.get_width(); ++t)
                 c.element(x, y) += a.const_element(t, y) * b.const_element(x, t);
         }
 }
 
 int main()
 {
-    const stxxl::unsigned_type width = 416, height = 416;
+    const uint64_t width = 416, height = 416;
 
     try
     {
         matrix2d<double> a(width, height), b(width, height), c(width, height);
 
-        for (stxxl::unsigned_type y = 0; y < height; ++y)
-            for (stxxl::unsigned_type x = 0; x < width; ++x)
+        for (uint64_t y = 0; y < height; ++y)
+            for (uint64_t x = 0; x < width; ++x)
             {
                 a.element(x, y) = 1.0;
                 b.element(x, y) = 1.0;
