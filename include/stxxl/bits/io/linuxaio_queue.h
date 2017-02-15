@@ -57,7 +57,7 @@ private:
     semaphore num_waiting_requests, num_free_events, num_posted_requests;
 
     // two threads, one for posting, one for waiting
-    thread_type post_thread, wait_thread;
+    std::thread post_thread, wait_thread;
     state<thread_state> post_thread_state, wait_thread_state;
 
     // Why do we need two threads, one for posting, and one for waiting?  Is

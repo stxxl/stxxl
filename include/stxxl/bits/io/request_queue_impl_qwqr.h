@@ -41,7 +41,7 @@ private:
     queue_type m_read_queue;
 
     state<thread_state> m_thread_state;
-    thread_type m_thread;
+    std::thread m_thread;
     semaphore m_sem;
 
     static const priority_op m_priority_op = WRITE;

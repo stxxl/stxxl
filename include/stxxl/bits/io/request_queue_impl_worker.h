@@ -17,20 +17,11 @@
 #define STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 
 #include <stxxl/bits/config.h>
-
-#if STXXL_STD_THREADS
- #include <thread>
-#elif STXXL_BOOST_THREADS
- #include <boost/thread/thread.hpp>
-#elif STXXL_POSIX_THREADS
- #include <pthread.h>
-#else
- #error "Thread implementation not detected."
-#endif
-
 #include <stxxl/bits/io/request_queue.h>
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/state.h>
+
+#include <thread>
 
 namespace stxxl {
 
@@ -45,17 +36,12 @@ class request_queue_impl_worker : public request_queue
 protected:
     enum thread_state { NOT_RUNNING, RUNNING, TERMINATING, TERMINATED };
 
-#if STXXL_STD_THREADS
-    typedef std::thread* thread_type;
-#elif STXXL_BOOST_THREADS
-    typedef boost::thread* thread_type;
-#else
-    typedef pthread_t thread_type;
-#endif
-
 protected:
-    void start_thread(void* (*worker)(void*), void* arg, thread_type& t, state<thread_state>& s);
-    void stop_thread(thread_type& t, state<thread_state>& s, semaphore& sem);
+    void start_thread(
+        void* (*worker)(void*), void* arg,
+        std::thread& t, state<thread_state>& s);
+
+    void stop_thread(std::thread& t, state<thread_state>& s, semaphore& sem);
 };
 
 //! \}

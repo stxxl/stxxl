@@ -18,14 +18,8 @@
 #include <iostream>
 #include <cstdio>
 #include <cmath>
-
-#ifndef STXXL_THREAD_ID
-# if STXXL_STD_THREADS || STXXL_BOOST_THREADS
-#  define STXXL_THREAD_ID (-1)
-# else
-#  define STXXL_THREAD_ID pthread_self()
-# endif
-#endif
+#include <thread>
+#include <sstream>
 
 namespace stxxl {
 
@@ -33,7 +27,7 @@ static const double program_start_time_stamp = timestamp();
 
 void print_msg(const char* label, const std::string& msg, unsigned flags)
 {
-    std::string s;
+    std::ostringstream s;
 #ifdef STXXL_PRINT_TIMESTAMP_ALWAYS
     const bool timestamp_always = true;
 #else
@@ -47,30 +41,26 @@ void print_msg(const char* label, const std::string& msg, unsigned flags)
                  int(t / (60 * 60)) % 24,
                  int(t / 60) % 60, int(t) % 60,
                  int((t - floor(t)) * 1000000));
-        s += tstr;
+        s << tstr;
     }
     if (label) {
-        s += '[';
-        s += label;
-        s += "] ";
+        s << '[' << label << "] ";
     }
     if (flags & _STXXL_PRNT_THREAD_ID) {
-        char tstr[32];
-        snprintf(tstr, sizeof(tstr), "[T%ld] ", long(STXXL_THREAD_ID));
-        s += tstr;
+        s << "[T" << std::this_thread::get_id() << "]";
     }
-    s += msg;
+    s << msg;
     if (flags & _STXXL_PRNT_ADDNEWLINE)
-        s += '\n';
+        s << '\n';
     if (flags & _STXXL_PRNT_COUT)
-        std::cout << s << std::flush;
+        std::cout << s.str() << std::flush;
     if (flags & _STXXL_PRNT_CERR)
-        std::cerr << s << std::flush;
+        std::cerr << s.str() << std::flush;
     logger* logger_instance = logger::get_instance();
     if (flags & _STXXL_PRNT_LOG)
-        logger_instance->log_stream() << s << std::flush;
+        logger_instance->log_stream() << s.str() << std::flush;
     if (flags & _STXXL_PRNT_ERRLOG)
-        logger_instance->errlog_stream() << s << std::flush;
+        logger_instance->errlog_stream() << s.str() << std::flush;
 }
 
 } // namespace stxxl

@@ -1576,7 +1576,6 @@ PREDEFINED             = "STXXL_DEPRECATED(x)=x" \
                          "STXXL_HAVE_MMAP_FILE=1" \
                          "STXXL_HAVE_LINUXAIO_FILE=1" \
                          "STXXL_WINDOWS=1" \
-                         "STXXL_POSIX_THREADS=1" \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

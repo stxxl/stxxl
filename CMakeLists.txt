@@ -96,10 +96,6 @@ endif()
 
 option(STXXL_TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
-if(NOT MSVC)
-  option(USE_STD_THREADS "Force usage of C++ standard library thread support." OFF)
-endif()
-
 option(NO_CXX11 "Build without C++11 flags" OFF)
 
 option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
@@ -331,42 +327,24 @@ include(CheckIncludeFileCXX)
 
 check_include_file_cxx(pthread.h HAVE_PTHREAD_H)
 
-if(MINGW AND NOT HAVE_PTHREAD_H)
-  set(USE_STD_THREADS ON)
-endif()
-
-if(MSVC OR USE_STD_THREADS)
-
-  # check for std::mutex and std::threads avalability
-  check_cxx_source_compiles(
-    "#include <mutex>
+# check for std::mutex and std::threads avalability
+check_cxx_source_compiles(
+  "#include <mutex>
     int main() { std::mutex mutex; mutex.lock(); return 0; }"
-    HAVE_STD_MUTEX)
+  HAVE_STD_MUTEX)
 
-  check_cxx_source_compiles(
-    "#include <thread>
+check_cxx_source_compiles(
+  "#include <thread>
     int main() { std::thread t; return 0; }"
-    HAVE_STD_THREAD)
+  HAVE_STD_THREAD)
 
-  if(HAVE_STD_THREAD AND HAVE_STD_MUTEX)
-    set(STXXL_STD_THREADS "1")
-  else()
-    set(USE_BOOST ON)
-    message("No std::thread and std::mutex found, trying to use Boost classes instead")
-  endif()
-
-  # using <thread> also requires -pthread on gcc
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-  endif()
-
-  # also check for <random>
-  check_include_file_cxx(random STXXL_STD_RANDOM)
-
-else()
-  find_package(Threads REQUIRED)
-  set(STXXL_POSIX_THREADS "1")
+# using <thread> also requires -pthread on gcc
+if(CMAKE_COMPILER_IS_GNUCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
+
+# also check for <random>
+check_include_file_cxx(random STXXL_STD_RANDOM)
 
 ###############################################################################
 # determine large file support
@@ -538,25 +516,6 @@ if(USE_GNU_PARALLEL)
   endif()
 
 endif(USE_GNU_PARALLEL)
-
-###############################################################################
-# check if one thread and random library is available
-
-if(STXXL_STD_THREADS)
-  message(STATUS "Using std::thread and other C++11 library functions.")
-  set(STXXL_BOOST_THREADS 0)
-  set(STXXL_POSIX_THREADS 0)
-elseif(STXXL_BOOST_THREADS)
-  message(STATUS "Using boost::thread library functions.")
-  set(STXXL_STD_THREADS 0)
-  set(STXXL_POSIX_THREADS 0)
-elseif(STXXL_POSIX_THREADS)
-  message(STATUS "Using POSIX pthread library functions.")
-  set(STXXL_STD_THREADS 0)
-  set(STXXL_BOOST_THREADS 0)
-else()
-  message(SEND_ERROR "Could not detect a thread library. Check the compilation documentation.")
-endif()
 
 ###############################################################################
 # test for additional includes and features used by some stxxl_tool components
