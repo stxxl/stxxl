@@ -160,7 +160,7 @@ protected:
     insert_heap_type insert_heap;
 
     // how many groups are active
-    unsigned_type num_active_groups;
+    size_t num_active_groups;
 
     // total size not counting insert_heap and delete_buffer
     size_type size_;
@@ -169,14 +169,22 @@ private:
     void init();
 
     void refill_delete_buffer();
-    size_type refill_group_buffer(unsigned_type k);
+    size_type refill_group_buffer(const size_t k);
 
-    unsigned_type make_space_available(unsigned_type level);
+    size_t make_space_available(const size_t level);
     void empty_insert_heap();
 
-    value_type get_supremum() const { return cmp.min_value(); } //{ return group_buffers[0][KNN].key; }
-    unsigned_type current_delete_buffer_size() const { return delete_buffer_end - delete_buffer_current_min; }
-    unsigned_type current_group_buffer_size(unsigned_type i) const { return &(group_buffers[i][N]) - group_buffer_current_mins[i]; }
+    value_type get_supremum() const {
+        return cmp.min_value();
+    }
+
+    size_t current_delete_buffer_size() const {
+        return delete_buffer_end - delete_buffer_current_min;
+    }
+
+    size_t current_group_buffer_size(const size_t i) const {
+        return (group_buffers[i] + N) - group_buffer_current_mins[i];
+    }
 
 public:
     //! \name Constructors/Destructors
@@ -211,7 +219,7 @@ public:
     //! for writing data for the memory<->disk transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
+    priority_queue(const size_t p_pool_mem, const size_t w_pool_mem);
 
     //! non-copyable: delete copy-constructor
     priority_queue(const priority_queue&) = delete;
@@ -223,20 +231,19 @@ public:
     //! \}
 
 #if 0
-
     //! swap this priority queue with another one.
     //! Implementation correctness is questionable.
     void swap(priority_queue& obj)
     {
         //swap_1D_arrays(int_mergers,obj.int_mergers,kNumIntGroups); // does not work in g++ 3.4.3 :( bug?
-        for (unsigned_type i = 0; i < kNumIntGroups; ++i)
+        for (size_t i = 0; i < kNumIntGroups; ++i)
             std::swap(int_mergers[i], obj.int_mergers[i]);
 
         //std::swap(pool,obj.pool);
         //std::swap(pool_owned, obj.pool_owned);
         std::swap(ext_mergers, obj.ext_mergers);
-        for (unsigned_type i1 = 0; i1 < kTotalNumGroups; ++i1)
-            for (unsigned_type i2 = 0; i2 < (N + 1); ++i2)
+        for (size_t i1 = 0; i1 < kTotalNumGroups; ++i1)
+            for (size_t i2 = 0; i2 < (N + 1); ++i2)
                 std::swap(group_buffers[i1][i2], obj.group_buffers[i1][i2]);
 
         static_assert(false, "false, this method does not work!");
@@ -305,9 +312,9 @@ public:
 
     //! Number of bytes consumed by the \b priority_queue from the internal
     //! memory not including pools (see the constructor)
-    unsigned_type mem_cons() const
+    size_t mem_cons() const
     {
-        unsigned_type dynam_alloc_mem = 0;
+        size_t dynam_alloc_mem = 0;
         //dynam_alloc_mem += w_pool.mem_cons();
         //dynam_alloc_mem += p_pool.mem_cons();
         for (size_t i = 0; i < kNumIntGroups; ++i)
@@ -407,7 +414,7 @@ priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type>& p_pool_, w
 }
 
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem)
+priority_queue<ConfigType>::priority_queue(const size_t p_pool_mem, const size_t w_pool_mem)
     : pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
       pool_owned(true),
       delete_buffer_end(delete_buffer + kDeleteBufferSize),
@@ -424,7 +431,7 @@ void priority_queue<ConfigType>::init()
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
     ext_mergers = new ext_merger_type*[kNumExtGroups];
-    for (unsigned_type j = 0; j < kNumExtGroups; ++j) {
+    for (size_t j = 0; j < kNumExtGroups; ++j) {
         ext_mergers[j] = new ext_merger_type;
         ext_mergers[j]->set_pool(pool);
     }
@@ -433,7 +440,7 @@ void priority_queue<ConfigType>::init()
     insert_heap.push(sentinel);                                // always keep the sentinel
     delete_buffer[kDeleteBufferSize] = sentinel;               // sentinel
     delete_buffer_current_min = delete_buffer_end;             // empty
-    for (unsigned_type i = 0; i < kTotalNumGroups; i++)
+    for (size_t i = 0; i < kTotalNumGroups; i++)
     {
         group_buffers[i][N] = sentinel;                        // sentinel
         group_buffer_current_mins[i] = &(group_buffers[i][N]); // empty
@@ -447,7 +454,7 @@ priority_queue<ConfigType>::~priority_queue()
     if (pool_owned)
         delete pool;
 
-    for (unsigned_type j = 0; j < kNumExtGroups; ++j)
+    for (size_t j = 0; j < kNumExtGroups; ++j)
         delete ext_mergers[j];
     delete[] ext_mergers;
 }
@@ -457,7 +464,7 @@ priority_queue<ConfigType>::~priority_queue()
 // refill group_buffers[j] and return number of elements found
 template <class ConfigType>
 typename priority_queue<ConfigType>::size_type
-priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
+priority_queue<ConfigType>::refill_group_buffer(const size_t group)
 {
     STXXL_VERBOSE_PQ("refill_group_buffer(" << group << ")");
 
@@ -466,7 +473,7 @@ priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
     size_type group_size = (group < kNumIntGroups) ?
                            int_mergers[group].size() :
                            ext_mergers[group - kNumIntGroups]->size();                         // elements left in segments
-    unsigned_type left_elements = group_buffers[group] + N - group_buffer_current_mins[group]; //elements left in target buffer
+    size_t left_elements = group_buffers[group] + N - group_buffer_current_mins[group]; //elements left in target buffer
     if (group_size + left_elements >= size_type(N))
     {                                                                                          // buffer will be filled completely
         target = group_buffers[group];
@@ -522,7 +529,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
 
     size_type total_group_size = 0;
     //num_active_groups is <= 4
-    for (unsigned_type i = num_active_groups; i > 0; )
+    for (size_t i = num_active_groups; i > 0; )
     {
         --i;
         if ((group_buffers[i] + N) - group_buffer_current_mins[i] < kDeleteBufferSize)
@@ -671,11 +678,13 @@ void priority_queue<ConfigType>::refill_delete_buffer()
 // empty this level if necessary leading to a recursive call.
 // return the level where space was finally available
 template <class ConfigType>
-unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type level)
+size_t priority_queue<ConfigType>::make_space_available(const size_t level)
 {
     STXXL_VERBOSE_PQ("make_space_available(" << level << ")");
-    unsigned_type finalLevel;
+
+    size_t finalLevel;
     assert(level < kTotalNumGroups);
+
     assert(level <= num_active_groups);
 
     if (level == num_active_groups)
@@ -700,7 +709,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
                      ", capacity(last externel group (" << kNumIntGroups + kNumExtGroups - 1 << "))=" << capacity);
         dump_sizes();
 
-        unsigned_type extLevel = level - kNumIntGroups;
+        const size_t extLevel = level - kNumIntGroups;
         const size_type segmentSize = ext_mergers[extLevel]->size();
         STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
         ext_merger_type* overflow_merger = new ext_merger_type;
@@ -716,7 +725,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
 
         if (level < kNumIntGroups - 1)                                            // from internal to internal tree
         {
-            unsigned_type segmentSize = int_mergers[level].size();
+            const size_t segmentSize = int_mergers[level].size();
             value_type* newSegment = new value_type[segmentSize + 1];
             int_mergers[level].multi_merge(newSegment, newSegment + segmentSize); // empty this level
 
@@ -730,7 +739,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
         {
             if (level == kNumIntGroups - 1) // from internal to external tree
             {
-                const unsigned_type segmentSize = int_mergers[kNumIntGroups - 1].size();
+                const size_t segmentSize = int_mergers[kNumIntGroups - 1].size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into first level external: " << level << " " << segmentSize);
                 ext_mergers[0]->append_merger(int_mergers[kNumIntGroups - 1], segmentSize);
             }
@@ -774,10 +783,10 @@ void priority_queue<ConfigType>::empty_insert_heap()
 
     // copy the delete_buffer and group_buffers[0] to temporary storage
     // (the temporary can be eliminated using some dirty tricks)
-    const unsigned_type kTempSize = N + kDeleteBufferSize;
+    const size_t kTempSize = N + kDeleteBufferSize;
     value_type temp[kTempSize + 1];
-    unsigned_type sz1 = current_delete_buffer_size();
-    unsigned_type sz2 = current_group_buffer_size(0);
+    const size_t sz1 = current_delete_buffer_size();
+    const size_t sz2 = current_group_buffer_size(0);
     value_type* pos = temp + kTempSize - sz1 - sz2;
     std::copy(delete_buffer_current_min, delete_buffer_current_min + sz1, pos);
     std::copy(group_buffer_current_mins[0], group_buffer_current_mins[0] + sz2, pos + sz1);
@@ -804,7 +813,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
                                           newSegment, newSegment + N, cmp);
 
     // and insert it
-    unsigned_type freeLevel = make_space_available(0);
+    const size_t freeLevel = make_space_available(0);
     assert(freeLevel == 0 || int_mergers[0].size() == 0);
     int_mergers[0].append_array(newSegment, N);
 
@@ -835,7 +844,7 @@ void priority_queue<ConfigType>::empty_insert_heap()
 template <class ConfigType>
 void priority_queue<ConfigType>::dump_sizes() const
 {
-    unsigned_type capacity = N;
+    size_t capacity = N;
     STXXL_MSG("pq::size()\t= " << size());
     STXXL_MSG("  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity);
     STXXL_MSG("  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize);
@@ -879,7 +888,7 @@ struct dummy
 };
 
 template <size_t ElementSize, size_t IntMem, external_size_type MaxItems, size_t BlockSize,
-          unsigned_type m_, bool stop = false>
+          size_t m_, bool stop = false>
 struct find_B_m
 {
     typedef find_B_m<ElementSize, IntMem,
@@ -911,7 +920,7 @@ struct find_B_m
         // if we have two ext mergers their degree must be at least 64=m/2
         ((MaxItems < ((k - m) * m / (2 * ElementSize)) * 1024) || m >= 128);
 
-    static constexpr unsigned_type step = 1;
+    static constexpr size_t step = 1;
 
     //! if not fits, recurse into configuration with +step more internal buffers
     typedef typename find_B_m<ElementSize, IntMem, MaxItems, B,
@@ -934,8 +943,8 @@ struct find_B_m<ElementSize, IntMem, MaxItems, 2048, 1, stop>
 
 // to speedup search
 template <size_t ElementSize, size_t IntMem,
-          external_size_type MaxItems, unsigned_type BlockSize,
-          unsigned_type m_>
+          external_size_type MaxItems, size_t BlockSize,
+          size_t m_>
 struct find_B_m<ElementSize, IntMem, MaxItems, BlockSize, m_, true>
 {
     enum { fits = false };
@@ -957,19 +966,19 @@ struct Parameters_not_found_Try_to_change_the_Tune_parameter
     typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
 };
 
-template <unsigned_type AI_, unsigned_type X_, unsigned_type CriticalSize>
+template <size_t AI_, size_t X_, size_t CriticalSize>
 struct compute_N
 {
     typedef compute_N<AI_, X_, CriticalSize> Self;
 
-    static const unsigned_type X = X_;
-    static const unsigned_type AI = AI_;
-    static const unsigned_type N = X / (AI * AI);     // two stage internal
+    static const size_t X = X_;
+    static const size_t AI = AI_;
+    static const size_t N = X / (AI * AI);     // two stage internal
 
     typedef typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result result;
 };
 
-template <unsigned_type X_, unsigned_type CriticalSize_>
+template <size_t X_, size_t CriticalSize_>
 struct compute_N<1, X_, CriticalSize_>
 {
     typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
@@ -1029,7 +1038,7 @@ public:
     };
 
     // Estimation of maximum internal memory consumption (in bytes)
-    static const unsigned_type EConsumption = X * settings::element_size + settings::B * AE + ((MaxItems / X) / AE) * settings::B * 1024;
+    static const size_t EConsumption = X * settings::element_size + settings::B * AE + ((MaxItems / X) / AE) * settings::B * 1024;
 
     /*
         unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.

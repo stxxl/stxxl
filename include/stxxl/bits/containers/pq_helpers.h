@@ -204,11 +204,11 @@ public:
  * - Maximum size is fixed at compilation time, so an array can be used.
  * - Can be cleared "at once", without reallocation.
  */
-template <typename ValueType, unsigned_type MaxSize>
+template <typename ValueType, size_t MaxSize>
 class internal_bounded_stack
 {
     typedef ValueType value_type;
-    typedef unsigned_type size_type;
+    typedef size_t size_type;
     enum { max_size = MaxSize };
 
     size_type m_size;
@@ -263,7 +263,7 @@ public:
     typedef typename std::iterator_traits<iterator>::difference_type size_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
-    typedef unsigned_type origin_type;
+    typedef size_t origin_type;
 
 private:
     origin_type m_origin;

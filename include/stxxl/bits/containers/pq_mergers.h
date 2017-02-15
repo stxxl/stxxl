@@ -271,9 +271,9 @@ public:
     compare_type cmp;
 
     //! current tree size, invariant (k == 1 << logK), always a power of two
-    unsigned_type k;
+    size_t k;
     //! log of current tree size
-    unsigned_type logK;
+    size_t logK;
 
     // only entries 0 .. arity-1 may hold actual sequences, the other
     // entries arity .. max_arity-1 are sentinels to make the size of the tree
@@ -287,14 +287,14 @@ protected:
     struct Entry
     {
         value_type key;          //!< Key of Loser element (winner for 0)
-        unsigned_type index;     //!< number of losing segment
+        size_t index;     //!< number of losing segment
     };
 
     //! levels of loser tree: entry[0] contains the winner info
     struct Entry entry[max_arity];
 
     //! stack of free player indices
-    internal_bounded_stack<unsigned_type, arity> free_slots;
+    internal_bounded_stack<size_t, arity> free_slots;
 
 public:
     loser_tree(const compare_type& c, arrays_type& a)
@@ -326,7 +326,7 @@ public:
     }
 
     //! Allocate a free slot for a new player.
-    unsigned_type new_player()
+    size_t new_player()
     {
         // get a free slot
         if (free_slots.empty()) {
@@ -335,14 +335,14 @@ public:
         }
 
         assert(!free_slots.empty());
-        unsigned_type index = free_slots.top();
+        const size_t index = free_slots.top();
         free_slots.pop();
 
         return index;
     }
 
     //! Free a finished player's slot
-    void free_player(unsigned_type slot)
+    void free_player(const size_t slot)
     {
         // push on the stack of free segment indices
         free_slots.push(slot);
@@ -357,7 +357,7 @@ public:
     //! rebuild loser tree information from the values in current
     void rebuild_loser_tree()
     {
-        unsigned_type winner = init_winner(1);
+        const size_t winner = init_winner(1);
         entry[0].index = winner;
         entry[0].key = *arrays.get_array(winner);
     }
@@ -367,7 +367,7 @@ public:
     // from scratch in linear time
     // initialize entry[root].index and the subtree rooted there
     // return winner index
-    unsigned_type init_winner(unsigned_type root)
+    size_t init_winner(const size_t root)
     {
         if (root >= k || root >= max_arity)
         {           // leaf reached
@@ -375,8 +375,8 @@ public:
         }
         else
         {
-            unsigned_type left = init_winner(2 * root);
-            unsigned_type right = init_winner(2 * root + 1);
+            const size_t left = init_winner(2 * root);
+            const size_t right = init_winner(2 * root + 1);
             value_type lk = *arrays.get_array(left);
             value_type rk = *arrays.get_array(right);
             assert(root < max_arity);
@@ -403,16 +403,17 @@ public:
      * subtree based on new value, and old winner and loser update each node on
      * the path to the root top down.  This is implemented recursively
      */
-    void update_on_insert(unsigned_type node,
-                          const value_type& newKey, unsigned_type newIndex,
+    void update_on_insert(const size_t node,
+                          const value_type& newKey,
+                          const size_t newIndex,
                           value_type* winner_key,
-                          unsigned_type* winner_index,   // old winner
-                          unsigned_type* mask)           // 1 << (ceil(log KNK) - dist-from-root)
+                          size_t* winner_index,   // old winner
+                          size_t* mask)           // 1 << (ceil(log KNK) - dist-from-root)
     {
         if (node == 0)
         {
             // winner part of root
-            *mask = (unsigned_type)(1) << (logK - 1);
+            *mask = size_t(1) << (logK - 1);
             *winner_key = entry[0].key;
             *winner_index = entry[0].index;
             if (cmp(entry[node].key, newKey))
@@ -425,7 +426,7 @@ public:
         {
             update_on_insert(node >> 1, newKey, newIndex, winner_key, winner_index, mask);
             value_type loserKey = entry[node].key;
-            unsigned_type loserIndex = entry[node].index;
+            size_t loserIndex = entry[node].index;
             if ((*winner_index & *mask) != (newIndex & *mask)) {     // different subtrees
                 // newKey will have influence here
                 if (cmp(loserKey, newKey)) {
@@ -455,11 +456,12 @@ public:
     }
 
     //! Initial call to recursive update_on_insert
-    void update_on_insert(unsigned_type node,
-                          const value_type& newKey, unsigned_type newIndex)
+    void update_on_insert(const size_t node,
+                          const value_type& newKey,
+                          const size_t newIndex)
     {
         value_type dummyKey;
-        unsigned_type dummyIndex, dummyMask;
+        size_t dummyIndex, dummyMask;
         update_on_insert(node, newKey, newIndex,
                          &dummyKey, &dummyIndex, &dummyMask);
     }
@@ -473,7 +475,7 @@ public:
         assert(free_slots.empty());                    // stack was free (probably not needed)
 
         // make all new entries free and push them on the free stack
-        for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
+        for (size_t i = 2 * k - 1; i >= k; i--) //backwards
         {
             arrays.make_array_sentinel(i);
             if (i < arity)
@@ -499,8 +501,8 @@ public:
         assert(logK > 0);
 
         // compact all nonempty segments to the left
-        unsigned_type last_empty = 0;
-        for (unsigned_type pos = 0; pos < k; pos++)
+        size_t last_empty = 0;
+        for (size_t pos = 0; pos < k; pos++)
         {
             if (!arrays.is_array_empty(pos))
             {
@@ -552,8 +554,8 @@ public:
     //! compact tree if it got considerably smaller
     void maybe_compact()
     {
-        const unsigned_type num_segments_used = k - free_slots.size();
-        const unsigned_type num_segments_trigger = k - (3 * k / 5);
+        const size_t num_segments_used = k - free_slots.size();
+        const size_t num_segments_trigger = k - (3 * k / 5);
         // using k/2 would be worst case inefficient (for large k)
         // for k \in {2, 4, 8} the trigger is k/2 which is good
         // because we have special mergers for k \in {1, 2, 4}
@@ -579,8 +581,8 @@ public:
     {
         Entry* current_pos;
         value_type current_key;
-        unsigned_type current_index; // leaf pointed to by current entry
-        unsigned_type winner_index = entry[0].index;
+        size_t current_index; // leaf pointed to by current entry
+        size_t winner_index = entry[0].index;
         value_type winner_key = entry[0].key;
 
         while (begin != end)
@@ -598,7 +600,7 @@ public:
                 arrays.free_array(winner_index);
 
             // go up the entry-tree
-            for (unsigned_type i = (winner_index + k) >> 1; i > 0; i >>= 1)
+            for (size_t i = (winner_index + k) >> 1; i > 0; i >>= 1)
             {
                 current_pos = entry + i;
                 current_key = current_pos->key;
@@ -619,7 +621,7 @@ public:
     template <int LogK, typename OutputIterator>
     void multi_merge_f(OutputIterator begin, OutputIterator end)
     {
-        unsigned_type winner_index = entry[0].index;
+        size_t winner_index = entry[0].index;
         value_type winner_key = entry[0].key;
 
         // TODO: reinsert assert(log_k >= LogK);
@@ -644,7 +646,7 @@ public:
         Entry* pos = entry + ((winner_index + (1 << LogK)) >> pos_shift);  \
         value_type key = pos->key;                                         \
         if (cmp(winner_key, key)) {                                        \
-            unsigned_type index = pos->index;                              \
+            size_t index = pos->index;                                     \
             pos->key = winner_key;                                         \
             pos->index = winner_index;                                     \
             winner_key = key;                                              \
@@ -803,16 +805,16 @@ public:
     compare_type cmp;
 
     //! current tree size, invariant (k == 1 << logK), always a power of two
-    unsigned_type k;
+    size_t k;
     //! log of current tree size
-    unsigned_type logK;
+    size_t logK;
 
 protected:
     //! reference to the linked arrays
     arrays_type& arrays;
 
     //! stack of free player indices
-    internal_bounded_stack<unsigned_type, arity> free_slots;
+    internal_bounded_stack<size_t, arity> free_slots;
 
 public:
     parallel_merger_adapter(const compare_type& c, arrays_type& a)
@@ -840,7 +842,7 @@ public:
     }
 
     //! Allocate a free slot for a new player.
-    unsigned_type new_player()
+    size_t new_player()
     {
         // get a free slot
         if (free_slots.empty()) {
@@ -849,14 +851,14 @@ public:
         }
 
         assert(!free_slots.empty());
-        unsigned_type index = free_slots.top();
+        const size_t index = free_slots.top();
         free_slots.pop();
 
         return index;
     }
 
     //! Free a finished player's slot
-    void free_player(unsigned_type slot)
+    void free_player(size_t slot)
     {
         free_slots.push(slot);
     }
@@ -868,9 +870,9 @@ public:
     }
 
     //! Initial call to recursive update_on_insert
-    void update_on_insert(unsigned_type /* node */,
+    void update_on_insert(size_t /* node */,
                           const value_type& /* newKey */,
-                          unsigned_type /* newIndex */)
+                          size_t /* newIndex */)
     { }
 
     //! make the tree twice as wide
@@ -882,7 +884,7 @@ public:
         assert(free_slots.empty());                    // stack was free (probably not needed)
 
         // make all new entries free and push them on the free stack
-        for (unsigned_type i = 2 * k - 1; i >= k; i--) //backwards
+        for (size_t i = 2 * k - 1; i >= k; i--) //backwards
         {
             arrays.make_array_sentinel(i);
             if (i < arity)
@@ -905,8 +907,8 @@ public:
         assert(logK > 0);
 
         // compact all nonempty segments to the left
-        unsigned_type last_empty = 0;
-        for (unsigned_type pos = 0; pos < k; pos++)
+        size_t last_empty = 0;
+        for (size_t pos = 0; pos < k; pos++)
         {
             if (!arrays.is_array_empty(pos))
             {
@@ -955,8 +957,8 @@ public:
     //! compact tree if it got considerably smaller
     void maybe_compact()
     {
-        const unsigned_type num_segments_used = k - free_slots.size();
-        const unsigned_type num_segments_trigger = k - (3 * k / 5);
+        const size_t num_segments_used = k - free_slots.size();
+        const size_t num_segments_trigger = k - (3 * k / 5);
         // using k/2 would be worst case inefficient (for large k)
         // for k \in {2, 4, 8} the trigger is k/2 which is good
         // because we have special mergers for k \in {1, 2, 4}

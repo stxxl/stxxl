@@ -76,7 +76,7 @@ public:
     struct sequence_state
     {
         block_type* block;          //!< current block
-        unsigned_type current;      //!< current index in current block
+        size_t current;      //!< current index in current block
         bid_container_type bids;    //!< list of blocks forming this sequence
         compare_type cmp;
         ext_merger* merger;
@@ -215,7 +215,7 @@ public:
     virtual ~ext_merger()
     {
         STXXL_VERBOSE1("ext_merger::~ext_merger()");
-        for (unsigned_type i = 0; i < arity; ++i)
+        for (size_t i = 0; i < arity; ++i)
         {
             delete states[i].block;
         }
@@ -232,38 +232,38 @@ public:
     //! \{
 
     //! is this segment empty ?
-    bool is_array_empty(unsigned_type slot) const
+    bool is_array_empty(const size_t slot) const
     {
         return is_sentinel(*(states[slot]));
     }
 
     //! Is this segment allocated? Otherwise it's empty, already on the stack
     //! of free segment indices and can be reused.
-    bool is_array_allocated(unsigned_type slot) const
+    bool is_array_allocated(size_t slot) const
     {
         return states[slot].allocated;
     }
 
     //! Return the item sequence of the given slot
-    sequence_type & get_array(unsigned_type slot)
+    sequence_type & get_array(const size_t slot)
     {
         return states[slot];
     }
 
     //! Swap contents of arrays a and b
-    void swap_arrays(unsigned_type a, unsigned_type b)
+    void swap_arrays(const size_t a, const size_t b)
     {
         states[a].swap(states[b]);
     }
 
     //! Set a usually empty array to the sentinel
-    void make_array_sentinel(unsigned_type a)
+    void make_array_sentinel(const size_t a)
     {
         states[a].make_inf();
     }
 
     //! free an empty segment.
-    void free_array(unsigned_type slot)
+    void free_array(const size_t slot)
     {
         STXXL_VERBOSE1("ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot)));
         assert(is_array_allocated(slot));
@@ -278,7 +278,7 @@ public:
     //! sequence.
     void prefetch_arrays()
     {
-        for (unsigned_type i = 0; i < tree.k; ++i)
+        for (size_t i = 0; i < tree.k; ++i)
         {
             if (!states[i].bids.empty())
                 pool->hint(states[i].bids.front());
@@ -296,7 +296,7 @@ protected:
         if (arity < kMaxArity)
         {
             sentinel_block = new block_type;
-            for (unsigned_type i = 0; i < block_type::size; ++i)
+            for (size_t i = 0; i < block_type::size; ++i)
                 (*sentinel_block)[i] = tree.cmp.min_value();
             if (arity + 1 == kMaxArity) {
                 // same memory consumption, but smaller merge width, better use arity = kMaxArity
@@ -304,7 +304,7 @@ protected:
             }
         }
 
-        for (unsigned_type i = 0; i < kMaxArity; ++i)
+        for (size_t i = 0; i < kMaxArity; ++i)
         {
             states[i].merger = this;
             if (i < arity)
@@ -330,9 +330,9 @@ protected:
 #endif
 
 public:
-    unsigned_type mem_cons() const // only rough estimation
+    size_t mem_cons() const // only rough estimation
     {
-        return (std::min<unsigned_type>(arity + 1, kMaxArity) * block_type::raw_size);
+        return (std::min<size_t>(arity + 1, kMaxArity) * block_type::raw_size);
     }
 
     //! Whether there is still space for new array
@@ -360,7 +360,7 @@ public:
       \param slot slot to insert into
     */
     void insert_segment(bid_container_type& bidlist, block_type* first_block,
-                        unsigned_type first_size, unsigned_type slot)
+                        const size_t first_size, const size_t slot)
     {
         STXXL_VERBOSE1("ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist.size() << " " << slot);
         assert(!is_array_allocated(slot));
@@ -390,11 +390,11 @@ public:
         }
 
         // allocate a new player slot
-        unsigned_type index = tree.new_player();
+        const size_t index = tree.new_player();
 
         // construct new sorted array from merger
         assert(segment_size);
-        unsigned_type nblocks = (unsigned_type)(segment_size / block_type::size);
+        size_t nblocks = static_cast<size_t>(segment_size / block_type::size);
         //assert(nblocks); // at least one block
         STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks);
         if (nblocks == 0)
@@ -403,7 +403,7 @@ public:
                            nblocks << " blocks");
             STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
         }
-        unsigned_type first_size = (unsigned_type)(segment_size % block_type::size);
+        size_t first_size = static_cast<size_t>(segment_size % block_type::size);
         if (first_size == 0)
         {
             first_size = block_type::size;
@@ -471,7 +471,7 @@ protected:
     template <class OutputIterator>
     void multi_merge_parallel(OutputIterator begin, OutputIterator end)
     {
-        const unsigned_type& k = tree.k;
+        const size_t& k = tree.k;
 
         if (begin == end)
             return;
@@ -481,11 +481,11 @@ protected:
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
 
         std::vector<sequence> seqs;
-        std::vector<unsigned_type> orig_seq_index;
+        std::vector<size_t> orig_seq_index;
 
         invert_order<compare_type, value_type, value_type> inv_cmp(tree.cmp);
 
-        for (unsigned_type i = 0; i < k; ++i) //initialize sequences
+        for (size_t i = 0; i < k; ++i) //initialize sequences
         {
             if (states[i].current == states[i].block->size || is_sentinel(*states[i]))
                 continue;
@@ -533,7 +533,7 @@ protected:
 
             diff_type total_size = 0;
 
-            for (unsigned_type i = 0; i < seqs.size(); ++i)
+            for (size_t i = 0; i < seqs.size(); ++i)
             {
                 diff_type seq_i_size = seqs[i].second - seqs[i].first;
                 if (seq_i_size > 0)
@@ -556,7 +556,7 @@ protected:
 
             diff_type less_equal_than_min_last = 0;
             //locate this element in all sequences
-            for (unsigned_type i = 0; i < seqs.size(); ++i)
+            for (size_t i = 0; i < seqs.size(); ++i)
             {
                 //assert(seqs[i].first < seqs[i].second);
 
@@ -586,7 +586,7 @@ protected:
             rest -= output_size;
             m_size -= output_size;
 
-            for (unsigned_type i = 0; i < seqs.size(); ++i)
+            for (size_t i = 0; i < seqs.size(); ++i)
             {
                 sequence_state& state = states[orig_seq_index[i]];
 
@@ -651,9 +651,9 @@ protected:
             }
         }       // while (rest > 1)
 
-        for (unsigned_type i = 0; i < seqs.size(); ++i)
+        for (size_t i = 0; i < seqs.size(); ++i)
         {
-            unsigned_type seg = orig_seq_index[i];
+            size_t seg = orig_seq_index[i];
             if (is_array_empty(seg))
             {
                 STXXL_VERBOSE1("deallocated " << seg);

@@ -77,9 +77,9 @@ protected:
     //! start of Segments
     value_type* segment[MaxArity];
     //! just to count the internal memory consumption, in bytes
-    unsigned_type segment_size[MaxArity];
+    size_t segment_size[MaxArity];
 
-    unsigned_type mem_cons_;
+    size_t mem_cons_;
 
     //! total number of elements stored
     size_type m_size;
@@ -89,7 +89,7 @@ public:
     //! \{
 
     //! is this array invalid? here: empty and prefixed with sentinel?
-    bool is_array_empty(unsigned_type slot) const
+    bool is_array_empty(const size_t slot) const
     {
         assert(slot < MaxArity);
         return tree.is_sentinel(*(current[slot]));
@@ -97,19 +97,19 @@ public:
 
     //! is this array's backing memory still allocated or does the current
     //! point to sentinel?
-    bool is_array_allocated(unsigned_type slot) const
+    bool is_array_allocated(const size_t slot) const
     {
         return current[slot] != &sentinel;
     }
 
     //! Return the item sequence of the given slot
-    sequence_type & get_array(unsigned_type slot)
+    sequence_type & get_array(const size_t slot)
     {
         return current[slot];
     }
 
     //! Swap contents of arrays a and b
-    void swap_arrays(unsigned_type a, unsigned_type b)
+    void swap_arrays(const size_t a, const size_t b)
     {
         std::swap(current[a], current[b]);
         std::swap(current_end[a], current_end[b]);
@@ -118,7 +118,7 @@ public:
     }
 
     //! Set a usually empty array to the sentinel
-    void make_array_sentinel(unsigned_type slot)
+    void make_array_sentinel(size_t slot)
     {
         current[slot] = &sentinel;
         current_end[slot] = &sentinel;
@@ -126,7 +126,7 @@ public:
     }
 
     //! free an empty segment .
-    void free_array(unsigned_type slot)
+    void free_array(size_t slot)
     {
         // reroute current pointer to some empty sentinel segment
         // with a sentinel key
@@ -175,7 +175,7 @@ public:
     ~int_merger()
     {
         STXXL_VERBOSE1("int_merger::~int_merger()");
-        for (unsigned_type i = 0; i < tree.k; ++i)
+        for (size_t i = 0; i < tree.k; ++i)
         {
             if (segment[i])
             {
@@ -198,7 +198,7 @@ public:
         std::swap(mem_cons_, obj.mem_cons_);
     }
 
-    unsigned_type mem_cons() const { return mem_cons_; }
+    size_t mem_cons() const { return mem_cons_; }
 
     //! Whether there is still space for new array
     bool is_space_available() const
@@ -214,7 +214,7 @@ public:
 
     //! append array to merger, takes ownership of the array.
     //! requires: is_space_available() == 1
-    void append_array(value_type* target, unsigned_type length)
+    void append_array(value_type* target, const size_t length)
     {
         STXXL_VERBOSE2("int_merger::insert_segment(" << target << "," << length << ")");
         //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
@@ -232,7 +232,7 @@ public:
         assert(tree.is_sentinel(target[length]));
 
         // allocate a new player slot
-        unsigned_type index = tree.new_player();
+        const size_t index = tree.new_player();
 
         assert(current[index] == &sentinel);
 
@@ -274,10 +274,10 @@ public:
 protected:
     //! extract the (length = end - begin) smallest elements using parallel
     //! multiway_merge.
-    void multi_merge_parallel(value_type* target, unsigned_type length)
+    void multi_merge_parallel(value_type* target, const size_t length)
     {
-        const unsigned_type& k = tree.k;
-        const unsigned_type& logK = tree.logK;
+        const size_t& k = tree.k;
+        const size_t& logK = tree.logK;
         compare_type& cmp = tree.cmp;
 
         STXXL_VERBOSE3("int_merger::multi_merge_parallel(target=" << target << ", len=" << length << ") k=" << k);
