@@ -225,18 +225,13 @@ endif()
 # enable C++14
 if(MSVC)
   # MSVC 11 or greater has C++11 automatically enabled
-elseif(CYGWIN)
-  # C++11 is very restrictive on Cygwin
 else()
   # try -std= flags to enable C++14
-  check_cxx_compiler_flag(-std=c++14 CXX_HAS_STD_CXX11)
-  if(CXX_HAS_STD_CXX11)
+  check_cxx_compiler_flag(-std=c++14 CXX_HAS_STD_CXX14)
+  if(CXX_HAS_STD_CXX14)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
   else()
-    check_cxx_compiler_flag(-std=c++0x CXX_HAS_STD_CXX0X)
-    if(CXX_HAS_STD_CXX0X)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    endif()
+    message(SEND_ERROR "Compiler does not support -std=c++14")
   endif()
   # on MacOSX with clang we need to use libc++ for C++14 headers
   if(APPLE)
