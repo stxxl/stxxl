@@ -23,7 +23,6 @@ set(LIBSTXXL_SOURCES
   common/verbose.cpp
   common/version.cpp
 
-  io/boostfd_file.cpp
   io/create_file.cpp
   io/disk_queued_file.cpp
   io/file.cpp

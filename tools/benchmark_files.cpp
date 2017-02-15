@@ -141,7 +141,7 @@ int benchmark_files(int argc, char* argv[])
                 "and report average rate");
 
     cp.add_string('f', "file-type", file_type,
-                  "Method to open file (syscall|mmap|wincall|boostfd|...) "
+                  "Method to open file (syscall|mmap|wincall|...) "
                   "default: " + file_type);
 
     cp.add_string('p', "operations", opstr,

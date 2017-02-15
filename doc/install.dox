@@ -19,8 +19,6 @@
 
 \subpage install_windows
 
-\subpage install_windows_boost
-
 \subpage install_build_options
 
 \subpage install_config
@@ -185,8 +183,6 @@ Package maintainers should make sure that \b both Debug and Release static libra
   The CMake script will also install CMake project files in \c lib/cmake/stxxl , which must be included in the development package. \n
   We also provide a \c pkg-config file, which installs by default into \c lib/pkgconfig/ as \c stxxl.pc and \c stxxl_debug.pc
 
-- Binary Unix packages should not use Boost.
-
 A typical build sequence would be
 \verbatim
 mkdir debug; cd debug
@@ -218,11 +214,6 @@ The mode mostly changes CXXFLAGS.
 $ cmake -DUSE_GNU_PARALLEL=ON ...
 \endverbatim
 when building. <b>Parallel is now ON by default for gcc</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
-
-- Use Boost for file I/O, multi-threading support and more. Boost is required on Windows for older MSVC versions and is CMake tries to automatically find it. On Linux/Unix it is optional <b>and not recommended</b>, but can be activated using
-\verbatim
-$ cmake -DUSE_BOOST=ON ...
-\endverbatim
 
 - STXXL contains many small example programs, which can be built by defining
 \verbatim
@@ -262,7 +253,7 @@ INSTALL_CMAKE_DIR=lib/cmake/stxxl
 $ cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ..
 \endverbatim
 
-- On Unix the pthreads library is used for threading, on Windows the Boost or STL thread library is used. For testing compilation, the STL thread library can optionally also be used on Unix/Linux by setting the \c -DUSE_STD_THREADS=ON switch.
+- On Unix the pthreads library is used for threading, on Windows the STL thread library is used. For testing compilation, the STL thread library can optionally also be used on Unix/Linux by setting the \c -DUSE_STD_THREADS=ON switch.
 
 - For build testing, the CMake script can check that all header files in \c include/ compile by themselves. This is required since each header must be self-sufficient and include other headers appropriately. These test compiles are trigged with \c -DSTXXL_TRY_COMPILE_HEADERS=ON.
 
@@ -278,14 +269,13 @@ The gcov coverage report can be automatically created using the additional targe
 
 */
 
-/** \page install_windows Compiling and Installing STXXL with Visual Studio 2012 and newer (without Boost)
+/** \page install_windows Compiling and Installing STXXL with Visual Studio 2015 and newer
 
 \author Timo Bingmann (2013)
 
 ## Prerequisites:
 
-- Microsoft <b>Visual Studio >= 2012 (VC11)</b>. \n
-  For older versions you need Boost, see \ref install_windows_boost.
+- Microsoft <b>Visual Studio >= 2015 (VC12)</b>.
 - CMake 2.8, visit http://www.cmake.org/
 - (a git client for development on the bleeding edge)
 
@@ -323,65 +313,6 @@ The gcov coverage report can be automatically created using the additional targe
 ## Using STXXL as a Library inside a Project
 
 TODO. If you are an experienced MSVC user, please contribute!
-
-*/
-
-/** \page install_windows_boost Compiling and Installing STXXL with Visual Studio 2010 and Boost
-
-\author Timo Bingmann (2013)
-
-## Prerequisites:
-
-- Microsoft Visual Studio <= 2010 (VC10). \n
-  For newer versions you \link install_windows don't need Boost \endlink anymore.
-- CMake 2.8, visit http://www.cmake.org/
-- (a git client for development on the bleeding edge)
-
-## Unpack STXXL source code
-
-- Download the STXXL archive from http://stxxl.sourceforge.net <br>
-  or use your favorite git client to clone the development version: http://github.com/stxxl/stxxl.git
-- Unpack the archive at a convenient location.
-
-## Download and Install Boost
-
-- We recommend the official binaries for MSVC. Visit http://sourceforge.net/projects/boost/files/boost-binaries/
-  and download the newest package for your compiler, e.g. <a href="http://sourceforge.net/projects/boost/files/boost-binaries/1.54.0/boost_1_54_0-msvc-10.0-64.exe/download">boost_1_54_0-msvc-10.0-64.exe</a>
-- When installing the package, make sure to install in directory \n
-  <b>C:\\Boost</b> \n
-  instead of the default location. This is the most easy way to enable the CMake auto-detection macros to find Boost.
-- The pre-compiled Boost libraries are then located at \n
-  <b>C:\\Boost\\lib64-msvc-10.0</b> or similar. \n
-  You must <b>rename</b> this directory to just <b>lib</b> for CMake to automatically find it.
-
-In summary, CMake only looks for Boost at a few locations: C:\\Boost for headers and C:\\Boost\\lib for library files. While it is possible to instruct CMake to look elsewhere for the necessary files, the easier way is to just rename the directories as required. Otherwise, the Boost location must be specified to CMake by setting the variables \c BOOST_ROOT, \c BOOST_INCLUDEDIR and \c BOOST_LIBRARYDIR in the dialog box each time.
-
-## Use CMake to Generate Visual Studio Projects
-
-- Open the CMake GUI.
-- Fill in the <b>source code</b> field with the place of the STXXL source and pick a <b>build</b> directory.
-- Pressing <b>"Configure"</b> brings up a dialog box: select your Visual Studio version (MSVC 10 here). <br>
-  Note that you must select between 32- and 64-bit building here.
-- Press <b>"Generate"</b> to run the CMake platform checks and to generate the Visual Studio project files.
-
-\image html install_windows_boost_cmake.png
-
-- If you get any error about CMake not being able to find Boost, refer to the previous section on the directories which CMake considers!
-
-- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c STXXL_BUILD_TESTS and \c STXXL_BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
-
-## Use Visual Studio to Build STXXL
-
-- Afterwards, use Visual Studio to open the <b>stxxl.sln</b> STXXL "Solution" containing the projects.
-- Building the <b>ALL_BUILD</b> will first compile the STXXL library sources and then <b>stxxl_tool</b> and the <b>test1</b> program in \c local/
-
-\image html install_windows_boost_msvc10.png
-
-- You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
-- Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
-- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>STXXL_BUILD_EXAMPLES</tt></b> or <b><tt>STXXL_BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
-
-\note For instruction on configuring disks on Windows, see \ref install_config
 
 */
 
@@ -452,9 +383,7 @@ Description of the parameters:
 
   - \c mmap : \c use \c mmap and \c munmap system calls
 
-  - \c boostfd : access the file using a Boost file descriptor
-
-  - \c fileperblock_syscall, \c fileperblock_mmap, \c fileperblock_boostfd : same as above, but take a single file per block, using full_disk_filename as file name prefix.  Usually provide worse performance than the standard variants, but release freed blocks to the file system immediately.
+  - \c fileperblock_syscall, \c fileperblock_mmap : same as above, but take a single file per block, using full_disk_filename as file name prefix.  Usually provide worse performance than the standard variants, but release freed blocks to the file system immediately.
 
   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point to a file on a RAM disk partition with sufficient space
 

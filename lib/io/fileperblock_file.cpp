@@ -16,13 +16,11 @@
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/mmap_file.h>
-#include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/serving_request.h>
@@ -156,10 +154,6 @@ template class fileperblock_file<mmap_file>;
 
 #if STXXL_HAVE_WINCALL_FILE
 template class fileperblock_file<wincall_file>;
-#endif
-
-#if STXXL_HAVE_BOOSTFD_FILE
-template class fileperblock_file<boostfd_file>;
 #endif
 
 } // namespace stxxl

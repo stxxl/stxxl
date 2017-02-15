@@ -198,24 +198,6 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         return result;
     }
 #endif
-#if STXXL_HAVE_BOOSTFD_FILE
-    else if (cfg.io_impl == "boostfd")
-    {
-        boostfd_file* result =
-            new boostfd_file(cfg.path, mode, cfg.queue, disk_allocator_id,
-                             cfg.device_id);
-        result->lock();
-        return result;
-    }
-    else if (cfg.io_impl == "fileperblock_boostfd")
-    {
-        fileperblock_file<boostfd_file>* result =
-            new fileperblock_file<boostfd_file>(cfg.path, mode, cfg.queue,
-                                                disk_allocator_id, cfg.device_id);
-        result->lock();
-        return result;
-    }
-#endif
 #if STXXL_HAVE_WBTL_FILE
     else if (cfg.io_impl == "wbtl")
     {

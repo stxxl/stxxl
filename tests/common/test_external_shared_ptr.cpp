@@ -21,9 +21,7 @@
 #include <stxxl/stats>
 #include <stxxl/bits/common/external_shared_ptr.h>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <map>
 #include <limits>
 #include <functional>
@@ -51,7 +49,7 @@ struct actual_element   // 24 bytes, not a power of 2 intentionally
     }
 };
 
-typedef boost::shared_ptr<actual_element> actual_element_ptr;
+typedef std::shared_ptr<actual_element> actual_element_ptr;
 typedef stxxl::external_shared_ptr<actual_element_ptr> element;
 
 struct counter
@@ -103,7 +101,7 @@ void test_vector()
     // fill the vector with increasing sequence of integer numbers
     for (i = 0; i < v.size(); ++i)
     {
-        actual_element_ptr aep(boost::make_shared<actual_element>());
+        actual_element_ptr aep(std::make_shared<actual_element>());
         aep->key = i + offset;
         element e(aep);
 
@@ -115,7 +113,7 @@ void test_vector()
     // fill the vector with random numbers
     for (i = 0; i < v.size(); ++i)
     {
-        actual_element_ptr aep(boost::make_shared<actual_element>());
+        actual_element_ptr aep(std::make_shared<actual_element>());
         aep->key = rnd();
         element e(aep);
 
@@ -153,7 +151,7 @@ void test_vector()
     STXXL_MSG("write " << v.size() << " elements");
     for (i = 0; i < v.size(); ++i)
     {
-        actual_element_ptr aep(boost::make_shared<actual_element>());
+        actual_element_ptr aep(std::make_shared<actual_element>());
         aep->key = rnd();
         element e(aep);
 
@@ -193,7 +191,7 @@ struct test_data {
     unsigned int c;
 };
 
-typedef boost::shared_ptr<test_data> test_data_ptr;
+typedef std::shared_ptr<test_data> test_data_ptr;
 typedef stxxl::external_shared_ptr<test_data_ptr> data_type;
 
 struct cmp : public std::less<key_type>
@@ -237,7 +235,7 @@ void test_map()
 
         for (size_t i = 0; i < el; ++i)
         {
-            test_data_ptr test = boost::make_shared<test_data>();
+            test_data_ptr test = std::make_shared<test_data>();
 
             test->a = (unsigned char)(i + 1);
             for (unsigned j = 0; j < 3; j++)
