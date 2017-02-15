@@ -23,6 +23,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <utility>
 
 namespace stxxl {
 
@@ -101,14 +102,14 @@ private:
     }
 
 public:
-    node_cache(unsigned_type cache_size_in_bytes,
+    node_cache(const size_t cache_size_in_bytes,
                btree_type* btree,
                key_compare cmp)
         : m_btree(btree),
           m_cmp(cmp),
           m_bm(block_manager::get_instance())
     {
-        const unsigned_type nnodes = cache_size_in_bytes / block_type::raw_size;
+        const size_t nnodes = cache_size_in_bytes / block_type::raw_size;
         STXXL_BTREE_CACHE_VERBOSE("btree::node_cache constructor nodes=" << nnodes);
         if (nnodes < 3)
         {
@@ -119,7 +120,7 @@ public:
         m_free_nodes.reserve(nnodes);
         m_fixed.resize(nnodes, false);
         m_dirty.resize(nnodes, true);
-        for (unsigned_type i = 0; i < nnodes; ++i)
+        for (size_t i = 0; i < nnodes; ++i)
         {
             m_nodes.push_back(new node_type(m_btree, m_cmp));
             m_free_nodes.push_back(i);
@@ -134,40 +135,33 @@ public:
     //! non-copyable: delete assignment operator
     node_cache& operator = (const node_cache&) = delete;
 
-    unsigned_type size() const
+    size_t size() const
     {
         return m_nodes.size();
     }
 
     // returns the number of fixed pages
-    unsigned_type nfixed() const
+    size_t nfixed() const
     {
-        typename bid2node_type::const_iterator i = m_bid2node.begin();
-        typename bid2node_type::const_iterator end = m_bid2node.end();
-        unsigned_type cnt = 0;
-        for ( ; i != end; ++i)
-        {
-            if (m_fixed[(*i).second])
-                ++cnt;
-        }
-        return cnt;
+        return std::count_if(m_bid2node.cbegin(), m_bid2node.cend(),
+                             [&] (const auto& it) {return m_fixed[it.second];});
     }
 
     ~node_cache()
     {
         STXXL_BTREE_CACHE_VERBOSE("btree::node_cache destructor addr=" << this);
-        typename bid2node_type::const_iterator i = m_bid2node.begin();
-        typename bid2node_type::const_iterator end = m_bid2node.end();
-        for ( ; i != end; ++i)
+
+        for (const auto& it : m_bid2node)
         {
-            const unsigned_type p = (*i).second;
+            const size_t& p = it.second;
             if (m_reqs[p].valid())
                 m_reqs[p]->wait();
 
             if (m_dirty[p])
                 m_nodes[p]->save();
         }
-        for (unsigned_type i = 0; i < size(); ++i)
+
+        for (size_t i = 0; i < size(); ++i)
             delete m_nodes[i];
     }
 
@@ -179,22 +173,21 @@ public:
         {
             // need to kick a node
             size_t node2kick;
-            unsigned_type i = 0;
-            const unsigned_type max_tries = size() + 1;
-            do
             {
-                ++i;
-                node2kick = m_pager.kick();
-                if (i == max_tries)
-                {
-                    STXXL_ERRMSG(
-                        "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                    STXXL_ERRMSG("Returning NULL node.");
-                    return NULL;
-                }
-                m_pager.hit(node2kick);
-            } while (m_fixed[node2kick]);
-
+                size_t i = 0;
+                const size_t max_tries = size() + 1;
+                do {
+                    ++i;
+                    node2kick = m_pager.kick();
+                    if (i == max_tries) {
+                        STXXL_ERRMSG(
+                                "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
+                        STXXL_ERRMSG("Returning NULL node.");
+                        return NULL;
+                    }
+                    m_pager.hit(node2kick);
+                } while (m_fixed[node2kick]);
+            }
             if (m_reqs[node2kick].valid())
                 m_reqs[node2kick]->wait();
 
@@ -277,21 +270,21 @@ public:
         {
             // need to kick a node
             size_t node2kick;
-            unsigned_type i = 0;
-            const unsigned_type max_tries = size() + 1;
-            do
             {
-                ++i;
-                node2kick = m_pager.kick();
-                if (i == max_tries)
-                {
-                    STXXL_ERRMSG(
-                        "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                    STXXL_ERRMSG("Returning NULL node.");
-                    return NULL;
-                }
-                m_pager.hit(node2kick);
-            } while (m_fixed[node2kick]);
+                size_t i = 0;
+                const size_t max_tries = size() + 1;
+                do {
+                    ++i;
+                    node2kick = m_pager.kick();
+                    if (i == max_tries) {
+                        STXXL_ERRMSG(
+                                "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
+                        STXXL_ERRMSG("Returning NULL node.");
+                        return NULL;
+                    }
+                    m_pager.hit(node2kick);
+                } while (m_fixed[node2kick]);
+            }
 
             if (m_reqs[node2kick].valid())
                 m_reqs[node2kick]->wait();
@@ -370,8 +363,8 @@ public:
         {
             // need to kick a node
             size_t node2kick;
-            unsigned_type i = 0;
-            const unsigned_type max_tries = size() + 1;
+            size_t i = 0;
+            const size_t max_tries = size() + 1;
             do
             {
                 ++i;
@@ -472,8 +465,8 @@ public:
         {
             // need to kick a node
             size_t node2kick;
-            unsigned_type i = 0;
-            const unsigned_type max_tries = size() + 1;
+            size_t i = 0;
+            const size_t max_tries = size() + 1;
             do
             {
                 ++i;

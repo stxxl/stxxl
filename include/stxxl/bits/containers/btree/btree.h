@@ -122,9 +122,9 @@ private:
             node_type* right_node = m_node_cache.get_new_node(right_bid);
             assert(right_node);
 
-            const unsigned_type old_size = m_root_node.size();
-            const unsigned_type half = m_root_node.size() / 2;
-            unsigned_type i = 0;
+            const size_t old_size = m_root_node.size();
+            const size_t half = m_root_node.size() / 2;
+            size_t i = 0;
             root_node_iterator_type it = m_root_node.begin();
             typename node_block_type::iterator block_it = left_node->block().begin();
             while (i < half)                    // copy smaller part
@@ -145,7 +145,10 @@ private:
                 ++block_it;
                 ++it;
             }
-            unsigned_type right_size = right_node->block().info.cur_size = (unsigned int)(old_size - half);
+
+            const size_t right_size = static_cast<size_t>(old_size - half);
+            right_node->block().info.cur_size = right_size;
+
             key_type right_key = (right_node->block()[right_size - 1]).first;
 
             assert(old_size == right_node->size() + left_node->size());
@@ -192,7 +195,7 @@ private:
         local_node_type* left_node = cache.get_node(left_bid, true);
         local_node_type* right_node = cache.get_node(right_bid, true);
 
-        const unsigned_type total_size = left_node->size() + right_node->size();
+        const size_t total_size = left_node->size() + right_node->size();
         if (total_size <= right_node->max_nelements())
         {
             // --- fuse ---
@@ -277,8 +280,8 @@ private:
 
         leaf_bid_type new_bid;
         leaf_type* leaf = m_leaf_cache.get_new_node(new_bid);
-        const unsigned_type max_leaf_elements = unsigned_type(
-            (double)leaf->max_nelements() * leaf_fill_factor);
+        const size_t max_leaf_elements = static_cast<size_t>(
+            leaf->max_nelements() * leaf_fill_factor);
 
         while (begin != end)
         {
@@ -335,8 +338,8 @@ private:
 
         bids.push_back(key_bid_pair(key_compare::max_value(), (node_bid_type)new_bid));
 
-        const unsigned_type max_node_elements = unsigned_type(
-            double(max_node_size) * node_fill_factor);
+        const size_t max_node_elements = static_cast<size_t>(
+            max_node_size * node_fill_factor);
 
         //-tb fixes bug with only one child remaining in m_root_node
         while (bids.size() > node_type::max_nelements())
@@ -358,7 +361,7 @@ private:
                 node_type* node = m_node_cache.get_new_node(new_bid);
                 assert(node);
 
-                for (unsigned_type cnt = 0;
+                for (size_t cnt = 0;
                      cnt < max_node_elements && it != bids.end(); ++cnt, ++it)
                 {
                     node->push_back(*it);
@@ -429,8 +432,8 @@ private:
     }
 
 public:
-    btree(unsigned_type node_cache_size_in_bytes,
-          unsigned_type leaf_cache_size_in_bytes)
+    btree(const size_t node_cache_size_in_bytes,
+          const size_t leaf_cache_size_in_bytes)
         : m_node_cache(node_cache_size_in_bytes, this, m_key_compare),
           m_leaf_cache(leaf_cache_size_in_bytes, this, m_key_compare),
           m_iterator_map(this),
@@ -451,8 +454,8 @@ public:
     }
 
     btree(const key_compare& key_compare,
-          unsigned_type node_cache_size_in_bytes,
-          unsigned_type leaf_cache_size_in_bytes)
+          const size_t node_cache_size_in_bytes,
+          const size_t leaf_cache_size_in_bytes)
         : m_key_compare(key_compare),
           m_node_cache(node_cache_size_in_bytes, this, m_key_compare),
           m_leaf_cache(leaf_cache_size_in_bytes, this, m_key_compare),
@@ -975,8 +978,8 @@ public:
     btree(InputIterator begin,
           InputIterator end,
           const key_compare& c_,
-          unsigned_type node_cache_size_in_bytes,
-          unsigned_type leaf_cache_size_in_bytes,
+          const size_t node_cache_size_in_bytes,
+          const size_t leaf_cache_size_in_bytes,
           bool range_sorted = false,
           double node_fill_factor = 0.75,
           double leaf_fill_factor = 0.6)
@@ -1010,8 +1013,8 @@ public:
     template <class InputIterator>
     btree(InputIterator begin,
           InputIterator end,
-          unsigned_type node_cache_size_in_bytes,
-          unsigned_type leaf_cache_size_in_bytes,
+          const size_t node_cache_size_in_bytes,
+          const size_t leaf_cache_size_in_bytes,
           bool range_sorted = false,
           double node_fill_factor = 0.75,
           double leaf_fill_factor = 0.6)

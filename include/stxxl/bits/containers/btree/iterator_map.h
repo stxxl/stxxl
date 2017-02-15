@@ -35,9 +35,9 @@ private:
     struct Key
     {
         bid_type bid;
-        unsigned_type pos;
+        size_t pos;
         Key() { }
-        Key(const bid_type& b, unsigned_type p)
+        Key(const bid_type& b, const size_t p)
             : bid(b), pos(p) { }
     };
 
@@ -121,8 +121,8 @@ public:
     }
     template <class OutputContainer>
     void find(const bid_type& bid,
-              unsigned_type first_pos,
-              unsigned_type last_pos,
+              const size_t first_pos,
+              const size_t last_pos,
               OutputContainer& out)
     {
         Key firstkey(bid, first_pos);

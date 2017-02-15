@@ -61,7 +61,7 @@ public:
 protected:
     btree_type* btree;
     bid_type bid;
-    unsigned_type pos;
+    size_t pos;
 
     btree_iterator_base()
     {
@@ -71,7 +71,7 @@ protected:
 
     btree_iterator_base(btree_type* _btree,
                         const bid_type& _bid,
-                        unsigned_type _pos)
+                        const size_t _pos)
         : btree(_btree), bid(_bid), pos(_pos)
     {
         STXXL_VERBOSE3("btree_iterator_base parameter construct addr=" << this);
@@ -252,7 +252,7 @@ public:
 private:
     btree_iterator(btree_type* _btree,
                    const bid_type& _bid,
-                   unsigned_type _pos)
+                   const size_t _pos)
         : base_type(_btree, _bid, _pos)
     { }
 };
@@ -356,7 +356,7 @@ public:
 private:
     btree_const_iterator(btree_type* _btree,
                          const bid_type& _bid,
-                         unsigned_type _pos)
+                         const size_t _pos)
         : base_type(_btree, _bid, _pos)
     { }
 };

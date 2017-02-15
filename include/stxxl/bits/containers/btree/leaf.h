@@ -271,12 +271,12 @@ public:
         m_block->info.cur_size = 0;
     }
 
-    reference operator [] (unsigned_type i)
+    reference operator [] (const size_t i)
     {
         return (*m_block)[i];
     }
 
-    const_reference operator [] (unsigned_type i) const
+    const_reference operator [] (const size_t i) const
     {
         return (*m_block)[i];
     }
