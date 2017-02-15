@@ -424,14 +424,18 @@ foreach my $arg (@ARGV) {
     or die("Please run this script in the STXXL source base directory.");
 
 # check uncrustify's version:
-my ($uncrustver) = filter_program("", "uncrustify-0.64", "--version");
-if ($uncrustver eq "uncrustify 0.64\n") {
-    $uncrustify = "uncrustify-0.64";
-}
-else {
+eval {
+    no warnings;
+    my $uncrustver = `uncrustify-0.64 --version` or die;
+    if ($uncrustver eq "uncrustify 0.64\n") {
+        $uncrustify = "uncrustify-0.64";
+    }
+};
+if ($@) {
     my ($uncrustver) = filter_program("", "uncrustify", "--version");
     ($uncrustver eq "uncrustify 0.64\n")
         or die("Requires uncrustify 0.64 to run correctly. Got: $uncrustver");
+    $uncrustify = "uncrustify";
 }
 
 use File::Find;
