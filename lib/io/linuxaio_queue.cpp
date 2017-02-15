@@ -57,8 +57,7 @@ linuxaio_queue::linuxaio_queue(int desired_queue_length)
                           " io_setup() nr_events=" << max_events);
     }
 
-    for (int e = 0; e < max_events; ++e)
-        num_free_events++;  // cannot set semaphore to value directly
+    num_free_events.signal(max_events);
 
     STXXL_MSG("Set up an linuxaio queue with " << max_events << " entries.");
 
@@ -85,7 +84,7 @@ void linuxaio_queue::add_request(request_ptr& req)
     std::unique_lock<std::mutex> lock(waiting_mtx);
 
     waiting_requests.push_back(req);
-    num_waiting_requests++;
+    num_waiting_requests.signal();
 }
 
 bool linuxaio_queue::cancel_request(request_ptr& req)
@@ -111,7 +110,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
             // request is canceled, but was not yet posted.
             dynamic_cast<linuxaio_request*>(req.get())->completed(false, true);
 
-            num_waiting_requests--; // will never block
+            num_waiting_requests.wait(); // will never block
             return true;
         }
     }
@@ -134,8 +133,8 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
             // request is canceled, already posted
             dynamic_cast<linuxaio_request*>(req.get())->completed(true, true);
 
-            num_free_events++;
-            num_posted_requests--; // will never block
+            num_free_events.signal();
+            num_posted_requests.wait(); // will never block
             return true;
         }
     }
@@ -152,7 +151,7 @@ void linuxaio_queue::post_requests()
     for ( ; ; ) // as long as thread is running
     {
         // might block until next request or message comes in
-        int num_currently_waiting_requests = num_waiting_requests--;
+        int num_currently_waiting_requests = num_waiting_requests.wait();
 
         // terminate if termination has been requested
         if (post_thread_state() == TERMINATING && num_currently_waiting_requests == 0)
@@ -165,7 +164,7 @@ void linuxaio_queue::post_requests()
             waiting_requests.pop_front();
             lock.unlock();
 
-            num_free_events--; // might block because too many requests are posted
+            num_free_events.wait(); // might block because too many requests are posted
 
             // polymorphic_downcast
             while (!dynamic_cast<linuxaio_request*>(req.get())->post())
@@ -188,7 +187,7 @@ void linuxaio_queue::post_requests()
             {
                 std::unique_lock<std::mutex> lock(posted_mtx);
                 posted_requests.push_back(req);
-                num_posted_requests++;
+                num_posted_requests.signal();
             }
         }
         else
@@ -196,7 +195,7 @@ void linuxaio_queue::post_requests()
             lock.unlock();
 
             // num_waiting_requests-- was premature, compensate for that
-            num_waiting_requests++;
+            num_waiting_requests.signal();
         }
     }
 
@@ -210,9 +209,9 @@ void linuxaio_queue::handle_events(io_event* events, long num_events, bool cance
         // unsigned_type is as long as a pointer, and like this, we avoid an icpc warning
         request_ptr* r = reinterpret_cast<request_ptr*>(static_cast<unsigned_type>(events[e].data));
         r->get()->completed(canceled);
-        delete r;              // release auto_ptr reference
-        num_free_events++;
-        num_posted_requests--; // will never block
+        delete r;                   // release auto_ptr reference
+        num_free_events.signal();
+        num_posted_requests.wait(); // will never block
     }
 }
 
@@ -225,7 +224,7 @@ void linuxaio_queue::wait_requests()
     for ( ; ; ) // as long as thread is running
     {
         // might block until next request is posted or message comes in
-        int num_currently_posted_requests = num_posted_requests--;
+        int num_currently_posted_requests = num_posted_requests.wait();
 
         // terminate if termination has been requested
         if (wait_thread_state() == TERMINATING && num_currently_posted_requests == 0)
@@ -247,7 +246,7 @@ void linuxaio_queue::wait_requests()
             break;
         }
 
-        num_posted_requests++; // compensate for the one eaten prematurely above
+        num_posted_requests.signal(); // compensate for the one eaten prematurely above
 
         handle_events(events, num_events, false);
     }

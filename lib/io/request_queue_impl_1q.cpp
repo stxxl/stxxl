@@ -73,7 +73,7 @@ void request_queue_impl_1q::add_request(request_ptr& req)
     std::unique_lock<std::mutex> lock(m_queue_mutex);
     m_queue.push_back(req);
 
-    m_sem++;
+    m_sem.signal();
 }
 
 bool request_queue_impl_1q::cancel_request(request_ptr& req)
@@ -96,7 +96,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr& req)
         {
             m_queue.erase(pos);
             was_still_in_queue = true;
-            m_sem--;
+            m_sem.wait();
         }
     }
 
@@ -114,7 +114,7 @@ void* request_queue_impl_1q::worker(void* arg)
 
     for ( ; ; )
     {
-        pthis->m_sem--;
+        pthis->m_sem.wait();
 
         {
             std::unique_lock<std::mutex> lock(pthis->m_queue_mutex);
@@ -132,16 +132,16 @@ void* request_queue_impl_1q::worker(void* arg)
             {
                 lock.unlock();
 
-                pthis->m_sem++;
+                pthis->m_sem.signal();
             }
         }
 
         // terminate if it has been requested and queues are empty
         if (pthis->m_thread_state() == TERMINATING) {
-            if ((pthis->m_sem--) == 0)
+            if (pthis->m_sem.wait() == 0)
                 break;
             else
-                pthis->m_sem++;
+                pthis->m_sem.signal();
         }
     }
 

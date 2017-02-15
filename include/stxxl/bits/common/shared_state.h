@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_COMMON_STATE_HEADER
-#define STXXL_COMMON_STATE_HEADER
+#ifndef STXXL_COMMON_SHARED_STATE_HEADER
+#define STXXL_COMMON_SHARED_STATE_HEADER
 
 #include <condition_variable>
 #include <mutex>
@@ -67,4 +67,4 @@ public:
 
 } // namespace stxxl
 
-#endif // !STXXL_COMMON_STATE_HEADER
+#endif // !STXXL_COMMON_SHARED_STATE_HEADER

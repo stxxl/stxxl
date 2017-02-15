@@ -91,7 +91,7 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
         m_write_queue.push_back(req);
     }
 
-    m_sem++;
+    m_sem.signal();
 }
 
 bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
@@ -114,7 +114,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
         {
             m_read_queue.erase(pos);
             was_still_in_queue = true;
-            m_sem--;
+            m_sem.wait();
         }
     }
     else
@@ -127,7 +127,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
         {
             m_write_queue.erase(pos);
             was_still_in_queue = true;
-            m_sem--;
+            m_sem.wait();
         }
     }
 
@@ -146,7 +146,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
     bool write_phase = true;
     for ( ; ; )
     {
-        pthis->m_sem--;
+        pthis->m_sem.wait();
 
         if (write_phase)
         {
@@ -165,7 +165,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
             {
                 WriteLock.unlock();
 
-                pthis->m_sem++;
+                pthis->m_sem.signal();
 
                 if (pthis->m_priority_op == WRITE)
                     write_phase = false;
@@ -194,7 +194,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
             {
                 ReadLock.unlock();
 
-                pthis->m_sem++;
+                pthis->m_sem.signal();
 
                 if (pthis->m_priority_op == READ)
                     write_phase = true;
@@ -206,10 +206,10 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
         // terminate if it has been requested and queues are empty
         if (pthis->m_thread_state() == TERMINATING) {
-            if ((pthis->m_sem--) == 0)
+            if (pthis->m_sem.wait() == 0)
                 break;
             else
-                pthis->m_sem++;
+                pthis->m_sem.signal();
         }
     }
 
