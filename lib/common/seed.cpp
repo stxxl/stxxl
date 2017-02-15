@@ -12,9 +12,9 @@
  **************************************************************************/
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/common/mutex.h>
 
 #include <cassert>
+#include <mutex>
 
 #if STXXL_WINDOWS
   #ifndef NOMINMAX
@@ -33,7 +33,7 @@ inline unsigned initial_seed();
 
 struct seed_generator_t {
     unsigned seed;
-    fastmutex mtx;
+    std::mutex mtx;
 
     explicit seed_generator_t(unsigned s) : seed(s)
     { }
@@ -66,13 +66,13 @@ inline unsigned initial_seed()
 
 void set_seed(unsigned seed)
 {
-    scoped_fast_mutex_lock Lock(seed_generator().mtx);
+    std::unique_lock<std::mutex> lock(seed_generator().mtx);
     seed_generator().seed = seed;
 }
 
 unsigned get_next_seed()
 {
-    scoped_fast_mutex_lock Lock(seed_generator().mtx);
+    std::unique_lock<std::mutex> lock(seed_generator().mtx);
     return seed_generator().seed++;
 }
 

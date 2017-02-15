@@ -18,9 +18,9 @@
 #ifndef STXXL_IO_UFS_FILE_BASE_HEADER
 #define STXXL_IO_UFS_FILE_BASE_HEADER
 
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/io/file.h>
 
+#include <mutex>
 #include <string>
 
 namespace stxxl {
@@ -32,7 +32,7 @@ namespace stxxl {
 class ufs_file_base : public virtual file
 {
 protected:
-    mutex fd_mutex;        // sequentialize function calls involving file_des
+    std::mutex fd_mutex;   // sequentialize function calls involving file_des
     int file_des;          // file descriptor
     int m_mode;            // open mode
     const std::string filename;

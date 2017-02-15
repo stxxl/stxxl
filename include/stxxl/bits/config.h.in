@@ -50,16 +50,6 @@
 // used in: io/linuxaio_file.h/cpp
 // effect:  enables/disables Linux AIO file implementation
 
-#cmakedefine STXXL_POSIX_THREADS ${STXXL_POSIX_THREADS}
-// default: off
-// cmake:   detection of pthreads by cmake
-// effect:  uses POSIX thread and mutexes on linux
-
-#cmakedefine STXXL_STD_THREADS ${STXXL_STD_THREADS}
-// default: off
-// cmake:   detection of <thread> and <mutex>
-// effect:  uses std thread and mutex on windows or (forced on linux)
-
 #cmakedefine STXXL_WINDOWS ${STXXL_WINDOWS}
 // default: off
 // cmake:   detection of ms windows platform (32- or 64-bit)

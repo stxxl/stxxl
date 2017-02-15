@@ -166,7 +166,7 @@ void ufs_file_base::_after_open()
 
 void ufs_file_base::close()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
 
     if (file_des == -1)
         return;
@@ -182,7 +182,7 @@ void ufs_file_base::lock()
 #if STXXL_WINDOWS || defined(__MINGW32__)
     // not yet implemented
 #else
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     struct flock lock_struct;
     lock_struct.l_type = (short)(m_mode & RDONLY ? F_RDLCK : F_RDLCK | F_WRLCK);
     lock_struct.l_whence = SEEK_SET;
@@ -209,13 +209,13 @@ file::offset_type ufs_file_base::_size()
 
 file::offset_type ufs_file_base::size()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     return _size();
 }
 
 void ufs_file_base::set_size(offset_type newsize)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     return _set_size(newsize);
 }
 

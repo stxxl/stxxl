@@ -16,8 +16,8 @@
 #define STXXL_IO_REQUEST_QUEUE_IMPL_1Q_HEADER
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
-#include <stxxl/bits/common/mutex.h>
 
+#include <mutex>
 #include <list>
 
 namespace stxxl {
@@ -33,11 +33,11 @@ private:
     typedef request_queue_impl_1q self;
     typedef std::list<request_ptr> queue_type;
 
-    mutex m_queue_mutex;
+    std::mutex m_queue_mutex;
     queue_type m_queue;
 
     state<thread_state> m_thread_state;
-    thread_type m_thread;
+    std::thread m_thread;
     semaphore m_sem;
 
     static const priority_op m_priority_op = WRITE;

@@ -33,7 +33,7 @@ class mem_file : public disk_queued_file
     offset_type m_size;
 
     //! sequentialize function calls
-    mutex m_mutex;
+    std::mutex m_mutex;
 
 public:
     //! constructs file object.

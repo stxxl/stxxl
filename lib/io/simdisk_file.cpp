@@ -159,7 +159,7 @@ IC35L080AVVA07::IC35L080AVVA07()
 void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes,
                           request::request_type type)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
 
     double op_start = timestamp();
 
@@ -214,7 +214,7 @@ const char* sim_disk_file::io_type() const
 
 void sim_disk_file::set_size(offset_type newsize)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     if (newsize > _size())
     {
         STXXL_THROW_ERRNO_LT_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error,

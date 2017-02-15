@@ -19,37 +19,30 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 
-#include <cassert>
-#include <cstddef>
-
-#if STXXL_BOOST_THREADS
- #include <boost/bind.hpp>
-#endif
-#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+#if STXXL_MSVC >= 1700
  #include <windows.h>
 #endif
 
+#include <cassert>
+#include <cstddef>
+#include <thread>
+
 namespace stxxl {
 
-void request_queue_impl_worker::start_thread(void* (*worker)(void*), void* arg, thread_type& t, state<thread_state>& s)
+void request_queue_impl_worker::start_thread(
+    void* (*worker)(void*), void* arg, std::thread& t, state<thread_state>& s)
 {
     assert(s() == NOT_RUNNING);
-#if STXXL_STD_THREADS
-    t = new std::thread(worker, arg);
-#elif STXXL_BOOST_THREADS
-    t = new boost::thread(boost::bind(worker, arg));
-#else
-    STXXL_CHECK_PTHREAD_CALL(pthread_create(&t, NULL, worker, arg));
-#endif
+    t = std::thread(worker, arg);
     s.set_to(RUNNING);
 }
 
-void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>& s, semaphore& sem)
+void request_queue_impl_worker::stop_thread(
+    std::thread& t, state<thread_state>& s, semaphore& sem)
 {
     assert(s() == RUNNING);
     s.set_to(TERMINATING);
     sem++;
-#if STXXL_STD_THREADS
 #if STXXL_MSVC >= 1700
     // In the Visual C++ Runtime 2012 and 2013, there is a deadlock bug, which
     // occurs when threads are joined after main() exits. Apparently, Microsoft
@@ -61,19 +54,10 @@ void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>&
     // std::thread::native_handle() and access the WINAPI to terminate the
     // thread directly (after it finished handling its i/o requests).
 
-    WaitForSingleObject(t->native_handle(), INFINITE);
-    CloseHandle(t->native_handle());
+    WaitForSingleObject(t.native_handle(), INFINITE);
+    CloseHandle(t.native_handle());
 #else
-    t->join();
-    delete t;
-#endif
-    t = NULL;
-#elif STXXL_BOOST_THREADS
-    t->join();
-    delete t;
-    t = NULL;
-#else
-    STXXL_CHECK_PTHREAD_CALL(pthread_join(t, NULL));
+    t.join();
 #endif
     assert(s() == TERMINATED);
     s.set_to(NOT_RUNNING);

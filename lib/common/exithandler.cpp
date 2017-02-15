@@ -40,16 +40,16 @@ void run_exit_handlers()
 #else // STXXL_NON_DEFAULT_EXIT_HANDLER
 
 #include <vector>
-#include <stxxl/bits/common/mutex.h>
+#include <mutex>
 
 namespace stxxl {
 
-mutex exit_handler_mutex;
+std::mutex exit_handler_mutex;
 std::vector<void (*)(void)> exit_handlers;
 
 int register_exit_handler(void (* function)(void))
 {
-    scoped_mutex_lock lock(exit_handler_mutex);
+    std::unique_lock<std::mutex> lock(exit_handler_mutex);
     exit_handlers.push_back(function);
     return 0;
 }
@@ -57,7 +57,7 @@ int register_exit_handler(void (* function)(void))
 // default exit handler
 void run_exit_handlers()
 {
-    scoped_mutex_lock lock(exit_handler_mutex);
+    std::unique_lock<std::mutex> lock(exit_handler_mutex);
     while (!exit_handlers.empty()) {
         (*(exit_handlers.back()))();
         exit_handlers.pop_back();

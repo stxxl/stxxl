@@ -18,6 +18,7 @@
 
 #include <random>
 #include <cmath>
+#include <cstring>
 
 using stxxl::file;
 using stxxl::timestamp;

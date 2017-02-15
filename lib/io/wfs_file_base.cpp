@@ -152,7 +152,7 @@ wfs_file_base::~wfs_file_base()
 
 void wfs_file_base::close()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
 
     if (file_des == INVALID_HANDLE_VALUE)
         return;
@@ -165,7 +165,7 @@ void wfs_file_base::close()
 
 void wfs_file_base::lock()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     if (locked)
         return;  // already locked
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
@@ -184,13 +184,13 @@ file::offset_type wfs_file_base::_size()
 
 file::offset_type wfs_file_base::size()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     return _size();
 }
 
 void wfs_file_base::set_size(offset_type newsize)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
     offset_type cur_size = _size();
 
     if (!(mode_ & RDONLY))

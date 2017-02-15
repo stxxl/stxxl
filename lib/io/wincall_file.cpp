@@ -28,7 +28,7 @@ namespace stxxl {
 void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
                          request::request_type type)
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex);
 
     if (bytes > 32 * 1024 * 1024) {
         STXXL_ERRMSG("Using a block size larger than 32 MiB may not work with the " << io_type() << " filetype");

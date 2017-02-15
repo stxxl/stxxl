@@ -14,9 +14,9 @@
 #define STXXL_SINGLETON_HEADER
 
 #include <stxxl/types>
-#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/exithandler.h>
 
+#include <mutex>
 #include <cstdlib>
 
 namespace stxxl {
@@ -54,8 +54,8 @@ template <typename INSTANCE, bool destroy_on_exit>
 typename singleton<INSTANCE, destroy_on_exit>::instance_pointer
 singleton<INSTANCE, destroy_on_exit>::create_instance()
 {
-    static mutex create_mutex;
-    scoped_mutex_lock instance_write_lock(create_mutex);
+    static std::mutex create_mutex;
+    std::unique_lock<std::mutex> instance_write_lock(create_mutex);
     if (!instance) {
         instance = new instance_type();
         if (destroy_on_exit)

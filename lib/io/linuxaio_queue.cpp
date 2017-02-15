@@ -82,7 +82,7 @@ void linuxaio_queue::add_request(request_ptr& req)
     if (!dynamic_cast<linuxaio_request*>(req.get()))
         STXXL_ERRMSG("Non-LinuxAIO request submitted to LinuxAIO queue.");
 
-    scoped_mutex_lock lock(waiting_mtx);
+    std::unique_lock<std::mutex> lock(waiting_mtx);
 
     waiting_requests.push_back(req);
     num_waiting_requests++;
@@ -99,7 +99,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
 
     queue_type::iterator pos;
     {
-        scoped_mutex_lock lock(waiting_mtx);
+        std::unique_lock<std::mutex> lock(waiting_mtx);
 
         pos = std::find(waiting_requests.begin(), waiting_requests.end(),
                         req _STXXL_FORCE_SEQUENTIAL);
@@ -116,7 +116,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
         }
     }
 
-    scoped_mutex_lock lock(posted_mtx);
+    std::unique_lock<std::mutex> lock(posted_mtx);
 
     pos = std::find(posted_requests.begin(), posted_requests.end(),
                     req _STXXL_FORCE_SEQUENTIAL);
@@ -158,7 +158,7 @@ void linuxaio_queue::post_requests()
         if (post_thread_state() == TERMINATING && num_currently_waiting_requests == 0)
             break;
 
-        scoped_mutex_lock lock(waiting_mtx);
+        std::unique_lock<std::mutex> lock(waiting_mtx);
         if (!waiting_requests.empty())
         {
             req = waiting_requests.front();
@@ -186,7 +186,7 @@ void linuxaio_queue::post_requests()
             // request is finally posted
 
             {
-                scoped_mutex_lock lock(posted_mtx);
+                std::unique_lock<std::mutex> lock(posted_mtx);
                 posted_requests.push_back(req);
                 num_posted_requests++;
             }
@@ -262,7 +262,7 @@ void* linuxaio_queue::post_async(void* arg)
     self_type* pthis = static_cast<self_type*>(arg);
     pthis->post_thread_state.set_to(TERMINATED);
 
-#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+#if STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
     ExitThread(NULL);
@@ -278,7 +278,7 @@ void* linuxaio_queue::wait_async(void* arg)
     self_type* pthis = static_cast<self_type*>(arg);
     pthis->wait_thread_state.set_to(TERMINATED);
 
-#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+#if STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
     ExitThread(NULL);
