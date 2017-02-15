@@ -395,7 +395,7 @@ streamify_sr(
 //! \return value of the output iterator after all increments,
 //! i.e. points to the first unwritten value
 //! \pre Output (range) is large enough to hold the all elements in the input stream
-template <class OutputIterator, class StreamAlgorithm>
+template <typename OutputIterator, typename StreamAlgorithm>
 OutputIterator materialize(StreamAlgorithm& in, OutputIterator out)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
@@ -417,9 +417,9 @@ OutputIterator materialize(StreamAlgorithm& in, OutputIterator out)
 //! \pre Output range is large enough to hold the all elements in the input stream
 //!
 //! This function is useful when you do not know the length of the stream beforehand.
-template <class OutputIterator, class StreamAlgorithm>
-OutputIterator materialize(StreamAlgorithm& in,
-                           OutputIterator outbegin, OutputIterator outend)
+template <typename OutputIterator, typename StreamAlgorithm>
+OutputIterator
+materialize(StreamAlgorithm& in, OutputIterator outbegin, OutputIterator outend)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     while ((!in.empty()) && outend != outbegin)
@@ -442,13 +442,29 @@ OutputIterator materialize(StreamAlgorithm& in,
 //! \pre Output range is large enough to hold the all elements in the input stream
 //!
 //! This function is useful when you do not know the length of the stream beforehand.
-template <typename ValueType, typename AllocStr, size_t BlockSize, typename PagerType,
-          unsigned PageSize, class StreamAlgorithm>
+template <
+        typename ValueType,
+        typename AllocStr,
+        size_t BlockSize,
+        typename PagerType,
+        unsigned PageSize,
+        typename StreamAlgorithm>
 stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
-materialize(StreamAlgorithm& in,
-            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> outbegin,
-            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> outend,
-            unsigned_type nbuffers = 0)
+materialize(
+        StreamAlgorithm& in,
+        stxxl::vector_iterator<
+                ValueType,
+                AllocStr,
+                BlockSize,
+                PagerType,
+                PageSize> outbegin,
+        stxxl::vector_iterator<
+                ValueType,
+                AllocStr,
+                BlockSize,
+                PagerType,
+                PageSize> outend,
+        size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     typedef stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ExtIterator;
@@ -520,12 +536,23 @@ materialize(StreamAlgorithm& in,
 //! \return value of the output iterator after all increments,
 //! i.e. points to the first unwritten value
 //! \pre Output (range) is large enough to hold the all elements in the input stream
-template <typename ValueType, typename AllocStr, size_t BlockSize, typename PagerType,
-          unsigned PageSize, class StreamAlgorithm>
+template <
+        typename ValueType,
+        typename AllocStr,
+        size_t BlockSize,
+        typename PagerType,
+        unsigned PageSize,
+        typename StreamAlgorithm>
 stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
-materialize(StreamAlgorithm& in,
-            stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> out,
-            unsigned_type nbuffers = 0)
+materialize(
+        StreamAlgorithm& in,
+        stxxl::vector_iterator<
+                ValueType,
+                AllocStr,
+                BlockSize,
+                PagerType,
+                PageSize> out,
+        size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     typedef stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ExtIterator;
@@ -600,7 +627,7 @@ materialize(StreamAlgorithm& in,
 //! Useful where you do not need the processed stream anymore,
 //! but are just interested in side effects, or just for debugging.
 //! \param in input stream
-template <class StreamAlgorithm>
+template <typename StreamAlgorithm>
 void discard(StreamAlgorithm& in)
 {
     while (!in.empty())
