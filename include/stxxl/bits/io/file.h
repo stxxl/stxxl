@@ -196,7 +196,7 @@ public:
 
 protected:
     //! count the number of requests referencing this file
-    atomic_counted_object m_request_ref;
+    reference_count m_request_ref;
 
 public:
     //! increment referenced requests

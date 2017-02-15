@@ -41,7 +41,7 @@ using request_ptr = counting_ptr<request>;
 using completion_handler = std::function<void(request*)>;
 
 //! Request object encapsulating basic properties like file and offset.
-class request : virtual public request_interface, public atomic_counted_object
+class request : virtual public request_interface, public reference_count
 {
     friend class linuxaio_queue;
 

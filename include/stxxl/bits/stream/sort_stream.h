@@ -586,7 +586,7 @@ public:
     void clear()
     {
         if (!m_result)
-            m_result = new sorted_runs_data_type;
+            m_result = sorted_runs_type(new sorted_runs_data_type);
         else
             m_result->clear();
 

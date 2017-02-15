@@ -18,6 +18,8 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
 
+#include <mutex>
+
 namespace stxxl {
 
 //! \addtogroup fileimpl

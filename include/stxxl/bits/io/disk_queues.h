@@ -60,7 +60,7 @@ public:
         // create new request queue
 #if STXXL_HAVE_LINUXAIO_FILE
         if (const linuxaio_file* af =
-            dynamic_cast<const linuxaio_file*>(file)) {
+                dynamic_cast<const linuxaio_file*>(file)) {
             queues_[queue_id] = new linuxaio_queue(af->get_desired_queue_length());
             return;
         }

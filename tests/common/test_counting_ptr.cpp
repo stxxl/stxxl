@@ -18,7 +18,7 @@
 static unsigned int count_deletes = 0;
 
 // derive from counted_object to include reference counter
-struct my_int : public stxxl::counted_object
+struct my_int : public stxxl::reference_count
 {
     int i;
 
@@ -30,7 +30,7 @@ struct my_int : public stxxl::counted_object
 };
 
 typedef stxxl::counting_ptr<my_int> int_ptr;
-typedef stxxl::const_counting_ptr<my_int> int_cptr;
+typedef stxxl::counting_ptr<const my_int> int_cptr;
 
 int_cptr run_test()
 {
@@ -57,7 +57,7 @@ int_cptr run_test()
     STXXL_CHECK(i3->get_reference_count() == 3);
 
     // replace object in i3 with new integer
-    i3 = new my_int(5);
+    i3 = stxxl::make_counting<my_int>(5);
     STXXL_CHECK(i1 != i3);
     STXXL_CHECK(i1->get_reference_count() == 2);
 
