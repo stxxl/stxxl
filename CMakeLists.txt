@@ -320,6 +320,12 @@ endif(USE_GCOV)
 ###############################################################################
 # find thread and random library
 
+# Check for threading library and set linker flags accordingly
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
+
 # for testing for c++ system include files
 include(CheckIncludeFileCXX)
 
@@ -335,11 +341,6 @@ check_cxx_source_compiles(
   "#include <thread>
     int main() { std::thread t; return 0; }"
   HAVE_STD_THREAD)
-
-# using <thread> also requires -pthread on gcc
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-endif()
 
 # also check for <random>
 check_include_file_cxx(random STXXL_STD_RANDOM)
