@@ -169,17 +169,6 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
         return result;
     }
 #endif
-#if STXXL_HAVE_SIMDISK_FILE
-    else if (cfg.io_impl == "simdisk")
-    {
-        mode &= ~(file::DIRECT | file::REQUIRE_DIRECT);  // clear the DIRECT flag, this file is supposed to be on tmpfs
-        ufs_file_base* result =
-            new sim_disk_file(cfg.path, mode, cfg.queue, disk_allocator_id,
-                              cfg.device_id);
-        result->lock();
-        return result;
-    }
-#endif
 #if STXXL_HAVE_WINCALL_FILE
     else if (cfg.io_impl == "wincall")
     {

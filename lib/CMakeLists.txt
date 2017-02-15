@@ -54,7 +54,6 @@ if(NOT MSVC)
   # additional sources for non Visual Studio builds
   set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
     io/mmap_file.cpp
-    io/simdisk_file.cpp
     )
 endif(NOT MSVC)
 

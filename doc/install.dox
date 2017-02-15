@@ -385,8 +385,6 @@ Description of the parameters:
 
   - \c fileperblock_syscall, \c fileperblock_mmap : same as above, but take a single file per block, using full_disk_filename as file name prefix.  Usually provide worse performance than the standard variants, but release freed blocks to the file system immediately.
 
-  - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point to a file on a RAM disk partition with sufficient space
-
   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs), based on \c syscall
 
 - <b><tt>\<options></tt></b> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
