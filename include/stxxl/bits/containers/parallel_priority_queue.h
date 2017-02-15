@@ -285,10 +285,10 @@ protected:
     std::vector<value_type> m_values;
 
     //! Index of the current head
-    unsigned_type m_min_index;
+    size_t m_min_index;
 
     //! Level of internal array (Sander's PQ: group number)
-    unsigned_type m_level;
+    size_t m_level;
 
     //! Begin and end pointers of the array
     //! This is used by the iterator
@@ -302,8 +302,8 @@ public:
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
     internal_array(std::vector<value_type>& values,
-                   unsigned_type min_index = 0,
-                   unsigned_type level = 0)
+                   const size_t min_index = 0,
+                   const size_t level = 0)
         : m_values(), m_min_index(min_index), m_level(level),
           m_block_pointers(1)
     {
@@ -389,7 +389,7 @@ public:
     }
 
     //! Returns the level (group number) of the array.
-    inline unsigned_type level() const
+    inline size_t level() const
     {
         return m_level;
     }
@@ -441,7 +441,7 @@ class external_array_writer;
  */
 template <
     class ValueType,
-    unsigned_type BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
     >
 class external_array
@@ -478,7 +478,7 @@ protected:
     unsigned_type m_num_blocks;
 
     //! Level of external array (Sander's PQ: group number)
-    unsigned_type m_level;
+    size_t m_level;
 
     //! Common prefetch and write buffer pool
     pool_type* m_pool;
@@ -515,12 +515,12 @@ protected:
     external_size_type m_end_index;
 
     //! The first unhinted block index.
-    unsigned_type m_unhinted_block;
+    size_t m_unhinted_block;
 
     //! The first unhinted block index as it was before the
     //! prepare_rebuilding_hints() call. Used for removal of hints which aren't
     //! needed anymore.
-    unsigned_type m_old_unhinted_block;
+    size_t m_old_unhinted_block;
 
     //! allow writer to access to all variables
     friend class external_array_writer<self_type>;
@@ -536,10 +536,10 @@ public:
      *
      * \param level Level index in the merge hierarchy
      */
-    external_array(external_size_type size, pool_type* pool, unsigned_type level = 0)
+    external_array(const external_size_type size, pool_type* pool, const size_t level = 0)
         :   // constants
           m_capacity(size),
-          m_num_blocks((size_t)div_ceil(m_capacity, block_items)),
+          m_num_blocks(static_cast<size_t>(div_ceil(m_capacity, block_items))),
           m_level(level),
           m_pool(pool),
 
@@ -641,8 +641,8 @@ public:
         // not all data has been read! this only happen when the PPQ is
         // destroyed while containing data.
 
-        const unsigned_type block_index = m_index / block_items;
-        const unsigned_type end_block_index = get_end_block_index();
+        const size_t block_index = m_index / block_items;
+        const size_t end_block_index = get_end_block_index();
 
         // released blocks currently held in RAM
         for (size_t i = block_index; i < end_block_index; ++i) {
@@ -692,7 +692,7 @@ public:
     }
 
     //! Returns the level (group number) of the array.
-    inline unsigned_type level() const
+    inline size_t level() const
     {
         return m_level;
     }
@@ -730,19 +730,20 @@ public:
     }
 
     //! Returns the block beyond the block in which *(m_end_index-1) is located.
-    unsigned_type get_end_block_index() const
+    size_t get_end_block_index() const
     {
-        unsigned_type end_block_index = m_end_index / block_items;
+        size_t end_block_index = m_end_index / block_items;
 
         // increase block index if inside the block
-        if (m_end_index % block_items != 0) ++end_block_index;
+        if (m_end_index % block_items != 0)
+            ++end_block_index;
         assert(end_block_index <= m_num_blocks);
 
         return end_block_index;
     }
 
     //! Returns the block in which m_index is located.
-    inline unsigned_type get_current_block_index() const
+    inline size_t get_current_block_index() const
     {
         return (m_index / block_items);
     }
@@ -788,9 +789,9 @@ public:
     bool valid() const
     {
         bool result = true;
-        const unsigned_type block_index = m_index / block_items;
-        const unsigned_type end_block_index = get_end_block_index();
-        for (unsigned_type i = block_index; i < end_block_index; ++i) {
+        const size_t block_index = static_cast<size_t>(m_index / block_items);
+        const size_t end_block_index = get_end_block_index();
+        for (size_t i = block_index; i < end_block_index; ++i) {
             result = result && block_valid(i);
         }
         return result;
@@ -811,9 +812,9 @@ public:
 public:
     //! prepare the pool for writing external arrays with given number of
     //! threads
-    static void prepare_write_pool(pool_type& pool, unsigned_type num_threads)
+    static void prepare_write_pool(pool_type& pool, const size_t num_threads)
     {
-        unsigned_type write_blocks = num_threads;
+        size_t write_blocks = num_threads;
         // need at least one
         if (write_blocks == 0) write_blocks = 1;
         // for holding boundary blocks
@@ -837,7 +838,7 @@ protected:
     //! prepare the external_array for writing using multiway_merge() with
     //! num_threads. this method is called by the external_array_writer's
     //! constructor.
-    void prepare_write(unsigned_type num_threads)
+    void prepare_write(const size_t num_threads)
     {
         prepare_write_pool(*m_pool, num_threads);
     }
@@ -847,7 +848,7 @@ protected:
     void finish_write()
     {
         // check that all blocks where written
-        for (unsigned_type i = 0; i < m_num_blocks; ++i)
+        for (size_t i = 0; i < m_num_blocks; ++i)
             assert(m_blocks[i] == NULL);
 
         // compatibility to the block write interface
@@ -1044,7 +1045,7 @@ public:
     //! Waits until the next prefetched block is read into RAM, then polls for
     //! any further blocks that are done as well. Returns how many blocks were
     //! successfully read.
-    unsigned_type wait_next_blocks()
+    size_t wait_next_blocks()
     {
         size_t begin = get_end_block_index(), i = begin;
 
@@ -1087,7 +1088,7 @@ public:
 
     //! Waits until all hinted blocks are read into RAM. Returns how many
     //! blocks were successfully read.
-    unsigned_type wait_all_hinted_blocks()
+    size_t wait_all_hinted_blocks()
     {
         size_t begin = get_end_block_index(), i = begin;
         while (i < m_unhinted_block)
@@ -1113,7 +1114,7 @@ public:
 
     //! Removes the first n elements from the array. Returns the number of
     //! blocks released into the block pool.
-    unsigned_type remove_items(size_t n)
+    size_t remove_items(const size_t n)
     {
         assert(m_index + n <= m_capacity);
         assert(m_index + n <= m_end_index);
@@ -1149,7 +1150,7 @@ public:
         m_index = index_after;
         m_size -= n;
 
-        unsigned_type blocks_freed = block_index_after - block_index;
+        size_t blocks_freed = block_index_after - block_index;
 
         STXXL_DEBUG("ea[" << this << "]: after remove:" <<
                     " index_after=" << index_after <<
@@ -1621,7 +1622,7 @@ protected:
               m_compare(compare)
         { }
 
-        const value_type & get_value(unsigned_type input) const
+        const value_type & get_value(size_t input) const
         {
             switch (input) {
             case HEAP:
@@ -1637,7 +1638,7 @@ protected:
             }
         }
 
-        bool operator () (const unsigned_type a, const unsigned_type b) const
+        bool operator () (const size_t a, const size_t b) const
         {
             return m_compare(get_value(a), get_value(b));
         }
@@ -1653,12 +1654,12 @@ protected:
             : m_proc(proc), m_compare(compare)
         { }
 
-        const value_type & get_value(unsigned_type index) const
+        const value_type & get_value(size_t index) const
         {
             return m_proc[index]->insertion_heap[0];
         }
 
-        bool operator () (const unsigned_type a, const unsigned_type b) const
+        bool operator () (const size_t a, const size_t b) const
         {
             return m_compare(get_value(a), get_value(b));
         }
@@ -1674,7 +1675,7 @@ protected:
             : m_ias(ias), m_compare(compare)
         { }
 
-        bool operator () (const unsigned_type a, const unsigned_type b) const
+        bool operator () (const size_t a, const size_t b) const
         {
             return m_compare(m_ias[a].get_min(), m_ias[b].get_min());
         }
@@ -1724,7 +1725,7 @@ public:
     //! Return smallest items of head winner tree.
     std::pair<unsigned, unsigned> top()
     {
-        unsigned_type type = m_head.top();
+        const size_t type = m_head.top();
         switch (type)
         {
         case HEAP:
@@ -1739,7 +1740,7 @@ public:
     }
 
     //! Update minima tree after an item from the heap index was removed.
-    void update_heap(unsigned_type index)
+    void update_heap(const size_t index)
     {
         m_heaps.notify_change(index);
         m_head.notify_change(HEAP);
@@ -1752,21 +1753,21 @@ public:
     }
 
     //! Update minima tree after an item from an internal array was removed.
-    void update_internal_array(unsigned_type index)
+    void update_internal_array(const size_t index)
     {
         m_ia.notify_change(index);
         m_head.notify_change(IA);
     }
 
     //! Add a newly created internal array to the minima tree.
-    void add_internal_array(unsigned_type index)
+    void add_internal_array(const size_t index)
     {
         m_ia.activate_player(index);
         m_head.notify_change(IA);
     }
 
     //! Remove an insertion heap from the minima tree.
-    void deactivate_heap(unsigned_type index)
+    void deactivate_heap(const size_t index)
     {
         m_heaps.deactivate_player(index);
         if (!m_heaps.empty())
@@ -1782,7 +1783,7 @@ public:
     }
 
     //! Remove an internal array from the minima tree.
-    void deactivate_internal_array(unsigned_type index)
+    void deactivate_internal_array(const size_t index)
     {
         m_ia.deactivate_player(index);
         if (!m_ia.empty())
@@ -1904,10 +1905,10 @@ public:
     static const bool debug = false;
 
     //! currently global public tuning parameter:
-    unsigned_type c_max_internal_level_size;
+    size_t c_max_internal_level_size;
 
     //! currently global public tuning parameter:
-    unsigned_type c_max_external_level_size;
+    size_t c_max_external_level_size;
 
 protected:
     //! type of insertion heap itself
@@ -2005,10 +2006,10 @@ protected:
     //! \name Parameters and Sizes for Memory Allocation Policy
 
     //! Number of insertion heaps. Usually equal to the number of CPUs.
-    const unsigned_type m_num_insertion_heaps;
+    size_t m_num_insertion_heaps;
 
     //! Capacity of one inserion heap
-    const size_type m_insertion_heap_capacity;
+    size_type m_insertion_heap_capacity;
 
     //! Return size of insertion heap reservation in bytes
     size_type insertion_heap_int_memory() const
@@ -2017,24 +2018,24 @@ protected:
     }
 
     //! Total amount of internal memory
-    const size_type m_mem_total;
+    size_type m_mem_total;
 
     //! Maximum size of extract buffer in number of elements
     //! Only relevant if c_limit_extract_buffer==true
     size_type m_extract_buffer_limit;
 
     //! Size of all insertion heaps together in bytes
-    const size_type m_mem_for_heaps;
+    size_type m_mem_for_heaps;
 
     //! Number of read/prefetch blocks per external array.
-    const float m_num_read_blocks_per_ea;
+    float m_num_read_blocks_per_ea;
 
     //! Total number of read/prefetch buffer blocks
-    unsigned_type m_num_read_blocks;
+    size_t m_num_read_blocks;
     //! number of currently hinted prefetch blocks
-    unsigned_type m_num_hinted_blocks;
+    size_t m_num_hinted_blocks;
     //! number of currently loaded blocks
-    unsigned_type m_num_used_read_blocks;
+    size_t m_num_used_read_blocks;
 
     //! Free memory in bytes
     size_type m_mem_left;
@@ -2050,7 +2051,7 @@ protected:
 
     //! First index in m_external_arrays that was not re-hinted during a
     //! bulk_push sequence.
-    unsigned_type m_bulk_first_delayed_external_array;
+    size_t m_bulk_first_delayed_external_array;
 
     //! Index of the currently smallest element in the extract buffer
     size_type m_extract_buffer_index;
@@ -2110,16 +2111,16 @@ protected:
     std::vector<value_type> m_aggregated_pushes;
 
     //! The maximum number of internal array levels.
-    static const unsigned_type c_max_internal_levels = 8;
+    static constexpr size_t kMaxInternalLevels = 8;
 
     //! The number of internal arrays on each level, we use plain array.
-    unsigned_type m_internal_levels[c_max_internal_levels];
+    size_t m_internal_levels[kMaxInternalLevels];
 
     //! The maximum number of external array levels.
-    static const unsigned_type c_max_external_levels = 8;
+    static constexpr size_t kMaxExternalLevels = 8;
 
     //! The number of external arrays on each level, we use plain array.
-    unsigned_type m_external_levels[c_max_external_levels];
+    size_t m_external_levels[kMaxExternalLevels];
 
     //! The winner tree containing the smallest values of all sources
     //! where the globally smallest element could come from.
@@ -2282,7 +2283,7 @@ protected:
      * minimum may have changed.
      */
     template <typename RandomAccessIterator, typename HeapCompareType>
-    static inline unsigned_type
+    static inline size_t
     push_heap(RandomAccessIterator first, RandomAccessIterator last,
               HeapCompareType comp)
     {
@@ -2291,8 +2292,8 @@ protected:
 
         value_type value = STXXL_MOVE(*(last - 1));
 
-        unsigned_type index = (last - first) - 1;
-        unsigned_type parent = (index - 1) / 2;
+        size_t index = (last - first) - 1;
+        size_t parent = (index - 1) / 2;
 
         while (index > 0 && comp(*(first + parent), value))
         {
@@ -2335,12 +2336,12 @@ public:
      */
     parallel_priority_queue(
         const compare_type& compare = compare_type(),
-        size_type total_ram = DefaultMemSize,
-        float num_read_blocks_per_ea = 1.5f,
-        unsigned_type num_write_buffer_blocks = c_num_write_buffer_blocks,
+        const size_type total_ram = DefaultMemSize,
+        const float num_read_blocks_per_ea = 1.5f,
+        const size_t num_write_buffer_blocks = c_num_write_buffer_blocks,
         unsigned num_insertion_heaps = 0,
-        size_type single_heap_ram = c_default_single_heap_ram,
-        size_type extract_buffer_ram = 0)
+        const size_type single_heap_ram = c_default_single_heap_ram,
+        const size_type extract_buffer_ram = 0)
         : c_max_internal_level_size(64),
           c_max_external_level_size(64),
           m_compare(compare),
@@ -2409,10 +2410,10 @@ public:
                     c_default_extract_buffer_ram_part / sizeof(value_type));
         }
 
-        for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
+        for (size_t i = 0; i < kMaxInternalLevels; ++i)
             m_internal_levels[i] = 0;
 
-        for (unsigned_type i = 0; i < c_max_external_levels; ++i)
+        for (size_t i = 0; i < kMaxExternalLevels; ++i)
             m_external_levels[i] = 0;
 
         // TODO: Do we still need this line? Insertion heap memory is
@@ -2515,7 +2516,7 @@ protected:
 
         size_type heaps_size = 0;
 
-        for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
+        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
         {
             // check that each insertion heap is a heap
 
@@ -2537,7 +2538,7 @@ protected:
 
         size_type ia_size = 0;
         size_type ia_memory = 0;
-        std::vector<unsigned_type> ia_levels(c_max_internal_levels, 0);
+        std::vector<size_t> ia_levels(kMaxInternalLevels, 0);
 
         for (typename internal_arrays_type::const_iterator ia =
                  m_internal_arrays.begin(); ia != m_internal_arrays.end(); ++ia)
@@ -2550,14 +2551,14 @@ protected:
         STXXL_CHECK_EQUAL(m_internal_size, ia_size);
         mem_used += ia_memory;
 
-        for (unsigned_type i = 0; i < c_max_internal_levels; ++i)
+        for (size_t i = 0; i < kMaxInternalLevels; ++i)
             STXXL_CHECK_EQUAL(m_internal_levels[i], ia_levels[i]);
 
         // count number of items in external arrays
 
         size_type ea_size = 0;
         size_type ea_memory = 0;
-        std::vector<unsigned_type> ea_levels(c_max_external_levels, 0);
+        std::vector<size_t> ea_levels(kMaxExternalLevels, 0);
 
         for (typename external_arrays_type::const_iterator ea =
                  m_external_arrays.begin(); ea != m_external_arrays.end(); ++ea)
@@ -2570,7 +2571,7 @@ protected:
         STXXL_CHECK_EQUAL(m_external_size, ea_size);
         mem_used += ea_memory;
 
-        for (unsigned_type i = 0; i < c_max_external_levels; ++i)
+        for (size_t i = 0; i < kMaxExternalLevels; ++i)
             STXXL_CHECK_EQUAL(m_external_levels[i], ea_levels[i]);
 
         // calculate mem_used so that == mem_total - mem_left
@@ -2644,7 +2645,7 @@ public:
         }
 
         // zero bulk insertion counters
-        for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
+        for (size_t p = 0; p < m_num_insertion_heaps; ++p)
             m_proc[p]->heap_add_size = 0;
     }
 
@@ -2655,7 +2656,7 @@ public:
      * \param element The element to push.
      * \param p The id of the insertion heap to use (usually the thread id).
      */
-    void bulk_push(const value_type& element, const unsigned_type p)
+    void bulk_push(const value_type& element, const size_t p)
     {
         assert(m_in_bulk_push);
 
@@ -2732,9 +2733,9 @@ public:
     void bulk_push(const value_type& element)
     {
 #if STXXL_PARALLEL
-        return bulk_push(element, (unsigned_type)omp_get_thread_num());
+        return bulk_push(element, static_cast<size_t>(omp_get_thread_num()));
 #else
-        unsigned_type id = m_rng() % m_num_insertion_heaps;
+        const size_t id = m_rng() % m_num_insertion_heaps;
         return bulk_push(element, id);
 #endif
     }
@@ -2750,7 +2751,7 @@ public:
 
         if (!m_is_very_large_bulk && 0)
         {
-            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
             {
                 m_heaps_size += m_proc[p]->heap_add_size;
 
@@ -2766,7 +2767,7 @@ public:
             for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
-                for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
+                for (size_t index = m_proc[p]->heap_add_size; index != 0; ) {
                     std::push_heap(m_proc[p]->insertion_heap.begin(),
                                    m_proc[p]->insertion_heap.end() - (--index),
                                    m_compare);
@@ -2778,7 +2779,7 @@ public:
                 m_heaps_size += m_proc[p]->heap_add_size;
             }
 
-            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -2789,7 +2790,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (m_proc[p]->insertion_heap.size() >= m_insertion_heap_capacity) {
                     // flush out overfull insertion heap arrays
@@ -2803,7 +2804,7 @@ public:
                 }
                 else {
                     // reestablish heap property: siftUp only those items pushed
-                    for (unsigned_type index = m_proc[p]->heap_add_size; index != 0; ) {
+                    for (size_t index = m_proc[p]->heap_add_size; index != 0; ) {
                         std::push_heap(m_proc[p]->insertion_heap.begin(),
                                        m_proc[p]->insertion_heap.end() - (--index),
                                        m_compare);
@@ -2817,7 +2818,7 @@ public:
                 }
             }
 
-            for (unsigned_type p = 0; p < m_num_insertion_heaps; ++p)
+            for (size_t p = 0; p < m_num_insertion_heaps; ++p)
             {
                 if (!m_proc[p]->insertion_heap.empty())
                     m_minima.update_heap(p);
@@ -2883,7 +2884,7 @@ public:
         std::vector<iterator_pair_type> sequences(eas + ias);
         size_type output_size = 0;
 
-        unsigned_type limiting_ea_index = m_external_min_tree.top();
+        size_t limiting_ea_index = m_external_min_tree.top();
 
         // pop limit may have to change due to memory limit
         value_type this_limit = limit;
@@ -3046,7 +3047,7 @@ public:
      * \param element the element to insert.
      * \param p number of insertion heap to insert item into
      */
-    void push(const value_type& element, unsigned_type p = 0)
+    void push(const value_type& element, const size_t p = 0)
     {
         assert(!m_in_bulk_push && !m_limit_extract);
 
@@ -3058,8 +3059,8 @@ public:
 
         // push item to end of heap and siftUp
         insheap.push_back(element);
-        unsigned_type index = push_heap(insheap.begin(), insheap.end(),
-                                        m_compare);
+        size_t index = push_heap(insheap.begin(), insheap.end(),
+                                 m_compare);
         ++m_heaps_size;
 
         if (insheap.size() == 1 || index == 0)
@@ -3217,7 +3218,7 @@ public:
     }
 
     //! Push new item >= bulk-limit element into insertion heap p.
-    void limit_push(const value_type& element, const unsigned_type p = 0)
+    void limit_push(const value_type& element, const size_t p = 0)
     {
         assert(m_limit_extract);
         assert(!m_compare(m_limit_element, element));
@@ -3303,7 +3304,7 @@ protected:
     void flush_insertion_heaps_with_limit(const value_type& limit)
     {
         // perform extract for all items < L into back of insertion_heap
-        std::vector<unsigned_type> back_size(m_num_insertion_heaps);
+        std::vector<size_t> back_size(m_num_insertion_heaps);
 
 //#if STXXL_PARALLEL
 //#pragma omp parallel for
@@ -3338,7 +3339,7 @@ protected:
         }
 
         // put items from insertion heaps into an internal array
-        unsigned_type back_sum = std::accumulate(
+        const size_t back_sum = std::accumulate(
             back_size.begin(), back_size.end(), 0u);
 
         STXXL_DEBUG("flush_insertion_heaps_with_limit(): back_sum = " << back_sum);
@@ -3416,8 +3417,8 @@ public:
     //! of external arrays.
     void resize_read_pool()
     {
-        unsigned_type new_num_read_blocks =
-            (unsigned_type)(m_num_read_blocks_per_ea * (float)m_external_arrays.size());
+        size_t new_num_read_blocks = static_cast<size_t>(
+            (m_num_read_blocks_per_ea * static_cast<float>(m_external_arrays.size())));
 
         STXXL_DEBUG("resize_read_pool:" <<
                     " m_num_read_blocks=" << m_num_read_blocks <<
@@ -3431,7 +3432,7 @@ public:
         // add new blocks
         if (new_num_read_blocks > m_num_read_blocks)
         {
-            unsigned_type mem_needed =
+            const size_t mem_needed =
                 (new_num_read_blocks - m_num_read_blocks) * block_size;
 
             // -tb: this may recursively call this function!
@@ -3487,11 +3488,11 @@ public:
         m_hint_tree.rebuild();
 
         // virtually release all hints
-        unsigned_type free_prefetch_blocks =
+        size_t free_prefetch_blocks =
             m_pool.free_size_prefetch() + m_num_hinted_blocks;
         m_num_hinted_blocks = 0;
 
-        unsigned_type gmin_index;
+        size_t gmin_index;
         while (free_prefetch_blocks > 0 &&
                (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
@@ -3562,7 +3563,7 @@ public:
         STXXL_DEBUG("hint_external_arrays()"
                     " for free_size_prefetch=" << m_pool.free_size_prefetch());
 
-        unsigned_type gmin_index;
+        size_t gmin_index;
         while (m_pool.free_size_prefetch() > 0 &&
                (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
@@ -3642,7 +3643,7 @@ protected:
          * determine minimum of each first block
          */
 
-        unsigned_type gmin_index = m_external_min_tree.top();
+        const size_t gmin_index = m_external_min_tree.top();
         bool needs_limit = (gmin_index != m_external_min_tree.invalid_key);
 
         STXXL_DEBUG("calculate_merge_sequences() gmin_index=" << gmin_index <<
@@ -3891,11 +3892,11 @@ protected:
 
     //! Requests more EM data from a given EA and updates
     //! the winner trees and hints accordingly.
-    inline void wait_next_ea_blocks(unsigned_type ea_index)
+    inline void wait_next_ea_blocks(const size_t ea_index)
     {
         STXXL_DEBUG("wait_next_ea_blocks() ea_index=" << ea_index);
 
-        unsigned_type used_blocks =
+        size_t used_blocks =
             m_external_arrays[ea_index].wait_next_blocks();
 
         m_num_hinted_blocks -= used_blocks;
@@ -3909,7 +3910,7 @@ protected:
                                std::vector<size_type>& sizes,
                                size_t eas, size_t ias)
     {
-        unsigned_type total_freed_blocks = 0;
+        size_t total_freed_blocks = 0;
 
         for (size_type i = 0; i < eas + ias; ++i) {
             // dist represents the number of elements that haven't been merged
@@ -3920,7 +3921,7 @@ protected:
 
             if (i < eas) {
                 // remove items and free blocks in RAM.
-                unsigned_type freed_blocks =
+                const size_t freed_blocks =
                     m_external_arrays[i].remove_items(diff);
 
                 m_num_used_read_blocks -= freed_blocks;
@@ -3951,7 +3952,7 @@ protected:
     }
 
     //! Flushes the insertions heap p into an internal array.
-    inline void flush_insertion_heap(unsigned_type p)
+    inline void flush_insertion_heap(size_t p)
     {
         assert(m_proc[p]->insertion_heap.size() != 0);
 
@@ -4053,7 +4054,7 @@ protected:
 
             add_as_internal_array(merged_array);
 
-            for (unsigned_type i = 0; i < m_num_insertion_heaps; ++i)
+            for (size_t i = 0; i < m_num_insertion_heaps; ++i)
             {
                 m_proc[i]->insertion_heap.clear();
                 m_proc[i]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -4159,7 +4160,7 @@ protected:
         cleanup_internal_arrays();
 
         // TODO: is this necessary? See cleanup_internal_arrays().
-        for (size_t i = 0; i < c_max_internal_levels; ++i)
+        for (size_t i = 0; i < kMaxInternalLevels; ++i)
             m_internal_levels[i] = 0;
 
         m_mem_left += int_memory;
@@ -4185,12 +4186,12 @@ protected:
     // Compares the largest accessible value of two external arrays.
     struct s_min_tree_comparator {
         const external_arrays_type& m_eas;
-        const std::vector<unsigned_type>& m_indices;
+        const std::vector<size_t>& m_indices;
         const inv_compare_type& m_compare;
 
         s_min_tree_comparator(const external_arrays_type& eas,
                               const inv_compare_type& compare,
-                              const std::vector<unsigned_type>& indices)
+                              const std::vector<size_t>& indices)
             : m_eas(eas), m_indices(indices), m_compare(compare) { }
 
         bool operator () (const size_t& a, const size_t& b) const
@@ -4202,7 +4203,7 @@ protected:
 
     //! Merges external arrays if there are too many external arrays on
     //! the same level.
-    void check_external_level(unsigned_type level, bool force_merge_all = false)
+    void check_external_level(const size_t level, const bool force_merge_all = false)
     {
         if (!force_merge_all)
             STXXL_DEBUG("Checking external level " << level);
@@ -4211,11 +4212,11 @@ protected:
         if (m_external_levels[level] < c_max_external_level_size && !force_merge_all)
             return;
 
-        unsigned_type level_size = 0;
+        size_t level_size = 0;
         size_type int_memory = 0;
-        std::vector<unsigned_type> ea_index;
+        std::vector<size_t> ea_index;
 
-        for (unsigned_type i = 0; i < m_external_arrays.size(); ++i)
+        for (size_t i = 0; i < m_external_arrays.size(); ++i)
         {
             if (m_external_arrays[i].level() != level && !force_merge_all) continue;
             if (m_external_arrays[i].empty()) continue;
@@ -4233,7 +4234,7 @@ protected:
         m_mem_left -= external_array_type::int_memory(level_size);
 
         STXXL_ASSERT(force_merge_all || c_max_external_level_size == ea_index.size());
-        unsigned_type num_arrays_to_merge = ea_index.size();
+        const size_t num_arrays_to_merge = ea_index.size();
 
         STXXL_DEBUG("merging external arrays" <<
                     " level=" << level <<
@@ -4243,7 +4244,7 @@ protected:
 
         // if force_merge_all: create array in highest level to avoid merging
         // of such a large EA.
-        unsigned_type new_level = force_merge_all ? c_max_external_levels - 1 : level + 1;
+        const size_t new_level = force_merge_all ? kMaxExternalLevels - 1 : level + 1;
 
         // construct new external array
         external_array_type ea(level_size, &m_pool, new_level);
@@ -4262,7 +4263,7 @@ protected:
 
             // =================================================
 
-            unsigned_type num_arrays_done = 0;
+            size_t num_arrays_done = 0;
 
             while (num_arrays_to_merge != num_arrays_done)
             {
@@ -4270,7 +4271,7 @@ protected:
 
                 // === build hints ===
 
-                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
+                for (size_t i = 0; i < num_arrays_to_merge; ++i) {
                     if (m_external_arrays[ea_index[i]].has_unhinted_em_data()) {
                         min_tree.activate_without_replay(i);
                     }
@@ -4291,20 +4292,20 @@ protected:
                 // ==============================================
 
                 // cleanup hints (all arrays, not only the ones to merge)
-                for (unsigned_type i = 0; i < m_external_arrays.size(); ++i) {
+                for (size_t i = 0; i < m_external_arrays.size(); ++i) {
                     m_external_arrays[i].rebuild_hints_prepare();
                 }
 
                 // virtually release all hints
-                unsigned_type free_prefetch_blocks =
+                size_t free_prefetch_blocks =
                     m_pool.free_size_prefetch() + m_num_hinted_blocks;
                 m_num_hinted_blocks = 0;
 
-                unsigned_type gmin_index_index; // index in ea_index
+                size_t gmin_index_index; // index in ea_index
                 while (free_prefetch_blocks > 0 &&
                        (gmin_index_index = min_tree.top()) != min_tree.invalid_key)
                 {
-                    const unsigned_type gmin_index = ea_index[gmin_index_index];
+                    const size_t gmin_index = ea_index[gmin_index_index];
                     assert(gmin_index < m_external_arrays.size());
 
                     STXXL_DEBUG0("check_external_level():Give pre-hint in EA[" << gmin_index << "] min " <<
@@ -4337,10 +4338,10 @@ protected:
                 // ================================ end build hints ======
 
                 // === wait for data ===
-                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
-                    const unsigned_type index = ea_index[i];
+                for (size_t i = 0; i < num_arrays_to_merge; ++i) {
+                    const size_t index = ea_index[i];
 
-                    unsigned_type used_blocks =
+                    const size_t used_blocks =
                         m_external_arrays[index].wait_all_hinted_blocks();
 
                     m_num_hinted_blocks -= used_blocks;
@@ -4355,13 +4356,13 @@ protected:
                 gmin_index_index = min_tree.top();
                 bool needs_limit = (gmin_index_index != min_tree.invalid_key) ? true : false;
 
-                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
-                    const unsigned_type index = ea_index[i];
+                for (size_t i = 0; i < num_arrays_to_merge; ++i) {
+                    const size_t index = ea_index[i];
                     iterator begin = m_external_arrays[index].begin();
                     iterator end = m_external_arrays[index].end();
 
                     if (needs_limit) {
-                        const unsigned_type gmin_index = ea_index[gmin_index_index];
+                        const size_t gmin_index = ea_index[gmin_index_index];
                         const value_type& gmin_value =
                             m_external_arrays[gmin_index].get_next_block_min();
 
@@ -4387,12 +4388,12 @@ protected:
                     sequences.begin(), sequences.end(),
                     out_iter, output_size, m_inv_compare);
 
-                for (unsigned_type i = 0; i < num_arrays_to_merge; ++i) {
-                    const unsigned_type index = ea_index[i];
+                for (size_t i = 0; i < num_arrays_to_merge; ++i) {
+                    const size_t index = ea_index[i];
 
                     if (!m_external_arrays[index].empty()) {
                         // remove items and free blocks in RAM.
-                        unsigned_type freed_blocks =
+                        size_t freed_blocks =
                             m_external_arrays[index].remove_items(sizes[i]);
 
                         m_num_used_read_blocks -= freed_blocks;
@@ -4441,8 +4442,8 @@ protected:
     //! automatically decreases m_mem_left! also merges internal arrays if
     //! there are too many internal arrays on the same level.
     void add_as_internal_array(std::vector<value_type>& values,
-                               unsigned_type used = 0,
-                               unsigned_type level = 0)
+                               const size_t used = 0,
+                               const size_t level = 0)
     {
         const size_t size = values.size();
         const size_t capacity = values.capacity();
@@ -4464,7 +4465,7 @@ protected:
         m_internal_size += size - used;
         m_mem_left -= internal_array_type::int_memory(capacity);
 
-        STXXL_CHECK(level < c_max_internal_levels &&
+        STXXL_CHECK(level < kMaxInternalLevels &&
                     "Internal array level is larger than anything possible "
                     "in this universe. Increase the size of m_internal_levels");
 
@@ -4475,12 +4476,12 @@ protected:
         // if IA level is too large ...
         if (m_internal_levels[level] < c_max_internal_level_size) return;
 
-        unsigned_type level_size = 0;
+        size_t level_size = 0;
         size_type int_memory = 0;
         std::vector<iterator_pair_type> sequences;
-        std::vector<unsigned_type> ia_index;
+        std::vector<size_t> ia_index;
 
-        for (unsigned_type i = 0; i < m_internal_arrays.size(); ++i)
+        for (size_t i = 0; i < m_internal_arrays.size(); ++i)
         {
             if (m_internal_arrays[i].level() != level) continue;
             if (m_internal_arrays[i].empty()) continue;
