@@ -134,7 +134,7 @@ extern void malloc_count_set_callback(malloc_count_callback_type cb,
 /****************************************************/
 
 /* exported malloc symbol that overrides loading from libc */
-extern void * malloc(size_t size) throw ()
+extern void * malloc(size_t size) noexcept
 {
     void* ret;
 
@@ -181,7 +181,7 @@ extern void * malloc(size_t size) throw ()
 }
 
 /* exported free symbol that overrides loading from libc */
-extern void free(void* ptr) throw ()
+extern void free(void* ptr) noexcept
 {
     size_t size;
 
@@ -222,7 +222,7 @@ extern void free(void* ptr) throw ()
 
 /* exported calloc() symbol that overrides loading from libc, implemented using
  * our malloc */
-extern void * calloc(size_t nmemb, size_t size) throw ()
+extern void * calloc(size_t nmemb, size_t size) noexcept
 {
     void* ret;
     size *= nmemb;
@@ -233,7 +233,7 @@ extern void * calloc(size_t nmemb, size_t size) throw ()
 }
 
 /* exported realloc() symbol that overrides loading from libc */
-extern void * realloc(void* ptr, size_t size) throw ()
+extern void * realloc(void* ptr, size_t size) noexcept
 {
     void* newptr;
     size_t oldsize;

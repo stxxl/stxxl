@@ -23,11 +23,11 @@ namespace stxxl {
 class io_error : public std::ios_base::failure
 {
 public:
-    io_error() throw ()
+    io_error() noexcept
         : std::ios_base::failure("")
     { }
 
-    io_error(const std::string& message) throw ()
+    explicit io_error(const std::string& message) noexcept
         : std::ios_base::failure(message)
     { }
 };
@@ -35,11 +35,11 @@ public:
 class resource_error : public std::runtime_error
 {
 public:
-    resource_error() throw ()
+    resource_error() noexcept
         : std::runtime_error("")
     { }
 
-    resource_error(const std::string& message) throw ()
+    explicit resource_error(const std::string& message) noexcept
         : std::runtime_error(message)
     { }
 };
@@ -47,11 +47,11 @@ public:
 class bad_ext_alloc : public std::runtime_error
 {
 public:
-    bad_ext_alloc() throw ()
+    bad_ext_alloc() noexcept
         : std::runtime_error("")
     { }
 
-    bad_ext_alloc(const std::string& message) throw ()
+    explicit bad_ext_alloc(const std::string& message) noexcept
         : std::runtime_error(message)
     { }
 };
@@ -59,11 +59,11 @@ public:
 class bad_parameter : public std::runtime_error
 {
 public:
-    bad_parameter() throw ()
+    bad_parameter() noexcept
         : std::runtime_error("")
     { }
 
-    bad_parameter(const std::string& message) throw ()
+    explicit bad_parameter(const std::string& message) noexcept
         : std::runtime_error(message)
     { }
 };
@@ -71,11 +71,11 @@ public:
 class unreachable : public std::runtime_error
 {
 public:
-    unreachable() throw ()
+    unreachable() noexcept
         : std::runtime_error("")
     { }
 
-    unreachable(const std::string& message) throw ()
+    explicit unreachable(const std::string& message) noexcept
         : std::runtime_error(message)
     { }
 };
