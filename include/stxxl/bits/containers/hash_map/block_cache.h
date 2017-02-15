@@ -21,6 +21,7 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
 
+#include <utility>
 #include <algorithm>
 #include <vector>
 #include <list>
@@ -40,17 +41,17 @@ public:
 protected:
     std::vector<block_type*> blocks_;
     std::vector<request_ptr> reqs_;
-    std::vector<unsigned_type> free_blocks_;
-    std::list<unsigned_type> busy_blocks_; // TODO make that a circular-buffer
+    std::vector<size_t> free_blocks_;
+    std::list<size_t> busy_blocks_; // TODO make that a circular-buffer
 
 public:
-    explicit block_cache_write_buffer(unsigned_type size)
+    explicit block_cache_write_buffer(const size_t size)
     {
         blocks_.reserve(size);
         free_blocks_.reserve(size);
         reqs_.resize(size);
 
-        for (unsigned_type i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             blocks_.push_back(new block_type());
             free_blocks_.push_back(i);
         }
@@ -66,7 +67,7 @@ public:
     block_type * write(block_type* write_block, const bid_type& bid)
     {
         if (free_blocks_.empty()) {
-            unsigned_type i_buffer = busy_blocks_.front();
+            const size_t i_buffer = busy_blocks_.front();
             busy_blocks_.pop_front();
 
             if (reqs_[i_buffer].valid())
@@ -75,7 +76,7 @@ public:
             free_blocks_.push_back(i_buffer);
         }
 
-        unsigned_type i_buffer = free_blocks_.back();
+        const size_t i_buffer = free_blocks_.back();
         free_blocks_.pop_back();
         block_type* buffer = blocks_[i_buffer];
 
@@ -89,14 +90,14 @@ public:
     void flush()
     {
         while (!busy_blocks_.empty()) {
-            unsigned_type i_buffer = busy_blocks_.front();
+            const size_t i_buffer = busy_blocks_.front();
             busy_blocks_.pop_front();
             if (reqs_[i_buffer].valid())
                 reqs_[i_buffer]->wait();
         }
         busy_blocks_.clear();
         free_blocks_.clear();
-        for (unsigned_type i = 0; i < blocks_.size(); i++)
+        for (size_t i = 0; i < blocks_.size(); i++)
             free_blocks_.push_back(i);
     }
 
@@ -111,7 +112,7 @@ public:
     ~block_cache_write_buffer()
     {
         flush();
-        for (unsigned_type i = 0; i < blocks_.size(); i++)
+        for (size_t i = 0; i < blocks_.size(); i++)
             delete blocks_[i];
     }
 };
@@ -160,7 +161,7 @@ protected:
     typedef block_cache_write_buffer<block_type> write_buffer_type;
 
     typedef typename std::unordered_map<
-            bid_type, unsigned_type, bid_hash> bid_map_type;
+            bid_type, size_t, bid_hash> bid_map_type;
 
     enum { valid_all = block_type::size };
 
@@ -170,16 +171,16 @@ protected:
     std::vector<block_type*> blocks_;
     //! bids of cached blocks
     std::vector<bid_type> bids_;
-    std::vector<unsigned_type> retain_count_;
+    std::vector<size_t> retain_count_;
 
     //! true iff block has been altered while in cache
     std::vector<unsigned char> dirty_;
 
     //! valid_all or the actually loaded subblock's index
-    std::vector<unsigned_type> valid_subblock_;
+    std::vector<size_t> valid_subblock_;
 
     //! free blocks as indices to blocks_-vector
-    std::vector<unsigned_type> free_blocks_;
+    std::vector<size_t> free_blocks_;
     std::vector<request_ptr> reqs_;
 
     bid_map_type bid_map_;
@@ -196,7 +197,7 @@ protected:
 public:
     //! Construct a new block-cache.
     //! \param cache_size cache-size in number of blocks
-    explicit block_cache(unsigned_type cache_size)
+    explicit block_cache(const size_t cache_size)
         : write_buffer_(config::get_instance()->disks_number() * 2),
           blocks_(cache_size),
           bids_(cache_size),
@@ -207,7 +208,7 @@ public:
           reqs_(cache_size),
           pager_(cache_size)
     {
-        for (unsigned_type i = 0; i < cache_size; i++)
+        for (size_t i = 0; i < cache_size; i++)
         {
             blocks_[i] = new block_type();
             free_blocks_[i] = i;
@@ -220,7 +221,7 @@ public:
     block_cache& operator = (const block_cache&) = delete;
 
     //! Return cache-size
-    unsigned_type size() const
+    size_t size() const
     {
         return blocks_.size();
     }
@@ -232,7 +233,7 @@ public:
         for (typename bid_map_type::const_iterator i = bid_map_.begin();
              i != bid_map_.end(); ++i)
         {
-            const unsigned_type i_block = (*i).second;
+            const size_t i_block = (*i).second;
 
             if (reqs_[i_block].valid())
                 reqs_[i_block]->wait();
@@ -244,7 +245,7 @@ public:
         }
         write_buffer_.flush();
 
-        for (unsigned_type i = 0; i < size(); ++i)
+        for (size_t i = 0; i < size(); ++i)
             delete blocks_[i];
     }
 
@@ -252,10 +253,10 @@ protected:
     //! Force a block from the cache; write back to disk if dirty
     void kick_block()
     {
-        unsigned_type i_block2kick;
+        size_t i_block2kick;
 
-        unsigned_type max_tries = size() + 1;
-        unsigned_type i = 0;
+        size_t max_tries = size() + 1;
+        size_t i = 0;
         do
         {
             ++i;
@@ -301,7 +302,7 @@ public:
         if (it == bid_map_.end())
             return false;
 
-        unsigned_type i_block = (*it).second;
+        const size_t i_block = (*it).second;
         retain_count_[i_block]++;
         return true;
     }
@@ -318,7 +319,7 @@ public:
         if (it == bid_map_.end())
             return false;
 
-        unsigned_type i_block = (*it).second;
+        const size_t i_block = (*it).second;
         if (retain_count_[i_block] == 0)
             return false;
 
@@ -336,7 +337,7 @@ public:
         if (it == bid_map_.end())
             return false;
 
-        unsigned_type i_block = (*it).second;
+        const size_t i_block = (*it).second;
 
         // only complete blocks can be marked as dirty
         if (valid_subblock_[i_block] != valid_all)
@@ -360,10 +361,10 @@ public:
     //! \param bid block, to which the requested subblock belongs
     //! \param i_subblock index of requested subblock
     //! \return pointer to subblock
-    subblock_type * get_subblock(const bid_type& bid, unsigned_type i_subblock)
+    subblock_type * get_subblock(const bid_type& bid, const size_t i_subblock)
     {
         block_type* block;
-        unsigned_type i_block;
+        size_t i_block;
         n_read++;
 
         // block (partly) cached?
@@ -433,7 +434,7 @@ public:
     //! \param bid Identifier of the block to load
     void prefetch_block(const bid_type& bid)
     {
-        unsigned_type i_block;
+        size_t i_block;
 
         // cached
         typename bid_map_type::const_iterator it = bid_map_.find(bid);
@@ -475,7 +476,7 @@ public:
         for (typename bid_map_type::const_iterator i = bid_map_.begin();
              i != bid_map_.end(); ++i)
         {
-            const unsigned_type i_block = (*i).second;
+            const size_t i_block = (*i).second;
             if (dirty_[i_block])
             {
                 blocks_[i_block] =
@@ -491,7 +492,7 @@ public:
     void clear()
     {
         free_blocks_.clear();
-        for (unsigned_type i = 0; i < size(); i++)
+        for (size_t i = 0; i < size(); i++)
         {
             if (reqs_[i].valid()) {
                 reqs_[i]->cancel();

@@ -30,6 +30,7 @@
 #include <utility>
 #include <vector>
 #include <limits>
+#include <tuple>
 
 namespace stxxl {
 
@@ -1598,7 +1599,7 @@ template <class KeyType, class MappedType, class HashType, class KeyCompareType,
           unsigned SubBlockSize, unsigned SubBlocksPerBlock, class AllocType>
 void swap(stxxl::hash_map::hash_map<KeyType, MappedType, HashType, KeyCompareType,
                                     SubBlockSize, SubBlocksPerBlock, AllocType>& a,
-          stxxl::hash_map::hash_map<KeyType, MappedType, HashType, KeyCompareType,
+          stxxl::hash_map::hash_map<KeyType, MappedType, HashType, KeyCompareType,   // NOLINT
                                     SubBlockSize, SubBlocksPerBlock, AllocType>& b)
 {
     if (&a != &b)

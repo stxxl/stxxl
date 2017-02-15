@@ -111,7 +111,7 @@ public:
 
 private:
     //! index within current block
-    unsigned_type i_value_;
+    size_t i_value_;
     //! points to the beginning of the block-sequence
     bid_iterator begin_bid_;
     //! points to the current block
@@ -127,9 +127,9 @@ private:
     //! true if prefetching enabled
     bool prefetch_;
     //! pages, which are read at once from disk, consist of this many blocks
-    unsigned_type page_size_;
+    const size_t page_size_;
     //! number of pages to prefetch
-    unsigned_type prefetch_pages_;
+    const size_t prefetch_pages_;
 
     //! current block dirty ?
     bool dirty_;
@@ -186,7 +186,7 @@ public:
         prefetch_ = true;
         pref_bid_ = curr_bid_;
         // start prefetching page_size*prefetch_pages blocks beginning with current one
-        for (unsigned_type i = 0; i < page_size_ * prefetch_pages_; i++)
+        for (size_t i = 0; i < page_size_ * prefetch_pages_; i++)
         {
             if (pref_bid_ == end_bid_)
                 break;
@@ -333,11 +333,11 @@ private:
     bid_container_type* bids_;
 
     //! current block's index
-    unsigned_type i_block_;
+    size_t i_block_;
     //! current value's index in the range of [0..\#values per block[
-    unsigned_type i_value_;
+    size_t i_value_;
     //! number of blocks to allocate in a row
-    unsigned_type increase_;
+    size_t increase_;
 
 public:
     //! Create a new buffered writer.
