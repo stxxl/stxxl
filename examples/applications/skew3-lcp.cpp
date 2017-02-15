@@ -17,6 +17,19 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/io>
+#include <stxxl/stats>
+#include <stxxl/timer>
+#include <stxxl/random>
+#include <stxxl/sorter>
+#include <stxxl/stream>
+#include <stxxl/vector>
+#include <stxxl/cmdline>
+#include <stxxl/sequence>
+#include <stxxl/algorithm>
+#include <stxxl/bits/common/uint_types.h>
+#include <stxxl/bits/common/utils.h>
+
 #include <cmath>
 #include <string>
 #include <iostream>
@@ -29,20 +42,6 @@
 #include <iterator>
 #include <cassert>
 #include <algorithm>
-
-#include <stxxl/io>
-#include <stxxl/timer>
-#include <stxxl/stats>
-#include <stxxl/timer>
-#include <stxxl/random>
-#include <stxxl/sorter>
-#include <stxxl/stream>
-#include <stxxl/vector>
-#include <stxxl/cmdline>
-#include <stxxl/sequence>
-#include <stxxl/algorithm>
-#include <stxxl/bits/common/uint_types.h>
-#include <stxxl/bits/common/utils.h>
 
 using stxxl::internal_size_type;
 using stxxl::external_size_type;

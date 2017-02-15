@@ -22,10 +22,11 @@
 //! memory matrix transpostion than sorting, see e.g. J.S. Vitter: Algorithms
 //! and Data Structures for External Memory, Chapter 7.2.
 
-#include <limits>
-#include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>
+
+#include <limits>
+#include <vector>
 
 class streamop_matrix_transpose
 {

@@ -15,9 +15,9 @@
 #ifndef STXXL_IO_REQUEST_INTERFACE_HEADER
 #define STXXL_IO_REQUEST_INTERFACE_HEADER
 
-#include <ostream>
-
 #include <stxxl/bits/common/types.h>
+
+#include <ostream>
 
 namespace stxxl {
 

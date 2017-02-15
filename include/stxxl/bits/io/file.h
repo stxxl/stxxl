@@ -18,14 +18,6 @@
 
 #include <stxxl/bits/config.h>
 
-#if defined(__linux__)
- #define STXXL_CHECK_BLOCK_ALIGNING
-#endif
-
-#include <cassert>
-#include <ostream>
-#include <string>
-
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/types.h>
@@ -34,6 +26,14 @@
 #include <stxxl/bits/libstxxl.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
+
+#if defined(__linux__)
+ #define STXXL_CHECK_BLOCK_ALIGNING
+#endif
+
+#include <cassert>
+#include <ostream>
+#include <string>
 
 namespace stxxl {
 
@@ -83,7 +83,7 @@ public:
     static const unsigned int DEFAULT_DEVICE_ID = (unsigned int)(-1);
 
     //! Construct a new file, usually called by a subclass.
-    file(unsigned int device_id = DEFAULT_DEVICE_ID)
+    explicit file(unsigned int device_id = DEFAULT_DEVICE_ID)
         : m_device_id(device_id)
     { }
 

@@ -16,6 +16,9 @@
 
 #include <stxxl/bits/containers/hash_map/iterator.h>
 
+#include <vector>
+#include <algorithm>
+#include <utility>
 #include <map>
 #include <unordered_map>
 
@@ -72,7 +75,7 @@ private:
     multimap_type it_map_;
 
 public:
-    iterator_map(hash_map_type* map)
+    explicit iterator_map(hash_map_type* map)
         : map_(map)
     { }
 

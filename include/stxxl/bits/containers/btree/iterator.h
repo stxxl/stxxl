@@ -13,10 +13,11 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
-#include <iterator>
-#include <cassert>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/types.h>
+
+#include <iterator>
+#include <cassert>
 
 namespace stxxl {
 namespace btree {
@@ -284,7 +285,7 @@ public:
         : base_type(obj)
     { }
 
-    btree_const_iterator(const iterator& obj)
+    btree_const_iterator(const iterator& obj) // NOLINT
         : base_type(obj)
     { }
 

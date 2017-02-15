@@ -18,6 +18,8 @@
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/parallel.h>
 
+#include <algorithm>
+
 int stxxl_info(int, char**)
 {
     stxxl::config::get_instance();

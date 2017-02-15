@@ -17,10 +17,6 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
 
-#include <vector>
-#include <iterator>
-#include <algorithm>
-
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
 #include <stxxl/bits/parallel/equally_split.h>
@@ -28,6 +24,11 @@
 #include <stxxl/bits/parallel/multiseq_selection.h>
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/timing.h>
+
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <algorithm>
 
 namespace stxxl {
 

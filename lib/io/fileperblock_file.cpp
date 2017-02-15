@@ -11,12 +11,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <cassert>
-#include <cstdio>
-#include <iomanip>
-#include <sstream>
-#include <string>
-
 #include <stxxl/bits/common/aligned_alloc.h>
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/error_handling.h>
@@ -37,6 +31,12 @@
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
 #include "ufs_platform.h"
+
+#include <cassert>
+#include <cstdio>
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 namespace stxxl {
 

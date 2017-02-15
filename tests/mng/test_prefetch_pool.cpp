@@ -13,9 +13,10 @@
 
 //! \example mng/test_prefetch_pool.cpp
 
-#include <iostream>
 #include <stxxl/mng>
 #include <stxxl/bits/mng/prefetch_pool.h>
+
+#include <iostream>
 
 #define BLOCK_SIZE (1024 * 512)
 

@@ -50,7 +50,7 @@ inline const char * get_version_string_long()
 #if STXXL_BOOST_CONFIG
            " + Boost " stringify(BOOST_VERSION)
 #endif
-    ;
+    ;     // NOLINT
 }
 
 #undef stringify

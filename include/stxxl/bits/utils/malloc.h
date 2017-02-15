@@ -15,14 +15,13 @@
 #define STXXL_UTILS_MALLOC_HEADER
 
 #include <stxxl/bits/config.h>
+#include <stxxl/bits/unused.h>
 
 #include <ostream>
 #if STXXL_HAVE_MALLINFO_PROTO
   #include <malloc.h>
 #endif
 #include <cstdlib>
-
-#include <stxxl/bits/unused.h>
 
 namespace stxxl {
 

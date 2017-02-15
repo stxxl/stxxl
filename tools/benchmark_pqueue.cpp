@@ -21,14 +21,15 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
-#include <cstdint>
-#include <limits>
-#include <iomanip>
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 #include <stxxl/random>
 #include <stxxl/cmdline>
 #include <stxxl/bits/common/tuple.h>
+
+#include <cstdint>
+#include <limits>
+#include <iomanip>
 
 using stxxl::external_size_type;
 
@@ -227,11 +228,11 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
     STXXL_MSG("block size: " << pq_type::BlockSize);
     STXXL_MSG("insertion buffer size (N): " << pq_type::N << " items ("
                                             << pq_type::N * sizeof(ValueType) << " B)");
-    STXXL_MSG("delete buffer size: " << pq_type::delete_buffer_size);
+    STXXL_MSG("delete buffer size: " << pq_type::kDeleteBufferSize);
     STXXL_MSG("maximal arity for internal mergers (AI): " << pq_type::IntKMAX);
     STXXL_MSG("maximal arity for external mergers (AE): " << pq_type::ExtKMAX);
-    STXXL_MSG("internal groups: " << pq_type::num_int_groups);
-    STXXL_MSG("external groups: " << pq_type::num_ext_groups);
+    STXXL_MSG("internal groups: " << pq_type::kNumIntGroups);
+    STXXL_MSG("external groups: " << pq_type::kNumExtGroups);
     STXXL_MSG("X : " << gen::X);
 
     if (volume == 0) volume = 2 * (mem_for_queue + mem_for_pools);

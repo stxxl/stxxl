@@ -35,6 +35,8 @@
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 
+#include <string>
+
 namespace stxxl {
 
 //! \addtogroup fileimpl

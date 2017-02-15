@@ -15,9 +15,10 @@
 #ifndef STXXL_ALGO_LOSERTREE_HEADER
 #define STXXL_ALGO_LOSERTREE_HEADER
 
-#include <algorithm>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
+
+#include <algorithm>
 
 namespace stxxl {
 

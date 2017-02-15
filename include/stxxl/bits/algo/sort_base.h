@@ -13,8 +13,9 @@
 #ifndef STXXL_ALGO_SORT_BASE_HEADER
 #define STXXL_ALGO_SORT_BASE_HEADER
 
-#include <cmath>
 #include <stxxl/bits/common/types.h>
+
+#include <cmath>
 
 #ifndef STXXL_NO_WARN_RECURSIVE_SORT
 #define STXXL_WARNMSG_RECURSIVE_SORT STXXL_ERRMSG

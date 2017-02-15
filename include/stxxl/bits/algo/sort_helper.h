@@ -14,10 +14,11 @@
 #ifndef STXXL_ALGO_SORT_HELPER_HEADER
 #define STXXL_ALGO_SORT_HELPER_HEADER
 
-#include <algorithm>
-#include <functional>
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/verbose.h>
+
+#include <algorithm>
+#include <functional>
 
 namespace stxxl {
 
@@ -55,7 +56,7 @@ struct trigger_entry_cmp
 {
     typedef TriggerEntryType trigger_entry_type;
     ValueCmp cmp;
-    trigger_entry_cmp(ValueCmp c) : cmp(c) { }
+    explicit trigger_entry_cmp(ValueCmp c) : cmp(c) { }
     trigger_entry_cmp(const trigger_entry_cmp& a) : cmp(a.cmp) { }
     bool operator () (const trigger_entry_type& a, const trigger_entry_type& b) const
     {
@@ -80,7 +81,7 @@ struct run_cursor2_cmp
     typedef run_cursor2<block_type, prefetcher_type> cursor_type;
     value_cmp cmp;
 
-    run_cursor2_cmp(value_cmp c) : cmp(c) { }
+    explicit run_cursor2_cmp(value_cmp c) : cmp(c) { }
     run_cursor2_cmp(const run_cursor2_cmp& a) : cmp(a.cmp) { }
     inline bool operator () (const cursor_type& a, const cursor_type& b) const
     {

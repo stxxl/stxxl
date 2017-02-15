@@ -18,8 +18,11 @@
 #define STXXL_PARALLEL_MERGE_HEADER
 
 #include <stxxl/bits/parallel/compiletime_settings.h>
+
 #include <iterator>
 #include <cassert>
+#include <utility>
+#include <algorithm>
 
 namespace stxxl {
 namespace parallel {
@@ -224,8 +227,7 @@ parallel_merge_advance(
         std::make_pair(begin1, end1), std::make_pair(begin2, end2)
     };
     RandomAccessIterator3 target_end = parallel_multiway_merge(
-        seqs, seqs + 2, target, comp, max_length, true, false
-        );
+        seqs, seqs + 2, target, comp, max_length, true, false);
 
     return target_end;
 }

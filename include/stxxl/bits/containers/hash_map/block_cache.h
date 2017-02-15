@@ -21,6 +21,7 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
 
+#include <algorithm>
 #include <vector>
 #include <list>
 #include <unordered_map>
@@ -43,7 +44,7 @@ protected:
     std::list<unsigned_type> busy_blocks_; // TODO make that a circular-buffer
 
 public:
-    block_cache_write_buffer(unsigned_type size)
+    explicit block_cache_write_buffer(unsigned_type size)
     {
         blocks_.reserve(size);
         free_blocks_.reserve(size);
@@ -195,7 +196,7 @@ protected:
 public:
     //! Construct a new block-cache.
     //! \param cache_size cache-size in number of blocks
-    block_cache(unsigned_type cache_size)
+    explicit block_cache(unsigned_type cache_size)
         : write_buffer_(config::get_instance()->disks_number() * 2),
           blocks_(cache_size),
           bids_(cache_size),
@@ -263,8 +264,7 @@ protected:
             {
                 throw std::runtime_error(
                           "The block cache is too small,"
-                          "no block can be kicked out (all blocks are retained)!"
-                          );
+                          "no block can be kicked out (all blocks are retained)!");
             }
             pager_.hit(i_block2kick);
         } while (retain_count_[i_block2kick] > 0);
@@ -419,8 +419,7 @@ public:
 
         // now actually load the wanted subblock and store it within *block
         subblock_bid_type subblock_bid(
-            bid.storage, bid.offset + i_subblock * subblock_type::raw_size
-            );
+            bid.storage, bid.offset + i_subblock * subblock_type::raw_size);
         request_ptr req = ((*block)[i_subblock]).read(subblock_bid);
         req->wait();
 

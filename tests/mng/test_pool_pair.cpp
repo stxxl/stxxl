@@ -12,10 +12,11 @@
 
 //! \example mng/test_pool_pair.cpp
 
-#include <iostream>
 #include <stxxl/mng>
 #include <stxxl/bits/mng/prefetch_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
+
+#include <iostream>
 
 #define BLOCK_SIZE (1024 * 512)
 

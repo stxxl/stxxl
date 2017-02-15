@@ -15,17 +15,21 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-#include <algorithm>
-#include <cmath>
 #include <stxxl/vector>
 #include <stxxl/scan>
 #include <stxxl/map>
 #include <stxxl/stats>
-
 #include <stxxl/bits/common/external_shared_ptr.h>
+
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
+
+#include <map>
+#include <limits>
+#include <functional>
+#include <iostream>
+#include <algorithm>
+#include <cmath>
 
 struct actual_element   // 24 bytes, not a power of 2 intentionally
 {

@@ -16,10 +16,6 @@
 #ifndef STXXL_ALGO_SORT_HEADER
 #define STXXL_ALGO_SORT_HEADER
 
-#include <functional>
-#include <algorithm>
-#include <iterator>
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>
@@ -41,6 +37,9 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
 
+#include <vector>
+#include <utility>
+#include <functional>
 #include <algorithm>
 
 namespace stxxl {
@@ -552,7 +551,9 @@ sort_blocks(InputBidIterator input_bids,
         runs[i] = new run_type(_n - full_runs * m2);
 
     for (i = 0; i < nruns; ++i)
-        mng->new_blocks(alloc_strategy(), make_bid_iterator(runs[i]->begin()), make_bid_iterator(runs[i]->end()));
+        mng->new_blocks(alloc_strategy(),
+                        make_bid_iterator(runs[i]->begin()),
+                        make_bid_iterator(runs[i]->end()));
 
     sort_local::create_runs<block_type,
                             run_type,
@@ -633,8 +634,7 @@ sort_blocks(InputBidIterator input_bids,
 #endif
             STXXL_VERBOSE("Merging " << runs2merge << " runs");
             merge_runs<block_type, run_type>(runs + nruns - runs_left,
-                                             runs2merge, *(new_runs + (cur_out_run++)), _m, cmp
-                                             );
+                                             runs2merge, *(new_runs + (cur_out_run++)), _m, cmp);
             runs_left -= runs2merge;
         }
 

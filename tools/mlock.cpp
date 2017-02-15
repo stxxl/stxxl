@@ -16,6 +16,7 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/cmdline>
 
 #if STXXL_HAVE_MLOCK_PROTO
 
@@ -23,10 +24,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <sys/mman.h>
 #include <unistd.h>
 
-#include <stxxl/cmdline>
+#include <sys/mman.h>
 
 int do_mlock(int argc, char* argv[])
 {

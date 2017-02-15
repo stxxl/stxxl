@@ -10,9 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stack>
 #include <stxxl/stack>
 #include <stxxl/random>
+
+#include <stack>
 
 int main()
 {

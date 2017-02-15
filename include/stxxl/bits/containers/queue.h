@@ -14,10 +14,6 @@
 #ifndef STXXL_CONTAINERS_QUEUE_HEADER
 #define STXXL_CONTAINERS_QUEUE_HEADER
 
-#include <vector>
-#include <queue>
-#include <deque>
-
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
@@ -26,6 +22,11 @@
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
+
+#include <vector>
+#include <queue>
+#include <deque>
+#include <algorithm>
 
 namespace stxxl {
 
@@ -146,7 +147,7 @@ public:
     //!                          default is number of blocks in the prefetch pool
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    queue(pool_type& pool_, int blocks2prefetch_ = -1)
+    explicit queue(pool_type& pool_, int blocks2prefetch_ = -1)
         : m_size(0),
           delete_pool(false),
           pool(&pool_),

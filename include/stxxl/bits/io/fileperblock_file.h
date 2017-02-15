@@ -13,8 +13,9 @@
 #ifndef STXXL_IO_FILEPERBLOCK_FILE_HEADER
 #define STXXL_IO_FILEPERBLOCK_FILE_HEADER
 
-#include <string>
 #include <stxxl/bits/io/disk_queued_file.h>
+
+#include <string>
 
 namespace stxxl {
 

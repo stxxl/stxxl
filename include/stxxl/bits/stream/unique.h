@@ -89,7 +89,7 @@ public:
     //! Standard stream typedef.
     typedef typename Input::value_type value_type;
 
-    unique(Input& input_) : input(input_)
+    explicit unique(Input& input_) : input(input_)
     {
         if (!input.empty())
             current = *input;

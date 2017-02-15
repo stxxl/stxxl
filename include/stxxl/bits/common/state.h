@@ -35,7 +35,7 @@ class state
     value_type m_state;
 
 public:
-    state(const value_type& s)
+    explicit state(const value_type& s)
         : m_state(s)
     { }
 

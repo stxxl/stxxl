@@ -15,9 +15,12 @@
 #ifndef STXXL_CONTAINERS_DEQUE_HEADER
 #define STXXL_CONTAINERS_DEQUE_HEADER
 
-#include <limits>
 #include <stxxl/vector>
+
+#include <limits>
 #include <algorithm>
+#include <deque>
+#include <vector>
 
 namespace stxxl {
 
@@ -257,7 +260,7 @@ protected:
 public:
     const_deque_iterator() : m_deque(NULL), m_offset(0) { }
 
-    const_deque_iterator(const deque_iterator<deque_type>& it)
+    const_deque_iterator(const deque_iterator<deque_type>& it) // NOLINT
         : m_deque(it.m_deque), m_offset(it.m_offset)
     { }
 
@@ -467,7 +470,7 @@ public:
           m_begin(0), m_end(0), m_size(0)
     { }
 
-    deque(size_type n)
+    explicit deque(size_type n)
         : m_vector(std::max<size_type>(STXXL_DEFAULT_BLOCK_SIZE(value_type) / sizeof(value_type), 2 * n)),
           m_begin(0), m_end(n), m_size(n)
     { }

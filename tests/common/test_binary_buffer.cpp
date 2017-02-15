@@ -73,7 +73,7 @@ void test1()
     STXXL_CHECK(br.get_varint() == 12345678);
 
     {
-        stxxl::binary_reader sub_br = br.get_binary_buffer_ref();
+        stxxl::binary_reader sub_br(br.get_binary_buffer_ref());
         STXXL_CHECK(sub_br.get_string() == "sub block");
         STXXL_CHECK(sub_br.get_varint() == 6 * 9);
         STXXL_CHECK(sub_br.empty());

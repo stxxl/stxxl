@@ -16,6 +16,8 @@
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/stream/sort_stream.h>
 
+#include <algorithm>
+
 namespace stxxl {
 
 #ifndef STXXL_VERBOSE_SORTER

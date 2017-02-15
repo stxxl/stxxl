@@ -14,12 +14,13 @@
 #ifndef STXXL_COMMON_COUNTING_PTR_HEADER
 #define STXXL_COMMON_COUNTING_PTR_HEADER
 
-#include <cassert>
-#include <cstdlib>
-#include <algorithm>
 #include <stxxl/types>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
+
+#include <cassert>
+#include <cstdlib>
+#include <algorithm>
 
 namespace stxxl {
 
@@ -76,7 +77,7 @@ public:
     { }
 
     //! constructor with pointer: initializes new reference to ptr.
-    counting_ptr(Type* ptr) : m_ptr(ptr)
+    explicit counting_ptr(Type* ptr) : m_ptr(ptr)
     { inc_reference(); }
 
     //! copy-constructor: also initializes new reference to ptr.
@@ -217,15 +218,16 @@ public:
     { }
 
     //! constructor with pointer: initializes new reference to ptr.
-    const_counting_ptr(const Type* ptr) : m_ptr(ptr)
+    explicit const_counting_ptr(const Type* ptr) : m_ptr(ptr)
     { inc_reference(); }
 
     //! copy-constructor: also initializes new reference to ptr.
     const_counting_ptr(const const_counting_ptr& other_ptr) : m_ptr(other_ptr)
     { inc_reference(); }
 
-    //! constructor from non-const: also initializes new reference to ptr.
-    const_counting_ptr(const counting_ptr<Type>& other_ptr) : m_ptr(other_ptr.get())
+    //! implicit conversion from non-const: also initializes new reference to ptr.
+    const_counting_ptr(const counting_ptr<Type>& other_ptr) // NOLINT
+        : m_ptr(other_ptr.get())
     { inc_reference(); }
 
     //! assignment operator: dereference current object and acquire reference on new one.
@@ -303,14 +305,16 @@ public:
     bool unique() const
     { return m_ptr && m_ptr->unique(); }
 
-    //! swap enclosed object with another const_counting pointer (no reference counts need change)
+    //! swap enclosed object with another const_counting pointer (no reference
+    //! counts need change)
     void swap(const_counting_ptr& b)
     {
         std::swap(m_ptr, b.m_ptr);
     }
 };
 
-//! swap enclosed object with another const_counting pointer (no reference counts need change)
+//! swap enclosed object with another const_counting pointer (no reference
+//! counts need change)
 template <class A>
 void swap(const_counting_ptr<A>& a1, const_counting_ptr<A>& a2)
 {

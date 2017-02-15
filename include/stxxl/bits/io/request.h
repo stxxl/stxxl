@@ -21,6 +21,7 @@
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/verbose.h>
 
+#include <string>
 #include <cassert>
 #include <memory>
 

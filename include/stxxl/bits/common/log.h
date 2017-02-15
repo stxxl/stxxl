@@ -14,9 +14,9 @@
 #ifndef STXXL_COMMON_LOG_HEADER
 #define STXXL_COMMON_LOG_HEADER
 
-#include <fstream>
-
 #include <stxxl/bits/singleton.h>
+
+#include <fstream>
 
 namespace stxxl {
 

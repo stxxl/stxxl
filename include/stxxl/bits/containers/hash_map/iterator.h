@@ -106,7 +106,7 @@ public:
     }
 
     //! Construct a new iterator pointing to the end of the given hash-map.
-    hash_map_iterator_base(hash_map_type* map)
+    explicit hash_map_iterator_base(hash_map_type* map)
         : map_(map),
           reader_(NULL),
           prefetch_(false),
@@ -413,7 +413,7 @@ public:
         : base_type(NULL)
     { }
 
-    hash_map_iterator(hash_map_type* map)
+    explicit hash_map_iterator(hash_map_type* map)
         : base_type(map)
     { }
 
@@ -516,11 +516,12 @@ public:
         : base_type(NULL)
     { }
 
-    hash_map_const_iterator(hash_map_type* map)
+    explicit hash_map_const_iterator(hash_map_type* map)
         : base_type(map)
     { }
 
-    hash_map_const_iterator(const hash_map_iterator& obj)
+    //! implicit conversion from non-const iterator
+    hash_map_const_iterator(const hash_map_iterator& obj) // NOLINT
         : base_type(obj)
     { }
 

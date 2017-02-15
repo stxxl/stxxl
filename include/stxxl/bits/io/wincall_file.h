@@ -30,6 +30,8 @@
 #include <stxxl/bits/io/wfs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 
+#include <string>
+
 namespace stxxl {
 
 //! \addtogroup fileimpl

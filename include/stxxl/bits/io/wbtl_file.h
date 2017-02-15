@@ -22,9 +22,11 @@
 
 #if STXXL_HAVE_WBTL_FILE
 
-#include <map>
-
 #include <stxxl/bits/io/disk_queued_file.h>
+
+#include <map>
+#include <utility>
+#include <functional>
 
 namespace stxxl {
 

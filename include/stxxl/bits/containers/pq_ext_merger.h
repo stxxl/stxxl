@@ -17,8 +17,10 @@
 #define STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 
 #include <stxxl/bits/containers/pq_mergers.h>
-#include <deque>
 
+#include <deque>
+#include <utility>
+#include <vector>
 #include <algorithm>
 
 namespace stxxl {
@@ -44,8 +46,8 @@ public:
     typedef BlockType block_type;
     typedef CompareType compare_type;
 
-    // max_arity / 2  <  arity  <=  max_arity
-    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
+    // kMaxArity / 2  <  arity  <=  kMaxArity
+    enum { arity = Arity, kMaxArity = 1UL << (LOG2<Arity>::ceil) };
 
     typedef AllocStr alloc_strategy;
 
@@ -183,7 +185,7 @@ protected:
     tree_type tree;
 
     //! sequence including current position, dereference gives current element
-    sequence_state states[max_arity];
+    sequence_state states[kMaxArity];
 
     //! read and writer block pool
     pool_type* pool;
@@ -195,7 +197,7 @@ protected:
     size_type m_size;
 
 public:
-    ext_merger(const compare_type& c = compare_type()) // TODO: pass pool as parameter
+    explicit ext_merger(const compare_type& c = compare_type()) // TODO: pass pool as parameter
         : tree(c, *this),
           pool(NULL),
           m_size(0)
@@ -291,18 +293,18 @@ protected:
         STXXL_VERBOSE2("ext_merger::init()");
 
         sentinel_block = NULL;
-        if (arity < max_arity)
+        if (arity < kMaxArity)
         {
             sentinel_block = new block_type;
             for (unsigned_type i = 0; i < block_type::size; ++i)
                 (*sentinel_block)[i] = tree.cmp.min_value();
-            if (arity + 1 == max_arity) {
-                // same memory consumption, but smaller merge width, better use arity = max_arity
-                STXXL_ERRMSG("inefficient PQ parameters for ext_merger: arity + 1 == max_arity");
+            if (arity + 1 == kMaxArity) {
+                // same memory consumption, but smaller merge width, better use arity = kMaxArity
+                STXXL_ERRMSG("inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity");
             }
         }
 
-        for (unsigned_type i = 0; i < max_arity; ++i)
+        for (unsigned_type i = 0; i < kMaxArity; ++i)
         {
             states[i].merger = this;
             if (i < arity)
@@ -321,7 +323,7 @@ protected:
         std::swap(k, obj.k);
         std::swap(logK, obj.logK);
         std::swap(m_size, obj.m_size);
-        swap_1D_arrays(states, obj.states, max_arity);
+        swap_1D_arrays(states, obj.states, kMaxArity);
 
         // std::swap(pool,obj.pool);
     }
@@ -330,7 +332,7 @@ protected:
 public:
     unsigned_type mem_cons() const // only rough estimation
     {
-        return (std::min<unsigned_type>(arity + 1, max_arity) * block_type::raw_size);
+        return (std::min<unsigned_type>(arity + 1, kMaxArity) * block_type::raw_size);
     }
 
     //! Whether there is still space for new array

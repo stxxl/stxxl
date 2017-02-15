@@ -16,13 +16,13 @@
 #ifndef STXXL_MNG_BID_HEADER
 #define STXXL_MNG_BID_HEADER
 
-#include <cstring>
-#include <ostream>
-#include <iomanip>
-
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/simple_vector.h>
+
+#include <cstring>
+#include <ostream>
+#include <iomanip>
 
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2
@@ -143,7 +143,7 @@ public:
         : simple_vector<BID<BlockSize> >()
     { }
 
-    BIDArray(unsigned_type size)
+    explicit BIDArray(const unsigned_type& size)
         : simple_vector<BID<BlockSize> >(size)
     { }
 };

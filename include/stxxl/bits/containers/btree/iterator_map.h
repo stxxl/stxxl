@@ -13,10 +13,12 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 
-#include <map>
-
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/common/error_handling.h>
+
+#include <map>
+#include <utility>
+#include <algorithm>
 
 namespace stxxl {
 namespace btree {
@@ -75,7 +77,7 @@ private:
     }
 
 public:
-    iterator_map(btree_type* b)
+    explicit iterator_map(btree_type* b)
         : m_btree(b)
     { }
 

@@ -39,7 +39,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     runs2bid_array_adaptor(RunType** a, PosType p, unsigned_type d)
         : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a, p), dim_size(d)
     { }
-    runs2bid_array_adaptor(const self_type& a)
+    explicit runs2bid_array_adaptor(const self_type& a)
         : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a), dim_size(a.dim_size)
     { }
 
@@ -96,7 +96,7 @@ struct runs2bid_array_adaptor2
           w(_w), h(_h), K(_w * _h)
     { }
 
-    runs2bid_array_adaptor2(const self_type& a)
+    runs2bid_array_adaptor2(const runs2bid_array_adaptor2& a)
         : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a),
           w(a.w), h(a.h), K(a.K)
     { }
@@ -163,8 +163,7 @@ struct trigger_entry_iterator
 
     trigger_iterator_type value;
 
-    trigger_entry_iterator(const self_type& a) : value(a.value) { }
-    trigger_entry_iterator(trigger_iterator_type v) : value(v) { }
+    explicit trigger_entry_iterator(trigger_iterator_type v) : value(v) { }
 
     bid_type& operator * ()
     {

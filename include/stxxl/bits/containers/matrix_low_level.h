@@ -17,10 +17,11 @@
 #define STXXL_BLAS 0
 #endif
 
-#include <complex>
-
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/parallel.h>
+
+#include <complex>
+#include <algorithm>
 
 namespace stxxl {
 
@@ -635,8 +636,8 @@ void gemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
     const blas_int& stride_in_a = a_in_col_major ? n : l;
     const blas_int& stride_in_b = b_in_col_major ? l : m;
     const blas_int& stride_in_c = c_in_col_major ? n : m;
-    const char transa = a_in_col_major xor c_in_col_major ? 'T' : 'N';
-    const char transb = b_in_col_major xor c_in_col_major ? 'T' : 'N';
+    const char transa = a_in_col_major ^ c_in_col_major ? 'T' : 'N';
+    const char transb = b_in_col_major ^ c_in_col_major ? 'T' : 'N';
     if (c_in_col_major)
         // blas expects matrices in column-major unless specified via transa rsp. transb
         gemm_(&transa, &transb, &n, &m, &l, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);

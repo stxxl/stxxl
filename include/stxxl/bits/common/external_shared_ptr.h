@@ -71,7 +71,7 @@ public:
      * Copy the pointer to internal storage and increment the refcount (the
      * destructor never gets called).
      */
-    external_shared_ptr(P ptr)
+    explicit external_shared_ptr(P ptr)
     {
         new (data)P(ptr);
     }

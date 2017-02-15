@@ -10,9 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
 #include <stxxl/vector>
 #include <stxxl/bits/config.h>
+
+#include <iostream>
 
 using stxxl::uint64;
 

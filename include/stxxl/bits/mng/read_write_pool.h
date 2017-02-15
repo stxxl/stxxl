@@ -16,6 +16,8 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
+#include <algorithm>
+
 namespace stxxl {
 
 //! \addtogroup schedlayer

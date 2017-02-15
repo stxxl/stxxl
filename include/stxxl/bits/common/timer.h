@@ -29,9 +29,12 @@
   #endif
   #include <windows.h>
 #else
-  #include <ctime>
   #include <sys/time.h>
+  #include <ctime>
 #endif
+
+#include <limits>
+#include <string>
 
 namespace stxxl {
 
@@ -39,7 +42,7 @@ namespace stxxl {
 //! \{
 
 //! Returns number of seconds since the epoch, high resolution.
-inline double
+static inline double
 timestamp()
 {
 #if STXXL_BOOST_TIMESTAMP
@@ -88,35 +91,35 @@ public:
     static const bool is_real = true;
 
     //! initialize and optionally immediately start the timer
-    inline timer(bool start_immediately = false)
+    explicit timer(bool start_immediately = false)
         : running(false), accumulated(0), last_clock(0)
     {
         if (start_immediately) start();
     }
 
     //! start timer
-    inline void start()
+    void start()
     {
         running = true;
         last_clock = timestamp();
     }
 
     //! stop timer
-    inline void stop()
+    void stop()
     {
         running = false;
         accumulated += timestamp() - last_clock;
     }
 
     //! return accumulated time
-    inline void reset()
+    void reset()
     {
         accumulated = 0.;
         last_clock = timestamp();
     }
 
     //! return currently accumulated time in milliseconds
-    inline double mseconds() const
+    double mseconds() const
     {
         if (running)
             return (accumulated + timestamp() - last_clock) * 1000.;
@@ -125,7 +128,7 @@ public:
     }
 
     //! return currently accumulated time in microseconds
-    inline double useconds() const
+    double useconds() const
     {
         if (running)
             return (accumulated + timestamp() - last_clock) * 1000000.;
@@ -134,7 +137,7 @@ public:
     }
 
     //! return currently accumulated time in seconds (as double)
-    inline double seconds() const
+    double seconds() const
     {
         if (running)
             return (accumulated + timestamp() - last_clock);
@@ -143,7 +146,7 @@ public:
     }
 
     //! accumulate elapsed time from another timer
-    inline timer& operator += (const timer& tm)
+    timer& operator += (const timer& tm)
     {
 #if STXXL_PARALLEL
 #pragma omp atomic
@@ -173,7 +176,7 @@ public:
     static const bool is_real = false;
 
     //! initialize and optionally immediately start the timer
-    fake_timer(bool = false)
+    explicit fake_timer(bool = false)
     { }
 
     //! start timer
@@ -207,7 +210,7 @@ public:
     }
 
     //! accumulate elapsed time from another timer
-    inline fake_timer& operator += (const fake_timer&)
+    fake_timer& operator += (const fake_timer&)
     {
         return *this;
     }
@@ -237,7 +240,7 @@ protected:
 
 public:
     //! save message and start timer
-    scoped_print_timer(const std::string& message, const uint64 bytes = 0)
+    explicit scoped_print_timer(const std::string& message, const uint64 bytes = 0)
         : m_message(message),
           m_bytes(bytes),
           m_timer(true)

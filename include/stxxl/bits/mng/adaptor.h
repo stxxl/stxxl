@@ -15,9 +15,9 @@
 #ifndef STXXL_MNG_ADAPTOR_HEADER
 #define STXXL_MNG_ADAPTOR_HEADER
 
-#include <iterator>
-
 #include <stxxl/bits/common/types.h>
+
+#include <iterator>
 
 namespace stxxl {
 
@@ -47,7 +47,7 @@ public:
         set(0);
     }
 
-    blocked_index(unsigned_type pos)
+    explicit blocked_index(unsigned_type pos)
     {
         set(pos);
     }
@@ -378,7 +378,8 @@ struct two2one_dim_array_column_adapter
     two2one_dim_array_column_adapter(one_dim_array_type* a, pos_type p)
         : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a, p)
     { }
-    two2one_dim_array_column_adapter(const self_type& a)
+
+    explicit two2one_dim_array_column_adapter(const self_type& a)
         : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a)
     { }
 
@@ -439,7 +440,7 @@ public:
         set(0);
     }
 
-    array_of_sequences_iterator(array_type* arrays)
+    explicit array_of_sequences_iterator(array_type* arrays)
     {
         this->arrays = arrays;
         set(0);

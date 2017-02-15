@@ -66,8 +66,7 @@ split(const std::string& str, const std::string& sep,
 
         result.push_back(
             str.substr(LastPos,
-                       std::string::size_type(CurPos - LastPos))
-            );
+                       std::string::size_type(CurPos - LastPos)));
 
         LastPos = CurPos + sep.size();
     }

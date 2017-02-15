@@ -17,12 +17,6 @@ static const char* description =
     "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
-#include <limits>
-#include <queue>
-
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
@@ -32,6 +26,13 @@ static const char* description =
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
+
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <limits>
+#include <queue>
+#include <utility>
 
 #if STXXL_PARALLEL
   #include <omp.h>
@@ -68,7 +69,7 @@ size_t extract_buffer_ram = 0;
 unsigned num_write_buffers = 14;
 double num_prefetchers = 2.0;
 unsigned num_read_blocks = 1;
-size_t block_size = STXXL_DEFAULT_BLOCK_SIZE(void *);
+size_t block_size = STXXL_DEFAULT_BLOCK_SIZE(void*);
 
 #if STXXL_PARALLEL
 const unsigned g_max_threads = omp_get_max_threads();
@@ -754,7 +755,7 @@ void do_bulk_push_asc(ContainerType& c, bool do_parallel)
         c.bulk_push_begin(bulk_size);
 
 #if STXXL_PARALLEL
-        #pragma omp parallel if(do_parallel) num_threads(g_max_threads)
+        #pragma omp parallel if (do_parallel) num_threads(g_max_threads)
 #endif
         {
             const unsigned thread_id = do_parallel ? get_thread_num() : 0;
@@ -776,7 +777,7 @@ void do_bulk_push_asc(ContainerType& c, bool do_parallel)
     c.bulk_push_begin(num_elements % bulk_size);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(do_parallel)
+#pragma omp parallel if (do_parallel)
 #endif
     {
         const unsigned thread_id = do_parallel ? get_thread_num() : 0;
@@ -827,7 +828,7 @@ void do_bulk_push_rand(ContainerType& c,
         c.bulk_push_begin(bulk_size);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(do_parallel) num_threads(g_max_threads)
+#pragma omp parallel if (do_parallel) num_threads(g_max_threads)
 #endif
         {
             const unsigned thread_id = do_parallel ? get_thread_num() : 0;
@@ -854,7 +855,7 @@ void do_bulk_push_rand(ContainerType& c,
     c.bulk_push_begin(bulk_remain);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(do_parallel)
+#pragma omp parallel if (do_parallel)
 #endif
     {
         const unsigned thread_id = do_parallel ? get_thread_num() : 0;
@@ -957,7 +958,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
         for (size_t i = 0; i < num_elements / bulk_size; ++i)
         {
 #if STXXL_PARALLEL
-#pragma omp parallel if(do_parallel) num_threads(g_max_threads)
+#pragma omp parallel if (do_parallel) num_threads(g_max_threads)
 #endif
             {
                 const unsigned thread_id = do_parallel ? get_thread_num() : 0;
@@ -984,7 +985,7 @@ void do_bulk_pop_check_rand(ContainerType& c,
         size_t bulk_remain = num_elements % bulk_size;
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(do_parallel)
+#pragma omp parallel if (do_parallel)
 #endif
         {
             const unsigned thread_id = do_parallel ? get_thread_num() : 0;
@@ -1125,7 +1126,7 @@ void do_bulk_rand_intermixed(ContainerType& c,
             c.bulk_push_begin(this_bulk_size);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel)
+#pragma omp parallel if (parallel)
 #endif
             {
                 const unsigned int thread_num =
@@ -1206,7 +1207,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 
                 c.bulk_push_begin(this_bulk_size);
 #if STXXL_PARALLEL
-#pragma omp parallel if(parallel)
+#pragma omp parallel if (parallel)
 #endif
                 {
                     const unsigned int thread_num =
@@ -1262,7 +1263,7 @@ void do_bulk_prefill(ContainerType& c, bool do_parallel,
     c.bulk_push_begin(num_elements / 2);
 
 #if STXXL_PARALLEL
-#pragma omp parallel if(do_parallel)
+#pragma omp parallel if (do_parallel)
 #endif
     {
         const unsigned int thread_num =
@@ -1811,12 +1812,12 @@ int main(int argc, char* argv[])
 
         STXXL_DEBUG1("PQ parameters:" <<
                      " total_memory=" << spq->mem_cons() <<
-                     " delete_buffer_size=" << spq->delete_buffer_size <<
+                     " kDeleteBufferSize=" << spq->kDeleteBufferSize <<
                      " N=" << spq->N <<
                      " IntKMAX=" << spq->IntKMAX <<
-                     " num_int_groups=" << spq->num_int_groups <<
-                     " num_ext_groups=" << spq->num_ext_groups <<
-                     " total_num_groups=" << spq->total_num_groups <<
+                     " kNumIntGroups=" << spq->kNumIntGroups <<
+                     " kNumExtGroups=" << spq->kNumExtGroups <<
+                     " kTotalNumGroups=" << spq->kTotalNumGroups <<
                      " BlockSize=" << spq->BlockSize <<
                      " ExtKMAX=" << spq->ExtKMAX);
 

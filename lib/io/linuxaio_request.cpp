@@ -73,8 +73,7 @@ bool linuxaio_request::post()
     // time before the call.
     double now = timestamp();
     linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
-        disk_queues::get_instance()->get_queue(m_file->get_queue_id())
-        );
+        disk_queues::get_instance()->get_queue(m_file->get_queue_id()));
     long success = syscall(SYS_io_submit, queue->get_io_context(), 1, &cb_pointer);
     if (success == 1)
     {
@@ -101,8 +100,7 @@ bool linuxaio_request::cancel()
 
     request_ptr req(this);
     linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
-        disk_queues::get_instance()->get_queue(m_file->get_queue_id())
-        );
+        disk_queues::get_instance()->get_queue(m_file->get_queue_id()));
     return queue->cancel_request(req);
 }
 
@@ -115,8 +113,7 @@ bool linuxaio_request::cancel_aio()
 
     io_event event;
     linuxaio_queue* queue = dynamic_cast<linuxaio_queue*>(
-        disk_queues::get_instance()->get_queue(m_file->get_queue_id())
-        );
+        disk_queues::get_instance()->get_queue(m_file->get_queue_id()));
     long result = syscall(SYS_io_cancel, queue->get_io_context(), &cb, &event);
     if (result == 0)    //successfully canceled
         queue->handle_events(&event, 1, true);

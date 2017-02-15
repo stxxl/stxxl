@@ -15,15 +15,15 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/types>
 
-template <unsigned n>
+template <unsigned kSize>
 struct bulk
 {
-    char m_data[n];
+    char m_data[kSize];
 
     bulk()
     {
 #if STXXL_WITH_VALGRIND
-        memset(m_data, 0, n);
+        memset(m_data, 0, kSize);
 #endif
     }
 };
@@ -41,7 +41,8 @@ struct my_type
     bulk<SIZE - sizeof(key_type)> m_data;
 
     my_type() { }
-    my_type(key_type k) : m_key(k) { }
+    //! implicit conversion
+    my_type(key_type k) : m_key(k) { } // NOLINT
 
 #ifdef KEY_COMPARE
     key_type key() const

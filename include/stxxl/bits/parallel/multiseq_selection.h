@@ -22,6 +22,8 @@
 #include <stxxl/bits/parallel/types.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
 
+#include <utility>
+#include <functional>
 #include <vector>
 #include <queue>
 #include <cstdlib>
@@ -39,7 +41,7 @@ protected:
     Comparator& m_comp;
 
 public:
-    lexicographic(Comparator& comp) : m_comp(comp) { }
+    explicit lexicographic(Comparator& comp) : m_comp(comp) { }
 
     inline bool operator () (const std::pair<T1, T2>& p1,
                              const std::pair<T1, T2>& p2)
@@ -64,7 +66,7 @@ protected:
     Comparator& m_comp;
 
 public:
-    lexicographic_rev(Comparator& comp) : m_comp(comp) { }
+    explicit lexicographic_rev(Comparator& comp) : m_comp(comp) { }
 
     inline bool operator () (const std::pair<T1, T2>& p1,
                              const std::pair<T1, T2>& p2)

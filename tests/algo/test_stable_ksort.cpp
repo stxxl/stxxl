@@ -20,6 +20,8 @@
 #include <stxxl/ksort>
 #include <stxxl/vector>
 
+#include <vector>
+
 struct my_type
 {
     typedef unsigned key_type;

@@ -14,11 +14,12 @@
 #ifndef STXXL_CONTAINERS_PAGER_HEADER
 #define STXXL_CONTAINERS_PAGER_HEADER
 
-#include <list>
-#include <cassert>
-
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/simple_vector.h>
+
+#include <algorithm>
+#include <list>
+#include <cassert>
 
 namespace stxxl {
 
@@ -43,7 +44,9 @@ class random_pager
     random_number<random_uniform_fast> rnd;
 
 public:
-    random_pager(size_type num_pages = n_pages) : num_pages(num_pages) { }
+    explicit random_pager(size_type num_pages = n_pages)
+        : num_pages(num_pages) { }
+
     size_type kick()
     {
         return rnd(size());
@@ -73,7 +76,8 @@ class lru_pager
     simple_vector<list_type::iterator> history_entry;
 
 public:
-    lru_pager(size_type num_pages = n_pages) : history_entry(num_pages)
+    explicit lru_pager(size_type num_pages = n_pages)
+        : history_entry(num_pages)
     {
         for (size_type i = 0; i < size(); ++i)
             history_entry[i] = history.insert(history.end(), i);

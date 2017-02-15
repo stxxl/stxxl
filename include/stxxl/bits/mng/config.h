@@ -15,14 +15,15 @@
 #ifndef STXXL_MNG_CONFIG_HEADER
 #define STXXL_MNG_CONFIG_HEADER
 
+#include <stxxl/version.h>
+#include <stxxl/bits/singleton.h>
+#include <stxxl/bits/common/log.h>
+
+#include <utility>
 #include <vector>
 #include <string>
 #include <cstdlib>
 #include <cassert>
-
-#include <stxxl/version.h>
-#include <stxxl/bits/singleton.h>
-#include <stxxl/bits/common/log.h>
 
 namespace stxxl {
 
@@ -56,7 +57,7 @@ public:
     disk_config(const std::string& path, uint64 size, const std::string& fileio);
 
     //! initializing constructor, parse full line as in config files
-    disk_config(const std::string& line);
+    explicit disk_config(const std::string& line);
 
     //! parse a disk=\<path>,\<size>,\<fileio> options line into disk_config,
     //! throws std::runtime_error on parse errors.

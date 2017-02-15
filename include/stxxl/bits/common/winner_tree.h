@@ -14,12 +14,13 @@
 #ifndef STXXL_COMMON_WINNER_TREE_HEADER
 #define STXXL_COMMON_WINNER_TREE_HEADER
 
-#include <vector>
-#include <limits>
-
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
+
+#include <vector>
+#include <limits>
+#include <string>
 
 namespace stxxl {
 

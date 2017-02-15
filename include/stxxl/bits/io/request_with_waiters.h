@@ -14,11 +14,11 @@
 #ifndef STXXL_IO_REQUEST_WITH_WAITERS_HEADER
 #define STXXL_IO_REQUEST_WITH_WAITERS_HEADER
 
-#include <set>
-
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request.h>
+
+#include <set>
 
 namespace stxxl {
 

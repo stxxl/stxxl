@@ -13,7 +13,6 @@
 #ifndef STXXL_CONTAINERS_BTREE_BTREE_HEADER
 #define STXXL_CONTAINERS_BTREE_BTREE_HEADER
 
-#include <limits>
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/iterator_map.h>
 #include <stxxl/bits/containers/btree/leaf.h>
@@ -21,6 +20,11 @@
 #include <stxxl/bits/containers/btree/root_node.h>
 #include <stxxl/bits/containers/btree/node.h>
 #include <stxxl/vector>
+
+#include <map>
+#include <utility>
+#include <algorithm>
+#include <limits>
 
 namespace stxxl {
 namespace btree {
@@ -227,8 +231,7 @@ private:
         assert(new_leaf);
         m_end_iterator = new_leaf->end();           // initialize end() iterator
         m_root_node.insert(
-            root_node_pair_type(key_compare::max_value(), (node_bid_type)new_bid)
-            );
+            root_node_pair_type(key_compare::max_value(), (node_bid_type)new_bid));
     }
 
     void deallocate_children()
@@ -275,8 +278,7 @@ private:
         leaf_bid_type new_bid;
         leaf_type* leaf = m_leaf_cache.get_new_node(new_bid);
         const unsigned_type max_leaf_elements = unsigned_type(
-            (double)leaf->max_nelements() * leaf_fill_factor
-            );
+            (double)leaf->max_nelements() * leaf_fill_factor);
 
         while (begin != end)
         {
@@ -334,8 +336,7 @@ private:
         bids.push_back(key_bid_pair(key_compare::max_value(), (node_bid_type)new_bid));
 
         const unsigned_type max_node_elements = unsigned_type(
-            double(max_node_size) * node_fill_factor
-            );
+            double(max_node_size) * node_fill_factor);
 
         //-tb fixes bug with only one child remaining in m_root_node
         while (bids.size() > node_type::max_nelements())

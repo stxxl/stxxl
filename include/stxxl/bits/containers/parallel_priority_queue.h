@@ -23,6 +23,9 @@
 #include <utility>
 #include <numeric>
 #include <vector>
+#include <string>
+#include <limits>
+#include <functional>
 
 #if STXXL_PARALLEL
     #include <omp.h>
@@ -544,7 +547,7 @@ public:
           m_bids(m_num_blocks),
           m_blocks(m_num_blocks, reinterpret_cast<block_type*>(1)),
           m_block_pointers(m_num_blocks),
-          m_requests(m_num_blocks, NULL),
+          m_requests(m_num_blocks),
           m_minima(m_num_blocks),
 
           // state
@@ -1517,7 +1520,7 @@ public:
     };
 
 public:
-    external_array_writer(ea_type& ea, unsigned int num_threads = 0)
+    explicit external_array_writer(ea_type& ea, unsigned int num_threads = 0)
         : m_ea(ea),
           m_ref_count(ea.num_blocks(), 0)
     {
@@ -1704,7 +1707,7 @@ public:
     };
 
     //! Construct the tree of minima sources.
-    minima_tree(parent_type& parent)
+    explicit minima_tree(parent_type& parent)
         : m_parent(parent),
           m_compare(parent.m_inv_compare),
           // construct comparators
@@ -1928,7 +1931,7 @@ protected:
     {
         const compare_type& compare;
 
-        inv_compare_type(const compare_type& c)
+        explicit inv_compare_type(const compare_type& c)
             : compare(c)
         { }
 
@@ -4455,8 +4458,7 @@ protected:
             m_stats.max_num_new_internal_arrays.set_max(
                 m_stats.num_new_internal_arrays);
             m_minima.add_internal_array(
-                static_cast<unsigned>(m_internal_arrays.size()) - 1
-                );
+                static_cast<unsigned>(m_internal_arrays.size()) - 1);
         }
 
         m_internal_size += size - used;
@@ -4538,8 +4540,7 @@ protected:
 
         // flush until enough memory for new array
         flush_ia_ea_until_memory_free(
-            internal_array_type::int_memory(values.size())
-            );
+            internal_array_type::int_memory(values.size()));
 
         add_as_internal_array(values);
     }

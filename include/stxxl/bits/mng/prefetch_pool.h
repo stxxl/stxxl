@@ -17,6 +17,8 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/mng/write_pool.h>
 
+#include <algorithm>
+#include <utility>
 #include <list>
 #include <unordered_map>
 

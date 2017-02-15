@@ -13,9 +13,10 @@
 #ifndef STXXL_COMMON_SWAP_VECTOR_HEADER
 #define STXXL_COMMON_SWAP_VECTOR_HEADER
 
+#include <stxxl/bits/verbose.h>
+
 #include <algorithm>
 #include <cassert>
-#include <stxxl/bits/verbose.h>
 
 namespace stxxl {
 
@@ -61,7 +62,7 @@ public:
     { }
 
     //! Create a vector with the spezified size.
-    swap_vector(size_type size)
+    explicit swap_vector(size_type size)
         : m_size(size), m_capacity(size), m_array(NULL)
     {
         if (m_size > 0)

@@ -16,6 +16,10 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/node_cache.h>
 
+#include <utility>
+#include <algorithm>
+#include <functional>
+
 namespace stxxl {
 namespace btree {
 
@@ -74,7 +78,7 @@ private:
     {
         key_compare comp;
 
-        value_compare(key_compare c) : comp(c) { }
+        explicit value_compare(key_compare c) : comp(c) { }
 
         bool operator () (const value_type& x, const value_type& y) const
         {

@@ -14,10 +14,6 @@
 #ifndef STXXL_CONTAINERS_STACK_HEADER
 #define STXXL_CONTAINERS_STACK_HEADER
 
-#include <stack>
-#include <vector>
-#include <cstdint>
-
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_manager.h>
@@ -28,6 +24,10 @@
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
+
+#include <algorithm>
+#include <stack>
+#include <vector>
 
 namespace stxxl {
 
@@ -128,7 +128,7 @@ public:
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class StackType>
-    normal_stack(const StackType& stack_)
+    explicit normal_stack(const StackType& stack_)
         : m_size(0),
           cache_offset(0),
           current_element(NULL),
@@ -379,7 +379,7 @@ public:
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class StackType>
-    grow_shrink_stack(const StackType& stack_)
+    explicit grow_shrink_stack(const StackType& stack_)
         : m_size(0),
           cache_offset(0),
           current_element(NULL),
@@ -805,7 +805,7 @@ public:
     }
 
     //! Returns number of blocks used for prefetching.
-    const size_t& get_prefetch_aggr() const
+    const size_t & get_prefetch_aggr() const
     {
         return pref_aggr;
     }
@@ -856,7 +856,7 @@ private:
     //! Copy-construction from a another stack of any type.
     //! \warning not implemented yet!
     template <class StackType>
-    migrating_stack(const StackType& stack_);
+    explicit migrating_stack(const StackType& stack_);
 
 public:
     //! \name Constructors/Destructors

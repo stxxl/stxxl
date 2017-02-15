@@ -188,7 +188,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     tuple() { }
 
     //! Initializing constructor
-    tuple(first_type first_)
+    explicit tuple(first_type first_)
         : first(first_)
     { }
 
@@ -466,7 +466,7 @@ template <class T1,
           class T4,
           class T5
           >
-struct tuple<T1, T2, T3, T4, T5, Plug>
+struct tuple<T1, T2, T3, T4, T5, Plug> // NOLINT
 {
     //! First tuple component type
     typedef T1 first_type;
@@ -657,7 +657,7 @@ protected:
     value_type m_count;
 
 public:
-    counter(const value_type& start = 0)
+    explicit counter(const value_type& start = 0)
         : m_count(start)
     { }
 

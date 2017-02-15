@@ -21,6 +21,8 @@
 #include <stxxl/bits/io/syscall_file.h>
 #include "ufs_platform.h"
 
+#include <limits>
+
 namespace stxxl {
 
 void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,

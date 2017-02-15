@@ -35,7 +35,7 @@ typedef stxxl::const_counting_ptr<my_int> int_cptr;
 int_cptr run_test()
 {
     // create object and pointer to it
-    int_ptr i1 = new my_int(42);
+    int_ptr i1 = int_ptr(new my_int(42));
 
     STXXL_CHECK(i1->i == 42);
     STXXL_CHECK((*i1).i == 42);

@@ -13,13 +13,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <algorithm>
-
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/io/request_queue_impl_1q.h>
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/parallel.h>
+
+#include <algorithm>
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
  #include <windows.h>

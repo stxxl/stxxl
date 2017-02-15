@@ -11,13 +11,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-#include <cmath>
-#include <cassert>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
+
+#include <iostream>
+#include <cmath>
+#include <cassert>
 
 template <size_t i>
 void log_i(size_t floorv, size_t ceilv)
@@ -54,7 +55,7 @@ void log_i(size_t floorv, size_t ceilv)
         STXXL_CHECK(stxxl::LOG2<i>::floor == floorv);
         STXXL_CHECK(stxxl::LOG2<i>::ceil == ceilv);
 
-#if 0                                        // not many compiler have log2l()
+#if 0                                   // not many compiler have log2l()
         if (i <= ((uint64_t)(1) << 59)) // does not work for higher powers
         {
             STXXL_CHECK(stxxl::LOG2_floor<i>::value == (size_t)floorl(log2l(i)));

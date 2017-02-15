@@ -16,11 +16,6 @@
 #ifndef STXXL_CONTAINERS_VECTOR_HEADER
 #define STXXL_CONTAINERS_VECTOR_HEADER
 
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <type_traits>
-
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_manager.h>
@@ -31,8 +26,12 @@
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_istream_reverse.h>
 #include <stxxl/bits/mng/buf_ostream.h>
-
 #include <stxxl/bits/common/types.h>
+
+#include <string>
+#include <vector>
+#include <queue>
+#include <algorithm>
 
 namespace stxxl {
 
@@ -76,7 +75,7 @@ class double_blocked_index
     }
 
 public:
-    explicit double_blocked_index(const size_type pos = 0)
+    explicit double_blocked_index(const size_type& pos = 0)
     {
         set(pos);
     }
@@ -223,7 +222,7 @@ public:
         return *this;
     }
 
-    const size_type& get_pos() const
+    const size_type & get_pos() const
     {
         return pos;
     }
@@ -322,7 +321,7 @@ public:
         : offset(0), p_vector(NULL)
     { }
     //! copy-constructor
-    vector_iterator(const self_type& a)
+    vector_iterator(const vector_iterator& a)
         : offset(a.offset),
           p_vector(a.p_vector)
     { }
@@ -595,11 +594,11 @@ public:
         : offset(0), p_vector(NULL)
     { }
     //! copy-constructor
-    const_vector_iterator(const self_type& a)
+    const_vector_iterator(const const_vector_iterator& a)
         : offset(a.offset), p_vector(a.p_vector)
     { }
-    //! copy-constructor from mutable iterator
-    const_vector_iterator(const mutable_self_type& a)
+    //! implicit conversion from mutable iterator
+    const_vector_iterator(const mutable_self_type& a) // NOLINT
         : offset(a.offset), p_vector(a.p_vector)
     { }
 
@@ -842,8 +841,7 @@ public:
     static constexpr size_t page_size = PageSize;
     static constexpr size_t block_size = BlockSize;
 
-    enum {on_disk = -1};
-
+    enum { on_disk = -1 };
 
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
     typedef vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size> iterator;
@@ -877,8 +875,7 @@ public:
         typedef typename super_type::size_type size_type;
         typedef typename super_type::value_type bid_type;
 
-        bid_vector(size_type sz) : super_type(sz)
-        { }
+        explicit bid_vector(size_type sz) : super_type(sz) { }
     };
 
     typedef bid_vector bids_container_type;
@@ -944,7 +941,7 @@ public:
     //!
     //! \param n Number of elements.
     //! \param npages Number of cached pages.
-    vector(const size_type n = 0, const size_t npages = pager_type().size())
+    explicit vector(const size_type n = 0, const size_t npages = pager_type().size())
         : m_size(n),
           m_bids((size_t)div_ceil(n, block_type::size)),
           m_pager(npages),
@@ -1102,7 +1099,7 @@ private:
         reserve(n);
         if (n < m_size) {
             // mark excess pages as uninitialized and evict them from cache
-            const size_t first_page_to_evict = static_cast<size_t>( div_ceil(n, block_type::size * page_size) );
+            const size_t first_page_to_evict = static_cast<size_t>(div_ceil(n, block_type::size * page_size));
             for (size_t i = first_page_to_evict; i < m_page_status.size(); ++i) {
                 if (m_page_to_slot[i] != on_disk) {
                     m_free_slots.push(m_page_to_slot[i]);
@@ -1118,7 +1115,7 @@ private:
     void _resize_shrink_capacity(size_type n)
     {
         const size_t old_bids_size = m_bids.size();
-        const size_t new_bids_size = static_cast<size_t>( div_ceil(n, block_type::size) );
+        const size_t new_bids_size = static_cast<size_t>(div_ceil(n, block_type::size));
 
         if (new_bids_size > old_bids_size)
         {
@@ -1229,7 +1226,7 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    vector(file* from, const size_type size = size_type(-1), const size_t npages = pager_type().size())
+    explicit vector(file* from, const size_type size = size_type(-1), const size_t npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
           m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
@@ -1695,8 +1692,7 @@ private:
     void block_externally_updated(const size_type offset) const
     {
         page_externally_updated(
-                static_cast<size_t>(offset / (block_type::size * page_size))
-        );
+            static_cast<size_t>(offset / (block_type::size * page_size)));
     }
 
     void block_externally_updated(const blocked_index_type& offset) const
@@ -1755,7 +1751,6 @@ private:
         const size_t& page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
         return m_page_to_slot[page_no] >= 0;       // != on_disk;
-
     }
 };
 
@@ -1958,7 +1953,7 @@ public:
     //! Create overlapped reader for the whole vector's content.
     //! \param vec vector to read
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader(const vector_type& vec, const size_t nbuffers = 0)
+    explicit vector_bufreader(const vector_type& vec, const size_t nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -2228,7 +2223,7 @@ public:
     //! Create overlapped reader for the whole vector's content.
     //! \param vec vector to read
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader_reverse(const vector_type& vec, size_t nbuffers = 0)
+    explicit vector_bufreader_reverse(const vector_type& vec, size_t nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
           m_bufin(NULL),
           m_nbuffers(nbuffers)

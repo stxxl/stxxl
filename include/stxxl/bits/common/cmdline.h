@@ -13,15 +13,15 @@
 #ifndef STXXL_COMMON_CMDLINE_HEADER
 #define STXXL_COMMON_CMDLINE_HEADER
 
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
+
 #include <cstddef>
 #include <cstdio>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <algorithm>
-
-#include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/utils.h>
 
 namespace stxxl {
 
@@ -489,8 +489,7 @@ public:
                   const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_flag(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_flag(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -501,8 +500,7 @@ public:
                  const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_int(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_int(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -513,8 +511,7 @@ public:
                   const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_uint(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_uint(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -525,8 +522,7 @@ public:
                     const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_double(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_double(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -537,8 +533,7 @@ public:
                    const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_bytes32(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_bytes32(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -549,8 +544,7 @@ public:
                    const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_bytes64(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_bytes64(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -560,8 +554,7 @@ public:
                     const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_string(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_string(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -572,8 +565,7 @@ public:
                         const std::string& desc)
     {
         m_optlist.push_back(
-            new argument_stringlist(key, longkey, keytype, desc, false, dest)
-            );
+            new argument_stringlist(key, longkey, keytype, desc, false, dest));
         calc_opt_max(m_optlist.back());
     }
 
@@ -630,8 +622,7 @@ public:
                        const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_int(0, name, "", desc, true, dest)
-            );
+            new argument_int(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -640,8 +631,7 @@ public:
                         const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_uint(0, name, "", desc, true, dest)
-            );
+            new argument_uint(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -650,8 +640,7 @@ public:
                           const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_double(0, name, "", desc, true, dest)
-            );
+            new argument_double(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -661,8 +650,7 @@ public:
                          const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_bytes32(0, name, "", desc, true, dest)
-            );
+            new argument_bytes32(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -672,8 +660,7 @@ public:
                          const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_bytes64(0, name, "", desc, true, dest)
-            );
+            new argument_bytes64(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -682,8 +669,7 @@ public:
                           const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_string(0, name, "", desc, true, dest)
-            );
+            new argument_string(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -695,8 +681,7 @@ public:
                               const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_stringlist(0, name, "", desc, true, dest)
-            );
+            new argument_stringlist(0, name, "", desc, true, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -708,8 +693,7 @@ public:
                            const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_int(0, name, "", desc, false, dest)
-            );
+            new argument_int(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -719,8 +703,7 @@ public:
                             const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_uint(0, name, "", desc, false, dest)
-            );
+            new argument_uint(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -729,8 +712,7 @@ public:
                               const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_double(0, name, "", desc, false, dest)
-            );
+            new argument_double(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -740,8 +722,7 @@ public:
                              const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_bytes32(0, name, "", desc, false, dest)
-            );
+            new argument_bytes32(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -751,8 +732,7 @@ public:
                              const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_bytes64(0, name, "", desc, false, dest)
-            );
+            new argument_bytes64(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -761,8 +741,7 @@ public:
                               const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_string(0, name, "", desc, false, dest)
-            );
+            new argument_string(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 
@@ -774,8 +753,7 @@ public:
                                   const std::string& desc)
     {
         m_paramlist.push_back(
-            new argument_stringlist(0, name, "", desc, false, dest)
-            );
+            new argument_stringlist(0, name, "", desc, false, dest));
         calc_param_max(m_paramlist.back());
     }
 

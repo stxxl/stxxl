@@ -13,6 +13,8 @@
 // [example]
 #include <stxxl/cmdline>
 
+#include <string>
+
 int main(int argc, char* argv[])
 {
     stxxl::cmdline_parser cp;

@@ -46,6 +46,8 @@ my %include_list;
 my %include_map;
 my %authormap;
 
+my @source_filelist;
+
 sub expect_error($$$$) {
     my ($path,$ln,$str,$expect) = @_;
 
@@ -148,6 +150,10 @@ sub process_cpp {
     open(F, $path) or die("Cannot read file $path: $!");
     my @data = <F>;
     close(F);
+
+    unless ($path =~ /\.dox$/) {
+        push(@source_filelist, $path);
+    }
 
     my @origdata = @data;
 
@@ -577,3 +583,19 @@ foreach my $a (sort keys %authormap)
     print A "$a$mail\n";
 }
 close(A);
+
+# run cpplint.py
+{
+    my @lintlist;
+
+    foreach my $path (@source_filelist)
+    {
+        #next if $path =~ /exclude/;
+
+        push(@lintlist, $path);
+    }
+
+    system("cpplint.py", "--counting=total", "--extensions=h,c,cc,hpp,cpp", @lintlist);
+}
+
+################################################################################

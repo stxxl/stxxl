@@ -44,7 +44,7 @@ public:
     typedef typename tuple_type::first_type value_type;
 
     //! Construction.
-    choose(Input& in_) : in(in_)
+    explicit choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -89,7 +89,7 @@ public:
     typedef typename tuple_type::second_type value_type;
 
     //! Construction.
-    choose(Input& in_) : in(in_)
+    explicit choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -134,7 +134,7 @@ public:
     typedef typename tuple_type::third_type value_type;
 
     //! Construction.
-    choose(Input& in_) : in(in_)
+    explicit choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -179,7 +179,7 @@ public:
     typedef typename tuple_type::fourth_type value_type;
 
     //! Construction.
-    choose(Input& in_) : in(in_)
+    explicit choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -224,7 +224,7 @@ public:
     typedef typename tuple_type::fifth_type value_type;
 
     //! Construction.
-    choose(Input& in_) : in(in_)
+    explicit choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.
@@ -269,7 +269,7 @@ public:
     typedef typename tuple_type::sixth_type value_type;
 
     //! Construction.
-    choose(Input& in_) : in(in_)
+    explicit choose(Input& in_) : in(in_)
     { }
 
     //! Standard stream method.

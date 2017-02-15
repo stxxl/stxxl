@@ -13,13 +13,22 @@
 #ifndef STXXL_MNG_BLOCK_SCHEDULER_HEADER
 #define STXXL_MNG_BLOCK_SCHEDULER_HEADER
 
-#include <stack>
-#include <queue>
-#include <limits>
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/addressable_queues.h>
+
+#include <algorithm>
+#include <vector>
+#include <list>
+#include <functional>
+#include <utility>
+#include <string>
+#include <map>
+#include <deque>
+#include <stack>
+#include <queue>
+#include <set>
+#include <limits>
 
 namespace stxxl {
 
@@ -553,12 +562,12 @@ protected:
     { bs.return_free_internal_block(iblock); }
 
 public:
-    block_scheduler_algorithm(block_scheduler_type& bs)
+    explicit block_scheduler_algorithm(block_scheduler_type& bs)
         : bs(bs),
           swappable_blocks(bs.swappable_blocks)
     { }
 
-    block_scheduler_algorithm(block_scheduler_algorithm* old)
+    explicit block_scheduler_algorithm(block_scheduler_algorithm* old)
         : bs(old->bs),
           swappable_blocks(bs.swappable_blocks)
     { }
@@ -631,11 +640,11 @@ protected:
     }
 
 public:
-    block_scheduler_algorithm_online_lru(block_scheduler_type& bs)
+    explicit block_scheduler_algorithm_online_lru(block_scheduler_type& bs)
         : block_scheduler_algorithm_type(bs)
     { init(); }
 
-    block_scheduler_algorithm_online_lru(block_scheduler_algorithm_type* old)
+    explicit block_scheduler_algorithm_online_lru(block_scheduler_algorithm_type* old)
         : block_scheduler_algorithm_type(old)
     { init(); }
 
@@ -777,14 +786,14 @@ protected:
     }
 
 public:
-    block_scheduler_algorithm_simulation(block_scheduler_type& bs)
+    explicit block_scheduler_algorithm_simulation(block_scheduler_type& bs)
         : block_scheduler_algorithm_type(bs),
           time_count(0),
           last_op_release(false),
           reference_counts(swappable_blocks.size())
     { init(); }
 
-    block_scheduler_algorithm_simulation(block_scheduler_algorithm_type* old)
+    explicit block_scheduler_algorithm_simulation(block_scheduler_algorithm_type* old)
         : block_scheduler_algorithm_type(old),
           time_count(0),
           last_op_release(false),
@@ -820,12 +829,10 @@ public:
         last_op_release = false;
         if (uninitialized)
             prediction_sequence.push_back(
-                prediction_sequence_element_type(block_scheduler_type::op_acquire_uninitialized, sbid, time_count)
-                );
+                prediction_sequence_element_type(block_scheduler_type::op_acquire_uninitialized, sbid, time_count));
         else
             prediction_sequence.push_back(
-                prediction_sequence_element_type(block_scheduler_type::op_acquire, sbid, time_count)
-                );
+                prediction_sequence_element_type(block_scheduler_type::op_acquire, sbid, time_count));
         return dummy_block;
     }
 
@@ -836,36 +843,31 @@ public:
         last_op_release = true;
         if (dirty)
             prediction_sequence.push_back(
-                prediction_sequence_element_type(block_scheduler_type::op_release_dirty, sbid, time_count)
-                );
+                prediction_sequence_element_type(block_scheduler_type::op_release_dirty, sbid, time_count));
         else
             prediction_sequence.push_back(
-                prediction_sequence_element_type(block_scheduler_type::op_release, sbid, time_count)
-                );
+                prediction_sequence_element_type(block_scheduler_type::op_release, sbid, time_count));
     }
 
     virtual void deinitialize(swappable_block_identifier_type sbid)
     {
         reference_counts[sbid] = false;
         prediction_sequence.push_back(
-            prediction_sequence_element_type(block_scheduler_type::op_deinitialize, sbid, time_count)
-            );
+            prediction_sequence_element_type(block_scheduler_type::op_deinitialize, sbid, time_count));
     }
 
     virtual void initialize(swappable_block_identifier_type sbid, external_block_type)
     {
         reference_counts[sbid] = true;
         prediction_sequence.push_back(
-            prediction_sequence_element_type(block_scheduler_type::op_initialize, sbid, time_count)
-            );
+            prediction_sequence_element_type(block_scheduler_type::op_initialize, sbid, time_count));
     }
 
     virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
     {
         reference_counts[sbid] = false;
         prediction_sequence.push_back(
-            prediction_sequence_element_type(block_scheduler_type::op_extract_external_block, sbid, time_count)
-            );
+            prediction_sequence_element_type(block_scheduler_type::op_extract_external_block, sbid, time_count));
         return external_block_type();
     }
 
@@ -1005,12 +1007,12 @@ protected:
     }
 
 public:
-    block_scheduler_algorithm_offline_lfd(block_scheduler_type& bs)
+    explicit block_scheduler_algorithm_offline_lfd(block_scheduler_type& bs)
         : block_scheduler_algorithm_type(bs)
     { init(get_algorithm_from_block_scheduler()); }
 
     // It is possible to keep an old simulation-algorithm object and reuse it's prediction sequence
-    block_scheduler_algorithm_offline_lfd(block_scheduler_algorithm_type* old)
+    explicit block_scheduler_algorithm_offline_lfd(block_scheduler_algorithm_type* old)
         : block_scheduler_algorithm_type(old)
     { init(old); }
 
@@ -1175,7 +1177,7 @@ protected:
     {
         write_read_request* wrr;
 
-        read_after_write(write_read_request* write_read_req)
+        explicit read_after_write(write_read_request* write_read_req)
             : wrr(write_read_req) { }
 
         void operator () (request*)
@@ -1193,7 +1195,7 @@ protected:
         request_ptr read_req;
         std::deque<block_scheduler_operation> operations; // invariant: not empty; front: last scheduled operation, back: upcoming operation
 
-        scheduled_block_meta(block_scheduler_operation op)
+        explicit scheduled_block_meta(block_scheduler_operation op)
             : reserved_iblock(0),
               giver(false, 0),
               read_req(0),
@@ -1518,15 +1520,16 @@ protected:
         {
             // list operation in scheduled_blocks
             std::pair<scheduled_blocks_iterator, bool> ins_res = scheduled_blocks.insert(
-                std::make_pair(next_op_to_schedule->id, next_op_to_schedule->op));
+                std::make_pair(next_op_to_schedule->id,
+                               scheduled_block_meta(next_op_to_schedule->op)));
             scheduled_blocks_iterator schedule_meta = ins_res.first;
             if (! ins_res.second)
                 schedule_meta->second.operations.push_front(next_op_to_schedule->op);
             SwappableBlockType& sblock = swappable_blocks[next_op_to_schedule->id];
 
             // do appropriate preparations
-            if (next_op_to_schedule->op == block_scheduler_type::op_acquire
-                || next_op_to_schedule->op == block_scheduler_type::op_acquire_uninitialized)
+            if (next_op_to_schedule->op == block_scheduler_type::op_acquire ||
+                next_op_to_schedule->op == block_scheduler_type::op_acquire_uninitialized)
             {
                 if (sblock.is_internal())
                 {
@@ -1638,12 +1641,12 @@ protected:
     }
 
 public:
-    block_scheduler_algorithm_offline_lru_prefetching(block_scheduler_type& bs)
+    explicit block_scheduler_algorithm_offline_lru_prefetching(block_scheduler_type& bs)
         : block_scheduler_algorithm_type(bs)
     { init(get_algorithm_from_block_scheduler()); }
 
     // It is possible to keep an old simulation-algorithm object and reuse it's prediction sequence
-    block_scheduler_algorithm_offline_lru_prefetching(block_scheduler_algorithm_type* old)
+    explicit block_scheduler_algorithm_offline_lru_prefetching(block_scheduler_algorithm_type* old)
         : block_scheduler_algorithm_type(old)
     { init(old); }
 

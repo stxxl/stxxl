@@ -15,6 +15,7 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #if STXXL_STD_THREADS
  #include <condition_variable>
@@ -23,8 +24,6 @@
 #elif STXXL_POSIX_THREADS
  #include <pthread.h>
  #include <cerrno>
-
- #include <stxxl/bits/common/error_handling.h>
 #else
  #error "Thread implementation not detected."
 #endif

@@ -16,9 +16,6 @@
 #ifndef STXXL_CONTAINERS_PQ_HELPERS_HEADER
 #define STXXL_CONTAINERS_PQ_HELPERS_HEADER
 
-#include <vector>
-#include <algorithm>
-
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
@@ -31,6 +28,11 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/error_handling.h>
+
+#include <vector>
+#include <algorithm>
+#include <utility>
+#include <functional>
 
 #if STXXL_PARALLEL
 
@@ -107,8 +109,7 @@ protected:
 
 public:
     //! Default constructor creates no elements.
-    explicit
-    internal_priority_queue(size_type capacity)
+    explicit internal_priority_queue(size_type capacity)
         : heap(capacity), current_size(0)
     { }
 
@@ -190,8 +191,7 @@ protected:
     Predicate pred;
 
 public:
-    explicit
-    invert_order(const Predicate& _pred) : pred(_pred) { }
+    explicit invert_order(const Predicate& _pred) : pred(_pred) { }
 
     bool operator () (const FirstType& x, const SecondType& y) const
     {

@@ -11,13 +11,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <cstdio>
-#include <iomanip>
-#include <vector>
-
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/common/cmdline.h>
+
+#include <cstdio>
+#include <iomanip>
+#include <vector>
 
 #if !STXXL_WINDOWS
  #include <unistd.h>

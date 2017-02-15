@@ -27,6 +27,9 @@
 #include <stxxl/bits/stream/sorted_runs.h>
 
 #include <algorithm>
+#include <utility>
+#include <vector>
+#include <functional>
 
 namespace stxxl {
 namespace stream {
@@ -816,8 +819,7 @@ public:
                 alloc_strategy,
                 make_bid_iterator(result_->runs[irun].begin() + iblock),
                 make_bid_iterator(result_->runs[irun].end()),
-                iblock
-                );
+                iblock);
 
             result_->runs[irun][iblock].value = (*cur_block)[0];             // init trigger
             cur_block = writer.write(cur_block, result_->runs[irun][iblock].bid);
@@ -855,8 +857,7 @@ public:
                 alloc_strategy,
                 make_bid_iterator(result_->runs[irun].begin() + iblock),
                 make_bid_iterator(result_->runs[irun].end()),
-                iblock
-                );
+                iblock);
 
             result_->runs[irun][iblock].value = (*cur_block)[0];             // init trigger
             cur_block = writer.write(cur_block, result_->runs[irun][iblock].bid);
@@ -1427,7 +1428,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                 // Construct temporary sorted_runs object as input into recursive merger.
                 // This sorted_runs is copied a subset of the over-large set of runs, which
                 // will be deallocated from external memory once the runs are merged.
-                sorted_runs_type cur_runs = new sorted_runs_data_type;
+                sorted_runs_type cur_runs(new sorted_runs_data_type);
                 cur_runs->runs.resize(runs2merge);
                 cur_runs->runs_sizes.resize(runs2merge);
 

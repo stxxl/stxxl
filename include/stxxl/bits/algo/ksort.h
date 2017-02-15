@@ -33,6 +33,7 @@
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/utils.h>
 
+#include <functional>
 #include <algorithm>
 
 //#define INTERLEAVED_ALLOC
@@ -309,7 +310,7 @@ struct run_cursor2_cmp : public std::binary_function<
 {
     typedef run_cursor2<BlockType, prefetcher_type> cursor_type;
     KeyExtractor keyobj;
-    run_cursor2_cmp(KeyExtractor _keyobj)
+    explicit run_cursor2_cmp(KeyExtractor _keyobj)
         : keyobj(_keyobj)
     { }
     inline bool operator () (const cursor_type& a, const cursor_type& b) const
@@ -335,7 +336,7 @@ class key_comparison : public std::binary_function<RecordType, RecordType, bool>
 
 public:
     key_comparison() { }
-    key_comparison(KeyExtractor ke_) : ke(ke_) { }
+    explicit key_comparison(KeyExtractor ke_) : ke(ke_) { }
     bool operator () (const RecordType& a, const RecordType& b) const
     {
         return ke(a) < ke(b);

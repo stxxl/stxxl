@@ -15,6 +15,9 @@
 #include <stxxl/random>
 #include <stxxl/types>
 
+#include <algorithm>
+#include <vector>
+
 //! Comparator interface for the winner tree: takes two players and decides
 //! which is smaller. In this implementation the players are the top elements
 //! from an array of vectors.

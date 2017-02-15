@@ -14,15 +14,16 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/cmdline>
 
 #if STXXL_HAVE_MALLINFO_PROTO
 
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+
 #include <malloc.h>
 #include <unistd.h>
-#include <stxxl/cmdline>
 
 void print_malloc_stats()
 {

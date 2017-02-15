@@ -13,10 +13,11 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
-#include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>
 #include <stxxl/algorithm>
+
+#include <vector>
 
 struct forty_two
 {

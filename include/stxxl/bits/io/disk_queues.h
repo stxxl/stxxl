@@ -16,8 +16,6 @@
 #ifndef STXXL_IO_DISK_QUEUES_HEADER
 #define STXXL_IO_DISK_QUEUES_HEADER
 
-#include <map>
-
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request.h>
@@ -25,6 +23,8 @@
 #include <stxxl/bits/io/linuxaio_queue.h>
 #include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/serving_request.h>
+
+#include <map>
 
 namespace stxxl {
 
@@ -61,8 +61,7 @@ public:
 #if STXXL_HAVE_LINUXAIO_FILE
             if (dynamic_cast<linuxaio_request*>(req.get()))
                 q = queues[disk] = new linuxaio_queue(
-                        dynamic_cast<linuxaio_file*>(req->get_file())->get_desired_queue_length()
-                        );
+                        dynamic_cast<linuxaio_file*>(req->get_file())->get_desired_queue_length());
             else
 #endif
             q = queues[disk] = new request_queue_impl_qwqr();

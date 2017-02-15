@@ -15,11 +15,12 @@
 #ifndef STXXL_VERBOSE_HEADER
 #define STXXL_VERBOSE_HEADER
 
+#include <stxxl/bits/unused.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <stxxl/bits/unused.h>
 
 #define _STXXL_PRNT_COUT        (1 << 0)
 #define _STXXL_PRNT_CERR        (1 << 1)

@@ -18,6 +18,10 @@
 #include <stxxl/bits/mng/block_scheduler.h>
 #include <stxxl/bits/containers/matrix_arithmetic.h>
 
+#include <algorithm>
+#include <vector>
+#include <utility>
+
 namespace stxxl {
 
 //! \defgroup matrix matrix
@@ -55,7 +59,7 @@ public:
     using vector_type::size;
 
     //! \param n number of elements
-    column_vector(size_type n = 0)
+    explicit column_vector(size_type n = 0)
         : vector_type(n) { }
 
     column_vector operator + (const column_vector& right) const
@@ -126,7 +130,7 @@ public:
     using vector_type::size;
 
     //! \param n number of elements
-    row_vector(size_type n = 0)
+    explicit row_vector(size_type n = 0)
         : vector_type(n) { }
 
     row_vector operator + (const row_vector& right) const
@@ -471,7 +475,7 @@ protected:
           current_iblock(0) { }
 
     //! create empty iterator
-    matrix_iterator(matrix_type& matrix)
+    explicit matrix_iterator(matrix_type& matrix)
         : m(&matrix),
           current_row(-1), // empty iterator
           current_col(-1),
@@ -603,12 +607,12 @@ protected:
         : matrix_iterator_type(matrix, start_row, start_col) { }
 
     //! create empty iterator
-    matrix_row_major_iterator(matrix_type& matrix)
+    explicit matrix_row_major_iterator(matrix_type& matrix)
         : matrix_iterator_type(matrix) { }
 
 public:
-    //! convert from matrix_iterator
-    matrix_row_major_iterator(const matrix_iterator_type& matrix_iterator)
+    //! implicit conversion from matrix_iterator
+    matrix_row_major_iterator(const matrix_iterator_type& matrix_iterator) // NOLINT
         : matrix_iterator_type(matrix_iterator) { }
 
     // Has to be not empty, else behavior is undefined.
@@ -669,12 +673,12 @@ protected:
         : matrix_iterator_type(matrix, start_row, start_col) { }
 
     //! create empty iterator
-    matrix_col_major_iterator(matrix_type& matrix)
+    explicit matrix_col_major_iterator(matrix_type& matrix)
         : matrix_iterator_type(matrix) { }
 
 public:
-    //! convert from matrix_iterator
-    matrix_col_major_iterator(const matrix_iterator_type& matrix_iterator)
+    //! implicit conversion from matrix_iterator
+    matrix_col_major_iterator(const matrix_iterator_type& matrix_iterator)  // NOLINT
         : matrix_iterator_type(matrix_iterator) { }
 
     // Has to be not empty, else behavior is undefined.
@@ -762,7 +766,7 @@ protected:
           current_iblock(0) { }
 
     //! create empty iterator
-    const_matrix_iterator(const matrix_type& matrix)
+    explicit const_matrix_iterator(const matrix_type& matrix)
         : m(&matrix),
           current_row(-1), // empty iterator
           current_col(-1),
@@ -780,7 +784,7 @@ protected:
     }
 
 public:
-    const_matrix_iterator(const matrix_iterator<ValueType, BlockSideLength>& other)
+    explicit const_matrix_iterator(const matrix_iterator<ValueType, BlockSideLength>& other)
         : m(other.m),
           current_row(other.current_row),
           current_col(other.current_col),
@@ -906,7 +910,7 @@ protected:
         : const_matrix_iterator_type(matrix, start_row, start_col) { }
 
     //! create empty iterator
-    const_matrix_row_major_iterator(const matrix_type& matrix)
+    explicit const_matrix_row_major_iterator(const matrix_type& matrix)
         : const_matrix_iterator_type(matrix) { }
 
 public:
@@ -914,8 +918,8 @@ public:
     const_matrix_row_major_iterator(const const_matrix_row_major_iterator& matrix_iterator)
         : const_matrix_iterator_type(matrix_iterator) { }
 
-    //! convert from matrix_iterator
-    const_matrix_row_major_iterator(const const_matrix_iterator_type& matrix_iterator)
+    //! implicit conversion from matrix_iterator
+    const_matrix_row_major_iterator(const const_matrix_iterator_type& matrix_iterator)  // NOLINT
         : const_matrix_iterator_type(matrix_iterator) { }
 
     // Has to be not empty, else behavior is undefined.
@@ -976,16 +980,18 @@ protected:
         : const_matrix_iterator_type(matrix, start_row, start_col) { }
 
     //! create empty iterator
-    const_matrix_col_major_iterator(const matrix_type& matrix)
+    explicit const_matrix_col_major_iterator(const matrix_type& matrix)
         : const_matrix_iterator_type(matrix) { }
 
 public:
-    //! convert from matrix_iterator
-    const_matrix_col_major_iterator(const matrix_iterator<ValueType, BlockSideLength>& matrix_iterator)
+    //! implicit conversion from matrix_iterator
+    const_matrix_col_major_iterator(
+        const matrix_iterator<ValueType, BlockSideLength>& matrix_iterator) // NOLINT
         : const_matrix_iterator_type(matrix_iterator) { }
 
-    //! convert from matrix_iterator
-    const_matrix_col_major_iterator(const const_matrix_iterator_type& matrix_iterator)
+    //! implicit conversion from matrix_iterator
+    const_matrix_col_major_iterator(
+        const const_matrix_iterator_type& matrix_iterator) // NOLINT
         : const_matrix_iterator_type(matrix_iterator) { }
 
     // Has to be not empty, else behavior is undefined.
@@ -1256,8 +1262,7 @@ public:
         {
             // all offline algos need a simulation-run
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
             switch (multiplication_algorithm)
             {
             case 0:
@@ -1290,18 +1295,15 @@ public:
         {
         case 0:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
             break;
         case 1:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
             break;
         case 2:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
             break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
@@ -1334,8 +1336,7 @@ public:
             break;
         }
         delete data->bs.switch_algorithm_to(
-            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
-            );
+            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
 
@@ -1350,34 +1351,29 @@ public:
         {
             // all offline algos need a simulation-run
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
             multiply_internal(right, res);
         }
         switch (scheduling_algorithm)
         {
         case 0:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
             break;
         case 1:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
             break;
         case 2:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs)
-                );
+                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
             break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
         }
         multiply_internal(right, res);
         delete data->bs.switch_algorithm_to(
-            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs)
-            );
+            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
     //! \}

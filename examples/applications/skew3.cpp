@@ -17,16 +17,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <limits>
-#include <string>
-#include <vector>
-
 #include <stxxl/algorithm>
 #include <stxxl/cmdline>
 #include <stxxl/io>
@@ -36,6 +26,16 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 #include <stxxl/bits/common/uint_types.h>
+
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <cstddef>
+#include <cstdlib>
+#include <iostream>
+#include <limits>
+#include <string>
+#include <vector>
 
 using stxxl::uint64;
 using stxxl::internal_size_type;
@@ -503,7 +503,7 @@ public:
         value_type result;
 
     public:
-        extract_mod12(Input& A_)
+        explicit extract_mod12(Input& A_)
             : A(A_),
               counter(0),
               output_counter(0)
@@ -1344,8 +1344,7 @@ int main(int argc, char* argv[])
     stxxl::cmdline_parser cp;
 
     cp.set_description(
-        "DC3 aka skew3 algorithm for external memory suffix array construction."
-        );
+        "DC3 aka skew3 algorithm for external memory suffix array construction.");
     cp.set_author(
         "Jens Mehnert <jmehnert@mpi-sb.mpg.de>, "
         "Timo Bingmann <tb@panthema.net>, "

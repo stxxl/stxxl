@@ -14,10 +14,13 @@
 #ifndef STXXL_MNG_WRITE_POOL_HEADER
 #define STXXL_MNG_WRITE_POOL_HEADER
 
-#include <list>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
+
+#include <algorithm>
+#include <list>
+#include <utility>
 
 #define STXXL_VERBOSE_WPOOL(msg) STXXL_VERBOSE1("write_pool[" << static_cast<void*>(this) << "]" << msg)
 

@@ -12,9 +12,10 @@
 
 //! \example mng/test_read_write_pool.cpp
 
-#include <iostream>
 #include <stxxl/mng>
 #include <stxxl/bits/mng/read_write_pool.h>
+
+#include <iostream>
 
 #define BLOCK_SIZE (1024 * 512)
 

@@ -13,6 +13,8 @@
 //! [example]
 #include <stxxl/map>
 #include <iostream>
+#include <limits>
+#include <utility>
 
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)

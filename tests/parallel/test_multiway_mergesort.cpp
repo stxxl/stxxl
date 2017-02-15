@@ -15,7 +15,10 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/random>
+
 #include <iostream>
+#include <functional>
+#include <vector>
 
 struct Something
 {

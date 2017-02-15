@@ -15,12 +15,13 @@
 #ifndef STXXL_MNG_BLOCK_PREFETCHER_HEADER
 #define STXXL_MNG_BLOCK_PREFETCHER_HEADER
 
-#include <vector>
-#include <queue>
-
 #include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
+
+#include <algorithm>
+#include <vector>
+#include <queue>
 
 namespace stxxl {
 
@@ -187,8 +188,7 @@ public:
             read_bids[ibuffer] = *(consume_seq_begin + next_2_prefetch);
             read_reqs[ibuffer] = read_buffers[ibuffer].read(
                 read_bids[ibuffer],
-                set_switch_handler(*(completed + next_2_prefetch), do_after_fetch)
-                );
+                set_switch_handler(*(completed + next_2_prefetch), do_after_fetch));
         }
 
         if (nextconsume >= seq_length)

@@ -19,8 +19,12 @@
 //! \c sorted_runs data structure from sorted sequences
 //! using \c stream::from_sorted_sequences specialization of \c stream::runs_creator class
 
-#include <limits>
 #include <stxxl/stream>
+
+#include <vector>
+#include <algorithm>
+#include <functional>
+#include <limits>
 
 const unsigned long long megabyte = 1024 * 1024;
 

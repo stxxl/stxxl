@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <random>
+#include <vector>
 
 namespace stxxl {
 
@@ -193,7 +194,8 @@ struct RC_flash : public RC
 struct single_disk
 {
     unsigned_type disk;
-    single_disk(unsigned_type d, unsigned_type = 0) : disk(d)
+
+    explicit single_disk(unsigned_type d, unsigned_type = 0) : disk(d)
     { }
 
     single_disk() : disk(0)
@@ -228,7 +230,7 @@ struct offset_allocator
 
     //! Creates functor based on instance of \c BaseAllocator functor.
     //! \param base_ used to create a copy
-    offset_allocator(const BaseAllocator& base_) : base(base_), offset(0)
+    explicit offset_allocator(const BaseAllocator& base_) : base(base_), offset(0)
     { }
 
     //! Creates functor based on default \c BaseAllocator functor.

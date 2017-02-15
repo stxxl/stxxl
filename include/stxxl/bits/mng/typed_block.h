@@ -128,12 +128,12 @@ class block_w_bids : public element_block<Type, Size>
 {
 public:
     static constexpr size_t raw_size = RawSize;
-    static constexpr size_t nbids = NBids;
+    static constexpr size_t kNBIDs = NBids;
 
     typedef BID<raw_size> bid_type;
 
     //! Array of BID references
-    bid_type ref[nbids];
+    bid_type ref[kNBIDs];
 
     //! An operator to access bid references
     bid_type& operator () (size_t i)
@@ -150,7 +150,7 @@ class block_w_bids<Type, Size, RawSize, 0>
 {
 public:
     static constexpr size_t raw_size = RawSize;
-    static constexpr size_t nbids = 0;
+    static constexpr size_t kNBIDs = 0;
 
     typedef BID<raw_size> bid_type;
 

@@ -13,11 +13,12 @@
 #ifndef STXXL_COMMON_CUSTOM_STATS_HEADER
 #define STXXL_COMMON_CUSTOM_STATS_HEADER
 
+#include <stxxl/bits/common/timer.h>
+#include <stxxl/bits/common/utils.h>
+
 #include <string>
 #include <utility>
 #include <algorithm>
-#include <stxxl/bits/common/timer.h>
-#include <stxxl/bits/common/utils.h>
 
 namespace stxxl {
 

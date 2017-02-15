@@ -17,6 +17,8 @@
 #include <stxxl/bits/mng/block_prefetcher.h>
 #include <stxxl/bits/algo/async_schedule.h>
 
+#include <algorithm>
+
 namespace stxxl {
 
 //! \addtogroup schedlayer

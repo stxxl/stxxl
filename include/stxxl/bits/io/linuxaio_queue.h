@@ -18,11 +18,11 @@
 
 #if STXXL_HAVE_LINUXAIO_FILE
 
-#include <linux/aio_abi.h>
-#include <list>
-
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
+
+#include <linux/aio_abi.h>
+#include <list>
 
 namespace stxxl {
 
@@ -82,7 +82,7 @@ private:
 public:
     //! Construct queue. Requests max number of requests simultaneously
     //! submitted to disk, 0 means as many as possible
-    linuxaio_queue(int desired_queue_length = 0);
+    explicit linuxaio_queue(int desired_queue_length = 0);
 
     void add_request(request_ptr& req);
     bool cancel_request(request_ptr& req);

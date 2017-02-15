@@ -15,10 +15,10 @@
 #ifndef STXXL_IO_REQUEST_QUEUE_IMPL_1Q_HEADER
 #define STXXL_IO_REQUEST_QUEUE_IMPL_1Q_HEADER
 
-#include <list>
-
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
+
+#include <list>
 
 namespace stxxl {
 
@@ -46,7 +46,7 @@ private:
 
 public:
     // \param n max number of requests simultaneously submitted to disk
-    request_queue_impl_1q(int n = 1);
+    explicit request_queue_impl_1q(int n = 1);
 
     // in a multi-threaded setup this does not work as intended
     // also there were race conditions possible

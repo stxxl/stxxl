@@ -11,9 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <cassert>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
+
+#include <cassert>
 
 #if STXXL_WINDOWS
   #ifndef NOMINMAX

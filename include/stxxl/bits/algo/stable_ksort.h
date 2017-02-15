@@ -17,8 +17,6 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
-#include <algorithm>
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
@@ -26,6 +24,8 @@
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/common/utils.h>
+
+#include <algorithm>
 
 #ifndef STXXL_VERBOSE_STABLE_KSORT
 #define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1
@@ -95,7 +95,7 @@ protected:
 
 public:
     bid_sequence() : bids(NULL) { }
-    bid_sequence(size_type size_)
+    explicit bid_sequence(size_type size_)
     {
         bids = new simple_vector<bid_type>(size_);
         block_manager* mng = block_manager::get_instance();

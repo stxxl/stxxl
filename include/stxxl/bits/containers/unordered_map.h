@@ -16,6 +16,10 @@
 
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 
+#include <utility>
+#include <algorithm>
+#include <memory>
+
 namespace stxxl {
 namespace hash_map {
 

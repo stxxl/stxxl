@@ -21,14 +21,13 @@
         "disk.log" using ($2/1024):($4)  w l title "write"
  */
 
-#include <iomanip>
-#include <vector>
-#include <ctime>
-
 #include <stxxl/io>
 #include <stxxl/mng>
 #include <stxxl/cmdline>
 
+#include <iomanip>
+#include <vector>
+#include <ctime>
 #include <algorithm>
 
 using stxxl::request_ptr;
@@ -44,7 +43,7 @@ struct print_number
 
     explicit print_number(size_t n) : n(n) { }
 
-    void operator () (stxxl::request_ptr)
+    void operator () (stxxl::request*)
     {
         //std::cout << n << " " << std::flush;
     }

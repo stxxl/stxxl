@@ -11,10 +11,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <algorithm>
-#include <cmath>
 #include <stxxl/map>
 #include <stxxl/stats>
+
+#include <algorithm>
+#include <cmath>
 
 typedef unsigned int key_type;
 typedef unsigned int data_type;

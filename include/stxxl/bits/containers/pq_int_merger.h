@@ -18,6 +18,10 @@
 
 #include <stxxl/bits/containers/pq_mergers.h>
 
+#include <utility>
+#include <algorithm>
+#include <vector>
+
 namespace stxxl {
 
 //! \addtogroup stlcontinternals
@@ -148,7 +152,7 @@ public:
     //! \}
 
 public:
-    int_merger(const compare_type& c = compare_type())
+    explicit int_merger(const compare_type& c = compare_type())
         : tree(c, *this),
           sentinel(c.min_value()),
           mem_cons_(0),

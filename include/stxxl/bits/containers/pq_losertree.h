@@ -18,6 +18,10 @@
 
 #include <stxxl/bits/containers/pq_helpers.h>
 
+#include <utility>
+#include <algorithm>
+#include <vector>
+
 namespace stxxl {
 
 //! \addtogroup stlcontinternals

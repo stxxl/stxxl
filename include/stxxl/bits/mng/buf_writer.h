@@ -13,11 +13,11 @@
 #ifndef STXXL_MNG_BUF_WRITER_HEADER
 #define STXXL_MNG_BUF_WRITER_HEADER
 
-#include <vector>
-#include <queue>
-
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/disk_queues.h>
+
+#include <vector>
+#include <queue>
 
 namespace stxxl {
 

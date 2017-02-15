@@ -41,8 +41,7 @@ struct node
     bool set_deleted(bool d)
     {
         next_and_del_ = reinterpret_cast<node<ValueType>*>(
-            (reinterpret_cast<uintptr_t>(next_and_del_) & ~uintptr_t(0x01u)) | static_cast<uintptr_t>(d)
-            );
+            (reinterpret_cast<uintptr_t>(next_and_del_) & ~uintptr_t(0x01u)) | static_cast<uintptr_t>(d));
         return d;
     }
 
@@ -56,8 +55,7 @@ struct node
     node<ValueType> * set_next(node<ValueType>* n)
     {
         next_and_del_ = reinterpret_cast<node<ValueType>*>(
-            (reinterpret_cast<uintptr_t>(next_and_del_) & 0x01u) | reinterpret_cast<uintptr_t>(n)
-            );
+            (reinterpret_cast<uintptr_t>(next_and_del_) & 0x01u) | reinterpret_cast<uintptr_t>(n));
 
         return n;
     }

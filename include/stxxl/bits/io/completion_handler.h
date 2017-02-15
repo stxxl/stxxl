@@ -38,9 +38,10 @@ private:
     HandlerType m_handler;
 
 public:
-    completion_handler1(const HandlerType& handler)
+    explicit completion_handler1(const HandlerType& handler)
         : m_handler(handler)
     { }
+
     completion_handler1 * clone() const
     {
         return new completion_handler1(*this);
@@ -74,7 +75,7 @@ public:
 
     //! Construct a completion handler which calls some function.
     template <typename HandlerType>
-    completion_handler(const HandlerType& handler)
+    completion_handler(const HandlerType& handler) // implicit conversion -- NOLINT
         : m_ptr(new completion_handler1<HandlerType>(handler))
     { }
 

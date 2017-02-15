@@ -20,6 +20,8 @@
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/common/error_handling.h>
 
+#include <vector>
+#include <algorithm>
 #include <unordered_map>
 
 namespace stxxl {

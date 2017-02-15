@@ -83,7 +83,7 @@ public:
 #endif
 
     public:
-        scoped_read_write_timer(size_type size, bool is_write = false)
+        explicit scoped_read_write_timer(size_type size, bool is_write = false)
             : is_write(is_write)
 #if STXXL_IO_STATS
               , running(false)
@@ -135,7 +135,7 @@ public:
 #endif
 
     public:
-        scoped_write_timer(size_type size)
+        explicit scoped_write_timer(size_type size)
 #if STXXL_IO_STATS
             : running(false)
 #endif
@@ -180,7 +180,7 @@ public:
 #endif
 
     public:
-        scoped_read_timer(size_type size)
+        explicit scoped_read_timer(size_type size)
 #if STXXL_IO_STATS
             : running(false)
 #endif
@@ -224,7 +224,7 @@ public:
 #endif
 
     public:
-        scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
+        explicit scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
             : running(false), wait_op(wait_op)
 #endif
@@ -466,7 +466,7 @@ public:
           elapsed(0.0)
     { }
 
-    stats_data(const stats& s)
+    stats_data(const stats& s) // implicit conversion -- NOLINT
         : reads(s.get_reads()),
           writes(s.get_writes()),
           volume_read(s.get_read_volume()),

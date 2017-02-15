@@ -14,10 +14,11 @@
 #ifndef STXXL_COMMON_ALIGNED_ALLOC_HEADER
 #define STXXL_COMMON_ALIGNED_ALLOC_HEADER
 
-#include <cstdlib>
-#include <cassert>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
+
+#include <cstdlib>
+#include <cassert>
 
 #ifndef STXXL_VERBOSE_ALIGNED_ALLOC
 #define STXXL_VERBOSE_ALIGNED_ALLOC STXXL_VERBOSE2

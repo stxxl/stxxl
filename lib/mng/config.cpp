@@ -13,13 +13,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <fstream>
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/version.h>
+
+#include <fstream>
 
 #if STXXL_WINDOWS
    #ifndef NOMINMAX

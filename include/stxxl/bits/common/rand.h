@@ -15,11 +15,11 @@
 #ifndef STXXL_COMMON_RAND_HEADER
 #define STXXL_COMMON_RAND_HEADER
 
-#include <cmath>
-
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/seed.h>
+
+#include <cmath>
 
 #if STXXL_STD_RANDOM
  #include <random>
@@ -75,7 +75,7 @@ struct random_number32_r
     typedef unsigned value_type;
     mutable unsigned state;
 
-    random_number32_r(unsigned seed = get_next_seed())
+    explicit random_number32_r(unsigned seed = get_next_seed())
     {
         state = seed;
     }
@@ -104,7 +104,7 @@ class random_number8_r
 public:
     typedef uint8 value_type;
 
-    random_number8_r(unsigned seed = get_next_seed())
+    explicit random_number8_r(unsigned seed = get_next_seed())
         : m_rnd32(seed), m_pos(4)
     { }
 
@@ -126,7 +126,7 @@ struct random_uniform_fast
     typedef double value_type;
     random_number32 rnd32;
 
-    random_uniform_fast(unsigned /*seed*/ = get_next_seed())
+    explicit random_uniform_fast(unsigned /*seed*/ = get_next_seed())
     { }
 
     //! Returns a random number from [0.0, 1.0)
@@ -154,7 +154,7 @@ struct random_uniform_slow
     typedef std::uniform_real_distribution<> uni_type;
     mutable uni_type uni;
 
-    random_uniform_slow(unsigned seed = get_next_seed())
+    explicit random_uniform_slow(unsigned seed = get_next_seed())
         : gen(seed), uni(0.0, 1.0)
     { }
 #elif STXXL_BOOST_RANDOM
@@ -163,7 +163,7 @@ struct random_uniform_slow
     boost::uniform_real<> uni_dist;
     mutable boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
 
-    random_uniform_slow(unsigned seed = get_next_seed())
+    explicit random_uniform_slow(unsigned seed = get_next_seed())
         : uni(generator, uni_dist)
     {
         uni.engine().seed(seed);
@@ -217,7 +217,7 @@ struct random_uniform_slow
     }
 /* end erand48.c */
 
-    random_uniform_slow(unsigned seed = get_next_seed())
+    explicit random_uniform_slow(unsigned seed = get_next_seed())
     {
         state48[0] = (unsigned short)(seed & 0xffff);
         state48[1] = (unsigned short)(seed >> 16);
@@ -246,7 +246,7 @@ struct random_number
     typedef unsigned value_type;
     UniformRGen uniform;
 
-    random_number(unsigned seed = get_next_seed())
+    explicit random_number(unsigned seed = get_next_seed())
         : uniform(seed)
     { }
 
@@ -263,7 +263,7 @@ struct random_number64
     typedef stxxl::uint64 value_type;
     random_uniform_slow uniform;
 
-    random_number64(unsigned seed = get_next_seed())
+    explicit random_number64(unsigned seed = get_next_seed())
         : uniform(seed)
     { }
 

@@ -15,11 +15,12 @@
 #ifndef STXXL_COMMON_SIMPLE_VECTOR_HEADER
 #define STXXL_COMMON_SIMPLE_VECTOR_HEADER
 
+#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/common/utils.h>
+
 #include <algorithm>
 #include <cstring>
 #include <cassert>
-#include <stxxl/bits/verbose.h>
-#include <stxxl/bits/common/utils.h>
 
 namespace stxxl {
 
@@ -62,7 +63,7 @@ public:
         : m_size(0), m_array(NULL)
     { }
     //! allocate vector's memory
-    simple_vector(size_type sz)
+    explicit simple_vector(const size_type& sz)
         : m_size(sz), m_array(NULL)
     {
         if (m_size > 0)

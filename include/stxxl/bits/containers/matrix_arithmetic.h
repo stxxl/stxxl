@@ -16,6 +16,8 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/matrix_low_level.h>
 
+#include <algorithm>
+
 namespace stxxl {
 
 #ifndef STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS
@@ -77,10 +79,10 @@ struct matrix_operation_statistic
 
 struct matrix_operation_statistic_data : public matrix_operation_statistic_dataset
 {
-    matrix_operation_statistic_data(const matrix_operation_statistic& stat = * matrix_operation_statistic::get_instance())
+    explicit matrix_operation_statistic_data(const matrix_operation_statistic& stat = * matrix_operation_statistic::get_instance())
         : matrix_operation_statistic_dataset(stat) { }
 
-    matrix_operation_statistic_data(const matrix_operation_statistic_dataset& stat)
+    explicit matrix_operation_statistic_data(const matrix_operation_statistic_dataset& stat)
         : matrix_operation_statistic_dataset(stat) { }
 
     matrix_operation_statistic_data& operator = (const matrix_operation_statistic& stat)
@@ -175,7 +177,7 @@ struct static_quadtree<ValueType, 0>
 {
     ValueType val;
 
-    static_quadtree(const ValueType& v)
+    explicit static_quadtree(const ValueType& v)
         : val(v) { }
 
     static_quadtree() { }
@@ -208,13 +210,13 @@ struct static_quadtree<ValueType, 0>
     { return static_quadtree(! val); }
 
     static_quadtree operator & (const static_quadtree& right) const
-    { return val & right.val; }
+    { return static_quadtree(val & right.val); }
 
     static_quadtree operator + (const static_quadtree& right) const
-    { return val + right.val; }
+    { return static_quadtree(val + right.val); }
 
     static_quadtree operator - (const static_quadtree& right) const
-    { return val - right.val; }
+    { return static_quadtree(val - right.val); }
 };
 
 template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
@@ -538,19 +540,19 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
 
     zbt begin_reading_block(const size_type& block_row, const size_type& block_col)
     {
-        bool zb = ! c.bs.is_initialized(c(block_row, block_col));
+        zbt zb = zbt(! c.bs.is_initialized(c(block_row, block_col)));
         iblock = &c.bs.acquire(c(block_row, block_col));
         return zb;
     }
 
     vt read_element(const int_type element_num)
-    { return (*iblock)[element_num]; }
+    { return vt((*iblock)[element_num]); }
 
     zbt end_reading_block(const size_type& block_row, const size_type& block_col)
     {
         c.bs.release(c(block_row, block_col), false);
         iblock = 0;
-        return ! c.bs.is_initialized(c(block_row, block_col));
+        return zbt(! c.bs.is_initialized(c(block_row, block_col)));
     }
 };
 
@@ -569,7 +571,7 @@ struct matrix_to_quadtree
 
     smaller_matrix_to_quadtree ul, ur, dl, dr;
 
-    matrix_to_quadtree(const swappable_block_matrix_type & matrix)
+    explicit matrix_to_quadtree(const swappable_block_matrix_type & matrix)
         : ul(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0,                    0),
           ur(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0, matrix.get_width()/2),
           dl(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2,                    0),
@@ -667,7 +669,7 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     swappable_block_matrix_type m;
     internal_block_type* iblock;
 
-    matrix_to_quadtree(const swappable_block_matrix_type& matrix)
+    explicit matrix_to_quadtree(const swappable_block_matrix_type& matrix)
         : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0),
           iblock(0) { }
 
@@ -693,19 +695,19 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
 
     zbt begin_reading_block(const size_type& block_row, const size_type& block_col)
     {
-        zbt zb = ! m.bs.is_initialized(m(block_row, block_col));
+        zbt zb = zbt(! m.bs.is_initialized(m(block_row, block_col)));
         iblock = &m.bs.acquire(m(block_row, block_col));
         return zb;
     }
 
     vt read_element(const int_type element_num)
-    { return (*iblock)[element_num]; }
+    { return vt((*iblock)[element_num]); }
 
     zbt end_reading_block(const size_type& block_row, const size_type& block_col)
     {
         m.bs.release(m(block_row, block_col), false);
         iblock = 0;
-        return ! m.bs.is_initialized(m(block_row, block_col));
+        return zbt(! m.bs.is_initialized(m(block_row, block_col)));
     }
 
     const size_type & get_height_in_blocks()
@@ -957,7 +959,7 @@ struct matrix_to_quadtree_block_grained
 
     smaller_matrix_to_quadtree_block_grained ul, ur, dl, dr;
 
-    inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix)
+    explicit matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix)
         : ul(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0,                    0),
           ur(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0, matrix.get_width()/2),
           dl(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2,                    0),
@@ -992,7 +994,7 @@ struct matrix_to_quadtree_block_grained<ValueType, BlockSideLength, 0, Granulari
 
     swappable_block_matrix_type m;
 
-    inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type& matrix)
+    explicit matrix_to_quadtree_block_grained(const swappable_block_matrix_type& matrix)
         : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0)
     { assert(! (matrix.get_height() % Granularity | matrix.get_width() % Granularity)); }
 
@@ -1057,7 +1059,7 @@ struct matrix_operations
 
     struct scalar_multiplication
     {
-        inline scalar_multiplication(const ValueType scalar = 1) : s(scalar) { }
+        explicit scalar_multiplication(const ValueType scalar = 1) : s(scalar) { }
         inline ValueType& operator () (ValueType& c, const ValueType& a) { return c = a * s; }
         inline ValueType operator () (const ValueType& a) { return a * s; }
         inline operator const ValueType& () { return s; }
@@ -1382,7 +1384,7 @@ struct matrix_operations
                                     downleft, downright,
                 & ul, & ur, & dl, & dr;
 
-        swappable_block_matrix_quarterer(const swappable_block_matrix_type & whole)
+        explicit swappable_block_matrix_quarterer(const swappable_block_matrix_type & whole)
             : upleft   (whole, whole.get_height()/2, whole.get_width()/2,                    0,                   0),
               upright  (whole, whole.get_height()/2, whole.get_width()/2,                    0, whole.get_width()/2),
               downleft (whole, whole.get_height()/2, whole.get_width()/2, whole.get_height()/2,                   0),
@@ -1397,7 +1399,7 @@ struct matrix_operations
                                     downleft, downright,
                 & ul, & ur, & dl, & dr;
 
-        swappable_block_matrix_padding_quarterer(const swappable_block_matrix_type & whole)
+        explicit swappable_block_matrix_padding_quarterer(const swappable_block_matrix_type & whole)
             : upleft   (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2),                              0,                             0),
               upright  (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2),                              0, div_ceil(whole.get_width(),2)),
               downleft (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2), div_ceil(whole.get_height(),2),                             0),
@@ -1411,7 +1413,7 @@ struct matrix_operations
             downleft, downright,
         & ul, & ur, & dl, & dr;
 
-        swappable_block_matrix_approximative_quarterer(const swappable_block_matrix_type & whole)
+        explicit swappable_block_matrix_approximative_quarterer(const swappable_block_matrix_type & whole)
             : upleft   (whole,                      whole.get_height()/2,                     whole.get_width()/2,                    0,                   0),
               upright  (whole,                      whole.get_height()/2, whole.get_width() - whole.get_width()/2,                    0, whole.get_width()/2),
               downleft (whole, whole.get_height() - whole.get_height()/2,                     whole.get_width()/2, whole.get_height()/2,                   0),

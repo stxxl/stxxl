@@ -19,6 +19,8 @@
 #include <stxxl/random>
 #include <stxxl/scan>
 
+#include <vector>
+
 #define KEY_COMPARE
 #include "test_sort_all_parameters.h"
 

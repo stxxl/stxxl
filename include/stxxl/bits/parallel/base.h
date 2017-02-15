@@ -37,8 +37,7 @@ protected:
     Predicate pred;
 
 public:
-    explicit
-    binary_negate(const Predicate& _pred) : pred(_pred) { }
+    explicit binary_negate(const Predicate& _pred) : pred(_pred) { }
 
     bool operator () (const first_argument_type& x,
                       const second_argument_type& y) const
@@ -84,7 +83,7 @@ private:
     Comparator& comp;
 
 public:
-    equal_from_less(Comparator& _comp) : comp(_comp) { }
+    explicit equal_from_less(Comparator& _comp) : comp(_comp) { }
 
     bool operator () (const T1& a, const T2& b)
     {

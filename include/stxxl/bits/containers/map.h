@@ -16,6 +16,10 @@
 
 #include <stxxl/bits/containers/btree/btree.h>
 
+#include <map>
+#include <utility>
+#include <algorithm>
+
 namespace stxxl {
 namespace btree {
 

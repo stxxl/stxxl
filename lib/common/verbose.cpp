@@ -10,13 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-#include <cstdio>
-#include <cmath>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/msvc_compatibility.h>
+
+#include <iostream>
+#include <cstdio>
+#include <cmath>
 
 #ifndef STXXL_THREAD_ID
 # if STXXL_STD_THREADS || STXXL_BOOST_THREADS

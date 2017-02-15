@@ -18,12 +18,12 @@
  * Macros for convenient error checking and reporting via exception.
  */
 
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/config.h>
+
 #include <sstream>
 #include <cerrno>
 #include <cstring>
-
-#include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/config.h>
 
 namespace stxxl {
 

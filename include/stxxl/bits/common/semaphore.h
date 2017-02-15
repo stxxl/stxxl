@@ -32,7 +32,7 @@ class semaphore
 
 public:
     //! construct semaphore
-    semaphore(int init_value = 1)
+    explicit semaphore(int init_value = 1)
         : v(init_value)
     { }
 

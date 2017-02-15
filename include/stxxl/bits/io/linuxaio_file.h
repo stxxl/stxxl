@@ -22,6 +22,8 @@
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
 
+#include <string>
+
 namespace stxxl {
 
 class linuxaio_queue;

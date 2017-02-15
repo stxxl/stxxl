@@ -10,8 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
 #include <stxxl/mng>
+
+#include <iostream>
 
 #define BLOCK_SIZE (1024 * 1024 * 32)
 

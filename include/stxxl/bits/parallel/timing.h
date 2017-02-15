@@ -17,12 +17,12 @@
 #ifndef STXXL_PARALLEL_TIMING_HEADER
 #define STXXL_PARALLEL_TIMING_HEADER
 
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/parallel/tags.h>
+
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/parallel/tags.h>
 
 #if STXXL_PARALLEL
   #include <omp.h>
@@ -46,12 +46,12 @@ template <typename must_be_int>
 class Timing<active_tag, must_be_int>
 {
 private:
-    static const int max_points_in_time = 100;
-    point_in_time points_in_time[max_points_in_time];
+    static const int kMaxPointsInTime = 100;
+    point_in_time points_in_time[kMaxPointsInTime];
     point_in_time active, last_start;
     int pos;
     char* str;
-    const char* tags[max_points_in_time];
+    const char* tags[kMaxPointsInTime];
 
 public:
     Timing()

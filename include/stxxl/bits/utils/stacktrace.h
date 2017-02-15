@@ -13,10 +13,11 @@
 #ifndef STXXL_UTILS_STACKTRACE_HEADER
 #define STXXL_UTILS_STACKTRACE_HEADER
 
-#include <cstdio>
-#include <cstdlib>
 #include <execinfo.h>
 #include <cxxabi.h>
+
+#include <cstdio>
+#include <cstdlib>
 
 namespace stxxl {
 

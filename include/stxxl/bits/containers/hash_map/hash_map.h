@@ -14,8 +14,6 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 
-#include <functional>
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/stream.h>
@@ -25,6 +23,13 @@
 #include <stxxl/bits/containers/hash_map/iterator_map.h>
 #include <stxxl/bits/containers/hash_map/block_cache.h>
 #include <stxxl/bits/containers/hash_map/util.h>
+
+#include <memory>
+#include <functional>
+#include <algorithm>
+#include <utility>
+#include <vector>
+#include <limits>
 
 namespace stxxl {
 
@@ -943,8 +948,7 @@ protected:
         //! TODO maybe specialize double arithmetic to integer. the old code
         //! was faulty -tb.
         return (internal_size_type)(
-            (double)n * ((double)hash_(key) / (double)std::numeric_limits<internal_size_type>::max())
-            );
+            (double)n * ((double)hash_(key) / (double)std::numeric_limits<internal_size_type>::max()));
     }
 
     /*!
@@ -978,8 +982,7 @@ protected:
 
         // number of subblocks occupied by bucket
         internal_size_type n_subblocks = (internal_size_type)(
-            bucket.n_external_ / subblock_size
-            );
+            bucket.n_external_ / subblock_size);
         if (bucket.n_external_ % subblock_size != 0)
             n_subblocks++;
 
@@ -992,8 +995,7 @@ protected:
                 (i_subblock + 1 < n_subblocks)
                 ? (internal_size_type)subblock_size
                 : (internal_size_type)(
-                    bucket.n_external_ - i_subblock * subblock_size
-                    );
+                    bucket.n_external_ - i_subblock * subblock_size);
 
             //! TODO: replace with bucket.n_external_ % subblock_size
 
@@ -1022,8 +1024,8 @@ protected:
                            (bucket.n_external_, value_type());
         }
 
-        return tuple<external_size_type, value_type>
-                   (bucket.n_external_, value_type());
+        return tuple<external_size_type, value_type>(
+            bucket.n_external_, value_type());
     }
 
     /*!
@@ -1267,7 +1269,7 @@ protected:
                      >
     {
         self_type& map_;
-        Cmp(self_type& map) : map_(map) { }
+        explicit Cmp(self_type& map) : map_(map) { }
 
         bool operator () (const std::pair<internal_size_type, value_type>& a,
                           const std::pair<internal_size_type, value_type>& b) const
@@ -1279,15 +1281,13 @@ protected:
         {
             return std::pair<internal_size_type, value_type>(
                 std::numeric_limits<internal_size_type>::min(),
-                value_type(map_.cmp_.min_value(), mapped_type())
-                );
+                value_type(map_.cmp_.min_value(), mapped_type()));
         }
         std::pair<internal_size_type, value_type> max_value() const
         {
             return std::pair<internal_size_type, value_type>(
                 std::numeric_limits<internal_size_type>::max(),
-                value_type(map_.cmp_.max_value(), mapped_type())
-                );
+                value_type(map_.cmp_.max_value(), mapped_type()));
         }
     };
 
@@ -1529,7 +1529,7 @@ public:
         const self_type& m_map;
 
         //! constructor requires reference to hash_map
-        equal_to(const self_type& map) : m_map(map) { }
+        explicit equal_to(const self_type& map) : m_map(map) { }
 
         //! return whether the arguments compare equal (x==y).
         bool operator () (const key_type& x, const key_type& y) const

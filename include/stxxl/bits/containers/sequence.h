@@ -15,8 +15,6 @@
 #ifndef STXXL_CONTAINERS_SEQUENCE_HEADER
 #define STXXL_CONTAINERS_SEQUENCE_HEADER
 
-#include <deque>
-
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
@@ -24,6 +22,9 @@
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
+
+#include <algorithm>
+#include <deque>
 
 namespace stxxl {
 
@@ -160,7 +161,7 @@ public:
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side), default is number of blocks in the prefetch pool
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    sequence(pool_type& pool, int blocks2prefetch = -1)
+    explicit sequence(pool_type& pool, int blocks2prefetch = -1)
         : m_size(0),
           m_owns_pool(false),
           m_pool(&pool),
@@ -240,7 +241,7 @@ public:
     }
 
     //! Returns the number of blocks prefetched from the \c front side
-    const size_t& get_prefetch_aggr() const
+    const size_t & get_prefetch_aggr() const
     {
         return m_blocks2prefetch;
     }
@@ -590,7 +591,7 @@ public:
         bid_iter_type m_next_bid;
 
     public:
-        stream(const sequence& sequence)
+        explicit stream(const sequence& sequence)
             : m_sequence(sequence),
               m_size(sequence.size())
         {
@@ -721,7 +722,7 @@ public:
         bid_iter_type m_next_bid;
 
     public:
-        reverse_stream(const sequence& sequence)
+        explicit reverse_stream(const sequence& sequence)
             : m_sequence(sequence),
               m_size(sequence.size())
         {

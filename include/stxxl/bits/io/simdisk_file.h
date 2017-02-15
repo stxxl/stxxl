@@ -16,6 +16,8 @@
 #define STXXL_IO_SIMDISK_FILE_HEADER
 
 #include <stxxl/bits/config.h>
+#include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 #ifndef STXXL_HAVE_SIMDISK_FILE
 // use mmap call
@@ -24,11 +26,9 @@
 
 #if STXXL_HAVE_SIMDISK_FILE
 
+#include <string>
 #include <set>
 #include <cmath>
-
-#include <stxxl/bits/io/ufs_file_base.h>
-#include <stxxl/bits/io/disk_queued_file.h>
 
 namespace stxxl {
 
@@ -48,7 +48,7 @@ class simdisk_geometry
         int first_sector;
         int sectors;
         double sustained_data_rate;  // in MiB/s
-        inline Zone(int _first_sector) : first_sector(_first_sector)
+        explicit inline Zone(int _first_sector) : first_sector(_first_sector)
         { }                          // constructor for zone search
 
         inline Zone(

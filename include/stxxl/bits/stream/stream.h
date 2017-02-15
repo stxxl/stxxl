@@ -123,8 +123,6 @@ class vector_iterator2stream
     }
 
 public:
-    typedef vector_iterator2stream<InputIterator> self_type;
-
     //! Standard stream typedef.
     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
 
@@ -144,9 +142,7 @@ public:
         {
             in.reset(new buf_istream_type(
                          begin.bid(), end_iter, nbuffers ? nbuffers :
-                         (2 * config::get_instance()->disks_number())
-                         )
-                     );
+                         (2 * config::get_instance()->disks_number())));
 
             InputIterator cur = begin - begin.block_offset();
 
@@ -156,9 +152,14 @@ public:
         }
     }
 
-    vector_iterator2stream(const self_type& a)
-        : m_current(a.m_current), m_end(a.m_end), in(a.in.release())
-    { }
+    //! non-copyable: delete copy-constructor
+    vector_iterator2stream(const vector_iterator2stream&) = delete;
+    //! non-copyable: delete assignment operator
+    vector_iterator2stream& operator = (const vector_iterator2stream&) = delete;
+    //! move-constructor: default
+    vector_iterator2stream(vector_iterator2stream&&) = default;
+    //! move-assignment operator: default
+    vector_iterator2stream& operator = (vector_iterator2stream&&) = default;
 
     //! Standard stream method.
     const value_type& operator * () const
@@ -172,7 +173,7 @@ public:
     }
 
     //! Standard stream method.
-    self_type& operator ++ ()
+    vector_iterator2stream& operator ++ ()
     {
         assert(m_end != m_current);
         ++m_current;
@@ -188,6 +189,7 @@ public:
     {
         return (m_current == m_end);
     }
+
     virtual ~vector_iterator2stream()
     {
         delete_stream();          // not needed actually
@@ -279,8 +281,6 @@ class vector_iterator2stream_sr
     typedef typename InputIterator::block_type block_type;
 
 public:
-    typedef vector_iterator2stream_sr<InputIterator> self_type;
-
     //! Standard stream typedef.
     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
 
@@ -301,10 +301,6 @@ public:
         }
     }
 
-    vector_iterator2stream_sr(const self_type& a)
-        : vec_it_stream(a.vec_it_stream), it_stream(a.it_stream)
-    { }
-
     //! Standard stream method.
     const value_type& operator * () const
     {
@@ -323,7 +319,7 @@ public:
     }
 
     //! Standard stream method.
-    self_type& operator ++ ()
+    vector_iterator2stream_sr& operator ++ ()
     {
         if (it_stream)
             ++(*it_stream);
@@ -342,6 +338,7 @@ public:
 
         return vec_it_stream->empty();
     }
+
     virtual ~vector_iterator2stream_sr()
     {
         if (it_stream)
@@ -632,7 +629,7 @@ private:
     value_type m_current;
 
 public:
-    generator2stream(Generator g)
+    explicit generator2stream(Generator g)
         : gen_(g), m_current(gen_())
     { }
 
@@ -1068,7 +1065,7 @@ private:
 
 public:
     //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_,
+    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, // NOLINT
               Input4& i4_, Input5& i5_)
         : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
     {
@@ -1432,7 +1429,7 @@ class make_tuple<Input1, Input2, Input3, Input4, Input5, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename stxxl::tuple<
+    typedef typename stxxl::tuple< // NOLINT
             typename Input1::value_type,
             typename Input2::value_type,
             typename Input3::value_type,

@@ -16,14 +16,15 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
-#include <limits>
-#include <cstdint>
 #include <stxxl/cmdline>
 #include <stxxl/vector>
 #include <stxxl/sort>
 #include <stxxl/ksort>
 #include <stxxl/stream>
 #include <stxxl/bits/common/tuple.h>
+
+#include <limits>
+#include <cstdint>
 
 using stxxl::timestamp;
 using stxxl::external_size_type;
@@ -214,14 +215,14 @@ int benchmark_sort(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    BenchmarkSort<pair32_type, stxxl::random_number32>
-        ("pair of uint32_t", length, memsize);
+    BenchmarkSort<pair32_type, stxxl::random_number32>(
+        "pair of uint32_t", length, memsize);
 
-    BenchmarkSort<pair64_type, stxxl::random_number32>
-        ("pair of uint64_t", length, memsize);
+    BenchmarkSort<pair64_type, stxxl::random_number32>(
+        "pair of uint64_t", length, memsize);
 
-    BenchmarkSort<struct64_type, stxxl::random_number32>
-        ("struct of 64 bytes", length, memsize);
+    BenchmarkSort<struct64_type, stxxl::random_number32>(
+        "struct of 64 bytes", length, memsize);
 
     return 0;
 }

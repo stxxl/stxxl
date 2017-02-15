@@ -15,6 +15,8 @@
 
 #include <set>
 #include <list>
+#include <utility>
+#include <functional>
 #include <map>
 
 namespace stxxl {

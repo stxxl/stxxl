@@ -19,7 +19,9 @@
 
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/base.h>
+
 #include <functional>
+#include <algorithm>
 
 namespace stxxl {
 namespace parallel {
@@ -195,7 +197,7 @@ public:
     using base_type::losers;
     using base_type::comp;
 
-    LoserTreeCopy(size_type _k, Comparator _comp = std::less<ValueType>())
+    explicit LoserTreeCopy(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
@@ -250,7 +252,7 @@ public:
     using base_type::losers;
     using base_type::comp;
 
-    LoserTreeCopy(size_type _k, Comparator _comp = std::less<ValueType>())
+    explicit LoserTreeCopy(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
@@ -320,7 +322,7 @@ private:
     Comparator comp;
 
 public:
-    LoserTreeReference(size_type _k, Comparator _comp = std::less<T>()) : comp(_comp)
+    explicit LoserTreeReference(size_type _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
         k = round_up_to_power_of_two(ik);
@@ -630,7 +632,7 @@ public:
     using base_type::losers;
     using base_type::comp;
 
-    LoserTreePointer(size_type _k, Comparator _comp = std::less<ValueType>())
+    explicit LoserTreePointer(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
@@ -681,7 +683,7 @@ public:
     using base_type::losers;
     using base_type::comp;
 
-    LoserTreePointer(size_type _k, Comparator _comp = std::less<ValueType>())
+    explicit LoserTreePointer(size_type _k, Comparator _comp = std::less<ValueType>())
         : base_type(_k, _comp)
     { }
 
