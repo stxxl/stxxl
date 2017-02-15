@@ -21,7 +21,7 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/timer>
 
-typedef std::pair<size_t, size_t> value_type;
+typedef std::pair<uint64_t, uint64_t> value_type;
 typedef stxxl::ppq_local::external_array<value_type> ea_type;
 typedef stxxl::ppq_local::internal_array<value_type> ia_type;
 
