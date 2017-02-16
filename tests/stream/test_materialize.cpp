@@ -62,16 +62,16 @@ struct forty_two
 
     template <typename StreamAlgorithm, typename VectorConfig>
     stxxl::vector_iterator<VectorConfig> materialize(
-	StreamAlgorithm& in,
-	stxxl::vector_iterator<VectorConfig> outbegin,
-	stxxl::vector_iterator<VectorConfig> outend,
-	size_t nbuffers = 0);
+        StreamAlgorithm& in,
+        stxxl::vector_iterator<VectorConfig> outbegin,
+        stxxl::vector_iterator<VectorConfig> outend,
+        size_t nbuffers = 0);
 
     template <typename StreamAlgorithm, typename VectorConfig>
     stxxl::vector_iterator<VectorConfig> materialize(
-	StreamAlgorithm& in,
-	stxxl::vector_iterator<VectorConfig> out,
-	size_t nbuffers = 0);
+        StreamAlgorithm& in,
+        stxxl::vector_iterator<VectorConfig> out,
+        size_t nbuffers = 0);
 */
 
 int generate_0()

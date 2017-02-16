@@ -287,9 +287,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     {
         // sort buckets
         size_t write_buffers_multiple_bs = 2;
-        size_t max_bucket_size_bl = (m - write_buffers_multiple_bs * ndisks) / 2; // in number of blocks
-        int64_t max_bucket_size_rec = int64_t(max_bucket_size_bl) * block_type::size;        // in number of records
-        int64_t max_bucket_size_act = 0;                                                   // actual max bucket size
+        size_t max_bucket_size_bl = (m - write_buffers_multiple_bs * ndisks) / 2;     // in number of blocks
+        int64_t max_bucket_size_rec = int64_t(max_bucket_size_bl) * block_type::size; // in number of records
+        int64_t max_bucket_size_act = 0;                                              // actual max bucket size
         // establish output stream
 
         for (i = 0; i < nbuckets; i++)

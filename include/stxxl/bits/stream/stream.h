@@ -207,14 +207,14 @@ auto streamify(
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for vector_iterator range is called");
-    return vector_iterator2stream<stxxl::vector_iterator<VectorConfig>>(
+    return vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
 
 template <typename VectorConfig>
-struct streamify_traits<stxxl::vector_iterator<VectorConfig>>
+struct streamify_traits<stxxl::vector_iterator<VectorConfig> >
 {
-    typedef vector_iterator2stream<stxxl::vector_iterator<VectorConfig>>
+    typedef vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >
         stream_type;
 };
 
@@ -233,14 +233,14 @@ auto streamify(
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
-    return vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig>>(
+    return vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
 
 template <typename VectorConfig>
-struct streamify_traits<stxxl::const_vector_iterator<VectorConfig>>
+struct streamify_traits<stxxl::const_vector_iterator<VectorConfig> >
 {
-    typedef vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig>>
+    typedef vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >
         stream_type;
 };
 
@@ -336,7 +336,7 @@ auto streamify_sr(
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
-    return vector_iterator2stream_sr<stxxl::vector_iterator<VectorConfig>>(
+    return vector_iterator2stream_sr<stxxl::vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
 
@@ -350,7 +350,7 @@ auto streamify_sr(
 {
     STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
     return vector_iterator2stream_sr<
-        stxxl::const_vector_iterator<VectorConfig>>(first, last, nbuffers);
+        stxxl::const_vector_iterator<VectorConfig> >(first, last, nbuffers);
 }
 
 ////////////////////////////////////////////////////////////////////////

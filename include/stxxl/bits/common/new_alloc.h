@@ -99,7 +99,7 @@ public:
         ::new ((void*)p)Type(value);
     }
 
-    template <typename ... Args>
+    template <typename... Args>
     void construct(pointer p, Args&& ... args)
     {
         ::new ((void*)p)Type(std::forward<Args>(args) ...);

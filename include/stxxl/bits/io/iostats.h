@@ -20,21 +20,21 @@
  #define STXXL_IO_STATS 1
 #endif
 
+#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/unused.h>
 
+#include <algorithm>
 #include <iostream>
+#include <limits>
+#include <list>
 #include <mutex>
 #include <string>
-#include <list>
 #include <vector>
-#include <algorithm>
-#include <limits>
 
 namespace stxxl {
 
@@ -46,19 +46,18 @@ class file_stats
 {
     const unsigned m_device_id;
 
-    unsigned reads, writes;                     // number of operations
-    external_size_type  volume_read, volume_written;          // number of bytes read/written
-    unsigned c_reads, c_writes;                 // number of cached operations
-    external_size_type  c_volume_read, c_volume_written;      // number of bytes read/written from/to cache
-    double t_reads, t_writes;                   // seconds spent in operations
-    double p_begin_read, p_begin_write;         // start time of parallel operation
+    unsigned reads, writes;                             // number of operations
+    external_size_type volume_read, volume_written;     // number of bytes read/written
+    unsigned c_reads, c_writes;                         // number of cached operations
+    external_size_type c_volume_read, c_volume_written; // number of bytes read/written from/to cache
+    double t_reads, t_writes;                           // seconds spent in operations
+    double p_begin_read, p_begin_write;                 // start time of parallel operation
 
-    int acc_reads, acc_writes;                  // number of requests, participating in parallel operation
+    int acc_reads, acc_writes;                          // number of requests, participating in parallel operation
 
     std::mutex read_mutex, write_mutex;
 
 public:
-
     file_stats(unsigned int device_id);
 
     class scoped_read_write_timer
@@ -73,9 +72,9 @@ public:
 
     public:
         explicit scoped_read_write_timer(file_stats* file_stats, size_type size, bool is_write = false)
-                : file_stats_(*file_stats), is_write(is_write)
+            : file_stats_(*file_stats), is_write(is_write)
 #if STXXL_IO_STATS
-                , running(false)
+              , running(false)
 #endif
         {
             start(size);
@@ -129,7 +128,7 @@ public:
             : file_stats_(*file_stats)
 
 #if STXXL_IO_STATS
-                , running(false)
+              , running(false)
 #endif
         {
             start(size);
@@ -174,9 +173,9 @@ public:
 
     public:
         explicit scoped_read_timer(file_stats* file_stats, size_type size)
-                : file_stats_(*file_stats)
+            : file_stats_(*file_stats)
 #if STXXL_IO_STATS
-                , running(false)
+              , running(false)
 #endif
         {
             start(size);
@@ -316,31 +315,31 @@ class file_stats_data
 
 public:
     file_stats_data()
-            : device_id(std::numeric_limits<unsigned>::max()),
-              reads(0),
-              writes(0),
-              volume_read(0),
-              volume_written(0),
-              c_reads(0),
-              c_writes(0),
-              c_volume_read(0),
-              c_volume_written(0),
-              t_reads(0.0),
-              t_writes(0.0)
+        : device_id(std::numeric_limits<unsigned>::max()),
+          reads(0),
+          writes(0),
+          volume_read(0),
+          volume_written(0),
+          c_reads(0),
+          c_writes(0),
+          c_volume_read(0),
+          c_volume_written(0),
+          t_reads(0.0),
+          t_writes(0.0)
     { }
 
     file_stats_data(const file_stats& fs)
-            : device_id(fs.get_device_id()),
-              reads(fs.get_reads()),
-              writes(fs.get_writes()),
-              volume_read(fs.get_read_volume()),
-              volume_written(fs.get_written_volume()),
-              c_reads(fs.get_cached_reads()),
-              c_writes(fs.get_cached_writes()),
-              c_volume_read(fs.get_cached_read_volume()),
-              c_volume_written(fs.get_cached_written_volume()),
-              t_reads(fs.get_read_time()),
-              t_writes(fs.get_write_time())
+        : device_id(fs.get_device_id()),
+          reads(fs.get_reads()),
+          writes(fs.get_writes()),
+          volume_read(fs.get_read_volume()),
+          volume_written(fs.get_written_volume()),
+          c_reads(fs.get_cached_reads()),
+          c_writes(fs.get_cached_writes()),
+          c_volume_read(fs.get_cached_read_volume()),
+          c_volume_written(fs.get_cached_written_volume()),
+          t_reads(fs.get_read_time()),
+          t_writes(fs.get_write_time())
     { }
 
     file_stats_data operator + (const file_stats_data& a) const
@@ -477,7 +476,6 @@ class stats : public singleton<stats>
     stats() : creation_time(timestamp()) { }
 
 public:
-
     enum wait_op_type {
         WAIT_OP_ANY,
         WAIT_OP_READ,
@@ -494,7 +492,7 @@ public:
     public:
         scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-                : running(false), wait_op(wait_op)
+            : running(false), wait_op(wait_op)
 #endif
         {
             if (measure_time)
@@ -538,7 +536,7 @@ public:
 
     //! create new instance of a file_stats for an io::file to collect
     //! statistics. (for internal library use.)
-    file_stats* create_file_stats(unsigned device_id);
+    file_stats * create_file_stats(unsigned device_id);
 
     //! I/O wait time counter.
     //! \return number of seconds spent in I/O waiting functions \link
@@ -580,7 +578,9 @@ public:
     }
 
     // for library use
-private:    // only called from file_stats
+
+private:
+    // only called from file_stats
     void p_write_started(double now);
     void p_write_finished(double now);
     void p_read_started(double now);
@@ -636,7 +636,7 @@ class stats_data
     T fetch_sum(const Functor& get_value) const
     {
         T sum = 0;
-        for(auto it = m_file_stats_data_list.begin(); it != m_file_stats_data_list.end(); it++)
+        for (auto it = m_file_stats_data_list.begin(); it != m_file_stats_data_list.end(); it++)
         {
             sum += get_value(*it);
         }
@@ -645,13 +645,12 @@ class stats_data
     }
 
 public:
-
     template <typename T>
     struct measurement_summary
     {
         T total, min, max;
         double avg, med;
-        std::vector<std::pair<T,unsigned>> values_per_device;
+        std::vector<std::pair<T, unsigned> > values_per_device;
 
         template <typename Functor>
         measurement_summary(const std::vector<file_stats_data>& fs,
@@ -660,26 +659,25 @@ public:
         {
             values_per_device.reserve(fs.size());
 
-            for(auto it = fs.begin(); it != fs.end(); it++)
+            for (auto it = fs.begin(); it != fs.end(); it++)
             {
-                values_per_device.emplace_back(get_value(*it),it->get_device_id());
+                values_per_device.emplace_back(get_value(*it), it->get_device_id());
             }
 
-            std::sort(values_per_device.begin(), values_per_device.end(),[](std::pair<T,unsigned> a, std::pair<T,unsigned> b){ return a.first < b.first; });
+            std::sort(values_per_device.begin(), values_per_device.end(), [](std::pair<T, unsigned> a, std::pair<T, unsigned> b) { return a.first < b.first; });
 
             min = values_per_device.front().first;
             max = values_per_device.back().first;
             long middle = values_per_device.size() / 2;
             med = (values_per_device.size() % 2 == 1) ? values_per_device[middle].first : (values_per_device[middle - 1].first + values_per_device[middle].first) / 2.0;
 
-            for(auto it = values_per_device.begin(); it != values_per_device.end(); it++)
+            for (auto it = values_per_device.begin(); it != values_per_device.end(); it++)
             {
                 total += it->first;
             }
 
-            avg = (double) total / values_per_device.size();
+            avg = (double)total / values_per_device.size();
         }
-
     };
 
 public:
@@ -708,15 +706,15 @@ public:
     {
         stats_data s;
 
-        if(a.m_file_stats_data_list.size() == 0)
+        if (a.m_file_stats_data_list.size() == 0)
         {
             s.m_file_stats_data_list = m_file_stats_data_list;
         }
-        else if(m_file_stats_data_list.size() == 0)
+        else if (m_file_stats_data_list.size() == 0)
         {
             s.m_file_stats_data_list = a.m_file_stats_data_list;
         }
-        else if(m_file_stats_data_list.size() == a.m_file_stats_data_list.size())
+        else if (m_file_stats_data_list.size() == a.m_file_stats_data_list.size())
         {
             for (auto it1 = m_file_stats_data_list.begin(), it2 = a.m_file_stats_data_list.begin();
                  it1 != m_file_stats_data_list.end(); it1++, it2++)
@@ -743,11 +741,11 @@ public:
     {
         stats_data s;
 
-        if(a.m_file_stats_data_list.size() == 0)
+        if (a.m_file_stats_data_list.size() == 0)
         {
             s.m_file_stats_data_list = m_file_stats_data_list;
         }
-        else if(m_file_stats_data_list.size() == a.m_file_stats_data_list.size())
+        else if (m_file_stats_data_list.size() == a.m_file_stats_data_list.size())
         {
             for (auto it1 = m_file_stats_data_list.begin(), it2 = a.m_file_stats_data_list.begin();
                  it1 != m_file_stats_data_list.end(); it1++, it2++)
@@ -757,7 +755,7 @@ public:
         }
         else
         {
-            STXXL_THROW(std::runtime_error,"The number of files has changed between the snapshots.");
+            STXXL_THROW(std::runtime_error, "The number of files has changed between the snapshots.");
         }
 
         s.p_reads = p_reads - a.p_reads;
@@ -889,7 +887,6 @@ public:
     double get_wait_read_time() const;
 
     double get_wait_write_time() const;
-
 };
 
 std::ostream& operator << (std::ostream& o, const stats_data& s);

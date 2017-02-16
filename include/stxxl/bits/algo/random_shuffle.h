@@ -108,7 +108,7 @@ void random_shuffle(ExtIterator first,
     pool.resize_prefetch(PageSize);
 
     size_t space_left = M - k * BlockSize -
-                               PageSize * BlockSize; // remaining int space
+                        PageSize * BlockSize;        // remaining int space
     ExtIterator Writer = first;
     ExtIterator it = first;
 
@@ -215,7 +215,7 @@ void random_shuffle(
         STXXL_ERRMSG("random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)");
     }
 
-    int64_t n = last - first;    // the number of input elements
+    int64_t n = last - first;         // the number of input elements
     int_type k = M / (3 * BlockSize); // number of buckets
 
     int64_t i, j, size = 0;

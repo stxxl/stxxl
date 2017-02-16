@@ -12,14 +12,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/priority_queue>
-#include <stxxl/sorter>
-#include <stxxl/vector>
 #include <stxxl/deque>
 #include <stxxl/map>
+#include <stxxl/priority_queue>
 #include <stxxl/queue>
 #include <stxxl/sequence>
+#include <stxxl/sorter>
 #include <stxxl/unordered_map>
+#include <stxxl/vector>
 
 #include <iostream>
 

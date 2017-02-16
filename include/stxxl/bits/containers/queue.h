@@ -26,8 +26,8 @@
 #include <algorithm>
 #include <deque>
 #include <queue>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace stxxl {
 

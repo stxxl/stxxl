@@ -200,7 +200,7 @@ public:
         return device_id_;
     }
 
-    file_stats* get_file_stats() const
+    file_stats * get_file_stats() const
     {
         return file_stats_;
     }

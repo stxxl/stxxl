@@ -243,7 +243,7 @@ public:
     { std::swap(ptr_, b.ptr_); }
 };
 
-template <typename Type, typename ... Args>
+template <typename Type, typename... Args>
 counting_ptr<Type> make_counting(Args&& ... args)
 {
     return counting_ptr<Type>(new Type(std::forward<Args>(args) ...));

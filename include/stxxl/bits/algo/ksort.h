@@ -548,7 +548,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 
     size_t m2 = div_ceil(_m, 2);
     const size_t m2_rf = m2 * block_type::raw_size /
-                                (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
+                         (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
     STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
                   m2_rf << " due to key size: " << sizeof(typename KeyExtractor::key_type) << " bytes");
     m2 = m2_rf;

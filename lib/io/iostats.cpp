@@ -79,11 +79,11 @@ void stats::wait_finished(wait_op_type wait_op)
         }
 #ifdef STXXL_WAIT_LOG_ENABLED
         std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
-    if (waitlog)
-        *waitlog << (now - last_reset) << "\t"
-                 << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
-                 << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
-                 << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;
+        if (waitlog)
+            *waitlog << (now - last_reset) << "\t"
+                     << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;
 #endif
     }
 }
@@ -170,7 +170,7 @@ file_stats* stats::create_file_stats(unsigned int device_id)
 std::vector<file_stats_data> stats::deepcopy_file_stats_data_list() const
 {
     std::vector<file_stats_data> fsdl;
-    for(auto it = file_stats_list.begin(); it != file_stats_list.end(); it++)
+    for (auto it = file_stats_list.begin(); it != file_stats_list.end(); it++)
     {
         fsdl.push_back(file_stats_data(*it));
     }
@@ -313,14 +313,14 @@ unsigned stats_data::get_reads() const
 stats_data::measurement_summary<unsigned> stats_data::get_reads_summary() const
 {
     return measurement_summary<unsigned>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_reads(); });
+                                         [](const file_stats_data& fsd) { return fsd.get_reads(); });
 }
 
 //! Returns the sum of all writes.
 //! \return the sum of all writes
 unsigned stats_data::get_writes() const
 {
-    return fetch_sum<unsigned>([](const file_stats_data& fsd){ return fsd.get_writes(); });
+    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_writes(); });
 }
 
 //! Returns sum, min, max, avarage and median of all writes.
@@ -328,7 +328,7 @@ unsigned stats_data::get_writes() const
 stats_data::measurement_summary<unsigned> stats_data::get_writes_summary() const
 {
     return measurement_summary<unsigned>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_writes(); });
+                                         [](const file_stats_data& fsd) { return fsd.get_writes(); });
 }
 
 //! Returns number of bytes read from disks in total.
@@ -336,7 +336,7 @@ stats_data::measurement_summary<unsigned> stats_data::get_writes_summary() const
 external_size_type stats_data::get_read_volume() const
 {
     return fetch_sum<external_size_type>(
-        [](const file_stats_data& fsd){ return fsd.get_read_volume(); });
+        [](const file_stats_data& fsd) { return fsd.get_read_volume(); });
 }
 
 //! Returns sum, min, max, avarage and median of all read bytes.
@@ -345,14 +345,14 @@ stats_data::measurement_summary<external_size_type> stats_data::get_read_volume_
 {
     return measurement_summary<external_size_type>(
         m_file_stats_data_list,
-        [](const file_stats_data& fsd){ return fsd.get_read_volume(); });
+        [](const file_stats_data& fsd) { return fsd.get_read_volume(); });
 }
 
 //! Returns number of bytes written to the disks in total.
 //! \return number of bytes written
 external_size_type stats_data::get_written_volume() const
 {
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd){ return fsd.get_written_volume(); });
+    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_written_volume(); });
 }
 
 //! Returns sum, min, max, avarage and median of all written bytes.
@@ -360,14 +360,14 @@ external_size_type stats_data::get_written_volume() const
 stats_data::measurement_summary<external_size_type> stats_data::get_written_volume_summary() const
 {
     return measurement_summary<external_size_type>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_written_volume(); });
+                                                   [](const file_stats_data& fsd) { return fsd.get_written_volume(); });
 }
 
 //! Returns total number of reads served from cache.
 //! \return the sum of all cached reads
 unsigned stats_data::get_cached_reads() const
 {
-    return fetch_sum<unsigned>([](const file_stats_data& fsd){ return fsd.get_cached_reads(); });
+    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_cached_reads(); });
 }
 
 //! Returns sum, min, max, avarage and median of all cached reads.
@@ -375,14 +375,14 @@ unsigned stats_data::get_cached_reads() const
 stats_data::measurement_summary<unsigned> stats_data::get_cached_reads_summary() const
 {
     return measurement_summary<unsigned>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_cached_reads(); });
+                                         [](const file_stats_data& fsd) { return fsd.get_cached_reads(); });
 }
 
 //! Retruns the sum of all cached writes.
 //! \return the sum of all cached writes
 unsigned stats_data::get_cached_writes() const
 {
-    return fetch_sum<unsigned>([](const file_stats_data& fsd){ return fsd.get_cached_writes(); });
+    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_cached_writes(); });
 }
 
 //! Returns sum, min, max, avarage and median of all cached writes
@@ -390,14 +390,14 @@ unsigned stats_data::get_cached_writes() const
 stats_data::measurement_summary<unsigned> stats_data::get_cached_writes_summary() const
 {
     return measurement_summary<unsigned>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_cached_writes(); });
+                                         [](const file_stats_data& fsd) { return fsd.get_cached_writes(); });
 }
 
 //! Returns number of bytes read from cache.
 //! \return number of bytes read from cache
 external_size_type stats_data::get_cached_read_volume() const
 {
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd){ return fsd.get_cached_read_volume(); });
+    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_cached_read_volume(); });
 }
 
 //! Returns sum, min, max, avarage and median of all bytes read from cache.
@@ -405,14 +405,14 @@ external_size_type stats_data::get_cached_read_volume() const
 stats_data::measurement_summary<external_size_type> stats_data::get_cached_read_volume_summary() const
 {
     return measurement_summary<external_size_type>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_cached_read_volume(); });
+                                                   [](const file_stats_data& fsd) { return fsd.get_cached_read_volume(); });
 }
 
 //! Returns number of bytes written to the cache.
 //! \return number of bytes written to the cache
 external_size_type stats_data::get_cached_written_volume() const
 {
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd){ return fsd.get_cached_written_volume(); });
+    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_cached_written_volume(); });
 }
 
 //! Returns sum, min, max, avarage and median of all cached written volumes
@@ -420,14 +420,14 @@ external_size_type stats_data::get_cached_written_volume() const
 stats_data::measurement_summary<external_size_type> stats_data::get_cached_written_volume_summary() const
 {
     return measurement_summary<external_size_type>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_cached_written_volume(); });
+                                                   [](const file_stats_data& fsd) { return fsd.get_cached_written_volume(); });
 }
 
 //! Time that would be spent in read syscalls if all parallel reads were serialized.
 //! \return seconds spent in reading
 double stats_data::get_read_time() const
 {
-    return fetch_sum<double>([](const file_stats_data& fsd){ return fsd.get_read_time(); });
+    return fetch_sum<double>([](const file_stats_data& fsd) { return fsd.get_read_time(); });
 }
 
 //! Returns sum, min, max, avarage and median of all read times
@@ -435,14 +435,14 @@ double stats_data::get_read_time() const
 stats_data::measurement_summary<double> stats_data::get_read_time_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_read_time(); });
+                                       [](const file_stats_data& fsd) { return fsd.get_read_time(); });
 }
 
 //! Time that would be spent in write syscalls if all parallel writes were serialized.
 //! \return the sum of the write times of all files
 double stats_data::get_write_time() const
 {
-    return fetch_sum<double>([](const file_stats_data& fsd){ return fsd.get_write_time(); });
+    return fetch_sum<double>([](const file_stats_data& fsd) { return fsd.get_write_time(); });
 }
 
 //! Returns sum, min, max, avarage and median of all write times
@@ -450,7 +450,7 @@ double stats_data::get_write_time() const
 stats_data::measurement_summary<double> stats_data::get_write_time_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                               [](const file_stats_data& fsd){ return fsd.get_write_time(); });
+                                       [](const file_stats_data& fsd) { return fsd.get_write_time(); });
 }
 
 //! Period of time when at least one I/O thread was executing a read.
@@ -477,33 +477,32 @@ double stats_data::get_pio_time() const
 stats_data::measurement_summary<double> stats_data::get_read_speed_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                                       [](const file_stats_data& fsd){ return (double) fsd.get_read_volume() / fsd.get_read_time(); });
+                                       [](const file_stats_data& fsd) { return (double)fsd.get_read_volume() / fsd.get_read_time(); });
 }
 
 stats_data::measurement_summary<double> stats_data::get_pread_speed_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                                       [this](const file_stats_data& fsd){ return (double) fsd.get_read_volume() / p_reads; });
+                                       [this](const file_stats_data& fsd) { return (double)fsd.get_read_volume() / p_reads; });
 }
 
 stats_data::measurement_summary<double> stats_data::get_write_speed_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                                       [](const file_stats_data& fsd){ return (double) fsd.get_written_volume() / fsd.get_write_time(); });
+                                       [](const file_stats_data& fsd) { return (double)fsd.get_written_volume() / fsd.get_write_time(); });
 }
 
 stats_data::measurement_summary<double> stats_data::get_pwrite_speed_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                                       [this](const file_stats_data& fsd){ return (double) fsd.get_written_volume() / p_writes; });
+                                       [this](const file_stats_data& fsd) { return (double)fsd.get_written_volume() / p_writes; });
 }
 
 stats_data::measurement_summary<double> stats_data::get_pio_speed_summary() const
 {
     return measurement_summary<double>(m_file_stats_data_list,
-                                       [this](const file_stats_data& fsd){ return (double) (fsd.get_read_volume() + fsd.get_written_volume()) / p_ios; });
+                                       [this](const file_stats_data& fsd) { return (double)(fsd.get_read_volume() + fsd.get_written_volume()) / p_ios; });
 }
-
 
 //! I/O wait time counter.
 //! \return number of seconds spent in I/O waiting functions
@@ -578,7 +577,7 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << "med: " << pread_speed_summary.med / one_mib << " MiB/s, "
       << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
       << std::endl;
-        if (s.get_cached_reads()) {
+    if (s.get_cached_reads()) {
         o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
         o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
         o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
@@ -627,15 +626,15 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
 #endif
     o << " Time since the last reset                  : " << s.get_elapsed_time() << " s" << std::endl;
     // WARNINGS add useful warnings here
-    if(pio_speed_summary.min / pio_speed_summary.max < 0.5 ||
-       pread_speed_summary.min / pread_speed_summary.max < 0.5 ||
-       pwrite_speed_summary.min / pwrite_speed_summary.max < 0.5)
+    if (pio_speed_summary.min / pio_speed_summary.max < 0.5 ||
+        pread_speed_summary.min / pread_speed_summary.max < 0.5 ||
+        pwrite_speed_summary.min / pwrite_speed_summary.max < 0.5)
     {
         o << "Warning: Slow disk(s) detected. " << std::endl
           << " Reading: ";
         o << pread_speed_summary.values_per_device.front().second
           << "@ " << pread_speed_summary.values_per_device.front().first / one_mib << " MiB/s";
-        for(int i = 1; pread_speed_summary.values_per_device[i].first / pread_speed_summary.values_per_device.back().first < 0.5; ++i)
+        for (int i = 1; pread_speed_summary.values_per_device[i].first / pread_speed_summary.values_per_device.back().first < 0.5; ++i)
         {
             o << ", " << pread_speed_summary.values_per_device[i].second
               << "@ " << pread_speed_summary.values_per_device[i].first / one_mib << " MiB/s";
@@ -644,17 +643,17 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
           << " Writing: "
           << pwrite_speed_summary.values_per_device.front().second
           << "@ " << pwrite_speed_summary.values_per_device.front().first / one_mib << " MiB/s";
-        for(int i = 1; pwrite_speed_summary.values_per_device[i].first / pwrite_speed_summary.values_per_device.back().first < 0.5; ++i)
+        for (int i = 1; pwrite_speed_summary.values_per_device[i].first / pwrite_speed_summary.values_per_device.back().first < 0.5; ++i)
         {
             o << ", " << pwrite_speed_summary.values_per_device[i].second
               << "@ " << pwrite_speed_summary.values_per_device[i].first / one_mib << " MiB/s";
         }
         o << std::endl;
     }
-    if((double)read_bytes_summary.min / read_bytes_summary.max < 0.5 ||
-       (double)written_bytes_summary.min / written_bytes_summary.max < 0.5)
+    if ((double)read_bytes_summary.min / read_bytes_summary.max < 0.5 ||
+        (double)written_bytes_summary.min / written_bytes_summary.max < 0.5)
     {
-        o << "Warning: Bad load balancing."<< std::endl
+        o << "Warning: Bad load balancing." << std::endl
           << " Smallest read load on disk  "
           << read_bytes_summary.values_per_device.front().second
           << " @ " << hr(read_bytes_summary.values_per_device.front().first, "B")
