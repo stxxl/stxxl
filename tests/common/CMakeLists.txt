@@ -12,6 +12,7 @@
 
 stxxl_build_test(test_binary_buffer)
 stxxl_build_test(test_cmdline)
+stxxl_build_test(test_comparator)
 stxxl_build_test(test_counting_ptr)
 stxxl_build_test(test_external_shared_ptr)
 stxxl_build_test(test_globals)
