@@ -17,7 +17,7 @@ namespace stxxl {
 
 \authors Timo Bingmann (2013)
 
-The \c stxxl_tool accompanies the source code and also binary distributions of STXXL. It contains multiple subprograms that can be used for benchmarking basic functionality of the library. We describe only some of the benchmarks and functions in this document. 
+The \c stxxl_tool accompanies the source code and also binary distributions of STXXL. It contains multiple subprograms that can be used for benchmarking basic functionality of the library. We describe only some of the benchmarks and functions in this document.
 
 \c stxxl_tool has a verbose command line help and descriptions of all subtools are available there. Try
 \verbatim
@@ -70,7 +70,7 @@ Offset        320 MiB: 138.3 MiB/s write, 113.2 MiB/s read
 
 The second performance metric of an experimental platform is how fast STXXL can sort on it. This is measured by the <tt>stxxl_tool benchmark_sort</tt> subtool.
 
-This subtool performs stxxl::sort, stxxl::ksort and stream::sort on uint32 pairs, uint64 pairs and a larger struct of 64 bytes.
+This subtool performs stxxl::sort, stxxl::ksort and stream::sort on uint32_t pairs, uint64_t pairs and a larger struct of 64 bytes.
 
 An example run looks as follows:
 \verbatim
@@ -83,7 +83,7 @@ Option -M, --ram set to 1073741824.
 [STXXL-MSG] Disk '/dev/sdd1' is allocated, space: 915527 MiB, I/O implementation: syscall
 [STXXL-MSG] Disk '/dev/sde1' is allocated, space: 915527 MiB, I/O implementation: syscall
 [STXXL-MSG] In total 4 disks are allocated, space: 3662109 MiB
-#!!! running sorting test with pair of uint32 = 8 bytes.
+#!!! running sorting test with pair of uint32_t = 8 bytes.
 # materialize random_stream into vector of size 2684354560
 finished in 46.9271 seconds @ 436.421 MiB/s
 # stxxl::sort vector of size 2684354560
@@ -93,7 +93,7 @@ finished in 356.964 seconds @ 57.3727 MiB/s
 # stxxl::stream::sort of size 2684354560
 finished in 213.102 seconds @ 96.1041 MiB/s
 
-#!!! running sorting test with pair of uint64 = 16 bytes.
+#!!! running sorting test with pair of uint64_t = 16 bytes.
 # materialize random_stream into vector of size 1342177280
 finished in 95.5571 seconds @ 214.322 MiB/s
 # stxxl::sort vector of size 1342177280

@@ -55,7 +55,7 @@ stxxl::random_uniform_fast urand_fast;  // uniform values in [0.0, 1.0)
 stxxl::random_number<> n_rand;  // integer values in [0,N)
 
 unsigned int random32 = rand32();
-stxxl::uint64 random64 = rand64();
+uint64_t random64 = rand64();
 double urandom_slow = urand_slow();
 double urandom_fast = urand_fast();
 unsigned int n_random = n_rand(123456789);
@@ -380,9 +380,9 @@ std::cout << stxxl::log2_ceil(10000) << std::endl;
 
 /** \page common_types Signed and Unsigned Integer Types
 
-STXXL provides two very important types: \ref stxxl::int_type and \ref stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
+STXXL provides a very important types: \ref stxxl::int_type. It should be used for general counting and indexing types, as it is defined to be the size of a register on the machines: on 32-bit machines it is 4 bytes size, while on a 64-bit machine it is 8 bytes in size! As a unsigned type for \ref stxxl::int_type use size_t.
 
-The previous types are for general purpose counting. For real 64-bit integers, also on 32-bit machines, STXXL also provides a stxx::uint64 type (independent of other headers).
+The previous types are for general purpose counting. For real 64-bit integers, also on 32-bit machines, use uint64_t.
 
 See the file common/types.h
 
