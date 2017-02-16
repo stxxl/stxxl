@@ -122,26 +122,6 @@ public:
 
     //! Constructs empty queue.
     //!
-    //! \param w_pool write pool
-    //! \param p_pool prefetch pool
-    //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
-    //!                          default is number of blocks in the prefetch pool
-    //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
-    //!  \warning Number of blocks in the prefetch pool recommended at least 1
-    STXXL_DEPRECATED(
-        queue(write_pool<block_type>&w_pool, prefetch_pool<block_type>&p_pool, int blocks2prefetch_ = -1))
-        : m_size(0),
-          delete_pool(true),
-          alloc_count(0),
-          bm(block_manager::get_instance())
-    {
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
-        pool = new pool_type(p_pool, w_pool);
-        init(blocks2prefetch_);
-    }
-
-    //! Constructs empty queue.
-    //!
     //! \param pool_ block write/prefetch pool
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of blocks in the prefetch pool
