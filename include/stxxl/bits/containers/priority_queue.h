@@ -43,7 +43,7 @@ namespace stxxl {
 
 template <
     class ValueType,
-    class CompareType,
+    class CompareTypeWithMin,
     size_t BufferSize1_ = 32,                    // equalize procedure call overheads etc.
     size_t N_ = 512,                             // length of group 1 sequences
     size_t IntKMAX_ = 64,                        // maximal arity for internal mergers
@@ -56,7 +56,7 @@ template <
 struct priority_queue_config
 {
     typedef ValueType value_type;
-    typedef CompareType comparator_type;
+    typedef CompareTypeWithMin comparator_type;
     typedef AllocStr_ alloc_strategy_type;
     enum
     {
@@ -76,17 +76,17 @@ struct priority_queue_config
 namespace std {
 
 template <class BlockType,
-          class CompareType,
+          class CompareTypeWithMin,
           unsigned Arity,
           class AllocStr>
-void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr>& a,
-          stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr>& b)
+void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareTypeWithMin, Arity, AllocStr>& a,
+          stxxl::priority_queue_local::ext_merger<BlockType, CompareTypeWithMin, Arity, AllocStr>& b)
 {
     a.swap(b);
 }
-template <class ValueType, class CompareType, unsigned KNKMAX>
-void swap(stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX>& a,
-          stxxl::priority_queue_local::int_merger<ValueType, CompareType, KNKMAX>& b)
+template <class ValueType, class CompareTypeWithMin, unsigned KNKMAX>
+void swap(stxxl::priority_queue_local::int_merger<ValueType, CompareTypeWithMin, KNKMAX>& a,
+          stxxl::priority_queue_local::int_merger<ValueType, CompareTypeWithMin, KNKMAX>& b)
 {
     a.swap(b);
 }
@@ -974,7 +974,7 @@ struct compute_N<1, X_, CriticalSize_>
 //!
 //! \tparam ValueType type of the contained objects (POD with no references to internal memory)
 //!
-//! \tparam CompareType the comparator type used to determine whether one element is
+//! \tparam CompareTypeWithMin the comparator type used to determine whether one element is
 //! smaller than another element.
 //!
 //! \tparam IntMemory upper limit for internal memory consumption in bytes.
@@ -990,7 +990,7 @@ struct compute_N<1, X_, CriticalSize_>
 //! happen that given IntMemory is too small for given MaxItems, try larger
 //! values.
 template <class ValueType,
-          class CompareType,
+          class CompareTypeWithMin,
           size_t IntMemory,
           external_size_type MaxItems,
           unsigned Tune = 6>
@@ -1026,7 +1026,7 @@ public:
         unsigned ExtKMAX_ = 64,     // maximal arity for external mergers
         unsigned ExtLevels_ = 2,
      */
-    typedef priority_queue<priority_queue_config<ValueType, CompareType, Buffer1Size, N, AI, 2, B, AE, 2> > result;
+    typedef priority_queue<priority_queue_config<ValueType, CompareTypeWithMin, Buffer1Size, N, AI, 2, B, AE, 2> > result;
 };
 
 //! \}
