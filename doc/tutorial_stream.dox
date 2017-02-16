@@ -469,12 +469,12 @@ The following code listing shows the pipelined code of the algorithm, the defini
 
 \code
 class random_edge_stream {
-    stxxl::int64 counter;
+    int64_t counter;
     edge current;
     random_edge_stream();
 public:
     typedef edge value_type;
-    random_edge_stream(stxxl::int64 elements)
+    random_edge_stream(int64_t elements)
         : counter(elements), current(random_edge()())
     { }
     const edge & operator * () const { return current; }

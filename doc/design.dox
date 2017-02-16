@@ -698,7 +698,7 @@ template < typename ExtIterator,
 void sort ( ExtIterator        first,
             ExtIterator        last,
             StrictWeakOrdering cmp,
-            unsigned_type      M
+            size_t             M
           )
 \endcode
 
@@ -816,16 +816,16 @@ This checker checks the \ref stxxl::sort, \ref stxxl::ksort, and the \ref design
 
 \code
 template < typename ExtIterator >
-void ksort ( ExtIterator   first,
-             ExtIterator   last,
-             unsigned_type M
+void ksort ( ExtIterator first,
+             ExtIterator last,
+             size_t      M
            )
 
 template < typename ExtIterator, typename KeyExtractor >
-void ksort ( ExtIterator   first,
-             ExtIterator   last,
-             KeyExtractor  keyobj,
-             unsigned_type M
+void ksort ( ExtIterator  first,
+             ExtIterator  last,
+             KeyExtractor keyobj,
+             size_t       M
            )
 \endcode
 
