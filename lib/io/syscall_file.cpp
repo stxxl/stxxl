@@ -32,7 +32,8 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
 
     char* cbuffer = static_cast<char*>(buffer);
 
-    stats::scoped_read_write_timer read_write_timer(bytes, op == request::WRITE);
+    file_stats::scoped_read_write_timer read_write_timer(
+        file_stats_, bytes, op == request::WRITE);
 
     while (bytes > 0)
     {

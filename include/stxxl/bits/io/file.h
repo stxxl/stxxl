@@ -17,6 +17,7 @@
 #define STXXL_IO_FILE_HEADER
 
 #include <stxxl/bits/config.h>
+#include <stxxl/bits/io/iostats.h>
 
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
@@ -91,7 +92,8 @@ public:
 
     //! Construct a new file, usually called by a subclass.
     explicit file(unsigned int device_id = DEFAULT_DEVICE_ID)
-        : device_id_(device_id)
+        : device_id_(device_id),
+          file_stats_(stats::get_instance()->create_file_stats(device_id))
     { }
 
     //! non-copyable: delete copy-constructor
@@ -187,11 +189,20 @@ protected:
     //! calculation)
     unsigned int device_id_;
 
+    //! pointer to file's stats inside of iostats. Because the stats can live
+    //! longer than the file, the iostats keeps ownership.
+    file_stats* file_stats_;
+
 public:
     //! Returns the file's physical device id
     unsigned int get_device_id() const
     {
         return device_id_;
+    }
+
+    file_stats* get_file_stats() const
+    {
+        return file_stats_;
     }
 
 protected:

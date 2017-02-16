@@ -27,12 +27,12 @@ void memory_file::serve(void* buffer, offset_type offset, size_type bytes,
 
     if (op == request::READ)
     {
-        stats::scoped_read_timer read_timer(bytes);
+        file_stats::scoped_read_timer read_timer(file_stats_, bytes);
         memcpy(buffer, ptr_ + offset, bytes);
     }
     else
     {
-        stats::scoped_write_timer write_timer(bytes);
+        file_stats::scoped_write_timer write_timer(file_stats_, bytes);
         memcpy(ptr_ + offset, buffer, bytes);
     }
 }
