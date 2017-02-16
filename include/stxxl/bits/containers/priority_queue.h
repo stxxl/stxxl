@@ -1063,7 +1063,7 @@ namespace std {
 
 template <class ConfigType>
 void swap(stxxl::priority_queue<ConfigType>& a,
-          stxxl::priority_queue<ConfigType>& b)
+          stxxl::priority_queue<ConfigType>& b)   // NOLINT
 {
     a.swap(b);
 }
