@@ -25,7 +25,8 @@ The map's key values are generally used to sort and uniquely identify the data v
 
 ### Creating a STXXL Map
 
-To create a stxxl::map object, several template parameters are required. The first two parameters KeyType and DataType which is an std::pair<int, char> in this example are self-explanatory, the third parameter has to be a comparator class which is used to determine whether a key is smaller than another one, the fourth and fifth parameter define the node- and leaf block size.
+To create a stxxl::map object, several template parameters are required.
+The first two parameters KeyType and DataType which is an std::pair<int, char> in this example are self-explanatory. The KeyType must provide an equality check using operator==(). The third parameter has to be a comparator class which is used to determine whether a key is smaller than another one, the fourth and fifth parameter define the node- and leaf block size.
 \code
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)

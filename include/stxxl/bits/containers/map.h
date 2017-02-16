@@ -41,7 +41,7 @@ class btree;
 //! <b> Introduction </b> to map container: see \ref tutorial_map tutorial. \n
 //! <b> Design and Internals </b> of map container: see \ref design_map
 //!
-//! \tparam KeyType key type (POD with no references to internal memory)
+//! \tparam KeyType key type (POD with no references to internal memory) and operator==
 //! \tparam DataType data type (POD with no references to internal memory)
 //! \tparam CompareType comparison type used to determine
 //! whether a key is smaller than another one.
