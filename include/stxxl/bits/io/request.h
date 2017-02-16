@@ -62,7 +62,7 @@ protected:
 public:
     request(const completion_handler& on_complete,
             file* file, void* buffer, offset_type offset, size_type bytes,
-            read_or_write type);
+            read_or_write op);
 
     virtual ~request();
 

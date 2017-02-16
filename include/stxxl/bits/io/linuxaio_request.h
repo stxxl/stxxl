@@ -43,8 +43,8 @@ public:
     linuxaio_request(
         const completion_handler& on_complete,
         file* file, void* buffer, offset_type offset, size_type bytes,
-        const read_or_write& type)
-        : request_with_state(on_complete, file, buffer, offset, bytes, type)
+        const read_or_write& op)
+        : request_with_state(on_complete, file, buffer, offset, bytes, op)
     {
         assert(dynamic_cast<linuxaio_file*>(file));
         STXXL_VERBOSE_LINUXAIO(
@@ -52,7 +52,7 @@ public:
                 " linuxaio_request" <<
                 "(file=" << file << " buffer=" << buffer <<
                 " offset=" << offset << " bytes=" << bytes <<
-                " type=" << type << ")");
+                " op=" << op << ")");
     }
 
     bool post();

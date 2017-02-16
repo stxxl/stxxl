@@ -26,13 +26,13 @@
 namespace stxxl {
 
 void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
-                         request::read_or_write type)
+                         request::read_or_write op)
 {
     std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
     char* cbuffer = static_cast<char*>(buffer);
 
-    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, op == request::WRITE);
 
     while (bytes > 0)
     {
@@ -48,11 +48,11 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                 " offset=" << offset <<
                 " buffer=" << cbuffer <<
                 " bytes=" << bytes <<
-                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " op=" << ((op == request::READ) ? "READ" : "WRITE") <<
                 " rc=" << rc);
         }
 
-        if (type == request::READ)
+        if (op == request::READ)
         {
 #if STXXL_MSVC
             assert(bytes <= std::numeric_limits<unsigned int>::max());
@@ -70,7 +70,7 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                     " offset=" << offset <<
                     " buffer=" << buffer <<
                     " bytes=" << bytes <<
-                    " type=" << "READ" <<
+                    " op=" << "READ" <<
                     " rc=" << rc);
             }
             bytes = (size_type)(bytes - rc);
@@ -103,7 +103,7 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                     " offset=" << offset <<
                     " buffer=" << buffer <<
                     " bytes=" << bytes <<
-                    " type=" << "WRITE" <<
+                    " op=" << "WRITE" <<
                     " rc=" << rc);
             }
             bytes = (size_type)(bytes - rc);

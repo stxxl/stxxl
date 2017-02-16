@@ -44,10 +44,10 @@ request_ptr linuxaio_file::awrite(
 }
 
 void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes,
-                          request::read_or_write type)
+                          request::read_or_write op)
 {
     // req need not be an linuxaio_request
-    if (type == request::READ)
+    if (op == request::READ)
         aread(buffer, offset, bytes)->wait();
     else
         awrite(buffer, offset, bytes)->wait();

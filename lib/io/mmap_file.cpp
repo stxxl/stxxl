@@ -23,15 +23,15 @@
 namespace stxxl {
 
 void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
-                      request::read_or_write type)
+                      request::read_or_write op)
 {
     std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
     //assert(offset + bytes <= _size());
 
-    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, op == request::WRITE);
 
-    int prot = (type == request::READ) ? PROT_READ : PROT_WRITE;
+    int prot = (op == request::READ) ? PROT_READ : PROT_WRITE;
     void* mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des_, offset);
     // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des_, offset);
     // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
@@ -50,7 +50,7 @@ void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
     }
     else
     {
-        if (type == request::READ)
+        if (op == request::READ)
         {
             memcpy(buffer, mem, bytes);
         }

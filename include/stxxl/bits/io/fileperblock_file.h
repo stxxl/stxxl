@@ -51,7 +51,7 @@ public:
     virtual ~fileperblock_file();
 
     virtual void serve(void* buffer, offset_type offset, size_type bytes,
-                       request::read_or_write type) final;
+                       request::read_or_write op) final;
 
     //! Changes the size of the file.
     //! \param new_size value of the new file size

@@ -49,7 +49,7 @@ public:
     bool cancel() override;
 
 protected:
-    void completed(bool canceled);
+    void completed(bool canceled) override;
 };
 
 //! \}

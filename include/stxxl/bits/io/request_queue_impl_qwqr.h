@@ -56,7 +56,7 @@ public:
     // also there were race conditions possible
     // and actually an old value was never restored once a new one was set ...
     // so just disable it and all it's nice implications
-    void set_priority_op(priority_op op)
+    void set_priority_op(const priority_op& op) final
     {
         //_priority_op = op;
         STXXL_UNUSED(op);

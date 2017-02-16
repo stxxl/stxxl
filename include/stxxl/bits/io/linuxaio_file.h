@@ -33,7 +33,7 @@ class linuxaio_queue;
 
 //! Implementation of \c file based on the Linux kernel interface for
 //! asynchronous I/O
-class linuxaio_file : public ufs_file_base, public disk_queued_file
+class linuxaio_file final : public ufs_file_base, public disk_queued_file
 {
     friend class linuxaio_request;
 
@@ -61,7 +61,7 @@ public:
     { }
 
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::read_or_write type) final;
+               request::read_or_write op) final;
 
     request_ptr aread(
         void* buffer, offset_type pos, size_type bytes,
@@ -74,9 +74,7 @@ public:
     const char * io_type() const final;
 
     int get_desired_queue_length() const
-    {
-        return desired_queue_length_;
-    }
+    { return desired_queue_length_; }
 };
 
 //! \}
