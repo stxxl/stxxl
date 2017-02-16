@@ -80,5 +80,7 @@ int main(int argc, char** argv)
 
     stxxl::aligned_dealloc<4096>(buffer);
 
+    file->close_remove();
+
     return 0;
 }
