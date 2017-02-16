@@ -99,13 +99,11 @@ public:
         ::new ((void*)p)Type(value);
     }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
     template <typename ... Args>
     void construct(pointer p, Args&& ... args)
     {
         ::new ((void*)p)Type(std::forward<Args>(args) ...);
     }
-#endif
 
     // destroy elements of initialized storage p
     void destroy(pointer p)
