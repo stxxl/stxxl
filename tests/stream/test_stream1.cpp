@@ -69,7 +69,8 @@ struct Cmp : std::binary_function<unsigned, unsigned, bool>
 
 int main()
 {
-    typedef stxxl::stream::runs_creator<Input, Cmp, 4096* MULT, stxxl::RC> CreateRunsAlg;
+    typedef stxxl::stream::runs_creator<
+            Input, Cmp, 4096* MULT, stxxl::random_cyclic> CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
     stxxl::stats* s = stxxl::stats::get_instance();

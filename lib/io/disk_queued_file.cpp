@@ -21,13 +21,11 @@
 namespace stxxl {
 
 request_ptr disk_queued_file::aread(
-    void* buffer,
-    offset_type pos,
-    size_type bytes,
-    const completion_handler& on_cmpl)
+    void* buffer, offset_type offset, size_type bytes,
+    const completion_handler& on_complete)
 {
-    request_ptr req(new serving_request(on_cmpl, this, buffer, pos, bytes,
-                                        request::READ));
+    request_ptr req = make_counting<serving_request>(
+        on_complete, this, buffer, offset, bytes, request::READ);
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
@@ -35,13 +33,11 @@ request_ptr disk_queued_file::aread(
 }
 
 request_ptr disk_queued_file::awrite(
-    void* buffer,
-    offset_type pos,
-    size_type bytes,
-    const completion_handler& on_cmpl)
+    void* buffer, offset_type offset, size_type bytes,
+    const completion_handler& on_complete)
 {
-    request_ptr req(new serving_request(on_cmpl, this, buffer, pos, bytes,
-                                        request::WRITE));
+    request_ptr req = make_counting<serving_request>(
+        on_complete, this, buffer, offset, bytes, request::WRITE);
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 

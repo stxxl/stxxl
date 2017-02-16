@@ -45,11 +45,12 @@ std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 }
 
 typedef stxxl::btree::btree<int, my_type, comp_type,
-                            NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::SR> btree_type;
+                            NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::simple_random> btree_type;
 
 // forced instantiation
-template class stxxl::btree::btree<int, my_type, comp_type,
-                                   NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::SR>;
+template class stxxl::btree::btree<
+        int, my_type, comp_type,
+        NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::simple_random>;
 
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (6 * LEAF_BLOCK_SIZE)

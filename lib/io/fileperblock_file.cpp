@@ -16,13 +16,10 @@
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/io/boostfd_file.h>
-#include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/mmap_file.h>
-#include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/serving_request.h>
@@ -49,21 +46,16 @@ fileperblock_file<base_file_type>::fileperblock_file(
     unsigned int device_id)
     : file(device_id),
       disk_queued_file(queue_id, allocator_id),
-      filename_prefix(filename_prefix),
-      mode(mode),
-      current_size(0),
-      lock_file_created(false),
-      lock_file(filename_prefix + "_fpb_lock", mode, queue_id)
+      filename_prefix_(filename_prefix),
+      mode_(mode),
+      current_size_(0)
 { }
 
 template <class base_file_type>
 fileperblock_file<base_file_type>::~fileperblock_file()
 {
-    if (lock_file_created)
-    {
-        if (::remove((filename_prefix + "_fpb_lock").c_str()) != 0)
-            STXXL_ERRMSG("remove() error on path=" << filename_prefix << "_fpb_lock error=" << strerror(errno));
-    }
+    if (lock_file_)
+        lock_file_->close_remove();
 }
 
 template <class base_file_type>
@@ -71,37 +63,40 @@ std::string fileperblock_file<base_file_type>::filename_for_block(offset_type of
 {
     std::ostringstream name;
     //enough for 1 billion blocks
-    name << filename_prefix << "_fpb_" << std::setw(20) << std::setfill('0') << offset;
+    name << filename_prefix_ << "_fpb_" << std::setw(20) << std::setfill('0') << offset;
     return name.str();
 }
 
 template <class base_file_type>
-void fileperblock_file<base_file_type>::serve(void* buffer, offset_type offset,
-                                              size_type bytes, request::request_type type)
+void fileperblock_file<base_file_type>::serve(
+    void* buffer, offset_type offset,
+    size_type bytes, request::read_or_write op)
 {
-    base_file_type base_file(filename_for_block(offset), mode, get_queue_id());
+    base_file_type base_file(filename_for_block(offset), mode_, get_queue_id());
     base_file.set_size(bytes);
-    base_file.serve(buffer, 0, bytes, type);
+    base_file.serve(buffer, 0, bytes, op);
 }
 
 template <class base_file_type>
 void fileperblock_file<base_file_type>::lock()
 {
-    if (!lock_file_created)
+    if (!lock_file_)
     {
+        lock_file_ = make_counting<base_file_type>(
+            filename_prefix_ + "_fpb_lock", mode_, get_queue_id());
+
         //create lock file and fill it with one page, an empty file cannot be locked
         const int page_size = STXXL_BLOCK_ALIGN;
         void* one_page = aligned_alloc<STXXL_BLOCK_ALIGN>(page_size);
 #if STXXL_WITH_VALGRIND
         memset(one_page, 0, page_size);
 #endif
-        lock_file.set_size(page_size);
-        request_ptr r = lock_file.awrite(one_page, 0, page_size);
+        lock_file_->set_size(page_size);
+        request_ptr r = lock_file_->awrite(one_page, 0, page_size);
         r->wait();
         aligned_dealloc<STXXL_BLOCK_ALIGN>(one_page);
-        lock_file_created = true;
     }
-    lock_file.lock();
+    lock_file_->lock();
 }
 
 template <class base_file_type>
@@ -156,10 +151,6 @@ template class fileperblock_file<mmap_file>;
 
 #if STXXL_HAVE_WINCALL_FILE
 template class fileperblock_file<wincall_file>;
-#endif
-
-#if STXXL_HAVE_BOOSTFD_FILE
-template class fileperblock_file<boostfd_file>;
 #endif
 
 } // namespace stxxl

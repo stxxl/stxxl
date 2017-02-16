@@ -14,10 +14,6 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_BLOCK_CACHE_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_BLOCK_CACHE_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
 

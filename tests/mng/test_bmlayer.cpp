@@ -25,7 +25,7 @@ struct MyType
 
 struct my_handler
 {
-    void operator () (stxxl::request* req)
+    void operator () (stxxl::request* req, bool /* success */)
     {
         STXXL_MSG(req << " done, type=" << req->io_type());
     }
@@ -78,10 +78,10 @@ void testIO()
 void testIO2()
 {
     typedef stxxl::typed_block<128* 1024, double> block_type;
-    std::vector<block_type::bid_type> bids;
+    std::vector<block_type::bid_type> bids(32);
     std::vector<stxxl::request_ptr> requests;
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
-    bm->new_blocks<block_type>(32, stxxl::striping(), std::back_inserter(bids));
+    bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
     block_type* blocks = new block_type[32];
     int vIndex;
     for (vIndex = 0; vIndex < 32; ++vIndex) {
@@ -158,10 +158,8 @@ int main()
     testWritePool();
     testStreams();
 
-#if STXXL_MNG_COUNT_ALLOCATION
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
-    STXXL_MSG("block_manager total allocation: " << bm->get_total_allocation());
-    STXXL_MSG("block_manager current allocation: " << bm->get_current_allocation());
-    STXXL_MSG("block_manager maximum allocation: " << bm->get_maximum_allocation());
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    STXXL_MSG("block_manager total allocation: " << bm->total_allocation());
+    STXXL_MSG("block_manager current allocation: " << bm->current_allocation());
+    STXXL_MSG("block_manager maximum allocation: " << bm->maximum_allocation());
 }

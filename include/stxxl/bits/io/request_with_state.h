@@ -14,7 +14,7 @@
 #ifndef STXXL_IO_REQUEST_WITH_STATE_HEADER
 #define STXXL_IO_REQUEST_WITH_STATE_HEADER
 
-#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/shared_state.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_with_waiters.h>
 
@@ -23,36 +23,33 @@ namespace stxxl {
 //! \addtogroup reqlayer
 //! \{
 
-//! Request with completion state.
+//! Request with completion shared_state.
 class request_with_state : public request_with_waiters
 {
 protected:
-    //! states of request
+    //! states of request.
     //! OP - operating, DONE - request served, READY2DIE - can be destroyed
     enum request_state { OP = 0, DONE = 1, READY2DIE = 2 };
 
-    state<request_state> m_state;
+    shared_state<request_state> state_;
 
 protected:
     request_with_state(
-        const completion_handler& on_cmpl,
-        file* f,
-        void* buf,
-        offset_type off,
-        size_type b,
-        request_type t)
-        : request_with_waiters(on_cmpl, f, buf, off, b, t),
-          m_state(OP)
+        const completion_handler& on_complete,
+        file* file, void* buffer, offset_type offset, size_type bytes,
+        read_or_write op)
+        : request_with_waiters(on_complete, file, buffer, offset, bytes, op),
+          state_(OP)
     { }
 
 public:
     virtual ~request_with_state();
-    void wait(bool measure_time = true);
-    bool poll();
-    bool cancel();
+    void wait(bool measure_time = true) final;
+    bool poll() final;
+    bool cancel() override;
 
 protected:
-    void completed(bool canceled);
+    void completed(bool canceled) override;
 };
 
 //! \}

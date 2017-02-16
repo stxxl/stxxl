@@ -30,30 +30,25 @@ The compilers marked with '*' are the maintainers' favorite choices and are most
 
 compiler                | supported options
 ----------------------- | --------------------------
-gcc 4.9.1               | stxxl parallel (boost) (c++11)
-gcc 4.8.3 *             | stxxl parallel (boost) (c++11)
-gcc 4.7.3               | stxxl parallel (boost) (c++0x)
-gcc 4.6.4               | stxxl parallel (boost) (c++0x)
-gcc 4.5.4               | stxxl parallel (boost) (c++0x)
-gcc 4.4.7               | stxxl parallel (boost) (c++0x)
-gcc 4.3.6               | stxxl (boost)
-gcc 4.1.2               | stxxl (boost)
-gcc 3.4.6               | stxxl (boost)
+gcc 4.9.1               | stxxl parallel (c++11)
+gcc 4.8.3 *             | stxxl parallel (c++11)
+gcc 4.7.3               | stxxl parallel (c++0x)
+gcc 4.6.4               | stxxl parallel (c++0x)
+gcc 4.5.4               | stxxl parallel (c++0x)
+gcc 4.4.7               | stxxl parallel (c++0x)
+gcc 4.3.6               | stxxl
+gcc 4.1.2               | stxxl
+gcc 3.4.6               | stxxl
 gcc 3.3                 | unsupported
-icpc 2015.0.090 *       | stxxl (boost) (c++0x)
-icpc 2013.5.192 *       | stxxl (boost) (c++0x)
-icpc 2011.13.367        | stxxl (boost) (c++0x)
-clang++ 3.2, 3.3, 3.4.2 | stxxl (boost) (c++0x)
-mingw-w64 gcc 4.8.3     | stxxl parallel (boost) (c++11)
-cygwin gcc 4.8.3        | stxxl parallel (boost) (c++11)
-msvc 2013 12.0 *        | stxxl (boost) (c++11)
-msvc 2012 11.0          | stxxl (boost) (c++0x)
-msvc 2010 10.0          | stxxl boost required
+icpc 2015.0.090 *       | stxxl (c++0x)
+icpc 2013.5.192 *       | stxxl (c++0x)
+icpc 2011.13.367        | stxxl (c++0x)
+clang++ 3.2, 3.3, 3.4.2 | stxxl (c++0x)
+mingw-w64 gcc 4.8.3     | stxxl parallel (c++11)
+cygwin gcc 4.8.3        | stxxl parallel (c++11)
+msvc 2015 13.0 *        | stxxl (c++11)
 
 - The option "parallel" uses the __gnu_parallel extensions in some parts of STXXL. For all \c gcc versions >= 4.4 the __gnu_parallel extensions are ON by default. Support for MCSTL (predecessor of __gnu_parallel) was removed in STXXL 1.4.0.
-
-- Boost is optional and not recommended on all systems, except MSVC 2010. It provides no advantages on other platforms. \n
-  STXXL has been tested with Boost 1.40.0, 1.42.0 and 1.46.1. Other versions may work, too, but older versions will not get support.
 
 - Support for C++0x and C++11 is integrated and automatically detected. No core parts of STXXL require C++11.
 
@@ -105,14 +100,14 @@ but you should not share a data structure between threads (without implementing 
 This is a design choice, having the data structures thread-safe would mean a significant performance loss.
 
 
-\section faq_diskalloc Disk Allocation on Multiple Disks
+\section faq_diskalloc Parallel Disk Block Allocation on Multiple Disks
 
 Q: I have configured several disks to use with STXXL. Why does STXXL fail complaining about the <b>lack of space</b>? According to my calclulations, the space on the disks should be sufficient.
 
 A: This may happen if the disks have <b>different size</b>. With the default parameters \c STXXL containers use randomized block-to-disk allocation strategies
 that distribute data evenly between the disks but ignore the availability of free space on them. Thus when the smallest disk is full, the program will abort because it cannot grow the file on that disk.
 
-A2: This round-robin disk allocation is due to the history of STXXL's support for parallel disk algorithms. It would be great if someone would contribute a patch for this issue. This would require adapting stxxl::disk_allocator and stxxl::block_manager to skip full disks when allocating new blocks.
+A2: This round-robin block allocation is due to the history of STXXL's support for parallel disk algorithms. It would be great if someone would contribute a patch for this issue. This would require adapting stxxl::disk_allocator and stxxl::block_manager to skip full disks when allocating new blocks.
 
 \section faq_msclr STXXL in a Microsoft CLR Library
 

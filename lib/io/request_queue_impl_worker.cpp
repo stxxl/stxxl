@@ -15,7 +15,7 @@
 
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/semaphore.h>
-#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/shared_state.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 
@@ -30,7 +30,8 @@
 namespace stxxl {
 
 void request_queue_impl_worker::start_thread(
-    void* (*worker)(void*), void* arg, std::thread& t, state<thread_state>& s)
+    void* (*worker)(void*), void* arg, std::thread& t,
+    shared_state<thread_state>& s)
 {
     assert(s() == NOT_RUNNING);
     t = std::thread(worker, arg);
@@ -38,11 +39,11 @@ void request_queue_impl_worker::start_thread(
 }
 
 void request_queue_impl_worker::stop_thread(
-    std::thread& t, state<thread_state>& s, semaphore& sem)
+    std::thread& t, shared_state<thread_state>& s, semaphore& sem)
 {
     assert(s() == RUNNING);
     s.set_to(TERMINATING);
-    sem++;
+    sem.signal();
 #if STXXL_MSVC >= 1700
     // In the Visual C++ Runtime 2012 and 2013, there is a deadlock bug, which
     // occurs when threads are joined after main() exits. Apparently, Microsoft

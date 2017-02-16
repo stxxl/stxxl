@@ -87,11 +87,11 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
         // ignored
     }
 
-    HANDLE file_des = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
-                                    dwCreationDisposition, dwFlagsAndAttributes, NULL);
+    HANDLE file_des_ = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
+                                     dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
-    if (file_des != INVALID_HANDLE_VALUE)
-        return file_des;
+    if (file_des_ != INVALID_HANDLE_VALUE)
+        return file_des_;
 
 #if !STXXL_DIRECT_IO_OFF
     if ((mode& file::DIRECT) && !(mode & file::REQUIRE_DIRECT))
@@ -111,11 +111,11 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
     STXXL_THROW_WIN_LASTERROR(io_error, "CreateFile() path=" << filename << " mode=" << mode);
 }
 
-wfs_file_base::wfs_file_base(
-    const std::string& filename,
-    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename), locked(false)
+wfs_file_base::wfs_file_base(const std::string& filename, int mode)
+    : file_des_(INVALID_HANDLE_VALUE),
+      mode_(mode), filename(filename), locked(false)
 {
-    file_des = open_file_impl(filename, mode);
+    file_des_ = open_file_impl(filename, mode);
 
     if (!(mode & NO_LOCK))
     {
@@ -152,45 +152,45 @@ wfs_file_base::~wfs_file_base()
 
 void wfs_file_base::close()
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
-    if (file_des == INVALID_HANDLE_VALUE)
+    if (file_des_ == INVALID_HANDLE_VALUE)
         return;
 
-    if (!CloseHandle(file_des))
-        STXXL_THROW_WIN_LASTERROR(io_error, "CloseHandle() of file fd=" << file_des);
+    if (!CloseHandle(file_des_))
+        STXXL_THROW_WIN_LASTERROR(io_error, "CloseHandle() of file fd=" << file_des_);
 
-    file_des = INVALID_HANDLE_VALUE;
+    file_des_ = INVALID_HANDLE_VALUE;
 }
 
 void wfs_file_base::lock()
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     if (locked)
         return;  // already locked
-    if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
-        STXXL_THROW_WIN_LASTERROR(io_error, "LockFile() fd=" << file_des);
+    if (LockFile(file_des_, 0, 0, 0xffffffff, 0xffffffff) == 0)
+        STXXL_THROW_WIN_LASTERROR(io_error, "LockFile() fd=" << file_des_);
     locked = true;
 }
 
 file::offset_type wfs_file_base::_size()
 {
     LARGE_INTEGER result;
-    if (!GetFileSizeEx(file_des, &result))
-        STXXL_THROW_WIN_LASTERROR(io_error, "GetFileSizeEx() fd=" << file_des);
+    if (!GetFileSizeEx(file_des_, &result))
+        STXXL_THROW_WIN_LASTERROR(io_error, "GetFileSizeEx() fd=" << file_des_);
 
     return result.QuadPart;
 }
 
 file::offset_type wfs_file_base::size()
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     return _size();
 }
 
 void wfs_file_base::set_size(offset_type newsize)
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     offset_type cur_size = _size();
 
     if (!(mode_ & RDONLY))
@@ -201,29 +201,29 @@ void wfs_file_base::set_size(offset_type newsize)
         bool direct_with_bad_size = (mode_& file::DIRECT) && (newsize % bytes_per_sector);
         if (direct_with_bad_size)
         {
-            if (!CloseHandle(file_des))
+            if (!CloseHandle(file_des_))
                 STXXL_THROW_WIN_LASTERROR(io_error, "closing file (call of ::CloseHandle() from set_size) ");
 
-            file_des = INVALID_HANDLE_VALUE;
-            file_des = open_file_impl(filename, WRONLY);
+            file_des_ = INVALID_HANDLE_VALUE;
+            file_des_ = open_file_impl(filename, WRONLY);
         }
 
-        if (!SetFilePointerEx(file_des, desired_pos, NULL, FILE_BEGIN))
+        if (!SetFilePointerEx(file_des_, desired_pos, NULL, FILE_BEGIN))
             STXXL_THROW_WIN_LASTERROR(io_error,
                                       "SetFilePointerEx() in wfs_file_base::set_size(..) oldsize=" << cur_size <<
                                       " newsize=" << newsize << " ");
 
-        if (!SetEndOfFile(file_des))
+        if (!SetEndOfFile(file_des_))
             STXXL_THROW_WIN_LASTERROR(io_error, "SetEndOfFile() oldsize=" << cur_size <<
                                       " newsize=" << newsize << " ");
 
         if (direct_with_bad_size)
         {
-            if (!CloseHandle(file_des))
+            if (!CloseHandle(file_des_))
                 STXXL_THROW_WIN_LASTERROR(io_error, "closing file (call of ::CloseHandle() from set_size) ");
 
-            file_des = INVALID_HANDLE_VALUE;
-            file_des = open_file_impl(filename, mode_ & ~TRUNC);
+            file_des_ = INVALID_HANDLE_VALUE;
+            file_des_ = open_file_impl(filename, mode_ & ~TRUNC);
         }
     }
 }

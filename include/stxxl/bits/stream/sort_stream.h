@@ -25,6 +25,7 @@
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/stream/sorted_runs.h>
+#include <stxxl/bits/parallel.h>
 
 #include <algorithm>
 #include <utility>
@@ -586,7 +587,7 @@ public:
     void clear()
     {
         if (!m_result)
-            m_result = new sorted_runs_data_type;
+            m_result = sorted_runs_type(new sorted_runs_data_type);
         else
             m_result->clear();
 

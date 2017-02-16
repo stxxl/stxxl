@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2010-2011 Raoul Steffen <R-Steffen@gmx.de>
- *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013-2017 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,311 +14,254 @@
 #ifndef STXXL_COMMON_COUNTING_PTR_HEADER
 #define STXXL_COMMON_COUNTING_PTR_HEADER
 
-#include <stxxl/types>
-#include <stxxl/bits/config.h>
-
-#include <mutex>
+#include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <cstdlib>
-#include <algorithm>
+#include <ostream>
+#include <type_traits>
 
 namespace stxxl {
 
 //! \addtogroup support
 //! \{
 
+//! default deleter for counting_ptr
+class default_counting_ptr_deleter
+{
+public:
+    template <typename Type>
+    void operator () (Type* ptr) const noexcept
+    {
+        delete ptr;
+    }
+};
+
 /*!
- * High-performance smart pointer used as a wrapping reference counting
- * pointer.
+ * High-performance smart pointer used as a wrapping reference counting pointer.
  *
- * This smart pointer class requires two functions in the templated type: void
+ * This smart pointer class requires two functions in the template type: void
  * inc_reference() and void dec_reference(). These must increment and decrement
- * a reference counter inside the templated object. When initialized, the type
- * must have reference count zero. It is _not_ immediately called with
- * add_reference(). Each new object referencing the data calls add_reference()
- * and each destroying holder calls del_reference(). When the data object
- * determines that it's internal counter is zero, then it must destroy itself.
+ * a reference count inside the templated object. When initialized, the type
+ * must have reference count zero. Each new object referencing the data calls
+ * inc_reference() and each destroying holder calls del_reference(). When the
+ * data object determines that it's internal count is zero, then it must destroy
+ * itself.
  *
- * Accompanying the counting_ptr is a const_counting_ptr and a class
- * counted_object, from which reference counted classes must be derive
- * from. The class counted_object implement all methods required for reference
- * counting.
+ * Accompanying the counting_ptr is a class reference_count, from which
+ * reference counted classes may be derive from. The class reference_count
+ * implement all methods required for reference counting.
  *
- * The whole method is more similar to boost' instrusive_ptr, but also yields
- * something resembling shared_ptr.
+ * The whole method is more similar to boost's instrusive_ptr, but also yields
+ * something resembling std::shared_ptr. However, compared to std::shared_ptr,
+ * this class only contains a single pointer, while shared_ptr contains two
+ * which are only related if constructed with std::make_shared.
  */
-template <class Type>
+template <typename Type,
+          typename Deleter = default_counting_ptr_deleter>
 class counting_ptr
 {
 public:
     //! contained type.
-    typedef Type element_type;
+    using element_type = Type;
 
 private:
     //! the pointer to the currently referenced object.
-    Type* m_ptr;
+    Type* ptr_;
 
-protected:
-    //! increment reference counter for current object.
-    void inc_reference()
-    { inc_reference(m_ptr); }
+    //! increment reference count for current object.
+    void inc_reference() noexcept
+    { inc_reference(ptr_); }
 
-    //! increment reference counter of other object.
-    void inc_reference(Type* o)
+    //! increment reference count of other object.
+    void inc_reference(Type* o) noexcept
     { if (o) o->inc_reference(); }
 
-    //! decrement reference counter of current object and maybe delete it.
-    void dec_reference()
-    { if (m_ptr && m_ptr->dec_reference()) delete m_ptr; }
+    //! decrement reference count of current object and maybe delete it.
+    void dec_reference() noexcept
+    { if (ptr_ && ptr_->dec_reference()) Deleter()(ptr_); }
 
 public:
-    //! default constructor: contains a NULL pointer.
-    counting_ptr() : m_ptr(NULL)
-    { }
+    //! all counting_ptr are friends such that they may steal pointers.
+    template <typename Other, typename OtherDeleter>
+    friend class counting_ptr;
 
-    //! constructor with pointer: initializes new reference to ptr.
-    explicit counting_ptr(Type* ptr) : m_ptr(ptr)
-    { inc_reference(); }
+    //! default constructor: contains a nullptr pointer.
+    counting_ptr() noexcept
+        : ptr_(nullptr) { }
+
+    //! implicit construction from nullptr_t: contains a nullptr pointer.
+    counting_ptr(std::nullptr_t) noexcept // NOLINT
+        : ptr_(nullptr) { }
+
+    //! constructor from pointer: initializes new reference to ptr.
+    explicit counting_ptr(Type* ptr) noexcept
+        : ptr_(ptr) { inc_reference(); }
 
     //! copy-constructor: also initializes new reference to ptr.
-    counting_ptr(const counting_ptr& other_ptr) : m_ptr(other_ptr)
-    { inc_reference(); }
+    counting_ptr(const counting_ptr& other) noexcept
+        : ptr_(other.ptr_) { inc_reference(); }
 
-    //! assignment operator: dereference current object and acquire reference on new one.
-    counting_ptr& operator = (const counting_ptr& other_ptr)
-    { return operator = (other_ptr.m_ptr); }
+    //! copy-constructor: also initializes new reference to ptr.
+    template <typename Down,
+              typename = typename std::enable_if<
+                  std::is_convertible<Down*, Type*>::value, void>::type>
+    counting_ptr(const counting_ptr<Down, Deleter>& other) noexcept
+        : ptr_(other.ptr_) { inc_reference(); }
 
-    //! assignment to pointer: dereference current and acquire reference to new ptr.
-    counting_ptr& operator = (Type* ptr)
+    //! move-constructor: just moves pointer, does not change reference counts.
+    counting_ptr(counting_ptr&& other) noexcept
+        : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+
+    //! move-constructor: just moves pointer, does not change reference counts.
+    template <typename Down,
+              typename = typename std::enable_if<
+                  std::is_convertible<Down*, Type*>::value, void>::type>
+    counting_ptr(counting_ptr<Down, Deleter>&& other) noexcept
+        : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+
+    //! copy-assignment operator: acquire reference on new one and dereference
+    //! current object.
+    counting_ptr& operator = (const counting_ptr& other) noexcept
     {
-        inc_reference(ptr);
+        if (&other == this) return *this;
+        inc_reference(other.ptr_);
         dec_reference();
-        m_ptr = ptr;
+        ptr_ = other.ptr_;
         return *this;
     }
 
-    //! destructor: decrements reference counter in ptr.
+    //! copy-assignment operator: acquire reference on new one and dereference
+    //! current object.
+    template <typename Down,
+              typename = typename std::enable_if<
+                  std::is_convertible<Down*, Type*>::value, void>::type>
+    counting_ptr& operator = (
+        const counting_ptr<Down, Deleter>& other) noexcept
+    {
+        if (&other == this) return *this;
+        inc_reference(other.ptr_);
+        dec_reference();
+        ptr_ = other.ptr_;
+        return *this;
+    }
+
+    //! move-assignment operator: move reference of other to current object.
+    counting_ptr& operator = (counting_ptr&& other) noexcept
+    {
+        if (&other == this) return *this;
+        dec_reference();
+        ptr_ = other.ptr_;
+        other.ptr_ = nullptr;
+        return *this;
+    }
+
+    //! move-assignment operator: move reference of other to current object.
+    template <typename Down,
+              typename = typename std::enable_if<
+                  std::is_convertible<Down*, Type*>::value, void>::type>
+    counting_ptr& operator = (counting_ptr<Down, Deleter>&& other) noexcept
+    {
+        if (get() == this->get()) return *this;
+        dec_reference();
+        ptr_ = other.ptr_;
+        other.ptr_ = nullptr;
+        return *this;
+    }
+
+    //! destructor: decrements reference count in ptr.
     ~counting_ptr()
     { dec_reference(); }
 
     //! return the enclosed object as reference.
-    Type& operator * () const
+    Type& operator * () const noexcept
     {
-        assert(m_ptr);
-        return *m_ptr;
+        assert(ptr_);
+        return *ptr_;
     }
 
     //! return the enclosed pointer.
-    Type* operator -> () const
+    Type* operator -> () const noexcept
     {
-        assert(m_ptr);
-        return m_ptr;
+        assert(ptr_);
+        return ptr_;
     }
 
-    //! implicit cast to the enclosed pointer.
-    operator Type* () const
-    { return m_ptr; }
-
     //! return the enclosed pointer.
-    Type * get() const
-    { return m_ptr; }
+    Type * get() const noexcept
+    { return ptr_; }
 
     //! test equality of only the pointer values.
-    bool operator == (const counting_ptr& other_ptr) const
-    { return m_ptr == other_ptr.m_ptr; }
+    bool operator == (const counting_ptr& other) const noexcept
+    { return ptr_ == other.ptr_; }
 
     //! test inequality of only the pointer values.
-    bool operator != (const counting_ptr& other_ptr) const
-    { return m_ptr != other_ptr.m_ptr; }
+    bool operator != (const counting_ptr& other) const noexcept
+    { return ptr_ != other.ptr_; }
 
-    //! cast to bool check for a NULL pointer
-    operator bool () const
+    //! test equality of only the address pointed to
+    bool operator == (Type* other) const noexcept
+    { return ptr_ == other; }
+
+    //! test inequality of only the address pointed to
+    bool operator != (Type* other) const noexcept
+    { return ptr_ != other; }
+
+    //! cast to bool check for a nullptr pointer
+    operator bool () const noexcept
     { return valid(); }
 
-    //! test for a non-NULL pointer
-    bool valid() const
-    { return (m_ptr != NULL); }
+    //! test for a non-nullptr pointer
+    bool valid() const noexcept
+    { return (ptr_ != nullptr); }
 
-    //! test for a NULL pointer
-    bool empty() const
-    { return (m_ptr == NULL); }
+    //! test for a nullptr pointer
+    bool empty() const noexcept
+    { return (ptr_ == nullptr); }
 
     //! if the object is referred by this counting_ptr only
-    bool unique() const
-    { return m_ptr && m_ptr->unique(); }
+    bool unique() const noexcept
+    { return ptr_ && ptr_->unique(); }
 
     //! make and refer a copy if the original object was shared.
     void unify()
     {
-        if (m_ptr && ! m_ptr->unique())
-            operator = (new Type(*m_ptr));
+        if (ptr_ && !ptr_->unique())
+            operator = (counting_ptr(new Type(*ptr_)));
     }
 
-    //! swap enclosed object with another counting pointer (no reference counts need change)
-    void swap(counting_ptr& b)
+    //! release contained pointer
+    void reset()
     {
-        std::swap(m_ptr, b.m_ptr);
+        dec_reference();
+        ptr_ = nullptr;
     }
+
+    //! swap enclosed object with another counting pointer (no reference counts
+    //! need change)
+    void swap(counting_ptr& b) noexcept
+    { std::swap(ptr_, b.ptr_); }
 };
 
-//! swap enclosed object with another counting pointer (no reference counts need change)
-template <class A>
-void swap(counting_ptr<A>& a1, counting_ptr<A>& a2)
+template <typename Type, typename ... Args>
+counting_ptr<Type> make_counting(Args&& ... args)
+{
+    return counting_ptr<Type>(new Type(std::forward<Args>(args) ...));
+}
+
+//! swap enclosed object with another counting pointer (no reference counts need
+//! change)
+template <typename A>
+void swap(counting_ptr<A>& a1, counting_ptr<A>& a2) noexcept
 {
     a1.swap(a2);
 }
 
-/*!
- * High-performance smart pointer used as a wrapping reference counting
- * pointer.
- *
- * This smart pointer class requires two functions in the templated type: void
- * inc_reference() and void dec_reference(). These must increment and decrement
- * a reference counter inside the templated object. When initialized, the type
- * must have reference count zero. It is _not_ immediately called with
- * add_reference(). Each new object referencing the data calls add_reference()
- * and each destroying holder calls del_reference(). When the data object
- * determines that it's internal counter is zero, then it must destroy itself.
- *
- * Accompanying the counting_ptr is a const_counting_ptr and a class
- * counted_object, from which reference counted classes must be derive
- * from. The class counted_object implement all methods required for reference
- * counting.
- *
- * The whole method is more similar to boost' instrusive_ptr, but also yields
- * something resembling shared_ptr.
- */
-template <class Type>
-class const_counting_ptr
+//! print pointer
+template <typename A>
+std::ostream& operator << (std::ostream& os, const counting_ptr<A>& c)
 {
-public:
-    //! contained type.
-    typedef Type element_type;
-
-private:
-    //! the pointer to the currently referenced object.
-    const Type* m_ptr;
-
-protected:
-    //! increment reference counter for current object.
-    void inc_reference()
-    { inc_reference(m_ptr); }
-
-    //! increment reference counter of other object.
-    void inc_reference(const Type* o)
-    { if (o) o->inc_reference(); }
-
-    //! decrement reference counter of current object and maybe delete it.
-    void dec_reference()
-    { if (m_ptr && m_ptr->dec_reference()) delete m_ptr; }
-
-public:
-    //! default constructor: contains a NULL pointer.
-    const_counting_ptr() : m_ptr(NULL)
-    { }
-
-    //! constructor with pointer: initializes new reference to ptr.
-    explicit const_counting_ptr(const Type* ptr) : m_ptr(ptr)
-    { inc_reference(); }
-
-    //! copy-constructor: also initializes new reference to ptr.
-    const_counting_ptr(const const_counting_ptr& other_ptr) : m_ptr(other_ptr)
-    { inc_reference(); }
-
-    //! implicit conversion from non-const: also initializes new reference to ptr.
-    const_counting_ptr(const counting_ptr<Type>& other_ptr) // NOLINT
-        : m_ptr(other_ptr.get())
-    { inc_reference(); }
-
-    //! assignment operator: dereference current object and acquire reference on new one.
-    const_counting_ptr& operator = (const const_counting_ptr& other_ptr)
-    { return operator = (other_ptr.m_ptr); }
-
-    //! assignment operator: dereference current object and acquire reference on new one.
-    const_counting_ptr& operator = (const counting_ptr<Type>& other_ptr)
-    { return operator = (other_ptr.get()); }
-
-    //! assignment to pointer: dereference current and acquire reference to new ptr.
-    const_counting_ptr& operator = (const Type* ptr)
-    {
-        inc_reference(ptr);
-        dec_reference();
-        m_ptr = ptr;
-        return *this;
-    }
-
-    //! destructor: decrements reference counter in ptr.
-    ~const_counting_ptr()
-    { dec_reference(); }
-
-    //! return the enclosed object as reference.
-    const Type& operator * () const
-    {
-        assert(m_ptr);
-        return *m_ptr;
-    }
-
-    //! return the enclosed pointer.
-    const Type* operator -> () const
-    {
-        assert(m_ptr);
-        return m_ptr;
-    }
-
-    //! implicit cast to the enclosed pointer.
-    operator const Type* () const
-    { return m_ptr; }
-
-    //! return the enclosed pointer.
-    const Type * get() const
-    { return m_ptr; }
-
-    //! test equality of only the pointer values.
-    bool operator == (const const_counting_ptr& other_ptr) const
-    { return m_ptr == other_ptr.m_ptr; }
-
-    //! test inequality of only the pointer values.
-    bool operator != (const const_counting_ptr& other_ptr) const
-    { return m_ptr != other_ptr.m_ptr; }
-
-    //! test equality of only the pointer values.
-    bool operator == (const counting_ptr<Type>& other_ptr) const
-    { return m_ptr == other_ptr.get(); }
-
-    //! test inequality of only the pointer values.
-    bool operator != (const counting_ptr<Type>& other_ptr) const
-    { return m_ptr != other_ptr.get(); }
-
-    //! cast to bool check for a NULL pointer
-    operator bool () const
-    { return m_ptr; }
-
-    //! test for a non-NULL pointer
-    bool valid() const
-    { return m_ptr; }
-
-    //! test for a NULL pointer
-    bool empty() const
-    { return !m_ptr; }
-
-    //! if the object is referred by this const_counting_ptr only
-    bool unique() const
-    { return m_ptr && m_ptr->unique(); }
-
-    //! swap enclosed object with another const_counting pointer (no reference
-    //! counts need change)
-    void swap(const_counting_ptr& b)
-    {
-        std::swap(m_ptr, b.m_ptr);
-    }
-};
-
-//! swap enclosed object with another const_counting pointer (no reference
-//! counts need change)
-template <class A>
-void swap(const_counting_ptr<A>& a1, const_counting_ptr<A>& a2)
-{
-    a1.swap(a2);
+    return os << c.get();
 }
 
 /*!
@@ -327,203 +270,53 @@ void swap(const_counting_ptr<A>& a1, const_counting_ptr<A>& a2)
  * Use as superclass of the actual object, this adds a reference_count
  * value. Then either use counting_ptr as pointer to manage references and
  * deletion, or just do normal new and delete.
- *
- * For thread-safe functions, use atomic_counted_object instead of this class!
  */
-class counted_object
+class reference_count
 {
 private:
-    using reference_count_t = size_t;
-    //! the reference count is kept mutable to all const_counting_ptr() to
+    //! the reference count is kept mutable for counting_ptr<const Type> to
     //! change the reference count.
-    mutable reference_count_t m_reference_count;
+    mutable std::atomic<size_t> reference_count_;
 
 public:
     //! new objects have zero reference count
-    counted_object()
-        : m_reference_count(0) { }
+    reference_count() noexcept
+        : reference_count_(0) { }
 
     //! coping still creates a new object with zero reference count
-    counted_object(const counted_object&)
-        : m_reference_count(0) { }
+    reference_count(const reference_count&) noexcept
+        : reference_count_(0) { }
 
     //! assignment operator, leaves pointers unchanged
-    counted_object& operator = (const counted_object&)
+    reference_count& operator = (const reference_count&) noexcept
     { return *this; } // changing the contents leaves pointers unchanged
 
-    ~counted_object()
-    { assert(m_reference_count == 0); }
+    ~reference_count()
+    { assert(reference_count_ == 0); }
 
 public:
     //! Call whenever setting a pointer to the object
-    void inc_reference() const
-    { ++m_reference_count; }
+    void inc_reference() const noexcept
+    { ++reference_count_; }
 
-    //! Call whenever resetting (i.e. overwriting) a pointer to the object.
-    //! IMPORTANT: In case of self-assignment, call AFTER inc_reference().
-    //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
-    bool dec_reference() const
-    { return (! --m_reference_count); }
+    /*!
+     * Call whenever resetting (i.e. overwriting) a pointer to the object.
+     * IMPORTANT: In case of self-assignment, call AFTER inc_reference().
+     *
+     * \return if the object has to be deleted (i.e. if it's reference count
+     * dropped to zero)
+     */
+    bool dec_reference() const noexcept
+    { assert(reference_count_ > 0); return (--reference_count_ == 0); }
 
-    //! Test if the counted_object is referenced by only one counting_ptr.
-    bool unique() const
-    { return (m_reference_count == 1); }
-
-    //! Return the number of references to this object (for debugging)
-    reference_count_t get_reference_count() const
-    { return m_reference_count; }
-};
-
-#if STXXL_HAVE_SYNC_ADD_AND_FETCH || STXXL_MSVC
-
-/*!
- * Provides reference counting abilities for use with counting_ptr with atomics
- * operations.
- *
- * Use as superclass of the actual object, this adds a reference_count
- * value. Then either use counting_ptr as pointer to manage references and
- * deletion, or just do normal new and delete.
- *
- * This class does thread-safe increment and decrement using atomic operations
- * on an integral type.
- */
-class atomic_counted_object
-{
-private:
-#if STXXL_MSVC
-    using reference_count_t = long;
-#else
-    using reference_count_t = size_t;
-#endif
-    //! the reference count is kept mutable to all const_counting_ptr() to
-    //! change the reference count.
-    mutable reference_count_t m_reference_count;
-
-public:
-    //! new objects have zero reference count
-    atomic_counted_object()
-        : m_reference_count(0) { }
-
-    //! coping still creates a new object with zero reference count
-    atomic_counted_object(const atomic_counted_object&)
-        : m_reference_count(0) { }
-
-    //! assignment operator, leaves pointers unchanged
-    atomic_counted_object& operator = (const atomic_counted_object&)
-    { return *this; } // changing the contents leaves pointers unchanged
-
-    ~atomic_counted_object()
-    { assert(m_reference_count == 0); }
-
-public:
-    //! Call whenever setting a pointer to the object
-    void inc_reference() const
-    {
-#if STXXL_MSVC
-        _InterlockedIncrement(&m_reference_count);
-#else
-        __sync_add_and_fetch(&m_reference_count, +1);
-#endif
-    }
-
-    //! Call whenever resetting (i.e. overwriting) a pointer to the object.
-    //! IMPORTANT: In case of self-assignment, call AFTER inc_reference().
-    //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
-    bool dec_reference() const
-    {
-#if STXXL_MSVC
-        return (_InterlockedDecrement(&m_reference_count) == 0);
-#else
-        return (__sync_add_and_fetch(&m_reference_count, reference_count_t(-1)) == 0);
-#endif
-    }
-
-    //! Test if the counted_object is referenced by only one counting_ptr.
-    bool unique() const
-    {
-        return (m_reference_count == 1);
-    }
+    //! Test if the reference_count is referenced by only one counting_ptr.
+    bool unique() const noexcept
+    { return (reference_count_ == 1); }
 
     //! Return the number of references to this object (for debugging)
-    reference_count_t get_reference_count() const
-    {
-        return m_reference_count;
-    }
+    size_t get_reference_count() const noexcept
+    { return reference_count_; }
 };
-
-#else // no atomic intrinsics found, use mutexes (slow)
-
-/*!
- * Provides reference counting abilities for use with counting_ptr with mutex
- * locking.
- *
- * Use as superclass of the actual object, this adds a reference_count
- * value. Then either use counting_ptr as pointer to manage references and
- * deletion, or just do normal new and delete.
- *
- * This class does thread-safe increment and decrement using scoped locks. A
- * faster version of this class is available using atomic operations.
- */
-class atomic_counted_object
-{
-private:
-    using reference_count_t = size_t;
-    //! the reference count is kept mutable to all const_counting_ptr() to
-    //! change the reference count.
-    mutable reference_count_t m_reference_count;
-
-    //! the mutex used to synchronize access to the reference counter.
-    mutable std::mutex m_reference_count_mutex;
-
-public:
-    //! new objects have zero reference count
-    atomic_counted_object()
-        : m_reference_count(0) { }
-
-    //! coping still creates a new object with zero reference count
-    atomic_counted_object(const atomic_counted_object&)
-        : m_reference_count(0) { }
-
-    //! assignment operator, leaves pointers unchanged
-    atomic_counted_object& operator = (const atomic_counted_object&)
-    { return *this; } // changing the contents leaves pointers unchanged
-
-    ~atomic_counted_object()
-    { assert(m_reference_count == 0); }
-
-public:
-    //! Call whenever setting a pointer to the object
-    void inc_reference() const
-    {
-        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
-        ++m_reference_count;
-    }
-
-    //! Call whenever resetting (i.e. overwriting) a pointer to the object.
-    //! IMPORTANT: In case of self-assignment, call AFTER inc_reference().
-    //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
-    bool dec_reference() const
-    {
-        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
-        return (--m_reference_count == 0);
-    }
-
-    //! Test if the counted_object is referenced by only one counting_ptr.
-    bool unique() const
-    {
-        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
-        return (m_reference_count == 1);
-    }
-
-    //! Return the number of references to this object (for debugging)
-    reference_count_t get_reference_count() const
-    {
-        std::unique_lock<std::mutex> lock(m_reference_count_mutex);
-        return m_reference_count;
-    }
-};
-
-#endif
 
 //! \}
 

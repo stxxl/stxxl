@@ -75,13 +75,6 @@ option(STXXL_BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
 
 option(STXXL_RUN_SLOW_TESTS "Run slow tests of extra stxxl tests and tool programs" ON)
 
-if(MSVC_VERSION LESS 1700)
-  # require boost for Visual C++ versions older than VC11 = MSVS 2012
-  set(USE_BOOST ON)
-else()
-  option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and date_time" OFF)
-endif()
-
 option(USE_OPENMP "Use OpenMP for multi-core parallelism" ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -408,50 +401,6 @@ check_cxx_source_compiles(
   STXXL_HAVE_SYNC_ADD_AND_FETCH)
 
 ###############################################################################
-# optional Boost libraries
-
-if(USE_BOOST)
-
-  set(Boost_USE_MULTITHREADED ON)
-
-  if(WIN32)
-    set(Boost_USE_STATIC_LIBS ON)
-  endif()
-
-  # first try to find the version
-  find_package(Boost 1.34.1 REQUIRED)
-
-  if(Boost_VERSION GREATER 104699)
-    #-tb Boost >= 1.47.0 found, we must also link with libboost_chrono for MSVC to work.
-    find_package(Boost 1.47.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
-  elseif(Boost_VERSION GREATER 103499)
-    #-tb Boost >= 1.35.0 found, we must also link with libboost_system for MSVC to work.
-    find_package(Boost 1.35.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
-  else()
-    find_package(Boost 1.34.1 REQUIRED COMPONENTS thread date_time iostreams filesystem)
-  endif()
-
-  # force caching of variables to display them to the user
-  set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Boost installation root." FORCE)
-
-  if(Boost_FOUND)
-    # globally add boost include directories
-    include_directories(${Boost_INCLUDE_DIRS})
-    # set defines in <stxxl/bits/config.h>
-    set(STXXL_BOOST_CONFIG "1")
-    set(STXXL_BOOST_FILESYSTEM "1")
-    set(STXXL_BOOST_RANDOM "1")
-    set(STXXL_BOOST_THREADS "1")
-    set(STXXL_BOOST_TIMESTAMP "1")
-  elseif(MSVC_VERSION LESS 1700)
-    message(FATAL_ERROR "Boost libraries are required for MSVC < 2012.")
-  else()
-    message(FATAL_ERROR "Boost libraries not found. Try compilation without them.")
-  endif()
-
-endif(USE_BOOST)
-
-###############################################################################
 # optional OpenMP parallelization
 
 if(USE_GNU_PARALLEL AND NOT USE_OPENMP)
@@ -542,7 +491,7 @@ set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/incl
 include_directories(${STXXL_INCLUDE_DIRS})
 
 # for targets using stxxl library
-set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 set(STXXL_LIBRARIES stxxl ${STXXL_EXTRA_LIBRARIES})
 
 # export STXXL_INCLUDE_DIRS and STXXL_LIBRARIES to global CACHE

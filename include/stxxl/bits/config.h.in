@@ -75,19 +75,6 @@
 // cmake:   -DUSE_GNU_PARALLEL=ON
 // effect:  explicitly enables use of __gnu_parallel algorithms
 
-#cmakedefine STXXL_BOOST_CONFIG ${STXXL_BOOST_CONFIG}
-#cmakedefine STXXL_BOOST_FILESYSTEM ${STXXL_BOOST_FILESYSTEM}
-#cmakedefine STXXL_BOOST_RANDOM ${STXXL_BOOST_RANDOM}
-#cmakedefine STXXL_BOOST_THREADS ${STXXL_BOOST_THREADS}
-#cmakedefine STXXL_BOOST_TIMESTAMP ${STXXL_BOOST_TIMESTAMP}
-// default: off
-// cmake:   -DUSE_BOOST=ON
-// effect:  enables use of boost libraries in different parts of STXXL.
-
-#if STXXL_BOOST_CONFIG
-  #include <boost/config.hpp>
-#endif
-
 #cmakedefine STXXL_STD_RANDOM ${STXXL_STD_RANDOM}
 // default: off
 // cmake:   detection of <random>

@@ -1170,7 +1170,8 @@ protected:
         request_ptr write_req;                         // completes with read_after_write
 
         write_read_request()
-            : write_done_soon(false), shall_read(false), block_to_start_read(), taker(), write_req(0) { }
+            : write_done_soon(false), shall_read(false), block_to_start_read(),
+              taker(), write_req(nullptr) { }
     };
 
     struct read_after_write
@@ -1180,7 +1181,7 @@ protected:
         explicit read_after_write(write_read_request* write_read_req)
             : wrr(write_read_req) { }
 
-        void operator () (request*)
+        void operator () (request*, bool /* success */)
         {
             wrr->write_done_soon = true;
             if (wrr->shall_read)
@@ -1198,7 +1199,7 @@ protected:
         explicit scheduled_block_meta(block_scheduler_operation op)
             : reserved_iblock(0),
               giver(false, 0),
-              read_req(0),
+              read_req(nullptr),
               operations()
         { operations.push_front(op); }
     };

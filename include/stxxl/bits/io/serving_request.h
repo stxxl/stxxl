@@ -26,23 +26,21 @@ class serving_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;
+
     friend class request_queue_impl_qwqr;
     friend class request_queue_impl_1q;
 
 public:
     serving_request(
-        const completion_handler& on_cmpl,
-        file* f,
-        void* buf,
-        offset_type off,
-        size_type b,
-        request_type t);
+        const completion_handler& on_complete,
+        file* file, void* buffer, offset_type offset, size_type bytes,
+        read_or_write op);
 
 protected:
     virtual void serve();
 
 public:
-    const char * io_type() const;
+    const char * io_type() const final;
 };
 
 //! \}

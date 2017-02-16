@@ -32,7 +32,7 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/mng/block_alloc.h>
+#include <stxxl/bits/mng/block_alloc_strategy.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 #include <stxxl/bits/mng/block_manager.h>

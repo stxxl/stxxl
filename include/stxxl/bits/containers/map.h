@@ -72,14 +72,14 @@ class btree;
 //! (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>)
 //! \tparam RawNodeSize size of internal nodes of map in bytes (btree implementation).
 //! \tparam RawLeafSize size of leaves of map in bytes (btree implementation).
-//! \tparam PDAllocStrategy parallel disk allocation strategy (\c stxxl::SR is recommended and default)
+//! \tparam PDAllocStrategy parallel disk block allocation strategy (\c stxxl::simple_random is recommended and default)
 //!
 template <class KeyType,
           class DataType,
           class CompareType,
           unsigned RawNodeSize = 16* 1024,      // 16 KBytes default
           unsigned RawLeafSize = 128* 1024,     // 128 KBytes default
-          class PDAllocStrategy = stxxl::SR
+          class PDAllocStrategy = stxxl::simple_random
           >
 class map
 {

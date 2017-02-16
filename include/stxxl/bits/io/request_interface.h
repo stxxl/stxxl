@@ -34,9 +34,12 @@ class onoff_switch;
 class request_interface
 {
 public:
-    typedef stxxl::external_size_type offset_type;
-    typedef stxxl::internal_size_type size_type;
-    enum request_type { READ, WRITE };
+    //! type for offsets within a file
+    using offset_type = uint64_t;
+    //! type for block transfer sizes
+    using size_type = size_t;
+
+    enum read_or_write { READ, WRITE };
 
 public:
     virtual bool add_waiter(onoff_switch* sw) = 0;
@@ -56,31 +59,37 @@ public:
     //! non-copyable: delete assignment operator
     request_interface& operator = (const request_interface&) = delete;
 
+    virtual ~request_interface() { }
+
     //! Suspends calling thread until completion of the request.
     virtual void wait(bool measure_time = true) = 0;
 
-    //! Cancel a request.
-    //!
-    //! The request is canceled unless already being processed.
-    //! However, cancelation cannot be guaranteed.
-    //! Canceled requests must still be waited for in order to ensure correct operation.
-    //! If the request was canceled successfully, the completion handler will not be called.
-    //! \return \c true iff the request was canceled successfully
+    /*!
+     * Cancel a request.
+     *
+     * The request is canceled unless already being processed.  However,
+     * cancelation cannot be guaranteed.  Canceled requests must still be waited
+     * for in order to ensure correct operation.  If the request was canceled
+     * successfully, the completion handler will not be called.
+     *
+     * \return \c true iff the request was canceled successfully
+     */
     virtual bool cancel() = 0;
 
     //! Polls the status of the request.
     //! \return \c true if request is completed, otherwise \c false
     virtual bool poll() = 0;
 
-    //! Identifies the type of I/O implementation.
-    //! \return pointer to null terminated string of characters, containing the name of I/O implementation
+    /*!
+     * Identifies the type of I/O implementation.
+     *
+     * \return pointer to null terminated string of characters, containing the
+     * name of I/O implementation
+     */
     virtual const char * io_type() const = 0;
 
     //! Dumps properties of a request.
     virtual std::ostream & print(std::ostream& out) const = 0;
-
-    virtual ~request_interface()
-    { }
 };
 
 //! \}

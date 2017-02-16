@@ -57,11 +57,6 @@ stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" syscall)
 if(STXXL_HAVE_MMAP_FILE)
   stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" mmap)
 endif(STXXL_HAVE_MMAP_FILE)
-if(USE_BOOST)
-  #-tb: boostfd does not work right with vector, because boostfd does not
-  #correctly support set_size() (truncate and extending of files). FIXME
-  #stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" boostfd)
-endif(USE_BOOST)
 
 # TESTS_MAP
 stxxl_build_test(test_map)

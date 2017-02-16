@@ -19,7 +19,7 @@
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/mng/block_alloc.h>
+#include <stxxl/bits/mng/block_alloc_strategy.h>
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 #include <stxxl/bits/mng/write_pool.h>

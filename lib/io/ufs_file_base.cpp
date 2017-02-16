@@ -29,10 +29,8 @@ const char* ufs_file_base::io_type() const
     return "ufs_base";
 }
 
-ufs_file_base::ufs_file_base(
-    const std::string& filename,
-    int mode)
-    : file_des(-1), m_mode(mode), filename(filename)
+ufs_file_base::ufs_file_base(const std::string& filename, int mode)
+    : file_des_(-1), mode_(mode), filename_(filename)
 {
     int flags = 0;
 
@@ -69,12 +67,12 @@ ufs_file_base::ufs_file_base(
         flags |= O_DIRECT;
 #else
         if (mode & REQUIRE_DIRECT) {
-            STXXL_ERRMSG("Error: open()ing " << filename << " with DIRECT mode required, but the system does not support it.");
-            file_des = -1;
+            STXXL_ERRMSG("Error: open()ing " << filename_ << " with DIRECT mode required, but the system does not support it.");
+            file_des_ = -1;
             return;
         }
         else {
-            STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, as the system does not support it.");
+            STXXL_MSG("Warning: open()ing " << filename_ << " without DIRECT mode, as the system does not support it.");
         }
 #endif
     }
@@ -96,7 +94,7 @@ ufs_file_base::ufs_file_base(
     const int perms = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
 #endif
 
-    if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
+    if ((file_des_ = ::open(filename_.c_str(), flags, perms)) >= 0)
     {
         _after_open();
         return;
@@ -105,12 +103,13 @@ ufs_file_base::ufs_file_base(
 #if !STXXL_DIRECT_IO_OFF
     if ((mode & DIRECT) && !(mode & REQUIRE_DIRECT) && errno == EINVAL)
     {
-        STXXL_MSG("open() error on path=" << filename << " flags=" << flags << ", retrying without O_DIRECT.");
+        STXXL_MSG("open() error on path=" << filename_
+                                          << " flags=" << flags << ", retrying without O_DIRECT.");
 
         flags &= ~O_DIRECT;
-        m_mode &= ~DIRECT;
+        mode &= ~DIRECT;
 
-        if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
+        if ((file_des_ = ::open(filename_.c_str(), flags, perms)) >= 0)
         {
             _after_open();
             return;
@@ -118,7 +117,8 @@ ufs_file_base::ufs_file_base(
     }
 #endif
 
-    STXXL_THROW_ERRNO(io_error, "open() rc=" << file_des << " path=" << filename << " flags=" << flags);
+    STXXL_THROW_ERRNO(io_error, "open() rc=" << file_des_
+                                             << " path=" << filename_ << " flags=" << flags);
 }
 
 ufs_file_base::~ufs_file_base()
@@ -131,50 +131,50 @@ void ufs_file_base::_after_open()
     // stat file type
 #if STXXL_WINDOWS || defined(__MINGW32__)
     struct _stat64 st;
-    STXXL_THROW_ERRNO_NE_0(::_fstat64(file_des, &st), io_error,
-                           "_fstat64() path=" << filename << " fd=" << file_des);
+    STXXL_THROW_ERRNO_NE_0(::_fstat64(file_des_, &st), io_error,
+                           "_fstat64() path=" << filename_ << " fd=" << file_des_);
 #else
     struct stat st;
-    STXXL_THROW_ERRNO_NE_0(::fstat(file_des, &st), io_error,
-                           "fstat() path=" << filename << " fd=" << file_des);
+    STXXL_THROW_ERRNO_NE_0(::fstat(file_des_, &st), io_error,
+                           "fstat() path=" << filename_ << " fd=" << file_des_);
 #endif
-    m_is_device = S_ISBLK(st.st_mode) ? true : false;
+    is_device_ = S_ISBLK(st.st_mode) ? true : false;
 
 #ifdef __APPLE__
-    if (m_mode & REQUIRE_DIRECT) {
-        STXXL_THROW_ERRNO_NE_0(fcntl(file_des, F_NOCACHE, 1), io_error,
-                               "fcntl() path=" << filename << " fd=" << file_des);
-        STXXL_THROW_ERRNO_NE_0(fcntl(file_des, F_RDAHEAD, 0), io_error,
-                               "fcntl() path=" << filename << " fd=" << file_des);
+    if (mode_ & REQUIRE_DIRECT) {
+        STXXL_THROW_ERRNO_NE_0(fcntl(file_des_, F_NOCACHE, 1), io_error,
+                               "fcntl() path=" << filename_ << " fd=" << file_des_);
+        STXXL_THROW_ERRNO_NE_0(fcntl(file_des_, F_RDAHEAD, 0), io_error,
+                               "fcntl() path=" << filename_ << " fd=" << file_des_);
     }
-    else if (m_mode & DIRECT) {
-        if (fcntl(file_des, F_NOCACHE, 1) != 0) {
-            STXXL_MSG("fcntl(fd,F_NOCACHE,1) failed on path=" << filename <<
-                      " fd=" << file_des << " : " << strerror(errno));
+    else if (mode_ & DIRECT) {
+        if (fcntl(file_des_, F_NOCACHE, 1) != 0) {
+            STXXL_MSG("fcntl(fd,F_NOCACHE,1) failed on path=" << filename_ <<
+                      " fd=" << file_des_ << " : " << strerror(errno));
         }
-        if (fcntl(file_des, F_RDAHEAD, 0) != 0) {
-            STXXL_MSG("fcntl(fd,F_RDAHEAD,0) failed on path=" << filename <<
-                      " fd=" << file_des << " : " << strerror(errno));
+        if (fcntl(file_des_, F_RDAHEAD, 0) != 0) {
+            STXXL_MSG("fcntl(fd,F_RDAHEAD,0) failed on path=" << filename_ <<
+                      " fd=" << file_des_ << " : " << strerror(errno));
         }
     }
 #endif
 
     // successfully opened file descriptor
-    if (!(m_mode & NO_LOCK))
+    if (!(mode_ & NO_LOCK))
         lock();
 }
 
 void ufs_file_base::close()
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
 
-    if (file_des == -1)
+    if (file_des_ == -1)
         return;
 
-    if (::close(file_des) < 0)
-        STXXL_THROW_ERRNO(io_error, "close() fd=" << file_des);
+    if (::close(file_des_) < 0)
+        STXXL_THROW_ERRNO(io_error, "close() fd=" << file_des_);
 
-    file_des = -1;
+    file_des_ = -1;
 }
 
 void ufs_file_base::lock()
@@ -182,14 +182,14 @@ void ufs_file_base::lock()
 #if STXXL_WINDOWS || defined(__MINGW32__)
     // not yet implemented
 #else
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     struct flock lock_struct;
-    lock_struct.l_type = (short)(m_mode & RDONLY ? F_RDLCK : F_RDLCK | F_WRLCK);
+    lock_struct.l_type = (short)(mode_ & RDONLY ? F_RDLCK : F_RDLCK | F_WRLCK);
     lock_struct.l_whence = SEEK_SET;
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
-    if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_THROW_ERRNO(io_error, "fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
+    if ((::fcntl(file_des_, F_SETLK, &lock_struct)) < 0)
+        STXXL_THROW_ERRNO(io_error, "fcntl(,F_SETLK,) path=" << filename_ << " fd=" << file_des_);
 #endif
 }
 
@@ -199,9 +199,9 @@ file::offset_type ufs_file_base::_size()
     // (where stat() returns zero), and we need not reset the position because
     // serve() always lseek()s before read/write.
 
-    off_t rc = ::lseek(file_des, 0, SEEK_END);
+    off_t rc = ::lseek(file_des_, 0, SEEK_END);
     if (rc < 0)
-        STXXL_THROW_ERRNO(io_error, "lseek(fd,0,SEEK_END) path=" << filename << " fd=" << file_des);
+        STXXL_THROW_ERRNO(io_error, "lseek(fd,0,SEEK_END) path=" << filename_ << " fd=" << file_des_);
 
     // return value is already the total size
     return rc;
@@ -209,13 +209,13 @@ file::offset_type ufs_file_base::_size()
 
 file::offset_type ufs_file_base::size()
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     return _size();
 }
 
 void ufs_file_base::set_size(offset_type newsize)
 {
-    std::unique_lock<std::mutex> fd_lock(fd_mutex);
+    std::unique_lock<std::mutex> fd_lock(fd_mutex_);
     return _set_size(newsize);
 }
 
@@ -223,12 +223,12 @@ void ufs_file_base::_set_size(offset_type newsize)
 {
     offset_type cur_size = _size();
 
-    if (!(m_mode & RDONLY) && !m_is_device)
+    if (!(mode_ & RDONLY) && !is_device_)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
-        HANDLE hfile = (HANDLE)::_get_osfhandle(file_des);
+        HANDLE hfile = (HANDLE)::_get_osfhandle(file_des_);
         STXXL_THROW_ERRNO_NE_0((hfile == INVALID_HANDLE_VALUE), io_error,
-                               "_get_osfhandle() path=" << filename << " fd=" << file_des);
+                               "_get_osfhandle() path=" << filename_ << " fd=" << file_des_);
 
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = newsize;
@@ -243,15 +243,15 @@ void ufs_file_base::_set_size(offset_type newsize)
                                       "SetEndOfFile oldsize=" << cur_size <<
                                       " newsize=" << newsize << " ");
 #else
-        STXXL_THROW_ERRNO_NE_0(::ftruncate(file_des, newsize), io_error,
-                               "ftruncate() path=" << filename << " fd=" << file_des);
+        STXXL_THROW_ERRNO_NE_0(::ftruncate(file_des_, newsize), io_error,
+                               "ftruncate() path=" << filename_ << " fd=" << file_des_);
 #endif
     }
 
 #if !STXXL_WINDOWS
     if (newsize > cur_size)
-        STXXL_THROW_ERRNO_LT_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error,
-                               "lseek() path=" << filename << " fd=" << file_des << " pos=" << newsize - 1);
+        STXXL_THROW_ERRNO_LT_0(::lseek(file_des_, newsize - 1, SEEK_SET), io_error,
+                               "lseek() path=" << filename_ << " fd=" << file_des_ << " pos=" << newsize - 1);
 #endif
 }
 
@@ -259,29 +259,29 @@ void ufs_file_base::close_remove()
 {
     close();
 
-    if (m_is_device) {
-        STXXL_ERRMSG("remove() path=" << filename << " skipped as file is device node");
+    if (is_device_) {
+        STXXL_ERRMSG("remove() path=" << filename_ << " skipped as file is device node");
         return;
     }
 
-    if (::remove(filename.c_str()) != 0)
-        STXXL_ERRMSG("remove() error on path=" << filename << " error=" << strerror(errno));
+    if (::remove(filename_.c_str()) != 0)
+        STXXL_ERRMSG("remove() error on path=" << filename_ << " error=" << strerror(errno));
 }
 
 void ufs_file_base::unlink()
 {
-    if (m_is_device) {
-        STXXL_ERRMSG("unlink() path=" << filename << " skipped as file is device node");
+    if (is_device_) {
+        STXXL_ERRMSG("unlink() path=" << filename_ << " skipped as file is device node");
         return;
     }
 
-    if (::unlink(filename.c_str()) != 0)
-        STXXL_THROW_ERRNO(io_error, "unlink() path=" << filename << " fd=" << file_des);
+    if (::unlink(filename_.c_str()) != 0)
+        STXXL_THROW_ERRNO(io_error, "unlink() path=" << filename_ << " fd=" << file_des_);
 }
 
 bool ufs_file_base::is_device() const
 {
-    return m_is_device;
+    return is_device_;
 }
 
 } // namespace stxxl

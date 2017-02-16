@@ -19,21 +19,15 @@
 namespace stxxl {
 
 request::request(
-    const completion_handler& on_compl,
-    file* file,
-    void* buffer,
-    offset_type offset,
-    size_type bytes,
-    request_type type)
-    : m_on_complete(on_compl),
-      m_file(file),
-      m_buffer(buffer),
-      m_offset(offset),
-      m_bytes(bytes),
-      m_type(type)
+    const completion_handler& on_complete,
+    file* file, void* buffer, offset_type offset, size_type bytes,
+    read_or_write op)
+    : on_complete_(on_complete),
+      file_(file), buffer_(buffer), offset_(offset), bytes_(bytes),
+      op_(op)
 {
     STXXL_VERBOSE3_THIS("request::(...), ref_cnt=" << get_reference_count());
-    m_file->add_request_ref();
+    file_->add_request_ref();
 }
 
 request::~request()
@@ -43,18 +37,18 @@ request::~request()
 
 void request::check_alignment() const
 {
-    if (m_offset % STXXL_BLOCK_ALIGN != 0)
+    if (offset_ % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Offset is not aligned: modulo " <<
-                     STXXL_BLOCK_ALIGN << " = " << m_offset % STXXL_BLOCK_ALIGN);
+                     STXXL_BLOCK_ALIGN << " = " << offset_ % STXXL_BLOCK_ALIGN);
 
-    if (m_bytes % STXXL_BLOCK_ALIGN != 0)
+    if (bytes_ % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Size is not a multiple of " <<
-                     STXXL_BLOCK_ALIGN << ", = " << m_bytes % STXXL_BLOCK_ALIGN);
+                     STXXL_BLOCK_ALIGN << ", = " << bytes_ % STXXL_BLOCK_ALIGN);
 
-    if (unsigned_type(m_buffer) % STXXL_BLOCK_ALIGN != 0)
+    if (unsigned_type(buffer_) % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Buffer is not aligned: modulo " <<
-                     STXXL_BLOCK_ALIGN << " = " << unsigned_type(m_buffer) % STXXL_BLOCK_ALIGN <<
-                     " (" << m_buffer << ")");
+                     STXXL_BLOCK_ALIGN << " = " << unsigned_type(buffer_) % STXXL_BLOCK_ALIGN <<
+                     " (" << buffer_ << ")");
 }
 
 void request::check_nref_failed(bool after)
@@ -63,28 +57,33 @@ void request::check_nref_failed(bool after)
                  (after ? "after" : "before") << " serve()" <<
                  " nref=" << get_reference_count() <<
                  " this=" << this <<
-                 " offset=" << m_offset <<
-                 " buffer=" << m_buffer <<
-                 " bytes=" << m_bytes <<
-                 " type=" << ((m_type == READ) ? "READ" : "WRITE") <<
-                 " file=" << m_file <<
-                 " iotype=" << m_file->io_type()
+                 " offset=" << offset_ <<
+                 " buffer=" << buffer_ <<
+                 " bytes=" << bytes_ <<
+                 " op=" << ((op_ == READ) ? "READ" : "WRITE") <<
+                 " file=" << file_ <<
+                 " iotype=" << file_->io_type()
                  );
 }
 
 const char* request::io_type() const
 {
-    return m_file->io_type();
+    return file_->io_type();
 }
 
 std::ostream& request::print(std::ostream& out) const
 {
-    out << "File object address: " << static_cast<void*>(m_file);
-    out << " Buffer address: " << static_cast<void*>(m_buffer);
-    out << " File offset: " << m_offset;
-    out << " Transfer size: " << m_bytes << " bytes";
-    out << " Type of transfer: " << ((m_type == READ) ? "READ" : "WRITE");
+    out << "File object address: " << file_;
+    out << " Buffer address: " << static_cast<void*>(buffer_);
+    out << " File offset: " << offset_;
+    out << " Transfer size: " << bytes_ << " bytes";
+    out << " Type of transfer: " << ((op_ == READ) ? "READ" : "WRITE");
     return out;
+}
+
+std::ostream& operator << (std::ostream& out, const request& req)
+{
+    return req.print(out);
 }
 
 } // namespace stxxl

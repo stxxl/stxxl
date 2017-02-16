@@ -75,13 +75,13 @@ void test_all_strategies(
         test<T, stxxl::striping, block_size>(data_mem, memory_to_use);
         break;
     case 1:
-        test<T, stxxl::SR, block_size>(data_mem, memory_to_use);
+        test<T, stxxl::simple_random, block_size>(data_mem, memory_to_use);
         break;
     case 2:
-        test<T, stxxl::FR, block_size>(data_mem, memory_to_use);
+        test<T, stxxl::fully_random, block_size>(data_mem, memory_to_use);
         break;
     case 3:
-        test<T, stxxl::RC, block_size>(data_mem, memory_to_use);
+        test<T, stxxl::random_cyclic, block_size>(data_mem, memory_to_use);
         break;
     default:
         STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");

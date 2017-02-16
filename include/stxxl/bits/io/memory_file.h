@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/mem_file.h
+ *  include/stxxl/bits/io/memory_file.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,11 +12,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_MEM_FILE_HEADER
-#define STXXL_IO_MEM_FILE_HEADER
+#ifndef STXXL_IO_MEMORY_FILE_HEADER
+#define STXXL_IO_MEMORY_FILE_HEADER
 
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
+
+#include <mutex>
 
 namespace stxxl {
 
@@ -24,39 +26,39 @@ namespace stxxl {
 //! \{
 
 //! Implementation of file based on new[] and memcpy.
-class mem_file : public disk_queued_file
+class memory_file final : public disk_queued_file
 {
     //! pointer to memory area of "file"
-    char* m_ptr;
+    char* ptr_;
 
     //! size of memory area
-    offset_type m_size;
+    offset_type size_;
 
     //! sequentialize function calls
-    std::mutex m_mutex;
+    std::mutex mutex_;
 
 public:
     //! constructs file object.
-    mem_file(
+    memory_file(
         int queue_id = DEFAULT_QUEUE,
         int allocator_id = NO_ALLOCATOR,
         unsigned int device_id = DEFAULT_DEVICE_ID)
         : file(device_id),
           disk_queued_file(queue_id, allocator_id),
-          m_ptr(NULL), m_size(0)
+          ptr_(NULL), size_(0)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
-               request::request_type type);
-    ~mem_file();
-    offset_type size();
-    void set_size(offset_type newsize);
-    void lock();
-    void discard(offset_type offset, offset_type size);
-    const char * io_type() const;
+               request::read_or_write op) final;
+    ~memory_file();
+    offset_type size() final;
+    void set_size(offset_type newsize) final;
+    void lock() final;
+    void discard(offset_type offset, offset_type size) final;
+    const char * io_type() const final;
 };
 
 //! \}
 
 } // namespace stxxl
 
-#endif // !STXXL_IO_MEM_FILE_HEADER
+#endif // !STXXL_IO_MEMORY_FILE_HEADER

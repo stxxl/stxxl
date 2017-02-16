@@ -28,7 +28,8 @@ struct comp_type : public std::less<int>
     }
 };
 
-typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
+typedef stxxl::btree::btree<
+        int, double, comp_type, 4096, 4096, stxxl::simple_random> btree_type;
 
 std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {
@@ -60,7 +61,8 @@ int main(int argc, char* argv[])
 
     const int log_nins = atoi(argv[1]);
     if (log_nins > 31) {
-        STXXL_ERRMSG("This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        STXXL_ERRMSG("This test can't do more than 2^31 operations, "
+                     "you requested 2^" << log_nins);
         return -1;
     }
 

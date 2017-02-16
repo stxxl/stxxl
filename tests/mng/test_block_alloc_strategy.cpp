@@ -13,7 +13,7 @@
  **************************************************************************/
 
 #include <stxxl/mng>
-#include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
 #include <stxxl/bits/common/error_handling.h>
 
 template <typename strategy>
@@ -51,14 +51,14 @@ int main()
     for (unsigned i = 0; i < cfg->disks_number(); ++i)
         STXXL_MSG(cfg->disk_path(i) << ", " << cfg->disk_size(i) << ", " << cfg->disk_io_impl(i));
     test_strategy<stxxl::striping>();
-    test_strategy<stxxl::FR>();
-    test_strategy<stxxl::SR>();
-    test_strategy<stxxl::RC>();
+    test_strategy<stxxl::fully_random>();
+    test_strategy<stxxl::simple_random>();
+    test_strategy<stxxl::random_cyclic>();
     STXXL_MSG("Regular disks: [" << cfg->regular_disk_range().first << "," << cfg->regular_disk_range().second << ")");
     if (cfg->regular_disk_range().first != cfg->regular_disk_range().second)
-        test_strategy<stxxl::RC_disk>();
+        test_strategy<stxxl::random_cyclic_disk>();
     STXXL_MSG("Flash devices: [" << cfg->flash_range().first << "," << cfg->flash_range().second << ")");
     if (cfg->flash_range().first != cfg->flash_range().second)
-        test_strategy<stxxl::RC_flash>();
+        test_strategy<stxxl::random_cyclic_flash>();
     test_strategy<stxxl::single_disk>();
 }

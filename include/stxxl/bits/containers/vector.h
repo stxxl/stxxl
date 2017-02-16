@@ -817,8 +817,8 @@ public:
 //! \tparam PagerType pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
 //!  default is \c lru_pager<8>
 //! \tparam BlockSize external block size in bytes, default is 2 MiB
-//! \tparam AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-//!  default is RC
+//! \tparam AllocStr one of allocation strategies: \c striping , \c random_cyclic , \c simple_random , or \c fully_random
+//!  default is random_cyclic
 //!
 //! Memory consumption: BlockSize*x*PageSize bytes
 //! \warning Do not store references to the elements of an external vector. Such references
@@ -926,7 +926,7 @@ private:
     mutable std::queue<size_t> m_free_slots;
     mutable simple_vector<block_type>* m_cache;
 
-    file* m_from;
+    file_ptr m_from;
     block_manager* m_bm;
     bool m_exported;
 
@@ -966,7 +966,6 @@ public:
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
           m_cache(NULL),
-          m_from(NULL),
           m_exported(false)
     {
         m_bm = block_manager::get_instance();
@@ -1068,7 +1067,7 @@ public:
         m_page_to_slot.resize(new_pages, on_disk);
 
         m_bids.resize(new_bids_size);
-        if (m_from == NULL)
+        if (!m_from)
         {
             m_bm->new_blocks(m_alloc_strategy,
                              m_bids.begin() + old_bids_size, m_bids.end(),
@@ -1080,11 +1079,11 @@ public:
             for (bids_container_iterator it = m_bids.begin() + old_bids_size;
                  it != m_bids.end(); ++it, offset += size_type(block_type::raw_size))
             {
-                (*it).storage = m_from;
+                (*it).storage = m_from.get();
                 (*it).offset = offset;
             }
             STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " <<
-                                 ((void*)m_from) << " to " << offset);
+                                 m_from << " to " << offset);
             m_from->set_size(offset);
         }
     }
@@ -1148,7 +1147,7 @@ private:
                                  new_pages_size << " pages");
 
             // release blocks
-            if (m_from != NULL)
+            if (m_from)
                 m_from->set_size(new_bids_size * block_type::raw_size);
             else
                 m_bm->delete_blocks(m_bids.begin() + old_bids_size, m_bids.end());
@@ -1176,7 +1175,7 @@ public:
     void clear()
     {
         m_size = 0;
-        if (m_from == NULL)
+        if (!m_from)
             m_bm->delete_blocks(m_bids.begin(), m_bids.end());
 
         m_bids.clear();
@@ -1243,7 +1242,8 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    explicit vector(file* from, const size_type size = size_type(-1), const size_t npages = pager_type().size())
+    explicit vector(file_ptr from, const size_type size = size_type(-1),
+                    const size_t npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
           m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
@@ -1275,7 +1275,7 @@ public:
         for (bids_container_iterator it = m_bids.begin();
              it != m_bids.end(); ++it, offset += size_type(block_type::raw_size))
         {
-            (*it).storage = from;
+            (*it).storage = from.get();
             (*it).offset = offset;
         }
         from->set_size(offset);
@@ -1290,7 +1290,6 @@ public:
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(obj.numpages()),
           m_cache(NULL),
-          m_from(NULL),
           m_exported(false)
     {
         assert(!obj.m_exported);
@@ -1485,13 +1484,13 @@ public:
 
         if (!m_exported)
         {
-            if (m_from == NULL) {
+            if (!m_from) {
                 m_bm->delete_blocks(m_bids.begin(), m_bids.end());
             }
             else // file must be truncated
             {
                 STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " <<
-                                     ((void*)m_from) << " to " << file_length());
+                                     m_from << " to " << file_length());
                 STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
                 try
                 {
@@ -1530,7 +1529,7 @@ public:
     }
 
     //! Get the file associated with this vector, or NULL.
-    file * get_file() const
+    const file_ptr & get_file() const
     {
         return m_from;
     }
@@ -2582,7 +2581,7 @@ public:
 //! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)
 //! \tparam CachePages number of pages in cache, default: \b 8 (recommended >= 2)
 //! \tparam BlockSize external block size \a B in bytes, default: <b>2 MiB</b>
-//! \tparam AllocStr parallel disk allocation strategies: \c striping, RC, SR, or FR. default: \b RC.
+//! \tparam AllocStr parallel disk block allocation strategies: \c striping, random_cyclic, simple_random, or fully_random. default: \b random_cyclic.
 //! \tparam Pager pager type: \c random or \c lru, default: \b lru.
 //!
 //! \warning Do not store references to the elements of an external vector. Such references

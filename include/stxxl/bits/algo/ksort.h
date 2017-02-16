@@ -20,7 +20,7 @@
 #include <stxxl/bits/mng/adaptor.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/onoff_switch.h>
-#include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/adaptor.h>
 #include <stxxl/bits/algo/async_schedule.h>
@@ -112,7 +112,7 @@ struct write_completion_handler
     BlockType* block;
     BidType bid;
     request_ptr* req;
-    void operator () (request* /*completed_req*/)
+    void operator () (request* /*completed_req*/, bool /* success */)
     {
         * req = block->read(bid);
     }
@@ -647,14 +647,14 @@ ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(FR(), firstBID);
+                mng->new_block(fully_random(), firstBID);
             }
             bid_type& lastBID = (*new_runs[0])[_n - 1].bid;
             if (lastBID.is_managed())
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(FR(), lastBID);
+                mng->new_block(fully_random(), lastBID);
             }
         }
         else
@@ -763,8 +763,8 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(FR(), first_bid);                // try to overlap
-                mng->new_block(FR(), last_bid);
+                mng->new_block(fully_random(), first_bid);                // try to overlap
+                mng->new_block(fully_random(), last_bid);
                 req->wait();
 
                 req = last_block->read(*last.bid());
@@ -869,7 +869,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(FR(), first_bid);                // try to overlap
+                mng->new_block(fully_random(), first_bid);                // try to overlap
                 req->wait();
 
                 unsigned_type i = 0;
@@ -947,7 +947,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 unsigned_type i;
 
                 req = last_block->read(*last.bid());
-                mng->new_block(FR(), last_bid);
+                mng->new_block(fully_random(), last_bid);
                 req->wait();
 
                 for (i = last.block_offset(); i < block_type::size; i++)

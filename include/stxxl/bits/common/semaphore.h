@@ -14,73 +14,68 @@
 #ifndef STXXL_COMMON_SEMAPHORE_HEADER
 #define STXXL_COMMON_SEMAPHORE_HEADER
 
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
 
 namespace stxxl {
 
 class semaphore
 {
-    //! value of the semaphore
-    int v;
-
-    //! mutex for condition variable
-    std::mutex m_mutex;
-
-    //! condition variable
-    std::condition_variable m_cond;
-
 public:
     //! construct semaphore
-    explicit semaphore(int init_value = 1)
-        : v(init_value)
+    explicit semaphore(size_t init_value = 1)
+        : value_(init_value)
     { }
 
     //! non-copyable: delete copy-constructor
     semaphore(const semaphore&) = delete;
     //! non-copyable: delete assignment operator
     semaphore& operator = (const semaphore&) = delete;
+    //! move-constructor: just move the value
+    semaphore(semaphore&& s) : value_(s.value_) { }
 
     //! function increments the semaphore and signals any threads that are
     //! blocked waiting a change in the semaphore
-    int operator ++ (int)
+    size_t signal()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        int res = ++v;
-        lock.unlock();
-        m_cond.notify_one();
+        std::unique_lock<std::mutex> lock(mutex_);
+        size_t res = ++value_;
+        cv_.notify_one();
         return res;
     }
+
+    //! function increments the semaphore and signals any threads that are
+    //! blocked waiting a change in the semaphore
+    size_t signal(size_t delta)
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        size_t res = (value_ += delta);
+        cv_.notify_all();
+        return res;
+    }
+
     //! function decrements the semaphore and blocks if the semaphore is <= 0
     //! until another thread signals a change
-    int operator -- (int)
+    size_t wait()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        while (v <= 0)
-            m_cond.wait(lock);
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (value_ <= 0)
+            cv_.wait(lock);
+        return --value_;
+    }
 
-        return --v;
-    }
-    //! function does NOT block but simply decrements the semaphore should not
-    //! be used instead of down -- only for programs where multiple threads
-    //! must up on a semaphore before another thread can go down, i.e., allows
-    //! programmer to set the semaphore to a negative value prior to using it
-    //! for synchronization.
-    int decrement()
-    {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return --v;
-    }
-#if 0
-    //! function returns the value of the semaphore at the time the
-    //! critical section is accessed.  obviously the value is not guaranteed
-    //! after the function unlocks the critical section.
-    int get_value()
-    {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return v;
-    }
-#endif
+    //! return the current value -- should only be used for debugging.
+    size_t value() const { return value_; }
+
+private:
+    //! value of the semaphore
+    size_t value_;
+
+    //! mutex for condition variable
+    std::mutex mutex_;
+
+    //! condition variable
+    std::condition_variable cv_;
 };
 
 } // namespace stxxl

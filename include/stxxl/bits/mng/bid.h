@@ -40,30 +40,23 @@ namespace stxxl {
 template <size_t Size>
 struct BID
 {
-    static constexpr size_t size = Size;   //!< Block size
-    static constexpr size_t t_size = Size; //!< Blocks size, given by the parameter
+    //! Block size
+    static constexpr size_t size = Size;
+    //! Blocks size, given by the parameter
+    static constexpr size_t t_size = Size;
 
-    file* storage;                         //!< pointer to the file of the block
-    stxxl::int64 offset;                   //!< offset within the file of the block
+    //! pointer to the file of the block
+    file* storage = nullptr;
+    //! offset within the file of the block (uint64_t)
+    external_size_type offset = 0;
 
-    BID() : storage(NULL), offset(0)
-    { }
+    BID() = default;
 
-    bool valid() const
-    {
-        return storage != NULL;
-    }
-
-    BID(file* s, stxxl::int64 o) : storage(s), offset(o)
-    { }
-
-    BID(const BID& obj) : storage(obj.storage), offset(obj.offset)
-    { }
+    BID(file* s, const external_size_type& o) : storage(s), offset(o) { }
 
     template <size_t BlockSize>
     explicit BID(const BID<BlockSize>& obj)
-        : storage(obj.storage), offset(obj.offset)
-    { }
+        : storage(obj.storage), offset(obj.offset) { }
 
     template <size_t BlockSize>
     BID& operator = (const BID<BlockSize>& obj)
@@ -73,47 +66,99 @@ struct BID
         return *this;
     }
 
+    bool valid() const
+    {
+        return storage != NULL;
+    }
+
     bool is_managed() const
     {
         return storage->get_allocator_id() != file::NO_ALLOCATOR;
     }
+
+    //! Writes data to the disk(s).
+    request_ptr write(void* data, size_t data_size,
+                      completion_handler on_complete = completion_handler())
+    {
+        return storage->awrite(data, offset, data_size, on_complete);
+    }
+
+    //! Reads data from the disk(s).
+    request_ptr read(void* data, size_t data_size,
+                     completion_handler on_complete = completion_handler())
+    {
+        return storage->aread(data, offset, data_size, on_complete);
+    }
+
+    bool operator == (const BID<Size>& b) const
+    {
+        return storage == b.storage && offset == b.offset;
+    }
+
+    bool operator != (const BID<Size>& b) const
+    {
+        return !operator == (b);
+    }
 };
 
-//! Specialization of block identifier class (BID) for variable size block size.
-//!
-//! Stores block identity, given by file, offset within the file, and size of the block
+/*!
+ * Specialization of block identifier class (BID) for variable size block size.
+ *
+ * Stores block identity, given by file, offset within the file, and size of the
+ * block
+ */
 template <>
 struct BID<0>
 {
-    file* storage;                      //!< pointer to the file of the block
-    stxxl::int64 offset;                //!< offset within the file of the block
-    unsigned size;                      //!< size of the block in bytes
+    //! pointer to the file of the block
+    file* storage = nullptr;
+    //! offset within the file of the block (uint64_t)
+    external_size_type offset = 0;
+    //! size of the block in bytes
+    size_t size = 0;
 
-    static constexpr size_t t_size = 0; //!< Blocks size, given by the parameter
+    //! Blocks size, given by the parameter
+    static constexpr size_t t_size = 0;
 
-    BID() : storage(NULL), offset(0), size(0)
-    { }
+    BID() = default;
 
-    BID(file* f, stxxl::int64 o, unsigned s) : storage(f), offset(o), size(s)
-    { }
+    BID(file* f, const external_size_type& o, size_t s)
+        : storage(f), offset(o), size(s) { }
 
     bool valid() const
     {
         return (storage != NULL);
     }
+
+    bool is_managed() const
+    {
+        return storage->get_allocator_id() != file::NO_ALLOCATOR;
+    }
+
+    //! Writes data to the disk(s).
+    request_ptr write(void* data, size_t data_size,
+                      completion_handler on_complete = completion_handler())
+    {
+        return storage->awrite(data, offset, data_size, on_complete);
+    }
+
+    //! Reads data from the disk(s).
+    request_ptr read(void* data, size_t data_size,
+                     completion_handler on_complete = completion_handler())
+    {
+        return storage->aread(data, offset, data_size, on_complete);
+    }
+
+    bool operator == (const BID<0>& b) const
+    {
+        return storage == b.storage && offset == b.offset && size == b.size;
+    }
+
+    bool operator != (const BID<0>& b) const
+    {
+        return !operator == (b);
+    }
 };
-
-template <size_t BlockSize>
-bool operator == (const BID<BlockSize>& a, const BID<BlockSize>& b)
-{
-    return (a.storage == b.storage) && (a.offset == b.offset) && (a.size == b.size);
-}
-
-template <size_t BlockSize>
-bool operator != (const BID<BlockSize>& a, const BID<BlockSize>& b)
-{
-    return (a.storage != b.storage) || (a.offset != b.offset) || (a.size != b.size);
-}
 
 template <size_t BlockSize>
 std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
@@ -136,17 +181,7 @@ std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
 }
 
 template <size_t BlockSize>
-class BIDArray : public simple_vector<BID<BlockSize> >
-{
-public:
-    BIDArray()
-        : simple_vector<BID<BlockSize> >()
-    { }
-
-    explicit BIDArray(const unsigned_type& size)
-        : simple_vector<BID<BlockSize> >(size)
-    { }
-};
+using BIDArray = simple_vector<BID<BlockSize> >;
 
 //! \}
 

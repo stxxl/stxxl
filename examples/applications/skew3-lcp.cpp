@@ -2201,19 +2201,19 @@ public:
     private:
         // Mod1 types
         typedef typename stxxl::stream::use_push<skew_quad_type> mod1_push_type;
-        typedef typename stxxl::stream::runs_creator<mod1_push_type, less_quad_2nd, block_size, stxxl::RC> mod1_runs_type;
+        typedef typename stxxl::stream::runs_creator<mod1_push_type, less_quad_2nd, block_size> mod1_runs_type;
         typedef typename mod1_runs_type::sorted_runs_type sorted_mod1_runs_type;
         typedef typename stxxl::stream::runs_merger<sorted_mod1_runs_type, less_quad_2nd> mod1_rm_type;
 
         // Mod2 types
         typedef typename stxxl::stream::use_push<skew_quint_type> mod2_push_type;
-        typedef typename stxxl::stream::runs_creator<mod2_push_type, less_quint_2nd, block_size, stxxl::RC> mod2_runs_type;
+        typedef typename stxxl::stream::runs_creator<mod2_push_type, less_quint_2nd, block_size> mod2_runs_type;
         typedef typename mod2_runs_type::sorted_runs_type sorted_mod2_runs_type;
         typedef typename stxxl::stream::runs_merger<sorted_mod2_runs_type, less_quint_2nd> mod2_rm_type;
 
         // Mod0 types
         typedef typename stxxl::stream::use_push<skew_quint_type> mod0_push_type;
-        typedef typename stxxl::stream::runs_creator<mod0_push_type, less_mod0, block_size, stxxl::RC> mod0_runs_type;
+        typedef typename stxxl::stream::runs_creator<mod0_push_type, less_mod0, block_size> mod0_runs_type;
         typedef typename mod0_runs_type::sorted_runs_type sorted_mod0_runs_type;
         typedef typename stxxl::stream::runs_merger<sorted_mod0_runs_type, less_mod0> mod0_rm_type;
 
@@ -2693,7 +2693,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
 
     // input and output files (if supplied via command line)
-    stxxl::syscall_file* input_file = NULL, * output_file = NULL;
+    stxxl::file_ptr input_file, output_file;
 
     // input and output vectors for suffix array construction
     alphabet_vector_type input_vector;
@@ -2734,14 +2734,16 @@ int process(const std::string& input_filename, const std::string& output_filenam
     }
     else {
         // define input file object and map input_vector to input_file (no copying)
-        input_file = new stxxl::syscall_file(input_filename, file::RDONLY | file::DIRECT);
+        input_file = stxxl::make_counting<stxxl::syscall_file>(
+            input_filename, file::RDONLY | file::DIRECT);
         alphabet_vector_type file_input_vector(input_file);
         input_vector.swap(file_input_vector);
     }
 
     if (output_filename.size()) {
         // define output file object and map output_vector to output_file
-        output_file = new stxxl::syscall_file(output_filename, file::RDWR | file::CREAT | file::DIRECT);
+        output_file = stxxl::make_counting<stxxl::syscall_file>(
+            output_filename, file::RDWR | file::CREAT | file::DIRECT);
         offset_vector_type file_output_vector(output_file);
         output_vector.swap(file_output_vector);
     }
@@ -2839,11 +2841,11 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
     if (input_file) {
         input_vector = alphabet_vector_type();
-        delete input_file;
+        input_file.reset();
     }
     if (output_file) {
         output_vector = offset_vector_type();
-        delete output_file;
+        output_file.reset();
     }
 
     return ret;

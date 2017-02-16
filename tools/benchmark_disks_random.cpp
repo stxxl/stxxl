@@ -43,7 +43,7 @@ struct print_number
 
     explicit print_number(size_t n) : n(n) { }
 
-    void operator () (stxxl::request*)
+    void operator () (stxxl::request*, bool /* success */)
     {
         //std::cout << n << " " << std::flush;
     }
@@ -226,7 +226,7 @@ int benchmark_disks_random(int argc, char* argv[])
         "Operations: [i]nitialize, [r]ead, and/or [w]rite (default: all).");
     cp.add_opt_param_string(
         "alloc", allocstr,
-        "Block allocation strategy: RC, SR, FR, striping (default: RC).");
+        "Block allocation strategy: random_cyclic, simple_random, fully_random, striping (default: random_cyclic).");
 
     cp.set_description(
         "This program will benchmark _random_ block access on the disks "
@@ -242,12 +242,12 @@ int benchmark_disks_random(int argc, char* argv[])
 #define run_alloc(alloc) benchmark_disks_random_alloc<alloc>(span, block_size, worksize, optirw)
     if (allocstr.size())
     {
-        if (allocstr == "RC")
-            return run_alloc(stxxl::RC);
-        if (allocstr == "SR")
-            return run_alloc(stxxl::SR);
-        if (allocstr == "FR")
-            return run_alloc(stxxl::FR);
+        if (allocstr == "random_cyclic")
+            return run_alloc(stxxl::random_cyclic);
+        if (allocstr == "simple_random")
+            return run_alloc(stxxl::simple_random);
+        if (allocstr == "fully_random")
+            return run_alloc(stxxl::fully_random);
         if (allocstr == "striping")
             return run_alloc(stxxl::striping);
 

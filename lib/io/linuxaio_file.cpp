@@ -20,12 +20,11 @@
 namespace stxxl {
 
 request_ptr linuxaio_file::aread(
-    void* buffer,
-    offset_type pos,
-    size_type bytes,
-    const completion_handler& on_cmpl)
+    void* buffer, offset_type offset, size_type bytes,
+    const completion_handler& on_complete)
 {
-    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::READ));
+    request_ptr req = make_counting<linuxaio_request>(
+        on_complete, this, buffer, offset, bytes, request::READ);
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
@@ -33,12 +32,11 @@ request_ptr linuxaio_file::aread(
 }
 
 request_ptr linuxaio_file::awrite(
-    void* buffer,
-    offset_type pos,
-    size_type bytes,
-    const completion_handler& on_cmpl)
+    void* buffer, offset_type offset, size_type bytes,
+    const completion_handler& on_complete)
 {
-    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE));
+    request_ptr req = make_counting<linuxaio_request>(
+        on_complete, this, buffer, offset, bytes, request::WRITE);
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
@@ -46,10 +44,10 @@ request_ptr linuxaio_file::awrite(
 }
 
 void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes,
-                          request::request_type type)
+                          request::read_or_write op)
 {
     // req need not be an linuxaio_request
-    if (type == request::READ)
+    if (op == request::READ)
         aread(buffer, offset, bytes)->wait();
     else
         awrite(buffer, offset, bytes)->wait();

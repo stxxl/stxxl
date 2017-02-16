@@ -23,13 +23,12 @@ set(LIBSTXXL_SOURCES
   common/verbose.cpp
   common/version.cpp
 
-  io/boostfd_file.cpp
   io/create_file.cpp
   io/disk_queued_file.cpp
   io/file.cpp
   io/fileperblock_file.cpp
   io/iostats.cpp
-  io/mem_file.cpp
+  io/memory_file.cpp
   io/request.cpp
   io/request_queue_impl_1q.cpp
   io/request_queue_impl_qwqr.cpp
@@ -39,13 +38,12 @@ set(LIBSTXXL_SOURCES
   io/serving_request.cpp
   io/syscall_file.cpp
   io/ufs_file_base.cpp
-  io/wbtl_file.cpp
   io/wfs_file_base.cpp
   io/wincall_file.cpp
 
   mng/block_manager.cpp
   mng/config.cpp
-  mng/disk_allocator.cpp
+  mng/disk_block_allocator.cpp
 
   algo/async_schedule.cpp
 
@@ -55,7 +53,6 @@ if(NOT MSVC)
   # additional sources for non Visual Studio builds
   set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
     io/mmap_file.cpp
-    io/simdisk_file.cpp
     )
 endif(NOT MSVC)
 

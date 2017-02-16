@@ -22,9 +22,10 @@ using stxxl::file;
 
 struct print_completion
 {
-    void operator () (stxxl::request* ptr)
+    void operator () (stxxl::request* ptr, bool success)
     {
-        std::cout << "Request completed: " << ptr << std::endl;
+        std::cout << "Request completed: " << ptr
+                  << " success: " << success << std::endl;
     }
 };
 
@@ -40,11 +41,9 @@ int main(int argc, char** argv)
     char* buffer = (char*)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
-    std::unique_ptr<stxxl::file> file(
-        stxxl::create_file(
-            argv[1], argv[2],
-            stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT)
-        );
+    stxxl::file_ptr file = stxxl::create_file(
+        argv[1], argv[2],
+        stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT);
 
     file->set_size(num_blocks * size);
     stxxl::request_ptr req[num_blocks];
@@ -80,6 +79,8 @@ int main(int argc, char** argv)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats2;
 
     stxxl::aligned_dealloc<4096>(buffer);
+
+    file->close_remove();
 
     return 0;
 }

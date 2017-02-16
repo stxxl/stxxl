@@ -40,25 +40,25 @@ class linuxaio_queue : public request_queue_impl_worker
     typedef linuxaio_queue self_type;
 
 private:
-    //! OS context
-    aio_context_t context;
+    //! OS context_
+    aio_context_t context_;
 
     //! storing linuxaio_request* would drop ownership
     typedef std::list<request_ptr> queue_type;
 
     // "waiting" request have submitted to this queue, but not yet to the OS,
     // those are "posted"
-    std::mutex waiting_mtx, posted_mtx;
-    queue_type waiting_requests, posted_requests;
+    std::mutex waiting_mtx_, posted_mtx_;
+    queue_type waiting_requests_, posted_requests_;
 
     //! max number of OS requests
-    int max_events;
+    int max_events_;
     //! number of requests in waitings_requests
-    semaphore num_waiting_requests, num_free_events, num_posted_requests;
+    semaphore num_waiting_requests_, num_free_events_, num_posted_requests_;
 
     // two threads, one for posting, one for waiting
-    std::thread post_thread, wait_thread;
-    state<thread_state> post_thread_state, wait_thread_state;
+    std::thread post_thread_, wait_thread_;
+    shared_state<thread_state> post_thread_state_, wait_thread_state_;
 
     // Why do we need two threads, one for posting, and one for waiting?  Is
     // one not enough?
@@ -68,7 +68,7 @@ private:
     //    and the OS to produce I/O completion events at the same time
     //    (IOCB_CMD_NOOP does not seem to help here either)
 
-    static const priority_op _priority_op = WRITE;
+    static const priority_op priority_op_ = WRITE;
 
     static void * post_async(void* arg);   // thread start callback
     static void * wait_async(void* arg);   // thread start callback
@@ -78,15 +78,15 @@ private:
     void suspend();
 
     // needed by linuxaio_request
-    aio_context_t get_io_context() { return context; }
+    aio_context_t get_io_context() { return context_; }
 
 public:
     //! Construct queue. Requests max number of requests simultaneously
     //! submitted to disk, 0 means as many as possible
     explicit linuxaio_queue(int desired_queue_length = 0);
 
-    void add_request(request_ptr& req);
-    bool cancel_request(request_ptr& req);
+    void add_request(request_ptr& req) final;
+    bool cancel_request(request_ptr& req) final;
     void complete_request(request_ptr& req);
     ~linuxaio_queue();
 };

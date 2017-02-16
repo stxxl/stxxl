@@ -17,8 +17,6 @@
 #ifndef STXXL_COMMON_ONOFF_SWITCH_HEADER
 #define STXXL_COMMON_ONOFF_SWITCH_HEADER
 
-#include <stxxl/bits/config.h>
-
 #include <condition_variable>
 #include <mutex>
 
@@ -27,18 +25,18 @@ namespace stxxl {
 class onoff_switch
 {
     //! mutex for condition variable
-    std::mutex m_mutex;
+    std::mutex mutex_;
 
     //! condition variable
-    std::condition_variable m_cond;
+    std::condition_variable cond_;
 
     //! the switch's state
-    bool m_on;
+    bool on_;
 
 public:
     //! construct switch
     explicit onoff_switch(bool flag = false)
-        : m_on(flag)
+        : on_(flag)
     { }
 
     //! non-copyable: delete copy-constructor
@@ -49,38 +47,40 @@ public:
     //! turn switch ON and notify one waiter
     void on()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_on = true;
-        lock.unlock();
-        m_cond.notify_one();
+        std::unique_lock<std::mutex> lock(mutex_);
+        on_ = true;
+        cond_.notify_one();
     }
+
     //! turn switch OFF and notify one waiter
     void off()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_on = false;
-        lock.unlock();
-        m_cond.notify_one();
+        std::unique_lock<std::mutex> lock(mutex_);
+        on_ = false;
+        cond_.notify_one();
     }
+
     //! wait for switch to turn ON
     void wait_for_on()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        if (!m_on)
-            m_cond.wait(lock);
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (!on_)
+            cond_.wait(lock);
     }
+
     //! wait for switch to turn OFF
     void wait_for_off()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_on)
-            m_cond.wait(lock);
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (on_)
+            cond_.wait(lock);
     }
+
     //! return true if switch is ON
     bool is_on()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return m_on;
+        std::unique_lock<std::mutex> lock(mutex_);
+        return on_;
     }
 };
 

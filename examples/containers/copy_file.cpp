@@ -27,17 +27,19 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
     stxxl::timer tm(true);     // start a timer
 
     // input file object
-    stxxl::syscall_file InputFile(input_path, file::RDONLY | file::DIRECT);
+    stxxl::file_ptr InputFile = stxxl::make_counting<stxxl::syscall_file>(
+        input_path, file::RDONLY | file::DIRECT);
     // output file object
-    stxxl::syscall_file OutputFile(output_path, file::RDWR | file::CREAT | file::DIRECT);
+    stxxl::file_ptr OutputFile = stxxl::make_counting<stxxl::syscall_file>(
+        output_path, file::RDWR | file::CREAT | file::DIRECT);
 
     typedef stxxl::vector<unsigned char> vector_type;
 
     std::cout << "Copying file " << input_path << " to " << output_path << std::endl;
 
     // InputVector is mapped to InputFile
-    vector_type InputVector(&InputFile);
-    vector_type OutputVector(&OutputFile);                      // OutputVector is mapped to OutputFile
+    vector_type InputVector(InputFile);
+    vector_type OutputVector(OutputFile);                      // OutputVector is mapped to OutputFile
 
     std::cout << "File " << input_path << " has size " << InputVector.size() << " bytes." << std::endl;
 

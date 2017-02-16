@@ -12,16 +12,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/mng/block_manager.h>
+
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/mng/disk_allocator.h>
+#include <stxxl/bits/mng/disk_block_allocator.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/io/disk_queues.h>
 
 #include <cstddef>
-#include <fstream>
 #include <string>
 
 namespace stxxl {
@@ -35,14 +36,14 @@ block_manager::block_manager()
     // initialize config (may read config files now)
     config->check_initialized();
 
-    // allocate disk_allocators
-    ndisks = config->disks_number();
-    disk_allocators = new disk_allocator*[ndisks];
-    disk_files = new file*[ndisks];
+    // allocate block_allocators_
+    ndisks_ = config->disks_number();
+    block_allocators_.resize(ndisks_);
+    disk_files_.resize(ndisks_);
 
-    uint64 total_size = 0;
+    uint64_t total_size = 0;
 
-    for (unsigned i = 0; i < ndisks; ++i)
+    for (size_t i = 0; i < ndisks_; ++i)
     {
         disk_config& cfg = config->disk(i);
 
@@ -52,7 +53,7 @@ block_manager::block_manager()
 
         try
         {
-            disk_files[i] = create_file(cfg, file::CREAT | file::RDWR, i);
+            disk_files_[i] = create_file(cfg, file::CREAT | file::RDWR, i);
 
             STXXL_MSG("Disk '" << cfg.path << "' is allocated, space: " <<
                       (cfg.size) / (1024 * 1024) <<
@@ -68,54 +69,71 @@ block_manager::block_manager()
 
         total_size += cfg.size;
 
-        disk_allocators[i] = new disk_allocator(disk_files[i], cfg);
+        // create queue for the file.
+        disk_queues::get_instance()->make_queue(disk_files_[i].get());
+
+        block_allocators_[i] = new disk_block_allocator(disk_files_[i].get(), cfg);
     }
 
-    if (ndisks > 1)
+    if (ndisks_ > 1)
     {
-        STXXL_MSG("In total " << ndisks << " disks are allocated, space: " <<
+        STXXL_MSG("In total " << ndisks_ << " disks are allocated, space: " <<
                   (total_size / (1024 * 1024)) <<
                   " MiB");
     }
-
-#if STXXL_MNG_COUNT_ALLOCATION
-    m_current_allocation = 0;
-    m_total_allocation = 0;
-    m_maximum_allocation = 0;
-#endif // STXXL_MNG_COUNT_ALLOCATION
 }
 
 block_manager::~block_manager()
 {
     STXXL_VERBOSE1("Block manager destructor");
-    for (size_t i = ndisks; i > 0; )
+    for (size_t i = ndisks_; i > 0; )
     {
         --i;
-        delete disk_allocators[i];
-        delete disk_files[i];
+        delete block_allocators_[i];
+        disk_files_[i].reset();
     }
-    delete[] disk_allocators;
-    delete[] disk_files;
 }
 
-uint64 block_manager::get_total_bytes() const
+uint64_t block_manager::total_bytes() const
 {
-    uint64 total = 0;
+    std::unique_lock<std::mutex> lock(mutex_);
 
-    for (unsigned i = 0; i < ndisks; ++i)
-        total += disk_allocators[i]->get_total_bytes();
+    uint64_t total = 0;
+
+    for (size_t i = 0; i < ndisks_; ++i)
+        total += block_allocators_[i]->total_bytes();
 
     return total;
 }
 
-uint64 block_manager::get_free_bytes() const
+uint64_t block_manager::free_bytes() const
 {
-    uint64 total = 0;
+    std::unique_lock<std::mutex> lock(mutex_);
 
-    for (unsigned i = 0; i < ndisks; ++i)
-        total += disk_allocators[i]->get_free_bytes();
+    uint64_t total = 0;
+
+    for (size_t i = 0; i < ndisks_; ++i)
+        total += block_allocators_[i]->free_bytes();
 
     return total;
+}
+
+uint64_t block_manager::total_allocation() const
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    return total_allocation_;
+}
+
+uint64_t block_manager::current_allocation() const
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    return current_allocation_;
+}
+
+uint64_t block_manager::maximum_allocation() const
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    return maximum_allocation_;
 }
 
 } // namespace stxxl

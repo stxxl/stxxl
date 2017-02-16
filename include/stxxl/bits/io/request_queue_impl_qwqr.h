@@ -29,22 +29,22 @@ namespace stxxl {
 //! Implementation of a local request queue having two queues, one for read and
 //! one for write requests, thus having two threads. This is the default
 //! implementation.
-class request_queue_impl_qwqr : public request_queue_impl_worker
+class request_queue_impl_qwqr final : public request_queue_impl_worker
 {
 private:
     typedef request_queue_impl_qwqr self;
     typedef std::list<request_ptr> queue_type;
 
-    std::mutex m_write_mutex;
-    std::mutex m_read_mutex;
-    queue_type m_write_queue;
-    queue_type m_read_queue;
+    std::mutex write_mutex_;
+    std::mutex read_mutex_;
+    queue_type write_queue_;
+    queue_type read_queue_;
 
-    state<thread_state> m_thread_state;
-    std::thread m_thread;
-    semaphore m_sem;
+    shared_state<thread_state> thread_state_;
+    std::thread thread_;
+    semaphore sem_;
 
-    static const priority_op m_priority_op = WRITE;
+    static const priority_op priority_op_ = WRITE;
 
     static void * worker(void* arg);
 
@@ -56,13 +56,13 @@ public:
     // also there were race conditions possible
     // and actually an old value was never restored once a new one was set ...
     // so just disable it and all it's nice implications
-    void set_priority_op(priority_op op)
+    void set_priority_op(const priority_op& op) final
     {
         //_priority_op = op;
         STXXL_UNUSED(op);
     }
-    void add_request(request_ptr& req);
-    bool cancel_request(request_ptr& req);
+    void add_request(request_ptr& req) final;
+    bool cancel_request(request_ptr& req) final;
     ~request_queue_impl_qwqr();
 };
 

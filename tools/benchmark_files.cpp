@@ -141,7 +141,7 @@ int benchmark_files(int argc, char* argv[])
                 "and report average rate");
 
     cp.add_string('f', "file-type", file_type,
-                  "Method to open file (syscall|mmap|wincall|boostfd|...) "
+                  "Method to open file (syscall|mmap|wincall|...) "
                   "default: " + file_type);
 
     cp.add_string('p', "operations", opstr,
@@ -209,8 +209,8 @@ int benchmark_files(int argc, char* argv[])
     const size_t step_size_int = step_size / sizeof(uint32_t);
 
     uint32_t* buffer = (uint32_t*)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * nfiles);
-    file** files = new file*[nfiles];
-    request_ptr* reqs = new request_ptr[nfiles * batch_size];
+    std::vector<stxxl::file_ptr> files(nfiles);
+    std::vector<request_ptr> reqs(nfiles* batch_size);
 
 #ifdef WATCH_TIMES
     double* r_finish_times = new double[nfiles];
@@ -282,7 +282,7 @@ int benchmark_files(int argc, char* argv[])
  #ifdef WATCH_TIMES
                 watch_times(reqs, nfiles, w_finish_times);
  #else
-                wait_all(reqs, nfiles * current_num_blocks);
+                wait_all(reqs.begin(), reqs.end());
  #endif
 
                 end = timestamp();
@@ -328,7 +328,7 @@ int benchmark_files(int argc, char* argv[])
  #ifdef WATCH_TIMES
                 watch_times(reqs, nfiles, r_finish_times);
  #else
-                wait_all(reqs, nfiles * current_num_blocks);
+                wait_all(reqs.begin(), reqs.end());
  #endif
 
                 end = timestamp();
@@ -448,10 +448,6 @@ int benchmark_files(int argc, char* argv[])
     delete[] r_finish_times;
     delete[] w_finish_times;
 #endif
-    delete[] reqs;
-    for (size_t i = 0; i < nfiles; i++)
-        delete files[i];
-    delete[] files;
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
     return (verify_failed ? 1 : 0);

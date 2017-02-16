@@ -226,7 +226,7 @@ int main()
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
     //convenience function based on streaming
     stxxl::sort<1024* 1024>(InternalArray.begin(), InternalArray.end(),
-                            cmp_int(), 1024 * 1024 * 31, stxxl::RC());
+                            cmp_int(), 1024 * 1024 * 31, stxxl::random_cyclic());
 
     return 0;
 }

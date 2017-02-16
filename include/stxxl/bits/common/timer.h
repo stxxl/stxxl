@@ -20,19 +20,7 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
-#if STXXL_BOOST_TIMESTAMP
-  #include <boost/date_time/posix_time/posix_time.hpp>
-  #include <cmath>
-#elif STXXL_WINDOWS
-  #ifndef NOMINMAX
-    #define NOMINMAX
-  #endif
-  #include <windows.h>
-#else
-  #include <sys/time.h>
-  #include <ctime>
-#endif
-
+#include <chrono>
 #include <limits>
 #include <string>
 
@@ -42,25 +30,11 @@ namespace stxxl {
 //! \{
 
 //! Returns number of seconds since the epoch, high resolution.
-static inline double
-timestamp()
+static inline double timestamp()
 {
-#if STXXL_BOOST_TIMESTAMP
-    boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::time_duration Duration =
-        MyTime - boost::posix_time::time_from_string("1970-01-01 00:00:00.000");
-    double sec = double(Duration.hours()) * 3600. +
-                 double(Duration.minutes()) * 60. +
-                 double(Duration.seconds()) +
-                 double(Duration.fractional_seconds()) / (pow(10., Duration.num_fractional_digits()));
-    return sec;
-#elif STXXL_WINDOWS
-    return GetTickCount() / 1000.0;
-#else
-    struct timeval tp;
-    gettimeofday(&tp, NULL);
-    return double(tp.tv_sec) + double(tp.tv_usec) / 1000000.;
-#endif
+    return static_cast<double>(
+        std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count()) / 1e6;
 }
 
 /*!

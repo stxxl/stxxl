@@ -89,8 +89,8 @@ void test2()
 
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
 
-    STXXL_CHECK_EQUAL(bm->get_total_bytes(), 300 * 1024 * 1024);
-    STXXL_CHECK_EQUAL(bm->get_free_bytes(), 300 * 1024 * 1024);
+    STXXL_CHECK_EQUAL(bm->total_bytes(), 300 * 1024 * 1024);
+    STXXL_CHECK_EQUAL(bm->free_bytes(), 300 * 1024 * 1024);
 
 #endif
 }

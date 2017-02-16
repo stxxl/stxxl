@@ -35,7 +35,7 @@ namespace stream {
 
 //! All sorted runs of a sort operation.
 template <typename TriggerEntryType, typename CompareType>
-struct sorted_runs : public counted_object
+struct sorted_runs : public reference_count
 {
     typedef TriggerEntryType trigger_entry_type;
     typedef typename trigger_entry_type::block_type block_type;

@@ -16,7 +16,7 @@
 int main()
 {
     // template parameter <value_type, page_size, number_of_pages, block_size, alloc_strategy, paging_strategy>
-    typedef stxxl::VECTOR_GENERATOR<unsigned int, 4, 8, 1*1024*1024, stxxl::RC, stxxl::lru>::result vector_type;
+    typedef stxxl::VECTOR_GENERATOR<unsigned int, 4, 8, 1*1024*1024, stxxl::random_cyclic, stxxl::lru>::result vector_type;
 
     vector_type my_vector;
     unsigned int counter = 0;

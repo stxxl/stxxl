@@ -1013,7 +1013,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //! \tparam MigrCritSize threshold value for number of elements when
 //!   stxxl::migrating_stack migrates to the external memory, default: <b>2 x BlocksPerPage x BlockSize</b>.
 //!
-//! \tparam AllocStr one of allocation strategies: striping, RC, SR, or FR. Default is \b RC.
+//! \tparam AllocStr one of allocation strategies: striping, random_cyclic, simple_random, or fully_random. Default is \b random_cyclic.
 //!
 //! \tparam SizeType size type, default is \c external_size_type.
 //!
