@@ -136,17 +136,7 @@ std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
 }
 
 template <size_t BlockSize>
-class BIDArray : public simple_vector<BID<BlockSize> >
-{
-public:
-    BIDArray()
-        : simple_vector<BID<BlockSize> >()
-    { }
-
-    explicit BIDArray(const unsigned_type& size)
-        : simple_vector<BID<BlockSize> >(size)
-    { }
-};
+using BIDArray = simple_vector<BID<BlockSize> >;
 
 //! \}
 
