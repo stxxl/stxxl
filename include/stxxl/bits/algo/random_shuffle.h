@@ -188,14 +188,17 @@ void random_shuffle(ExtIterator first,
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
 //! \param M number of bytes for internal use
-template <typename Type, size_t BlockSize, typename PageType, unsigned PageSize, typename AllocStrategy, typename RandomNumberGenerator>
+template <typename VectorConfig, typename RandomNumberGenerator>
 void random_shuffle(
-    stxxl::vector_iterator<Type, BlockSize, PageType, PageSize, AllocStrategy> first,
-    stxxl::vector_iterator<Type, BlockSize, PageType, PageSize, AllocStrategy> last,
+    stxxl::vector_iterator<VectorConfig> first,
+    stxxl::vector_iterator<VectorConfig> last,
     RandomNumberGenerator& rand,
     unsigned_type M)
 {
-    typedef stxxl::vector_iterator<Type, BlockSize, PageType, PageSize, AllocStrategy> ExtIterator;
+    typedef stxxl::vector_iterator<VectorConfig> ExtIterator;
+    typedef typename ExtIterator::vector_type::alloc_strategy_type AllocStrategy;
+    constexpr unsigned PageSize = ExtIterator::vector_type::page_size;
+    constexpr unsigned BlockSize = ExtIterator::vector_type::block_size;
     typedef typename ExtIterator::value_type value_type;
     typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
     typedef typename stxxl::STACK_GENERATOR<value_type, stxxl::external,
@@ -361,11 +364,11 @@ void random_shuffle(
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param M number of bytes for internal use
-template <typename Type, size_t BlockSize, typename PageType, unsigned PageSize, typename AllocStrategy>
+template <typename VectorConfig>
 inline
 void random_shuffle(
-    stxxl::vector_iterator<Type, BlockSize, PageType, PageSize, AllocStrategy> first,
-    stxxl::vector_iterator<Type, BlockSize, PageType, PageSize, AllocStrategy> last,
+    stxxl::vector_iterator<VectorConfig> first,
+    stxxl::vector_iterator<VectorConfig> last,
     unsigned_type M)
 {
     stxxl::random_number<> rand;

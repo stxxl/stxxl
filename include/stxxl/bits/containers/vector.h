@@ -253,7 +253,23 @@ template <
     typename AllocStr>
 class vector;
 
-template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
+template <
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    size_t BlockSize,
+    typename AllocStr>
+struct vector_configuration {
+    using value_type = ValueType;
+    static constexpr unsigned page_size = PageSize;
+    using pager_type = PagerType;
+    static constexpr size_t block_size = BlockSize;
+    using alloc_str = AllocStr;
+
+    using vector_type = vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>;
+};
+
+template <typename VectorConfig>
 class const_vector_iterator;
 
 template <typename VectorIteratorType>
@@ -268,14 +284,14 @@ class vector_bufwriter;
 ////////////////////////////////////////////////////////////////////////////
 
 //! External vector iterator, model of \c ext_random_access_iterator concept.
-template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
+template <typename VectorConfig>
 class vector_iterator
 {
-    typedef vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> self_type;
+    typedef vector_iterator<VectorConfig> self_type;
 
-    typedef const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> const_self_type;
+    typedef const_vector_iterator<VectorConfig> const_self_type;
 
-    friend class const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>;
+    friend class const_vector_iterator<VectorConfig>;
 
 public:
     //! \name Types
@@ -285,8 +301,8 @@ public:
     typedef const_self_type const_iterator;
 
     typedef unsigned block_offset_type;
-    typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr> vector_type;
-    friend class vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>;
+    using vector_type = typename VectorConfig::vector_type;
+    friend vector_type;
     typedef typename vector_type::bids_container_type bids_container_type;
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typename bids_container_type::bid_type bid_type;
@@ -540,14 +556,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 
 //! Const external vector iterator, model of \c ext_random_access_iterator concept.
-template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
+template <typename VectorConfig>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> self_type;
+    typedef const_vector_iterator<VectorConfig> self_type;
 
-    typedef vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> mutable_self_type;
+    typedef vector_iterator<VectorConfig> mutable_self_type;
 
-    friend class vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>;
+    friend class vector_iterator<VectorConfig>;
 
 public:
     //! \name Types
@@ -557,8 +573,8 @@ public:
     typedef mutable_self_type iterator;
 
     typedef unsigned block_offset_type;
-    typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr> vector_type;
-    friend class vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>;
+    using vector_type = typename VectorConfig::vector_type;
+    friend vector_type;
     typedef typename vector_type::bids_container_type bids_container_type;
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typename bids_container_type::bid_type bid_type;
@@ -841,13 +857,16 @@ public:
 
     enum { on_disk = -1 };
 
+    typedef vector_configuration<ValueType, PageSize, PagerType, BlockSize, AllocStr> configuration_type;
+    static_assert(std::is_same<vector, typename configuration_type::vector_type>::value, "Inconsistent vector type in config");
+
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
-    typedef vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type> iterator;
-    friend class vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type>;
+    typedef vector_iterator<configuration_type> iterator;
+    friend iterator;
 
     //! constant iterator used to iterate through a vector, see \ref design_vector_notes.
-    typedef const_vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type> const_iterator;
-    friend class const_vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type>;
+    typedef const_vector_iterator<configuration_type> const_iterator;
+    friend const_iterator;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -1837,25 +1856,25 @@ inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize
 ////////////////////////////////////////////////////////////////////////////
 
 // specialization for stxxl::vector, to use only const_iterators
-template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
+template <typename VectorConfig>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> first,
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> last)
+    stxxl::vector_iterator<VectorConfig> first,
+    stxxl::vector_iterator<VectorConfig> last)
 {
     return stxxl::is_sorted(
-        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(first),
-        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(last));
+        stxxl::const_vector_iterator<VectorConfig>(first),
+        stxxl::const_vector_iterator<VectorConfig>(last));
 }
 
-template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr, typename StrictWeakOrdering>
+template <typename VectorConfig, typename StrictWeakOrdering>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> first,
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> last,
+    stxxl::vector_iterator<VectorConfig> first,
+    stxxl::vector_iterator<VectorConfig> last,
     StrictWeakOrdering comp)
 {
     return stxxl::is_sorted(
-        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(first),
-        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(last),
+        stxxl::const_vector_iterator<VectorConfig>(first),
+        stxxl::const_vector_iterator<VectorConfig>(last),
         comp);
 }
 

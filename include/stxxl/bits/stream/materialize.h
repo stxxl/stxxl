@@ -87,24 +87,20 @@ materialize(StreamAlgorithm& in, OutputIterator outbegin, OutputIterator outend)
 //!
 //! This function is useful when you do not know the length of the stream beforehand.
 template <
-    typename ValueType,
-    size_t BlockSize,
-    typename PagerType,
-    unsigned PageSize,
-    typename AllocStr,
+    typename VectorConfig,
     typename StreamAlgorithm>
-stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
+stxxl::vector_iterator<VectorConfig>
 materialize(
     StreamAlgorithm& in,
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
+    stxxl::vector_iterator<VectorConfig>
     outbegin,
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
+    stxxl::vector_iterator<VectorConfig>
     outend,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ExtIterator;
-    typedef stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ConstExtIterator;
+    typedef stxxl::vector_iterator<VectorConfig> ExtIterator;
+    typedef stxxl::const_vector_iterator<VectorConfig> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     while (outbegin.block_offset())     //  go to the beginning of the block
@@ -173,22 +169,18 @@ materialize(
 //! i.e. points to the first unwritten value
 //! \pre Output (range) is large enough to hold the all elements in the input stream
 template <
-    typename ValueType,
-    size_t BlockSize,
-    typename PagerType,
-    unsigned PageSize,
-    typename AllocStr,
+    typename VectorConfig,
     typename StreamAlgorithm>
-stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
+stxxl::vector_iterator<VectorConfig>
 materialize(
     StreamAlgorithm& in,
-    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
+    stxxl::vector_iterator<VectorConfig>
     out,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ExtIterator;
-    typedef stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ConstExtIterator;
+    typedef stxxl::vector_iterator<VectorConfig> ExtIterator;
+    typedef stxxl::const_vector_iterator<VectorConfig> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     // on the I/O complexity of "materialize":

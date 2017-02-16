@@ -173,11 +173,14 @@ int main()
     return 0;
 }
 
+static_assert(std::is_same<stxxl::vector<double>, stxxl::vector<double>::iterator::vector_type>::value, "Vector iterator has inconsistent vector type");
+static_assert(std::is_same<stxxl::vector<double>, stxxl::vector<double>::const_iterator::vector_type>::value, "Vector const iterator has inconsistent vector type");
+
 // forced instantiation
 template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024* 1024), stxxl::striping>;
 template class stxxl::vector<double>;
-template class stxxl::vector_iterator<double, STXXL_DEFAULT_BLOCK_SIZE(double), stxxl::lru_pager<8>, 4, STXXL_DEFAULT_ALLOC_STRATEGY>;
-template class stxxl::const_vector_iterator<double, STXXL_DEFAULT_BLOCK_SIZE(double), stxxl::lru_pager<8>, 4, STXXL_DEFAULT_ALLOC_STRATEGY>;
+template class stxxl::vector_iterator<stxxl::vector<double>::configuration_type>;
+template class stxxl::const_vector_iterator<stxxl::vector<double>::configuration_type>;
 
 //-tb bufreader instantiation work only for const_iterator!
 typedef stxxl::vector<double>::const_iterator const_vector_iterator;
