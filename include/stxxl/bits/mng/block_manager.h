@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <string>
 #include <cstdlib>
+#include <mutex>
 
 #if STXXL_MSVC
 #include <memory.h>
@@ -43,44 +44,96 @@ namespace stxxl {
 //! \addtogroup mnglayer
 //! \{
 
-//! Block manager class.
-//!
-//! Manages allocation and deallocation of blocks in multiple/single disk setting
-//! \remarks is a singleton
+/*!
+ * Block manager class.
+ *
+ * Manages allocation and deallocation of blocks in multiple/single disk setting
+ * \remarks is a singleton
+ */
 class block_manager : public singleton<block_manager>
 {
-    friend class singleton<block_manager>;
-
-    //! number of managed disks
-    size_t ndisks_;
-
-    //! vector of opened disk files
-    simple_vector<file_ptr> disk_files_;
-
-    //! one block allocator per disk
-    simple_vector<disk_block_allocator*> block_allocators_;
-
-    //! total requested allocation in bytes
-    uint64_t total_allocation_;
-
-    //! currently allocated bytes
-    uint64_t current_allocation_;
-
-    //! maximum number of bytes allocated during program run.
-    uint64_t maximum_allocation_;
-
-    //! private construction from singleton
-    block_manager();
-
-protected:
-    template <class BIDType, class DiskAssignFunctor, class BIDIteratorClass>
-    void new_blocks_int(
-        const unsigned_type nblocks,
-        const DiskAssignFunctor& functor,
-        unsigned_type offset,
-        BIDIteratorClass out);
-
 public:
+    /*!
+     * Allocates new blocks.
+     *
+     * Allocates new blocks according to the strategy given by \b functor and
+     * stores block identifiers to the range [ \b bid_begin, \b bid_end)
+     * Allocation will be lined up with previous partial allocations of \b
+     * offset blocks.
+     *
+     * \param functor object of model of \b allocation_strategy concept
+     * \param bid_begin bidirectional BID iterator object
+     * \param bid_end bidirectional BID iterator object
+     * \param offset advance for \b functor to line up partial allocations
+     */
+    template <typename DiskAssignFunctor, typename BIDIterator>
+    void new_blocks(
+        const DiskAssignFunctor& functor,
+        BIDIterator bid_begin, BIDIterator bid_end,
+        size_t offset = 0)
+    {
+        typedef typename std::iterator_traits<BIDIterator>::value_type bid_type;
+        new_blocks_int<bid_type>(
+            std::distance(bid_begin, bid_end), functor, offset, bid_begin);
+    }
+
+    /*!
+     * Allocates new blocks according to the strategy given by \b functor and
+     * stores block identifiers to the output iterator \b out Allocation will be
+     * lined up with previous partial allocations of \b offset blocks.
+     *
+     * \param nblocks the number of blocks to allocate
+     * \param functor object of model of \b allocation_strategy concept
+     * \param out iterator object of OutputIterator concept
+     * \param offset advance for \b functor to line up partial allocations
+     *
+     * The \c BlockType template parameter defines the type of block to allocate
+     */
+    template <typename BlockType, typename DiskAssignFunctor,
+              typename BIDIterator>
+    void new_blocks(
+        const size_t nblocks, const DiskAssignFunctor& functor,
+        BIDIterator out, size_t offset = 0)
+    {
+        typedef typename BlockType::bid_type bid_type;
+        new_blocks_int<bid_type>(nblocks, functor, offset, out);
+    }
+
+    /*!
+     * Allocates a new block according to the strategy given by \b functor and
+     * stores the block identifier to bid.
+     *
+     * Allocation will be lined up with previous partial allocations of \b
+     * offset blocks.
+     *
+     * \param functor object of model of \b allocation_strategy concept
+     * \param bid BID to store the block identifier
+     * \param offset advance for \b functor to line up partial allocations
+     */
+    template <typename DiskAssignFunctor, size_t BlockSize>
+    void new_block(const DiskAssignFunctor& functor,
+                   BID<BlockSize>& bid, size_t offset = 0)
+    {
+        new_blocks_int<BID<BlockSize> >(1, functor, offset, &bid);
+    }
+
+    //! Deallocates blocks.
+    //!
+    //! Deallocates blocks in the range [ \b bid_begin, \b bid_end)
+    //! \param bid_begin iterator object of \b bid_iterator concept
+    //! \param bid_end iterator object of \b bid_iterator concept
+    template <typename BIDIterator>
+    void delete_blocks(const BIDIterator& bid_begin,
+                       const BIDIterator& bid_end);
+
+    //! Deallocates a block.
+    //! \param bid block identifier
+    template <size_t BlockSize>
+    void delete_block(const BID<BlockSize>& bid);
+
+    //! \name Statistics
+    //! \{
+
     //! return total number of bytes available in all disks
     uint64_t total_bytes() const;
 
@@ -96,90 +149,51 @@ public:
     //! return maximum number of bytes allocated during program run.
     uint64_t maximum_allocation() const;
 
-    //! Allocates new blocks.
-    //!
-    //! Allocates new blocks according to the strategy
-    //! given by \b functor and stores block identifiers
-    //! to the range [ \b bid_begin, \b bid_end)
-    //! Allocation will be lined up with previous partial allocations
-    //! of \b offset blocks.
-    //! \param functor object of model of \b allocation_strategy concept
-    //! \param bid_begin bidirectional BID iterator object
-    //! \param bid_end bidirectional BID iterator object
-    //! \param offset advance for \b functor to line up partial allocations
-    template <class DiskAssignFunctor, class BIDIteratorClass>
-    void new_blocks(
-        const DiskAssignFunctor& functor,
-        BIDIteratorClass bid_begin,
-        BIDIteratorClass bid_end,
-        unsigned_type offset = 0)
-    {
-        typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
-        new_blocks_int<bid_type>(
-            std::distance(bid_begin, bid_end), functor, offset, bid_begin);
-    }
-
-    //! Allocates new blocks according to the strategy
-    //! given by \b functor and stores block identifiers
-    //! to the output iterator \b out
-    //! Allocation will be lined up with previous partial allocations
-    //! of \b offset blocks.
-    //! \param nblocks the number of blocks to allocate
-    //! \param functor object of model of \b allocation_strategy concept
-    //! \param out iterator object of OutputIterator concept
-    //! \param offset advance for \b functor to line up partial allocations
-    //!
-    //! The \c BlockType template parameter defines the type of block to allocate
-    template <class BlockType, class DiskAssignFunctor, class BIDIteratorClass>
-    void new_blocks(
-        const unsigned_type nblocks,
-        const DiskAssignFunctor& functor,
-        BIDIteratorClass out,
-        unsigned_type offset = 0)
-    {
-        typedef typename BlockType::bid_type bid_type;
-        new_blocks_int<bid_type>(nblocks, functor, offset, out);
-    }
-
-    //! Allocates a new block according to the strategy
-    //! given by \b functor and stores the block identifier
-    //! to bid.
-    //! Allocation will be lined up with previous partial allocations
-    //! of \b offset blocks.
-    //! \param functor object of model of \b allocation_strategy concept
-    //! \param bid BID to store the block identifier
-    //! \param offset advance for \b functor to line up partial allocations
-    template <typename DiskAssignFunctor, size_t BLK_SIZE>
-    void new_block(const DiskAssignFunctor& functor,
-                   BID<BLK_SIZE>& bid, unsigned_type offset = 0)
-    {
-        new_blocks_int<BID<BLK_SIZE> >(1, functor, offset, &bid);
-    }
-
-    //! Deallocates blocks.
-    //!
-    //! Deallocates blocks in the range [ \b bid_begin, \b bid_end)
-    //! \param bid_begin iterator object of \b bid_iterator concept
-    //! \param bid_end iterator object of \b bid_iterator concept
-    template <class BIDIteratorClass>
-    void delete_blocks(const BIDIteratorClass& bid_begin,
-                       const BIDIteratorClass& bid_end);
-
-    //! Deallocates a block.
-    //! \param bid block identifier
-    template <size_t BLK_SIZE>
-    void delete_block(const BID<BLK_SIZE>& bid);
+    //! \}
 
     ~block_manager();
+
+private:
+    friend class singleton<block_manager>;
+
+    //! number of managed disks
+    size_t ndisks_;
+
+    //! vector of opened disk files
+    simple_vector<file_ptr> disk_files_;
+
+    //! one block allocator per disk
+    simple_vector<disk_block_allocator*> block_allocators_;
+
+    //! total requested allocation in bytes
+    uint64_t total_allocation_ = 0;
+
+    //! currently allocated bytes
+    uint64_t current_allocation_ = 0;
+
+    //! maximum number of bytes allocated during program run.
+    uint64_t maximum_allocation_ = 0;
+
+    //! private construction from singleton
+    block_manager();
+
+    //! protect internal data structures
+    mutable std::mutex mutex_;
+
+    //! actual allocation function
+    template <typename BIDType, typename DiskAssignFunctor, typename BIDIterator>
+    void new_blocks_int(
+        const size_t nblocks, const DiskAssignFunctor& functor,
+        size_t offset, BIDIterator out);
 };
 
-template <class BIDType, class DiskAssignFunctor, class OutputIterator>
+template <typename BIDType, typename DiskAssignFunctor, typename OutputIterator>
 void block_manager::new_blocks_int(
-    const unsigned_type nblocks,
-    const DiskAssignFunctor& functor,
-    unsigned_type offset,
-    OutputIterator out)
+    const size_t nblocks, const DiskAssignFunctor& functor,
+    size_t offset, OutputIterator out)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     typedef BIDType bid_type;
     typedef BIDArray<bid_type::t_size> bid_array_type;
 
@@ -190,16 +204,16 @@ void block_manager::new_blocks_int(
     // choose disks by calling DiskAssignFunctor
 
     bl.memzero();
-    for (unsigned_type i = 0; i < nblocks; ++i)
+    for (size_t i = 0; i < nblocks; ++i)
     {
-        unsigned_type disk = functor(offset + i);
+        size_t disk = functor(offset + i);
         disk_ptrs[i] = disk_files_[disk].get();
         bl[disk]++;
     }
 
     // allocate blocks on disks
 
-    for (unsigned_type i = 0; i < ndisks_; ++i)
+    for (size_t i = 0; i < ndisks_; ++i)
     {
         if (bl[i])
         {
@@ -211,7 +225,7 @@ void block_manager::new_blocks_int(
     bl.memzero();
 
     OutputIterator it = out;
-    for (unsigned_type i = 0; i != nblocks; ++it, ++i)
+    for (size_t i = 0; i != nblocks; ++it, ++i)
     {
         const int disk = disk_ptrs[i]->get_allocator_id();
         bid_type bid(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
@@ -227,6 +241,8 @@ void block_manager::new_blocks_int(
 template <size_t BlockSize>
 void block_manager::delete_block(const BID<BlockSize>& bid)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     if (!bid.valid()) {
         //STXXL_MSG("Warning: invalid block to be deleted.");
         return;
@@ -241,15 +257,12 @@ void block_manager::delete_block(const BID<BlockSize>& bid)
     current_allocation_ -= BlockSize;
 }
 
-template <class BIDIteratorClass>
+template <typename BIDIterator>
 void block_manager::delete_blocks(
-    const BIDIteratorClass& bid_begin,
-    const BIDIteratorClass& bid_end)
+    const BIDIterator& bid_begin, const BIDIterator& bid_end)
 {
-    for (BIDIteratorClass it = bid_begin; it != bid_end; it++)
-    {
+    for (BIDIterator it = bid_begin; it != bid_end; ++it)
         delete_block(*it);
-    }
 }
 
 // in bytes

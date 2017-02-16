@@ -81,10 +81,6 @@ block_manager::block_manager()
                   (total_size / (1024 * 1024)) <<
                   " MiB");
     }
-
-    current_allocation_ = 0;
-    total_allocation_ = 0;
-    maximum_allocation_ = 0;
 }
 
 block_manager::~block_manager()
@@ -100,6 +96,8 @@ block_manager::~block_manager()
 
 uint64_t block_manager::total_bytes() const
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     uint64_t total = 0;
 
     for (size_t i = 0; i < ndisks_; ++i)
@@ -110,6 +108,8 @@ uint64_t block_manager::total_bytes() const
 
 uint64_t block_manager::free_bytes() const
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     uint64_t total = 0;
 
     for (size_t i = 0; i < ndisks_; ++i)
@@ -120,16 +120,19 @@ uint64_t block_manager::free_bytes() const
 
 uint64_t block_manager::total_allocation() const
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     return total_allocation_;
 }
 
 uint64_t block_manager::current_allocation() const
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     return current_allocation_;
 }
 
 uint64_t block_manager::maximum_allocation() const
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     return maximum_allocation_;
 }
 
