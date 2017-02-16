@@ -253,7 +253,7 @@ template <
     typename AllocStr>
 class vector;
 
-template <typename ValueType, typename AllocStr, size_t BlockSize, typename PagerType, unsigned PageSize>
+template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
 class const_vector_iterator;
 
 template <typename VectorIteratorType>
@@ -268,15 +268,14 @@ class vector_bufwriter;
 ////////////////////////////////////////////////////////////////////////////
 
 //! External vector iterator, model of \c ext_random_access_iterator concept.
-template <typename ValueType, typename AllocStr,
-          size_t BlockSize, typename PagerType, unsigned PageSize>
+template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
 class vector_iterator
 {
-    typedef vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> self_type;
+    typedef vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> self_type;
 
-    typedef const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> const_self_type;
+    typedef const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> const_self_type;
 
-    friend class const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>;
+    friend class const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>;
 
 public:
     //! \name Types
@@ -541,15 +540,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 
 //! Const external vector iterator, model of \c ext_random_access_iterator concept.
-template <typename ValueType, typename AllocStr,
-          size_t BlockSize, typename PagerType, unsigned PageSize>
+template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> self_type;
+    typedef const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> self_type;
 
-    typedef vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> mutable_self_type;
+    typedef vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> mutable_self_type;
 
-    friend class vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>;
+    friend class vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>;
 
 public:
     //! \name Types
@@ -844,12 +842,12 @@ public:
     enum { on_disk = -1 };
 
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
-    typedef vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size> iterator;
-    friend class vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size>;
+    typedef vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type> iterator;
+    friend class vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type>;
 
     //! constant iterator used to iterate through a vector, see \ref design_vector_notes.
-    typedef const_vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size> const_iterator;
-    friend class const_vector_iterator<value_type, alloc_strategy_type, block_size, pager_type, page_size>;
+    typedef const_vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type> const_iterator;
+    friend class const_vector_iterator<value_type, block_size, pager_type, page_size, alloc_strategy_type>;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -1839,27 +1837,25 @@ inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize
 ////////////////////////////////////////////////////////////////////////////
 
 // specialization for stxxl::vector, to use only const_iterators
-template <typename ValueType, typename AllocStr,
-          size_t BlockSize, typename PagerType, unsigned PageSize>
+template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> first,
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> last)
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> first,
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> last)
 {
     return stxxl::is_sorted(
-        stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>(first),
-        stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>(last));
+        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(first),
+        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(last));
 }
 
-template <typename ValueType, typename AllocStr,
-          size_t BlockSize, typename PagerType, unsigned PageSize, typename StrictWeakOrdering>
+template <typename ValueType, size_t BlockSize, typename PagerType, unsigned PageSize, typename AllocStr, typename StrictWeakOrdering>
 bool is_sorted(
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> first,
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> last,
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> first,
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> last,
     StrictWeakOrdering comp)
 {
     return stxxl::is_sorted(
-        stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>(first),
-        stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>(last),
+        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(first),
+        stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>(last),
         comp);
 }
 

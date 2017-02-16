@@ -88,23 +88,23 @@ materialize(StreamAlgorithm& in, OutputIterator outbegin, OutputIterator outend)
 //! This function is useful when you do not know the length of the stream beforehand.
 template <
     typename ValueType,
-    typename AllocStr,
     size_t BlockSize,
     typename PagerType,
     unsigned PageSize,
+    typename AllocStr,
     typename StreamAlgorithm>
-stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
+stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
 materialize(
     StreamAlgorithm& in,
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
     outbegin,
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
     outend,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ExtIterator;
-    typedef stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ConstExtIterator;
+    typedef stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ExtIterator;
+    typedef stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     while (outbegin.block_offset())     //  go to the beginning of the block
@@ -174,21 +174,21 @@ materialize(
 //! \pre Output (range) is large enough to hold the all elements in the input stream
 template <
     typename ValueType,
-    typename AllocStr,
     size_t BlockSize,
     typename PagerType,
     unsigned PageSize,
+    typename AllocStr,
     typename StreamAlgorithm>
-stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
+stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
 materialize(
     StreamAlgorithm& in,
-    stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize>
+    stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr>
     out,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ExtIterator;
-    typedef stxxl::const_vector_iterator<ValueType, AllocStr, BlockSize, PagerType, PageSize> ConstExtIterator;
+    typedef stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ExtIterator;
+    typedef stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> ConstExtIterator;
     typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     // on the I/O complexity of "materialize":
