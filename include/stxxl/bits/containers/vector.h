@@ -1768,89 +1768,43 @@ private:
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
         return m_page_to_slot[page_no] >= 0;       // != on_disk;
     }
+
+public:
+    //! \name Comparison Operators
+    //! \{
+
+    friend bool operator == (vector& a, vector& b)
+    {
+        return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+    }
+
+    friend bool operator != (vector& a, vector& b)
+    {
+        return !(a == b);
+    }
+
+    friend bool operator < (vector& a, vector& b)
+    {
+        return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
+    }
+
+    friend bool operator > (vector& a, vector& b)
+    {
+        return b < a;
+    }
+
+    friend bool operator <= (vector& a, vector& b)
+    {
+        return !(b < a);
+    }
+
+    friend bool operator >= (vector& a, vector& b)
+    {
+        return !(a < b);
+    }
+
+    //! \}
 };
-
-template <
-    typename ValueType,
-    unsigned PageSize,
-    typename PagerType,
-    size_t BlockSize,
-    typename AllocStr>
-inline bool operator == (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr>& a,
-                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr>& b)
-{
-    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
-}
-
-template <
-    typename ValueType,
-    unsigned PageSize,
-    typename PagerType,
-    size_t BlockSize,
-    typename AllocStr>
-inline bool operator != (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr>& a,
-                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr>& b)
-{
-    return !(a == b);
-}
-
-template <
-    typename ValueType,
-    unsigned PageSize,
-    typename PagerType,
-    size_t BlockSize,
-    typename AllocStr>
-inline bool operator < (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr>& a,
-                        stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr>& b)
-{
-    return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
-}
-
-template <
-    typename ValueType,
-    unsigned PageSize,
-    typename PagerType,
-    size_t BlockSize,
-    typename AllocStr>
-inline bool operator > (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr>& a,
-                        stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                      AllocStr>& b)
-{
-    return b < a;
-}
-
-template <
-    typename ValueType,
-    unsigned PageSize,
-    typename PagerType,
-    size_t BlockSize,
-    typename AllocStr>
-inline bool operator <= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr>& a,
-                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
-                                       AllocStr>& b)
-{
-    return !(b < a);
-}
-
-template <
-    typename ValueType,
-    unsigned PageSize,
-    typename PagerType,
-    size_t BlockSize,
-    typename AllocStr>
-inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& a,
-                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& b)
-{
-    return !(a < b);
-}
 
 ////////////////////////////////////////////////////////////////////////////
 
