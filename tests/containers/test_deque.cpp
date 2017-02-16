@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
         if (!(i % 100000))
         {
-            STXXL_CHECK(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
+            STXXL_CHECK(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin()));
             STXXL_MSG("Operations done: " << i << " size: " << STDDeque.size());
         }
     }

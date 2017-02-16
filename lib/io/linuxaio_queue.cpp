@@ -100,8 +100,8 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
     {
         std::unique_lock<std::mutex> lock(waiting_mtx_);
 
-        pos = std::find(waiting_requests_.begin(), waiting_requests_.end(),
-                        req _STXXL_FORCE_SEQUENTIAL);
+        pos = std::find(
+            waiting_requests_.begin(), waiting_requests_.end(), req);
         if (pos != waiting_requests_.end())
         {
             waiting_requests_.erase(pos);
@@ -117,8 +117,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
 
     std::unique_lock<std::mutex> lock(posted_mtx_);
 
-    pos = std::find(posted_requests_.begin(), posted_requests_.end(),
-                    req _STXXL_FORCE_SEQUENTIAL);
+    pos = std::find(posted_requests_.begin(), posted_requests_.end(), req);
     if (pos != posted_requests_.end())
     {
         // polymorphic_downcast to linuxaio_request,

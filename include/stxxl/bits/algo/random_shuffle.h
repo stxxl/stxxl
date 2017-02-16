@@ -22,6 +22,7 @@
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/scan>
 #include <stxxl/stack>
+#include <stxxl/bits/parallel.h>
 
 namespace stxxl {
 

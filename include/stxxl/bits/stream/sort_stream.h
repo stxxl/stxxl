@@ -25,6 +25,7 @@
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/stream/sorted_runs.h>
+#include <stxxl/bits/parallel.h>
 
 #include <algorithm>
 #include <utility>

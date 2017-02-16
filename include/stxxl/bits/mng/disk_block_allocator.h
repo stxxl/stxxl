@@ -22,13 +22,11 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 
 #include <mutex>
 #include <algorithm>
 #include <cassert>
-#include <functional>
 #include <map>
 #include <ostream>
 #include <utility>
@@ -45,55 +43,45 @@ namespace stxxl {
  */
 class disk_block_allocator
 {
-    typedef std::pair<stxxl::int64, stxxl::int64> place;
+    //! pair (offset, size) used for free space calculation
+    typedef std::pair<uint64_t, uint64_t> place;
+    typedef std::map<uint64_t, uint64_t> space_map_type;
 
-    struct first_fit : public std::binary_function<place, stxxl::int64, bool>
-    {
-        bool operator () (
-            const place& entry,
-            const stxxl::int64 size) const
-        {
-            return (entry.second >= size);
-        }
-    };
-
-    typedef std::map<stxxl::int64, stxxl::int64> sortseq;
-
-    std::mutex mutex;
-    sortseq free_space;
-    stxxl::int64 free_bytes;
-    stxxl::int64 disk_bytes;
-    stxxl::int64 cfg_bytes;
-    stxxl::file* storage;
-    bool autogrow;
+    std::mutex mutex_;
+    //! map of free space as places
+    space_map_type free_space_;
+    uint64_t free_bytes_ = 0;
+    uint64_t disk_bytes_ = 0;
+    uint64_t cfg_bytes_;
+    file* storage_;
+    bool autogrow_;
 
     void dump() const;
 
     void deallocation_error(
-        stxxl::int64 block_pos, stxxl::int64 block_size,
-        const sortseq::iterator& pred, const sortseq::iterator& succ) const;
+        uint64_t block_pos, uint64_t block_size,
+        const space_map_type::iterator& pred,
+        const space_map_type::iterator& succ) const;
 
-    // expects the mutex to be locked to prevent concurrent access
-    void add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size);
+    // expects the mutex_ to be locked to prevent concurrent access
+    void add_free_region(uint64_t block_pos, uint64_t block_size);
 
-    // expects the mutex to be locked to prevent concurrent access
-    void grow_file(stxxl::int64 extend_bytes)
+    // expects the mutex_ to be locked to prevent concurrent access
+    void grow_file(uint64_t extend_bytes)
     {
-        if (!extend_bytes)
+        if (extend_bytes == 0)
             return;
 
-        storage->set_size(disk_bytes + extend_bytes);
-        add_free_region(disk_bytes, extend_bytes);
-        disk_bytes += extend_bytes;
+        storage_->set_size(disk_bytes_ + extend_bytes);
+        add_free_region(disk_bytes_, extend_bytes);
+        disk_bytes_ += extend_bytes;
     }
 
 public:
-    disk_block_allocator(stxxl::file* storage, const disk_config& cfg)
-        : free_bytes(0),
-          disk_bytes(0),
-          cfg_bytes(cfg.size),
-          storage(storage),
-          autogrow(cfg.autogrow)
+    disk_block_allocator(stxxl::file* storage_, const disk_config& cfg)
+        : cfg_bytes_(cfg.size),
+          storage_(storage_),
+          autogrow_(cfg.autogrow)
     {
         // initial growth to configured file size
         grow_file(cfg.size);
@@ -106,24 +94,24 @@ public:
 
     ~disk_block_allocator()
     {
-        if (disk_bytes > cfg_bytes) { // reduce to original size
-            storage->set_size(cfg_bytes);
+        if (disk_bytes_ > cfg_bytes_) { // reduce to original size
+            storage_->set_size(cfg_bytes_);
         }
     }
 
-    inline int64 get_free_bytes() const
+    uint64_t free_bytes() const
     {
-        return free_bytes;
+        return free_bytes_;
     }
 
-    inline int64 get_used_bytes() const
+    uint64_t used_bytes() const
     {
-        return disk_bytes - free_bytes;
+        return disk_bytes_ - free_bytes_;
     }
 
-    inline int64 get_total_bytes() const
+    uint64_t total_bytes() const
     {
-        return disk_bytes;
+        return disk_bytes_;
     }
 
     template <size_t BlockSize>
@@ -135,23 +123,21 @@ public:
     template <size_t BlockSize>
     void new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end);
 
-#if 0
     template <size_t BlockSize>
     void delete_blocks(const BIDArray<BlockSize>& bids)
     {
         for (size_t i = 0; i < bids.size(); ++i)
             delete_block(bids[i]);
     }
-#endif
 
     template <size_t BlockSize>
     void delete_block(const BID<BlockSize>& bid)
     {
-        std::unique_lock<std::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex_);
 
         STXXL_VERBOSE2("disk_block_allocator::delete_block<" << BlockSize <<
                        ">(pos=" << bid.offset << ", size=" << bid.size <<
-                       "), free:" << free_bytes << " total:" << disk_bytes);
+                       "), free:" << free_bytes_ << " total:" << disk_bytes_);
 
         add_free_region(bid.offset, bid.size);
     }
@@ -160,7 +146,7 @@ public:
 template <size_t BlockSize>
 void disk_block_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 {
-    size_t requested_size = 0;
+    uint64_t requested_size = 0;
 
     for (typename BIDArray<BlockSize>::iterator cur = begin; cur != end; ++cur)
     {
@@ -168,26 +154,27 @@ void disk_block_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end
         requested_size += cur->size;
     }
 
-    std::unique_lock<std::mutex> lock(mutex);
+    std::unique_lock<std::mutex> lock(mutex_);
 
-    STXXL_VERBOSE2("disk_block_allocator::new_blocks<BlockSize>,  BlockSize = " << BlockSize <<
-                   ", free:" << free_bytes << " total:" << disk_bytes <<
+    STXXL_VERBOSE2("disk_block_allocator::new_blocks<BlockSize>"
+                   ", BlockSize = " << BlockSize <<
+                   ", free:" << free_bytes_ << " total:" << disk_bytes_ <<
                    ", blocks: " << (end - begin) <<
                    " begin: " << static_cast<void*>(begin) <<
                    " end: " << static_cast<void*>(end) <<
                    ", requested_size=" << requested_size);
 
-    if (free_bytes < static_cast<int64_t>(requested_size))
+    if (free_bytes_ < requested_size)
     {
-        if (!autogrow) {
+        if (!autogrow_) {
             STXXL_THROW(bad_ext_alloc,
                         "Out of external memory error: " << requested_size <<
-                        " requested, " << free_bytes << " bytes free. "
-                        "Maybe enable autogrow flags?");
+                        " requested, " << free_bytes_ << " bytes free. "
+                        "Maybe enable autogrow_ flags?");
         }
 
         STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
-                     " bytes requested, " << free_bytes <<
+                     " bytes requested, " << free_bytes_ <<
                      " bytes free. Trying to extend the external memory space...");
 
         grow_file(requested_size);
@@ -195,50 +182,58 @@ void disk_block_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end
 
     // dump();
 
-    sortseq::iterator space;
-    space = std::find_if(free_space.begin(), free_space.end(),
-                         bind2nd(first_fit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
+    space_map_type::iterator space =
+        std::find_if(free_space_.begin(), free_space_.end(),
+                     [requested_size](const place& entry) {
+                         return (entry.second >= requested_size);
+                     });
 
-    if (space == free_space.end() && requested_size == BlockSize)
+    if (space == free_space_.end() && requested_size == BlockSize)
     {
         assert(end - begin == 1);
 
-        if (!autogrow) {
+        if (!autogrow_) {
             STXXL_ERRMSG("Warning: Severe external memory space fragmentation!");
             dump();
 
             STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
-                         " bytes requested, " << free_bytes <<
+                         " bytes requested, " << free_bytes_ <<
                          " bytes free. Trying to extend the external memory space...");
         }
 
         grow_file(BlockSize);
 
-        space = std::find_if(free_space.begin(), free_space.end(),
-                             bind2nd(first_fit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
+        space = std::find_if(free_space_.begin(), free_space_.end(),
+                             [requested_size](const place& entry) {
+                                 return (entry.second >= requested_size);
+                             });
     }
 
-    if (space != free_space.end())
+    if (space != free_space_.end())
     {
-        stxxl::int64 region_pos = (*space).first;
-        stxxl::int64 region_size = (*space).second;
-        free_space.erase(space);
-        if (region_size > static_cast<int64_t>(requested_size))
-            free_space[region_pos + requested_size] = region_size - requested_size;
+        uint64_t region_pos = (*space).first;
+        uint64_t region_size = (*space).second;
+        free_space_.erase(space);
 
-        for (stxxl::int64 pos = region_pos; begin != end; ++begin)
+        if (region_size > requested_size)
+            free_space_[region_pos + requested_size] = region_size - requested_size;
+
+        for (uint64_t pos = region_pos; begin != end; ++begin)
         {
             begin->offset = pos;
             pos += begin->size;
         }
-        free_bytes -= requested_size;
+
+        assert(free_bytes_ >= requested_size);
+        free_bytes_ -= requested_size;
         //dump();
 
         return;
     }
 
     // no contiguous region found
-    STXXL_VERBOSE1("Warning, when allocating an external memory space, no contiguous region found");
+    STXXL_VERBOSE1("Warning, when allocating an external memory space, "
+                   "no contiguous region found");
     STXXL_VERBOSE1("It might harm the performance");
 
     assert(requested_size > BlockSize);
