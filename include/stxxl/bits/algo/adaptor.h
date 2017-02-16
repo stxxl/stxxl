@@ -122,16 +122,22 @@ struct runs2bid_array_adaptor2
         return (BID<BlockSize>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 
-    const data_type* operator -> () const
+    const data_type& operator * () const
     {
         PosType i = pos - K;
         if (i < 0)
-            return &((*(array[(pos) % w])[(pos) / w].bid));
+            return (BID<BlockSize>&)((*(array[(pos) % w]))[(pos) / w].bid);
 
         PosType _w = w;
         _w--;
-        return &((*(array[(i) % _w])[h + (i / _w)].bid));
+        return (BID<BlockSize>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
+
+    data_type* operator -> ()
+    { return &operator * (); }
+
+    const data_type* operator -> () const
+    { return &operator * (); }
 
     data_type& operator [] (PosType n) const
     {

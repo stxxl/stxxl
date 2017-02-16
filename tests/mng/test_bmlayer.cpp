@@ -78,10 +78,10 @@ void testIO()
 void testIO2()
 {
     typedef stxxl::typed_block<128* 1024, double> block_type;
-    std::vector<block_type::bid_type> bids;
+    std::vector<block_type::bid_type> bids(32);
     std::vector<stxxl::request_ptr> requests;
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
-    bm->new_blocks<block_type>(32, stxxl::striping(), std::back_inserter(bids));
+    bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
     block_type* blocks = new block_type[32];
     int vIndex;
     for (vIndex = 0; vIndex < 32; ++vIndex) {
