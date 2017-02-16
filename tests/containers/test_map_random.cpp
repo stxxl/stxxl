@@ -25,7 +25,7 @@ typedef int data_type;
 
 struct cmp2 : public std::less<int>
 {
-    static int max_value()
+    int max_value()
     {
         return std::numeric_limits<int>::max();
     }

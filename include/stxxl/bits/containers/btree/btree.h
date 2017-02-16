@@ -31,7 +31,7 @@ namespace btree {
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned RawNodeSize,
           unsigned RawLeafSize,
           class PDAllocStrategy
@@ -41,9 +41,9 @@ class btree
 public:
     typedef KeyType key_type;
     typedef DataType data_type;
-    typedef CompareType key_compare;
+    typedef KeyCompareWithMaxType key_compare;
 
-    typedef btree<KeyType, DataType, CompareType,
+    typedef btree<KeyType, DataType, KeyCompareWithMaxType,
                   RawNodeSize, RawLeafSize, PDAllocStrategy> self_type;
 
     typedef PDAllocStrategy alloc_strategy_type;
@@ -175,7 +175,7 @@ private:
         typedef typename local_node_type::bid_type local_bid_type;
 
         root_node_iterator_type left_it, right_it;
-        if (uit->first == key_compare::max_value())
+        if (uit->first == m_key_compare.max_value())
         {
             // uit is the last entry in the root
             assert(uit != m_root_node.begin());
@@ -234,7 +234,7 @@ private:
         assert(new_leaf);
         m_end_iterator = new_leaf->end();           // initialize end() iterator
         m_root_node.insert(
-            root_node_pair_type(key_compare::max_value(), (node_bid_type)new_bid));
+            root_node_pair_type(m_key_compare.max_value(), (node_bid_type)new_bid));
     }
 
     void deallocate_children()
@@ -269,7 +269,7 @@ private:
     {
         assert(node_fill_factor >= 0.5);
         assert(leaf_fill_factor >= 0.5);
-        key_type last_key = key_compare::max_value();
+        key_type last_key = m_key_compare.max_value();
 
         typedef std::pair<key_type, node_bid_type> key_bid_pair;
         typedef typename stxxl::VECTOR_GENERATOR<
@@ -336,7 +336,7 @@ private:
 
         m_end_iterator = leaf->end();                 // initialize end() iterator
 
-        bids.push_back(key_bid_pair(key_compare::max_value(), (node_bid_type)new_bid));
+        bids.push_back(key_bid_pair(m_key_compare.max_value(), (node_bid_type)new_bid));
 
         const size_t max_node_elements = static_cast<size_t>(
             max_node_size * node_fill_factor);
@@ -522,8 +522,8 @@ public:
 
             m_leaf_cache.unfix_node((leaf_bid_type)it->second);
             //if(key_compare::max_value() == Splitter.first)
-            if (!(m_key_compare(key_compare::max_value(), splitter.first) ||
-                  m_key_compare(splitter.first, key_compare::max_value())))
+            if (!(m_key_compare(m_key_compare.max_value(), splitter.first) ||
+                  m_key_compare(splitter.first, m_key_compare.max_value())))
                 return result;
             // no overflow/splitting happened
 
@@ -547,8 +547,8 @@ public:
 
         m_node_cache.unfix_node((node_bid_type)it->second);
         //if(key_compare::max_value() == Splitter.first)
-        if (!(m_key_compare(key_compare::max_value(), splitter.first) ||
-              m_key_compare(splitter.first, key_compare::max_value())))
+        if (!(m_key_compare(m_key_compare.max_value(), splitter.first) ||
+              m_key_compare(splitter.first, m_key_compare.max_value())))
             return result;
         // no overflow/splitting happened
 
@@ -906,10 +906,10 @@ public:
             STXXL_VERBOSE1("btree Deallocate root and decrease height");
             it = m_root_node.begin();
             node_bid_type root_bid = it->second;
-            assert(it->first == key_compare::max_value());
+            assert(it->first == m_key_compare.max_value());
             node_type* root_node = m_node_cache.get_node(root_bid);
             assert(root_node);
-            assert(root_node->back().first == key_compare::max_value());
+            assert(root_node->back().first == m_key_compare.max_value());
             m_root_node.clear();
             m_root_node.insert(root_node->block().begin(),
                                root_node->block().begin() + root_node->size());
@@ -1107,15 +1107,15 @@ public:
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
 inline bool operator ==
-    (const btree<KeyType, DataType, CompareType,
+    (const btree<KeyType, DataType, KeyCompareWithMaxType,
                  LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-    const btree<KeyType, DataType, CompareType,
+    const btree<KeyType, DataType, KeyCompareWithMaxType,
                 LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
@@ -1123,15 +1123,15 @@ inline bool operator ==
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
 inline bool operator !=
-    (const btree<KeyType, DataType, CompareType,
+    (const btree<KeyType, DataType, KeyCompareWithMaxType,
                  LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-    const btree<KeyType, DataType, CompareType,
+    const btree<KeyType, DataType, KeyCompareWithMaxType,
                 LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     return !(a == b);
@@ -1139,15 +1139,15 @@ inline bool operator !=
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
 inline bool operator <
-    (const btree<KeyType, DataType, CompareType,
+    (const btree<KeyType, DataType, KeyCompareWithMaxType,
                  LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-    const btree<KeyType, DataType, CompareType,
+    const btree<KeyType, DataType, KeyCompareWithMaxType,
                 LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
@@ -1155,15 +1155,15 @@ inline bool operator <
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
 inline bool operator >
-    (const btree<KeyType, DataType, CompareType,
+    (const btree<KeyType, DataType, KeyCompareWithMaxType,
                  LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-    const btree<KeyType, DataType, CompareType,
+    const btree<KeyType, DataType, KeyCompareWithMaxType,
                 LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     return b < a;
@@ -1171,15 +1171,15 @@ inline bool operator >
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
 inline bool operator <=
-    (const btree<KeyType, DataType, CompareType,
+    (const btree<KeyType, DataType, KeyCompareWithMaxType,
                  LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-    const btree<KeyType, DataType, CompareType,
+    const btree<KeyType, DataType, KeyCompareWithMaxType,
                 LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     return !(b < a);
@@ -1187,15 +1187,15 @@ inline bool operator <=
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
 inline bool operator >=
-    (const btree<KeyType, DataType, CompareType,
+    (const btree<KeyType, DataType, KeyCompareWithMaxType,
                  LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-    const btree<KeyType, DataType, CompareType,
+    const btree<KeyType, DataType, KeyCompareWithMaxType,
                 LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     return !(a < b);
@@ -1208,14 +1208,14 @@ namespace std {
 
 template <class KeyType,
           class DataType,
-          class CompareType,
+          class KeyCompareWithMaxType,
           unsigned LogNodeSize,
           unsigned LogLeafSize,
           class PDAllocStrategy
           >
-void swap(stxxl::btree::btree<KeyType, DataType, CompareType,
+void swap(stxxl::btree::btree<KeyType, DataType, KeyCompareWithMaxType,
                               LogNodeSize, LogLeafSize, PDAllocStrategy>& a,
-          stxxl::btree::btree<KeyType, DataType, CompareType,
+          stxxl::btree::btree<KeyType, DataType, KeyCompareWithMaxType,
                               LogNodeSize, LogLeafSize, PDAllocStrategy>& b)
 {
     if (&a != &b)

@@ -94,7 +94,7 @@ private:
     std::pair<key_type, bid_type> insert(const std::pair<key_type, bid_type>& splitter,
                                          const block_iterator& place2insert)
     {
-        std::pair<key_type, bid_type> result(key_compare::max_value(), bid_type());
+        std::pair<key_type, bid_type> result(m_cmp.max_value(), bid_type());
 
         // splitter != *place2insert
         assert(m_vcmp(*place2insert, splitter) || m_vcmp(splitter, *place2insert));
@@ -328,7 +328,7 @@ public:
            std::pair<key_type, bid_type>& splitter)
     {
         assert(size() <= max_nelements());
-        splitter.first = key_compare::max_value();
+        splitter.first = m_cmp.max_value();
 
         value_type key2search(x.first, bid_type());
         block_iterator it =
@@ -347,8 +347,8 @@ public:
             std::pair<iterator, bool> result = leaf->insert(x, bot_splitter);
             m_btree->m_leaf_cache.unfix_node((leaf_bid_type)it->second);
             //if(key_compare::max_value() == BotSplitter.first)
-            if (!(m_cmp(key_compare::max_value(), bot_splitter.first) ||
-                  m_cmp(bot_splitter.first, key_compare::max_value())))
+            if (!(m_cmp(m_cmp.max_value(), bot_splitter.first) ||
+                  m_cmp(bot_splitter.first, m_cmp.max_value())))
                 return result;
             // no overflow/splitting happened
 
@@ -367,8 +367,8 @@ public:
             std::pair<iterator, bool> result = node->insert(x, height - 1, bot_splitter);
             m_btree->m_node_cache.unfix_node((node_bid_type)it->second);
             //if(key_compare::max_value() == BotSplitter.first)
-            if (!(m_cmp(key_compare::max_value(), bot_splitter.first) ||
-                  m_cmp(bot_splitter.first, key_compare::max_value())))
+            if (!(m_cmp(m_cmp.max_value(), bot_splitter.first) ||
+                  m_cmp(bot_splitter.first, m_cmp.max_value())))
                 return result;
             // no overflow/splitting happened
 

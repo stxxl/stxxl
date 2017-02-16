@@ -313,7 +313,7 @@ public:
         std::pair<key_type, bid_type>& splitter)
     {
         assert(size() <= max_nelements());
-        splitter.first = key_compare::max_value();
+        splitter.first = m_cmp.max_value();
 
         typename block_type::iterator it =
             std::lower_bound(m_block->begin(), m_block->begin() + size(), x, m_vcmp);
