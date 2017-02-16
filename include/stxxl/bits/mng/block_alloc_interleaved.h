@@ -26,22 +26,22 @@ namespace stxxl {
 struct interleaved_striping
 {
 protected:
-    int_type nruns;
-    unsigned_type begindisk;
-    unsigned_type diff;
+    int nruns_;
+    size_t begin_disk_;
+    size_t diff_;
 
-    interleaved_striping(int_type nruns, unsigned_type begindisk, unsigned_type diff)
-        : nruns(nruns), begindisk(begindisk), diff(diff)
+    interleaved_striping(int nruns, size_t begin_disk, size_t diff)
+        : nruns_(nruns), begin_disk_(begin_disk), diff_(diff)
     { }
 
 public:
-    interleaved_striping(int_type _nruns, const striping& strategy)
-        : nruns(_nruns), begindisk(strategy.begin), diff(strategy.diff)
+    interleaved_striping(int nruns, const striping& strategy)
+        : nruns_(nruns), begin_disk_(strategy.begin_), diff_(strategy.diff_)
     { }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return begindisk + (i / nruns) % diff;
+        return begin_disk_ + (i / nruns_) % diff_;
     }
 };
 
@@ -49,66 +49,66 @@ struct interleaved_fully_random : public interleaved_striping
 {
     mutable std::default_random_engine rng_ { std::random_device { } () };
 
-    interleaved_fully_random(int_type _nruns, const fully_random& strategy)
-        : interleaved_striping(_nruns, strategy.begin, strategy.diff)
+    interleaved_fully_random(int nruns, const fully_random& strategy)
+        : interleaved_striping(nruns, strategy.begin_, strategy.diff_)
     { }
 
-    unsigned_type operator () (unsigned_type /* i */) const
+    size_t operator () (size_t /* i */) const
     {
-        return begindisk + rng_() % diff;
+        return begin_disk_ + rng_() % diff_;
     }
 };
 
 struct interleaved_simple_random : public interleaved_striping
 {
-    std::vector<size_t> offsets;
+    std::vector<size_t> offsets_;
 
-    interleaved_simple_random(int_type _nruns, const simple_random& strategy)
-        : interleaved_striping(_nruns, strategy.begin, strategy.diff)
+    interleaved_simple_random(int nruns, const simple_random& strategy)
+        : interleaved_striping(nruns, strategy.begin_, strategy.diff_)
     {
         std::default_random_engine rng { std::random_device { } () };
-        for (int_type i = 0; i < nruns; i++)
-            offsets.push_back(rng() % diff);
+        for (int i = 0; i < nruns; i++)
+            offsets_.push_back(rng() % diff_);
     }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return begindisk + (i / nruns + offsets[i % nruns]) % diff;
+        return begin_disk_ + (i / nruns_ + offsets_[i % nruns_]) % diff_;
     }
 };
 
 struct interleaved_random_cyclic : public interleaved_striping
 {
-    std::vector<std::vector<unsigned_type> > perms;
+    std::vector<std::vector<size_t> > perms_;
 
-    interleaved_random_cyclic(int_type _nruns, const random_cyclic& strategy)
-        : interleaved_striping(_nruns, strategy.begin, strategy.diff),
-          perms(nruns, std::vector<unsigned_type>(diff))
+    interleaved_random_cyclic(int nruns, const random_cyclic& strategy)
+        : interleaved_striping(nruns, strategy.begin_, strategy.diff_),
+          perms_(nruns, std::vector<size_t>(diff_))
     {
-        for (int_type i = 0; i < nruns; i++)
+        for (int i = 0; i < nruns; i++)
         {
-            for (unsigned_type j = 0; j < diff; j++)
-                perms[i][j] = j;
+            for (size_t j = 0; j < diff_; j++)
+                perms_[i][j] = j;
 
-            std::random_shuffle(perms[i].begin(), perms[i].end());
+            std::random_shuffle(perms_[i].begin(), perms_[i].end());
         }
     }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return begindisk + perms[i % nruns][(i / nruns) % diff];
+        return begin_disk_ + perms_[i % nruns_][(i / nruns_) % diff_];
     }
 };
 
 struct first_disk_only : public interleaved_striping
 {
-    first_disk_only(int_type _nruns, const single_disk& strategy)
-        : interleaved_striping(_nruns, strategy.disk, 1)
+    first_disk_only(int nruns, const single_disk& strategy)
+        : interleaved_striping(nruns, strategy.disk_, 1)
     { }
 
-    unsigned_type operator () (unsigned_type) const
+    size_t operator () (size_t) const
     {
-        return begindisk;
+        return begin_disk_;
     }
 };
 

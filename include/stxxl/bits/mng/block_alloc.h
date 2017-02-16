@@ -14,8 +14,7 @@
 #ifndef STXXL_MNG_BLOCK_ALLOC_HEADER
 #define STXXL_MNG_BLOCK_ALLOC_HEADER
 
-#include <stxxl/bits/parallel.h>
-#include <stxxl/bits/mng/config.h>
+#include <stxxl/bits/mng/block_manager.h>
 
 #include <algorithm>
 #include <random>
@@ -32,9 +31,9 @@ namespace stxxl {
 //! \remarks model of \b allocation_strategy concept
 struct basic_allocation_strategy
 {
-    basic_allocation_strategy(int disks_begin, int disks_end);
+    basic_allocation_strategy(size_t disks_begin, size_t disks_end);
     basic_allocation_strategy();
-    int operator () (int i) const;
+    size_t operator () (size_t i) const;
     static const char * name();
 };
 
@@ -42,20 +41,20 @@ struct basic_allocation_strategy
 //! \remarks model of \b allocation_strategy concept
 struct striping
 {
-    unsigned_type begin, diff;
+    size_t begin_, diff_;
 
 public:
-    striping(unsigned_type b, unsigned_type e) : begin(b), diff(e - b)
-    { }
+    striping(size_t begin, size_t end)
+        : begin_(begin), diff_(end - begin) { }
 
-    striping() : begin(0)
+    striping() : begin_(0)
     {
-        diff = config::get_instance()->disks_number();
+        diff_ = config::get_instance()->disks_number();
     }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return begin + i % diff;
+        return begin_ + i % diff_;
     }
 
     static const char * name()
@@ -72,15 +71,13 @@ private:
     mutable std::default_random_engine rng_ { std::random_device { } () };
 
 public:
-    fully_random(unsigned_type b, unsigned_type e) : striping(b, e)
-    { }
+    fully_random(size_t begin, size_t end) : striping(begin, end) { }
 
-    fully_random() : striping()
-    { }
+    fully_random() : striping() { }
 
-    unsigned_type operator () (unsigned_type /*i*/) const
+    size_t operator () (size_t /* i */) const
     {
-        return begin + rng_() % diff;
+        return begin_ + rng_() % diff_;
     }
 
     static const char * name()
@@ -94,16 +91,16 @@ public:
 struct simple_random : public striping
 {
 private:
-    unsigned_type offset;
+    size_t offset;
 
     void init()
     {
         std::default_random_engine rng { std::random_device { } () };
-        offset = rng() % diff;
+        offset = rng() % diff_;
     }
 
 public:
-    simple_random(unsigned_type b, unsigned_type e) : striping(b, e)
+    simple_random(size_t begin, size_t end) : striping(begin, end)
     {
         init();
     }
@@ -113,9 +110,9 @@ public:
         init();
     }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return begin + (i + offset) % diff;
+        return begin_ + (i + offset) % diff_;
     }
 
     static const char * name()
@@ -129,30 +126,31 @@ public:
 struct random_cyclic : public striping
 {
 private:
-    std::vector<unsigned_type> perm;
+    std::vector<size_t> perm_;
 
     void init()
     {
-        for (unsigned_type i = 0; i < diff; i++)
-            perm[i] = i;
+        for (size_t i = 0; i < diff_; i++)
+            perm_[i] = i;
 
-        std::random_shuffle(perm.begin(), perm.end());
+        std::random_shuffle(perm_.begin(), perm_.end());
     }
 
 public:
-    random_cyclic(unsigned_type b, unsigned_type e) : striping(b, e), perm(diff)
+    random_cyclic(size_t begin, size_t end)
+        : striping(begin, end), perm_(diff_)
     {
         init();
     }
 
-    random_cyclic() : striping(), perm(diff)
+    random_cyclic() : striping(), perm_(diff_)
     {
         init();
     }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return begin + perm[i % diff];
+        return begin_ + perm_[i % diff_];
     }
 
     static const char * name()
@@ -163,8 +161,7 @@ public:
 
 struct random_cyclic_disk : public random_cyclic
 {
-    random_cyclic_disk(unsigned_type b, unsigned_type e) : random_cyclic(b, e)
-    { }
+    random_cyclic_disk(size_t begin, size_t end) : random_cyclic(begin, end) { }
 
     random_cyclic_disk()
         : random_cyclic(config::get_instance()->regular_disk_range().first,
@@ -179,8 +176,8 @@ struct random_cyclic_disk : public random_cyclic
 
 struct random_cyclic_flash : public random_cyclic
 {
-    random_cyclic_flash(unsigned_type b, unsigned_type e) : random_cyclic(b, e)
-    { }
+    random_cyclic_flash(size_t begin, size_t end)
+        : random_cyclic(begin, end) { }
 
     random_cyclic_flash()
         : random_cyclic(config::get_instance()->flash_range().first,
@@ -197,17 +194,13 @@ struct random_cyclic_flash : public random_cyclic
 //! \remarks model of \b allocation_strategy concept
 struct single_disk
 {
-    unsigned_type disk;
+    size_t disk_;
 
-    explicit single_disk(unsigned_type d, unsigned_type = 0) : disk(d)
-    { }
+    explicit single_disk(size_t disk = 0, size_t = 0) : disk_(disk) { }
 
-    single_disk() : disk(0)
-    { }
-
-    unsigned_type operator () (unsigned_type /*i*/) const
+    size_t operator () (size_t /* i */) const
     {
-        return disk;
+        return disk_;
     }
 
     static const char * name()
@@ -216,44 +209,43 @@ struct single_disk
     }
 };
 
-//! Allocator functor adaptor.
+//! Allocator functor adapter.
 //!
 //! Gives offset to disk number sequence defined in constructor
 template <class BaseAllocator>
 struct offset_allocator
 {
-    BaseAllocator base;
-    int_type offset;
+    BaseAllocator base_;
+    int offset_;
 
     //! Creates functor based on instance of \c BaseAllocator functor
-    //! with offset \c offset_.
-    //! \param offset_ offset
+    //! with offset.
+    //! \param offset offset
     //! \param base_ used to create a copy
-    offset_allocator(int_type offset_, const BaseAllocator& base_) : base(base_), offset(offset_)
-    { }
+    offset_allocator(int offset, const BaseAllocator& base)
+        : base_(base), offset_(offset) { }
 
     //! Creates functor based on instance of \c BaseAllocator functor.
     //! \param base_ used to create a copy
-    explicit offset_allocator(const BaseAllocator& base_) : base(base_), offset(0)
-    { }
+    explicit offset_allocator(const BaseAllocator& base_)
+        : base_(base_), offset_(0) { }
 
     //! Creates functor based on default \c BaseAllocator functor.
-    offset_allocator() : offset(0)
-    { }
+    offset_allocator() : offset_(0) { }
 
-    unsigned_type operator () (unsigned_type i) const
+    size_t operator () (size_t i) const
     {
-        return base(offset + i);
+        return base_(offset_ + i);
     }
 
-    int_type get_offset() const
+    int get_offset() const
     {
-        return offset;
+        return offset_;
     }
 
-    void set_offset(int_type i)
+    void set_offset(int i)
     {
-        offset = i;
+        offset_ = i;
     }
 };
 
