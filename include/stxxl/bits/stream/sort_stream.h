@@ -80,16 +80,16 @@ private:
     //! stores the result (sorted runs) as smart pointer
     sorted_runs_type m_result;
     //! memory for internal use in blocks
-    unsigned_type m_memsize;
+    size_t m_memsize;
     //! true iff result is already computed (used in 'result()' method)
     bool m_result_computed;
 
     //! Fetch data from input into blocks[first_idx,last_idx).
-    unsigned_type fetch(block_type* blocks,
-                        unsigned_type first_idx, unsigned_type last_idx)
+    size_t fetch(block_type* blocks,
+                        size_t first_idx, size_t last_idx)
     {
         element_iterator output = make_element_iterator(blocks, first_idx);
-        unsigned_type curr_idx = first_idx;
+        size_t curr_idx = first_idx;
         while (!m_input.empty() && curr_idx != last_idx) {
             *output = *m_input;
             ++m_input;
@@ -100,10 +100,10 @@ private:
     }
 
     //! fill the rest of the block with max values
-    void fill_with_max_value(block_type* blocks, unsigned_type num_blocks,
-                             unsigned_type first_idx)
+    void fill_with_max_value(block_type* blocks, size_t num_blocks,
+                             size_t first_idx)
     {
-        unsigned_type last_idx = num_blocks * block_type::size;
+        size_t last_idx = num_blocks * block_type::size;
         if (first_idx < last_idx) {
             element_iterator curr = make_element_iterator(blocks, first_idx);
             while (first_idx != last_idx) {
@@ -115,7 +115,7 @@ private:
     }
 
     //! Sort a specific run, contained in a sequences of blocks.
-    void sort_run(block_type* run, unsigned_type elements)
+    void sort_run(block_type* run, size_t elements)
     {
         check_sort_settings();
         potentially_parallel::sort(make_element_iterator(run, 0),
@@ -132,7 +132,7 @@ public:
     //! \param memory_to_use memory amount that is allowed to used by the
     //! sorter in bytes
     basic_runs_creator(Input& input, CompareType cmp,
-                       unsigned_type memory_to_use)
+                       size_t memory_to_use)
         : m_input(input),
           m_cmp(cmp),
           m_result(new sorted_runs_data_type),
@@ -176,11 +176,11 @@ public:
 template <class Input, class CompareType, size_t BlockSize, class AllocStr>
 void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result()
 {
-    unsigned_type i = 0;
-    unsigned_type m2 = m_memsize / 2;
-    const unsigned_type el_in_run = m2 * block_type::size;     // # el in a run
+    size_t i = 0;
+    size_t m2 = m_memsize / 2;
+    const size_t el_in_run = m2 * block_type::size;     // # el in a run
     STXXL_VERBOSE1("basic_runs_creator::compute_result m2=" << m2);
-    unsigned_type blocks1_length = 0, blocks2_length = 0;
+    size_t blocks1_length = 0, blocks2_length = 0;
     block_type* Blocks1 = NULL;
 
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
@@ -233,7 +233,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     request_ptr* write_reqs = new request_ptr[m2];
     run_type run;
 
-    unsigned_type cur_run_size = div_ceil(blocks1_length, block_type::size);      // in blocks
+    size_t cur_run_size = div_ceil(blocks1_length, block_type::size);      // in blocks
     run.resize(cur_run_size);
     bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
@@ -386,7 +386,7 @@ public:
     //! \param cmp comparator object
     //! \param memory_to_use memory amount that is allowed to used by the
     //! sorter in bytes
-    runs_creator(Input& input, CompareType cmp, unsigned_type memory_to_use)
+    runs_creator(Input& input, CompareType cmp, size_t memory_to_use)
         : base(input, cmp, memory_to_use)
     { }
 };
@@ -448,19 +448,19 @@ private:
     sorted_runs_type m_result;
 
     //! memory size in bytes to use
-    const unsigned_type m_memory_to_use;
+    const size_t m_memory_to_use;
 
     //! memory size in numberr of blocks for internal use
-    const unsigned_type m_memsize;
+    const size_t m_memsize;
 
     //! m_memsize / 2
-    const unsigned_type m_m2;
+    const size_t m_m2;
 
     //! true after the result() method was called for the first time
     bool m_result_computed;
 
     //! total number of elements in a run
-    const unsigned_type m_el_in_run;
+    const internal_size_type m_el_in_run;
 
     //! current number of elements in the run m_blocks1
     internal_size_type m_cur_el;
@@ -480,10 +480,10 @@ private:
 
 protected:
     //!  fill the rest of the block with max values
-    void fill_with_max_value(block_type* blocks, unsigned_type num_blocks,
-                             unsigned_type first_idx)
+    void fill_with_max_value(block_type* blocks, size_t num_blocks,
+                             size_t first_idx)
     {
-        unsigned_type last_idx = num_blocks * block_type::size;
+        size_t last_idx = num_blocks * block_type::size;
         if (first_idx < last_idx) {
             element_iterator curr = make_element_iterator(blocks, first_idx);
             while (first_idx != last_idx) {
@@ -495,7 +495,7 @@ protected:
     }
 
     //! Sort a specific run, contained in a sequences of blocks.
-    void sort_run(block_type* run, unsigned_type elements)
+    void sort_run(block_type* run, internal_size_type elements)
     {
         check_sort_settings();
         potentially_parallel::sort(make_element_iterator(run, 0),
@@ -519,7 +519,7 @@ protected:
             return;
         }
 
-        const unsigned_type cur_run_size = div_ceil(m_cur_el, block_type::size);         // in blocks
+        const size_t cur_run_size = div_ceil(m_cur_el, block_type::size);         // in blocks
         run.resize(cur_run_size);
         block_manager* bm = block_manager::get_instance();
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
@@ -529,7 +529,7 @@ protected:
         // fill the rest of the last block with max values
         fill_with_max_value(m_blocks1, cur_run_size, m_cur_el);
 
-        unsigned_type i = 0;
+        size_t i = 0;
         for ( ; i < cur_run_size; ++i)
         {
             run[i].value = m_blocks1[i][0];
@@ -551,7 +551,7 @@ public:
     //! Creates the object.
     //! \param cmp comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    runs_creator(CompareType cmp, unsigned_type memory_to_use)
+    runs_creator(CompareType cmp, size_t memory_to_use)
         : m_cmp(cmp),
           m_memory_to_use(memory_to_use),
           m_memsize(memory_to_use / BlockSize / sort_memory_usage_factor()),
@@ -593,7 +593,7 @@ public:
         m_result_computed = false;
         m_cur_el = 0;
 
-        for (unsigned_type i = 0; i < m_m2; ++i)
+        for (size_t i = 0; i < m_m2; ++i)
         {
             if (m_write_reqs[i].get())
                 m_write_reqs[i]->cancel();
@@ -647,14 +647,14 @@ public:
         // sort and store m_blocks1
         sort_run(m_blocks1, m_el_in_run);
 
-        const unsigned_type cur_run_blocks = div_ceil(m_el_in_run, block_type::size);        // in blocks
+        const size_t cur_run_blocks = div_ceil(m_el_in_run, block_type::size);        // in blocks
         run.resize(cur_run_blocks);
         block_manager* bm = block_manager::get_instance();
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
-        for (unsigned_type i = 0; i < cur_run_blocks; ++i)
+        for (size_t i = 0; i < cur_run_blocks; ++i)
         {
             run[i].value = m_blocks1[i][0];
             if (m_write_reqs[i].get())
@@ -699,7 +699,7 @@ public:
     }
 
     //! return memory size used (in bytes).
-    unsigned_type memory_used() const
+    size_t memory_used() const
     {
         return m_memory_to_use;
     }
@@ -760,12 +760,12 @@ private:
     //! stores the result (sorted runs)
     sorted_runs_type result_;
     //! memory for internal use in blocks
-    unsigned_type m_;
+    size_t m_;
     buffered_writer<block_type> writer;
     block_type* cur_block;
-    unsigned_type offset;
-    unsigned_type iblock;
-    unsigned_type irun;
+    size_t offset;
+    size_t iblock;
+    size_t irun;
     //! needs to be reset after each run
     alloc_strategy_type alloc_strategy;
 
@@ -774,7 +774,7 @@ public:
     //! \param c comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes.
     //! Recommended value: 2 * block_size * D
-    runs_creator(CompareType c, unsigned_type memory_to_use)
+    runs_creator(CompareType c, size_t memory_to_use)
         : cmp(c),
           result_(new sorted_runs_data_type),
           m_(memory_to_use / BlockSize / sort_memory_usage_factor()),
@@ -892,22 +892,22 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
     typedef typename RunsType::element_type::block_type block_type;
     STXXL_VERBOSE2("Elements: " << sruns->elements);
-    unsigned_type nruns = sruns->runs.size();
+    size_t nruns = sruns->runs.size();
     STXXL_VERBOSE2("Runs: " << nruns);
-    unsigned_type irun = 0;
+    size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
-        const unsigned_type nblocks = sruns->runs[irun].size();
+        const size_t nblocks = sruns->runs[irun].size();
         block_type* blocks = new block_type[nblocks];
         request_ptr* reqs = new request_ptr[nblocks];
-        for (unsigned_type j = 0; j < nblocks; ++j)
+        for (size_t j = 0; j < nblocks; ++j)
         {
             reqs[j] = blocks[j].read(sruns->runs[irun][j].bid);
         }
         wait_all(reqs, reqs + nblocks);
         delete[] reqs;
 
-        for (unsigned_type j = 0; j < nblocks; ++j)
+        for (size_t j = 0; j < nblocks; ++j)
         {
             if (cmp(blocks[j][0], sruns->runs[irun][j].value) ||
                 cmp(sruns->runs[irun][j].value, blocks[j][0]))     //!=
@@ -965,7 +965,7 @@ public:
     typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
     typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
     typedef loser_tree<run_cursor_type, run_cursor2_cmp_type> loser_tree_type;
-    typedef stxxl::int64 diff_type;
+    typedef int64_t diff_type;
     typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
     typedef typename std::vector<sequence>::size_type seqs_size_type;
 
@@ -978,7 +978,7 @@ private:
     value_cmp m_cmp;
 
     //! memory size in bytes to use
-    unsigned_type m_memory_to_use;
+    size_t m_memory_to_use;
 
     //! smart pointer to sorted_runs object
     sorted_runs_type m_sruns;
@@ -1120,7 +1120,7 @@ public:
     //! Creates a runs merger object.
     //! \param c comparison object
     //! \param memory_to_use amount of memory available for the merger in bytes
-    basic_runs_merger(value_cmp c, unsigned_type memory_to_use)
+    basic_runs_merger(value_cmp c, size_t memory_to_use)
         : m_cmp(c),
           m_memory_to_use(memory_to_use),
           m_buffer_block(new out_block_type),
@@ -1145,7 +1145,7 @@ public:
     basic_runs_merger& operator = (const basic_runs_merger&) = delete;
 
     //! Set memory amount to use for the merger in bytes.
-    void set_memory_to_use(unsigned_type memory_to_use)
+    void set_memory_to_use(size_t memory_to_use)
     {
         m_memory_to_use = memory_to_use;
     }
@@ -1180,12 +1180,12 @@ public:
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         int_type disks_number = config::get_instance()->disks_number();
-        unsigned_type min_prefetch_buffers = 2 * disks_number;
-        unsigned_type input_buffers =
+        size_t min_prefetch_buffers = 2 * disks_number;
+        size_t input_buffers =
             (m_memory_to_use > sizeof(out_block_type)
              ? m_memory_to_use - sizeof(out_block_type)
              : 0) / block_type::raw_size;
-        unsigned_type nruns = m_sruns->runs.size();
+        size_t nruns = m_sruns->runs.size();
 
         if (input_buffers < nruns + min_prefetch_buffers)
         {
@@ -1197,7 +1197,7 @@ public:
             STXXL_WARNMSG_RECURSIVE_SORT("memory_to_use=" << m_memory_to_use << " bytes  block_type::raw_size=" << block_type::raw_size << " bytes");
 
             // check whether we have enough memory to merge recursively
-            unsigned_type recursive_merge_buffers = m_memory_to_use / block_type::raw_size;
+            size_t recursive_merge_buffers = m_memory_to_use / block_type::raw_size;
             if (recursive_merge_buffers < 2 * min_prefetch_buffers + 1 + 2) {
                 // recursive merge uses min_prefetch_buffers for input buffering and min_prefetch_buffers output buffering
                 // as well as 1 current output block and at least 2 input blocks
@@ -1218,8 +1218,8 @@ public:
 
         deallocate_prefetcher();
 
-        unsigned_type prefetch_seq_size = 0;
-        for (unsigned_type i = 0; i < nruns; ++i)
+        size_t prefetch_seq_size = 0;
+        for (size_t i = 0; i < nruns; ++i)
         {
             prefetch_seq_size += m_sruns->runs[i].size();
         }
@@ -1228,7 +1228,7 @@ public:
         m_prefetch_seq = new int_type[prefetch_seq_size];
 
         typename run_type::iterator copy_start = m_consume_seq.begin();
-        for (unsigned_type i = 0; i < nruns; ++i)
+        for (size_t i = 0; i < nruns; ++i)
         {
             copy_start = std::copy(m_sruns->runs[i].begin(),
                                    m_sruns->runs[i].end(),
@@ -1238,7 +1238,7 @@ public:
         std::stable_sort(m_consume_seq.begin(), m_consume_seq.end(),
                          sort_helper::trigger_entry_cmp<trigger_entry_type, value_cmp>(m_cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
-        const unsigned_type n_prefetch_buffers = std::max(min_prefetch_buffers, input_buffers - nruns);
+        const size_t n_prefetch_buffers = std::max(min_prefetch_buffers, input_buffers - nruns);
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
         // heuristic
@@ -1250,7 +1250,7 @@ public:
             n_opt_prefetch_buffers,
             config::get_instance()->get_max_device_id());
 #else
-        for (unsigned_type i = 0; i < prefetch_seq_size; ++i)
+        for (size_t i = 0; i < prefetch_seq_size; ++i)
             m_prefetch_seq[i] = i;
 #endif //STXXL_SORT_OPTIMAL_PREFETCHING
 
@@ -1267,7 +1267,7 @@ public:
             seqs = new std::vector<sequence>(nruns);
             buffers = new std::vector<block_type*>(nruns);
 
-            for (unsigned_type i = 0; i < nruns; ++i)                                           //initialize sequences
+            for (size_t i = 0; i < nruns; ++i)                                           //initialize sequences
             {
                 (*buffers)[i] = m_prefetcher->pull_block();                                     //get first block of each run
                 (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());      //this memory location stays the same, only the data is exchanged
@@ -1363,28 +1363,28 @@ template <class RunsType, class CompareType, class AllocStr>
 void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 {
     block_manager* bm = block_manager::get_instance();
-    unsigned_type ndisks = config::get_instance()->disks_number();
-    unsigned_type nwrite_buffers = 2 * ndisks;
-    unsigned_type memory_for_write_buffers = nwrite_buffers * sizeof(block_type);
+    size_t ndisks = config::get_instance()->disks_number();
+    size_t nwrite_buffers = 2 * ndisks;
+    size_t memory_for_write_buffers = nwrite_buffers * sizeof(block_type);
 
     // memory consumption of the recursive merger (uses block_type as
     // out_block_type)
-    unsigned_type recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
-    unsigned_type recursive_merger_memory_out_block = sizeof(block_type);
-    unsigned_type memory_for_buffers = memory_for_write_buffers
+    size_t recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
+    size_t recursive_merger_memory_out_block = sizeof(block_type);
+    size_t memory_for_buffers = memory_for_write_buffers
                                        + recursive_merger_memory_prefetch_buffers
                                        + recursive_merger_memory_out_block;
     // maximum arity in the recursive merger
-    unsigned_type max_arity = (m_memory_to_use > memory_for_buffers ? m_memory_to_use - memory_for_buffers : 0) / block_type::raw_size;
+    size_t max_arity = (m_memory_to_use > memory_for_buffers ? m_memory_to_use - memory_for_buffers : 0) / block_type::raw_size;
 
-    unsigned_type nruns = m_sruns->runs.size();
-    const unsigned_type merge_factor = optimal_merge_factor(nruns, max_arity);
+    size_t nruns = m_sruns->runs.size();
+    const size_t merge_factor = optimal_merge_factor(nruns, max_arity);
     assert(merge_factor > 1);
     assert(merge_factor <= max_arity);
 
     while (nruns > max_arity)
     {
-        unsigned_type new_nruns = div_ceil(nruns, merge_factor);
+        size_t new_nruns = div_ceil(nruns, merge_factor);
         STXXL_MSG("Starting new merge phase: nruns: " << nruns <<
                   " opt_merge_factor: " << merge_factor <<
                   " max_arity: " << max_arity << " new_nruns: " << new_nruns);
@@ -1399,27 +1399,27 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 
         // merge all runs from m_runs into news_runs
 
-        unsigned_type runs_left = nruns;
-        unsigned_type cur_out_run = 0;
+        size_t runs_left = nruns;
+        size_t cur_out_run = 0;
         size_type elements_left = m_sruns->elements;
 
         while (runs_left > 0)
         {
-            unsigned_type runs2merge = std::min(runs_left, merge_factor);
+            size_t runs2merge = std::min(runs_left, merge_factor);
             STXXL_MSG("Merging " << runs2merge << " runs");
 
             if (runs2merge > 1)     // non-trivial merge
             {
                 // count the number of elements in the run
                 size_type elements_in_new_run = 0;
-                for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); ++i)
+                for (size_t i = nruns - runs_left; i < (nruns - runs_left + runs2merge); ++i)
                 {
                     elements_in_new_run += m_sruns->runs_sizes[i];
                 }
                 new_runs.runs_sizes[cur_out_run] = elements_in_new_run;
 
                 // calculate blocks in run
-                const unsigned_type blocks_in_new_run = (unsigned_type)div_ceil(elements_in_new_run, block_type::size);
+                const size_t blocks_in_new_run = (size_t)div_ceil(elements_in_new_run, block_type::size);
 
                 // allocate blocks for the new runs
                 new_runs.runs[cur_out_run].resize(blocks_in_new_run);
@@ -1460,7 +1460,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                     {
                         *out = *merger;
                         if ((cnt % block_type::size) == 0)     // have to write the trigger value
-                            new_runs.runs[cur_out_run][(unsigned_type)(cnt / size_type(block_type::size))].value = *merger;
+                            new_runs.runs[cur_out_run][(size_t)(cnt / size_type(block_type::size))].value = *merger;
 
                         ++cnt, ++out, ++merger;
                     }
@@ -1529,7 +1529,7 @@ public:
     //! \param cmp comparison object
     //! \param memory_to_use amount of memory available for the merger in bytes
     runs_merger(sorted_runs_type& sruns, value_cmp cmp,
-                unsigned_type memory_to_use)
+                size_t memory_to_use)
         : base(cmp, memory_to_use)
     {
         this->initialize(sruns);
@@ -1538,7 +1538,7 @@ public:
     //! Creates a runs merger object without initializing a round of sorted_runs.
     //! \param cmp comparison object
     //! \param memory_to_use amount of memory available for the merger in bytes
-    runs_merger(value_cmp cmp, unsigned_type memory_to_use)
+    runs_merger(value_cmp cmp, size_t memory_to_use)
         : base(cmp, memory_to_use)
     { }
 };
@@ -1578,7 +1578,7 @@ public:
     //! \param in input stream
     //! \param c comparator object
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-    sort(Input& in, CompareType c, unsigned_type memory_to_use)
+    sort(Input& in, CompareType c, size_t memory_to_use)
         : creator(in, c, memory_to_use),
           merger(creator.result(), c, memory_to_use)
     {
@@ -1590,8 +1590,8 @@ public:
     //! \param c comparator object
     //! \param m_memory_to_userc memory amount that is allowed to used by the runs creator in bytes
     //! \param m_memory_to_use memory amount that is allowed to used by the merger in bytes
-    sort(Input& in, CompareType c, unsigned_type m_memory_to_userc,
-         unsigned_type m_memory_to_use)
+    sort(Input& in, CompareType c, size_t m_memory_to_userc,
+         size_t m_memory_to_use)
         : creator(in, c, m_memory_to_userc),
           merger(creator.result(), c, m_memory_to_use)
     {
@@ -1674,7 +1674,7 @@ template <
 void sort(RandomAccessIterator begin,
           RandomAccessIterator end,
           CmpType cmp,
-          unsigned_type MemSize,
+          size_t MemSize,
           AllocStr AS)
 {
     STXXL_UNUSED(AS);

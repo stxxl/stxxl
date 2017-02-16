@@ -123,7 +123,7 @@ public:
     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
 
     vector_iterator2stream(InputIterator begin, InputIterator end,
-                           unsigned_type nbuffers = 0)
+                           size_t nbuffers = 0)
         : m_current(begin), m_end(end),
           in(static_cast<buf_istream_type*>(NULL))
     {
@@ -208,7 +208,7 @@ vector_iterator2stream<
 streamify(
     stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> begin,
     stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> end,
-    unsigned_type nbuffers = 0)
+    size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for vector_iterator range is called");
     return vector_iterator2stream<
@@ -243,7 +243,7 @@ vector_iterator2stream<
 streamify(
     stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> begin,
     stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> end,
-    unsigned_type nbuffers = 0)
+    size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
     return vector_iterator2stream<
@@ -281,7 +281,7 @@ public:
     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
 
     vector_iterator2stream_sr(InputIterator begin, InputIterator end,
-                              unsigned_type nbuffers = 0)
+                              size_t nbuffers = 0)
     {
         if (end - begin < block_type::size)
         {
@@ -355,7 +355,7 @@ vector_iterator2stream_sr<
 streamify_sr(
     stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> begin,
     stxxl::vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> end,
-    unsigned_type nbuffers = 0)
+    size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
     return vector_iterator2stream_sr<
@@ -373,7 +373,7 @@ vector_iterator2stream_sr<
 streamify_sr(
     stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> begin,
     stxxl::const_vector_iterator<ValueType, BlockSize, PagerType, PageSize, AllocStr> end,
-    unsigned_type nbuffers = 0)
+    size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
     return vector_iterator2stream_sr<

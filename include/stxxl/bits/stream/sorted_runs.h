@@ -116,7 +116,7 @@ private:
     void deallocate_blocks()
     {
         block_manager* bm = block_manager::get_instance();
-        for (unsigned_type i = 0; i < runs.size(); ++i)
+        for (size_t i = 0; i < runs.size(); ++i)
         {
             bm->delete_blocks(make_bid_iterator(runs[i].begin()),
                               make_bid_iterator(runs[i].end()));
