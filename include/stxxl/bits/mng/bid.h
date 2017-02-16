@@ -47,12 +47,12 @@ struct BID
 
     //! pointer to the file of the block
     file* storage = nullptr;
-    //! offset within the file of the block
-    int64_t offset = 0;
+    //! offset within the file of the block (uint64_t)
+    external_size_type offset = 0;
 
     BID() = default;
 
-    BID(file* s, int64_t o) : storage(s), offset(o) { }
+    BID(file* s, const external_size_type& o) : storage(s), offset(o) { }
 
     template <size_t BlockSize>
     explicit BID(const BID<BlockSize>& obj)
@@ -98,8 +98,8 @@ struct BID<0>
 {
     //! pointer to the file of the block
     file* storage = nullptr;
-    //! offset within the file of the block
-    int64_t offset = 0;
+    //! offset within the file of the block (uint64_t)
+    external_size_type offset = 0;
     //! size of the block in bytes
     size_t size = 0;
 
@@ -108,7 +108,7 @@ struct BID<0>
 
     BID() = default;
 
-    BID(file* f, int64_t o, size_t s)
+    BID(file* f, const external_size_type& o, size_t s)
         : storage(f), offset(o), size(s) { }
 
     bool valid() const
