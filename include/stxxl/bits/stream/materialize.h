@@ -86,16 +86,11 @@ materialize(StreamAlgorithm& in, OutputIterator outbegin, OutputIterator outend)
 //! \pre Output range is large enough to hold the all elements in the input stream
 //!
 //! This function is useful when you do not know the length of the stream beforehand.
-template <
-    typename VectorConfig,
-    typename StreamAlgorithm>
-stxxl::vector_iterator<VectorConfig>
-materialize(
+template <typename StreamAlgorithm, typename VectorConfig>
+stxxl::vector_iterator<VectorConfig> materialize(
     StreamAlgorithm& in,
-    stxxl::vector_iterator<VectorConfig>
-    outbegin,
-    stxxl::vector_iterator<VectorConfig>
-    outend,
+    stxxl::vector_iterator<VectorConfig> outbegin,
+    stxxl::vector_iterator<VectorConfig> outend,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
@@ -168,14 +163,10 @@ materialize(
 //! \return value of the output iterator after all increments,
 //! i.e. points to the first unwritten value
 //! \pre Output (range) is large enough to hold the all elements in the input stream
-template <
-    typename VectorConfig,
-    typename StreamAlgorithm>
-stxxl::vector_iterator<VectorConfig>
-materialize(
+template <typename StreamAlgorithm, typename VectorConfig>
+stxxl::vector_iterator<VectorConfig> materialize(
     StreamAlgorithm& in,
-    stxxl::vector_iterator<VectorConfig>
-    out,
+    stxxl::vector_iterator<VectorConfig> out,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
