@@ -158,10 +158,8 @@ int main()
     testWritePool();
     testStreams();
 
-#if STXXL_MNG_COUNT_ALLOCATION
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
-    STXXL_MSG("block_manager total allocation: " << bm->get_total_allocation());
-    STXXL_MSG("block_manager current allocation: " << bm->get_current_allocation());
-    STXXL_MSG("block_manager maximum allocation: " << bm->get_maximum_allocation());
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    STXXL_MSG("block_manager total allocation: " << bm->total_allocation());
+    STXXL_MSG("block_manager current allocation: " << bm->current_allocation());
+    STXXL_MSG("block_manager maximum allocation: " << bm->maximum_allocation());
 }

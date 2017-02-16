@@ -46,10 +46,6 @@
 
 namespace stxxl {
 
-#ifndef STXXL_MNG_COUNT_ALLOCATION
-#define STXXL_MNG_COUNT_ALLOCATION 1
-#endif // STXXL_MNG_COUNT_ALLOCATION
-
 //! \addtogroup mnglayer
 //! \{
 
@@ -67,16 +63,14 @@ class block_manager : public singleton<block_manager>
     size_t ndisks;
     block_manager();
 
-#if STXXL_MNG_COUNT_ALLOCATION
     //! total requested allocation in bytes
-    uint64 m_total_allocation;
+    uint64 total_allocation_;
 
     //! currently allocated bytes
-    uint64 m_current_allocation;
+    uint64 current_allocation_;
 
     //! maximum number of bytes allocated during program run.
-    uint64 m_maximum_allocation;
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    uint64 maximum_allocation_;
 
 protected:
     template <class BIDType, class DiskAssignFunctor, class BIDIteratorClass>
@@ -166,19 +160,17 @@ public:
 
     ~block_manager();
 
-#if STXXL_MNG_COUNT_ALLOCATION
     //! return total requested allocation in bytes
-    uint64 get_total_allocation() const
-    { return m_total_allocation; }
+    uint64 total_allocation() const
+    { return total_allocation_; }
 
     //! return currently allocated bytes
-    uint64 get_current_allocation() const
-    { return m_current_allocation; }
+    uint64 current_allocation() const
+    { return current_allocation_; }
 
     //! return maximum number of bytes allocated during program run.
-    uint64 get_maximum_allocation() const
-    { return m_maximum_allocation; }
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    uint64 maximum_allocation() const
+    { return maximum_allocation_; }
 };
 
 template <class BIDType, class DiskAssignFunctor, class OutputIterator>
@@ -227,11 +219,9 @@ void block_manager::new_blocks_int(
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:new    " << FMT_BID(bid));
     }
 
-#if STXXL_MNG_COUNT_ALLOCATION
-    m_total_allocation += nblocks * BIDType::size;
-    m_current_allocation += nblocks * BIDType::size;
-    m_maximum_allocation = std::max(m_maximum_allocation, m_current_allocation);
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    total_allocation_ += nblocks * BIDType::size;
+    current_allocation_ += nblocks * BIDType::size;
+    maximum_allocation_ = std::max(maximum_allocation_, current_allocation_);
 }
 
 template <size_t BlockSize>
@@ -248,9 +238,7 @@ void block_manager::delete_block(const BID<BlockSize>& bid)
     block_allocators_[bid.storage->get_allocator_id()]->delete_block(bid);
     disk_files_[bid.storage->get_allocator_id()]->discard(bid.offset, bid.size);
 
-#if STXXL_MNG_COUNT_ALLOCATION
-    m_current_allocation -= BlockSize;
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    current_allocation_ -= BlockSize;
 }
 
 template <class BIDIteratorClass>

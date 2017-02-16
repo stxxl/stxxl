@@ -82,11 +82,9 @@ block_manager::block_manager()
                   " MiB");
     }
 
-#if STXXL_MNG_COUNT_ALLOCATION
-    m_current_allocation = 0;
-    m_total_allocation = 0;
-    m_maximum_allocation = 0;
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    current_allocation_ = 0;
+    total_allocation_ = 0;
+    maximum_allocation_ = 0;
 }
 
 block_manager::~block_manager()
