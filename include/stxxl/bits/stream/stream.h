@@ -38,7 +38,7 @@ namespace stream {
 //! A model of stream that retrieves the data from an input iterator.
 //! For convenience use \c streamify function instead of direct instantiation
 //! of \c iterator2stream .
-template <class InputIterator>
+template <typename InputIterator>
 class iterator2stream
 {
     InputIterator m_current, m_end;
@@ -85,14 +85,14 @@ public:
 //! \param begin iterator, pointing to the first value
 //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
 //! \return an instance of a stream object
-template <class InputIterator>
-iterator2stream<InputIterator> streamify(InputIterator begin, InputIterator end)
+template <typename InputIterator>
+auto streamify(InputIterator first, InputIterator last)
 {
-    return iterator2stream<InputIterator>(begin, end);
+    return iterator2stream<InputIterator>(first, last);
 }
 
 //! Traits class of \c streamify function.
-template <class InputIterator>
+template <typename InputIterator>
 struct streamify_traits
 {
     //! return type (stream type) of \c streamify for \c InputIterator.
@@ -103,7 +103,7 @@ struct streamify_traits
 //! iterator.  It is more efficient than generic \c iterator2stream thanks to
 //! use of overlapping For convenience use \c streamify function instead of
 //! direct instantiation of \c vector_iterator2stream .
-template <class InputIterator>
+template <typename InputIterator>
 class vector_iterator2stream
 {
     InputIterator m_current, m_end;
@@ -201,28 +201,21 @@ public:
 //! \return an instance of a stream object
 
 template <typename VectorConfig>
-vector_iterator2stream<
-    stxxl::vector_iterator<VectorConfig>
-    >
-streamify(
-    stxxl::vector_iterator<VectorConfig> begin,
-    stxxl::vector_iterator<VectorConfig> end,
+auto streamify(
+    stxxl::vector_iterator<VectorConfig> first,
+    stxxl::vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for vector_iterator range is called");
-    return vector_iterator2stream<
-        stxxl::vector_iterator<VectorConfig>
-        >(begin, end, nbuffers);
+    return vector_iterator2stream<stxxl::vector_iterator<VectorConfig>>(
+        first, last, nbuffers);
 }
 
 template <typename VectorConfig>
-struct streamify_traits<
-    stxxl::vector_iterator<VectorConfig>
-    >
+struct streamify_traits<stxxl::vector_iterator<VectorConfig>>
 {
-    typedef vector_iterator2stream<
-            stxxl::vector_iterator<VectorConfig>
-            > stream_type;
+    typedef vector_iterator2stream<stxxl::vector_iterator<VectorConfig>>
+        stream_type;
 };
 
 //! Input external \c stxxl::vector const iterator range to stream converter.
@@ -234,28 +227,21 @@ struct streamify_traits<
 //! \return an instance of a stream object
 
 template <typename VectorConfig>
-vector_iterator2stream<
-    stxxl::const_vector_iterator<VectorConfig>
-    >
-streamify(
-    stxxl::const_vector_iterator<VectorConfig> begin,
-    stxxl::const_vector_iterator<VectorConfig> end,
+auto streamify(
+    stxxl::const_vector_iterator<VectorConfig> first,
+    stxxl::const_vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
-    return vector_iterator2stream<
-        stxxl::const_vector_iterator<VectorConfig>
-        >(begin, end, nbuffers);
+    return vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig>>(
+        first, last, nbuffers);
 }
 
 template <typename VectorConfig>
-struct streamify_traits<
-    stxxl::const_vector_iterator<VectorConfig>
-    >
+struct streamify_traits<stxxl::const_vector_iterator<VectorConfig>>
 {
-    typedef vector_iterator2stream<
-            stxxl::const_vector_iterator<VectorConfig>
-            > stream_type;
+    typedef vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig>>
+        stream_type;
 };
 
 //! Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
@@ -264,7 +250,7 @@ struct streamify_traits<
 //! \c vector_iterator2stream and \c iterator2stream .
 //! iterator2stream is chosen if the input iterator range
 //! is small ( < B )
-template <class InputIterator>
+template <typename InputIterator>
 class vector_iterator2stream_sr
 {
     vector_iterator2stream<InputIterator>* vec_it_stream;
@@ -344,35 +330,27 @@ public:
 //! Version of \c streamify. Switches from \c vector_iterator2stream to \c
 //! iterator2stream for small ranges.
 template <typename VectorConfig>
-vector_iterator2stream_sr<
-    stxxl::vector_iterator<VectorConfig>
-    >
-streamify_sr(
-    stxxl::vector_iterator<VectorConfig> begin,
-    stxxl::vector_iterator<VectorConfig> end,
+auto streamify_sr(
+    stxxl::vector_iterator<VectorConfig> first,
+    stxxl::vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
-    return vector_iterator2stream_sr<
-        stxxl::vector_iterator<VectorConfig>
-        >(begin, end, nbuffers);
+    return vector_iterator2stream_sr<stxxl::vector_iterator<VectorConfig>>(
+        first, last, nbuffers);
 }
 
 //! Version of \c streamify. Switches from \c vector_iterator2stream to \c
 //! iterator2stream for small ranges.
 template <typename VectorConfig>
-vector_iterator2stream_sr<
-    stxxl::const_vector_iterator<VectorConfig>
-    >
-streamify_sr(
-    stxxl::const_vector_iterator<VectorConfig> begin,
-    stxxl::const_vector_iterator<VectorConfig> end,
+auto streamify_sr(
+    stxxl::const_vector_iterator<VectorConfig> first,
+    stxxl::const_vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
     return vector_iterator2stream_sr<
-        stxxl::const_vector_iterator<VectorConfig>
-        >(begin, end, nbuffers);
+        stxxl::const_vector_iterator<VectorConfig>>(first, last, nbuffers);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -382,7 +360,7 @@ streamify_sr(
 //! A model of stream that outputs data from an adaptable generator functor.
 //! For convenience use \c streamify function instead of direct instantiation
 //! of \c generator2stream .
-template <class Generator, typename T = typename Generator::value_type>
+template <typename Generator, typename T = typename Generator::value_type>
 class generator2stream
 {
 public:
@@ -428,8 +406,8 @@ public:
 //! Adaptable generator to stream converter.
 //! \param gen_ generator object
 //! \return an instance of a stream object
-template <class Generator>
-generator2stream<Generator> streamify(Generator gen_)
+template <typename Generator>
+auto streamify(Generator gen_)
 {
     return generator2stream<Generator>(gen_);
 }
