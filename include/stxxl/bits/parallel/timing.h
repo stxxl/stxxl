@@ -20,9 +20,9 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/tags.h>
 
+#include <cassert>
 #include <cstdio>
 #include <cstring>
-#include <cassert>
 
 #if STXXL_PARALLEL
   #include <omp.h>

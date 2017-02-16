@@ -1,4 +1,6 @@
 /***************************************************************************
+ *  include/stxxl/bits/algo/trigger_entry.h
+ *
  *  include/stxxl/bits/algo/adaptor.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
@@ -12,11 +14,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_ALGO_ADAPTOR_HEADER
-#define STXXL_ALGO_ADAPTOR_HEADER
+#ifndef STXXL_ALGO_TRIGGER_ENTRY_HEADER
+#define STXXL_ALGO_TRIGGER_ENTRY_HEADER
 
-#include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/algo/bid_adapter.h>
+#include <stxxl/bits/mng/bid.h>
 
 namespace stxxl {
 
@@ -248,4 +250,4 @@ make_bid_iterator(Iterator iter)
 
 } // namespace stxxl
 
-#endif // !STXXL_ALGO_ADAPTOR_HEADER
+#endif // !STXXL_ALGO_TRIGGER_ENTRY_HEADER

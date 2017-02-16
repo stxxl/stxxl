@@ -13,22 +13,22 @@
 #ifndef STXXL_MNG_BLOCK_SCHEDULER_HEADER
 #define STXXL_MNG_BLOCK_SCHEDULER_HEADER
 
+#include <stxxl/bits/common/addressable_queues.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/common/addressable_queues.h>
 
 #include <algorithm>
-#include <vector>
-#include <list>
-#include <functional>
-#include <utility>
-#include <string>
-#include <map>
 #include <deque>
-#include <stack>
+#include <functional>
+#include <limits>
+#include <list>
+#include <map>
 #include <queue>
 #include <set>
-#include <limits>
+#include <stack>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 

@@ -11,11 +11,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
 #include <stxxl/aligned_alloc>
+#include <stxxl/io>
 
-#include <limits>
 #include <cstring>
+#include <limits>
 
 //! \example io/test_io.cpp
 //! This is an example of use of \c \<stxxl\> files, requests, and

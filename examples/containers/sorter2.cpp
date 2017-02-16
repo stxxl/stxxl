@@ -10,11 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <limits>
+#include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/stats>
 #include <stxxl/timer>
-#include <stxxl/random>
-#include <limits>
 
 struct TwoInteger
 {

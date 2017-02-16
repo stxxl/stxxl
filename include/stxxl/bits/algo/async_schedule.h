@@ -19,8 +19,8 @@
 // and queued writing on parallel disks, 2005
 // DOI: 10.1137/S0097539703431573
 
-#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/types.h>
 
 namespace stxxl {
 

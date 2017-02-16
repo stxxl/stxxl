@@ -30,8 +30,8 @@
 
 // these exist on Windows and Unixs
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 // required for ::remove()
 #include <cstdio>

@@ -12,11 +12,11 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
-#include <iostream>
 #include <algorithm>
-#include <stxxl/vector>
+#include <iostream>
 #include <stxxl/scan>
 #include <stxxl/stream>
+#include <stxxl/vector>
 
 struct my_type  // 24 bytes, not a power of 2 intentionally
 {

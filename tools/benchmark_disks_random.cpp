@@ -21,14 +21,14 @@
         "disk.log" using ($2/1024):($4)  w l title "write"
  */
 
+#include <stxxl/cmdline>
 #include <stxxl/io>
 #include <stxxl/mng>
-#include <stxxl/cmdline>
 
+#include <algorithm>
+#include <ctime>
 #include <iomanip>
 #include <vector>
-#include <ctime>
-#include <algorithm>
 
 using stxxl::request_ptr;
 using stxxl::timestamp;

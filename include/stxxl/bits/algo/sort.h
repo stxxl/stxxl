@@ -16,31 +16,31 @@
 #ifndef STXXL_ALGO_SORT_HEADER
 #define STXXL_ALGO_SORT_HEADER
 
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/algo/bid_adapter.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/settings.h>
-#include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
-#include <stxxl/bits/io/request_operations.h>
+#include <stxxl/bits/algo/inmemsort.h>
+#include <stxxl/bits/algo/intksort.h>
+#include <stxxl/bits/algo/losertree.h>
+#include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
-#include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/trigger_entry.h>
-#include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/common/settings.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/io/request_operations.h>
+#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/block_prefetcher.h>
 #include <stxxl/bits/mng/buf_writer.h>
-#include <stxxl/bits/algo/run_cursor.h>
-#include <stxxl/bits/algo/losertree.h>
-#include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/common/is_sorted.h>
 
-#include <vector>
-#include <utility>
-#include <functional>
 #include <algorithm>
+#include <functional>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 

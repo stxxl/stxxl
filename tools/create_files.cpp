@@ -11,9 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/io>
 
 #include <cstdio>
 #include <iomanip>

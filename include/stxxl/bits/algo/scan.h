@@ -15,9 +15,9 @@
 #ifndef STXXL_ALGO_SCAN_HEADER
 #define STXXL_ALGO_SCAN_HEADER
 
-#include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
+#include <stxxl/bits/mng/config.h>
 
 namespace stxxl {
 

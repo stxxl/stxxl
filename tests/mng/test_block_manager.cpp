@@ -14,12 +14,12 @@
 //! This is an example of use of completion handlers, \c stxxl::block_manager, and
 //! \c stxxl::typed_block
 
-#include <stxxl/request>
-#include <stxxl/mng>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/mng>
+#include <stxxl/request>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #define BLOCK_SIZE (1024 * 512)
 

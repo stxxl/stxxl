@@ -19,10 +19,10 @@
 
 #include <stxxl/bits/parallel/compiletime_settings.h>
 
-#include <iterator>
-#include <cassert>
-#include <utility>
 #include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <utility>
 
 namespace stxxl {
 namespace parallel {

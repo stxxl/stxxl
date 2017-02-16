@@ -15,9 +15,9 @@
 #ifndef STXXL_IO_REQUEST_OPERATIONS_HEADER
 #define STXXL_IO_REQUEST_OPERATIONS_HEADER
 
-#include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/onoff_switch.h>
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
 
 namespace stxxl {
 

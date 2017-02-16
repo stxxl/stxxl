@@ -20,13 +20,14 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/mmap_file.h>
-#include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/wincall_file.h>
+#include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
+
 #include "ufs_platform.h"
 
 #include <cassert>

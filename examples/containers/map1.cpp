@@ -11,9 +11,9 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/map>
 #include <iostream>
 #include <limits>
+#include <stxxl/map>
 #include <utility>
 
 #define DATA_NODE_BLOCK_SIZE (4096)

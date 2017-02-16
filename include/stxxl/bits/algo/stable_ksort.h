@@ -17,13 +17,13 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
+#include <stxxl/bits/algo/intksort.h>
+#include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/algo/intksort.h>
-#include <stxxl/bits/algo/sort_base.h>
-#include <stxxl/bits/common/utils.h>
 
 #include <algorithm>
 

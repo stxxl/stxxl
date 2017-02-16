@@ -21,9 +21,9 @@
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/config.h>
 
-#include <sstream>
 #include <cerrno>
 #include <cstring>
+#include <sstream>
 
 namespace stxxl {
 

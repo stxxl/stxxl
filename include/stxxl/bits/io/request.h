@@ -15,15 +15,15 @@
 #ifndef STXXL_IO_REQUEST_HEADER
 #define STXXL_IO_REQUEST_HEADER
 
-#include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/verbose.h>
 
-#include <string>
 #include <cassert>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
 
 namespace stxxl {
 

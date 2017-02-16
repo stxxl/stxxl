@@ -13,10 +13,10 @@
 //! \example mng/test_buf_streams.cpp
 //! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream
 
-#include <stxxl/mng>
-#include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_istream_reverse.h>
+#include <stxxl/bits/mng/buf_ostream.h>
+#include <stxxl/mng>
 
 #include <iostream>
 

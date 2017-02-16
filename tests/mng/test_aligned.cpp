@@ -15,8 +15,8 @@
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE0
 
 #include <iostream>
-#include <vector>
 #include <stxxl/mng>
+#include <vector>
 
 #define BLOCK_SIZE (512 * 1024)
 

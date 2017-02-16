@@ -12,6 +12,7 @@
 
 //! [example]
 #include <stxxl/bits/containers/matrix.h>
+
 #include <iostream>
 
 int main()

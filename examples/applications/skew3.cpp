@@ -18,6 +18,7 @@
  **************************************************************************/
 
 #include <stxxl/algorithm>
+#include <stxxl/bits/common/uint_types.h>
 #include <stxxl/cmdline>
 #include <stxxl/io>
 #include <stxxl/random>
@@ -25,7 +26,6 @@
 #include <stxxl/stats>
 #include <stxxl/stream>
 #include <stxxl/vector>
-#include <stxxl/bits/common/uint_types.h>
 
 #include <algorithm>
 #include <cassert>

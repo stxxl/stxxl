@@ -14,8 +14,10 @@
 #ifndef STXXL_ALGO_RUN_CURSOR_HEADER
 #define STXXL_ALGO_RUN_CURSOR_HEADER
 
-#include <cstdlib>
 #include <stxxl/bits/common/types.h>
+
+#include <cassert>
+#include <cstdlib>
 
 namespace stxxl {
 

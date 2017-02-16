@@ -17,9 +17,9 @@
 #ifndef STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 #define STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 
+#include <cstdio>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/settings.h>
-#include <cstdio>
 
 namespace stxxl {
 namespace parallel {

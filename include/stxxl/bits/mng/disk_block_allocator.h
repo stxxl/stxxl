@@ -16,18 +16,18 @@
 #ifndef STXXL_MNG_DISK_BLOCK_ALLOCATOR_HEADER
 #define STXXL_MNG_DISK_BLOCK_ALLOCATOR_HEADER
 
-#include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/verbose.h>
 
-#include <mutex>
 #include <algorithm>
 #include <cassert>
 #include <map>
+#include <mutex>
 #include <ostream>
 #include <utility>
 
@@ -78,9 +78,9 @@ class disk_block_allocator
     }
 
 public:
-    disk_block_allocator(stxxl::file* storage_, const disk_config& cfg)
+    disk_block_allocator(stxxl::file* storage, const disk_config& cfg)
         : cfg_bytes_(cfg.size),
-          storage_(storage_),
+          storage_(storage),
           autogrow_(cfg.autogrow)
     {
         // initial growth to configured file size

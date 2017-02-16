@@ -19,9 +19,9 @@
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/mng/config.h>
 
-#include <string>
 #include <ostream>
 #include <stdexcept>
+#include <string>
 
 namespace stxxl {
 

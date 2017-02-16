@@ -11,8 +11,8 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/deque>
 #include <iostream>
+#include <stxxl/deque>
 
 int main()
 {

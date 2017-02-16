@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/deque>
 #include <iostream>
+#include <stxxl/deque>
 
 int main()
 {

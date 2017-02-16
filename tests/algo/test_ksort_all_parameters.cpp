@@ -13,11 +13,11 @@
 
 //#define PLAY_WITH_OPT_PREF
 
-#include <stxxl/mng>
 #include <stxxl/ksort>
-#include <stxxl/vector>
+#include <stxxl/mng>
 #include <stxxl/random>
 #include <stxxl/scan>
+#include <stxxl/vector>
 
 #include <vector>
 

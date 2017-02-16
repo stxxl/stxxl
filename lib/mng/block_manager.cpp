@@ -16,11 +16,11 @@
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/create_file.h>
+#include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/disk_block_allocator.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/io/disk_queues.h>
 
 #include <cstddef>
 #include <string>

@@ -11,12 +11,12 @@
  **************************************************************************/
 
 #include <stxxl/bits/containers/btree/btree.h>
+#include <stxxl/random_shuffle>
 #include <stxxl/scan>
 #include <stxxl/sort>
-#include <stxxl/random_shuffle>
 
-#include <iostream>
 #include <ctime>
+#include <iostream>
 
 struct comp_type : public std::less<int>
 {

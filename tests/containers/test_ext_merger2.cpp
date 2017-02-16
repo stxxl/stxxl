@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <limits>
 #include <iterator>
+#include <limits>
 #include <stxxl/priority_queue>
 
 typedef int my_type;

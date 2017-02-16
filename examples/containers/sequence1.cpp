@@ -11,8 +11,8 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/sequence>
 #include <iostream>
+#include <stxxl/sequence>
 
 int main()
 {

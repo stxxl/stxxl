@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/file.h>
 #include "ufs_platform.h"
+#include <stxxl/bits/io/file.h>
 
 namespace stxxl {
 

@@ -13,9 +13,9 @@
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/utils.h>
 
-#include <iomanip>
-#include <cstring>
 #include <algorithm>
+#include <cstring>
+#include <iomanip>
 
 namespace stxxl {
 

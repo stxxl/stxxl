@@ -19,15 +19,15 @@
  #define STXXL_IO_STATS 1
 #endif
 
-#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/unused.h>
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/singleton.h>
+#include <stxxl/bits/unused.h>
 
-#include <mutex>
 #include <iostream>
+#include <mutex>
 #include <string>
 
 namespace stxxl {

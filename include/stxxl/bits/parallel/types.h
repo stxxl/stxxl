@@ -17,8 +17,8 @@
 #ifndef STXXL_PARALLEL_TYPES_HEADER
 #define STXXL_PARALLEL_TYPES_HEADER
 
-#include <stxxl/bits/common/types.h>
 #include <cstdlib>
+#include <stxxl/bits/common/types.h>
 
 namespace stxxl {
 namespace parallel {

@@ -11,8 +11,8 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/vector>
 #include <iostream>
+#include <stxxl/vector>
 
 int main()
 {

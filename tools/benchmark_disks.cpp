@@ -26,15 +26,15 @@
         "disk.log" using ($2/1024):($4)  w l title "write"
  */
 
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/io>
 #include <stxxl/mng>
-#include <stxxl/bits/common/cmdline.h>
 
+#include <algorithm>
 #include <iomanip>
-#include <vector>
 #include <limits>
 #include <string>
-#include <algorithm>
+#include <vector>
 
 using stxxl::timestamp;
 using stxxl::external_size_type;

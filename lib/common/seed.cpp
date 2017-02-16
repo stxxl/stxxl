@@ -23,8 +23,8 @@
   #include <io.h>
   #include <windows.h>
 #else
-  #include <unistd.h>
   #include <sys/time.h>
+  #include <unistd.h>
 #endif
 
 namespace stxxl {

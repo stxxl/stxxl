@@ -14,8 +14,8 @@
 #define STXXL_ALGO_INTKSORT_HEADER
 
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/unused.h>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/bits/unused.h>
 
 #include <algorithm>
 #include <cassert>

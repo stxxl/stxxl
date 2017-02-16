@@ -12,16 +12,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/log.h>
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/verbose.h>
 
-#include <mutex>
-#include <string>
-#include <sstream>
 #include <iomanip>
+#include <mutex>
+#include <sstream>
+#include <string>
 
 namespace stxxl {
 

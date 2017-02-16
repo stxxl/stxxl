@@ -18,10 +18,10 @@ static const char* description =
     "cycle or fill/intermixed inserts/deletes.";
 
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
-#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/bits/unused.h>
+#include <stxxl/bits/verbose.h>
 #include <stxxl/cmdline>
 #include <stxxl/random>
 #include <stxxl/sorter>

@@ -13,9 +13,9 @@
 #ifndef STXXL_COMMON_TUPLE_HEADER
 #define STXXL_COMMON_TUPLE_HEADER
 
-#include <stxxl/bits/common/tmeta.h>
 #include <limits>
 #include <ostream>
+#include <stxxl/bits/common/tmeta.h>
 
 namespace stxxl {
 

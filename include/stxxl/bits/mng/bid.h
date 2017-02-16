@@ -16,13 +16,13 @@
 #ifndef STXXL_MNG_BID_HEADER
 #define STXXL_MNG_BID_HEADER
 
-#include <stxxl/bits/io/file.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/io/file.h>
 
 #include <cstring>
-#include <ostream>
 #include <iomanip>
+#include <ostream>
 
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2

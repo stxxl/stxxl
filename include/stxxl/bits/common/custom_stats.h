@@ -16,9 +16,9 @@
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/utils.h>
 
+#include <algorithm>
 #include <string>
 #include <utility>
-#include <algorithm>
 
 namespace stxxl {
 

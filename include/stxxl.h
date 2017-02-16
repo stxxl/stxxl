@@ -19,16 +19,16 @@
 
 #include <stxxl/mng>
 
-#include <stxxl/vector>
-#include <stxxl/stack>
 #include <stxxl/priority_queue>
+#include <stxxl/stack>
+#include <stxxl/vector>
 #if ! defined(__GNUG__) || ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 30400)
 // map does not work with g++ 3.3
 #include <stxxl/map>
 #endif
-#include <stxxl/unordered_map>
-#include <stxxl/queue>
 #include <stxxl/deque>
+#include <stxxl/queue>
+#include <stxxl/unordered_map>
 
 #include <stxxl/algorithm>
 

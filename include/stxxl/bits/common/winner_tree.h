@@ -18,9 +18,9 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 
-#include <vector>
 #include <limits>
 #include <string>
+#include <vector>
 
 namespace stxxl {
 

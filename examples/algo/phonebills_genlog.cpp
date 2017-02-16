@@ -12,8 +12,8 @@
 
 #include <stxxl.h>
 
-#include <fstream>
 #include <ctime>
+#include <fstream>
 
 struct LogEntry
 {

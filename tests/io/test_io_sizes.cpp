@@ -10,9 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/io>
 
 //! \example io/test_io_sizes.cpp
 //! This tests the maximum chunk size that a file type can handle with a single request.

@@ -16,15 +16,15 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
-#include <stxxl/cmdline>
-#include <stxxl/vector>
-#include <stxxl/sort>
-#include <stxxl/ksort>
-#include <stxxl/stream>
 #include <stxxl/bits/common/tuple.h>
+#include <stxxl/cmdline>
+#include <stxxl/ksort>
+#include <stxxl/sort>
+#include <stxxl/stream>
+#include <stxxl/vector>
 
-#include <limits>
 #include <cstdint>
+#include <limits>
 
 using stxxl::timestamp;
 using stxxl::external_size_type;

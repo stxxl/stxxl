@@ -17,20 +17,20 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/parallel/merge.h>
-#include <stxxl/bits/parallel/losertree.h>
-#include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/equally_split.h>
+#include <stxxl/bits/parallel/losertree.h>
+#include <stxxl/bits/parallel/merge.h>
 #include <stxxl/bits/parallel/multiseq_selection.h>
-#include <stxxl/bits/parallel/timing.h>
+#include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/tags.h>
+#include <stxxl/bits/parallel/timing.h>
+#include <stxxl/bits/verbose.h>
 
-#include <vector>
-#include <iterator>
 #include <algorithm>
+#include <iterator>
+#include <vector>
 
 #if defined(_MSC_VER) && STXXL_DEBUG_ASSERTIONS
 #include <BaseTsd.h>

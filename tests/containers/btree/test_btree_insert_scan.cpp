@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
 #include <ctime>
+#include <iostream>
 
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/scan>

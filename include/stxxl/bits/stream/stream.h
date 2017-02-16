@@ -15,10 +15,10 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
+#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/vector>
 
 #include <memory>
@@ -1258,8 +1258,8 @@ public:
 } // namespace stxxl
 
 #include <stxxl/bits/stream/choose.h>
-#include <stxxl/bits/stream/unique.h>
 #include <stxxl/bits/stream/materialize.h>
+#include <stxxl/bits/stream/unique.h>
 
 #endif // !STXXL_STREAM_STREAM_HEADER
 // vim: et:ts=4:sw=4

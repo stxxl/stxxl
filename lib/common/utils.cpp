@@ -13,8 +13,8 @@
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 #include <string>
 
 namespace stxxl {

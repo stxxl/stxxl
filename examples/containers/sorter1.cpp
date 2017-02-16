@@ -11,10 +11,10 @@
  **************************************************************************/
 
 //! [example]
+#include <limits>
 #include <stxxl/sorter>
 #include <stxxl/stats>
 #include <stxxl/timer>
-#include <limits>
 
 struct my_comparator
 {

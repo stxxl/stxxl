@@ -18,9 +18,9 @@
 
 #if STXXL_HAVE_LINUXAIO_FILE
 
-#include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 #include <string>
 

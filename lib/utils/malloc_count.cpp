@@ -22,10 +22,10 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/utils/malloc_count.h>
 
+#include <clocale>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cstdio>
-#include <clocale>
 #include <dlfcn.h>
 
 /* user-defined options for output malloc()/free() operations to stderr */

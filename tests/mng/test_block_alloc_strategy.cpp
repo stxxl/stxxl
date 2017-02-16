@@ -12,9 +12,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/mng>
-#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
+#include <stxxl/mng>
 
 template <typename strategy>
 void test_strategy()

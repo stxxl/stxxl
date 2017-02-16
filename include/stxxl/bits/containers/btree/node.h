@@ -16,9 +16,9 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/node_cache.h>
 
-#include <utility>
 #include <algorithm>
 #include <functional>
+#include <utility>
 
 namespace stxxl {
 namespace btree {

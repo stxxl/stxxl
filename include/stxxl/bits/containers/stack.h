@@ -14,16 +14,16 @@
 #ifndef STXXL_CONTAINERS_STACK_HEADER
 #define STXXL_CONTAINERS_STACK_HEADER
 
+#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/tmeta.h>
-#include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/mng/read_write_pool.h>
-#include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
+#include <stxxl/bits/mng/read_write_pool.h>
+#include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/bits/mng/write_pool.h>
 
 #include <algorithm>
 #include <stack>

@@ -12,12 +12,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/sorter>
 #include <stxxl/stream>
 #include <stxxl/vector>
-#include <stxxl/sorter>
 
-#include <vector>
 #include <climits>
+#include <vector>
 
 struct counter_object
 {

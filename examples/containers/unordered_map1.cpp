@@ -12,8 +12,8 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/unordered_map>
 #include <iostream>
+#include <stxxl/unordered_map>
 
 //! [hash]
 struct HashFunctor

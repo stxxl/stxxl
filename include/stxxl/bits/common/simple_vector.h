@@ -15,12 +15,12 @@
 #ifndef STXXL_COMMON_SIMPLE_VECTOR_HEADER
 #define STXXL_COMMON_SIMPLE_VECTOR_HEADER
 
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/verbose.h>
 
 #include <algorithm>
-#include <cstring>
 #include <cassert>
+#include <cstring>
 
 namespace stxxl {
 

@@ -16,8 +16,8 @@
 #ifndef STXXL_IO_SYSCALL_FILE_HEADER
 #define STXXL_IO_SYSCALL_FILE_HEADER
 
-#include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 #include <string>
 

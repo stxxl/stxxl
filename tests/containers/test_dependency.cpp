@@ -1,4 +1,6 @@
 /***************************************************************************
+ *  tests/containers/test_dependency.cpp
+ *
  *  tests/containers/test_ext_merger.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
@@ -10,76 +12,75 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-
 #include <stxxl/priority_queue>
-#include <stxxl/vector>
 #include <stxxl/sorter>
-
+#include <stxxl/vector>
 #include <stxxl/deque>
 #include <stxxl/map>
 #include <stxxl/queue>
 #include <stxxl/sequence>
 #include <stxxl/unordered_map>
 
+#include <iostream>
+
 struct MinimalType {
     size_t a;
 
-    MinimalType(size_t a = 0) : a(a) {
-
-    }
+    MinimalType(size_t a = 0) : a(a) { }
 };
 
 struct MinimalTypeWithEq : public MinimalType {
     size_t a;
 
-    MinimalTypeWithEq(size_t a = 0) : a(a) {
+    MinimalTypeWithEq(size_t a = 0) : a(a) { }
 
-    }
-
-    bool operator==(const MinimalType o) const {
+    bool operator == (const MinimalType o) const
+    {
         return a == o.a;
     }
 };
 
-
 template <typename T>
 struct CompareLessWithMin {
-    bool operator() (const T& a, const T& b) const {
+    bool operator () (const T& a, const T& b) const
+    {
         return a.a < b.a;
     }
-    T min_value() const {return {0};}
+    T min_value() const { return { 0 }; }
 };
 
 template <typename T>
 struct CompareLessWithMax {
-    bool operator() (const T& a, const T& b) const {
+    bool operator () (const T& a, const T& b) const
+    {
         return a.a < b.a;
     }
-    T max_value() const {return {std::numeric_limits<size_t>::max()};}
+    T max_value() const { return { std::numeric_limits<size_t>::max() }; }
 };
 
 template <typename T>
 struct CompareLessWithMinMax {
-    bool operator()(const T &a, const T &b) const {
+    bool operator () (const T& a, const T& b) const
+    {
         return a.a < b.a;
     }
 
-    T min_value() const { return {0}; }
-    T max_value() const { return {std::numeric_limits<size_t>::max()}; };
+    T min_value() const { return { 0 }; }
+    T max_value() const { return { std::numeric_limits<size_t>::max() }; }
 };
 
 template <typename T>
 struct HashFunctor
 {
-    size_t operator () (const T& a) const {
+    size_t operator () (const T& a) const
+    {
         return a.a;
     }
 };
 
 template class stxxl::priority_queue<
         stxxl::priority_queue_config<MinimalType, CompareLessWithMin<MinimalType>, 32ul, 256ul, 16ul, 2ul, 16384ul, 16ul, 2ul, stxxl::random_cyclic>
->;
+        >;
 
 template class stxxl::vector<MinimalType>;
 
@@ -95,10 +96,10 @@ template class stxxl::sequence<MinimalType>;
 
 template class stxxl::unordered_map<
         MinimalType, MinimalType, HashFunctor<MinimalType>, CompareLessWithMinMax<MinimalType>, 1024, 128
->;
+        >;
 
-
-int main() {
+int main()
+{
     std::cout << "Nothing to see here" << std::endl;
     return 0;
 }

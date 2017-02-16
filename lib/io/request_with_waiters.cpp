@@ -15,9 +15,9 @@
 #include <stxxl/bits/io/request_with_waiters.h>
 #include <stxxl/bits/parallel.h>
 
-#include <mutex>
 #include <algorithm>
 #include <functional>
+#include <mutex>
 
 namespace stxxl {
 

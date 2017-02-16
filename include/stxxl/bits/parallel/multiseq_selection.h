@@ -19,15 +19,15 @@
 #ifndef STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 #define STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 
-#include <stxxl/bits/parallel/types.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
+#include <stxxl/bits/parallel/types.h>
 
-#include <utility>
-#include <functional>
-#include <vector>
-#include <queue>
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
+#include <functional>
+#include <queue>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 namespace parallel {

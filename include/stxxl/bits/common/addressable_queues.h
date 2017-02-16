@@ -13,11 +13,12 @@
 #ifndef STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER
 #define STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER
 
-#include <set>
-#include <list>
-#include <utility>
+#include <cassert>
 #include <functional>
+#include <list>
 #include <map>
+#include <set>
+#include <utility>
 
 namespace stxxl {
 

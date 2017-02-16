@@ -16,10 +16,10 @@
 #ifndef STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 #define STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/io/request_queue.h>
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/shared_state.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/io/request_queue.h>
 
 #include <thread>
 

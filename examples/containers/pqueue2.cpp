@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/priority_queue>
 #include <limits>
+#include <stxxl/priority_queue>
 
 // comparison struct for priority queue where top() returns the biggest contained value:
 struct Cmp

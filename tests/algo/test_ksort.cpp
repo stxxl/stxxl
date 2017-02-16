@@ -15,8 +15,8 @@
 //! \example algo/test_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
-#include <stxxl/mng>
 #include <stxxl/ksort>
+#include <stxxl/mng>
 #include <stxxl/vector>
 
 struct my_type

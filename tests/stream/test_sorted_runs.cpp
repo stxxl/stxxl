@@ -21,10 +21,10 @@
 
 #include <stxxl/stream>
 
-#include <vector>
 #include <algorithm>
 #include <functional>
 #include <limits>
+#include <vector>
 
 const unsigned long long megabyte = 1024 * 1024;
 

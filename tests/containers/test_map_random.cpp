@@ -18,6 +18,7 @@
 //! This is an example of use of \c stxxl::map container.
 
 #include <stxxl/map>
+
 #include "map_test_handlers.h"
 
 typedef int key_type;

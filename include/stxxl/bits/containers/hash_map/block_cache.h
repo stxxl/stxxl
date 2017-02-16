@@ -14,14 +14,14 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_BLOCK_CACHE_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_BLOCK_CACHE_HEADER
 
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/pager.h>
+#include <stxxl/bits/mng/block_manager.h>
 
-#include <utility>
 #include <algorithm>
-#include <vector>
 #include <list>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 namespace hash_map {

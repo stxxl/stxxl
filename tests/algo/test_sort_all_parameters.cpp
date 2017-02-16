@@ -14,10 +14,10 @@
 //#define PLAY_WITH_OPT_PREF
 
 #include <stxxl/mng>
-#include <stxxl/sort>
-#include <stxxl/scan>
-#include <stxxl/vector>
 #include <stxxl/random>
+#include <stxxl/scan>
+#include <stxxl/sort>
+#include <stxxl/vector>
 
 #include "test_sort_all_parameters.h"
 

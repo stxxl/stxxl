@@ -14,17 +14,17 @@
 #ifndef STXXL_IO_IO_HEADER
 #define STXXL_IO_IO_HEADER
 
-#include <stxxl/request>
-#include <stxxl/bits/io/file.h>
-#include <stxxl/bits/io/syscall_file.h>
-#include <stxxl/bits/io/mmap_file.h>
-#include <stxxl/bits/io/wincall_file.h>
-#include <stxxl/bits/io/memory_file.h>
-#include <stxxl/bits/io/fileperblock_file.h>
-#include <stxxl/bits/io/linuxaio_file.h>
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/disk_queues.h>
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/linuxaio_file.h>
+#include <stxxl/bits/io/memory_file.h>
+#include <stxxl/bits/io/mmap_file.h>
+#include <stxxl/bits/io/syscall_file.h>
+#include <stxxl/bits/io/wincall_file.h>
+#include <stxxl/request>
 
 //! \c STXXL library namespace
 namespace stxxl {

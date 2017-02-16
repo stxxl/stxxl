@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/mng/block_scheduler.h>
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/mng/block_scheduler.h>
 
 #include <iostream>
 #include <limits>

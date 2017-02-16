@@ -12,9 +12,9 @@
 
 //! \example mng/test_pool_pair.cpp
 
-#include <stxxl/mng>
 #include <stxxl/bits/mng/prefetch_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/mng>
 
 #include <iostream>
 

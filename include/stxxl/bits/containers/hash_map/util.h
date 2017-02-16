@@ -18,8 +18,8 @@
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_writer.h>
 
-#include <stxxl/bits/containers/hash_map/tuning.h>
 #include <stxxl/bits/containers/hash_map/block_cache.h>
+#include <stxxl/bits/containers/hash_map/tuning.h>
 
 namespace stxxl {
 namespace hash_map {

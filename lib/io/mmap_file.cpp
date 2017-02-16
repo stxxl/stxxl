@@ -15,9 +15,9 @@
 
 #if STXXL_HAVE_MMAP_FILE
 
-#include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/common/error_handling.h>
 #include "ufs_platform.h"
+#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/io/iostats.h>
 #include <sys/mman.h>
 
 namespace stxxl {

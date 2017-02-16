@@ -13,8 +13,8 @@
 #ifndef STXXL_MNG_READ_WRITE_POOL_HEADER
 #define STXXL_MNG_READ_WRITE_POOL_HEADER
 
-#include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
+#include <stxxl/bits/mng/write_pool.h>
 
 #include <algorithm>
 

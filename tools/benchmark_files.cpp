@@ -22,16 +22,16 @@
         "file.log" using ($3/1024):($7)  w l title "write"
  */
 
-#include <stxxl/io>
 #include <stxxl/aligned_alloc>
-#include <stxxl/timer>
-#include <stxxl/bits/version.h>
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/version.h>
+#include <stxxl/io>
+#include <stxxl/timer>
 
-#include <iomanip>
-#include <cstring>
-#include <vector>
 #include <algorithm>
+#include <cstring>
+#include <iomanip>
+#include <vector>
 
 using stxxl::request_ptr;
 using stxxl::file;

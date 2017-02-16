@@ -18,8 +18,9 @@
 #include <stxxl/bits/common/simple_vector.h>
 
 #include <algorithm>
-#include <list>
 #include <cassert>
+#include <list>
+#include <utility>
 
 namespace stxxl {
 

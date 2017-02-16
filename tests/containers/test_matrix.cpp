@@ -14,10 +14,10 @@
 #include <iostream>
 #include <limits>
 
-#include <stxxl/vector>
-#include <stxxl/stream>
-#include <stxxl/bits/containers/matrix.h>
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/containers/matrix.h>
+#include <stxxl/stream>
+#include <stxxl/vector>
 
 using stxxl::int_type;
 

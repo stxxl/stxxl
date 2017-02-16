@@ -15,8 +15,8 @@
 #define STXXL_COMMON_EXCEPTIONS_HEADER
 
 #include <iostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace stxxl {
 

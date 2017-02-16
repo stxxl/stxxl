@@ -22,8 +22,8 @@
 
 #include <linux/aio_abi.h>
 
-#include <mutex>
 #include <list>
+#include <mutex>
 
 namespace stxxl {
 

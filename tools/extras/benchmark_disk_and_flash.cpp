@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
 #include <stxxl/aligned_alloc>
+#include <stxxl/io>
 
 #include <iomanip>
 #include <vector>

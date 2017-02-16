@@ -18,10 +18,10 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
-#include <vector>
 #include <stxxl/io>
-#include <stxxl/vector>
 #include <stxxl/stream>
+#include <stxxl/vector>
+#include <vector>
 
 struct my_type
 {

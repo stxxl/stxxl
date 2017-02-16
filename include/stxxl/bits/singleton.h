@@ -13,11 +13,11 @@
 #ifndef STXXL_SINGLETON_HEADER
 #define STXXL_SINGLETON_HEADER
 
-#include <stxxl/types>
 #include <stxxl/bits/common/exithandler.h>
+#include <stxxl/types>
 
-#include <mutex>
 #include <cstdlib>
+#include <mutex>
 
 namespace stxxl {
 

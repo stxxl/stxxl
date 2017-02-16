@@ -12,8 +12,8 @@
  **************************************************************************/
 
 #include <stxxl.h>
-#include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 
 #include <iostream>

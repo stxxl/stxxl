@@ -15,6 +15,7 @@
 #define STXXL_MNG_BLOCK_ALLOC_STRATEGY_HEADER
 
 #include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/mng/config.h>
 
 #include <algorithm>
 #include <random>
@@ -227,8 +228,8 @@ struct offset_allocator
 
     //! Creates functor based on instance of \c BaseAllocator functor.
     //! \param base_ used to create a copy
-    explicit offset_allocator(const BaseAllocator& base_)
-        : base_(base_), offset_(0) { }
+    explicit offset_allocator(const BaseAllocator& base)
+        : base_(base), offset_(0) { }
 
     //! Creates functor based on default \c BaseAllocator functor.
     offset_allocator() : offset_(0) { }

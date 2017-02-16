@@ -11,12 +11,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/memory_file.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/memory_file.h>
 
+#include <cassert>
 #include <cstring>
 #include <limits>
-#include <cassert>
 
 namespace stxxl {
 

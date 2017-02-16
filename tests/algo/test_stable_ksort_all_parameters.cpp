@@ -14,9 +14,9 @@
 //#define PLAY_WITH_OPT_PREF
 
 #include <stxxl/mng>
+#include <stxxl/random>
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
-#include <stxxl/random>
 
 #define KEY_COMPARE
 #include "test_sort_all_parameters.h"

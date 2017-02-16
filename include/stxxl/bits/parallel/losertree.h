@@ -20,8 +20,8 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/base.h>
 
-#include <functional>
 #include <algorithm>
+#include <functional>
 
 namespace stxxl {
 namespace parallel {

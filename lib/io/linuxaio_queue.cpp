@@ -15,14 +15,14 @@
 
 #if STXXL_HAVE_LINUXAIO_FILE
 
-#include <unistd.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
-#include <stxxl/bits/verbose.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/io/linuxaio_request.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
+#include <stxxl/bits/io/linuxaio_request.h>
+#include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/verbose.h>
 
 #include <algorithm>
 

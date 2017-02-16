@@ -11,12 +11,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/parallel.h>
 #include <stxxl/io>
 #include <stxxl/mng>
 #include <stxxl/version.h>
-#include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/common/cmdline.h>
-#include <stxxl/bits/parallel.h>
 
 #include <algorithm>
 

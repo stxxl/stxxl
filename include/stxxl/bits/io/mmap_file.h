@@ -19,8 +19,8 @@
 
 #if STXXL_HAVE_MMAP_FILE
 
-#include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 #include <string>
 

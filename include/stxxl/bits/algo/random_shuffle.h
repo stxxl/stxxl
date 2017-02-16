@@ -19,10 +19,10 @@
 //        (free stacks buffers)
 // TODO: shuffle small input in internal memory
 
+#include <stxxl/bits/parallel.h>
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/scan>
 #include <stxxl/stack>
-#include <stxxl/bits/parallel.h>
 
 namespace stxxl {
 

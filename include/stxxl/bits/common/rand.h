@@ -15,9 +15,9 @@
 #ifndef STXXL_COMMON_RAND_HEADER
 #define STXXL_COMMON_RAND_HEADER
 
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/config.h>
 
 #include <cmath>
 

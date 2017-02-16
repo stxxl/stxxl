@@ -15,12 +15,12 @@
 
 #if STXXL_HAVE_LINUXAIO_FILE
 
+#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/common/error_handling.h>
 
-#include <unistd.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
 namespace stxxl {
 

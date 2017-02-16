@@ -16,13 +16,13 @@
 #ifndef STXXL_COMMON_UINT_TYPES_HEADER
 #define STXXL_COMMON_UINT_TYPES_HEADER
 
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/config.h>
 
+#include <cassert>
 #include <limits>
 #include <ostream>
-#include <cassert>
 
 namespace stxxl {
 

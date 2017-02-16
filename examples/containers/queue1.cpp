@@ -11,8 +11,8 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/queue>
 #include <iostream>
+#include <stxxl/queue>
 
 int main()
 {

@@ -18,9 +18,9 @@
 //! array of sorted tuples (character, index position).
 
 #include <limits>
-#include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>
+#include <vector>
 
 // comment if you want to use one 'sort' algorithm without producing
 // intermediate sorted runs.

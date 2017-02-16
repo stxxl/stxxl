@@ -16,10 +16,10 @@
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/node_cache.h>
 
-#include <functional>
-#include <vector>
-#include <utility>
 #include <algorithm>
+#include <functional>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 namespace btree {

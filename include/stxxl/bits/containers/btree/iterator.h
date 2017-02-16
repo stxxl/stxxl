@@ -13,11 +13,11 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/verbose.h>
 
-#include <iterator>
 #include <cassert>
+#include <iterator>
 
 namespace stxxl {
 namespace btree {

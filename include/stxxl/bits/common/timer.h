@@ -16,9 +16,9 @@
 #ifndef STXXL_COMMON_TIMER_HEADER
 #define STXXL_COMMON_TIMER_HEADER
 
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/common/utils.h>
 
 #include <chrono>
 #include <limits>

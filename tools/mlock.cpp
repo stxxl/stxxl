@@ -20,8 +20,8 @@
 
 #if STXXL_HAVE_MLOCK_PROTO
 
-#include <unistd.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 #include <cerrno>
 #include <cstdlib>

@@ -15,15 +15,15 @@
 #ifndef STXXL_MNG_CONFIG_HEADER
 #define STXXL_MNG_CONFIG_HEADER
 
-#include <stxxl/version.h>
-#include <stxxl/bits/singleton.h>
 #include <stxxl/bits/common/log.h>
+#include <stxxl/bits/singleton.h>
+#include <stxxl/version.h>
 
+#include <cassert>
+#include <cstdlib>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
-#include <cstdlib>
-#include <cassert>
 
 namespace stxxl {
 

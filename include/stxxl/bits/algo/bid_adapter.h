@@ -1,4 +1,6 @@
 /***************************************************************************
+ *  include/stxxl/bits/algo/bid_adapter.h
+ *
  *  include/stxxl/bits/mng/adaptor.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
@@ -12,8 +14,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_ADAPTOR_HEADER
-#define STXXL_MNG_ADAPTOR_HEADER
+#ifndef STXXL_ALGO_BID_ADAPTER_HEADER
+#define STXXL_ALGO_BID_ADAPTER_HEADER
 
 #include <stxxl/bits/common/types.h>
 
@@ -656,5 +658,5 @@ make_element_iterator(BlockType* blocks, SizeType offset)
 
 } // namespace stxxl
 
-#endif // !STXXL_MNG_ADAPTOR_HEADER
+#endif // !STXXL_ALGO_BID_ADAPTER_HEADER
 // vim: et:ts=4:sw=4

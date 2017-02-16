@@ -27,8 +27,8 @@
 
 #if STXXL_HAVE_WINCALL_FILE
 
-#include <stxxl/bits/io/wfs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/wfs_file_base.h>
 
 #include <string>
 

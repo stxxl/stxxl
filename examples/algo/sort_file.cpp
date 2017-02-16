@@ -16,8 +16,8 @@
 //! content and then sorts it using stxxl::sort / stxxl::ksort / ...
 
 #include <stxxl/io>
-#include <stxxl/mng>
 #include <stxxl/ksort>
+#include <stxxl/mng>
 #include <stxxl/sort>
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>

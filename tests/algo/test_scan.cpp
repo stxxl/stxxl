@@ -15,11 +15,11 @@
 //! \example algo/test_scan.cpp
 //! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
-#include <stxxl/vector>
 #include <stxxl/scan>
+#include <stxxl/vector>
 
 using stxxl::timestamp;
 

@@ -14,10 +14,10 @@
 #ifndef STXXL_COMMON_TYPES_HEADER
 #define STXXL_COMMON_TYPES_HEADER
 
-#include <stxxl/bits/config.h>
-#include <cstdint>
-#include <type_traits>
 #include <cstddef>
+#include <cstdint>
+#include <stxxl/bits/config.h>
+#include <type_traits>
 
 namespace stxxl {
 

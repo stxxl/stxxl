@@ -16,12 +16,12 @@
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 namespace stxxl {
 

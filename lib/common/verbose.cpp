@@ -10,16 +10,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/msvc_compatibility.h>
+#include <stxxl/bits/verbose.h>
 
-#include <iostream>
-#include <cstdio>
 #include <cmath>
-#include <thread>
+#include <cstdio>
+#include <iostream>
 #include <sstream>
+#include <thread>
 
 namespace stxxl {
 

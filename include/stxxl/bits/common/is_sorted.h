@@ -14,8 +14,8 @@
 #ifndef STXXL_COMMON_IS_SORTED_HEADER
 #define STXXL_COMMON_IS_SORTED_HEADER
 
-#include <iterator>
 #include <functional>
+#include <iterator>
 
 namespace stxxl {
 

@@ -13,13 +13,14 @@
 //! \example containers/external_array.cpp
 //! This is an example of how to use \c stxxl::external_array
 
-#include <cstddef>
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/timer>
+
+#include <cstddef>
 
 typedef std::pair<uint64_t, uint64_t> value_type;
 typedef stxxl::ppq_local::external_array<value_type> ea_type;

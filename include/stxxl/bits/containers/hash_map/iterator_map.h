@@ -16,11 +16,11 @@
 
 #include <stxxl/bits/containers/hash_map/iterator.h>
 
-#include <vector>
 #include <algorithm>
-#include <utility>
 #include <map>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 namespace hash_map {

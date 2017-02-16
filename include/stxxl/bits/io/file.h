@@ -18,8 +18,8 @@
 
 #include <stxxl/bits/config.h>
 
-#include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/counting_ptr.h>
+#include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_interface.h>

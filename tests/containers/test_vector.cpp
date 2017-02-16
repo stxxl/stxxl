@@ -18,10 +18,10 @@
 //! \c stxxl::VECTOR_GENERATOR. Vector type is configured
 //! to store 64-bit integers and have 2 pages each of 1 block
 
-#include <iostream>
 #include <algorithm>
-#include <stxxl/vector>
+#include <iostream>
 #include <stxxl/scan>
+#include <stxxl/vector>
 
 struct element  // 24 bytes, not a power of 2 intentionally
 {

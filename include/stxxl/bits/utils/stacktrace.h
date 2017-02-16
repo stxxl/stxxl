@@ -13,8 +13,8 @@
 #ifndef STXXL_UTILS_STACKTRACE_HEADER
 #define STXXL_UTILS_STACKTRACE_HEADER
 
-#include <execinfo.h>
 #include <cxxabi.h>
+#include <execinfo.h>
 
 #include <cstdio>
 #include <cstdlib>

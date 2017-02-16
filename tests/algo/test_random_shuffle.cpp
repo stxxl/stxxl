@@ -20,8 +20,8 @@
 //! \example algo/test_random_shuffle.cpp
 //! Test \c stxxl::random_shuffle()
 
-#include <stxxl/vector>
 #include <stxxl/random_shuffle>
+#include <stxxl/vector>
 
 template <typename type>
 struct counter

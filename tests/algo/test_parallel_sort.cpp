@@ -26,10 +26,10 @@
 #include <functional>
 #include <limits>
 
-#include <stxxl/vector>
-#include <stxxl/stream>
 #include <stxxl/scan>
 #include <stxxl/sort>
+#include <stxxl/stream>
+#include <stxxl/vector>
 
 const unsigned long long megabyte = 1024 * 1024;
 

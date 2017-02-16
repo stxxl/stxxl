@@ -13,8 +13,8 @@
 #ifndef STXXL_COMMON_IS_HEAP_HEADER
 #define STXXL_COMMON_IS_HEAP_HEADER
 
-#include <iterator>
 #include <functional>
+#include <iterator>
 
 namespace stxxl {
 

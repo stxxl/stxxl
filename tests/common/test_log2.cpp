@@ -11,14 +11,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/config.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/verbose.h>
 
-#include <iostream>
-#include <cmath>
 #include <cassert>
+#include <cmath>
+#include <iostream>
 
 template <size_t i>
 void log_i(size_t floorv, size_t ceilv)

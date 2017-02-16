@@ -16,22 +16,22 @@
 #ifndef STXXL_CONTAINERS_VECTOR_HEADER
 #define STXXL_CONTAINERS_VECTOR_HEADER
 
+#include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/tmeta.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/common/tmeta.h>
-#include <stxxl/bits/containers/pager.h>
-#include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_istream_reverse.h>
 #include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/mng/typed_block.h>
 
+#include <algorithm>
+#include <queue>
 #include <string>
 #include <vector>
-#include <queue>
-#include <algorithm>
 
 namespace stxxl {
 

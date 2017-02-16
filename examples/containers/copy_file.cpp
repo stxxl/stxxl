@@ -15,8 +15,8 @@
  **************************************************************************/
 
 #include <stxxl/io>
-#include <stxxl/vector>
 #include <stxxl/stream>
+#include <stxxl/vector>
 
 void copy_file(const char* input_path, const char* output_path, unsigned int method)
 {

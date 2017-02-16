@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/request>
 #include <stxxl/mng>
+#include <stxxl/request>
 
 int main()
 {

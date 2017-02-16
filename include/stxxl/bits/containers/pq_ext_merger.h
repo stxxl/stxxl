@@ -18,10 +18,10 @@
 
 #include <stxxl/bits/containers/pq_mergers.h>
 
+#include <algorithm>
 #include <deque>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 namespace stxxl {
 
@@ -553,8 +553,8 @@ protected:
             assert(!is_sentinel(min_last));
 
             STXXL_VERBOSE1(
-            //req-ostream "min_last " << min_last <<
-                    " total size " << total_size << " num_seq " << seqs.size());
+                //req-ostream "min_last " << min_last <<
+                " total size " << total_size << " num_seq " << seqs.size());
 
             diff_type less_equal_than_min_last = 0;
             //locate this element in all sequences
@@ -623,7 +623,7 @@ protected:
                         }
                         pool->read(state.block, bid)->wait();
                         STXXL_VERBOSE1("seq " << i << ": first element of read block " << bid <<
-                                       //" " << *(state.block->begin()) <<
+                                                             //" " << *(state.block->begin()) <<
                                        " cached in " << state.block);
                         if (!(state.bids.empty()))
                             pool->hint(state.bids.front());  // re-hint, reading might have made a block free

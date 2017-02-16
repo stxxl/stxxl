@@ -14,8 +14,8 @@
 #ifndef STXXL_COMMON_NEW_ALLOC_HEADER
 #define STXXL_COMMON_NEW_ALLOC_HEADER
 
-#include <memory>
 #include <limits>
+#include <memory>
 
 namespace stxxl {
 

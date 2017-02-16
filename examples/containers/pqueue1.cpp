@@ -11,9 +11,9 @@
  **************************************************************************/
 
 //! [example]
-#include <stxxl/priority_queue>
 #include <iostream>
 #include <limits>
+#include <stxxl/priority_queue>
 
 // comparison struct for priority queue where top() returns the smallest contained value:
 struct ComparatorGreater

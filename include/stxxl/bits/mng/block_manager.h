@@ -15,25 +15,25 @@
 #ifndef STXXL_MNG_BLOCK_MANAGER_HEADER
 #define STXXL_MNG_BLOCK_MANAGER_HEADER
 
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/defines.h>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/create_file.h>
-#include <stxxl/bits/singleton.h>
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/mng/bid.h>
-#include <stxxl/bits/mng/disk_block_allocator.h>
 #include <stxxl/bits/mng/block_alloc_strategy.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/config.h>
+#include <stxxl/bits/mng/disk_block_allocator.h>
+#include <stxxl/bits/singleton.h>
 
-#include <memory>
 #include <algorithm>
-#include <string>
 #include <cstdlib>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 #if STXXL_MSVC

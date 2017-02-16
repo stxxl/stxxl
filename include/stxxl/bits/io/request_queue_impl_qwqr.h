@@ -18,8 +18,8 @@
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 
-#include <mutex>
 #include <list>
+#include <mutex>
 
 namespace stxxl {
 

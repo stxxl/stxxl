@@ -17,9 +17,9 @@
 
 #include <stxxl/vector>
 
-#include <limits>
 #include <algorithm>
 #include <deque>
+#include <limits>
 #include <vector>
 
 namespace stxxl {

@@ -13,10 +13,10 @@
 //! \example containers/test_vector_export.cpp
 //! This is an example of use of \c stxxl::vector::export_files
 
-#include <iostream>
 #include <algorithm>
-#include <stxxl/vector>
+#include <iostream>
 #include <stxxl/scan>
+#include <stxxl/vector>
 
 int main()
 {

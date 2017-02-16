@@ -11,9 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
-#include <stxxl/aligned_alloc>
 #include <cstring>
+#include <stxxl/aligned_alloc>
+#include <stxxl/io>
 
 //! \example io/test_cancel.cpp
 //! This tests the request cancelation mechanisms.

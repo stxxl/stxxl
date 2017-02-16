@@ -24,18 +24,18 @@
 #define STXXL_MOVE(T) T
 #endif
 
-#include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/common/custom_stats.h>
-#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/is_heap.h>
-#include <stxxl/bits/common/swap_vector.h>
 #include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/common/swap_vector.h>
+#include <stxxl/bits/common/timer.h>
+#include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/mng/block_alloc_strategy.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/parallel.h>
@@ -47,15 +47,15 @@
 #include <cstddef>
 #include <cstdlib>
 #include <ctime>
-#include <list>
-#include <utility>
-#include <numeric>
-#include <vector>
-#include <string>
-#include <limits>
 #include <functional>
+#include <limits>
+#include <list>
 #include <mutex>
+#include <numeric>
 #include <random>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace stxxl {
 namespace ppq_local {
@@ -2739,7 +2739,7 @@ public:
 #if STXXL_PARALLEL
         return bulk_push(element, static_cast<size_t>(omp_get_thread_num()));
 #else
-        std::uniform_int_distribution<size_t> distr(0, m_num_insertion_heaps-1);
+        std::uniform_int_distribution<size_t> distr(0, m_num_insertion_heaps - 1);
         return bulk_push(element, distr(m_rng));
 #endif
     }
@@ -2989,7 +2989,7 @@ public:
             }
         }
 #else
-        std::uniform_int_distribution<size_t> distr(0, m_num_insertion_heaps-1);
+        std::uniform_int_distribution<size_t> distr(0, m_num_insertion_heaps - 1);
         for (size_type i = 0; i < elements.size(); ++i) {
             bulk_push(elements[i], distr(m_rng));
         }

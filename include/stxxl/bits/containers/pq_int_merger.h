@@ -18,8 +18,8 @@
 
 #include <stxxl/bits/containers/pq_mergers.h>
 
-#include <utility>
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 namespace stxxl {

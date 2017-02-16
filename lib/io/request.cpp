@@ -13,8 +13,8 @@
 
 #include <ostream>
 
-#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/request.h>
 
 namespace stxxl {
 

@@ -14,8 +14,8 @@
 #define STXXL_CONTAINERS_HASH_MAP_TUNING_HEADER
 #define _STXXL_TUNING_H_
 
-#include <stxxl/mng>
 #include <stxxl/bits/singleton.h>
+#include <stxxl/mng>
 
 namespace stxxl {
 namespace hash_map {

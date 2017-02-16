@@ -16,21 +16,21 @@
 #ifndef STXXL_STREAM_SORT_STREAM_HEADER
 #define STXXL_STREAM_SORT_STREAM_HEADER
 
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/stream/stream.h>
-#include <stxxl/bits/mng/block_manager.h>
+#include <stxxl/bits/algo/losertree.h>
+#include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/trigger_entry.h>
-#include <stxxl/bits/algo/run_cursor.h>
-#include <stxxl/bits/algo/losertree.h>
-#include <stxxl/bits/stream/sorted_runs.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/bits/stream/sorted_runs.h>
+#include <stxxl/bits/stream/stream.h>
 
 #include <algorithm>
+#include <functional>
 #include <utility>
 #include <vector>
-#include <functional>
 
 namespace stxxl {
 namespace stream {
@@ -87,7 +87,7 @@ private:
 
     //! Fetch data from input into blocks[first_idx,last_idx).
     size_t fetch(block_type* blocks,
-                        size_t first_idx, size_t last_idx)
+                 size_t first_idx, size_t last_idx)
     {
         element_iterator output = make_element_iterator(blocks, first_idx);
         size_t curr_idx = first_idx;
@@ -1268,10 +1268,10 @@ public:
             seqs = new std::vector<sequence>(nruns);
             buffers = new std::vector<block_type*>(nruns);
 
-            for (size_t i = 0; i < nruns; ++i)                                           //initialize sequences
+            for (size_t i = 0; i < nruns; ++i)                                             //initialize sequences
             {
-                (*buffers)[i] = m_prefetcher->pull_block();                                     //get first block of each run
-                (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());      //this memory location stays the same, only the data is exchanged
+                (*buffers)[i] = m_prefetcher->pull_block();                                //get first block of each run
+                (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end()); //this memory location stays the same, only the data is exchanged
             }
 // end of STL-style merging
 #else
@@ -1373,8 +1373,8 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
     size_t recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
     size_t recursive_merger_memory_out_block = sizeof(block_type);
     size_t memory_for_buffers = memory_for_write_buffers
-                                       + recursive_merger_memory_prefetch_buffers
-                                       + recursive_merger_memory_out_block;
+                                + recursive_merger_memory_prefetch_buffers
+                                + recursive_merger_memory_out_block;
     // maximum arity in the recursive merger
     size_t max_arity = (m_memory_to_use > memory_for_buffers ? m_memory_to_use - memory_for_buffers : 0) / block_type::raw_size;
 

@@ -16,18 +16,18 @@
 #ifndef STXXL_COMMON_UTILS_HEADER
 #define STXXL_COMMON_UTILS_HEADER
 
-#include <stxxl/bits/config.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
-#include <vector>
-#include <string>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
-#include <algorithm>
-#include <sstream>
 #include <limits>
+#include <sstream>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 namespace stxxl {
 

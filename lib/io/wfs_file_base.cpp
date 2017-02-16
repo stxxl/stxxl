@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/wfs_file_base.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/io/wfs_file_base.h>
 
 #if STXXL_WINDOWS
 

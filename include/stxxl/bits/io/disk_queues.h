@@ -16,13 +16,13 @@
 #ifndef STXXL_IO_DISK_QUEUES_HEADER
 #define STXXL_IO_DISK_QUEUES_HEADER
 
-#include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/linuxaio_queue.h>
 #include <stxxl/bits/io/linuxaio_request.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/serving_request.h>
+#include <stxxl/bits/singleton.h>
 
 #include <map>
 

@@ -39,8 +39,8 @@ void run_exit_handlers()
 
 #else // STXXL_NON_DEFAULT_EXIT_HANDLER
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
 namespace stxxl {
 

@@ -16,12 +16,12 @@
 #define STXXL_MNG_BLOCK_PREFETCHER_HEADER
 
 #include <stxxl/bits/common/onoff_switch.h>
-#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
 
 #include <algorithm>
-#include <vector>
 #include <queue>
+#include <vector>
 
 namespace stxxl {
 
