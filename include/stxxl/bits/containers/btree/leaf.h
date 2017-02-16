@@ -435,7 +435,7 @@ public:
         value_type search_val(k, data_type());
         typename block_type::iterator lb =
             std::lower_bound(m_block->begin(), m_block->begin() + size(), search_val, m_vcmp);
-        if (lb == m_block->begin() + size() || lb->first != k)
+        if (lb == m_block->begin() + size() || !(lb->first == k))
             return m_btree->end();
 
         return iterator(m_btree, my_bid(), unsigned(lb - m_block->begin()));
@@ -446,7 +446,7 @@ public:
         value_type search_val(k, data_type());
         typename block_type::iterator lb =
             std::lower_bound(m_block->begin(), m_block->begin() + size(), search_val, m_vcmp);
-        if (lb == m_block->begin() + size() || lb->first != k)
+        if (lb == m_block->begin() + size() || !(lb->first == k))
             return m_btree->end();
 
         return const_iterator(m_btree, my_bid(), unsigned(lb - m_block->begin()));
@@ -519,7 +519,7 @@ public:
         typename block_type::iterator it =
             std::lower_bound(m_block->begin(), m_block->begin() + size(), search_val, m_vcmp);
 
-        if (it == m_block->begin() + size() || it->first != k)
+        if (it == m_block->begin() + size() || !(it->first == k))
             return 0;
         // no such element
 
