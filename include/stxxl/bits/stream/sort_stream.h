@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/stream/sort_stream.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006-2008 Johannes Singler <singler@ira.uka.de>

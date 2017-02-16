@@ -4,7 +4,7 @@
  *  Constructs a typed_block object containing as many elements elements plus
  *  some metadata as fits into the given block size.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>

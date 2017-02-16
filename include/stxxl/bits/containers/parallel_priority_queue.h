@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/containers/parallel_priority_queue.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2014-2015 Thomas Keh <thomas.keh@student.kit.edu>
  *  Copyright (C) 2014-2015 Timo Bingmann <tb@panthema.net>

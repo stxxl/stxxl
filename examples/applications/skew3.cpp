@@ -6,7 +6,7 @@
  *  Peter Sanders. "Better External Memory Suffix Array Construction". Journal
  *  of Experimental Algorithmics (JEA), volume 12, 2008.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2004 Jens Mehnert <jmehnert@mpi-sb.mpg.de>
  *  Copyright (C) 2012-2013 Timo Bingmann <tb@panthema.net>

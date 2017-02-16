@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/io/linuxaio_file.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2011 Johannes Singler <singler@kit.edu>
  *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>

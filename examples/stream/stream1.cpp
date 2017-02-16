@@ -3,7 +3,7 @@
  *
  *  This file contains the example snippets from the stream tutorial.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2012-2013 Timo Bingmann <tb@panthema.net>
  *

@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/containers/btree/root_node.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
  *

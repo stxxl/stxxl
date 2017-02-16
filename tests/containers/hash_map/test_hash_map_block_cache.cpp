@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/containers/hash_map/test_hash_map_block_cache.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
  *

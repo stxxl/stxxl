@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/stream/test_push_sort.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009, 2010 Johannes Singler <singler@kit.edu>

@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/containers/hash_map/iterator_map.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
  *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>

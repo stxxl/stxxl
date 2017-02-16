@@ -1,7 +1,7 @@
 /***************************************************************************
  *  lib/io/wincall_file.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2005-2006 Roman Dementiev <dementiev@ira.uka.de>
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>

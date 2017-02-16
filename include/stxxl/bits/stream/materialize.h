@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/stream/materialize.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2003-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>

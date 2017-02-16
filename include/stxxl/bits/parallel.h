@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/parallel.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2011 Johannes Singler <singler@kit.edu>

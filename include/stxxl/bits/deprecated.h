@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/deprecated.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>

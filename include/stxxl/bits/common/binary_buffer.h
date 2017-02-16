@@ -6,7 +6,7 @@
  *  binary_buffer::put<type>() and read them using
  *  binary_reader::get<type>(). The operation sequences should match.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
  *

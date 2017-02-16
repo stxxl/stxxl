@@ -5,7 +5,7 @@ libdir=${exec_prefix}/@INSTALL_LIB_DIR@
 
 Name: stxxl
 Description: An implementation of the C++ STL interfaces for external (out-of-core) memory.
-URL: http://stxxl.sourceforge.net
+URL: http://stxxl.org
 Version: @STXXL_VERSION_STRING@
 Cflags: -I${includedir} @STXXL_CXX_FLAGS@
 Libs: -L${libdir} -l@STXXL_LIBNAME@ @STXXL_EXTRA_LIBRARIES@

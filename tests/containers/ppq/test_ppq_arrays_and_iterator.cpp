@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/containers/ppq/test_ppq_arrays_and_iterator.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2014 Thomas Keh <thomas.keh@student.kit.edu>
  *

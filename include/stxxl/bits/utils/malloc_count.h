@@ -8,7 +8,7 @@
  *
  *  See http://panthema.net/2013/malloc_count/ for a tutorial.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2013-2015 Timo Bingmann <tb@panthema.net>
  *

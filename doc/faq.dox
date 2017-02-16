@@ -4,7 +4,7 @@
  *
  *  Frequently asked and answered questions
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2007 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
@@ -18,7 +18,7 @@
 
 \section faq_latest Latest version of this FAQ
 
-The most recent version of this FAQ can always be found <a href="http://stxxl.sourceforge.net">here</a>.
+The most recent version of this FAQ can always be found <a href="http://stxxl.org">here</a>.
 
 \section faq_compilers Supported Compilers and Platforms
 
@@ -62,7 +62,7 @@ msvc 2015 13.0 *        | stxxl (c++11)
   - Rate STXXL at heise Software-Verzeichnis (German): http://www.heise.de/software/download/stxxl/76072
   - Rate STXXL at SourceForge: https://sourceforge.net/projects/stxxl/
 
-- For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
+- For scientific work:  Cite the papers mentioned here: http://stxxl.org/
 
 - For industrial users:  Tell us the name of your company, so we can use it as a reference.
 

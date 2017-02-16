@@ -4,7 +4,7 @@
 #
 #  Notes about the procedure of publishing a release.
 #
-#  Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.org
 #
 #  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
 #
@@ -60,7 +60,7 @@
    # remove hashstamp files
    rm doxygen-html/*.md5
    # tag HTML with version and link
-   sed -i "s@<li class=\"footer\">Generated@<li class=\"footer\"><a href=\"http://stxxl.sourceforge.net\">STXXL 1.4.x</a> - Generated@" doxygen-html/*.html
+   sed -i "s@<li class=\"footer\">Generated@<li class=\"footer\"><a href=\"http://stxxl.org\">STXXL 1.4.x</a> - Generated@" doxygen-html/*.html
    tar czf stxxl-1.4.x-doxygen.tar.gz doxygen-html
    # check tarball
    tar tvvzf stxxl-1.4.x-doxygen.tar.gz

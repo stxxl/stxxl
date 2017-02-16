@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/containers/btree/btree.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2006, 2008 Roman Dementiev <dementiev@ira.uka.de>
  *

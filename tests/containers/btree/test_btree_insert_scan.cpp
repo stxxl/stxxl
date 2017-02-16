@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/containers/btree/test_btree_insert_scan.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
  *

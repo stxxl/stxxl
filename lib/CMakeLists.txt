@@ -3,7 +3,7 @@
 #
 #  CMake file for libstxxl.a/so/lib
 #
-#  Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.org
 #
 #  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
 #

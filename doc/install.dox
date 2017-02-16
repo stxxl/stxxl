@@ -4,7 +4,7 @@
  *
  *  Installation and Linking Instruction for STXXL using CMake
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
@@ -281,7 +281,7 @@ The gcov coverage report can be automatically created using the additional targe
 
 ## Unpack STXXL source code
 
-- Download the STXXL archive from http://stxxl.sourceforge.net <br>
+- Download the STXXL archive from http://stxxl.org <br>
   or use your favorite git client to clone the development version: http://github.com/stxxl/stxxl.git
 - Unpack the archive at a convenient location.
 

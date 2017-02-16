@@ -1,7 +1,7 @@
 /***************************************************************************
  *  lib/io/ufs_file_base.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002, 2005, 2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>

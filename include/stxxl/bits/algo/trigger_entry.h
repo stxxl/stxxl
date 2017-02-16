@@ -3,7 +3,7 @@
  *
  *  include/stxxl/bits/algo/adaptor.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>

@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/io/fileperblock_file.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2008, 2009 Johannes Singler <singler@ira.uka.de>
  *

@@ -4,7 +4,7 @@
 #  SqlPlotTools script for output of bench_multiway_merge.cpp
 #  Run the benchmark and save the output to stats.txt
 #
-#  Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.org
 #
 #  Copyright (C) 2014-2015 Timo Bingmann <tb@panthema.net>
 #

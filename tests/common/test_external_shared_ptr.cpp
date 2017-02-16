@@ -6,7 +6,7 @@
  *     - test_vector.cpp
  *     - test_map.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2011 Daniel Godas-Lopez <dgodas@gmail.com>
  *

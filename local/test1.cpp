@@ -5,7 +5,7 @@
  *  files in local/ are automatically compiled and linked with STXXL by CMake.
  *  You can use this method for simple prototype applications.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *

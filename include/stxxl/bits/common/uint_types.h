@@ -4,7 +4,7 @@
  *  Class representing a 40-bit or 48-bit unsigned integer encoded in five or
  *  six bytes.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *

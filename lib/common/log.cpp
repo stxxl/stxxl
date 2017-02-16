@@ -1,7 +1,7 @@
 /***************************************************************************
  *  lib/common/log.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2004-2005 Roman Dementiev <dementiev@ira.uka.de>
  *  Copyright (C) 2008 Johannes Singler <singler@ira.uka.de>

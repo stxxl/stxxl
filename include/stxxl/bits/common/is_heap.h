@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/common/is_heap.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2015 Timo Bingmann <tb@panthema.net>
  *

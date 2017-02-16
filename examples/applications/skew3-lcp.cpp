@@ -6,7 +6,7 @@
  *  Peter Sanders and Stefan Burkhardt. "Linear work suffix array construction".
  *  Journal of the ACM, Volume 53 Issue 6, November 2006, Pages 918-936.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2004 Jens Mehnert <jmehnert@mpi-sb.mpg.de>
  *  Copyright (C) 2012-2015 Timo Bingmann <tb@panthema.net>

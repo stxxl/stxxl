@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/containers/pager.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002, 2003, 2006 Roman Dementiev <dementiev@ira.uka.de>
  *  Copyright (C) 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>

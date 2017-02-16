@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/algo/test_random_shuffle.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2007 Manuel Krings
  *  Copyright (C) 2007 Markus Westphal <mail@markuswestphal.de>

@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tools/benchmark_disks.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>

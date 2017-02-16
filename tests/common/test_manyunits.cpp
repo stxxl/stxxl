@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/common/test_manyunits.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *

@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl/bits/algo/intksort.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002 Peter Sanders <sanders@mpi-sb.mpg.de>
  *

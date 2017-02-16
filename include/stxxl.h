@@ -1,7 +1,7 @@
 /***************************************************************************
  *  include/stxxl.h
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *

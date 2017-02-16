@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/containers/test_map_random.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2004, 2005 Thomas Nowak <t.nowak@imail.de>
  *  Copyright (C) 2005, 2006 Roman Dementiev <dementiev@ira.uka.de>

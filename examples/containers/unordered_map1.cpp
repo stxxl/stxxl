@@ -1,7 +1,7 @@
 /***************************************************************************
  *  examples/containers/unordered_map1.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
  *  Copyright (C) 2014 Timo Bingmann <tb@panthema.net>

@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tools/extras/iobench_scatter_in_place.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *

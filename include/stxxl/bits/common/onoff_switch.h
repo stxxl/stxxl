@@ -4,7 +4,7 @@
  *  Kind of binary semaphore: initially OFF, then multiple waiters can attach
  *  to the switch, which get notified one-by-one when switched ON.
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>

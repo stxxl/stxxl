@@ -5,7 +5,7 @@
 #  Perl script to test source header files, license headers and write
 #  AUTHORS from copyright statements.
 #
-#  Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.org
 #
 #  Copyright (C) 2013-2014 Timo Bingmann <tb@panthema.net>
 #
@@ -249,7 +249,7 @@ sub process_cpp {
 
     # check "Part of STXXL"
     expect($path, $i-1, @data, " *\n");
-    expect($path, $i, @data, " *  Part of the STXXL. See http://stxxl.sourceforge.net\n"); ++$i;
+    expect($path, $i, @data, " *  Part of the STXXL. See http://stxxl.org\n"); ++$i;
     expect($path, $i, @data, " *\n"); ++$i;
 
     # read authors
@@ -396,7 +396,7 @@ sub process_pl_cmake {
 
     # check "Part of STXXL"
     expect($path, $i-1, @data, "#\n");
-    expect($path, $i, @data, "#  Part of the STXXL. See http://stxxl.sourceforge.net\n"); ++$i;
+    expect($path, $i, @data, "#  Part of the STXXL. See http://stxxl.org\n"); ++$i;
     expect($path, $i, @data, "#\n"); ++$i;
 
     # read authors
