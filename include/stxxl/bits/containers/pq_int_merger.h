@@ -122,7 +122,7 @@ public:
     {
         current[slot] = &sentinel;
         current_end[slot] = &sentinel;
-        segment[slot] = NULL;
+        segment[slot] = nullptr;
     }
 
     //! free an empty segment .
@@ -137,7 +137,7 @@ public:
 
         // free memory
         delete[] segment[slot];
-        segment[slot] = NULL;
+        segment[slot] = nullptr;
         mem_cons_ -= segment_size[slot];
 
         // free player in loser tree
@@ -158,7 +158,7 @@ public:
           mem_cons_(0),
           m_size(0)
     {
-        segment[0] = NULL;
+        segment[0] = nullptr;
         current[0] = &sentinel;
         current_end[0] = &sentinel;
 

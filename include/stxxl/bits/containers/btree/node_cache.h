@@ -182,8 +182,8 @@ public:
                     if (i == max_tries) {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning NULL node.");
-                        return NULL;
+                        STXXL_ERRMSG("Returning nullptr node.");
+                        return nullptr;
                     }
                     m_pager.hit(node2kick);
                 } while (m_fixed[node2kick]);
@@ -279,8 +279,8 @@ public:
                     if (i == max_tries) {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning NULL node.");
-                        return NULL;
+                        STXXL_ERRMSG("Returning nullptr node.");
+                        return nullptr;
                     }
                     m_pager.hit(node2kick);
                 } while (m_fixed[node2kick]);
@@ -373,8 +373,8 @@ public:
                 {
                     STXXL_ERRMSG(
                         "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                    STXXL_ERRMSG("Returning NULL node.");
-                    return NULL;
+                    STXXL_ERRMSG("Returning nullptr node.");
+                    return nullptr;
                 }
                 m_pager.hit(node2kick);
             } while (m_fixed[node2kick]);
@@ -475,7 +475,7 @@ public:
                 {
                     STXXL_ERRMSG(
                         "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                    STXXL_ERRMSG("Returning NULL node.");
+                    STXXL_ERRMSG("Returning nullptr node.");
                     return;
                 }
                 m_pager.hit(node2kick);

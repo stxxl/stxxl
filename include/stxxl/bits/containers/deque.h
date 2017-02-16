@@ -63,7 +63,7 @@ protected:
     { }
 
 public:
-    deque_iterator() : m_deque(NULL), m_offset(0) { }
+    deque_iterator() : m_deque(nullptr), m_offset(0) { }
 
     difference_type operator - (const self_type& a) const
     {
@@ -258,7 +258,7 @@ protected:
     { }
 
 public:
-    const_deque_iterator() : m_deque(NULL), m_offset(0) { }
+    const_deque_iterator() : m_deque(nullptr), m_offset(0) { }
 
     const_deque_iterator(const deque_iterator<deque_type>& it) // NOLINT
         : m_deque(it.m_deque), m_offset(it.m_offset)

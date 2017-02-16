@@ -89,8 +89,8 @@ public:
         }
 
         sequence_state()
-            : block(NULL), current(0),
-              merger(NULL),
+            : block(nullptr), current(0),
+              merger(nullptr),
               allocated(false)
         { }
 
@@ -199,7 +199,7 @@ protected:
 public:
     explicit ext_merger(const compare_type& c = compare_type()) // TODO: pass pool as parameter
         : tree(c, *this),
-          pool(NULL),
+          pool(nullptr),
           m_size(0)
     {
         init();
@@ -292,7 +292,7 @@ protected:
     {
         STXXL_VERBOSE2("ext_merger::init()");
 
-        sentinel_block = NULL;
+        sentinel_block = nullptr;
         if (arity < kMaxArity)
         {
             sentinel_block = new block_type;

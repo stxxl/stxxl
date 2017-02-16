@@ -45,7 +45,7 @@ const char* memory_file::io_type() const
 memory_file::~memory_file()
 {
     free(ptr_);
-    ptr_ = NULL;
+    ptr_ = nullptr;
 }
 
 void memory_file::lock()

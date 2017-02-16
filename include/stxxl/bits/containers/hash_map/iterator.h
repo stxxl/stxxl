@@ -91,7 +91,7 @@ public:
                            external_size_type i_external, source_type source,
                            bool ext_valid, key_type key)
         : map_(map),
-          reader_(NULL),
+          reader_(nullptr),
           prefetch_(false),
           i_bucket_(i_bucket),
           source_(source),
@@ -108,11 +108,11 @@ public:
     //! Construct a new iterator pointing to the end of the given hash-map.
     explicit hash_map_iterator_base(hash_map_type* map)
         : map_(map),
-          reader_(NULL),
+          reader_(nullptr),
           prefetch_(false),
           i_bucket_(0),
           source_(hash_map_type::src_unknown),
-          node_(NULL),
+          node_(nullptr),
           i_external_(0),
           ext_valid_(false),
           end_(true)
@@ -121,7 +121,7 @@ public:
     //! Construct a new iterator from an existing one
     hash_map_iterator_base(const hash_map_iterator_base& obj)
         : map_(obj.map_),
-          reader_(NULL),
+          reader_(nullptr),
           prefetch_(obj.prefetch_),
           i_bucket_(obj.i_bucket_),
           source_(obj.source_),
@@ -208,7 +208,7 @@ protected:
         }
         // otw lookup external value.
         // case I: no internal value => first external value is the desired one
-        else if (node_ == NULL)
+        else if (node_ == nullptr)
         {
             i_external_ = 0;
             ext_valid_ = true;
@@ -236,7 +236,7 @@ protected:
     {
         if (reader_) {
             delete reader_;
-            reader_ = NULL;
+            reader_ = nullptr;
         }
     }
 
@@ -254,7 +254,7 @@ public:
         internal_size_type i_bucket_old = i_bucket_;
         bucket_type bucket = map_->buckets_[i_bucket_];
 
-        if (reader_ == NULL)
+        if (reader_ == nullptr)
             init_reader();
 
         // when incremented once, more increments are likely to follow;
@@ -266,7 +266,7 @@ public:
         }
 
         // determine starting-points for comparision, which are given by:
-        // - tmp_node: smallest internal value > old value (tmp_node may be NULL)
+        // - tmp_node: smallest internal value > old value (tmp_node may be nullptr)
         // - reader_: smallest external value > old value (external value may not exists)
         node_type* tmp_node = (node_) ? node_ : bucket.list_;
         if (source_ == hash_map_type::src_external)
@@ -349,7 +349,7 @@ public:
                 bucket = map_->buckets_[i_bucket_];
                 i_external_ = 0;
                 tmp_node = bucket.list_;
-                node_ = NULL;
+                node_ = nullptr;
                 reader_->skip_to(map_->bids_.begin() + bucket.i_block_, bucket.i_subblock_);
             }
         }
@@ -410,7 +410,7 @@ public:
     { }
 
     hash_map_iterator()
-        : base_type(NULL)
+        : base_type(nullptr)
     { }
 
     explicit hash_map_iterator(hash_map_type* map)
@@ -457,7 +457,7 @@ public:
         }
         else
         {
-            if (this->reader_ == NULL)
+            if (this->reader_ == nullptr)
                 base_type::init_reader();
 
             return this->reader_->value();
@@ -513,7 +513,7 @@ public:
     { }
 
     hash_map_const_iterator()
-        : base_type(NULL)
+        : base_type(nullptr)
     { }
 
     explicit hash_map_const_iterator(hash_map_type* map)
@@ -564,7 +564,7 @@ public:
         }
         else
         {
-            if (this->reader_ == NULL)
+            if (this->reader_ == nullptr)
                 base_type::init_reader();
 
             return this->reader_->const_value();

@@ -87,8 +87,8 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
         // ignored
     }
 
-    HANDLE file_des_ = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
-                                     dwCreationDisposition, dwFlagsAndAttributes, NULL);
+    HANDLE file_des_ = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, nullptr,
+                                     dwCreationDisposition, dwFlagsAndAttributes, nullptr);
 
     if (file_des_ != INVALID_HANDLE_VALUE)
         return file_des_;
@@ -100,8 +100,8 @@ static HANDLE open_file_impl(const std::string& filename, int mode)
 
         dwFlagsAndAttributes &= ~FILE_FLAG_NO_BUFFERING;
 
-        HANDLE file_des2 = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
-                                         dwCreationDisposition, dwFlagsAndAttributes, NULL);
+        HANDLE file_des2 = ::CreateFileA(filename.c_str(), dwDesiredAccess, dwShareMode, nullptr,
+                                         dwCreationDisposition, dwFlagsAndAttributes, nullptr);
 
         if (file_des2 != INVALID_HANDLE_VALUE)
             return file_des2;
@@ -134,7 +134,7 @@ wfs_file_base::wfs_file_base(const std::string& filename, int mode)
         {
             part[0] = char();
             DWORD bytes_per_sector_;
-            if (!GetDiskFreeSpaceA(buf, NULL, &bytes_per_sector_, NULL, NULL))
+            if (!GetDiskFreeSpaceA(buf, nullptr, &bytes_per_sector_, nullptr, nullptr))
             {
                 STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetDiskFreeSpaceA() error for path " << buf);
                 bytes_per_sector = 512;
@@ -208,7 +208,7 @@ void wfs_file_base::set_size(offset_type newsize)
             file_des_ = open_file_impl(filename, WRONLY);
         }
 
-        if (!SetFilePointerEx(file_des_, desired_pos, NULL, FILE_BEGIN))
+        if (!SetFilePointerEx(file_des_, desired_pos, nullptr, FILE_BEGIN))
             STXXL_THROW_WIN_LASTERROR(io_error,
                                       "SetFilePointerEx() in wfs_file_base::set_size(..) oldsize=" << cur_size <<
                                       " newsize=" << newsize << " ");

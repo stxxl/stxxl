@@ -29,7 +29,7 @@ void test1()
 
     // good command line
     const char* cmdline1[] =
-    { "test", "-i", "42", "-f", "somefile", NULL };
+    { "test", "-i", "42", "-f", "somefile", nullptr };
 
     std::ostringstream os1;
     STXXL_CHECK(cp.process(5, cmdline1, os1));
@@ -39,7 +39,7 @@ void test1()
 
     // bad command line
     const char* cmdline2[] =
-    { "test", "-i", "dd", "-f", "somefile", NULL };
+    { "test", "-i", "dd", "-f", "somefile", nullptr };
 
     std::ostringstream os2;
     STXXL_CHECK(!cp.process(5, cmdline2, os2));

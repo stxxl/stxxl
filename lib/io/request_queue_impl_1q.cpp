@@ -151,9 +151,9 @@ void* request_queue_impl_1q::worker(void* arg)
 #if STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
-    ExitThread(NULL);
+    ExitThread(nullptr);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 

@@ -45,7 +45,7 @@ public:
         unsigned int device_id = DEFAULT_DEVICE_ID)
         : file(device_id),
           disk_queued_file(queue_id, allocator_id),
-          ptr_(NULL), size_(0)
+          ptr_(nullptr), size_(0)
     { }
     void serve(void* buffer, offset_type offset, size_type bytes,
                request::read_or_write op) final;

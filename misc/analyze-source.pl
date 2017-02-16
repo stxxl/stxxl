@@ -226,6 +226,14 @@ sub process_cpp {
         }
     }
 
+    foreach my $ln (@data)
+    {
+        # replace all NULL with nullptr
+        if ($ln =~ /\bNULL\b/ && $ln !~ /NOLINT/) {
+            $ln =~ s/\bNULL\b/nullptr/g;
+        }
+    }
+
     # check source header
     my $i = 0;
     if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # skip emacs mode line

@@ -333,7 +333,7 @@ prepare_unguarded_sentinel(
     typedef typename std::iterator_traits<RandomAccessIterator>
         ::difference_type diff_type;
 
-    value_type* max_value = NULL;   // last element in sequence
+    value_type* max_value = nullptr;   // last element in sequence
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
     {
         if ((*s).first == (*s).second)
@@ -980,7 +980,7 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 
     DiffType total_length = 0;
 
-    const value_type* arbitrary_element = NULL;
+    const value_type* arbitrary_element = nullptr;
 
     // find an arbitrary element to avoid default construction
     for (source_type t = 0; t < k; ++t)

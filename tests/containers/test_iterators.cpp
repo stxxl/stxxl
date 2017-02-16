@@ -23,7 +23,7 @@ template <typename T>
 const char * _()
 {
     const char* start = strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
-    if (start == NULL)
+    if (start == nullptr)
         return "unknown";
     else
         return start;

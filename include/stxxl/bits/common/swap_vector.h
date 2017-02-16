@@ -58,12 +58,12 @@ public:
 public:
     //! Create an empty vector.
     swap_vector()
-        : m_size(0), m_capacity(0), m_array(NULL)
+        : m_size(0), m_capacity(0), m_array(nullptr)
     { }
 
     //! Create a vector with the spezified size.
     explicit swap_vector(size_type size)
-        : m_size(size), m_capacity(size), m_array(NULL)
+        : m_size(size), m_capacity(size), m_array(nullptr)
     {
         if (m_size > 0)
             m_array = new value_type[m_size];
@@ -72,7 +72,7 @@ public:
     //! Create a vector with the spezified size and reserve (possibly more)
     //! space.
     swap_vector(size_type size, size_type capacity)
-        : m_size(size), m_capacity(std::max(size, capacity)), m_array(NULL)
+        : m_size(size), m_capacity(std::max(size, capacity)), m_array(nullptr)
     {
         if (m_capacity > 0)
             m_array = new value_type[m_capacity];

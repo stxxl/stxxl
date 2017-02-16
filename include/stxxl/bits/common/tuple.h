@@ -564,7 +564,7 @@ struct tuple<T1, T2, T3, T4, T5, Plug> // NOLINT
    template <class tuple_type,int I>
    typename tuple_type::item_type<I>::result get(const tuple_type & t)
    {
-   return NULL;
+   return nullptr;
    }
 */
 

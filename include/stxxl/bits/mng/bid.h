@@ -68,7 +68,7 @@ struct BID
 
     bool valid() const
     {
-        return storage != NULL;
+        return storage != nullptr;
     }
 
     bool is_managed() const
@@ -127,7 +127,7 @@ struct BID<0>
 
     bool valid() const
     {
-        return (storage != NULL);
+        return (storage != nullptr);
     }
 
     bool is_managed() const
@@ -166,7 +166,7 @@ std::ostream& operator << (std::ostream& s, const BID<BlockSize>& bid)
     // [0x12345678|0]0x00100000/0x00010000
     // [file ptr|file id]offset/size
 
-    std::ios state(NULL);
+    std::ios state(nullptr);
     state.copyfmt(s);
 
     s << "[" << bid.storage << "|";

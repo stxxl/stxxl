@@ -61,7 +61,7 @@ void cmdline_parser::output_wrap(std::ostream& os, const std::string& text, size
 
 void cmdline_parser::print_usage(std::ostream& os)
 {
-    std::ios state(NULL);
+    std::ios state(nullptr);
     state.copyfmt(os);
 
     os << "Usage: " << m_progname
@@ -305,7 +305,7 @@ bool cmdline_parser::process(int argc, const char* const* argv, std::ostream& os
 
 void cmdline_parser::print_result(std::ostream& os)
 {
-    std::ios state(NULL);
+    std::ios state(nullptr);
     state.copyfmt(os);
 
     int maxlong = std::max(m_param_maxlong, m_opt_maxlong);

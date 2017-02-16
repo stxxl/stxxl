@@ -45,9 +45,9 @@ typedef void* (* malloc_type)(size_t);
 typedef void (* free_type)(void*);
 typedef void* (* realloc_type)(void*, size_t);
 
-static malloc_type real_malloc = NULL;
-static free_type real_free = NULL;
-static realloc_type real_realloc = NULL;
+static malloc_type real_malloc = nullptr;
+static free_type real_free = nullptr;
+static realloc_type real_realloc = nullptr;
 
 /* a sentinel value prefixed to each allocation */
 static const size_t sentinel = 0xDEADC0DE;
@@ -67,8 +67,8 @@ static const int log_operations_init_heap = 0;
 
 static long long peak = 0, curr = 0, total = 0;
 
-static malloc_count_callback_type callback = NULL;
-static void* callback_cookie = NULL;
+static malloc_count_callback_type callback = nullptr;
+static void* callback_cookie = nullptr;
 
 /* add allocation to statistics */
 static void inc_count(size_t inc)
@@ -139,7 +139,7 @@ extern void * malloc(size_t size) noexcept
 {
     void* ret;
 
-    if (size == 0) return NULL;
+    if (size == 0) return nullptr;
 
     if (real_malloc)
     {
@@ -186,7 +186,7 @@ extern void free(void* ptr) noexcept
 {
     size_t size;
 
-    if (!ptr) return;   /* free(NULL) is no operation */
+    if (!ptr) return;   /* free(nullptr) is no operation */
 
     if ((char*)ptr >= init_heap &&
         (char*)ptr <= init_heap + init_heap_use)
@@ -227,7 +227,7 @@ extern void * calloc(size_t nmemb, size_t size) noexcept
 {
     void* ret;
     size *= nmemb;
-    if (!size) return NULL;
+    if (!size) return nullptr;
     ret = malloc(size);
     memset(ret, 0, size);
     return ret;
@@ -273,10 +273,10 @@ extern void * realloc(void* ptr, size_t size) noexcept
 
     if (size == 0) { /* special case size == 0 -> free() */
         free(ptr);
-        return NULL;
+        return nullptr;
     }
 
-    if (ptr == NULL) { /* special case ptr == 0 -> malloc() */
+    if (ptr == nullptr) { /* special case ptr == 0 -> malloc() */
         return malloc(size);
     }
 
@@ -320,19 +320,19 @@ static __attribute__ ((constructor)) void init(void)
     dlerror();
 
     real_malloc = (malloc_type)dlsym(RTLD_NEXT, "malloc");
-    if ((error = dlerror()) != NULL) {
+    if ((error = dlerror()) != nullptr) {
         fprintf(stderr, PPREFIX "error %s\n", error);
         exit(EXIT_FAILURE);
     }
 
     real_realloc = (realloc_type)dlsym(RTLD_NEXT, "realloc");
-    if ((error = dlerror()) != NULL) {
+    if ((error = dlerror()) != nullptr) {
         fprintf(stderr, PPREFIX "error %s\n", error);
         exit(EXIT_FAILURE);
     }
 
     real_free = (free_type)dlsym(RTLD_NEXT, "free");
-    if ((error = dlerror()) != NULL) {
+    if ((error = dlerror()) != nullptr) {
         fprintf(stderr, PPREFIX "error %s\n", error);
         exit(EXIT_FAILURE);
     }

@@ -333,7 +333,7 @@ private:
 public:
     //! constructs invalid iterator
     vector_iterator()
-        : offset(0), p_vector(NULL)
+        : offset(0), p_vector(nullptr)
     { }
     //! copy-constructor
     vector_iterator(const vector_iterator& a)
@@ -605,7 +605,7 @@ private:
 public:
     //! constructs invalid iterator
     const_vector_iterator()
-        : offset(0), p_vector(NULL)
+        : offset(0), p_vector(nullptr)
     { }
     //! copy-constructor
     const_vector_iterator(const const_vector_iterator& a)
@@ -965,7 +965,7 @@ public:
           m_page_status(div_ceil(m_bids.size(), page_size), uninitialized),
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
-          m_cache(NULL),
+          m_cache(nullptr),
           m_exported(false)
     {
         m_bm = block_manager::get_instance();
@@ -1018,7 +1018,7 @@ public:
     {
         flush();
         delete m_cache;
-        m_cache = NULL;
+        m_cache = nullptr;
     }
 
     //! \name Size and Capacity
@@ -1250,7 +1250,7 @@ public:
           m_page_status(div_ceil(m_bids.size(), page_size), valid_on_disk),
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
-          m_cache(NULL),
+          m_cache(nullptr),
           m_from(from),
           m_exported(false)
     {
@@ -1289,7 +1289,7 @@ public:
           m_page_status(div_ceil(m_bids.size(), page_size), uninitialized),
           m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(obj.numpages()),
-          m_cache(NULL),
+          m_cache(nullptr),
           m_exported(false)
     {
         assert(!obj.m_exported);
@@ -1528,7 +1528,7 @@ public:
         m_exported = true;
     }
 
-    //! Get the file associated with this vector, or NULL.
+    //! Get the file associated with this vector, or nullptr.
     const file_ptr & get_file() const
     {
         return m_from;
@@ -1907,7 +1907,7 @@ public:
     vector_bufreader(vector_iterator begin, vector_iterator end,
                      const size_t nbuffers = 0)
         : m_begin(begin), m_end(end),
-          m_bufin(NULL),
+          m_bufin(nullptr),
           m_nbuffers(nbuffers)
     {
         m_begin.flush(); // flush container
@@ -1923,7 +1923,7 @@ public:
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
     explicit vector_bufreader(const vector_type& vec, const size_t nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
-          m_bufin(NULL),
+          m_bufin(nullptr),
           m_nbuffers(nbuffers)
     {
         m_begin.flush(); // flush container
@@ -1988,7 +1988,7 @@ public:
 
         if (UNLIKELY(empty())) {
             delete m_bufin;
-            m_bufin = NULL;
+            m_bufin = nullptr;
         }
 
         return *this;
@@ -2177,7 +2177,7 @@ public:
     vector_bufreader_reverse(vector_iterator begin, vector_iterator end,
                              size_t nbuffers = 0)
         : m_begin(begin), m_end(end),
-          m_bufin(NULL),
+          m_bufin(nullptr),
           m_nbuffers(nbuffers)
     {
         m_begin.flush(); // flush container
@@ -2193,7 +2193,7 @@ public:
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
     explicit vector_bufreader_reverse(const vector_type& vec, size_t nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
-          m_bufin(NULL),
+          m_bufin(nullptr),
           m_nbuffers(nbuffers)
     {
         m_begin.flush(); // flush container
@@ -2262,7 +2262,7 @@ public:
 
         if (UNLIKELY(empty())) {
             delete m_bufin;
-            m_bufin = NULL;
+            m_bufin = nullptr;
         }
 
         return *this;
@@ -2363,7 +2363,7 @@ public:
         : m_iter(begin),
           m_end(m_iter.parent_vector()->end()),
           m_grown(false),
-          m_bufout(NULL),
+          m_bufout(nullptr),
           m_nbuffers(nbuffers)
     {
         if (m_nbuffers == 0)
@@ -2380,7 +2380,7 @@ public:
         : m_iter(vec.begin()),
           m_end(m_iter.parent_vector()->end()),
           m_grown(false),
-          m_bufout(NULL),
+          m_bufout(nullptr),
           m_nbuffers(nbuffers)
     {
         if (m_nbuffers == 0)
@@ -2416,7 +2416,7 @@ public:
                     m_bufout->flush(); // flushes overlap buffers
 
                 delete m_bufout;
-                m_bufout = NULL;
+                m_bufout = nullptr;
 
                 if (m_iter.block_offset() != 0)
                     m_iter.block_externally_updated();
@@ -2435,7 +2435,7 @@ public:
 
         assert(m_iter < m_end);
 
-        if (UNLIKELY(m_bufout == NULL))
+        if (UNLIKELY(m_bufout == nullptr))
         {
             if (m_iter.block_offset() != 0)
             {
@@ -2477,7 +2477,7 @@ public:
         ++m_iter;
 
         // if buf_ostream active, advance that too
-        if (LIKELY(m_bufout != NULL)) m_bufout->operator ++ ();
+        if (LIKELY(m_bufout != nullptr)) m_bufout->operator ++ ();
 
         return *this;
     }
@@ -2514,7 +2514,7 @@ public:
             }
 
             delete m_bufout;
-            m_bufout = NULL;
+            m_bufout = nullptr;
         }
 
         if (m_grown)

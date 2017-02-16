@@ -233,7 +233,7 @@ void ufs_file_base::_set_size(offset_type newsize)
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = newsize;
 
-        if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
+        if (!SetFilePointerEx(hfile, desired_pos, nullptr, FILE_BEGIN))
             STXXL_THROW_WIN_LASTERROR(io_error,
                                       "SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
                                       " newsize=" << newsize << " ");

@@ -438,7 +438,7 @@ protected:
 public:
     array_of_sequences_iterator()
     {
-        this->arrays = NULL;
+        this->arrays = nullptr;
         set(0);
     }
 

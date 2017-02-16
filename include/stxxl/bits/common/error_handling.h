@@ -137,10 +137,10 @@ namespace stxxl {
         DWORD dw = GetLastError();                                       \
         FormatMessage(                                                   \
             FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, \
-            NULL, dw,                                                    \
+            nullptr, dw,                                                 \
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),                   \
             (LPTSTR)&lpMsgBuf,                                           \
-            0, NULL);                                                    \
+            0, nullptr);                                                 \
         std::ostringstream msg;                                          \
         msg << "Error in " << STXXL_PRETTY_FUNCTION_NAME                 \
             << " : " << error_message                                    \

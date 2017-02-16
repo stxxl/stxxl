@@ -173,7 +173,7 @@ void linuxaio_queue::post_requests()
                 // empty, then try again.
 
                 // wait for at least one event to complete, no time limit
-                long num_events = syscall(SYS_io_getevents, context_, 1, max_events_, events, NULL);
+                long num_events = syscall(SYS_io_getevents, context_, 1, max_events_, events, nullptr);
                 if (num_events < 0) {
                     STXXL_THROW_ERRNO(io_error, "linuxaio_queue::post_requests"
                                       " io_getevents() nr_events=" << num_events);
@@ -233,7 +233,7 @@ void linuxaio_queue::wait_requests()
         // wait for at least one of them to finish
         long num_events;
         while (1) {
-            num_events = syscall(SYS_io_getevents, context_, 1, max_events_, events, NULL);
+            num_events = syscall(SYS_io_getevents, context_, 1, max_events_, events, nullptr);
             if (num_events < 0) {
                 if (errno == EINTR) {
                     // io_getevents may return prematurely in case a signal is received
@@ -264,9 +264,9 @@ void* linuxaio_queue::post_async(void* arg)
 #if STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
-    ExitThread(NULL);
+    ExitThread(nullptr);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -280,9 +280,9 @@ void* linuxaio_queue::wait_async(void* arg)
 #if STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
-    ExitThread(NULL);
+    ExitThread(nullptr);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 

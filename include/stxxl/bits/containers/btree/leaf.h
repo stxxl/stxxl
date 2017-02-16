@@ -98,7 +98,7 @@ private:
 
         // update links
         new_leaf->succ() = my_bid();
-        normal_leaf* pred_leaf = NULL;
+        normal_leaf* pred_leaf = nullptr;
         if (pred().valid())
         {
             new_leaf->pred() = pred();

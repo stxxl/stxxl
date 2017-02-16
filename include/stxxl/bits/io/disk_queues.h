@@ -116,7 +116,7 @@ public:
         if (queues_.find(disk) != queues_.end())
             return queues_[disk];
         else
-            return NULL;
+            return nullptr;
     }
 
     ~disk_queues()

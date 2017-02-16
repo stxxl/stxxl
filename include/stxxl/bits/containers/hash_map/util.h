@@ -78,7 +78,7 @@ struct bucket
     size_t i_subblock_;
 
     bucket()
-        : list_(NULL),
+        : list_(nullptr),
           n_external_(0),
           i_block_(0),
           i_subblock_(0)
@@ -155,7 +155,7 @@ public:
           page_size_(tuning::get_instance()->prefetch_page_size),
           prefetch_pages_(tuning::get_instance()->prefetch_pages),
           dirty_(false),
-          subblock_(NULL)
+          subblock_(nullptr)
     {
         if (seq_begin == seq_end)
             return;
@@ -517,7 +517,7 @@ struct HashedValuesStream
           end_bucket_(end_bucket),
           begin_bid_(begin_bid),
           i_bucket_(0),
-          node_(curr_bucket_ != end_bucket_ ? curr_bucket_->list_ : NULL),
+          node_(curr_bucket_ != end_bucket_ ? curr_bucket_->list_ : nullptr),
           i_external_(0)
     {
         if (!empty())

@@ -71,7 +71,7 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     if (posix_memalign((void**)&buffer, Alignment, alloc_size) != 0)
         throw std::bad_alloc();
 #endif
-    if (buffer == NULL)
+    if (buffer == nullptr)
         throw std::bad_alloc();
     #ifdef STXXL_ALIGNED_CALLOC
     memset(buffer, 0, alloc_size);

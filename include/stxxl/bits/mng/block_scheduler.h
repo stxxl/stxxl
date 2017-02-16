@@ -53,7 +53,7 @@ public:
 
 protected:
     external_block_type external_data;      //!external_data.valid if no associated space on disk
-    internal_block_type* internal_data;     //NULL if there is no internal memory reserved
+    internal_block_type* internal_data;     //nullptr if there is no internal memory reserved
     bool dirty;
     int_type reference_count;
 
@@ -77,7 +77,7 @@ public:
 
     //! If it has an internal_block. The internal_block implicitly holds valid data.
     bool is_internal() const
-    { return (internal_data != NULL); }
+    { return (internal_data != nullptr); }
 
     //! If the external_block does not hold valid data.
     bool is_dirty() const
@@ -203,8 +203,8 @@ public:
     }
 
     //! Bring the block in uninitialized state, freeing external and internal memory.
-    //! Returns a pointer to the internal_block, NULL if it had none.
-    //! \return A pointer to the freed internal_block, NULL if it had none.
+    //! Returns a pointer to the internal_block, nullptr if it had none.
+    //! \return A pointer to the freed internal_block, nullptr if it had none.
     internal_block_type * deinitialize()
     {
         assert(! is_acquired());
@@ -325,7 +325,7 @@ protected:
     block_scheduler_algorithm<SwappableBlockType>* algo;
 
     //! Get an internal_block from the freelist or a newly allocated one if available.
-    //! \return Pointer to the internal_block. NULL if none available.
+    //! \return Pointer to the internal_block. nullptr if none available.
     internal_block_type * get_free_internal_block()
     {
         if (! free_internal_blocks.empty())
@@ -553,7 +553,7 @@ protected:
     { return bs.algo; }
 
     //! Get an internal_block from the block_scheduler.
-    //! \return Pointer to the internal_block. NULL if none available.
+    //! \return Pointer to the internal_block. nullptr if none available.
     internal_block_type * get_free_internal_block_from_block_scheduler()
     { return bs.get_free_internal_block(); }
 
@@ -1564,7 +1564,7 @@ protected:
                                        !shall_keep_internal_block(scheduled_blocks.find(giver), false));
                             }
                             write_read_request* wrr = schedule_write(giver);
-                            schedule_meta->second.giver.first = (wrr != NULL);
+                            schedule_meta->second.giver.first = (wrr != nullptr);
                             schedule_meta->second.giver.second = giver;
                             schedule_meta->second.reserved_iblock = swappable_blocks[giver].detach_internal_block();
                             if (wrr)

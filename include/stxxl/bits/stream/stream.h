@@ -125,7 +125,7 @@ public:
     vector_iterator2stream(InputIterator begin, InputIterator end,
                            size_t nbuffers = 0)
         : m_current(begin), m_end(end),
-          in(static_cast<buf_istream_type*>(NULL))
+          in(static_cast<buf_istream_type*>(nullptr))
     {
         if (empty())
             return;
@@ -269,12 +269,12 @@ public:
         {
             STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator>");
             it_stream = new iterator2stream<InputIterator>(begin, end);
-            vec_it_stream = NULL;
+            vec_it_stream = nullptr;
         }
         else
         {
             STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator>");
-            it_stream = NULL;
+            it_stream = nullptr;
             vec_it_stream = new vector_iterator2stream<InputIterator>(begin, end, nbuffers);
         }
     }

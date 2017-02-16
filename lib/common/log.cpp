@@ -18,12 +18,12 @@
 
 namespace stxxl {
 
-logger::logger() : waitlog_stream_(NULL)
+logger::logger() : waitlog_stream_(nullptr)
 {
     const char* log_filename = getenv("STXXLLOGFILE");
-    log_stream_.open(log_filename == NULL ? "stxxl.log" : log_filename);
+    log_stream_.open(log_filename == nullptr ? "stxxl.log" : log_filename);
     const char* errlog_filename = getenv("STXXLERRLOGFILE");
-    errlog_stream_.open(errlog_filename == NULL ? "stxxl.errlog" : errlog_filename);
+    errlog_stream_.open(errlog_filename == nullptr ? "stxxl.errlog" : errlog_filename);
 #ifdef STXXL_WAIT_LOG_ENABLED
     const char* waitlog_filename = getenv("STXXLWAITLOGFILE");
     if (waitlog_filename) {

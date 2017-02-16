@@ -80,7 +80,7 @@ protected:
 
     void make_invalid()
     {
-        btree = NULL;
+        btree = nullptr;
         pos = 0;
     }
 

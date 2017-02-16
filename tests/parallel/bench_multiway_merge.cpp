@@ -131,7 +131,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
     {
         stxxl::scoped_print_timer spt("Merging", total_bytes);
 
-        const char* method_name = NULL;
+        const char* method_name = nullptr;
 
         typedef std::pair<typename sequence_type::iterator,
                           typename sequence_type::iterator>

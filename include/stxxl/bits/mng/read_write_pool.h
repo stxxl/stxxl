@@ -166,7 +166,7 @@ public:
         return p_pool->read(block, bid, *w_pool);
     }
 
-    //! Returns the request pointer for a hinted block, or an invalid NULL
+    //! Returns the request pointer for a hinted block, or an invalid nullptr
     //! request in case it was not requested due to lack of prefetch buffers.
     request_ptr find_hint(bid_type bid)
     {

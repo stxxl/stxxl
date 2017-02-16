@@ -203,7 +203,7 @@ void multiseq_partition(
     {
         n /= 2;
 
-        const value_type* lmax = NULL; // impossible to avoid the warning?
+        const value_type* lmax = nullptr; // impossible to avoid the warning?
         for (diff_type i = 0; i < m; ++i)
         {
             if (a[i] > 0)
@@ -291,7 +291,7 @@ void multiseq_partition(
     // edges of the border
 
     // maximum of left edge, minimum of right edge
-    value_type* maxleft = NULL, * minright = NULL;
+    value_type* maxleft = nullptr, * minright = nullptr;
     for (diff_type i = 0; i < m; ++i)
     {
         if (a[i] > 0)
@@ -430,7 +430,7 @@ ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
     {
         n /= 2;
 
-        const ValueType* lmax = NULL;
+        const ValueType* lmax = nullptr;
         for (diff_type i = 0; i < m; ++i)
         {
             if (a[i] > 0)
@@ -520,7 +520,7 @@ ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
     // edges of the border
 
     // maximum of left edge, minimum of right edge
-    ValueType* maxleft = NULL, * minright = NULL;
+    ValueType* maxleft = nullptr, * minright = nullptr;
     for (diff_type i = 0; i < m; ++i)
     {
         if (a[i] > 0)

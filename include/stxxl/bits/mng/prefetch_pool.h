@@ -139,7 +139,7 @@ public:
     {
         free_blocks.push_back(block);
         ++free_blocks_size;
-        block = NULL; // prevent caller from using the block any further
+        block = nullptr; // prevent caller from using the block any further
     }
 
     //! Take out a block from the pool, one unhinted free block must be
@@ -261,7 +261,7 @@ public:
         return (busy_blocks.find(bid) != busy_blocks.end());
     }
 
-    //! Returns the request pointer for a hinted block, or an invalid NULL
+    //! Returns the request pointer for a hinted block, or an invalid nullptr
     //! request in case it was not requested due to lack of prefetch buffers.
     request_ptr find(bid_type bid)
     {

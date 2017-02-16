@@ -440,7 +440,7 @@ public:
     cmdline_parser()
         : m_opt_maxlong(8),
           m_param_maxlong(8),
-          m_progname(NULL),
+          m_progname(nullptr),
           m_verbose_process(true),
           m_linewrap(80)
     { }

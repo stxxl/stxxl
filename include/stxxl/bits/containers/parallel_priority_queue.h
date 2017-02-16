@@ -100,7 +100,7 @@ protected:
 public:
     //! default constructor (should not be used directly)
     ppq_iterator()
-        : m_block_pointers(NULL)
+        : m_block_pointers(nullptr)
     { }
 
     //! constructor
@@ -261,7 +261,7 @@ private:
             assert(m_block_index == m_block_pointers->size());
             assert(local_index == 0);
             //-tb old: m_current = (*m_block_pointers)[m_block_index - 1].second;
-            m_current = NULL;
+            m_current = nullptr;
         }
     }
 };
@@ -488,7 +488,7 @@ protected:
     bid_vector m_bids;
 
     //! A vector of size m_num_blocks with block_type pointers, some of them
-    //! will be filled while writing, but most are NULL.
+    //! will be filled while writing, but most are nullptr.
     block_vector m_blocks;
 
     //! Begin and end pointers for each block, used for merging with
@@ -574,7 +574,7 @@ public:
           m_capacity(0),
           m_num_blocks(0),
           m_level(0),
-          m_pool(NULL),
+          m_pool(nullptr),
 
           // vectors
           m_bids(0),
@@ -661,7 +661,7 @@ public:
             // put block back into pool
             m_pool->add_prefetch(m_blocks[i]);
             // invalidate block entry
-            m_blocks[i] = NULL;
+            m_blocks[i] = nullptr;
             m_requests[i] = request_ptr();
         }
 
@@ -671,7 +671,7 @@ public:
 
         // check that all is empty
         for (size_t i = block_index; i < end_block_index; ++i)
-            assert(m_blocks[i] == NULL);
+            assert(m_blocks[i] == nullptr);
     }
 
     //! Returns the capacity in items.
@@ -850,7 +850,7 @@ protected:
     {
         // check that all blocks where written
         for (size_t i = 0; i < m_num_blocks; ++i)
-            assert(m_blocks[i] == NULL);
+            assert(m_blocks[i] == nullptr);
 
         // compatibility to the block write interface
         m_size = m_capacity;
@@ -870,7 +870,7 @@ protected:
     void read_block(size_t block_index)
     {
         assert(block_index < m_num_blocks);
-        assert(m_blocks[block_index] == NULL ||
+        assert(m_blocks[block_index] == nullptr ||
                m_blocks[block_index] == reinterpret_cast<block_type*>(1));
 
         if (m_blocks[block_index] == reinterpret_cast<block_type*>(1))
@@ -911,7 +911,7 @@ protected:
     void write_block(size_t block_index)
     {
         assert(block_index < m_num_blocks);
-        assert(m_blocks[block_index] != NULL &&
+        assert(m_blocks[block_index] != nullptr &&
                m_blocks[block_index] != reinterpret_cast<block_type*>(1));
 
         // calculate minimum and maximum values
@@ -929,7 +929,7 @@ protected:
         // write out block (in background)
         m_pool->write(m_blocks[block_index], m_bids[block_index]);
 
-        m_blocks[block_index] = NULL;
+        m_blocks[block_index] = nullptr;
     }
 
 public:
@@ -948,7 +948,7 @@ public:
         STXXL_DEBUG("ea[" << this << "]: prefetching block_index=" << i);
 
         assert(m_pool->size_write() > 0);
-        assert(m_blocks[i] == NULL);
+        assert(m_blocks[i] == nullptr);
 
         // steal block from pool, but also perform read via pool, since this
         // checks the associated write_pool.
@@ -1016,7 +1016,7 @@ public:
             // put block back into pool
             m_pool->add_prefetch(m_blocks[i]);
             // invalidate block entry
-            m_blocks[i] = NULL;
+            m_blocks[i] = nullptr;
             m_requests[i] = request_ptr();
         }
     }
@@ -1031,7 +1031,7 @@ public:
                         " block " << i);
 
             assert(m_pool->size_write() > 0);
-            assert(m_blocks[i] == NULL);
+            assert(m_blocks[i] == nullptr);
             m_blocks[i] = m_pool->steal_prefetch();
             m_requests[i] = m_pool->read(m_blocks[i], m_bids[i]);
         }
@@ -1198,8 +1198,8 @@ protected:
                 m_block_pointers[block_index].first
                 + (m_capacity - block_index * block_items);
 
-        assert(m_block_pointers[block_index].first != NULL);
-        assert(m_block_pointers[block_index].second != NULL);
+        assert(m_block_pointers[block_index].first != nullptr);
+        assert(m_block_pointers[block_index].second != nullptr);
     }
 
     inline size_t last_block_items()
@@ -1376,7 +1376,7 @@ public:
     public:
         //! default constructor (should not be used directly)
         iterator()
-            : m_writer(NULL), m_live(false), m_index(0)
+            : m_writer(nullptr), m_live(false), m_index(0)
         { }
 
         //! construct a new iterator

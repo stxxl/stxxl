@@ -56,7 +56,7 @@ private:
 public:
     Timing()
     {
-        str = NULL;
+        str = nullptr;
         pos = 0;
         active = 0.0;
         last_start = -1.0;
@@ -71,7 +71,7 @@ public:
      *  \param  tag  Optional description that will be output again with the timings.
      *  It should describe the operation before the tic(). To time a series of \c n
      *  operations, there should be \c n+1 calls to tic(), and one call to print(). */
-    inline void tic(const char* tag = NULL)
+    inline void tic(const char* tag = nullptr)
     {
         points_in_time[pos] = omp_get_wtime();
         tags[pos] = tag;
@@ -138,7 +138,7 @@ private:
             i++;
             if (i == pos)
                 break;
-            if (tags[i] == NULL)
+            if (tags[i] == nullptr)
                 sprintf(tmp, "%2d:     ", i - 1);
             else
                 sprintf(tmp, "%20s:     ", tags[i]);
@@ -180,7 +180,7 @@ private:
     static const char* empty_string;
 
 public:
-    inline void tic(const char* /*tag*/ = NULL) { }
+    inline void tic(const char* /*tag*/ = nullptr) { }
     inline void start() { }
     inline void stop() { }
     inline void reset() { }

@@ -74,7 +74,7 @@ void singleton<INSTANCE, destroy_on_exit>::destroy_instance()
 
 template <typename INSTANCE, bool destroy_on_exit>
 typename singleton<INSTANCE, destroy_on_exit>::volatile_instance_pointer
-singleton<INSTANCE, destroy_on_exit>::instance = NULL;
+singleton<INSTANCE, destroy_on_exit>::instance = nullptr;
 
 } // namespace stxxl
 

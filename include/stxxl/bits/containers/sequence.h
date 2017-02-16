@@ -642,7 +642,7 @@ public:
                     assert(m_next_bid == m_sequence.m_bids.end());
                     assert(m_current_block == m_sequence.m_back_block);
                     // nothing to give back to sequence pool
-                    m_current_element = NULL;
+                    m_current_element = nullptr;
                     return *this;
                 }
                 else if (m_size <= block_type::size)    // still items left in last partial block
@@ -773,7 +773,7 @@ public:
                     assert(m_next_bid == m_sequence.m_bids.rend());
                     assert(m_current_block == m_sequence.m_front_block);
                     // nothing to give back to sequence pool
-                    m_current_element = NULL;
+                    m_current_element = nullptr;
                     return *this;
                 }
                 else if (m_size <= block_type::size)

@@ -52,33 +52,33 @@ protected:
 public:
     //! Create a new empty object
     binary_buffer()
-        : m_data(NULL), m_size(0), m_capacity(0)
+        : m_data(nullptr), m_size(0), m_capacity(0)
     { }
 
     //! Copy-Constructor, duplicates memory content.
     binary_buffer(const binary_buffer& other)
-        : m_data(NULL), m_size(0), m_capacity(0)
+        : m_data(nullptr), m_size(0), m_capacity(0)
     {
         assign(other);
     }
 
     //! Constructor, copy memory area.
     binary_buffer(const void* data, size_t n)
-        : m_data(NULL), m_size(0), m_capacity(0)
+        : m_data(nullptr), m_size(0), m_capacity(0)
     {
         assign(data, n);
     }
 
     //! Constructor, create object with n bytes pre-allocated.
     explicit binary_buffer(size_t n)
-        : m_data(NULL), m_size(0), m_capacity(0)
+        : m_data(nullptr), m_size(0), m_capacity(0)
     {
         alloc(n);
     }
 
     //! Constructor from std::string, copies string content.
     explicit binary_buffer(const std::string& str)
-        : m_data(NULL), m_size(0), m_capacity(0)
+        : m_data(nullptr), m_size(0), m_capacity(0)
     {
         assign(str.data(), str.size());
     }
@@ -146,7 +146,7 @@ public:
     binary_buffer & dealloc()
     {
         if (m_data) free(m_data);
-        m_data = NULL;
+        m_data = nullptr;
         m_size = m_capacity = 0;
 
         return *this;
@@ -156,7 +156,7 @@ public:
     const char * detach()
     {
         const char* data = m_data;
-        m_data = NULL;
+        m_data = nullptr;
         m_size = m_capacity = 0;
         return data;
     }

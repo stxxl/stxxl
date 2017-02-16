@@ -560,7 +560,7 @@ public:
         for (internal_size_type i_bucket = 0;
              i_bucket < buckets_.size(); i_bucket++)
         {
-            _erase_nodes(buckets_[i_bucket].list_, NULL);
+            _erase_nodes(buckets_[i_bucket].list_, nullptr);
             buckets_[i_bucket] = bucket_type();
         }
         oblivious_ = false;
@@ -915,7 +915,7 @@ protected:
         return node;
     }
 
-    //! Free nodes in range [first, last). If last is NULL all nodes will be
+    //! Free nodes in range [first, last). If last is nullptr all nodes will be
     //! freed.
     void _erase_nodes(node_type* first, node_type* last)
     {
@@ -962,7 +962,7 @@ protected:
     node_type*
     _find_key_internal(const bucket_type& bucket, const key_type& key) const
     {
-        node_type* old = NULL;
+        node_type* old = nullptr;
         for (node_type* curr = bucket.list_;
              curr && _leq(curr->value_.first, key);
              curr = curr->next())
@@ -1192,7 +1192,7 @@ protected:
         for (internal_size_type i_bucket = 0;
              i_bucket < old_buckets.size(); i_bucket++)
         {
-            _erase_nodes(old_buckets[i_bucket].list_, NULL);
+            _erase_nodes(old_buckets[i_bucket].list_, nullptr);
             old_buckets[i_bucket] = bucket_type();
         }
 
@@ -1424,7 +1424,7 @@ public:
         for (internal_size_type i_bucket = 0;
              i_bucket < old_buckets.size(); i_bucket++)
         {
-            _erase_nodes(old_buckets[i_bucket].list_, NULL);
+            _erase_nodes(old_buckets[i_bucket].list_, nullptr);
             old_buckets[i_bucket] = bucket_type();
         }
 

@@ -913,13 +913,13 @@ public:
                 assert(vmerge_sa->empty());
                 ready = true;
 
-                assert(vmerge_sa != NULL);
-                delete vmerge_sa, vmerge_sa = NULL;
+                assert(vmerge_sa != nullptr);
+                delete vmerge_sa, vmerge_sa = nullptr;
 
-                assert(mod0_result != NULL && mod1_result != NULL && mod2_result != NULL);
-                delete mod0_result, mod0_result = NULL;
-                delete mod1_result, mod1_result = NULL;
-                delete mod2_result, mod2_result = NULL;
+                assert(mod0_result != nullptr && mod1_result != nullptr && mod2_result != nullptr);
+                delete mod0_result, mod0_result = nullptr;
+                delete mod1_result, mod1_result = nullptr;
+                delete mod2_result, mod2_result = nullptr;
             }
 
             return *this;
@@ -1123,7 +1123,7 @@ public:
             if (out_sa->empty()) {
                 finished = true;
                 delete out_sa;
-                out_sa = NULL;
+                out_sa = nullptr;
             }
             return *this;
         }

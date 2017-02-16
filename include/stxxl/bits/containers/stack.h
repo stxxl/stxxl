@@ -95,7 +95,7 @@ public:
     normal_stack()
         : m_size(0),
           cache_offset(0),
-          current_element(NULL),
+          current_element(nullptr),
           cache(blocks_per_page * 2),
           front_page(cache.begin() + blocks_per_page),
           back_page(cache.begin()),
@@ -131,7 +131,7 @@ public:
     explicit normal_stack(const StackType& stack_)
         : m_size(0),
           cache_offset(0),
-          current_element(NULL),
+          current_element(nullptr),
           cache(blocks_per_page * 2),
           front_page(cache.begin() + blocks_per_page),
           back_page(cache.begin()),
@@ -342,7 +342,7 @@ public:
     grow_shrink_stack()
         : m_size(0),
           cache_offset(0),
-          current_element(NULL),
+          current_element(nullptr),
           cache(blocks_per_page * 2),
           cache_buffers(cache.begin()),
           overlap_buffers(cache.begin() + blocks_per_page),
@@ -382,7 +382,7 @@ public:
     explicit grow_shrink_stack(const StackType& stack_)
         : m_size(0),
           cache_offset(0),
-          current_element(NULL),
+          current_element(nullptr),
           cache(blocks_per_page * 2),
           cache_buffers(cache.begin()),
           overlap_buffers(cache.begin() + blocks_per_page),
@@ -593,7 +593,7 @@ public:
           cache_offset(0),
           cache(new block_type),
           pref_aggr(prefetch_aggressiveness),
-          owned_pool(NULL),
+          owned_pool(nullptr),
           pool(&pool_)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
@@ -667,10 +667,10 @@ public:
             for ( ; cur != end; ++cur)
             {
                 // FIXME: read_write_pool needs something like cancel_write(bid)
-                block_type* b = NULL;   // w_pool.steal(*cur);
+                block_type* b = nullptr; // w_pool.steal(*cur);
                 if (b)
                 {
-                    pool->add(cache);   // return buffer
+                    pool->add(cache);    // return buffer
                     cache = b;
                 }
             }
@@ -864,7 +864,7 @@ public:
 
     //! Default constructor: creates empty stack.
     migrating_stack()
-        : int_impl(new int_stack_type()), ext_impl(NULL)
+        : int_impl(new int_stack_type()), ext_impl(nullptr)
     { }
 
     //! non-copyable: delete copy-constructor
@@ -898,13 +898,13 @@ public:
     bool internal() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-        return (int_impl != NULL);
+        return (int_impl != nullptr);
     }
     //! Returns true if current implementation is external, otherwise false.
     bool external() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-        return (ext_impl != NULL);
+        return (ext_impl != nullptr);
     }
 
     //! \}
@@ -960,7 +960,7 @@ public:
                 // migrate to external stack
                 ext_impl = new ext_stack_type(*int_impl);
                 delete int_impl;
-                int_impl = NULL;
+                int_impl = nullptr;
             }
         }
         else

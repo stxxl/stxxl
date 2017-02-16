@@ -94,7 +94,7 @@ protected:
     alloc_strategy alloc_strategy_;
 
 public:
-    bid_sequence() : bids(NULL) { }
+    bid_sequence() : bids(nullptr) { }
     explicit bid_sequence(size_type size_)
     {
         bids = new simple_vector<bid_type>(size_);

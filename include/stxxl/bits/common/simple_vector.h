@@ -60,11 +60,11 @@ public:
 public:
     //! allocate empty simple vector
     simple_vector()
-        : m_size(0), m_array(NULL)
+        : m_size(0), m_array(nullptr)
     { }
     //! allocate vector's memory
     explicit simple_vector(const size_type& sz)
-        : m_size(sz), m_array(NULL)
+        : m_size(sz), m_array(nullptr)
     {
         if (m_size > 0)
             m_array = new value_type[m_size];

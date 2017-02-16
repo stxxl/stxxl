@@ -174,7 +174,7 @@ public:
         if (read_reqs[ibuffer].valid())
             read_reqs[ibuffer]->wait();
 
-        read_reqs[ibuffer] = NULL;
+        read_reqs[ibuffer] = nullptr;
 
         if (nextread < seq_length)
         {

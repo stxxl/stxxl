@@ -448,7 +448,7 @@ protected:
         current_col;                     // /
     block_size_type current_block_row,
         current_block_col;
-    internal_block_type* current_iblock; // NULL if block is not acquired
+    internal_block_type* current_iblock; // nullptr if block is not acquired
 
     void acquire_current_iblock()
     {
@@ -739,7 +739,7 @@ protected:
         current_col;                     // /
     block_size_type current_block_row,
         current_block_col;
-    internal_block_type* current_iblock; // NULL if block is not acquired
+    internal_block_type* current_iblock; // nullptr if block is not acquired
 
     void acquire_current_iblock()
     {

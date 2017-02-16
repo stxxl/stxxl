@@ -123,9 +123,9 @@ inline int64_t atoi64(const char* s)
 inline uint64_t atouint64(const char* s)
 {
 #if STXXL_MSVC
-    return _strtoui64(s, NULL, 10);
+    return _strtoui64(s, nullptr, 10);
 #else
-    return strtoull(s, NULL, 10);
+    return strtoull(s, nullptr, 10);
 #endif
 }
 

@@ -100,7 +100,7 @@ struct SubTool subtools[] = {
         "mallinfo", &do_mallinfo, true,
         "Show mallinfo statistics."
     },
-    { NULL, NULL, false, NULL }
+    { nullptr, nullptr, false, nullptr }
 };
 
 int main_usage(const char* arg0)

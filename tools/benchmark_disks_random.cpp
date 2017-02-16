@@ -108,7 +108,7 @@ void run_test(external_size_type span, external_size_type worksize, bool do_init
 
         std::cout << "Random block access..." << std::endl;
 
-        srand((unsigned int)time(NULL));
+        srand((unsigned int)time(nullptr));
         std::random_shuffle(blocks.begin(), blocks.end());
 
         begin = timestamp();

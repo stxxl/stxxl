@@ -150,13 +150,13 @@ public:
             }
 
             (**it2fix).i_bucket_ = i_bucket_new;
-            (**it2fix).node_ = NULL;
+            (**it2fix).node_ = nullptr;
             (**it2fix).i_external_ = i_ext;
             (**it2fix).source_ = hash_map_type::src_external;
             // external position is now known (i_ext) and therefore valid
             (**it2fix).ext_valid_ = true;
             (**it2fix).reset_reader();
-            (**it2fix).reader_ = NULL;
+            (**it2fix).reader_ = nullptr;
         }
     }
 

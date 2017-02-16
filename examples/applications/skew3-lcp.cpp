@@ -1458,7 +1458,7 @@ public:
             isa2_ptr = ISA2;
             sa12_ptr = SA_12;
 
-            l1_ptr = NULL;
+            l1_ptr = nullptr;
         }
 
         void saveL1(char l)
@@ -1468,7 +1468,7 @@ public:
 
         void saveRMQ(offset_type r_i, offset_type r_j)
         {
-            if (lcp12_ptr != NULL) {
+            if (lcp12_ptr != nullptr) {
                 if (r_j > offset_type(0))
                     r_j = r_j - offset_type(1);
 
@@ -1486,11 +1486,11 @@ public:
 
         void finalize()
         {
-            if (l1_ptr != NULL) return;
+            if (l1_ptr != nullptr) return;
 
             l1_ptr = new simpleDeqStream(l1Deq);
 
-            if (lcp12_ptr != NULL) {
+            if (lcp12_ptr != nullptr) {
                 pairDeqStream rmqStream = l2RMQ.get_stream();
 
                 sparseTableAlgo<build_lcp, pairDeqStream> sp_algo;
@@ -1501,7 +1501,7 @@ public:
                 sp_algo.answerRMQ(l2Deq);
             }
             delete lcp12_ptr;
-            lcp12_ptr = NULL;
+            lcp12_ptr = nullptr;
 
             l2_ptr = new simpleDeqStream(l2Deq);
 
@@ -1710,7 +1710,7 @@ public:
             else {
                 blank = true;
 
-                assert(l1_ptr != NULL && l2_ptr != NULL && l3_ptr != NULL);
+                assert(l1_ptr != nullptr && l2_ptr != nullptr && l3_ptr != nullptr);
                 delete l1_ptr;
                 delete l2_ptr;
                 delete l3_ptr;
@@ -2386,17 +2386,17 @@ public:
                 assert(vmerge_sa_lcp->empty());
                 ready = true;
 
-                assert(vmerge_sa_lcp != NULL);
+                assert(vmerge_sa_lcp != nullptr);
                 delete vmerge_sa_lcp;
-                vmerge_sa_lcp = NULL;
+                vmerge_sa_lcp = nullptr;
 
-                assert(mod0_result != NULL && mod1_result != NULL && mod2_result != NULL);
+                assert(mod0_result != nullptr && mod1_result != nullptr && mod2_result != nullptr);
                 delete mod0_result;
-                mod0_result = NULL;
+                mod0_result = nullptr;
                 delete mod1_result;
-                mod1_result = NULL;
+                mod1_result = nullptr;
                 delete mod2_result;
-                mod2_result = NULL;
+                mod2_result = nullptr;
             }
 
             return *this;
@@ -2575,8 +2575,8 @@ public:
 
             offset_array_it_rg source(text.begin(), text.end());
 
-            // build lcp12[i] = 0 forall i -> use NULL
-            return new buildSA_type(source, isa1, isa2, text.size(), ram_use, lcp_names, NULL, NULL);
+            // build lcp12[i] = 0 forall i -> use nullptr
+            return new buildSA_type(source, isa1, isa2, text.size(), ram_use, lcp_names, nullptr, nullptr);
         }   //dc3-lcp()
 
     public:
@@ -2592,7 +2592,7 @@ public:
         ~algorithm()
         {
             delete out_sa;
-            out_sa = NULL;
+            out_sa = nullptr;
         }
 
         const value_type& operator * () const
@@ -2606,7 +2606,7 @@ public:
 
             ++(*out_sa);
 
-            if ((out_sa != NULL) && (out_sa->empty()))
+            if ((out_sa != nullptr) && (out_sa->empty()))
                 finished = true;
 
             return *this;

@@ -27,7 +27,7 @@ struct run_cursor
     size_t pos;
     BlockType* buffer;
 
-    run_cursor() : pos(0), buffer(NULL) { }
+    run_cursor() : pos(0), buffer(nullptr) { }
 
     inline typename BlockType::const_reference current() const
     {
@@ -81,7 +81,7 @@ struct run_cursor2 : public run_cursor<BlockType>
         return prefetcher_;
     }
 
-    explicit run_cursor2(prefetcher_type* p = NULL) : prefetcher_(p) { }
+    explicit run_cursor2(prefetcher_type* p = nullptr) : prefetcher_(p) { }
 #endif
 
     inline bool empty() const
@@ -106,7 +106,7 @@ struct run_cursor2 : public run_cursor<BlockType>
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
 template <typename MustBeVoid>
-void* have_prefetcher<MustBeVoid>::untyped_prefetcher = NULL;
+void* have_prefetcher<MustBeVoid>::untyped_prefetcher = nullptr;
 #endif
 
 #if 0

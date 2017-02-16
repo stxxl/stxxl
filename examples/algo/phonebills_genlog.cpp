@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     const uint64_t nclients = ncalls / av_calls;
     uint64_t calls_made = 0;
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     vector_type log;
     log.reserve(2 * ncalls);

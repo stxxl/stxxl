@@ -182,7 +182,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     const size_t el_in_run = m2 * block_type::size;     // # el in a run
     STXXL_VERBOSE1("basic_runs_creator::compute_result m2=" << m2);
     size_t blocks1_length = 0, blocks2_length = 0;
-    block_type* Blocks1 = NULL;
+    block_type* Blocks1 = nullptr;
 
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
     Blocks1 = new block_type[m2 * 2];
@@ -558,8 +558,8 @@ public:
           m_memsize(memory_to_use / BlockSize / sort_memory_usage_factor()),
           m_m2(m_memsize / 2),
           m_el_in_run(m_m2 * block_type::size),
-          m_blocks1(NULL), m_blocks2(NULL),
-          m_write_reqs(NULL)
+          m_blocks1(nullptr), m_blocks2(nullptr),
+          m_write_reqs(nullptr)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
         if (!(2 * BlockSize * sort_memory_usage_factor() <= m_memory_to_use)) {
@@ -623,10 +623,10 @@ public:
         if (m_blocks1)
         {
             delete[] ((m_blocks1 < m_blocks2) ? m_blocks1 : m_blocks2);
-            m_blocks1 = m_blocks2 = NULL;
+            m_blocks1 = m_blocks2 = nullptr;
 
             delete[] m_write_reqs;
-            m_write_reqs = NULL;
+            m_write_reqs = nullptr;
         }
     }
 
@@ -1034,7 +1034,7 @@ private:
 #endif
             delete m_prefetcher;
             delete[] m_prefetch_seq;
-            m_prefetcher = NULL;
+            m_prefetcher = nullptr;
         }
     }
 
@@ -1125,12 +1125,12 @@ public:
         : m_cmp(c),
           m_memory_to_use(memory_to_use),
           m_buffer_block(new out_block_type),
-          m_prefetch_seq(NULL),
-          m_prefetcher(NULL),
-          m_losers(NULL)
+          m_prefetch_seq(nullptr),
+          m_prefetcher(nullptr),
+          m_losers(nullptr)
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-          , seqs(NULL),
-          buffers(NULL),
+          , seqs(nullptr),
+          buffers(nullptr),
           num_currently_mergeable(0)
 #endif
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -1292,7 +1292,7 @@ public:
     void deallocate()
     {
         deallocate_prefetcher();
-        m_sruns = NULL;         // release reference on result object
+        m_sruns = nullptr;         // release reference on result object
     }
 
 public:

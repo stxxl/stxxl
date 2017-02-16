@@ -44,7 +44,7 @@ public:
         request_ptr req;
         bid_type bid;
 
-        busy_entry() : block(NULL) { }
+        busy_entry() : block(nullptr) { }
         busy_entry(const busy_entry& a) : block(a.block), req(a.req), bid(a.bid) { }
         busy_entry(block_type*& bl, request_ptr& r, bid_type& bi)
             : block(bl), req(r), bid(bi) { }
@@ -137,7 +137,7 @@ public:
         }
         request_ptr result = block->write(bid);
         busy_blocks.push_back(busy_entry(block, result, bid));
-        block = NULL; // prevent caller from using the block any further
+        block = nullptr; // prevent caller from using the block any further
         return result;
     }
 
@@ -224,7 +224,7 @@ public:
                 return p;
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     // returns a block and a (potentially unfinished) I/O request associated with it
@@ -246,14 +246,14 @@ public:
         }
         STXXL_VERBOSE_WPOOL("::steal_request NOT FOUND");
         // not matching request found, return a dummy
-        return std::pair<block_type*, request_ptr>((block_type*)NULL, request_ptr());
+        return std::pair<block_type*, request_ptr>((block_type*)nullptr, request_ptr());
     }
 
     void add(block_type*& block)
     {
         STXXL_VERBOSE_WPOOL("::add " << block);
         free_blocks.push_back(block);
-        block = NULL; // prevent caller from using the block any further
+        block = nullptr; // prevent caller from using the block any further
     }
 
 protected:

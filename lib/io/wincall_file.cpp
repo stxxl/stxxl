@@ -37,7 +37,7 @@ void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
     HANDLE handle = file_des_;
     LARGE_INTEGER desired_pos;
     desired_pos.QuadPart = offset;
-    if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
+    if (!SetFilePointerEx(handle, desired_pos, nullptr, FILE_BEGIN))
     {
         STXXL_THROW_WIN_LASTERROR(
             io_error,
@@ -57,7 +57,7 @@ void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
         {
             DWORD NumberOfBytesRead = 0;
             assert(bytes <= std::numeric_limits<DWORD>::max());
-            if (!ReadFile(handle, buffer, (DWORD)bytes, &NumberOfBytesRead, NULL))
+            if (!ReadFile(handle, buffer, (DWORD)bytes, &NumberOfBytesRead, nullptr))
             {
                 STXXL_THROW_WIN_LASTERROR(
                     io_error,
@@ -77,7 +77,7 @@ void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
         {
             DWORD NumberOfBytesWritten = 0;
             assert(bytes <= std::numeric_limits<DWORD>::max());
-            if (!WriteFile(handle, buffer, (DWORD)bytes, &NumberOfBytesWritten, NULL))
+            if (!WriteFile(handle, buffer, (DWORD)bytes, &NumberOfBytesWritten, nullptr))
             {
                 STXXL_THROW_WIN_LASTERROR(
                     io_error,

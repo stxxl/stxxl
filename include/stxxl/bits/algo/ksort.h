@@ -153,7 +153,7 @@ inline void write_out(
             {
                 next_read->block = cur_blk;
                 next_read->req = read_reqs + out_block;
-                read_reqs[out_block] = NULL;
+                read_reqs[out_block] = nullptr;
                 bids[out_block] = next_read->bid = *(it++);
 
                 write_reqs[out_block] = cur_blk->write(

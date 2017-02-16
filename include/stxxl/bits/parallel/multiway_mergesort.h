@@ -343,7 +343,7 @@ parallel_sort_mwms(RandomAccessIterator begin,
     if (SETTINGS::sort_splitting == SETTINGS::SAMPLING)
         sd.samples = new ValueType[num_threads * (SETTINGS::sort_mwms_oversampling * num_threads - 1)];
     else
-        sd.samples = NULL;
+        sd.samples = nullptr;
     sd.offsets = new DiffType[num_threads - 1];
     sd.pieces = new std::vector<PMWMSPiece<DiffType> >[num_threads];
     for (int s = 0; s < num_threads; s++)

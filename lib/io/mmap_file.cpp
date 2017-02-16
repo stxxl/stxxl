@@ -33,7 +33,7 @@ void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
         file_stats_, bytes, op == request::WRITE);
 
     int prot = (op == request::READ) ? PROT_READ : PROT_WRITE;
-    void* mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des_, offset);
+    void* mem = mmap(nullptr, bytes, prot, MAP_SHARED, file_des_, offset);
     // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des_, offset);
     // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
     if (mem == MAP_FAILED)
@@ -47,7 +47,7 @@ void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
     }
     else if (mem == 0)
     {
-        STXXL_THROW_ERRNO(io_error, "mmap() returned NULL");
+        STXXL_THROW_ERRNO(io_error, "mmap() returned nullptr");
     }
     else
     {
