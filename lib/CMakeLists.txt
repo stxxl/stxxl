@@ -43,7 +43,7 @@ set(LIBSTXXL_SOURCES
 
   mng/block_manager.cpp
   mng/config.cpp
-  mng/disk_allocator.cpp
+  mng/disk_block_allocator.cpp
 
   algo/async_schedule.cpp
 

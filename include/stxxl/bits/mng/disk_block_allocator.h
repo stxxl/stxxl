@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/mng/disk_allocator.h
+ *  include/stxxl/bits/mng/disk_block_allocator.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -38,7 +38,12 @@ namespace stxxl {
 //! \ingroup mnglayer
 //! \{
 
-class disk_allocator
+/*!
+ * This class manages allocation of blocks onto a single disk. It contains a map
+ * of all currently allocated blocks. The block_manager selects which of the
+ * disk_block_allocator objects blocks are drawn from.
+ */
+class disk_block_allocator
 {
     typedef std::pair<stxxl::int64, stxxl::int64> place;
 
@@ -83,7 +88,7 @@ class disk_allocator
     }
 
 public:
-    disk_allocator(stxxl::file* storage, const disk_config& cfg)
+    disk_block_allocator(stxxl::file* storage, const disk_config& cfg)
         : free_bytes(0),
           disk_bytes(0),
           cfg_bytes(cfg.size),
@@ -95,11 +100,11 @@ public:
     }
 
     //! non-copyable: delete copy-constructor
-    disk_allocator(const disk_allocator&) = delete;
+    disk_block_allocator(const disk_block_allocator&) = delete;
     //! non-copyable: delete assignment operator
-    disk_allocator& operator = (const disk_allocator&) = delete;
+    disk_block_allocator& operator = (const disk_block_allocator&) = delete;
 
-    ~disk_allocator()
+    ~disk_block_allocator()
     {
         if (disk_bytes > cfg_bytes) { // reduce to original size
             storage->set_size(cfg_bytes);
@@ -144,7 +149,7 @@ public:
     {
         std::unique_lock<std::mutex> lock(mutex);
 
-        STXXL_VERBOSE2("disk_allocator::delete_block<" << BlockSize <<
+        STXXL_VERBOSE2("disk_block_allocator::delete_block<" << BlockSize <<
                        ">(pos=" << bid.offset << ", size=" << bid.size <<
                        "), free:" << free_bytes << " total:" << disk_bytes);
 
@@ -153,7 +158,7 @@ public:
 };
 
 template <size_t BlockSize>
-void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
+void disk_block_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 {
     size_t requested_size = 0;
 
@@ -165,7 +170,7 @@ void disk_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end)
 
     std::unique_lock<std::mutex> lock(mutex);
 
-    STXXL_VERBOSE2("disk_allocator::new_blocks<BlockSize>,  BlockSize = " << BlockSize <<
+    STXXL_VERBOSE2("disk_block_allocator::new_blocks<BlockSize>,  BlockSize = " << BlockSize <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
                    ", blocks: " << (end - begin) <<
                    " begin: " << static_cast<void*>(begin) <<

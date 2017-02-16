@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/config.h>
-#include <stxxl/bits/mng/disk_allocator.h>
+#include <stxxl/bits/mng/disk_block_allocator.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/disk_queues.h>
 
@@ -36,9 +36,9 @@ block_manager::block_manager()
     // initialize config (may read config files now)
     config->check_initialized();
 
-    // allocate disk_allocators_
+    // allocate block_allocators_
     ndisks = config->disks_number();
-    disk_allocators_.resize(ndisks);
+    block_allocators_.resize(ndisks);
     disk_files_.resize(ndisks);
 
     uint64 total_size = 0;
@@ -72,7 +72,7 @@ block_manager::block_manager()
         // create queue for the file.
         disk_queues::get_instance()->make_queue(disk_files_[i].get());
 
-        disk_allocators_[i] = new disk_allocator(disk_files_[i].get(), cfg);
+        block_allocators_[i] = new disk_block_allocator(disk_files_[i].get(), cfg);
     }
 
     if (ndisks > 1)
@@ -95,7 +95,7 @@ block_manager::~block_manager()
     for (size_t i = ndisks; i > 0; )
     {
         --i;
-        delete disk_allocators_[i];
+        delete block_allocators_[i];
         disk_files_[i].reset();
     }
 }
@@ -105,7 +105,7 @@ uint64 block_manager::get_total_bytes() const
     uint64 total = 0;
 
     for (unsigned i = 0; i < ndisks; ++i)
-        total += disk_allocators_[i]->get_total_bytes();
+        total += block_allocators_[i]->get_total_bytes();
 
     return total;
 }
@@ -115,7 +115,7 @@ uint64 block_manager::get_free_bytes() const
     uint64 total = 0;
 
     for (unsigned i = 0; i < ndisks; ++i)
-        total += disk_allocators_[i]->get_free_bytes();
+        total += block_allocators_[i]->get_free_bytes();
 
     return total;
 }
