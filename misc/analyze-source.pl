@@ -274,12 +274,12 @@ sub process_cpp {
         $guard = uc($guard)."_HEADER";
         #print $guard."\n";
 
-        expect($path, $i, @data, "#ifndef $guard\n"); ++$i;
-        expect($path, $i, @data, "#define $guard\n"); ++$i;
+        expectr($path, $i, @data, "#ifndef $guard\n", qr/^#ifndef /); ++$i;
+        expectr($path, $i, @data, "#define $guard\n", qr/^#define /); ++$i;
 
         my $n = scalar(@data)-1;
         if ($data[$n] =~ m!// vim:!) { --$n; } # skip vim
-        expect($path, $n, @data, "#endif // !$guard\n");
+        expectr($path, $n, @data, "#endif // !$guard\n", qr/^#endif /);
     }
 
     # run uncrustify if in filter

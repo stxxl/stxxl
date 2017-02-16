@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_BLOCK_ALLOC_HEADER
-#define STXXL_MNG_BLOCK_ALLOC_HEADER
+#ifndef STXXL_MNG_BLOCK_ALLOC_STRATEGY_HEADER
+#define STXXL_MNG_BLOCK_ALLOC_STRATEGY_HEADER
 
 #include <stxxl/bits/mng/block_manager.h>
 
@@ -257,5 +257,5 @@ struct offset_allocator
 
 } // namespace stxxl
 
-#endif // !STXXL_MNG_BLOCK_ALLOC_HEADER
+#endif // !STXXL_MNG_BLOCK_ALLOC_STRATEGY_HEADER
 // vim: et:ts=4:sw=4

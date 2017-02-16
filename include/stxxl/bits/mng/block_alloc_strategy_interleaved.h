@@ -1,4 +1,6 @@
 /***************************************************************************
+ *  include/stxxl/bits/mng/block_alloc_strategy_interleaved.h
+ *
  *  include/stxxl/bits/mng/block_alloc_interleaved.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
@@ -11,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
-#define STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
+#ifndef STXXL_MNG_BLOCK_ALLOC_STRATEGY_INTERLEAVED_HEADER
+#define STXXL_MNG_BLOCK_ALLOC_STRATEGY_INTERLEAVED_HEADER
 
 #include <stxxl/bits/mng/block_manager.h>
 
@@ -162,5 +164,5 @@ struct interleaved_alloc_traits<single_disk>
 
 } // namespace stxxl
 
-#endif // !STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
+#endif // !STXXL_MNG_BLOCK_ALLOC_STRATEGY_INTERLEAVED_HEADER
 // vim: et:ts=4:sw=4

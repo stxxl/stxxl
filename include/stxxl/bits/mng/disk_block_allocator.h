@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_DISK_ALLOCATOR_HEADER
-#define STXXL_MNG_DISK_ALLOCATOR_HEADER
+#ifndef STXXL_MNG_DISK_BLOCK_ALLOCATOR_HEADER
+#define STXXL_MNG_DISK_BLOCK_ALLOCATOR_HEADER
 
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/exceptions.h>
@@ -255,5 +255,5 @@ void disk_block_allocator::new_blocks(BID<BlockSize>* begin, BID<BlockSize>* end
 
 } // namespace stxxl
 
-#endif // !STXXL_MNG_DISK_ALLOCATOR_HEADER
+#endif // !STXXL_MNG_DISK_BLOCK_ALLOCATOR_HEADER
 // vim: et:ts=4:sw=4
