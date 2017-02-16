@@ -17,7 +17,7 @@
 
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/algo/adaptor.h>
+#include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/common/counting_ptr.h>
 
 #include <vector>

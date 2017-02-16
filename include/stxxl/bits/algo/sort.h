@@ -27,7 +27,7 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/intksort.h>
-#include <stxxl/bits/algo/adaptor.h>
+#include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/mng/block_prefetcher.h>
 #include <stxxl/bits/mng/buf_writer.h>
