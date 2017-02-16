@@ -134,8 +134,7 @@ private:
 
             m_btree->m_node_cache.unfix_node(new_bid);
 
-            STXXL_VERBOSE1("btree::normal_node split leaf " << this
-                                                            << " splitter: " << result.first);
+            //req-ostream STXXL_VERBOSE1("btree::normal_node split leaf " << this << " splitter: " << result.first);
         }
 
         return result;

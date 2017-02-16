@@ -144,8 +144,7 @@ private:
             m_btree->m_iterator_map.register_iterator(**it2fix);
         }
 
-        STXXL_VERBOSE1("btree::normal_leaf split leaf " << this
-                                                        << " splitter: " << splitter.first);
+        //req-ostream STXXL_VERBOSE1("btree::normal_leaf split leaf " << this << " splitter: " << splitter.first);
 
 #if STXXL_VERBOSE_LEVEL >= 1
         if (pred_leaf)
@@ -154,10 +153,12 @@ private:
             STXXL_VERBOSE1("btree::normal_leaf pred_part.largest     = " << pred_leaf->back().first);
         }
 #endif
+        /* req-ostream
         STXXL_VERBOSE1("btree::normal_leaf smaller_part.smallest = " << new_leaf->front().first);
         STXXL_VERBOSE1("btree::normal_leaf smaller_part.largest  = " << new_leaf->back().first);
         STXXL_VERBOSE1("btree::normal_leaf larger_part.smallest  = " << front().first);
         STXXL_VERBOSE1("btree::normal_leaf larger_part.largest   = " << back().first);
+        */
 
         m_btree->m_leaf_cache.unfix_node(new_bid);
     }
@@ -303,9 +304,9 @@ public:
 
     void dump()
     {
-        STXXL_VERBOSE2("Dump of leaf " << this);
-        for (unsigned i = 0; i < size(); ++i)
-            STXXL_VERBOSE2((*this)[i].first << " " << (*this)[i].second);
+        STXXL_VERBOSE2("Dump of leaf " << this << ". Please remove comment in lines below");
+        // for (unsigned i = 0; i < size(); ++i)
+        //     STXXL_VERBOSE2((*this)[i].first << " " << (*this)[i].second);
     }
 
     std::pair<iterator, bool> insert(
