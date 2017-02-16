@@ -33,7 +33,7 @@ namespace stxxl {
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
 //! \param M number of bytes for internal use
-//! \param AS parallel disk allocation strategy
+//! \param AllocStrategy parallel disk block allocation strategy
 //!
 //! - BlockSize size of the block to use for external memory data structures
 //! - PageSize page size in blocks to use for external memory data structures

@@ -143,7 +143,7 @@ public:
     //! same queue, unless there is a common queue (e.g. with linuxaio).
     virtual int get_queue_id() const = 0;
 
-    //! Returns the file's disk allocator number
+    //! Returns the file's parallel disk block allocator number
     virtual int get_allocator_id() const = 0;
 
     //! Locks file for reading and writing (acquires a lock in the file system).

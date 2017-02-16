@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>

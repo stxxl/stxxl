@@ -43,7 +43,7 @@ namespace stxxl {
 //!
 //! \tparam ValueType type of the contained objects (POD with no references to internal memory)
 //! \tparam BlockSize size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValueType)
-//! \tparam AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
+//! \tparam AllocStr parallel disk block allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
 //! \tparam SizeType size data type, default is \c external_size_type
 template <class ValueType,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),

@@ -39,7 +39,7 @@
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/disk_allocator.h>
-#include <stxxl/bits/mng/block_alloc.h>
+#include <stxxl/bits/mng/block_alloc_strategy.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/simple_vector.h>
@@ -90,7 +90,7 @@ public:
     //! return total number of bytes available in all disks
     uint64 get_total_bytes() const;
 
-    //! Return total number of free disk allocations
+    //! Return total number of free bytes
     uint64 get_free_bytes() const;
 
     //! Allocates new blocks.

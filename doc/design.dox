@@ -83,7 +83,7 @@ AIO file and request implementation classes are derived from the generic \ref st
 
 \section mng_layer The Block-Management Layer
 
-The Block-Management (BM) layer provides an implementation of the central concept in I/O efficient algorithms and data structures: a block of elements (\ref stxxl::typed_block object). Besides, it includes a toolbox for allocating, deallocating, buffered writing, prefetching, and caching of blocks. The external memory manager (object \ref stxxl::block_manager) is responsible for allocating and deallocating external memory space on disks. The manager supports four parallel disk allocation strategies: simple striping, fully randomized, simple randomized \cite BarGroVit97, and randomized cycling \cite VitHut01.
+The Block-Management (BM) layer provides an implementation of the central concept in I/O efficient algorithms and data structures: a block of elements (\ref stxxl::typed_block object). Besides, it includes a toolbox for allocating, deallocating, buffered writing, prefetching, and caching of blocks. The external memory manager (object \ref stxxl::block_manager) is responsible for allocating and deallocating external memory space on disks. The manager supports four parallel disk block allocation strategies: simple striping, fully randomized, simple randomized \cite BarGroVit97, and randomized cycling \cite VitHut01.
 
 The BM layer also delivers a set of helper classes that efficiently implement frequently used sequential patterns of interaction with the (parallel disk) external memory. The optimal parallel disk queued writing \cite HutSanVit01b is implemented in the \ref stxxl::buffered_writer class. The class operates on blocks. The \ref stxxl::buf_ostream class is build on top of \ref stxxl::buffered_writer and has a high level interface, similar to the interface of STL output iterators. Analogously, the classes \ref stxxl::block_prefetcher and \ref stxxl::buf_istream contain an implementation of an optimal parallel disk \b prefetching algorithm \cite HutSanVit01b. The helper objects of the BM layer support overlapping between I/O and computation, which means that they are able to perform I/O in the background, while the user thread is doing useful computations.
 
@@ -229,9 +229,9 @@ The \ref stxxl::VECTOR_GENERATOR has the following template parameters:
 strategy           | identifier
 ------------------ | ----------
 striping           | striping
-simple randomized  | SR
-fully randomized   | FR
-randomized cycling | RC
+simple randomized  | simple_random
+fully randomized   | fully_random
+randomized cycling | random_cyclic
 
 - Supported paging strategies:
 strategy            | identifier
@@ -245,7 +245,7 @@ least recently used | lru
 
 - VECTOR_GENERATOR<double,8>::result -- external vector of \b double's , with \b eight blocks per page, the cache with eight pages, 2 MiB blocks, Random Allocation and lru cache replacement strategy
 
-- VECTOR_GENERATOR<double,8,2,524288,SR>::result -- external vector of \b double's, with \b eight blocks per page, the cache
+- VECTOR_GENERATOR<double,8,2,524288,simple_random>::result -- external vector of \b double's, with \b eight blocks per page, the cache
 with \b two pages, \b 512 KiB blocks, <b>Simple Randomized</b> allocation and lru cache replacement strategy
 
 \section design_vector_memory Internal Memory Consumption of stxxl::vector

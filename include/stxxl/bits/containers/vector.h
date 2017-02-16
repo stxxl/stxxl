@@ -803,8 +803,8 @@ public:
 //! \tparam PagerType pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
 //!  default is \c lru_pager<8>
 //! \tparam BlockSize external block size in bytes, default is 2 MiB
-//! \tparam AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-//!  default is RC
+//! \tparam AllocStr one of allocation strategies: \c striping , \c random_cyclic , \c simple_random , or \c fully_random
+//!  default is random_cyclic
 //!
 //! Memory consumption: BlockSize*x*PageSize bytes
 //! \warning Do not store references to the elements of an external vector. Such references
@@ -2566,7 +2566,7 @@ public:
 //! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)
 //! \tparam CachePages number of pages in cache, default: \b 8 (recommended >= 2)
 //! \tparam BlockSize external block size \a B in bytes, default: <b>2 MiB</b>
-//! \tparam AllocStr parallel disk allocation strategies: \c striping, RC, SR, or FR. default: \b RC.
+//! \tparam AllocStr parallel disk block allocation strategies: \c striping, random_cyclic, simple_random, or fully_random. default: \b random_cyclic.
 //! \tparam Pager pager type: \c random or \c lru, default: \b lru.
 //!
 //! \warning Do not store references to the elements of an external vector. Such references

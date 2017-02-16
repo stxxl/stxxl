@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/mng/block_alloc.h
+ *  include/stxxl/bits/mng/block_alloc_strategy.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -27,7 +27,7 @@ namespace stxxl {
 //! Standard allocation strategies encapsulated in functors.
 //! \{
 
-//! Example disk allocation scheme functor.
+//! Example parallel disk block allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct basic_allocation_strategy
 {
@@ -37,7 +37,7 @@ struct basic_allocation_strategy
     static const char * name();
 };
 
-//! Striping disk allocation scheme functor.
+//! Striping parallel disk block allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct striping
 {
@@ -63,7 +63,7 @@ public:
     }
 };
 
-//! Fully randomized disk allocation scheme functor.
+//! Fully randomized parallel disk block allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct fully_random : public striping
 {
@@ -86,7 +86,7 @@ public:
     }
 };
 
-//! Simple randomized disk allocation scheme functor.
+//! Simple randomized parallel disk block allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct simple_random : public striping
 {
@@ -121,7 +121,7 @@ public:
     }
 };
 
-//! Randomized cycling disk allocation scheme functor.
+//! Randomized cycling parallel disk block allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct random_cyclic : public striping
 {
@@ -190,7 +190,7 @@ struct random_cyclic_flash : public random_cyclic
     }
 };
 
-//! 'Single disk' disk allocation scheme functor.
+//! 'Single disk' parallel disk block allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct single_disk
 {

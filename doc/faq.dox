@@ -100,14 +100,14 @@ but you should not share a data structure between threads (without implementing 
 This is a design choice, having the data structures thread-safe would mean a significant performance loss.
 
 
-\section faq_diskalloc Disk Allocation on Multiple Disks
+\section faq_diskalloc Parallel Disk Block Allocation on Multiple Disks
 
 Q: I have configured several disks to use with STXXL. Why does STXXL fail complaining about the <b>lack of space</b>? According to my calclulations, the space on the disks should be sufficient.
 
 A: This may happen if the disks have <b>different size</b>. With the default parameters \c STXXL containers use randomized block-to-disk allocation strategies
 that distribute data evenly between the disks but ignore the availability of free space on them. Thus when the smallest disk is full, the program will abort because it cannot grow the file on that disk.
 
-A2: This round-robin disk allocation is due to the history of STXXL's support for parallel disk algorithms. It would be great if someone would contribute a patch for this issue. This would require adapting stxxl::disk_allocator and stxxl::block_manager to skip full disks when allocating new blocks.
+A2: This round-robin block allocation is due to the history of STXXL's support for parallel disk algorithms. It would be great if someone would contribute a patch for this issue. This would require adapting stxxl::disk_allocator and stxxl::block_manager to skip full disks when allocating new blocks.
 
 \section faq_msclr STXXL in a Microsoft CLR Library
 

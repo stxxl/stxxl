@@ -13,7 +13,7 @@
  **************************************************************************/
 
 #include <stxxl/mng>
-#include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
 #include <stxxl/bits/common/error_handling.h>
 
 template <typename strategy>
