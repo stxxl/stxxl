@@ -184,8 +184,8 @@ void
 create_runs(
     InputBidIterator it,
     RunType** runs,
-    const unsigned_type nruns,
-    const unsigned_type m2,
+    const size_t nruns,
+    const size_t m2,
     KeyExtractor keyobj)
 {
     typedef typename BlockType::value_type type;
@@ -226,7 +226,7 @@ create_runs(
         read_reqs[i] = Blocks1[i].read(bids[i]);
     }
 
-    unsigned_type k = 0;
+    size_t k = 0;
     const int shift1 = (int)(sizeof(key_type) * 8 - log_k1);
     const int shift2 = shift1 - log_k2;
     STXXL_VERBOSE("shift1: " << shift1 << " shift2:" << shift2);
@@ -256,7 +256,7 @@ create_runs(
 
         int_type out_block = 0;
         size_t out_pos = 0;
-        unsigned_type next_run_size = (k < nruns - 1) ? (runs[k + 1]->size()) : 0;
+        size_t next_run_size = (k < nruns - 1) ? (runs[k + 1]->size()) : 0;
 
         // recurse on each bucket
         type_key_* c = refs2;
@@ -345,30 +345,30 @@ public:
 
 template <typename BlockType, typename RunType, typename KeyExtractor>
 bool check_ksorted_runs(RunType** runs,
-                        unsigned_type nruns,
-                        unsigned_type m,
+                        size_t nruns,
+                        size_t m,
                         KeyExtractor keyext)
 {
     typedef BlockType block_type;
     typedef typename BlockType::value_type value_type;
 
     STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
-    unsigned_type irun = 0;
+    size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
-        const unsigned_type nblocks_per_run = runs[irun]->size();
-        unsigned_type blocks_left = nblocks_per_run;
+        const size_t nblocks_per_run = runs[irun]->size();
+        size_t blocks_left = nblocks_per_run;
         block_type* blocks = new block_type[m];
         request_ptr* reqs = new request_ptr[m];
         value_type last = keyext.min_value();
 
-        for (unsigned_type off = 0; off < nblocks_per_run; off += m)
+        for (size_t off = 0; off < nblocks_per_run; off += m)
         {
-            const unsigned_type nblocks = std::min(blocks_left, m);
-            const unsigned_type nelements = nblocks * block_type::size;
+            const size_t nblocks = std::min(blocks_left, m);
+            const size_t nelements = nblocks * block_type::size;
             blocks_left -= nblocks;
 
-            for (unsigned_type j = 0; j < nblocks; ++j)
+            for (size_t j = 0; j < nblocks; ++j)
             {
                 reqs[j] = blocks[j].read((*runs[irun])[off + j].bid);
             }
@@ -379,7 +379,7 @@ bool check_ksorted_runs(RunType** runs,
                 STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
                 STXXL_MSG(" first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]));
                 STXXL_MSG(" last  value: " << last << " with key" << keyext(last));
-                for (unsigned_type k = 0; k < block_type::size; ++k)
+                for (size_t k = 0; k < block_type::size; ++k)
                     STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]));
 
                 delete[] reqs;
@@ -387,18 +387,18 @@ bool check_ksorted_runs(RunType** runs,
                 return false;
             }
 
-            for (unsigned_type j = 0; j < nblocks; ++j)
+            for (size_t j = 0; j < nblocks; ++j)
             {
                 if (keyext(blocks[j][0]) != (*runs[irun])[off + j].key)
                 {
                     STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j));
                     STXXL_MSG("                   trigger value: " << (*runs[irun])[off + j].key);
                     STXXL_MSG("Data in the block:");
-                    for (unsigned_type k = 0; k < block_type::size; ++k)
+                    for (size_t k = 0; k < block_type::size; ++k)
                         STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]));
 
                     STXXL_MSG("BIDS:");
-                    for (unsigned_type k = 0; k < nblocks; ++k)
+                    for (size_t k = 0; k < nblocks; ++k)
                     {
                         if (k == j)
                             STXXL_MSG("Bad one comes next.");
@@ -416,13 +416,13 @@ bool check_ksorted_runs(RunType** runs,
             {
                 STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                 STXXL_MSG("Data in blocks:");
-                for (unsigned_type j = 0; j < nblocks; ++j)
+                for (size_t j = 0; j < nblocks; ++j)
                 {
-                    for (unsigned_type k = 0; k < block_type::size; ++k)
+                    for (size_t k = 0; k < block_type::size; ++k)
                         STXXL_MSG("     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]));
                 }
                 STXXL_MSG("BIDS:");
-                for (unsigned_type k = 0; k < nblocks; ++k)
+                for (size_t k = 0; k < nblocks; ++k)
                 {
                     STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                 }
@@ -443,13 +443,13 @@ bool check_ksorted_runs(RunType** runs,
 }
 
 template <typename BlockType, typename RunType, typename KeyExtractor>
-void merge_runs(RunType** in_runs, unsigned_type nruns, RunType* out_run, unsigned_type _m, KeyExtractor keyobj)
+void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, KeyExtractor keyobj)
 {
     typedef BlockType block_type;
     typedef block_prefetcher<BlockType, typename RunType::iterator> prefetcher_type;
     typedef run_cursor2<BlockType, prefetcher_type> run_cursor_type;
 
-    unsigned_type i;
+    size_t i;
     RunType consume_seq(out_run->size());
 
     int_type* prefetch_seq = new int_type[out_run->size()];
@@ -498,7 +498,7 @@ void merge_runs(RunType** in_runs, unsigned_type nruns, RunType* out_run, unsign
 
     buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
 
-    unsigned_type out_run_size = out_run->size();
+    size_t out_run_size = out_run->size();
 
     run_cursor2_cmp<block_type, prefetcher_type, KeyExtractor> cmp(keyobj);
     loser_tree<
@@ -520,8 +520,8 @@ void merge_runs(RunType** in_runs, unsigned_type nruns, RunType* out_run, unsign
     block_manager* bm = block_manager::get_instance();
     for (i = 0; i < nruns; i++)
     {
-        unsigned_type sz = in_runs[i]->size();
-        for (unsigned_type j = 0; j < sz; j++)
+        size_t sz = in_runs[i]->size();
+        for (size_t j = 0; j < sz; j++)
             bm->delete_block((*in_runs[i])[j].bid);
 
         delete in_runs[i];
@@ -535,8 +535,8 @@ template <typename BlockType,
 simple_vector<
     trigger_entry<typename BlockType::bid_type, typename KeyExtractor::key_type>
     >*
-ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
-             unsigned_type _m, KeyExtractor keyobj)
+ksort_blocks(InputBidIterator input_bids, size_t _n,
+             size_t _m, KeyExtractor keyobj)
 {
     typedef BlockType block_type;
     typedef typename BlockType::value_type type;
@@ -546,16 +546,16 @@ ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
     typedef simple_vector<trigger_entry_type> run_type;
     typedef typename interleaved_alloc_traits<AllocStrategy>::strategy interleaved_alloc_strategy;
 
-    unsigned_type m2 = div_ceil(_m, 2);
-    const unsigned_type m2_rf = m2 * block_type::raw_size /
+    size_t m2 = div_ceil(_m, 2);
+    const size_t m2_rf = m2 * block_type::raw_size /
                                 (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
     STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
                   m2_rf << " due to key size: " << sizeof(typename KeyExtractor::key_type) << " bytes");
     m2 = m2_rf;
-    unsigned_type full_runs = _n / m2;
-    unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
-    unsigned_type nruns = full_runs + partial_runs;
-    unsigned_type i;
+    size_t full_runs = _n / m2;
+    size_t partial_runs = ((_n % m2) ? 1 : 0);
+    size_t nruns = full_runs + partial_runs;
+    size_t i;
 
     block_manager* mng = block_manager::get_instance();
 
@@ -571,7 +571,7 @@ ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
 #ifdef INTERLEAVED_ALLOC
     if (partial_runs)
     {
-        unsigned_type last_run_size = _n - full_runs * m2;
+        size_t last_run_size = _n - full_runs * m2;
         runs[i] = new run_type(last_run_size);
 
         mng->new_blocks(interleaved_alloc_strategy(nruns, AllocStrategy()),
@@ -625,7 +625,7 @@ ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
         {
             int_type runs2merge = std::min(runs_left, merge_factor);
             blocks_in_new_run = 0;
-            for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
+            for (size_t i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
                 blocks_in_new_run += runs[i]->size();
 
             // allocate run
@@ -725,7 +725,7 @@ ksort_blocks(InputBidIterator input_bids, unsigned_type _n,
  * \param M amount of memory for internal use (in bytes)
  */
 template <typename ExtIterator, typename KeyExtractor>
-void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_type M)
+void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
 {
     typedef simple_vector<
             ksort_local::trigger_entry<
@@ -738,7 +738,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
     typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy_type;
     typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
 
-    unsigned_type n = 0;
+    size_t n = 0;
     block_manager* mng = block_manager::get_instance();
 
     first.flush();
@@ -769,7 +769,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
 
                 req = last_block->read(*last.bid());
 
-                unsigned_type i = 0;
+                size_t i = 0;
                 for ( ; i < first.block_offset(); i++)
                 {
                     first_block->elem[i] = keyobj.min_value();
@@ -872,7 +872,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 mng->new_block(fully_random(), first_bid);                // try to overlap
                 req->wait();
 
-                unsigned_type i = 0;
+                size_t i = 0;
                 for ( ; i < first.block_offset(); i++)
                 {
                     first_block->elem[i] = keyobj.min_value();
@@ -944,7 +944,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_ty
                 block_type* last_block = new block_type;
                 bid_type last_bid;
                 request_ptr req;
-                unsigned_type i;
+                size_t i;
 
                 req = last_block->read(*last.bid());
                 mng->new_block(fully_random(), last_bid);
@@ -1072,7 +1072,7 @@ struct ksort_defaultkey
  * \remark Order in the result is non-stable
  */
 template <typename ExtIterator>
-void ksort(ExtIterator first, ExtIterator last, unsigned_type M)
+void ksort(ExtIterator first, ExtIterator last, size_t M)
 {
     ksort(first, last,
           ksort_defaultkey<typename ExtIterator::vector_type::value_type>(), M);

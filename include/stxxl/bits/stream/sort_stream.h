@@ -461,10 +461,10 @@ private:
     bool m_result_computed;
 
     //! total number of elements in a run
-    const internal_size_type m_el_in_run;
+    const size_t m_el_in_run;
 
     //! current number of elements in the run m_blocks1
-    internal_size_type m_cur_el;
+    size_t m_cur_el;
 
     //! accumulation buffer of size m_m2 blocks, half the available memory size
     block_type* m_blocks1;
@@ -496,7 +496,7 @@ protected:
     }
 
     //! Sort a specific run, contained in a sequences of blocks.
-    void sort_run(block_type* run, internal_size_type elements)
+    void sort_run(block_type* run, size_t elements)
     {
         check_sort_settings();
         potentially_parallel::sort(make_element_iterator(run, 0),

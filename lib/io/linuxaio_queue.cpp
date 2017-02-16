@@ -206,8 +206,8 @@ void linuxaio_queue::handle_events(io_event* events, long num_events, bool cance
 {
     for (int e = 0; e < num_events; ++e)
     {
-        // unsigned_type is as long as a pointer, and like this, we avoid an icpc warning
-        request_ptr* r = reinterpret_cast<request_ptr*>(static_cast<unsigned_type>(events[e].data));
+        // size_t is as long as a pointer, and like this, we avoid an icpc warning
+        request_ptr* r = reinterpret_cast<request_ptr*>(static_cast<size_t>(events[e].data));
         r->get()->completed(canceled);
         delete r;                    // release auto_ptr reference
         num_free_events_.signal();

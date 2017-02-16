@@ -170,7 +170,7 @@ public:
 
     virtual ~file()
     {
-        unsigned_type nr = get_request_nref();
+        size_t nr = get_request_nref();
         if (nr != 0)
             STXXL_ERRMSG("stxxl::file is being deleted while there are "
                          "still " << nr << " (unfinished) requests "
@@ -212,7 +212,7 @@ public:
     }
 
     //! return number of referenced requests
-    unsigned_type get_request_nref()
+    size_t get_request_nref()
     {
         return m_request_ref.get_reference_count();
     }

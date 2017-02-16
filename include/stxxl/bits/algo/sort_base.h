@@ -38,9 +38,9 @@
 namespace stxxl {
 
 // Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) runs at once
-inline unsigned_type optimal_merge_factor(unsigned_type num_runs, unsigned_type max_concurrent_runs)
+inline size_t optimal_merge_factor(size_t num_runs, size_t max_concurrent_runs)
 {
-    return unsigned_type(ceil(pow(double(num_runs), 1. / ceil(log(double(num_runs)) / log(double(max_concurrent_runs))))));
+    return size_t(ceil(pow(double(num_runs), 1. / ceil(log(double(num_runs)) / log(double(max_concurrent_runs))))));
 }
 
 } // namespace stxxl

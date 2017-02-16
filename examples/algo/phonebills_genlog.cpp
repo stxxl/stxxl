@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 
         return 0;
     }
-    stxxl::internal_size_type M = atol(argv[3]) * 1024 * 1024;
+    size_t M = atol(argv[3]) * 1024 * 1024;
     const uint64_t ncalls = stxxl::atouint64(argv[1]);
     const long av_calls = atol(argv[2]);
     const uint64_t nclients = ncalls / av_calls;

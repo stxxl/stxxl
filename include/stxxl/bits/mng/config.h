@@ -42,7 +42,7 @@ public:
     std::string path;
 
     //! file size to initially allocate
-    uint64 size;
+    external_size_type size;
 
     //! io implementation to access file
     std::string io_impl;
@@ -54,7 +54,7 @@ public:
     disk_config();
 
     //! initializing constructor, also parses fileio parameter
-    disk_config(const std::string& path, uint64 size, const std::string& fileio);
+    disk_config(const std::string& path, external_size_type size, const std::string& fileio);
 
     //! initializing constructor, parse full line as in config files
     explicit disk_config(const std::string& line);
@@ -249,7 +249,7 @@ public:
     //! Returns disk size.
     //! \param disk disk's identifier
     //! \return disk size in bytes
-    inline stxxl::uint64 disk_size(size_t disk) const
+    inline external_size_type disk_size(size_t disk) const
     {
         assert(is_initialized);
         return disks_list[disk].size;
@@ -264,7 +264,7 @@ public:
     }
 
     //! Returns the total size over all disks
-    uint64 total_size() const;
+    external_size_type total_size() const;
 
     //! \}
 };

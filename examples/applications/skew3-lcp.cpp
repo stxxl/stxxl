@@ -43,7 +43,6 @@
 #include <string>
 #include <vector>
 
-using stxxl::internal_size_type;
 using stxxl::external_size_type;
 
 /// Global variables, types and helpers.

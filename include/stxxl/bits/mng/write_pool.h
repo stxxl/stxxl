@@ -63,9 +63,9 @@ protected:
 public:
     //! Constructs pool.
     //! \param init_size initial number of blocks in the pool
-    explicit write_pool(unsigned_type init_size = 1)
+    explicit write_pool(size_t init_size = 1)
     {
-        for (unsigned_type i = 0; i < init_size; ++i)
+        for (size_t i = 0; i < init_size; ++i)
         {
             free_blocks.push_back(new block_type);
             STXXL_VERBOSE_WPOOL("  create block=" << free_blocks.back());
@@ -112,7 +112,7 @@ public:
     }
 
     //! Returns number of owned blocks.
-    unsigned_type size() const { return free_blocks.size() + busy_blocks.size(); }
+    size_t size() const { return free_blocks.size() + busy_blocks.size(); }
 
     //! Passes a block to the pool for writing.
     //! \param block block to write. Ownership of the block goes to the pool.
@@ -172,7 +172,7 @@ public:
 
     //! Resizes size of the pool.
     //! \param new_size new size of the pool after the call
-    void resize(unsigned_type new_size)
+    void resize(size_t new_size)
     {
         int_type diff = int_type(new_size) - int_type(size());
         if (diff > 0)

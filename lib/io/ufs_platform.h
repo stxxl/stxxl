@@ -72,7 +72,7 @@
     #define lseek _lseeki64
   #endif
   #ifndef off_t
-    #define off_t int64
+    #define off_t int64_t
   #endif
 #endif
 

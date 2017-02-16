@@ -27,7 +27,7 @@ namespace parallel {
  * Unsigned integer to index elements.
  * The total number of elements for each algorithm must fit into this type.
  */
-typedef uint64 sequence_index_t;
+typedef uint64_t sequence_index_t;
 /**
  * Unsigned integer to index a thread number.
  * The maximum thread number must fit into this type.
@@ -36,7 +36,7 @@ typedef int thread_index_t;
 /**
  * Longest compare-and-swappable integer type on this platform.
  */
-typedef int64 lcas_t;
+typedef int64_t lcas_t;
 /**
  * Number of bits of ::lcas_t.
  */

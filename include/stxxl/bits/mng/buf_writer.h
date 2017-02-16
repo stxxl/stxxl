@@ -38,11 +38,11 @@ class buffered_writer
     typedef typename block_type::bid_type bid_type;
 
 protected:
-    const unsigned_type nwriteblocks;
+    const size_t nwriteblocks;
     block_type* write_buffers;
     bid_type* write_bids;
     request_ptr* write_reqs;
-    const unsigned_type writebatchsize;
+    const size_t writebatchsize;
 
     std::vector<int_type> free_write_blocks;            // contains free write blocks
     std::vector<int_type> busy_write_blocks;            // blocks that are in writing, notice that if block is not in free_
@@ -50,9 +50,9 @@ protected:
 
     struct batch_entry
     {
-        stxxl::int64 offset;
+        int64_t offset;
         int_type ibuffer;
-        batch_entry(stxxl::int64 o, int_type b) : offset(o), ibuffer(b) { }
+        batch_entry(int64_t o, int_type b) : offset(o), ibuffer(b) { }
     };
     struct batch_entry_cmp
     {
@@ -70,7 +70,7 @@ public:
     //! \param write_buf_size number of write buffers to use
     //! \param write_batch_size number of blocks to accumulate in
     //!        order to flush write requests (bulk buffered writing)
-    buffered_writer(unsigned_type write_buf_size, unsigned_type write_batch_size)
+    buffered_writer(size_t write_buf_size, size_t write_batch_size)
         : nwriteblocks((write_buf_size > 2) ? write_buf_size : 2),
           writebatchsize(write_batch_size ? write_batch_size : 1)
     {
@@ -79,7 +79,7 @@ public:
 
         write_bids = new bid_type[nwriteblocks];
 
-        for (unsigned_type i = 0; i < nwriteblocks; i++)
+        for (size_t i = 0; i < nwriteblocks; i++)
             free_write_blocks.push_back(i);
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
@@ -186,7 +186,7 @@ public:
         free_write_blocks.clear();
         busy_write_blocks.clear();
 
-        for (unsigned_type i = 0; i < nwriteblocks; i++)
+        for (size_t i = 0; i < nwriteblocks; i++)
             free_write_blocks.push_back(i);
     }
 

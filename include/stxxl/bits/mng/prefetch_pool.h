@@ -69,15 +69,15 @@ protected:
     unordered_map_type busy_blocks;
 
     //! count number of free blocks, since traversing the std::list is slow.
-    unsigned_type free_blocks_size;
+    size_t free_blocks_size;
 
 public:
     //! Constructs pool.
     //! \param init_size initial number of blocks in the pool
-    explicit prefetch_pool(unsigned_type init_size = 1)
+    explicit prefetch_pool(size_t init_size = 1)
         : free_blocks_size(init_size)
     {
-        unsigned_type i = 0;
+        size_t i = 0;
         for ( ; i < init_size; ++i)
             free_blocks.push_back(new block_type);
     }
@@ -117,19 +117,19 @@ public:
     }
 
     //! Returns number of owned blocks.
-    unsigned_type size() const
+    size_t size() const
     {
         return free_blocks_size + busy_blocks.size();
     }
 
     //! Returns the number of free prefetching blocks.
-    unsigned_type free_size() const
+    size_t free_size() const
     {
         return free_blocks_size;
     }
 
     //! Returns the number of busy prefetching blocks.
-    unsigned_type busy_size() const
+    size_t busy_size() const
     {
         return busy_blocks.size();
     }
@@ -352,7 +352,7 @@ public:
     //! Only free blocks (not in prefetching) can be freed by reducing
     //! the size of the pool calling this method.
     //! \return new size of the pool
-    unsigned_type resize(unsigned_type new_size)
+    size_t resize(size_t new_size)
     {
         int_type diff = int_type(new_size) - int_type(size());
         if (diff > 0)

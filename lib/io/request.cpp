@@ -45,9 +45,9 @@ void request::check_alignment() const
         STXXL_ERRMSG("Size is not a multiple of " <<
                      STXXL_BLOCK_ALIGN << ", = " << bytes_ % STXXL_BLOCK_ALIGN);
 
-    if (unsigned_type(buffer_) % STXXL_BLOCK_ALIGN != 0)
+    if (size_t(buffer_) % STXXL_BLOCK_ALIGN != 0)
         STXXL_ERRMSG("Buffer is not aligned: modulo " <<
-                     STXXL_BLOCK_ALIGN << " = " << unsigned_type(buffer_) % STXXL_BLOCK_ALIGN <<
+                     STXXL_BLOCK_ALIGN << " = " << size_t(buffer_) % STXXL_BLOCK_ALIGN <<
                      " (" << buffer_ << ")");
 }
 

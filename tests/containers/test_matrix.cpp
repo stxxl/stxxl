@@ -44,10 +44,10 @@ struct constant_one
 struct modulus_integers
 {
 private:
-    unsigned_type step, counter, modulus;
+    size_t step, counter, modulus;
 
 public:
-    modulus_integers(unsigned_type start = 1, unsigned_type step = 1, unsigned_type modulus = 0)
+    modulus_integers(size_t start = 1, size_t step = 1, size_t modulus = 0)
         : step(step),
           counter(start),
           modulus(modulus)
@@ -63,16 +63,16 @@ public:
 
     bool empty() const { return false; }
 
-    unsigned_type operator * () const { return counter; }
+    size_t operator * () const { return counter; }
 };
 
 struct diagonal_matrix
 {
 private:
-    unsigned_type order, counter, value;
+    size_t order, counter, value;
 
 public:
-    diagonal_matrix(unsigned_type order, unsigned_type value = 1)
+    diagonal_matrix(size_t order, size_t value = 1)
         : order(order), counter(0), value(value) { }
 
     diagonal_matrix& operator ++ ()
@@ -83,17 +83,17 @@ public:
 
     bool empty() const { return false; }
 
-    unsigned_type operator * () const
+    size_t operator * () const
     { return (counter % (order + 1) == 0) * value; }
 };
 
 struct inverse_diagonal_matrix
 {
 private:
-    unsigned_type order, counter, value;
+    size_t order, counter, value;
 
 public:
-    inverse_diagonal_matrix(unsigned_type order, unsigned_type value = 1)
+    inverse_diagonal_matrix(size_t order, size_t value = 1)
         : order(order), counter(0), value(value) { }
 
     inverse_diagonal_matrix& operator ++ ()
@@ -104,7 +104,7 @@ public:
 
     bool empty() const { return false; }
 
-    unsigned_type operator * () const
+    size_t operator * () const
     { return (counter % order == order - 1 - counter / order) * value; }
 };
 
@@ -135,7 +135,7 @@ public:
     bool empty() const { return compiter.empty(); }
     ValueType& operator * () { return current_value; }
 
-    unsigned_type get_num_errors() { return errors.size(); }
+    size_t get_num_errors() { return errors.size(); }
     stxxl::vector<error_type> & get_errors() { return errors; }
 };
 */

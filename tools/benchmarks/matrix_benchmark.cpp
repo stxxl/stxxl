@@ -19,7 +19,6 @@
 #include <stxxl/vector>
 
 using stxxl::int_type;
-using stxxl::internal_size_type;
 
 int main(int argc, char** argv)
 {
@@ -30,7 +29,7 @@ int main(int argc, char** argv)
     #endif
 
     int rank = 10000;
-    internal_size_type internal_memory = 256 * 1024 * 1024;
+    size_t internal_memory = 256 * 1024 * 1024;
     int mult_algo_num = 5;
     int sched_algo_num = 2;
 

@@ -84,7 +84,7 @@ public:
     typedef value_type const* const_pointer;
 
     typedef stxxl::external_size_type external_size_type;
-    typedef stxxl::internal_size_type internal_size_type;
+    typedef size_t internal_size_type;
     typedef stxxl::external_diff_type difference_type;
 
     //! type of (mother) hash-function

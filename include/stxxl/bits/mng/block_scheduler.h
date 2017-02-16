@@ -45,7 +45,7 @@ template <typename ValueType, size_t BlockSize>
 class swappable_block
 {
 protected:
-    static const unsigned_type raw_block_size = BlockSize * sizeof(ValueType);
+    static const size_t raw_block_size = BlockSize * sizeof(ValueType);
 
 public:
     typedef typed_block<raw_block_size, ValueType> internal_block_type;
@@ -57,7 +57,7 @@ protected:
     bool dirty;
     int_type reference_count;
 
-    static unsigned_type disk_allocation_offset;
+    static size_t disk_allocation_offset;
 
     void get_external_block()
     { block_manager::get_instance()->new_block(striping(), external_data, ++disk_allocation_offset); }
@@ -238,7 +238,7 @@ public:
 };
 
 template <typename ValueType, size_t BlockSize>
-unsigned_type swappable_block<ValueType, BlockSize>::disk_allocation_offset = 0;
+size_t swappable_block<ValueType, BlockSize>::disk_allocation_offset = 0;
 
 template <class SwappableBlockType>
 class block_scheduler_algorithm;
@@ -909,7 +909,7 @@ protected:
 
     class priority
     {
-        unsigned_type p;
+        size_t p;
 
     public:
         priority(const SwappableBlockType& sblock, const std::pair<bool, time_type>& t)
@@ -918,18 +918,18 @@ protected:
             if (t.first)
             {
                 // most significant: next use
-                p = unsigned_type(t.second) << 2;
+                p = size_t(t.second) << 2;
                 // less significant: not dirty
-                p |= unsigned_type(! sblock.is_dirty()) << 1;
+                p |= size_t(! sblock.is_dirty()) << 1;
                 // less significant: has external_block
-                p |= unsigned_type(sblock.has_external_block()) << 0;
+                p |= size_t(sblock.has_external_block()) << 0;
             }
             else
             {
                 // most significant: next use
-                p = std::numeric_limits<unsigned_type>::max() << 2;
+                p = std::numeric_limits<size_t>::max() << 2;
                 // less significant: next operation: extract > accessed no more > deinitialize
-                p |= unsigned_type(t.second) << 0;
+                p |= size_t(t.second) << 0;
             }
         }
 

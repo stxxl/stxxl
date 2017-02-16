@@ -59,14 +59,14 @@ public:
     //! \param begin \c bid_iterator pointing to the first block of the stream
     //! \param end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_istream(bid_iterator_type begin, bid_iterator_type end, unsigned_type nbuffers)
+    buf_istream(bid_iterator_type begin, bid_iterator_type end, size_t nbuffers)
         : current_elem(0)
 #ifdef BUF_ISTREAM_CHECK_END
           , not_finished(true)
 #endif
     {
-        const unsigned_type ndisks = config::get_instance()->disks_number();
-        const unsigned_type mdevid = config::get_instance()->get_max_device_id();
+        const size_t ndisks = config::get_instance()->disks_number();
+        const size_t mdevid = config::get_instance()->get_max_device_id();
         const int_type seq_length = end - begin;
         prefetch_seq = new int_type[seq_length];
 
@@ -75,7 +75,7 @@ public:
         //      prefetch_seq[i] = i;
 
         // optimal schedule
-        nbuffers = std::max(2 * ndisks, unsigned_type(nbuffers - 1));
+        nbuffers = std::max(2 * ndisks, size_t(nbuffers - 1));
         compute_prefetch_schedule(begin, end, prefetch_seq,
                                   nbuffers, mdevid);
 

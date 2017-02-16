@@ -161,8 +161,8 @@ struct low_level_matrix_multiply_and_add
                 #pragma omp parallel for
                 #endif
                 for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
-                    for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                        for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                    for (size_t k = 0; k < BlockSideLength; ++k)
+                        for (size_t j = 0; j < BlockSideLength; ++j)
                             c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
             }
             else
@@ -171,8 +171,8 @@ struct low_level_matrix_multiply_and_add
                 #pragma omp parallel for
                 #endif
                 for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
-                    for (unsigned_type j = 0; j < BlockSideLength; ++j)
-                        for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                    for (size_t j = 0; j < BlockSideLength; ++j)
+                        for (size_t k = 0; k < BlockSideLength; ++k)
                             c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k + j * BlockSideLength];
             }
         }
@@ -184,8 +184,8 @@ struct low_level_matrix_multiply_and_add
                 #pragma omp parallel for
                 #endif
                 for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
-                    for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                        for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                    for (size_t k = 0; k < BlockSideLength; ++k)
+                        for (size_t j = 0; j < BlockSideLength; ++j)
                             c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k * BlockSideLength + j];
             }
             else
@@ -194,8 +194,8 @@ struct low_level_matrix_multiply_and_add
                 #pragma omp parallel for
                 #endif
                 for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
-                    for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                        for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                    for (size_t k = 0; k < BlockSideLength; ++k)
+                        for (size_t j = 0; j < BlockSideLength; ++j)
                             c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k + j * BlockSideLength];
             }
         }

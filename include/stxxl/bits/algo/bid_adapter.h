@@ -27,16 +27,16 @@ namespace stxxl {
 //!
 //! \{
 
-template <unsigned_type modulo>
+template <size_t modulo>
 class blocked_index
 {
-    unsigned_type pos;
-    unsigned_type block;
-    unsigned_type offset;
+    size_t pos;
+    size_t block;
+    size_t offset;
 
     //! \invariant block * modulo + offset = pos
 
-    void set(unsigned_type pos)
+    void set(size_t pos)
     {
         this->pos = pos;
         block = pos / modulo;
@@ -49,19 +49,19 @@ public:
         set(0);
     }
 
-    explicit blocked_index(unsigned_type pos)
+    explicit blocked_index(size_t pos)
     {
         set(pos);
     }
 
-    blocked_index(unsigned_type block, unsigned_type offset)
+    blocked_index(size_t block, size_t offset)
     {
         this->block = block;
         this->offset = offset;
         pos = block * modulo + offset;
     }
 
-    void operator = (unsigned_type pos)
+    void operator = (size_t pos)
     {
         set(pos);
     }
@@ -108,29 +108,29 @@ public:
         return former;
     }
 
-    blocked_index& operator += (unsigned_type addend)
+    blocked_index& operator += (size_t addend)
     {
         set(pos + addend);
         return *this;
     }
 
-    blocked_index& operator >>= (unsigned_type shift)
+    blocked_index& operator >>= (size_t shift)
     {
         set(pos >> shift);
         return *this;
     }
 
-    operator unsigned_type () const
+    operator size_t () const
     {
         return pos;
     }
 
-    const unsigned_type & get_block() const
+    const size_t & get_block() const
     {
         return block;
     }
 
-    const unsigned_type & get_offset() const
+    const size_t & get_offset() const
     {
         return offset;
     }
@@ -208,7 +208,7 @@ public:
 
 template <class OneDimArrayType, class DataType, class PosType>
 struct two2one_dim_array_adapter_base
-    : public std::iterator<std::random_access_iterator_tag, DataType, unsigned_type>
+    : public std::iterator<std::random_access_iterator_tag, DataType, size_t>
 {
     typedef OneDimArrayType one_dim_array_type;
     typedef DataType data_type;
@@ -410,24 +410,24 @@ struct two2one_dim_array_column_adapter
 };
 #endif
 
-template <typename ArrayType, typename ValueType, unsigned_type modulo>
+template <typename ArrayType, typename ValueType, size_t modulo>
 class array_of_sequences_iterator
-    : public std::iterator<std::random_access_iterator_tag, ValueType, unsigned_type>
+    : public std::iterator<std::random_access_iterator_tag, ValueType, size_t>
 {
 public:
     typedef ArrayType array_type;
     typedef ValueType value_type;
 
 protected:
-    unsigned_type pos;
-    unsigned_type offset;
+    size_t pos;
+    size_t offset;
     array_type* arrays;
     array_type* base;
     value_type* base_element;
 
     //! \invariant block * modulo + offset = pos
 
-    void set(unsigned_type pos)
+    void set(size_t pos)
     {
         this->pos = pos;
         offset = pos % modulo;
@@ -448,13 +448,13 @@ public:
         set(0);
     }
 
-    array_of_sequences_iterator(array_type* arrays, unsigned_type pos)
+    array_of_sequences_iterator(array_type* arrays, size_t pos)
     {
         this->arrays = arrays;
         set(pos);
     }
 
-    void operator = (unsigned_type pos)
+    void operator = (size_t pos)
     {
         set(pos);
     }
@@ -503,29 +503,29 @@ public:
         return former;
     }
 
-    array_of_sequences_iterator& operator += (unsigned_type addend)
+    array_of_sequences_iterator& operator += (size_t addend)
     {
         set(pos + addend);
         return *this;
     }
 
-    array_of_sequences_iterator& operator -= (unsigned_type addend)
+    array_of_sequences_iterator& operator -= (size_t addend)
     {
         set(pos - addend);
         return *this;
     }
 
-    array_of_sequences_iterator operator + (unsigned_type addend) const
+    array_of_sequences_iterator operator + (size_t addend) const
     {
         return array_of_sequences_iterator(arrays, pos + addend);
     }
 
-    array_of_sequences_iterator operator - (unsigned_type subtrahend) const
+    array_of_sequences_iterator operator - (size_t subtrahend) const
     {
         return array_of_sequences_iterator(arrays, pos - subtrahend);
     }
 
-    unsigned_type operator - (const array_of_sequences_iterator& subtrahend) const
+    size_t operator - (const array_of_sequences_iterator& subtrahend) const
     {
         return pos - subtrahend.pos;
     }
@@ -580,12 +580,12 @@ public:
         return &(base_element[offset]);
     }
 
-    const value_type& operator [] (unsigned_type index) const
+    const value_type& operator [] (size_t index) const
     {
         return arrays[index / modulo][index % modulo];
     }
 
-    value_type& operator [] (unsigned_type index)
+    value_type& operator [] (size_t index)
     {
         return arrays[index / modulo][index % modulo];
     }

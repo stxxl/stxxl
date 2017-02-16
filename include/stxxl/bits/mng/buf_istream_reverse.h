@@ -77,13 +77,13 @@ public:
         std::reverse_copy(begin, end, bids_.begin());
 
         // calculate prefetch sequence
-        const unsigned_type ndisks = config::get_instance()->disks_number();
-        const unsigned_type mdevid = config::get_instance()->get_max_device_id();
+        const size_t ndisks = config::get_instance()->disks_number();
+        const size_t mdevid = config::get_instance()->get_max_device_id();
 
         prefetch_seq = new int_type[bids_.size()];
 
         // optimal schedule
-        nbuffers = std::max(2 * ndisks, unsigned_type(nbuffers - 1));
+        nbuffers = std::max(2 * ndisks, size_t(nbuffers - 1));
         compute_prefetch_schedule(bids_.begin(), bids_.end(), prefetch_seq,
                                   nbuffers, mdevid);
 

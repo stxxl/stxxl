@@ -194,11 +194,11 @@ void config::update_max_device_id(unsigned int devid)
         m_max_device_id = devid + 1;
 }
 
-uint64 config::total_size() const
+external_size_type config::total_size() const
 {
     assert(is_initialized);
 
-    uint64 total_size = 0;
+    external_size_type total_size = 0;
 
     for (disk_list_type::const_iterator it = disks_list.begin();
          it != disks_list.end(); it++)
@@ -224,7 +224,7 @@ disk_config::disk_config()
       queue_length(0)
 { }
 
-disk_config::disk_config(const std::string& _path, uint64 _size,
+disk_config::disk_config(const std::string& _path, external_size_type _size,
                          const std::string& _io_impl)
     : path(_path),
       size(_size),

@@ -861,7 +861,7 @@ struct feedable_strassen_winograd_block_grained
         p6.read_and_add(row, col, qbl.ur);
     }
 
-    inline static unsigned_type get_num_temp_grains()
+    inline static size_t get_num_temp_grains()
     { return smaller_feedable_strassen_winograd_ab::get_num_temp_grains() + (4 ^ Level) * 2; }
 };
 
@@ -945,7 +945,7 @@ struct feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, 0, A
         ct.set_zero();
     }
 
-    inline static unsigned_type get_num_temp_grains()
+    inline static size_t get_num_temp_grains()
     { return 0; }
 };
 

@@ -37,12 +37,11 @@
 #include <string>
 #include <vector>
 
-using stxxl::internal_size_type;
 using stxxl::external_size_type;
 namespace stream = stxxl::stream;
 
 // 1 GiB ram used by external data structures / 1 MiB block size
-internal_size_type ram_use = 1024 * 1024 * 1024;
+size_t ram_use = 1024 * 1024 * 1024;
 
 // alphabet data type
 typedef unsigned char alphabet_type;

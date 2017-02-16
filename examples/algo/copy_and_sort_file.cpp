@@ -86,8 +86,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const stxxl::internal_size_type memory_to_use = 512 * 1024 * 1024;
-    const stxxl::internal_size_type block_size = sizeof(my_type) * 4096;
+    const size_t memory_to_use = 512 * 1024 * 1024;
+    const size_t block_size = sizeof(my_type) * 4096;
 
     typedef stxxl::vector<my_type, 1, stxxl::lru_pager<2>, block_size> vector_type;
 

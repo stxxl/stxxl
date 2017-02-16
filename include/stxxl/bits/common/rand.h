@@ -98,11 +98,11 @@ struct random_number32_r
 class random_number8_r
 {
     random_number32_r m_rnd32;
-    uint32 m_value;
+    uint32_t m_value;
     unsigned int m_pos;
 
 public:
-    typedef uint8 value_type;
+    typedef uint8_t value_type;
 
     explicit random_number8_r(unsigned seed = get_next_seed())
         : m_rnd32(seed), m_pos(4)
@@ -115,7 +115,7 @@ public:
             m_value = m_rnd32();
             m_pos = 0;
         }
-        return ((uint8*)&m_value)[m_pos];
+        return ((uint8_t*)&m_value)[m_pos];
     }
 };
 
@@ -260,7 +260,7 @@ struct random_number
 //! Slow and precise uniform [0, 2^64) pseudo-random generator
 struct random_number64
 {
-    typedef stxxl::uint64 value_type;
+    typedef uint64_t value_type;
     random_uniform_slow uniform;
 
     explicit random_number64(unsigned seed = get_next_seed())

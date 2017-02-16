@@ -208,30 +208,30 @@ create_runs(
 
 template <typename BlockType, typename RunType, typename ValueCmp>
 bool check_sorted_runs(RunType** runs,
-                       unsigned_type nruns,
-                       unsigned_type m,
+                       size_t nruns,
+                       size_t m,
                        ValueCmp cmp)
 {
     typedef BlockType block_type;
     typedef typename block_type::value_type value_type;
 
     STXXL_MSG("check_sorted_runs  Runs: " << nruns);
-    unsigned_type irun = 0;
+    size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
-        const unsigned_type nblocks_per_run = runs[irun]->size();
-        unsigned_type blocks_left = nblocks_per_run;
+        const size_t nblocks_per_run = runs[irun]->size();
+        size_t blocks_left = nblocks_per_run;
         block_type* blocks = new block_type[m];
         request_ptr* reqs = new request_ptr[m];
         value_type last = cmp.min_value();
 
-        for (unsigned_type off = 0; off < nblocks_per_run; off += m)
+        for (size_t off = 0; off < nblocks_per_run; off += m)
         {
-            const unsigned_type nblocks = std::min(blocks_left, m);
-            const unsigned_type nelements = nblocks * block_type::size;
+            const size_t nblocks = std::min(blocks_left, m);
+            const size_t nelements = nblocks * block_type::size;
             blocks_left -= nblocks;
 
-            for (unsigned_type j = 0; j < nblocks; ++j)
+            for (size_t j = 0; j < nblocks; ++j)
             {
                 reqs[j] = blocks[j].read((*runs[irun])[j + off].bid);
             }
@@ -242,7 +242,7 @@ bool check_sorted_runs(RunType** runs,
                 STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
                 STXXL_MSG(" first value: " << blocks[0][0]);
                 STXXL_MSG(" last  value: " << last);
-                for (unsigned_type k = 0; k < block_type::size; ++k)
+                for (size_t k = 0; k < block_type::size; ++k)
                     STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k]);
 
                 delete[] reqs;
@@ -250,18 +250,18 @@ bool check_sorted_runs(RunType** runs,
                 return false;
             }
 
-            for (unsigned_type j = 0; j < nblocks; ++j)
+            for (size_t j = 0; j < nblocks; ++j)
             {
                 if (!(blocks[j][0] == (*runs[irun])[j + off].value))
                 {
                     STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off));
                     STXXL_MSG("                   trigger value: " << (*runs[irun])[j + off].value);
                     STXXL_MSG("Data in the block:");
-                    for (unsigned_type k = 0; k < block_type::size; ++k)
+                    for (size_t k = 0; k < block_type::size; ++k)
                         STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k]);
 
                     STXXL_MSG("BIDS:");
-                    for (unsigned_type k = 0; k < nblocks; ++k)
+                    for (size_t k = 0; k < nblocks; ++k)
                     {
                         if (k == j)
                             STXXL_MSG("Bad one comes next.");
@@ -279,13 +279,13 @@ bool check_sorted_runs(RunType** runs,
             {
                 STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                 STXXL_MSG("Data in blocks:");
-                for (unsigned_type j = 0; j < nblocks; ++j)
+                for (size_t j = 0; j < nblocks; ++j)
                 {
-                    for (unsigned_type k = 0; k < block_type::size; ++k)
+                    for (size_t k = 0; k < block_type::size; ++k)
                         STXXL_MSG("     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k]);
                 }
                 STXXL_MSG("BIDS:");
-                for (unsigned_type k = 0; k < nblocks; ++k)
+                for (size_t k = 0; k < nblocks; ++k)
                 {
                     STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                 }
@@ -308,7 +308,7 @@ bool check_sorted_runs(RunType** runs,
 
 template <typename BlockType, typename RunType, typename ValueCmp>
 void merge_runs(RunType** in_runs, int_type nruns,
-                RunType* out_run, unsigned_type _m, ValueCmp cmp)
+                RunType* out_run, size_t _m, ValueCmp cmp)
 {
     typedef BlockType block_type;
     typedef RunType run_type;
@@ -355,7 +355,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
         n_opt_prefetch_buffers,
         config::get_instance()->get_max_device_id());
 #else
-    for (unsigned_type i = 0; i < out_run->size(); i++)
+    for (size_t i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;
 
 #endif
@@ -503,8 +503,8 @@ void merge_runs(RunType** in_runs, int_type nruns,
     block_manager* bm = block_manager::get_instance();
     for (int_type i = 0; i < nruns; ++i)
     {
-        unsigned_type sz = in_runs[i]->size();
-        for (unsigned_type j = 0; j < sz; ++j)
+        size_t sz = in_runs[i]->size();
+        for (size_t j = 0; j < sz; ++j)
             bm->delete_block((*in_runs[i])[j].bid);
 
         delete in_runs[i];
@@ -517,8 +517,8 @@ template <typename BlockType,
           typename ValueCmp>
 simple_vector<sort_helper::trigger_entry<BlockType> >*
 sort_blocks(InputBidIterator input_bids,
-            unsigned_type _n,
-            unsigned_type _m,
+            size_t _n,
+            size_t _m,
             ValueCmp cmp)
 {
     typedef BlockType block_type;
@@ -530,11 +530,11 @@ sort_blocks(InputBidIterator input_bids,
     typedef simple_vector<trigger_entry_type> run_type;
     typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
-    unsigned_type m2 = _m / 2;
-    unsigned_type full_runs = _n / m2;
-    unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
-    unsigned_type nruns = full_runs + partial_runs;
-    unsigned_type i;
+    size_t m2 = _m / 2;
+    size_t full_runs = _n / m2;
+    size_t partial_runs = ((_n % m2) ? 1 : 0);
+    size_t nruns = full_runs + partial_runs;
+    size_t i;
 
     block_manager* mng = block_manager::get_instance();
 
@@ -585,7 +585,7 @@ sort_blocks(InputBidIterator input_bids,
         {
             int_type runs2merge = std::min(runs_left, merge_factor);
             blocks_in_new_run = 0;
-            for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
+            for (size_t i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
                 blocks_in_new_run += runs[i]->size();
 
             // allocate run
@@ -681,7 +681,7 @@ sort_blocks(InputBidIterator input_bids,
  * \param M amount of memory for internal use (in bytes)
  */
 template <typename ExtIterator, typename StrictWeakOrdering>
-void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_type M)
+void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
@@ -693,7 +693,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
     typedef simple_vector<sort_helper::trigger_entry<block_type> > run_type;
 
-    unsigned_type n = 0;
+    size_t n = 0;
 
     block_manager* mng = block_manager::get_instance();
 
@@ -705,7 +705,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
     }
     else
     {
-        if (!(2 * block_type::raw_size * (unsigned_type)sort_memory_usage_factor() <= M)) {
+        if (!(2 * block_type::raw_size * (size_t)sort_memory_usage_factor() <= M)) {
             throw bad_parameter("stxxl::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
         }
 
@@ -726,7 +726,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 req = last_block->read(*last.bid());
 
-                unsigned_type i = 0;
+                size_t i = 0;
                 for ( ; i < first.block_offset(); ++i)
                 {
                     first_block->elem[i] = cmp.min_value();
@@ -832,7 +832,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 mng->new_block(fully_random(), first_bid);                // try to overlap
                 req->wait();
 
-                unsigned_type i = 0;
+                size_t i = 0;
                 for ( ; i < first.block_offset(); ++i)
                 {
                     first_block->elem[i] = cmp.min_value();
@@ -906,7 +906,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 block_type* last_block = new block_type;
                 bid_type last_bid;
                 request_ptr req;
-                unsigned_type i;
+                size_t i;
 
                 req = last_block->read(*last.bid());
                 mng->new_block(fully_random(), last_bid);

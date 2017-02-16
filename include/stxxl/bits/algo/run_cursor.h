@@ -24,7 +24,7 @@ namespace stxxl {
 template <typename BlockType>
 struct run_cursor
 {
-    unsigned_type pos;
+    size_t pos;
     BlockType* buffer;
 
     run_cursor() : pos(0), buffer(NULL) { }

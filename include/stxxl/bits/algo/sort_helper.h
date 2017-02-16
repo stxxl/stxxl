@@ -98,13 +98,13 @@ struct run_cursor2_cmp
 
 // this function is used by parallel mergers
 template <typename SequenceVector, typename ValueType, typename Comparator>
-inline unsigned_type
+inline size_t
 count_elements_less_equal(const SequenceVector& seqs,
                           const ValueType& bound, Comparator cmp)
 {
     typedef typename SequenceVector::size_type seqs_size_type;
     typedef typename SequenceVector::value_type::first_type iterator;
-    unsigned_type count = 0;
+    size_t count = 0;
 
     for (seqs_size_type i = 0; i < seqs.size(); ++i)
     {

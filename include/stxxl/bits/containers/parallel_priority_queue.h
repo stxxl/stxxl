@@ -476,7 +476,7 @@ protected:
     external_size_type m_capacity;
 
     //! Number of blocks, again: calculated at construction time.
-    unsigned_type m_num_blocks;
+    size_t m_num_blocks;
 
     //! Level of external array (Sander's PQ: group number)
     size_t m_level;

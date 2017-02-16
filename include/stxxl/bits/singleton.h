@@ -68,8 +68,7 @@ template <typename INSTANCE, bool destroy_on_exit>
 void singleton<INSTANCE, destroy_on_exit>::destroy_instance()
 {
     instance_pointer inst = instance;
-    //instance = NULL;
-    instance = reinterpret_cast<instance_pointer>(unsigned_type(-1));     // bomb if used again
+    instance = reinterpret_cast<instance_pointer>(size_t(-1));     // bomb if used again
     delete inst;
 }
 

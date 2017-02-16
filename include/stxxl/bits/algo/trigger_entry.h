@@ -32,13 +32,13 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
         block_size = BlockSize
     };
 
-    unsigned_type dim_size;
+    size_t dim_size;
 
     typedef two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType> parent_type;
     using parent_type::array;
     using parent_type::pos;
 
-    runs2bid_array_adaptor(RunType** a, PosType p, unsigned_type d)
+    runs2bid_array_adaptor(RunType** a, PosType p, size_t d)
         : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a, p), dim_size(d)
     { }
     explicit runs2bid_array_adaptor(const self_type& a)

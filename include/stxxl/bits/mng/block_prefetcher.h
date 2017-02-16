@@ -64,12 +64,12 @@ public:
 protected:
     bid_iterator_type consume_seq_begin;
     bid_iterator_type consume_seq_end;
-    unsigned_type seq_length;
+    size_t seq_length;
 
     int_type* prefetch_seq;
 
-    unsigned_type nextread;
-    unsigned_type nextconsume;
+    size_t nextread;
+    size_t nextconsume;
 
     const int_type nreadblocks;
 
@@ -115,7 +115,7 @@ public:
           consume_seq_end(_cons_end),
           seq_length(_cons_end - _cons_begin),
           prefetch_seq(_pref_seq),
-          nextread(std::min(static_cast<unsigned_type>(_prefetch_buf_size), seq_length)),
+          nextread(std::min(static_cast<size_t>(_prefetch_buf_size), seq_length)),
           nextconsume(0),
           nreadblocks(nextread),
           do_after_fetch(do_after_fetch)
@@ -208,7 +208,7 @@ public:
     }
 
     //! Index of the next element in the consume sequence.
-    unsigned_type pos() const
+    size_t pos() const
     {
         return nextconsume;
     }

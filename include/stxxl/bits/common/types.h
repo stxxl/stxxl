@@ -21,41 +21,7 @@
 
 namespace stxxl {
 
-// will be deprecated soon
-typedef int8_t int8;
-typedef uint8_t uint8;
-typedef int16_t int16;
-typedef uint16_t uint16;
-typedef int32_t int32;
-typedef uint32_t uint32;
-typedef int64_t int64;
-typedef uint64_t uint64;
-
-// integer types declarations
-enum { my_pointer_size = sizeof(void*) };
-
-template <int PtrSize>
-struct choose_int_types
-{ };
-
-template <>
-struct choose_int_types<4>  // for 32-bit processors/compilers
-{
-    typedef int32 int_type;
-    typedef uint32 unsigned_type;
-};
-
-template <>
-struct choose_int_types<8>  // for 64-bit processors/compilers
-{
-    typedef int64 int_type;
-    typedef uint64 unsigned_type;
-};
-
-typedef choose_int_types<my_pointer_size>::int_type int_type;
-typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
-
-typedef unsigned_type internal_size_type;  // fits in internal memory
+typedef std::make_signed<size_t>::type int_type;
 
 typedef uint64_t external_size_type;       // may require external memory
 typedef int64_t external_diff_type;        // may require external memory

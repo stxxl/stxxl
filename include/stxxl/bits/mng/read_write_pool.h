@@ -30,7 +30,7 @@ class read_write_pool
 public:
     typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
-    typedef unsigned_type size_type;
+    typedef size_t size_type;
 
 protected:
     typedef write_pool<block_type> write_pool_type;
@@ -200,13 +200,13 @@ public:
     }
 
     //! Returns the number of free prefetching blocks.
-    unsigned_type free_size_prefetch() const
+    size_t free_size_prefetch() const
     {
         return p_pool->free_size();
     }
 
     //! Returns the number of busy prefetching blocks.
-    unsigned_type busy_size_prefetch() const
+    size_t busy_size_prefetch() const
     {
         return p_pool->busy_size();
     }
