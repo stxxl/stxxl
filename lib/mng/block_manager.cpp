@@ -12,17 +12,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/mng/block_manager.h>
+
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/disk_block_allocator.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/disk_queues.h>
 
 #include <cstddef>
-#include <fstream>
 #include <string>
 
 namespace stxxl {
@@ -37,13 +37,13 @@ block_manager::block_manager()
     config->check_initialized();
 
     // allocate block_allocators_
-    ndisks = config->disks_number();
-    block_allocators_.resize(ndisks);
-    disk_files_.resize(ndisks);
+    ndisks_ = config->disks_number();
+    block_allocators_.resize(ndisks_);
+    disk_files_.resize(ndisks_);
 
-    uint64 total_size = 0;
+    uint64_t total_size = 0;
 
-    for (unsigned i = 0; i < ndisks; ++i)
+    for (size_t i = 0; i < ndisks_; ++i)
     {
         disk_config& cfg = config->disk(i);
 
@@ -75,9 +75,9 @@ block_manager::block_manager()
         block_allocators_[i] = new disk_block_allocator(disk_files_[i].get(), cfg);
     }
 
-    if (ndisks > 1)
+    if (ndisks_ > 1)
     {
-        STXXL_MSG("In total " << ndisks << " disks are allocated, space: " <<
+        STXXL_MSG("In total " << ndisks_ << " disks are allocated, space: " <<
                   (total_size / (1024 * 1024)) <<
                   " MiB");
     }
@@ -90,7 +90,7 @@ block_manager::block_manager()
 block_manager::~block_manager()
 {
     STXXL_VERBOSE1("Block manager destructor");
-    for (size_t i = ndisks; i > 0; )
+    for (size_t i = ndisks_; i > 0; )
     {
         --i;
         delete block_allocators_[i];
@@ -98,24 +98,39 @@ block_manager::~block_manager()
     }
 }
 
-uint64 block_manager::get_total_bytes() const
+uint64_t block_manager::total_bytes() const
 {
-    uint64 total = 0;
+    uint64_t total = 0;
 
-    for (unsigned i = 0; i < ndisks; ++i)
+    for (size_t i = 0; i < ndisks_; ++i)
         total += block_allocators_[i]->get_total_bytes();
 
     return total;
 }
 
-uint64 block_manager::get_free_bytes() const
+uint64_t block_manager::free_bytes() const
 {
-    uint64 total = 0;
+    uint64_t total = 0;
 
-    for (unsigned i = 0; i < ndisks; ++i)
+    for (size_t i = 0; i < ndisks_; ++i)
         total += block_allocators_[i]->get_free_bytes();
 
     return total;
+}
+
+uint64_t block_manager::total_allocation() const
+{
+    return total_allocation_;
+}
+
+uint64_t block_manager::current_allocation() const
+{
+    return current_allocation_;
+}
+
+uint64_t block_manager::maximum_allocation() const
+{
+    return maximum_allocation_;
 }
 
 } // namespace stxxl
