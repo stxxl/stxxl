@@ -76,6 +76,20 @@ struct BID
         return storage->get_allocator_id() != file::NO_ALLOCATOR;
     }
 
+    //! Writes data to the disk(s).
+    request_ptr write(void* data, size_t data_size,
+                      completion_handler on_complete = completion_handler())
+    {
+        return storage->awrite(data, offset, data_size, on_complete);
+    }
+
+    //! Reads data from the disk(s).
+    request_ptr read(void* data, size_t data_size,
+                     completion_handler on_complete = completion_handler())
+    {
+        return storage->aread(data, offset, data_size, on_complete);
+    }
+
     bool operator == (const BID<Size>& b) const
     {
         return storage == b.storage && offset == b.offset;
@@ -119,6 +133,20 @@ struct BID<0>
     bool is_managed() const
     {
         return storage->get_allocator_id() != file::NO_ALLOCATOR;
+    }
+
+    //! Writes data to the disk(s).
+    request_ptr write(void* data, size_t data_size,
+                      completion_handler on_complete = completion_handler())
+    {
+        return storage->awrite(data, offset, data_size, on_complete);
+    }
+
+    //! Reads data from the disk(s).
+    request_ptr read(void* data, size_t data_size,
+                     completion_handler on_complete = completion_handler())
+    {
+        return storage->aread(data, offset, data_size, on_complete);
     }
 
     bool operator == (const BID<0>& b) const

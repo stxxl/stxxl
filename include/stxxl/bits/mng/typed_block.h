@@ -265,28 +265,58 @@ public:
     }
 #endif
 
-    /*! Writes block to the disk(s).
-     *! \param bid block identifier, points the file(disk) and position
-     *! \param on_cmpl completion handler
-     *! \return \c pointer_ptr object to track status I/O operation after the call
+    /*!
+     * Writes block to the disk(s).
+     * \param bid block identifier, points the file(disk) and position
+     * \param on_complete completion handler
+     * \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr write(const bid_type& bid,
-                      completion_handler on_cmpl = completion_handler())
+                      completion_handler on_complete = completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
-        return bid.storage->awrite(this, bid.offset, raw_size, on_cmpl);
+        return bid.storage->awrite(this, bid.offset, raw_size, on_complete);
     }
 
-    /*! Reads block from the disk(s).
-     *! \param bid block identifier, points the file(disk) and position
-     *! \param on_cmpl completion handler
-     *! \return \c pointer_ptr object to track status I/O operation after the call
+    /*!
+     * Reads block from the disk(s).
+     * \param bid block identifier, points the file(disk) and position
+     * \param on_complete completion handler
+     * \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr read(const bid_type& bid,
-                     completion_handler on_cmpl = completion_handler())
+                     completion_handler on_complete = completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
-        return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
+        return bid.storage->aread(this, bid.offset, raw_size, on_complete);
+    }
+
+    /*!
+     * Writes block to the disk(s).
+     * \param bid block identifier, points the file(disk) and position
+     * \param on_complete completion handler
+     * \return \c pointer_ptr object to track status I/O operation after the call
+     */
+    request_ptr write(const BID<0>& bid,
+                      completion_handler on_complete = completion_handler())
+    {
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
+        assert(bid.size >= raw_size);
+        return bid.storage->awrite(this, bid.offset, raw_size, on_complete);
+    }
+
+    /*!
+     * Reads block from the disk(s).
+     * \param bid block identifier, points the file(disk) and position
+     * \param on_complete completion handler
+     * \return \c pointer_ptr object to track status I/O operation after the call
+     */
+    request_ptr read(const BID<0>& bid,
+                     completion_handler on_complete = completion_handler())
+    {
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
+        assert(bid.size >= raw_size);
+        return bid.storage->aread(this, bid.offset, raw_size, on_complete);
     }
 
     static void* operator new (size_t bytes)

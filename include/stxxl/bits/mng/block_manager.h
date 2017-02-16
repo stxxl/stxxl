@@ -34,6 +34,7 @@
 #include <string>
 #include <cstdlib>
 #include <mutex>
+#include <vector>
 
 #if STXXL_MSVC
 #include <memory.h>
