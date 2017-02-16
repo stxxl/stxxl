@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/mng/adaptor.h>
+#include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/common/error_handling.h>

@@ -16,7 +16,7 @@
 #define STXXL_ALGO_ADAPTOR_HEADER
 
 #include <stxxl/bits/mng/bid.h>
-#include <stxxl/bits/mng/adaptor.h>
+#include <stxxl/bits/algo/bid_adapter.h>
 
 namespace stxxl {
 
