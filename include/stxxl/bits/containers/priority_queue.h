@@ -201,19 +201,6 @@ public:
     explicit priority_queue(pool_type& pool_);
 
     //! Constructs external priority queue object.
-    //! \param p_pool_ pool of blocks that will be used
-    //! for data prefetching for the disk<->memory transfers
-    //! happening in the priority queue. Larger pool size
-    //! helps to speed up operations.
-    //! \param w_pool_ pool of blocks that will be used
-    //! for writing data for the memory<->disk transfers
-    //! happening in the priority queue. Larger pool size
-    //! helps to speed up operations.
-    STXXL_DEPRECATED(
-        priority_queue(prefetch_pool<block_type>&p_pool_,
-                       write_pool<block_type>&w_pool_));
-
-    //! Constructs external priority queue object.
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
     //! for data prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
@@ -400,19 +387,6 @@ priority_queue<ConfigType>::priority_queue(pool_type& pool_)
       num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE_PQ("priority_queue(pool)");
-    init();
-}
-
-// DEPRECATED
-template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type>& p_pool_, write_pool<block_type>& w_pool_)
-    : pool(new pool_type(p_pool_, w_pool_)),
-      pool_owned(true),
-      delete_buffer_end(delete_buffer + kDeleteBufferSize),
-      insert_heap(N + 2),
-      num_active_groups(0), size_(0)
-{
-    STXXL_VERBOSE_PQ("priority_queue(p_pool, w_pool)");
     init();
 }
 
