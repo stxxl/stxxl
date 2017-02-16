@@ -166,7 +166,7 @@ public:
                         merger->pool->hint(bids.front());
                     }
                     merger->pool->read(block, bid)->wait();
-                    STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
+                    //req-ostream STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
                     if (!(bids.empty()))
                         merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
                     block_manager::get_instance()->delete_block(bid);
