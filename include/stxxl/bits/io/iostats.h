@@ -40,18 +40,25 @@ namespace stxxl {
 
 class file_stats
 {
-    const unsigned m_device_id;
+    //! associated device id
+    const unsigned device_id_;
 
-    unsigned reads, writes;                             // number of operations
-    external_size_type volume_read, volume_written;     // number of bytes read/written
-    double t_reads, t_writes;                           // seconds spent in operations
-    double p_begin_read, p_begin_write;                 // start time of parallel operation
+    //! number of operations: read/write
+    unsigned read_count_, write_count_;
+    //! number of bytes read/written
+    external_size_type read_bytes_, write_bytes_;
+    //! seconds spent in operations
+    double read_time_, write_time_;
+    //! start time of parallel operation
+    double p_begin_read_, p_begin_write_;
 
-    int acc_reads, acc_writes;                          // number of requests, participating in parallel operation
+    //! number of requests, participating in parallel operation
+    int acc_reads_, acc_writes_;
 
-    std::mutex read_mutex, write_mutex;
+    std::mutex read_mutex_, write_mutex_;
 
 public:
+    //! construct zero initialized
     file_stats(unsigned int device_id);
 
     class scoped_read_write_timer
@@ -59,12 +66,13 @@ public:
         typedef size_t size_type;
         file_stats& file_stats_;
 
-        bool is_write;
-        bool running = false;
+        bool is_write_;
+        bool running_ = false;
 
     public:
-        explicit scoped_read_write_timer(file_stats* file_stats, size_type size, bool is_write = false)
-            : file_stats_(*file_stats), is_write(is_write)
+        explicit scoped_read_write_timer(
+            file_stats* file_stats, size_type size, bool is_write_ = false)
+            : file_stats_(*file_stats), is_write_(is_write_)
         {
             start(size);
         }
@@ -76,9 +84,9 @@ public:
 
         void start(size_type size)
         {
-            if (!running) {
-                running = true;
-                if (is_write)
+            if (!running_) {
+                running_ = true;
+                if (is_write_)
                     file_stats_.write_started(size);
                 else
                     file_stats_.read_started(size);
@@ -87,12 +95,12 @@ public:
 
         void stop()
         {
-            if (running) {
-                if (is_write)
+            if (running_) {
+                if (is_write_)
                     file_stats_.write_finished();
                 else
                     file_stats_.read_finished();
-                running = false;
+                running_ = false;
             }
         }
     };
@@ -102,7 +110,7 @@ public:
         typedef size_t size_type;
         file_stats& file_stats_;
 
-        bool running = false;
+        bool running_ = false;
 
     public:
         explicit scoped_write_timer(file_stats* file_stats, size_type size)
@@ -118,17 +126,17 @@ public:
 
         void start(size_type size)
         {
-            if (!running) {
-                running = true;
+            if (!running_) {
+                running_ = true;
                 file_stats_.write_started(size);
             }
         }
 
         void stop()
         {
-            if (running) {
+            if (running_) {
                 file_stats_.write_finished();
-                running = false;
+                running_ = false;
             }
         }
     };
@@ -138,7 +146,7 @@ public:
         typedef size_t size_type;
         file_stats& file_stats_;
 
-        bool running = false;
+        bool running_ = false;
 
     public:
         explicit scoped_read_timer(file_stats* file_stats, size_type size)
@@ -154,17 +162,17 @@ public:
 
         void start(size_type size)
         {
-            if (!running) {
-                running = true;
+            if (!running_) {
+                running_ = true;
                 file_stats_.read_started(size);
             }
         }
 
         void stop()
         {
-            if (running) {
+            if (running_) {
                 file_stats_.read_finished();
-                running = false;
+                running_ = false;
             }
         }
     };
@@ -174,49 +182,51 @@ public:
     //! \return device id
     unsigned get_device_id() const
     {
-        return m_device_id;
+        return device_id_;
     }
 
-    //! Returns total number of reads.
-    //! \return total number of reads
-    unsigned get_reads() const
+    //! Returns total number of read_count_.
+    //! \return total number of read_count_
+    unsigned get_read_count() const
     {
-        return reads;
+        return read_count_;
     }
 
-    //! Returns total number of writes.
-    //! \return total number of writes
-    unsigned get_writes() const
+    //! Returns total number of write_count_.
+    //! \return total number of write_count_
+    unsigned get_write_count() const
     {
-        return writes;
+        return write_count_;
     }
 
     //! Returns number of bytes read from disks.
     //! \return number of bytes read
-    external_size_type get_read_volume() const
+    external_size_type get_read_bytes() const
     {
-        return volume_read;
+        return read_bytes_;
     }
 
     //! Returns number of bytes written to the disks.
     //! \return number of bytes written
-    external_size_type get_written_volume() const
+    external_size_type get_write_bytes() const
     {
-        return volume_written;
+        return write_bytes_;
     }
 
-    //! Time that would be spent in read syscalls if all parallel reads were serialized.
+    //! Time that would be spent in read syscalls if all parallel read_count_
+    //! were serialized.
     //! \return seconds spent in reading
     double get_read_time() const
     {
-        return t_reads;
+        return read_time_;
     }
 
-    //! Time that would be spent in write syscalls if all parallel writes were serialized.
+    //! Time that would be spent in write syscalls if all parallel write_count_
+    //! were serialized.
     //! \return seconds spent in writing
     double get_write_time() const
     {
-        return t_writes;
+        return write_time_;
     }
 
     // for library use
@@ -231,101 +241,69 @@ public:
 class file_stats_data
 {
     //! device id
-    unsigned device_id;
+    unsigned device_id_;
     //! number of operations
-    unsigned reads, writes;
+    unsigned read_count_, write_count_;
     //! number of bytes read/written
-    external_size_type volume_read, volume_written;
+    external_size_type read_bytes_, write_bytes_;
     //! seconds spent in operations
-    double t_reads, t_writes;
+    double read_time_, write_time_;
 
 public:
     file_stats_data()
-        : device_id(std::numeric_limits<unsigned>::max()),
-          reads(0),
-          writes(0),
-          volume_read(0),
-          volume_written(0),
-          t_reads(0.0),
-          t_writes(0.0)
+        : device_id_(std::numeric_limits<unsigned>::max()),
+          read_count_(0), write_count_(0),
+          read_bytes_(0), write_bytes_(0),
+          read_time_(0.0), write_time_(0.0)
     { }
 
+    //! construct file_stats_data by taking current values from file_stats
     file_stats_data(const file_stats& fs)
-        : device_id(fs.get_device_id()),
-          reads(fs.get_reads()),
-          writes(fs.get_writes()),
-          volume_read(fs.get_read_volume()),
-          volume_written(fs.get_written_volume()),
-          t_reads(fs.get_read_time()),
-          t_writes(fs.get_write_time())
+        : device_id_(fs.get_device_id()),
+          read_count_(fs.get_read_count()),
+          write_count_(fs.get_write_count()),
+          read_bytes_(fs.get_read_bytes()),
+          write_bytes_(fs.get_write_bytes()),
+          read_time_(fs.get_read_time()),
+          write_time_(fs.get_write_time())
     { }
 
-    file_stats_data operator + (const file_stats_data& a) const
-    {
-        STXXL_THROW_IF(device_id != a.device_id, std::runtime_error,
-                       "stxxl::file_stats_data objects do not belong to the same file/disk");
-
-        file_stats_data fsd;
-        fsd.device_id = device_id;
-
-        fsd.reads = reads + a.reads;
-        fsd.writes = writes + a.writes;
-        fsd.volume_read = volume_read + a.volume_read;
-        fsd.volume_written = volume_written + a.volume_written;
-        fsd.t_reads = t_reads + a.t_reads;
-        fsd.t_writes = t_writes + a.t_writes;
-        return fsd;
-    }
-
-    file_stats_data operator - (const file_stats_data& a) const
-    {
-        STXXL_THROW_IF(device_id != a.device_id, std::runtime_error, "stxxl::file_stats_data objects do not belong to the same file/disk");
-
-        file_stats_data fsd;
-        fsd.device_id = device_id;
-
-        fsd.reads = reads - a.reads;
-        fsd.writes = writes - a.writes;
-        fsd.volume_read = volume_read - a.volume_read;
-        fsd.volume_written = volume_written - a.volume_written;
-        fsd.t_reads = t_reads - a.t_reads;
-        fsd.t_writes = t_writes - a.t_writes;
-        return fsd;
-    }
+    file_stats_data operator + (const file_stats_data& a) const;
+    file_stats_data operator - (const file_stats_data& a) const;
 
     unsigned get_device_id() const
     {
-        return device_id;
+        return device_id_;
     }
 
-    unsigned get_reads() const
+    unsigned get_read_count() const
     {
-        return reads;
+        return read_count_;
     }
 
-    unsigned get_writes() const
+    unsigned get_write_count() const
     {
-        return writes;
+        return write_count_;
     }
 
-    external_size_type get_read_volume() const
+    external_size_type get_read_bytes() const
     {
-        return volume_read;
+        return read_bytes_;
     }
 
-    external_size_type get_written_volume() const
+    external_size_type get_write_bytes() const
     {
-        return volume_written;
+        return write_bytes_;
     }
 
     double get_read_time() const
     {
-        return t_reads;
+        return read_time_;
     }
 
     double get_write_time() const
     {
-        return t_writes;
+        return write_time_;
     }
 };
 
@@ -342,17 +320,24 @@ class stats : public singleton<stats>
     //! enclosed file_stats objects and this list may grow.
     std::list<file_stats> file_stats_list;
 
-    // parallel times have to be counted globally
-    double p_reads, p_writes;                   // seconds spent in parallel operations
-    double p_begin_read, p_begin_write;         // start time of parallel operation
-    double p_ios;                               // seconds spent in all parallel I/O operations (read and write)
+    // *** parallel times have to be counted globally ***
+
+    //! seconds spent in parallel operations
+    double p_reads, p_writes;
+    //! start time of parallel operation
+    double p_begin_read_, p_begin_write_;
+    // seconds spent in all parallel I/O operations (read and write)
+    double p_ios;
     double p_begin_io;
 
-    int acc_reads, acc_writes;                  // number of requests, participating in parallel operation
+    // number of requests, participating in parallel operation
+    int acc_reads_, acc_writes_;
     int acc_ios;
 
-    // waits are measured globally
-    double t_waits, p_waits;                    // seconds spent waiting for completion of I/O operations
+    // *** waits are measured globally ***
+
+    // seconds spent waiting for completion of I/O operations
+    double t_waits, p_waits;
     double p_begin_wait;
     double t_wait_read, p_wait_read;
     double p_begin_wait_read;
@@ -361,8 +346,9 @@ class stats : public singleton<stats>
     int acc_waits;
     int acc_wait_read, acc_wait_write;
 
-    std::mutex wait_mutex, read_mutex, write_mutex, io_mutex;
+    std::mutex wait_mutex_, read_mutex_, write_mutex_, io_mutex_;
 
+    //! private construction from singleton
     stats() : creation_time(timestamp()) { }
 
 public:
@@ -375,14 +361,14 @@ public:
     class scoped_wait_timer
     {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-        bool running = false;
-        wait_op_type wait_op;
+        bool running_ = false;
+        wait_op_type wait_op_;
 #endif
 
     public:
         scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-            : wait_op(wait_op)
+            : wait_op_(wait_op)
 #endif
         {
             if (measure_time)
@@ -397,9 +383,9 @@ public:
         void start()
         {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-            if (!running) {
-                running = true;
-                stats::get_instance()->wait_started(wait_op);
+            if (!running_) {
+                running_ = true;
+                stats::get_instance()->wait_started(wait_op_);
             }
 #endif
         }
@@ -407,9 +393,9 @@ public:
         void stop()
         {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-            if (running) {
-                stats::get_instance()->wait_finished(wait_op);
-                running = false;
+            if (running_) {
+                stats::get_instance()->wait_finished(wait_op_);
+                running_ = false;
             }
 #endif
         }
@@ -477,8 +463,8 @@ private:
     void p_read_finished(double now);
 
 public:
-    void wait_started(wait_op_type wait_op);
-    void wait_finished(wait_op_type wait_op);
+    void wait_started(wait_op_type wait_op_);
+    void wait_finished(wait_op_type wait_op_);
 };
 
 #ifdef STXXL_DO_NOT_COUNT_WAIT_TIME
@@ -498,54 +484,23 @@ class stats_data
     double elapsed;
 
     //! list of individual file statistics.
-    std::vector<file_stats_data> m_file_stats_data_list;
+    std::vector<file_stats_data> file_stats_data_list_;
 
+    //! aggregator
     template <typename T, typename Functor>
-    T fetch_sum(const Functor& get_value) const
-    {
-        T sum = 0;
-        for (auto it = m_file_stats_data_list.begin(); it != m_file_stats_data_list.end(); it++)
-        {
-            sum += get_value(*it);
-        }
-
-        return sum;
-    }
+    T fetch_sum(const Functor& get_value) const;
 
 public:
     template <typename T>
-    struct measurement_summary
+    struct summary
     {
         T total, min, max;
         double avg, med;
         std::vector<std::pair<T, unsigned> > values_per_device;
 
         template <typename Functor>
-        measurement_summary(const std::vector<file_stats_data>& fs,
-                            const Functor& get_value)
-            : total(0)
-        {
-            values_per_device.reserve(fs.size());
-
-            for (auto it = fs.begin(); it != fs.end(); it++)
-            {
-                values_per_device.emplace_back(get_value(*it), it->get_device_id());
-            }
-
-            std::sort(values_per_device.begin(), values_per_device.end(), [](std::pair<T, unsigned> a, std::pair<T, unsigned> b) { return a.first < b.first; });
-
-            min = values_per_device.front().first;
-            max = values_per_device.back().first;
-            long middle = values_per_device.size() / 2;
-            med = (values_per_device.size() % 2 == 1) ? values_per_device[middle].first : (values_per_device[middle - 1].first + values_per_device[middle].first) / 2.0;
-
-            for (auto it = values_per_device.begin(); it != values_per_device.end(); it++)
-            {
-                total += it->first;
-            }
-
-            avg = (double)total / values_per_device.size();
-        }
+        summary(const std::vector<file_stats_data>& fs,
+                const Functor& get_value);
     };
 
 public:
@@ -567,122 +522,61 @@ public:
           t_wait_read(s.get_wait_read_time()),
           t_wait_write(s.get_wait_write_time()),
           elapsed(timestamp() - s.get_creation_time()),
-          m_file_stats_data_list(s.deepcopy_file_stats_data_list())
+          file_stats_data_list_(s.deepcopy_file_stats_data_list())
     { }
 
-    stats_data operator + (const stats_data& a) const
-    {
-        stats_data s;
+    stats_data operator + (const stats_data& a) const;
+    stats_data operator - (const stats_data& a) const;
 
-        if (a.m_file_stats_data_list.size() == 0)
-        {
-            s.m_file_stats_data_list = m_file_stats_data_list;
-        }
-        else if (m_file_stats_data_list.size() == 0)
-        {
-            s.m_file_stats_data_list = a.m_file_stats_data_list;
-        }
-        else if (m_file_stats_data_list.size() == a.m_file_stats_data_list.size())
-        {
-            for (auto it1 = m_file_stats_data_list.begin(), it2 = a.m_file_stats_data_list.begin();
-                 it1 != m_file_stats_data_list.end(); it1++, it2++)
-            {
-                s.m_file_stats_data_list.push_back((*it1) + (*it2));
-            }
-        }
-        else
-        {
-            STXXL_THROW(std::runtime_error, "The number of files has changed between the snapshots.");
-        }
+    //! Returns the sum of all read_count_.
+    //! \return the sum of all read_count_
+    unsigned get_read_count() const;
 
-        s.p_reads = p_reads + a.p_reads;
-        s.p_writes = p_writes + a.p_writes;
-        s.p_ios = p_ios + a.p_ios;
-        s.t_wait = t_wait + a.t_wait;
-        s.t_wait_read = t_wait_read + a.t_wait_read;
-        s.t_wait_write = t_wait_write + a.t_wait_write;
-        s.elapsed = elapsed + a.elapsed;
-        return s;
-    }
-
-    stats_data operator - (const stats_data& a) const
-    {
-        stats_data s;
-
-        if (a.m_file_stats_data_list.size() == 0)
-        {
-            s.m_file_stats_data_list = m_file_stats_data_list;
-        }
-        else if (m_file_stats_data_list.size() == a.m_file_stats_data_list.size())
-        {
-            for (auto it1 = m_file_stats_data_list.begin(), it2 = a.m_file_stats_data_list.begin();
-                 it1 != m_file_stats_data_list.end(); it1++, it2++)
-            {
-                s.m_file_stats_data_list.push_back((*it1) - (*it2));
-            }
-        }
-        else
-        {
-            STXXL_THROW(std::runtime_error, "The number of files has changed between the snapshots.");
-        }
-
-        s.p_reads = p_reads - a.p_reads;
-        s.p_writes = p_writes - a.p_writes;
-        s.p_ios = p_ios - a.p_ios;
-        s.t_wait = t_wait - a.t_wait;
-        s.t_wait_read = t_wait_read - a.t_wait_read;
-        s.t_wait_write = t_wait_write - a.t_wait_write;
-        s.elapsed = elapsed - a.elapsed;
-        return s;
-    }
-
-    //! Returns the sum of all reads.
-    //! \return the sum of all reads
-    unsigned get_reads() const;
-
-    //! Retruns sum, min, max, avarage and median of all reads.
+    //! Retruns sum, min, max, avarage and median of all read_count_.
     //! \return a summary of the read measurements
-    stats_data::measurement_summary<unsigned> get_reads_summary() const;
+    stats_data::summary<unsigned> get_read_count_summary() const;
 
-    //! Returns the sum of all writes.
-    //! \return the sum of all writes
-    unsigned get_writes() const;
+    //! Returns the sum of all write_count_.
+    //! \return the sum of all write_count_
+    unsigned get_write_count() const;
 
-    //! Returns sum, min, max, avarage and median of all writes.
+    //! Returns sum, min, max, avarage and median of all write_count_.
     //! \returns a summary of the write measurements
-    stats_data::measurement_summary<unsigned> get_writes_summary() const;
+    stats_data::summary<unsigned> get_write_count_summary() const;
 
     //! Returns number of bytes read from disks in total.
     //! \return number of bytes read
-    external_size_type get_read_volume() const;
+    external_size_type get_read_bytes() const;
 
     //! Returns sum, min, max, avarage and median of all read bytes.
     //! \returns a summary of the write measurements
-    stats_data::measurement_summary<external_size_type> get_read_volume_summary() const;
+    stats_data::summary<external_size_type> get_read_bytes_summary() const;
 
     //! Returns number of bytes written to the disks in total.
     //! \return number of bytes written
-    external_size_type get_written_volume() const;
+    external_size_type get_write_bytes() const;
 
     //! Returns sum, min, max, avarage and median of all written bytes.
     //! \return a summary of the written bytes
-    stats_data::measurement_summary<external_size_type> get_written_volume_summary() const;
+    stats_data::summary<external_size_type> get_write_bytes_summary() const;
 
-    //! Time that would be spent in read syscalls if all parallel reads were serialized.
+    //! Time that would be spent in read syscalls if all parallel read_count_
+    //! were serialized.
     //! \return seconds spent in reading
     double get_read_time() const;
 
     //! Returns sum, min, max, avarage and median of all read times
     //! \return a summary of the read times
-    stats_data::measurement_summary<double> get_read_time_summary() const;
+    stats_data::summary<double> get_read_time_summary() const;
 
-    //! Time that would be spent in write syscalls if all parallel writes were serialized.
+    //! Time that would be spent in write syscalls if all parallel write_count_
+    //! were serialized.
     //! \return the sum of the write times of all files
     double get_write_time() const;
 
     //! Returns sum, min, max, avarage and median of all write times
     //! \return a summary of the write times
-    stats_data::measurement_summary<double> get_write_time_summary() const;
+    stats_data::summary<double> get_write_time_summary() const;
 
     //! Period of time when at least one I/O thread was executing a read.
     //! \return seconds spent in reading
@@ -696,15 +590,15 @@ public:
     //! \return seconds spent in I/O
     double get_pio_time() const;
 
-    stats_data::measurement_summary<double> get_read_speed_summary() const;
+    stats_data::summary<double> get_read_speed_summary() const;
 
-    stats_data::measurement_summary<double> get_pread_speed_summary() const;
+    stats_data::summary<double> get_pread_speed_summary() const;
 
-    stats_data::measurement_summary<double> get_write_speed_summary() const;
+    stats_data::summary<double> get_write_speed_summary() const;
 
-    stats_data::measurement_summary<double> get_pwrite_speed_summary() const;
+    stats_data::summary<double> get_pwrite_speed_summary() const;
 
-    stats_data::measurement_summary<double> get_pio_speed_summary() const;
+    stats_data::summary<double> get_pio_speed_summary() const;
 
     //! Retruns elapsed time
     //! \remark If stats_data is not the difference between two other stats_data

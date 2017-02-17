@@ -164,7 +164,7 @@ int main(int argc, char** argv)
               << " ad " << matrix_stats_after.block_addition_calls
               << " ads " << matrix_stats_after.block_additions_saved_through_zero;
     std::cout << " t " << stats_after.get_elapsed_time()
-              << " r " << stats_after.get_reads() << " w " << stats_after.get_writes()
+              << " r " << stats_after.get_read_count() << " w " << stats_after.get_write_count()
               << " rt " << stats_after.get_read_time() << " rtp " << stats_after.get_pread_time()
               << " wt " << stats_after.get_write_time() << " wtp " << stats_after.get_pwrite_time()
               << " rw " << stats_after.get_wait_read_time() << " ww " << stats_after.get_wait_write_time()

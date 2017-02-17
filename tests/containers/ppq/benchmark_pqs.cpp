@@ -582,12 +582,12 @@ public:
                   << " num_elements=" << num_elements
                   << " volume=" << num_elements * m_value_size
                   << " time=" << timer().seconds()
-                  << " read_count=" << s.get_reads()
-                  << " read_vol=" << s.get_read_volume()
+                  << " read_count=" << s.get_read_count()
+                  << " read_bytes=" << s.get_read_bytes()
                   << " read_time=" << s.get_read_time()
                   << " pread_time=" << s.get_pread_time()
-                  << " write_count=" << s.get_writes()
-                  << " write_vol=" << s.get_written_volume()
+                  << " write_count=" << s.get_write_count()
+                  << " write_bytes=" << s.get_write_bytes()
                   << " write_time=" << s.get_write_time()
                   << " pwrite_time=" << s.get_pwrite_time()
                   << " wait_io_time=" << s.get_io_wait_time()

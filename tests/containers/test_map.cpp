@@ -69,7 +69,7 @@ int main(int argc, char** argv)
         }
         STXXL_CHECK(Map.size() == el);
         stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
-        double writes = double(stats_elapsed.get_writes()) / double(el);
+        double writes = double(stats_elapsed.get_write_count()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
         STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
         STXXL_MSG(stats_elapsed);
@@ -89,8 +89,8 @@ int main(int argc, char** argv)
             STXXL_CHECK(result->second == key + 1);
         }
         stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
-        double reads = double(stats_elapsed.get_reads()) / logel;
-        double readsperq = double(stats_elapsed.get_reads()) / (double)queries;
+        double reads = double(stats_elapsed.get_read_count()) / logel;
+        double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
         STXXL_MSG(stats_elapsed);
 
