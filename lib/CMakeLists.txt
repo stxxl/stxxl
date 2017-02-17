@@ -14,7 +14,6 @@
 
 set(LIBSTXXL_SOURCES
 
-  common/exithandler.cpp
   common/log.cpp
   common/rand.cpp
   common/seed.cpp
