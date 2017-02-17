@@ -391,7 +391,7 @@ private:
     template <typename... Ts>
     static tuple_with_removed_refs<Ts...> remove_ref_from_tuple_members(std::tuple<Ts...>)
     {
-        return tuple_with_removed_refs<Ts...>{ }
+        return tuple_with_removed_refs<Ts...>();
     }
 
     using return_type = typename std::result_of<KeyExtract(ValueType&)>::type;
@@ -402,7 +402,7 @@ private:
     template <typename... Ts>
     static tuple_with_removed_refs<Ts...> remove_ref_from_tuple_members(std::tuple<Ts...> const&)
     {
-        return tuple_with_removed_refs<Ts...>{ }
+        return tuple_with_removed_refs<Ts...>();
     }
 };
 
