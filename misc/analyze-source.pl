@@ -243,7 +243,7 @@ sub process_cpp {
     my $i = 0;
     if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # skip emacs mode line
     expect($path, $i, @data, "/".('*'x75)."\n"); ++$i;
-    expect($path, $i, @data, " *  $path\n"); ++$i;
+    expectr($path, $i, @data, " *  $path\n", qr/^ \* /); ++$i;
     expect($path, $i, @data, " *\n"); ++$i;
 
     # skip over comment

@@ -14,9 +14,10 @@
 #define STXXL_CONTAINERS_MATRIX_HEADER
 
 #include <stxxl/bits/containers/vector.h>
-#include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/mng/block_scheduler.h>
 #include <stxxl/bits/containers/matrix_arithmetic.h>
+
+#include <foxxll/common/counting_ptr.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -233,7 +234,7 @@ public:
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
-class swappable_block_matrix : public reference_count
+class swappable_block_matrix : public foxxll::reference_count
 {
 public:
     using size_type =  int_type ;
@@ -1044,24 +1045,25 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix
 {
 protected:
-    using matrix_type =  matrix<ValueType, BlockSideLength> ;
-    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
-    using swappable_block_matrix_pointer_type =  counting_ptr<swappable_block_matrix_type> ;
-    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
-    using block_size_type =  typename swappable_block_matrix_type::size_type ;
-    using elem_size_type =  typename swappable_block_matrix_type::elem_size_type ;
-    using Ops =  matrix_local::matrix_operations<ValueType, BlockSideLength> ;
-    using swappable_block_type =  matrix_swappable_block<ValueType, BlockSideLength> ;
+    using matrix_type = matrix<ValueType, BlockSideLength>;
+    using swappable_block_matrix_type = swappable_block_matrix<ValueType, BlockSideLength>;
+    using swappable_block_matrix_pointer_type =
+        foxxll::counting_ptr<swappable_block_matrix_type>;
+    using block_scheduler_type = typename swappable_block_matrix_type::block_scheduler_type;
+    using block_size_type = typename swappable_block_matrix_type::size_type;
+    using elem_size_type = typename swappable_block_matrix_type::elem_size_type;
+    using Ops = matrix_local::matrix_operations<ValueType, BlockSideLength>;
+    using swappable_block_type = matrix_swappable_block<ValueType, BlockSideLength>;
 
 public:
-    using iterator =  matrix_iterator<ValueType, BlockSideLength> ;
-    using const_iterator =  const_matrix_iterator<ValueType, BlockSideLength> ;
-    using row_major_iterator =  matrix_row_major_iterator<ValueType, BlockSideLength> ;
-    using col_major_iterator =  matrix_col_major_iterator<ValueType, BlockSideLength> ;
-    using const_row_major_iterator =  const_matrix_row_major_iterator<ValueType, BlockSideLength> ;
-    using const_col_major_iterator =  const_matrix_col_major_iterator<ValueType, BlockSideLength> ;
-    using column_vector_type =  column_vector<ValueType> ;
-    using row_vector_type =  row_vector<ValueType> ;
+    using iterator = matrix_iterator<ValueType, BlockSideLength>;
+    using const_iterator = const_matrix_iterator<ValueType, BlockSideLength>;
+    using row_major_iterator = matrix_row_major_iterator<ValueType, BlockSideLength>;
+    using col_major_iterator = matrix_col_major_iterator<ValueType, BlockSideLength>;
+    using const_row_major_iterator = const_matrix_row_major_iterator<ValueType, BlockSideLength>;
+    using const_col_major_iterator = const_matrix_col_major_iterator<ValueType, BlockSideLength>;
+    using column_vector_type = column_vector<ValueType>;
+    using row_vector_type = row_vector<ValueType>;
 
 protected:
     template <typename VT, unsigned BSL>
@@ -1162,7 +1164,7 @@ public:
         if (data.unique())
             data->set_zero();
         else
-            data = make_counting<swappable_block_matrix_type>(
+            data = foxxll::make_counting<swappable_block_matrix_type>(
                 data->bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength));
     }
     //! \}

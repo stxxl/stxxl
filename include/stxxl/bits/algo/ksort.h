@@ -15,7 +15,7 @@
 #ifndef STXXL_ALGO_KSORT_HEADER
 #define STXXL_ALGO_KSORT_HEADER
 
-#include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/mng/async_schedule.h>
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/intksort.h>
