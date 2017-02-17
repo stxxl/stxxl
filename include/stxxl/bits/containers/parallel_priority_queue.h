@@ -303,8 +303,8 @@ public:
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
     explicit internal_array(std::vector<value_type>& values,
-                   const size_t min_index = 0,
-                   const size_t level = 0)
+                            const size_t min_index = 0,
+                            const size_t level = 0)
         : m_values(), m_min_index(min_index), m_level(level),
           m_block_pointers(1)
     {
@@ -2289,7 +2289,7 @@ protected:
               HeapCompareType comp)
     {
         using value_type =
-            typename std::iterator_traits<RandomAccessIterator>::value_type        ;
+                  typename std::iterator_traits<RandomAccessIterator>::value_type;
 
         value_type value = STXXL_MOVE(*(last - 1));
 

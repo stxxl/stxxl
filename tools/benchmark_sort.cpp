@@ -173,7 +173,7 @@ public:
         {
             std::cout << "# stxxl::stream::sort of size " << vec_size << std::endl;
             double ts1 = timestamp();
-            using random_stream_sort_type = stxxl::stream::sort<random_stream, value_less>            ;
+            using random_stream_sort_type = stxxl::stream::sort<random_stream, value_less>;
 
             random_stream stream(vec_size);
             random_stream_sort_type stream_sort(stream, value_less(), memsize);

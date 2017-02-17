@@ -55,9 +55,9 @@ template <typename RandomAccessIterator>
 struct PMWMSSortingData
 {
     using ValueType =
-        typename std::iterator_traits<RandomAccessIterator>::value_type    ;
+              typename std::iterator_traits<RandomAccessIterator>::value_type;
     using DiffType =
-        typename std::iterator_traits<RandomAccessIterator>::difference_type    ;
+              typename std::iterator_traits<RandomAccessIterator>::difference_type;
 
     //! Input begin.
     RandomAccessIterator source;
@@ -133,9 +133,9 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
                                   Comparator& comp)
 {
     using ValueType =
-        typename std::iterator_traits<RandomAccessIterator>::value_type    ;
+              typename std::iterator_traits<RandomAccessIterator>::value_type;
     using DiffType =
-        typename std::iterator_traits<RandomAccessIterator>::difference_type    ;
+              typename std::iterator_traits<RandomAccessIterator>::difference_type;
 
     Timing<inactive_tag> t;
 
@@ -316,9 +316,9 @@ parallel_sort_mwms(RandomAccessIterator begin,
 {
     STXXL_PARALLEL_PCALL(end - begin)
     using ValueType =
-        typename std::iterator_traits<RandomAccessIterator>::value_type    ;
+              typename std::iterator_traits<RandomAccessIterator>::value_type;
     using DiffType =
-        typename std::iterator_traits<RandomAccessIterator>::difference_type    ;
+              typename std::iterator_traits<RandomAccessIterator>::difference_type;
 
     DiffType n = end - begin;
 

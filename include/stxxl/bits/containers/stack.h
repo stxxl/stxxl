@@ -588,7 +588,7 @@ public:
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     explicit grow_shrink_stack2(pool_type& pool_,
-                       const size_t prefetch_aggressiveness = 0)
+                                const size_t prefetch_aggressiveness = 0)
         : m_size(0),
           cache_offset(0),
           cache(new block_type),

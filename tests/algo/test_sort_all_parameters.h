@@ -13,9 +13,10 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/types>
+
+#include <functional>
 #include <limits>
 #include <ostream>
-#include <functional>
 
 template <unsigned kSize>
 struct bulk

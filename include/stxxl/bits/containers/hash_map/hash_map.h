@@ -178,10 +178,10 @@ public:
      * \param a allocation-strategory for internal-memory buffer
      */
     explicit hash_map(internal_size_type n = 0,
-             const hasher& hf = hasher(),
-             const key_compare& cmp = key_compare(),
-             internal_size_type buffer_size = 128*1024*1024,
-             const allocator_type& a = allocator_type())
+                      const hasher& hf = hasher(),
+                      const key_compare& cmp = key_compare(),
+                      internal_size_type buffer_size = 128*1024*1024,
+                      const allocator_type& a = allocator_type())
         : hash_(hf),
           cmp_(cmp),
           buckets_(n),

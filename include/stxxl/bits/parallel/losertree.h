@@ -73,7 +73,7 @@ protected:
 
 public:
     explicit LoserTreeCopyBase(size_type _k,
-                      Comparator _comp = std::less<ValueType>())
+                               Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(round_up_to_power_of_two(ik)),
           comp(_comp),
@@ -526,7 +526,7 @@ protected:
 
 public:
     explicit LoserTreePointerBase(size_type _k,
-                         Comparator _comp = std::less<ValueType>())
+                                  Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
