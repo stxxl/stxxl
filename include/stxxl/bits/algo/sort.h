@@ -73,8 +73,8 @@ void
 create_runs(
     InputBidIterator it,
     RunType** runs,
-    int_type nruns,
-    int_type _m,
+    const size_t nruns,
+    const size_t _m,
     ValueCmp cmp)
 {
     using block_type = BlockType;
@@ -83,7 +83,7 @@ create_runs(
     using bid_type = typename block_type::bid_type;
     STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
 
-    int_type m2 = _m / 2;
+    const size_t m2 = _m / 2;
     block_manager* bm = block_manager::get_instance();
     block_type* Blocks1 = new block_type[m2];
     block_type* Blocks2 = new block_type[m2];
@@ -97,8 +97,8 @@ create_runs(
 
     disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
-    int_type i;
-    int_type run_size = 0;
+    size_t i;
+    size_t run_size = 0;
 
     assert(nruns >= 2);
 
@@ -121,12 +121,12 @@ create_runs(
         read_reqs2[i] = Blocks2[i].read(bids2[i]);
     }
 
-    for (int_type k = 0; k < nruns - 1; ++k)
+    for (size_t k = 0; k < nruns - 1; ++k)
     {
         run_type* run = runs[k];
         run_size = run->size();
         assert(run_size == m2);
-        int_type next_run_size = runs[k + 1]->size();
+        size_t next_run_size = runs[k + 1]->size();
         STXXL_ASSERT((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
@@ -146,7 +146,7 @@ create_runs(
             wait_all(write_reqs, m2);
         STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
 
-        int_type runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
+        size_t runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
         for (i = 0; i < m2; ++i)
         {
             STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
@@ -208,7 +208,7 @@ create_runs(
 
 template <typename BlockType, typename RunType, typename ValueCmp>
 bool check_sorted_runs(RunType** runs,
-                       size_t nruns,
+                       const size_t nruns,
                        size_t m,
                        ValueCmp cmp)
 {
@@ -307,7 +307,7 @@ bool check_sorted_runs(RunType** runs,
 }
 
 template <typename BlockType, typename RunType, typename ValueCmp>
-void merge_runs(RunType** in_runs, int_type nruns,
+void merge_runs(RunType** in_runs, size_t nruns,
                 RunType* out_run, size_t _m, ValueCmp cmp)
 {
     using block_type = BlockType;
@@ -320,10 +320,10 @@ void merge_runs(RunType** in_runs, int_type nruns,
 
     run_type consume_seq(out_run->size());
 
-    int_type* prefetch_seq = new int_type[out_run->size()];
+    size_t* prefetch_seq = new size_t[out_run->size()];
 
     typename run_type::iterator copy_start = consume_seq.begin();
-    for (int_type i = 0; i < nruns; i++)
+    for (size_t i = 0; i < nruns; i++)
     {
         // \todo: try to avoid copy
         copy_start = std::copy(
@@ -335,16 +335,16 @@ void merge_runs(RunType** in_runs, int_type nruns,
     std::stable_sort(consume_seq.begin(), consume_seq.end(),
                      sort_helper::trigger_entry_cmp<trigger_entry_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
-    int_type disks_number = config::get_instance()->disks_number();
+    size_t disks_number = config::get_instance()->disks_number();
 
 #ifdef PLAY_WITH_OPT_PREF
-    const int_type n_write_buffers = 4 * disks_number;
+    const size_t n_write_buffers = 4 * disks_number;
 #else
-    const int_type n_prefetch_buffers = std::max(2 * disks_number, (3 * (int_type(_m) - nruns) / 4));
-    const int_type n_write_buffers = std::max(2 * disks_number, int_type(_m) - nruns - n_prefetch_buffers);
+    const size_t n_prefetch_buffers = std::max(2 * disks_number, (3 * (_m - nruns) / 4));
+    const size_t n_write_buffers = std::max(2 * disks_number, _m - nruns - n_prefetch_buffers);
  #if STXXL_SORT_OPTIMAL_PREFETCHING
     // heuristic
-    const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
+    const size_t n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
  #endif
 #endif
 
@@ -367,7 +367,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
 
     buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
 
-    int_type out_run_size = out_run->size();
+    size_t out_run_size = out_run->size();
 
     block_type* out_buffer = writer.get_free_block();
 
@@ -386,7 +386,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
         std::vector<sequence> seqs(nruns);
         std::vector<block_type*> buffers(nruns);
 
-        for (int_type i = 0; i < nruns; i++)                    // initialize sequences
+        for (size_t i = 0; i < nruns; i++)                    // initialize sequences
         {
             buffers[i] = prefetcher.pull_block();               // get first block of each run
             seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());
@@ -398,7 +398,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
  #endif
         diff_type num_currently_mergeable = 0;
 
-        for (int_type j = 0; j < out_run_size; ++j)                     // for the whole output run, out_run_size is in blocks
+        for (size_t j = 0; j < out_run_size; ++j)                     // for the whole output run, out_run_size is in blocks
         {
             diff_type rest = block_type::size;                          // elements still to merge for this output block
 
@@ -475,7 +475,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
         value_type last_elem = cmp.min_value();
 #endif
 
-        for (int_type i = 0; i < out_run_size; ++i)
+        for (size_t i = 0; i < out_run_size; ++i)
         {
             losers.multi_merge(out_buffer->elem, out_buffer->elem + block_type::size);
             (*out_run)[i].value = *(out_buffer->elem);
@@ -501,7 +501,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
     delete[] prefetch_seq;
 
     block_manager* bm = block_manager::get_instance();
-    for (int_type i = 0; i < nruns; ++i)
+    for (size_t i = 0; i < nruns; ++i)
     {
         size_t sz = in_runs[i]->size();
         for (size_t j = 0; j < sz; ++j)
@@ -566,24 +566,24 @@ sort_blocks(InputBidIterator input_bids,
 
     disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
-    const int_type merge_factor = optimal_merge_factor(nruns, _m);
+    const size_t merge_factor = optimal_merge_factor(nruns, _m);
     run_type** new_runs;
 
     while (nruns > 1)
     {
-        int_type new_nruns = div_ceil(nruns, merge_factor);
+        size_t new_nruns = div_ceil(nruns, merge_factor);
         STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                       " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 
         new_runs = new run_type*[new_nruns];
 
-        int_type runs_left = nruns;
-        int_type cur_out_run = 0;
-        int_type blocks_in_new_run = 0;
+        size_t runs_left = nruns;
+        size_t cur_out_run = 0;
+        size_t blocks_in_new_run = 0;
 
         while (runs_left > 0)
         {
-            int_type runs2merge = std::min(runs_left, merge_factor);
+            size_t runs2merge = std::min(runs_left, merge_factor);
             blocks_in_new_run = 0;
             for (size_t i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
                 blocks_in_new_run += runs[i]->size();
@@ -593,11 +593,11 @@ sort_blocks(InputBidIterator input_bids,
             runs_left -= runs2merge;
         }
         // allocate blocks for the new runs
-        if (cur_out_run == 1 && blocks_in_new_run == int_type(_n) && !input_bids->is_managed())
+        if (cur_out_run == 1 && blocks_in_new_run == _n && !input_bids->is_managed())
         {
             // if we sort a file we can reuse the input bids for the output
             input_bid_iterator cur = input_bids;
-            for (int_type i = 0; cur != (input_bids + _n); ++cur)
+            for (size_t i = 0; cur != (input_bids + _n); ++cur)
             {
                 (*new_runs[0])[i++].bid = *cur;
             }
@@ -631,7 +631,7 @@ sort_blocks(InputBidIterator input_bids,
         cur_out_run = 0;
         while (runs_left > 0)
         {
-            int_type runs2merge = std::min(runs_left, merge_factor);
+            size_t runs2merge = std::min(runs_left, merge_factor);
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_sorted_runs<block_type, run_type, value_cmp>(runs + nruns - runs_left, runs2merge, m2, cmp)));
 #endif

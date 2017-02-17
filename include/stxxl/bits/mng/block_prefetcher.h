@@ -66,23 +66,23 @@ protected:
     bid_iterator_type consume_seq_end;
     size_t seq_length;
 
-    int_type* prefetch_seq;
+    size_t* prefetch_seq;
 
     size_t nextread;
     size_t nextconsume;
 
-    const int_type nreadblocks;
+    const size_t nreadblocks;
 
     block_type* read_buffers;
     request_ptr* read_reqs;
     bid_type* read_bids;
 
     onoff_switch* completed;
-    int_type* pref_buffer;
+    size_t* pref_buffer;
 
     completion_handler do_after_fetch;
 
-    block_type * wait(int_type iblock)
+    block_type * wait(size_t iblock)
     {
         STXXL_VERBOSE1("block_prefetcher: waiting block " << iblock);
         {
@@ -91,7 +91,7 @@ protected:
             completed[iblock].wait_for_on();
         }
         STXXL_VERBOSE1("block_prefetcher: finished waiting block " << iblock);
-        int_type ibuffer = pref_buffer[iblock];
+        size_t ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
         return (read_buffers + ibuffer);
@@ -108,14 +108,14 @@ public:
     block_prefetcher(
         bid_iterator_type _cons_begin,
         bid_iterator_type _cons_end,
-        int_type* _pref_seq,
-        int_type _prefetch_buf_size,
+        size_t* _pref_seq,
+        size_t _prefetch_buf_size,
         completion_handler do_after_fetch = completion_handler())
         : consume_seq_begin(_cons_begin),
           consume_seq_end(_cons_end),
           seq_length(_cons_end - _cons_begin),
           prefetch_seq(_pref_seq),
-          nextread(std::min(static_cast<size_t>(_prefetch_buf_size), seq_length)),
+          nextread(std::min(_prefetch_buf_size, seq_length)),
           nextconsume(0),
           nreadblocks(nextread),
           do_after_fetch(do_after_fetch)
@@ -124,11 +124,11 @@ public:
         STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size=" << _prefetch_buf_size);
         assert(seq_length > 0);
         assert(_prefetch_buf_size > 0);
-        int_type i;
+        size_t i;
         read_buffers = new block_type[nreadblocks];
         read_reqs = new request_ptr[nreadblocks];
         read_bids = new bid_type[nreadblocks];
-        pref_buffer = new int_type[seq_length];
+        pref_buffer = new size_t[seq_length];
 
         std::fill(pref_buffer, pref_buffer + seq_length, -1);
 
@@ -136,8 +136,7 @@ public:
 
         for (i = 0; i < nreadblocks; ++i)
         {
-            assert(prefetch_seq[i] < int_type(seq_length));
-            assert(prefetch_seq[i] >= 0);
+            assert(prefetch_seq[i] < seq_length);
             read_bids[i] = *(consume_seq_begin + prefetch_seq[i]);
             STXXL_VERBOSE1("block_prefetcher: reading block " << i <<
                            " prefetch_seq[" << i << "]=" << prefetch_seq[i] <<
@@ -169,7 +168,7 @@ public:
     //! \return \c false if there are no blocks to prefetch left, \c true if consumption sequence is not emptied
     bool block_consumed(block_type*& buffer)
     {
-        int_type ibuffer = buffer - read_buffers;
+        size_t ibuffer = buffer - read_buffers;
         STXXL_VERBOSE1("block_prefetcher: buffer " << ibuffer << " consumed");
         if (read_reqs[ibuffer].valid())
             read_reqs[ibuffer]->wait();
@@ -179,10 +178,10 @@ public:
         if (nextread < seq_length)
         {
             assert(ibuffer >= 0 && ibuffer < nreadblocks);
-            int_type next_2_prefetch = prefetch_seq[nextread++];
+            size_t next_2_prefetch = prefetch_seq[nextread++];
             STXXL_VERBOSE1("block_prefetcher: prefetching block " << next_2_prefetch);
 
-            assert((next_2_prefetch < int_type(seq_length)) && (next_2_prefetch >= 0));
+            assert(next_2_prefetch < seq_length);
             assert(!completed[next_2_prefetch].is_on());
 
             pref_buffer[next_2_prefetch] = ibuffer;
@@ -216,7 +215,7 @@ public:
     //! Frees used memory.
     ~block_prefetcher()
     {
-        for (int_type i = 0; i < nreadblocks; ++i)
+        for (size_t i = 0; i < nreadblocks; ++i)
             if (read_reqs[i].valid())
                 read_reqs[i]->wait();
 

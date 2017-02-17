@@ -25,32 +25,32 @@
 namespace stxxl {
 
 void compute_prefetch_schedule(
-    const int_type* first,
-    const int_type* last,
-    int_type* out_first,
-    int_type m,
-    int_type D);
+    const size_t* first,
+    const size_t* last,
+    size_t* out_first,
+    size_t m,
+    size_t D);
 
 inline void compute_prefetch_schedule(
-    int_type* first,
-    int_type* last,
-    int_type* out_first,
-    int_type m,
-    int_type D)
+    size_t* first,
+    size_t* last,
+    size_t* out_first,
+    size_t m,
+    size_t D)
 {
-    compute_prefetch_schedule(static_cast<const int_type*>(first), last, out_first, m, D);
+    compute_prefetch_schedule(static_cast<const size_t*>(first), last, out_first, m, D);
 }
 
 template <typename RunType>
 void compute_prefetch_schedule(
     const RunType& input,
-    int_type* out_first,
-    int_type m,
-    int_type D)
+    size_t* out_first,
+    size_t m,
+    size_t D)
 {
-    const int_type L = input.size();
-    simple_vector<int_type> disks(L);
-    for (int_type i = 0; i < L; ++i)
+    const size_t L = input.size();
+    simple_vector<size_t> disks(L);
+    for (size_t i = 0; i < L; ++i)
         disks[i] = input[i].bid.storage->get_device_id();
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
@@ -59,13 +59,13 @@ template <typename BidIteratorType>
 void compute_prefetch_schedule(
     BidIteratorType input_begin,
     BidIteratorType input_end,
-    int_type* out_first,
-    int_type m,
-    int_type D)
+    size_t* out_first,
+    size_t m,
+    size_t D)
 {
-    const int_type L = input_end - input_begin;
-    simple_vector<int_type> disks(L);
-    int_type i = 0;
+    const size_t L = input_end - input_begin;
+    simple_vector<size_t> disks(L);
+    size_t i = 0;
     for (BidIteratorType it = input_begin; it != input_end; ++it, ++i)
         disks[i] = it->storage->get_device_id();
     compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);

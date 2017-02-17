@@ -27,12 +27,12 @@ template <typename RunCursorType,
 class loser_tree
 {
     int logK;
-    int_type k;
-    int_type* entry;
+    size_t k;
+    size_t* entry;
     RunCursorType* current;
     RunCursorCmpType cmp;
 
-    int_type init_winner(int_type root)
+    size_t init_winner(size_t root)
     {
         if (root >= k)
         {
@@ -40,8 +40,8 @@ class loser_tree
         }
         else
         {
-            int_type left = init_winner(2 * root);
-            int_type right = init_winner(2 * root + 1);
+            size_t left = init_winner(2 * root);
+            size_t right = init_winner(2 * root + 1);
             if (cmp(current[left], current[right]))
             {
                 entry[root] = right;
@@ -61,13 +61,13 @@ public:
 
     loser_tree(
         prefetcher_type* p,
-        int_type nruns,
+        size_t nruns,
         RunCursorCmpType c)
         : cmp(c)
     {
-        int_type i;
+        size_t i;
         logK = ilog2_ceil(nruns);
-        int_type kReg = k = (int_type(1) << logK);
+        size_t kReg = k = size_t(1) << logK;
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
 
@@ -79,7 +79,7 @@ public:
         for (i = 0; i < kReg; ++i)
             current[i].prefetcher() = p;
 #endif
-        entry = new int_type[(kReg << 1)];
+        entry = new size_t[(kReg << 1)];
         // init cursors
         for (i = 0; i < nruns; ++i)
         {
@@ -122,8 +122,8 @@ private:
     void multi_merge_unrolled(value_type* out_first, value_type* out_last)
     {
         RunCursorType* currentE, * winnerE;
-        int_type* regEntry = entry;
-        int_type winnerIndex = regEntry[0];
+        size_t* regEntry = entry;
+        size_t winnerIndex = regEntry[0];
 
         while (LIKELY(out_first != out_last))
         {
@@ -176,8 +176,8 @@ private:
     void multi_merge_k(value_type* out_first, value_type* out_last)
     {
         RunCursorType* currentE, * winnerE;
-        int_type kReg = k;
-        int_type winnerIndex = entry[0];
+        size_t kReg = k;
+        size_t winnerIndex = entry[0];
 
         while (LIKELY(out_first != out_last))
         {
@@ -187,7 +187,7 @@ private:
 
             ++(*winnerE);
 
-            for (int_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1)
+            for (size_t i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1)
             {
                 currentE = current + entry[i];
 

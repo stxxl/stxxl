@@ -174,7 +174,7 @@ public:
     //! \param new_size new size of the pool after the call
     void resize(size_t new_size)
     {
-        int_type diff = int_type(new_size) - int_type(size());
+        int64_t diff = int64_t(new_size) - int64_t(size());
         if (diff > 0)
         {
             while (--diff >= 0)
@@ -260,7 +260,7 @@ protected:
     void check_all_busy()
     {
         busy_blocks_iterator cur = busy_blocks.begin();
-        int_type cnt = 0;
+        size_t cnt = 0;
         while (cur != busy_blocks.end())
         {
             if (cur->req->poll())

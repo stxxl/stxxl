@@ -42,22 +42,22 @@ struct switch_major_index;
 template <unsigned BlockSideLength>
 struct switch_major_index<BlockSideLength, false>
 {
-    inline switch_major_index(const int_type row, const int_type col) : i(row * BlockSideLength + col) { }
-    inline operator int_type& () { return i; }
+    inline switch_major_index(const size_t row, const size_t col) : i(row * BlockSideLength + col) { }
+    inline operator size_t& () { return i; }
 
 private:
-    int_type i;
+    size_t i;
 };
 
 //column-major specialization
 template <unsigned BlockSideLength>
 struct switch_major_index<BlockSideLength, true>
 {
-    inline switch_major_index(const int_type row, const int_type col) : i(row + col * BlockSideLength) { }
-    inline operator int_type& () { return i; }
+    inline switch_major_index(const size_t row, const size_t col) : i(row + col * BlockSideLength) { }
+    inline operator size_t& () { return i; }
 
 private:
-    int_type i;
+    size_t i;
 };
 
 //! c = a [op] b; for arbitrary entries
@@ -72,7 +72,7 @@ struct low_level_matrix_binary_ass_op
                 #pragma omp parallel for
                 #endif
                 for (int_type row = 0; row < int_type(BlockSideLength); ++row)
-                    for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+                    for (size_t col = 0; col < BlockSideLength; ++col)
                         op(c[switch_major_index < BlockSideLength, false > (row, col)],
                            a[switch_major_index < BlockSideLength, a_transposed > (row, col)],
                            b[switch_major_index < BlockSideLength, b_transposed > (row, col)]);
@@ -81,7 +81,7 @@ struct low_level_matrix_binary_ass_op
                 #pragma omp parallel for
                 #endif
                 for (int_type row = 0; row < int_type(BlockSideLength); ++row)
-                    for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+                    for (size_t col = 0; col < BlockSideLength; ++col)
                         op(c[switch_major_index < BlockSideLength, false > (row, col)],
                            a[switch_major_index < BlockSideLength, a_transposed > (row, col)], 0);
         else
@@ -91,7 +91,7 @@ struct low_level_matrix_binary_ass_op
             #pragma omp parallel for
             #endif
             for (int_type row = 0; row < int_type(BlockSideLength); ++row)
-                for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+                for (size_t col = 0; col < BlockSideLength; ++col)
                     op(c[switch_major_index < BlockSideLength, false > (row, col)],
                        0, b[switch_major_index < BlockSideLength, b_transposed > (row, col)]);
         }
@@ -109,7 +109,7 @@ struct low_level_matrix_unary_ass_op
             #pragma omp parallel for
             #endif
             for (int_type row = 0; row < int_type(BlockSideLength); ++row)
-                for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+                for (size_t col = 0; col < BlockSideLength; ++col)
                     op(c[switch_major_index < BlockSideLength, false > (row, col)],
                        a[switch_major_index < BlockSideLength, a_transposed > (row, col)]);
     }
@@ -126,7 +126,7 @@ struct low_level_matrix_unary_op
         #pragma omp parallel for
         #endif
         for (int_type row = 0; row < int_type(BlockSideLength); ++row)
-            for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+            for (size_t col = 0; col < BlockSideLength; ++col)
                 c[switch_major_index < BlockSideLength, false > (row, col)] =
                     op(a[switch_major_index < BlockSideLength, a_transposed > (row, col)]);
     }

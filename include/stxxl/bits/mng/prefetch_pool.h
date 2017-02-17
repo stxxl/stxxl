@@ -354,7 +354,7 @@ public:
     //! \return new size of the pool
     size_t resize(size_t new_size)
     {
-        int_type diff = int_type(new_size) - int_type(size());
+        int64_t diff = int64_t(new_size) - int64_t(size());
         if (diff > 0)
         {
             free_blocks_size += diff;

@@ -22,7 +22,7 @@
 
 namespace stxxl {
 
-template <size_t BlockSize, typename RunType, class PosType = int_type>
+template <size_t BlockSize, typename RunType, class PosType = std::make_signed<size_t>::type>
 struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
 {
     using self_type = runs2bid_array_adaptor<BlockSize, RunType, PosType>;
@@ -75,7 +75,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
 
 BLOCK_ADAPTOR_OPERATORS(runs2bid_array_adaptor)
 
-template <size_t BlockSize, typename RunType, class PosType = int_type>
+template <size_t BlockSize, typename RunType, class PosType = std::make_signed<size_t>::type>
 struct runs2bid_array_adaptor2
     : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
 {
@@ -93,7 +93,7 @@ struct runs2bid_array_adaptor2
 
     PosType w, h, K;
 
-    runs2bid_array_adaptor2(RunType** a, PosType p, int_type _w, int_type _h)
+    runs2bid_array_adaptor2(RunType** a, PosType p, PosType _w, PosType _h)
         : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a, p),
           w(_w), h(_h), K(_w * _h)
     { }
@@ -165,7 +165,7 @@ struct trigger_entry_iterator
     // STL typedefs
     using value_type = bid_type;
     using iterator_category = std::random_access_iterator_tag;
-    using difference_type = int_type;
+    using difference_type = int64_t;
     using pointer = value_type *;
     using reference = value_type &;
 
@@ -181,11 +181,11 @@ struct trigger_entry_iterator
     {
         return &(value->bid);
     }
-    const bid_type& operator [] (int_type n) const
+    const bid_type& operator [] (size_t n) const
     {
         return (value + n)->bid;
     }
-    bid_type& operator [] (int_type n)
+    bid_type& operator [] (size_t n)
     {
         return (value + n)->bid;
     }
@@ -220,12 +220,12 @@ struct trigger_entry_iterator
     {
         return value != a.value;
     }
-    self_type operator += (int_type n)
+    self_type operator += (size_t n)
     {
         value += n;
         return *this;
     }
-    self_type operator -= (int_type n)
+    self_type operator -= (size_t n)
     {
         value -= n;
         return *this;
@@ -234,7 +234,7 @@ struct trigger_entry_iterator
     {
         return value - a.value;
     }
-    int_type operator + (const self_type& a) const
+    trigger_iterator_type operator + (const self_type& a) const
     {
         return value + a.value;
     }

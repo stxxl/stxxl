@@ -47,7 +47,7 @@ namespace stxxl {
  */
 template <typename ExtIterator, typename UnaryFunction>
 UnaryFunction for_each(ExtIterator begin, ExtIterator end,
-                       UnaryFunction functor, int_type nbuffers = 0)
+                       UnaryFunction functor, size_t nbuffers = 0)
 {
     if (begin == end)
         return functor;
@@ -122,7 +122,7 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end,
  */
 template <typename ExtIterator, typename UnaryFunction>
 UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
-                         UnaryFunction functor, int_type nbuffers = 0)
+                         UnaryFunction functor, size_t nbuffers = 0)
 {
     if (begin == end)
         return functor;
@@ -202,7 +202,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
  */
 template <typename ExtIterator, typename Generator>
 void generate(ExtIterator begin, ExtIterator end,
-              Generator generator, int_type nbuffers = 0)
+              Generator generator, size_t nbuffers = 0)
 {
     using block_type = typename ExtIterator::block_type;
     using buf_ostream_type = buf_ostream<
@@ -283,7 +283,7 @@ void generate(ExtIterator begin, ExtIterator end,
  */
 template <typename ExtIterator, typename EqualityComparable>
 ExtIterator find(ExtIterator begin, ExtIterator end,
-                 const EqualityComparable& value, int_type nbuffers = 0)
+                 const EqualityComparable& value, size_t nbuffers = 0)
 {
     if (begin == end)
         return end;

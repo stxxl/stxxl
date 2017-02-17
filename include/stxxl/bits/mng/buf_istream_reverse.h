@@ -50,9 +50,9 @@ private:
 protected:
     using prefetcher_type = block_prefetcher<block_type, typename bid_vector_type::iterator>;
     prefetcher_type* prefetcher;
-    int_type current_elem;
+    size_t current_elem;
     block_type* current_blk;
-    int_type* prefetch_seq;
+    size_t* prefetch_seq;
 #ifdef BUF_ISTREAM_CHECK_END
     bool not_finished;
 #endif
@@ -66,7 +66,7 @@ public:
     //! \param begin \c bid_iterator pointing to the first block of the stream
     //! \param end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_istream_reverse(bid_iterator_type begin, bid_iterator_type end, int_type nbuffers)
+    buf_istream_reverse(bid_iterator_type begin, bid_iterator_type end, size_t nbuffers)
         : current_elem(0),
 #ifdef BUF_ISTREAM_CHECK_END
           not_finished(true),
@@ -80,10 +80,10 @@ public:
         const size_t ndisks = config::get_instance()->disks_number();
         const size_t mdevid = config::get_instance()->get_max_device_id();
 
-        prefetch_seq = new int_type[bids_.size()];
+        prefetch_seq = new size_t[bids_.size()];
 
         // optimal schedule
-        nbuffers = std::max(2 * ndisks, size_t(nbuffers - 1));
+        nbuffers = std::max(2 * ndisks, nbuffers - 1);
         compute_prefetch_schedule(bids_.begin(), bids_.end(), prefetch_seq,
                                   nbuffers, mdevid);
 
@@ -110,9 +110,9 @@ public:
         assert(not_finished);
 #endif
 
-        record = current_blk->elem[current_elem--];
+        record = current_blk->elem[current_elem];
 
-        if (UNLIKELY(current_elem < 0))
+        if (UNLIKELY(current_elem == 0))
         {
             current_elem = block_type::size - 1;
 #ifdef BUF_ISTREAM_CHECK_END
@@ -120,6 +120,10 @@ public:
 #else
             prefetcher->block_consumed(current_blk);
 #endif
+        }
+        else
+        {
+            current_elem--;
         }
 
         return (*this);
@@ -145,9 +149,7 @@ public:
         assert(not_finished);
 #endif
 
-        current_elem--;
-
-        if (UNLIKELY(current_elem < 0))
+        if (UNLIKELY(current_elem == 0))
         {
             current_elem = block_type::size - 1;
 #ifdef BUF_ISTREAM_CHECK_END
@@ -156,6 +158,11 @@ public:
             prefetcher->block_consumed(current_blk);
 #endif
         }
+        else
+        {
+            current_elem--;
+        }
+
         return *this;
     }
 

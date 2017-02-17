@@ -44,15 +44,15 @@ protected:
     request_ptr* write_reqs;
     const size_t writebatchsize;
 
-    std::vector<int_type> free_write_blocks;            // contains free write blocks
-    std::vector<int_type> busy_write_blocks;            // blocks that are in writing, notice that if block is not in free_
+    std::vector<size_t> free_write_blocks;            // contains free write blocks
+    std::vector<size_t> busy_write_blocks;            // blocks that are in writing, notice that if block is not in free_
     // an not in busy then block is not yet filled
 
     struct batch_entry
     {
         int64_t offset;
-        int_type ibuffer;
-        batch_entry(int64_t o, int_type b) : offset(o), ibuffer(b) { }
+        size_t ibuffer;
+        batch_entry(int64_t o, size_t b) : offset(o), ibuffer(b) { }
     };
     struct batch_entry_cmp
     {
@@ -94,9 +94,8 @@ public:
     //! \return pointer to the block from the internal buffer pool
     block_type * get_free_block()
     {
-        int_type ibuffer;
-        for (std::vector<int_type>::iterator it = busy_write_blocks.begin();
-             it != busy_write_blocks.end(); ++it)
+        size_t ibuffer;
+        for (auto it = busy_write_blocks.begin(); it != busy_write_blocks.end(); ++it)
         {
             if (write_reqs[ibuffer = (*it)]->poll())
             {
@@ -108,15 +107,15 @@ public:
         }
         if (UNLIKELY(free_write_blocks.empty()))
         {
-            int_type size = busy_write_blocks.size();
+            size_t size = busy_write_blocks.size();
             request_ptr* reqs = new request_ptr[size];
-            int_type i = 0;
+            size_t i = 0;
             for ( ; i < size; ++i)
             {
                 reqs[i] = write_reqs[busy_write_blocks[i]];
             }
-            int_type completed = wait_any(reqs, size);
-            int_type completed_global = busy_write_blocks[completed];
+            size_t completed = wait_any(reqs, size);
+            size_t completed_global = busy_write_blocks[completed];
             delete[] reqs;
             busy_write_blocks.erase(busy_write_blocks.begin() + completed);
 
@@ -139,7 +138,7 @@ public:
             // flush batch
             while (!batch_write_blocks.empty())
             {
-                int_type ibuffer = batch_write_blocks.top().ibuffer;
+                size_t ibuffer = batch_write_blocks.top().ibuffer;
                 batch_write_blocks.pop();
 
                 if (write_reqs[ibuffer].valid())
@@ -152,7 +151,7 @@ public:
         }
         //    STXXL_MSG("Adding write request to batch");
 
-        int_type ibuffer = filled_block - write_buffers;
+        size_t ibuffer = filled_block - write_buffers;
         write_bids[ibuffer] = bid;
         batch_write_blocks.push(batch_entry(bid.offset, ibuffer));
 
@@ -161,7 +160,7 @@ public:
     //! Flushes not yet written buffers.
     void flush()
     {
-        int_type ibuffer;
+        size_t ibuffer;
         while (!batch_write_blocks.empty())
         {
             ibuffer = batch_write_blocks.top().ibuffer;
@@ -174,9 +173,7 @@ public:
 
             busy_write_blocks.push_back(ibuffer);
         }
-        for (std::vector<int_type>::const_iterator it =
-                 busy_write_blocks.begin();
-             it != busy_write_blocks.end(); it++)
+        for (auto it = busy_write_blocks.begin(); it != busy_write_blocks.end(); it++)
         {
             ibuffer = *it;
             write_reqs[ibuffer]->wait();
@@ -193,7 +190,7 @@ public:
     //! Flushes not yet written buffers and frees used memory.
     ~buffered_writer()
     {
-        int_type ibuffer;
+        size_t ibuffer;
         while (!batch_write_blocks.empty())
         {
             ibuffer = batch_write_blocks.top().ibuffer;
@@ -206,9 +203,7 @@ public:
 
             busy_write_blocks.push_back(ibuffer);
         }
-        for (std::vector<int_type>::const_iterator it =
-                 busy_write_blocks.begin();
-             it != busy_write_blocks.end(); it++)
+        for (auto it =  busy_write_blocks.begin(); it != busy_write_blocks.end(); it++)
         {
             ibuffer = *it;
             write_reqs[ibuffer]->wait();

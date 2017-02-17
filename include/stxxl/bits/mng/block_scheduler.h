@@ -55,7 +55,7 @@ protected:
     external_block_type external_data;      //!external_data.valid if no associated space on disk
     internal_block_type* internal_data;     //nullptr if there is no internal memory reserved
     bool dirty;
-    int_type reference_count;
+    size_t reference_count;
 
     static size_t disk_allocation_offset;
 
@@ -261,9 +261,9 @@ class block_scheduler
 protected:
     // tuning-parameter: To acquire blocks, internal memory has to be allocated.
     // This constant limits the number of internal_blocks allocated at once.
-    static const int_type max_internal_blocks_alloc_at_once;
+    static const size_t max_internal_blocks_alloc_at_once;
 
-    using time_type = int_type;
+    using time_type = size_t;
 
 public:
     using internal_block_type = typename SwappableBlockType::internal_block_type;
@@ -299,7 +299,7 @@ public:
         time_type time;
 
         prediction_sequence_element(block_scheduler_operation op,
-                                    swappable_block_identifier_type id, int_type time)
+                                    swappable_block_identifier_type id, time_type time)
             : op(op), id(id), time(time) { }
     };
 
@@ -310,8 +310,8 @@ protected:
     template <class SBT>
     friend class block_scheduler_algorithm;
 
-    const int_type max_internal_blocks;
-    int_type remaining_internal_blocks;
+    const size_t max_internal_blocks;
+    size_t remaining_internal_blocks;
     //! Stores pointers to arrays of internal_blocks. Used to deallocate them only.
     std::stack<internal_block_type*> internal_blocks_blocks;
     //! holds free internal_blocks with attributes reset.
@@ -338,11 +338,11 @@ protected:
         else if (remaining_internal_blocks > 0)
         {
             // => more internal_blocks can be allocated
-            int_type num_blocks = std::min(max_internal_blocks_alloc_at_once, remaining_internal_blocks);
+            size_t num_blocks = std::min(max_internal_blocks_alloc_at_once, remaining_internal_blocks);
             remaining_internal_blocks -= num_blocks;
             internal_block_type* iblocks = new internal_block_type[num_blocks];
             internal_blocks_blocks.push(iblocks);
-            for (int_type i = num_blocks - 1; i > 0; --i)
+            for (size_t i = num_blocks - 1; i > 0; --i)
                 free_internal_blocks.push(iblocks + i);
             return iblocks;
         }
@@ -360,7 +360,7 @@ protected:
 public:
     //! Create a block_scheduler with empty prediction sequence in simple mode.
     //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
-    explicit block_scheduler(const int_type max_internal_memory)
+    explicit block_scheduler(const size_t max_internal_memory)
         : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
           remaining_internal_blocks(max_internal_blocks),
           bm(block_manager::get_instance()),
@@ -377,7 +377,7 @@ public:
     ~block_scheduler()
     {
         delete algo;
-        int_type num_freed_internal_blocks = 0;
+        size_t num_freed_internal_blocks = 0;
         if (free_swappable_blocks.size() != swappable_blocks.size())
         {
             // => not all swappable_blocks are free, at least deinitialize them
@@ -391,8 +391,8 @@ public:
                     num_freed_internal_blocks++;
             }
         }
-        if (int_type nlost = (max_internal_blocks - remaining_internal_blocks)
-                             - (free_internal_blocks.size() + num_freed_internal_blocks)) {
+        if (int64_t nlost = static_cast<int64_t>(max_internal_blocks - remaining_internal_blocks)
+                             - static_cast<int64_t>(free_internal_blocks.size() + num_freed_internal_blocks)) {
             STXXL_ERRMSG(nlost << " internal_blocks are lost. They will get deallocated.");
         }
         while (! internal_blocks_blocks.empty())
@@ -528,7 +528,7 @@ public:
 };
 
 template <class SwappableBlockType>
-const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at_once = 128;
+const size_t block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at_once = 128;
 
 //! Interface of a block scheduling algorithm.
 template <class SwappableBlockType>

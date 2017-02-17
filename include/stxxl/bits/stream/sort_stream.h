@@ -1000,7 +1000,7 @@ private:
     run_type m_consume_seq;
 
     //! precalculated order of blocks in which they are prefetched
-    int_type* m_prefetch_seq;
+    size_t* m_prefetch_seq;
 
     //! prefetcher object
     prefetcher_type* m_prefetcher;
@@ -1180,7 +1180,7 @@ public:
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
-        int_type disks_number = config::get_instance()->disks_number();
+        size_t disks_number = config::get_instance()->disks_number();
         size_t min_prefetch_buffers = 2 * disks_number;
         size_t input_buffers =
             (m_memory_to_use > sizeof(out_block_type)
@@ -1226,7 +1226,7 @@ public:
         }
 
         m_consume_seq.resize(prefetch_seq_size);
-        m_prefetch_seq = new int_type[prefetch_seq_size];
+        m_prefetch_seq = new size_t[prefetch_seq_size];
 
         typename run_type::iterator copy_start = m_consume_seq.begin();
         for (size_t i = 0; i < nruns; ++i)
@@ -1243,7 +1243,7 @@ public:
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
         // heuristic
-        const int_type n_opt_prefetch_buffers = min_prefetch_buffers + (3 * (n_prefetch_buffers - min_prefetch_buffers)) / 10;
+        const size_t n_opt_prefetch_buffers = min_prefetch_buffers + (3 * (n_prefetch_buffers - min_prefetch_buffers)) / 10;
 
         compute_prefetch_schedule(
             m_consume_seq,

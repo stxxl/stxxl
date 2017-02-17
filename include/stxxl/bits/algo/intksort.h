@@ -24,7 +24,7 @@ namespace stxxl {
 
 template <typename TypeKey>
 static void
-count(TypeKey* a, TypeKey* aEnd, int_type* bucket, int_type K,
+count(TypeKey* a, TypeKey* aEnd, size_t* bucket, size_t K,
       typename TypeKey::key_type offset, unsigned shift)
 {
     // reset buckets
@@ -33,7 +33,7 @@ count(TypeKey* a, TypeKey* aEnd, int_type* bucket, int_type K,
     // count occupancies
     for (TypeKey* p = a; p < aEnd; p++)
     {
-        int_type i = (int_type)((p->key - offset) >> shift);
+        size_t i = (p->key - offset) >> shift;
         /*
         if (!(i < K && i >= 0))
         {
@@ -46,12 +46,12 @@ count(TypeKey* a, TypeKey* aEnd, int_type* bucket, int_type K,
 }
 
 static inline void
-exclusive_prefix_sum(int_type* bucket, int_type K)
+exclusive_prefix_sum(size_t* bucket, size_t K)
 {
-    int_type sum = 0;
-    for (int_type i = 0; i < K; i++)
+    size_t sum = 0;
+    for (size_t i = 0; i < K; i++)
     {
-        int_type current = bucket[i];
+        size_t current = bucket[i];
         bucket[i] = sum;
         sum += current;
     }
@@ -60,13 +60,13 @@ exclusive_prefix_sum(int_type* bucket, int_type K)
 // distribute input a to output b using bucket for the starting indices
 template <typename TypeKey>
 static void
-classify(TypeKey* a, TypeKey* aEnd, TypeKey* b, int_type* bucket,
+classify(TypeKey* a, TypeKey* aEnd, TypeKey* b, size_t* bucket,
          typename TypeKey::key_type offset, unsigned shift)
 {
     for (TypeKey* p = a; p < aEnd; p++)
     {
-        int_type i = (int_type)((p->key - offset) >> shift);
-        int_type bi = bucket[i];
+        size_t i = (p->key - offset) >> shift;
+        size_t bi = bucket[i];
         b[bi] = *p;
         bucket[i] = bi + 1;
     }
@@ -259,10 +259,10 @@ insertion_sort(Type* a, Type* aEnd)
 // the end of the i-th bucket
 template <class Type>
 static void
-cleanup(Type* b, int_type* bucket, int_type K)
+cleanup(Type* b, size_t* bucket, size_t K)
 {
     Type* c = b;
-    for (int_type i = 0; i < K; i++)
+    for (size_t i = 0; i < K; i++)
     {
         Type* cEnd = b + bucket[i];
         switch (cEnd - c)
@@ -317,7 +317,7 @@ template <typename TypeKey>
 void
 l1sort(TypeKey* a,
        TypeKey* aEnd,
-       TypeKey* b, int_type* bucket, int_type K,
+       TypeKey* b, size_t* bucket, size_t K,
        typename TypeKey::key_type offset, int shift)
 {
     count(a, aEnd, bucket, K, offset, shift);
@@ -328,28 +328,28 @@ l1sort(TypeKey* a,
 
 template <typename Type, typename TypeKey, typename KeyExtractor>
 void classify_block(Type* begin, Type* end, TypeKey*& out,
-                    int_type* bucket, typename KeyExtractor::key_type offset, unsigned shift, KeyExtractor keyobj)
+                    size_t* bucket, typename KeyExtractor::key_type offset, unsigned shift, KeyExtractor keyobj)
 {
     assert(shift < (sizeof(typename KeyExtractor::key_type) * 8 + 1));
     for (Type* p = begin; p < end; p++, out++)  // count & create references
     {
         out->ptr = p;
         typename KeyExtractor::key_type key = keyobj(*p);
-        int_type ibucket = (int_type)((key - offset) >> shift);
+        size_t ibucket = (key - offset) >> shift;
         out->key = key;
         bucket[ibucket]++;
     }
 }
 template <typename Type, typename TypeKey, typename KeyExtractor>
-void classify_block(Type* begin, Type* end, TypeKey*& out, int_type* bucket, typename Type::key_type offset, unsigned shift,
-                    const int_type K, KeyExtractor keyobj)
+void classify_block(Type* begin, Type* end, TypeKey*& out, size_t* bucket, typename Type::key_type offset, unsigned shift,
+                    const size_t K, KeyExtractor keyobj)
 {
     assert(shift < (sizeof(typename Type::key_type) * 8 + 1));
     for (Type* p = begin; p < end; p++, out++)  // count & create references
     {
         out->ptr = p;
         typename Type::key_type key = keyobj(*p);
-        int_type ibucket = (key - offset) >> shift;
+        size_t ibucket = (key - offset) >> shift;
         /*
         if (!(ibucket < K && ibucket >= 0))
         {

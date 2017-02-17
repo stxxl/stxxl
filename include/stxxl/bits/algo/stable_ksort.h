@@ -42,14 +42,14 @@ namespace stable_ksort_local {
 
 template <class Type, class TypeKey>
 void classify_block(Type* begin, Type* end, TypeKey*& out,
-                    int_type* bucket, typename Type::key_type offset,
+                    size_t* bucket, typename Type::key_type offset,
                     unsigned shift)
 {
     for (Type* p = begin; p < end; p++, out++)      // count & create references
     {
         out->ptr = p;
         typename Type::key_type key = p->key();
-        int_type ibucket = (int_type)((key - offset) >> shift);
+        size_t ibucket = (key - offset) >> shift;
         out->key = key;
         bucket[ibucket]++;
     }
@@ -134,13 +134,13 @@ template <typename ExtIterator>
 void distribute(
     bid_sequence<typename ExtIterator::vector_type::block_type::bid_type,
                  typename ExtIterator::vector_type::alloc_strategy_type>* bucket_bids,
-    int64_t* bucket_sizes,
-    const int_type nbuckets,
-    const int_type lognbuckets,
+    uint64_t* bucket_sizes,
+    const size_t nbuckets,
+    const unsigned lognbuckets,
     ExtIterator first,
     ExtIterator last,
-    const int_type nread_buffers,
-    const int_type nwrite_buffers)
+    const size_t nread_buffers,
+    const size_t nwrite_buffers)
 {
     using value_type = typename ExtIterator::vector_type::value_type;
     using key_type = typename value_type::key_type;
@@ -149,7 +149,7 @@ void distribute(
 
     using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
 
-    int_type i = 0;
+    size_t i = 0;
 
     buf_istream_type in(first.bid(), last.bid() + ((first.block_offset()) ? 1 : 0),
                         nread_buffers);
@@ -175,20 +175,20 @@ void distribute(
     for ( ; cur != first; cur++)
         ++in;
 
-    const int_type shift = sizeof(key_type) * 8 - lognbuckets;
+    const size_t shift = sizeof(key_type) * 8 - lognbuckets;
     // search in the the range [_begin,_end)
     STXXL_VERBOSE_STABLE_KSORT("Shift by: " << shift << " bits, lognbuckets: " << lognbuckets);
     for ( ; cur != last; cur++)
     {
         key_type cur_key = in.current().key();
-        int_type ibucket = (int_type)(cur_key >> shift);
+        size_t ibucket = cur_key >> shift;
 
-        int_type block_offset = bucket_block_offsets[ibucket];
+        size_t block_offset = bucket_block_offsets[ibucket];
         in >> (bucket_blocks[ibucket]->elem[block_offset++]);
         if (block_offset == block_type::size)
         {
             block_offset = 0;
-            int_type iblock = bucket_iblock[ibucket]++;
+            size_t iblock = bucket_iblock[ibucket]++;
             bucket_blocks[ibucket] = out.write(bucket_blocks[ibucket], bucket_bids[ibucket][iblock]);
         }
         bucket_block_offsets[ibucket] = block_offset;
@@ -199,7 +199,7 @@ void distribute(
         {
             out.write(bucket_blocks[i], bucket_bids[i][bucket_iblock[i]]);
         }
-        bucket_sizes[i] = int64_t(block_type::size) * bucket_iblock[i] +
+        bucket_sizes[i] = uint64_t(block_type::size) * bucket_iblock[i] +
                           bucket_block_offsets[i];
         STXXL_VERBOSE_STABLE_KSORT("Bucket " << i << " has size " << bucket_sizes[i] <<
                                    ", estimated size: " << ((last - first) / int64_t(nbuckets)));
@@ -267,7 +267,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     for (i = 0; i < nbuckets; ++i)
         bucket_bids[i].init(est_bucket_size);
 
-    int64_t* bucket_sizes = new int64_t[nbuckets];
+    uint64_t* bucket_sizes = new uint64_t[nbuckets];
 
     disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
@@ -288,8 +288,8 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         // sort buckets
         size_t write_buffers_multiple_bs = 2;
         size_t max_bucket_size_bl = (m - write_buffers_multiple_bs * ndisks) / 2;     // in number of blocks
-        int64_t max_bucket_size_rec = int64_t(max_bucket_size_bl) * block_type::size; // in number of records
-        int64_t max_bucket_size_act = 0;                                              // actual max bucket size
+        uint64_t max_bucket_size_rec = uint64_t(max_bucket_size_bl) * block_type::size; // in number of records
+        uint64_t max_bucket_size_act = 0;                                              // actual max bucket size
         // establish output stream
 
         for (i = 0; i < nbuckets; i++)
@@ -305,7 +305,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
-        const int_type max_bucket_size_act_bl = (int_type)div_ceil(max_bucket_size_act, block_type::size);
+        const size_t max_bucket_size_act_bl = (size_t)div_ceil(max_bucket_size_act, block_type::size);
         STXXL_VERBOSE_STABLE_KSORT("Reducing required number of required blocks per bucket from " <<
                                    max_bucket_size_bl << " to " << max_bucket_size_act_bl);
         max_bucket_size_rec = max_bucket_size_act;
@@ -351,7 +351,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         key_type offset = 0;
         const unsigned log_k1 = std::max<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
         size_t k1 = size_t(1) << log_k1;
-        int_type* bucket1 = new int_type[k1];
+        size_t* bucket1 = new size_t[k1];
 
         const unsigned int shift = (unsigned int)(sizeof(key_type) * 8 - lognbuckets);
         const unsigned int shift1 = shift - log_k1;
@@ -400,7 +400,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
 
                 const unsigned log_k2 = ilog2_floor(bucket1[i]) - 1;        // adaptive bucket size
                 const size_t k2 = size_t(1) << log_k2;
-                int_type* bucket2 = new int_type[k2];
+                size_t* bucket2 = new size_t[k2];
                 const unsigned shift2 = shift1 - log_k2;
 
                 // STXXL_MSG("Sorting bucket "<<k<<":"<<i);
