@@ -15,8 +15,11 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
           packages:
             - g++-5
+            - cmake
+            - cmake-data
     - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
       addons: *gcc5
     - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
@@ -49,6 +52,11 @@ matrix:
             - cmake-data
 
 before_script:
+
+  # print out some version numbers
+  - $CMAKE_CXX --version
+  - cmake --version
+
   # run on ramdisk
   - echo "disk=/dev/shm/stxxl.###.tmp,2G,syscall unlink" > ~/.stxxl
   - df -h
