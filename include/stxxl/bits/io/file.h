@@ -91,9 +91,11 @@ public:
     static const unsigned int DEFAULT_DEVICE_ID = (unsigned int)(-1);
 
     //! Construct a new file, usually called by a subclass.
-    explicit file(unsigned int device_id = DEFAULT_DEVICE_ID)
+    explicit file(unsigned int device_id = DEFAULT_DEVICE_ID,
+                  file_stats* file_stats = nullptr)
         : device_id_(device_id),
-          file_stats_(stats::get_instance()->create_file_stats(device_id))
+          file_stats_(file_stats != nullptr ? file_stats
+                      : stats::get_instance()->create_file_stats(device_id))
     { }
 
     //! non-copyable: delete copy-constructor
