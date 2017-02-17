@@ -16,10 +16,6 @@
 #ifndef STXXL_IO_IOSTATS_HEADER
 #define STXXL_IO_IOSTATS_HEADER
 
-#ifndef STXXL_IO_STATS
- #define STXXL_IO_STATS 1
-#endif
-
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
@@ -66,16 +62,11 @@ public:
         file_stats& file_stats_;
 
         bool is_write;
-#if STXXL_IO_STATS
-        bool running;
-#endif
+        bool running = false;
 
     public:
         explicit scoped_read_write_timer(file_stats* file_stats, size_type size, bool is_write = false)
             : file_stats_(*file_stats), is_write(is_write)
-#if STXXL_IO_STATS
-              , running(false)
-#endif
         {
             start(size);
         }
@@ -87,7 +78,6 @@ public:
 
         void start(size_type size)
         {
-#if STXXL_IO_STATS
             if (!running) {
                 running = true;
                 if (is_write)
@@ -95,14 +85,10 @@ public:
                 else
                     file_stats_.read_started(size);
             }
-#else
-            STXXL_UNUSED(size);
-#endif
         }
 
         void stop()
         {
-#if STXXL_IO_STATS
             if (running) {
                 if (is_write)
                     file_stats_.write_finished();
@@ -110,7 +96,6 @@ public:
                     file_stats_.read_finished();
                 running = false;
             }
-#endif
         }
     };
 
@@ -119,17 +104,11 @@ public:
         typedef size_t size_type;
         file_stats& file_stats_;
 
-#if STXXL_IO_STATS
-        bool running;
-#endif
+        bool running = false;
 
     public:
         explicit scoped_write_timer(file_stats* file_stats, size_type size)
             : file_stats_(*file_stats)
-
-#if STXXL_IO_STATS
-              , running(false)
-#endif
         {
             start(size);
         }
@@ -141,24 +120,18 @@ public:
 
         void start(size_type size)
         {
-#if STXXL_IO_STATS
             if (!running) {
                 running = true;
                 file_stats_.write_started(size);
             }
-#else
-            STXXL_UNUSED(size);
-#endif
         }
 
         void stop()
         {
-#if STXXL_IO_STATS
             if (running) {
                 file_stats_.write_finished();
                 running = false;
             }
-#endif
         }
     };
 
@@ -167,16 +140,11 @@ public:
         typedef size_t size_type;
         file_stats& file_stats_;
 
-#if STXXL_IO_STATS
-        bool running;
-#endif
+        bool running = false;
 
     public:
         explicit scoped_read_timer(file_stats* file_stats, size_type size)
             : file_stats_(*file_stats)
-#if STXXL_IO_STATS
-              , running(false)
-#endif
         {
             start(size);
         }
@@ -188,24 +156,18 @@ public:
 
         void start(size_type size)
         {
-#if STXXL_IO_STATS
             if (!running) {
                 running = true;
                 file_stats_.read_started(size);
             }
-#else
-            STXXL_UNUSED(size);
-#endif
         }
 
         void stop()
         {
-#if STXXL_IO_STATS
             if (running) {
                 file_stats_.read_finished();
                 running = false;
             }
-#endif
         }
     };
 
@@ -485,14 +447,14 @@ public:
     class scoped_wait_timer
     {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-        bool running;
+        bool running = false;
         wait_op_type wait_op;
 #endif
 
     public:
         scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-            : running(false), wait_op(wait_op)
+            : wait_op(wait_op)
 #endif
         {
             if (measure_time)
@@ -591,28 +553,6 @@ public:
     void wait_finished(wait_op_type wait_op);
 };
 
-#if !STXXL_IO_STATS
-inline void stats::write_started(size_t size_, double now)
-{
-    STXXL_UNUSED(size_);
-    STXXL_UNUSED(now);
-}
-inline void stats::write_cached(size_t size_)
-{
-    STXXL_UNUSED(size_);
-}
-inline void stats::write_finished() { }
-inline void stats::read_started(size_t size_, double now)
-{
-    STXXL_UNUSED(size_);
-    STXXL_UNUSED(now);
-}
-inline void stats::read_cached(size_t size_)
-{
-    STXXL_UNUSED(size_);
-}
-inline void stats::read_finished() { }
-#endif
 #ifdef STXXL_DO_NOT_COUNT_WAIT_TIME
 inline void stats::wait_started(wait_op_type) { }
 inline void stats::wait_finished(wait_op_type) { }

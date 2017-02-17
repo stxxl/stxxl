@@ -195,7 +195,6 @@ file_stats::file_stats(unsigned int device_id)
       acc_reads(0), acc_writes(0)
 { }
 
-#if STXXL_IO_STATS
 void file_stats::write_started(size_t size_, double now)
 {
     if (now == 0.0)
@@ -299,7 +298,6 @@ void file_stats::read_cached(size_t size_)
     ++c_reads;
     c_volume_read += size_;
 }
-#endif
 
 //! Returns the sum of all reads.
 //! \return the sum of all reads
@@ -550,7 +548,6 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
 #define hr add_IEC_binary_multiplier
 #define one_mib 1048576.0
     o << "STXXL I/O statistics" << std::endl;
-#if STXXL_IO_STATS
     auto read_bytes_summary = s.get_read_volume_summary();
     auto written_bytes_summary = s.get_written_volume_summary();
 
@@ -614,9 +611,7 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << "med: " << pio_speed_summary.med / one_mib << " MiB/s, "
       << "max: " << pio_speed_summary.max / one_mib << " MiB/s"
       << std::endl;
-#else
     o << " n/a" << std::endl;
-#endif
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     o << " I/O wait time                              : " << s.get_io_wait_time() << " s" << std::endl;
     if (s.get_wait_read_time() != 0.0)
