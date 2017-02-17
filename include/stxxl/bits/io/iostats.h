@@ -314,42 +314,42 @@ class stats : public singleton<stats>
     friend class singleton<stats>;
     friend class file_stats;
 
-    const double creation_time;
+    const double creation_time_;
 
     //! need std::list here, because the io::file objects keep a pointer to the
     //! enclosed file_stats objects and this list may grow.
-    std::list<file_stats> file_stats_list;
+    std::list<file_stats> file_stats_list_;
 
     // *** parallel times have to be counted globally ***
 
     //! seconds spent in parallel operations
-    double p_reads, p_writes;
+    double p_reads_, p_writes_;
     //! start time of parallel operation
     double p_begin_read_, p_begin_write_;
     // seconds spent in all parallel I/O operations (read and write)
-    double p_ios;
-    double p_begin_io;
+    double p_ios_;
+    double p_begin_io_;
 
     // number of requests, participating in parallel operation
     int acc_reads_, acc_writes_;
-    int acc_ios;
+    int acc_ios_;
 
     // *** waits are measured globally ***
 
     // seconds spent waiting for completion of I/O operations
-    double t_waits, p_waits;
-    double p_begin_wait;
-    double t_wait_read, p_wait_read;
-    double p_begin_wait_read;
-    double t_wait_write, p_wait_write;
-    double p_begin_wait_write;
-    int acc_waits;
-    int acc_wait_read, acc_wait_write;
+    double t_waits_, p_waits_;
+    double p_begin_wait_;
+    double t_wait_read_, p_wait_read_;
+    double p_begin_wait_read_;
+    double t_wait_write_, p_wait_write_;
+    double p_begin_wait_write_;
+    int acc_waits_;
+    int acc_wait_read_, acc_wait_write_;
 
     std::mutex wait_mutex_, read_mutex_, write_mutex_, io_mutex_;
 
     //! private construction from singleton
-    stats() : creation_time(timestamp()) { }
+    stats();
 
 public:
     enum wait_op_type {
@@ -407,7 +407,7 @@ public:
 
     double get_creation_time() const
     {
-        return creation_time;
+        return creation_time_;
     }
 
     //! create new instance of a file_stats for an io::file to collect
@@ -419,38 +419,38 @@ public:
     //! request::wait request::wait \endlink, \c wait_any and \c wait_all
     double get_io_wait_time() const
     {
-        return t_waits;
+        return t_waits_;
     }
 
     double get_wait_read_time() const
     {
-        return t_wait_read;
+        return t_wait_read_;
     }
 
     double get_wait_write_time() const
     {
-        return t_wait_write;
+        return t_wait_write_;
     }
 
     //! Period of time when at least one I/O thread was executing a read.
     //! \return seconds spent in reading
     double get_pread_time() const
     {
-        return p_reads;
+        return p_reads_;
     }
 
     //! Period of time when at least one I/O thread was executing a write.
     //! \return seconds spent in writing
     double get_pwrite_time() const
     {
-        return p_writes;
+        return p_writes_;
     }
 
     //! Period of time when at least one I/O thread was executing a read or a write.
     //! \return seconds spent in I/O
     double get_pio_time() const
     {
-        return p_ios;
+        return p_ios_;
     }
 
     // for library use
@@ -475,13 +475,13 @@ inline void stats::wait_finished(wait_op_type) { }
 class stats_data
 {
     //! seconds spent in parallel io
-    double p_reads, p_writes, p_ios;
+    double p_reads_, p_writes_, p_ios_;
 
     //! seconds spent waiting for completion of I/O operations
     double t_wait;
-    double t_wait_read, t_wait_write;
+    double t_wait_read_, t_wait_write_;
 
-    double elapsed;
+    double elapsed_;
 
     //! list of individual file statistics.
     std::vector<file_stats_data> file_stats_data_list_;
@@ -495,7 +495,7 @@ public:
     struct summary
     {
         T total, min, max;
-        double avg, med;
+        double average, median;
         std::vector<std::pair<T, unsigned> > values_per_device;
 
         template <typename Functor>
@@ -505,23 +505,21 @@ public:
 
 public:
     stats_data()
-        : p_reads(0.0),
-          p_writes(0.0),
-          p_ios(0.0),
+        : p_reads_(0.0), p_writes_(0.0),
+          p_ios_(0.0),
           t_wait(0.0),
-          t_wait_read(0.0),
-          t_wait_write(0.0),
-          elapsed(0.0)
+          t_wait_read_(0.0), t_wait_write_(0.0),
+          elapsed_(0.0)
     { }
 
     stats_data(const stats& s) // implicit conversion -- NOLINT
-        : p_reads(s.get_pread_time()),
-          p_writes(s.get_pwrite_time()),
-          p_ios(s.get_pio_time()),
+        : p_reads_(s.get_pread_time()),
+          p_writes_(s.get_pwrite_time()),
+          p_ios_(s.get_pio_time()),
           t_wait(s.get_io_wait_time()),
-          t_wait_read(s.get_wait_read_time()),
-          t_wait_write(s.get_wait_write_time()),
-          elapsed(timestamp() - s.get_creation_time()),
+          t_wait_read_(s.get_wait_read_time()),
+          t_wait_write_(s.get_wait_write_time()),
+          elapsed_(timestamp() - s.get_creation_time()),
           file_stats_data_list_(s.deepcopy_file_stats_data_list())
     { }
 
@@ -600,14 +598,14 @@ public:
 
     stats_data::summary<double> get_pio_speed_summary() const;
 
-    //! Retruns elapsed time
+    //! Retruns elapsed_ time
     //! \remark If stats_data is not the difference between two other stats_data
     //! objects, then this value is measures the time since the first file object
     //! was initilized.
-    //! \return elapsed time
+    //! \return elapsed_ time
     double get_elapsed_time() const
     {
-        return elapsed;
+        return elapsed_;
     }
 
     //! I/O wait time counter.
@@ -621,20 +619,26 @@ public:
 
 std::ostream& operator << (std::ostream& o, const stats_data& s);
 
-inline std::ostream& operator << (std::ostream& o, const stats& s)
+static inline
+std::ostream& operator << (std::ostream& o, const stats& s)
 {
     o << stxxl::stats_data(s);
     return o;
 }
 
-std::string format_with_SI_IEC_unit_multiplier(external_size_type number, const char* unit = "", int multiplier = 1000);
+std::string format_with_SI_IEC_unit_multiplier(
+    external_size_type number, const char* unit = "", int multiplier = 1000);
 
-inline std::string add_IEC_binary_multiplier(external_size_type number, const char* unit = "")
+static inline
+std::string add_IEC_binary_multiplier(
+    external_size_type number, const char* unit = "")
 {
     return format_with_SI_IEC_unit_multiplier(number, unit, 1024);
 }
 
-inline std::string add_SI_multiplier(external_size_type number, const char* unit = "")
+static inline
+std::string add_SI_multiplier(
+    external_size_type number, const char* unit = "")
 {
     return format_with_SI_IEC_unit_multiplier(number, unit, 1000);
 }

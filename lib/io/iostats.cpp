@@ -166,6 +166,26 @@ file_stats_data file_stats_data::operator - (const file_stats_data& a) const
 /******************************************************************************/
 // stats
 
+stats::stats()
+    : creation_time_(timestamp()),
+      p_reads_(0.0), p_writes_(0.0),
+      p_begin_read_(0.0), p_begin_write_(0.0),
+      p_ios_(0.0),
+      p_begin_io_(0.0),
+
+      acc_reads_(0.0), acc_writes_(0.0),
+      acc_ios_(0.0),
+
+      t_waits_(0.0), p_waits_(0.0),
+      p_begin_wait_(0.0),
+      t_wait_read_(0.0), p_wait_read_(0.0),
+      p_begin_wait_read_(0.0),
+      t_wait_write_(0.0), p_wait_write_(0.0),
+      p_begin_wait_write_(0.0),
+      acc_waits_(0.0),
+      acc_wait_read_(0.0), acc_wait_write_(0.0)
+{ }
+
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
 void stats::wait_started(wait_op_type wait_op)
 {
@@ -173,23 +193,23 @@ void stats::wait_started(wait_op_type wait_op)
     {
         std::unique_lock<std::mutex> wait_lock(wait_mutex_);
 
-        double diff = now - p_begin_wait;
-        t_waits += double(acc_waits) * diff;
-        p_begin_wait = now;
-        p_waits += (acc_waits++) ? diff : 0.0;
+        double diff = now - p_begin_wait_;
+        t_waits_ += double(acc_waits_) * diff;
+        p_begin_wait_ = now;
+        p_waits_ += (acc_waits_++) ? diff : 0.0;
 
         if (wait_op == WAIT_OP_READ) {
-            diff = now - p_begin_wait_read;
-            t_wait_read += double(acc_wait_read) * diff;
-            p_begin_wait_read = now;
-            p_wait_read += (acc_wait_read++) ? diff : 0.0;
+            diff = now - p_begin_wait_read_;
+            t_wait_read_ += double(acc_wait_read_) * diff;
+            p_begin_wait_read_ = now;
+            p_wait_read_ += (acc_wait_read_++) ? diff : 0.0;
         }
         else /* if (wait_op == WAIT_OP_WRITE) */ {
             // wait_any() is only used from write_pool and buffered_writer, so account WAIT_OP_ANY for WAIT_OP_WRITE, too
-            diff = now - p_begin_wait_write;
-            t_wait_write += double(acc_wait_write) * diff;
-            p_begin_wait_write = now;
-            p_wait_write += (acc_wait_write++) ? diff : 0.0;
+            diff = now - p_begin_wait_write_;
+            t_wait_write_ += double(acc_wait_write_) * diff;
+            p_begin_wait_write_ = now;
+            p_wait_write_ += (acc_wait_write_++) ? diff : 0.0;
         }
     }
 }
@@ -200,22 +220,22 @@ void stats::wait_finished(wait_op_type wait_op)
     {
         std::unique_lock<std::mutex> wait_lock(wait_mutex_);
 
-        double diff = now - p_begin_wait;
-        t_waits += double(acc_waits) * diff;
-        p_begin_wait = now;
-        p_waits += (acc_waits--) ? diff : 0.0;
+        double diff = now - p_begin_wait_;
+        t_waits_ += double(acc_waits_) * diff;
+        p_begin_wait_ = now;
+        p_waits_ += (acc_waits_--) ? diff : 0.0;
 
         if (wait_op == WAIT_OP_READ) {
-            double diff2 = now - p_begin_wait_read;
-            t_wait_read += double(acc_wait_read) * diff2;
-            p_begin_wait_read = now;
-            p_wait_read += (acc_wait_read--) ? diff2 : 0.0;
+            double diff2 = now - p_begin_wait_read_;
+            t_wait_read_ += double(acc_wait_read_) * diff2;
+            p_begin_wait_read_ = now;
+            p_wait_read_ += (acc_wait_read_--) ? diff2 : 0.0;
         }
         else /* if (wait_op == WAIT_OP_WRITE) */ {
-            double diff2 = now - p_begin_wait_write;
-            t_wait_write += double(acc_wait_write) * diff2;
-            p_begin_wait_write = now;
-            p_wait_write += (acc_wait_write--) ? diff2 : 0.0;
+            double diff2 = now - p_begin_wait_write_;
+            t_wait_write_ += double(acc_wait_write_) * diff2;
+            p_begin_wait_write_ = now;
+            p_wait_write_ += (acc_wait_write_--) ? diff2 : 0.0;
         }
 #ifdef STXXL_WAIT_LOG_ENABLED
         std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
@@ -223,7 +243,7 @@ void stats::wait_finished(wait_op_type wait_op)
             *waitlog << (now - last_reset) << "\t"
                      << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
                      << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
-                     << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;
+                     << t_wait_read_ << "\t" << t_wait_write_ << std::endl << std::flush;
 #endif
     }
 }
@@ -236,14 +256,14 @@ void stats::p_write_started(double now)
 
         double diff = now - p_begin_write_;
         p_begin_write_ = now;
-        p_writes += (acc_writes_++) ? diff : 0.0;
+        p_writes_ += (acc_writes_++) ? diff : 0.0;
     }
     {
         std::unique_lock<std::mutex> io_lock(io_mutex_);
 
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios++) ? diff : 0.0;
-        p_begin_io = now;
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_++) ? diff : 0.0;
+        p_begin_io_ = now;
     }
 }
 
@@ -254,14 +274,14 @@ void stats::p_write_finished(double now)
 
         double diff = now - p_begin_write_;
         p_begin_write_ = now;
-        p_writes += (acc_writes_--) ? diff : 0.0;
+        p_writes_ += (acc_writes_--) ? diff : 0.0;
     }
     {
         std::unique_lock<std::mutex> io_lock(io_mutex_);
 
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios--) ? diff : 0.0;
-        p_begin_io = now;
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_--) ? diff : 0.0;
+        p_begin_io_ = now;
     }
 }
 
@@ -272,14 +292,14 @@ void stats::p_read_started(double now)
 
         double diff = now - p_begin_read_;
         p_begin_read_ = now;
-        p_reads += (acc_reads_++) ? diff : 0.0;
+        p_reads_ += (acc_reads_++) ? diff : 0.0;
     }
     {
         std::unique_lock<std::mutex> io_lock(io_mutex_);
 
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios++) ? diff : 0.0;
-        p_begin_io = now;
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_++) ? diff : 0.0;
+        p_begin_io_ = now;
     }
 }
 
@@ -290,27 +310,27 @@ void stats::p_read_finished(double now)
 
         double diff = now - p_begin_read_;
         p_begin_read_ = now;
-        p_reads += (acc_reads_--) ? diff : 0.0;
+        p_reads_ += (acc_reads_--) ? diff : 0.0;
     }
     {
 //        std::unique_lock<std::mutex> io_lock(io_mutex_);
 
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios--) ? diff : 0.0;
-        p_begin_io = now;
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_--) ? diff : 0.0;
+        p_begin_io_ = now;
     }
 }
 
 file_stats* stats::create_file_stats(unsigned int device_id)
 {
-    file_stats_list.emplace_back(device_id);
-    return &file_stats_list.back();
+    file_stats_list_.emplace_back(device_id);
+    return &file_stats_list_.back();
 }
 
 std::vector<file_stats_data> stats::deepcopy_file_stats_data_list() const
 {
     std::vector<file_stats_data> fsdl;
-    for (auto it = file_stats_list.begin(); it != file_stats_list.end(); it++)
+    for (auto it = file_stats_list_.begin(); it != file_stats_list_.end(); it++)
     {
         fsdl.push_back(file_stats_data(*it));
     }
@@ -336,7 +356,6 @@ template <typename T>
 template <typename Functor>
 stats_data::summary<T>::summary(
     const std::vector<file_stats_data>& fs, const Functor& get_value)
-    : total(0)
 {
     values_per_device.reserve(fs.size());
 
@@ -350,19 +369,30 @@ stats_data::summary<T>::summary(
                   return a.first < b.first;
               });
 
-    min = values_per_device.front().first;
-    max = values_per_device.back().first;
-    long middle = values_per_device.size() / 2;
-    med = (values_per_device.size() % 2 == 1)
-          ? values_per_device[middle].first
-          : (values_per_device[middle - 1].first + values_per_device[middle].first) / 2.0;
-
-    for (auto it = values_per_device.begin(); it != values_per_device.end(); it++)
+    if (values_per_device.size() != 0)
     {
-        total += it->first;
-    }
+        min = values_per_device.front().first;
+        max = values_per_device.back().first;
+        long mid = values_per_device.size() / 2;
+        median =
+            (values_per_device.size() % 2 == 1)
+            ? values_per_device[mid].first
+            : (values_per_device[mid - 1].first + values_per_device[mid].first) / 2.0;
 
-    avg = (double)total / values_per_device.size();
+        total = values_per_device.front().first;
+        for (auto it = values_per_device.begin() + 1; it != values_per_device.end(); ++it)
+            total += it->first;
+
+        average = (double)total / values_per_device.size();
+    }
+    else
+    {
+        min = std::numeric_limits<T>::quiet_NaN();
+        max = std::numeric_limits<T>::quiet_NaN();
+        median = std::numeric_limits<T>::quiet_NaN();
+        total = std::numeric_limits<T>::quiet_NaN();
+        average = std::numeric_limits<T>::quiet_NaN();
+    }
 }
 
 stats_data stats_data::operator + (const stats_data& a) const
@@ -392,13 +422,13 @@ stats_data stats_data::operator + (const stats_data& a) const
                     "The number of files has changed between the snapshots.");
     }
 
-    s.p_reads = p_reads + a.p_reads;
-    s.p_writes = p_writes + a.p_writes;
-    s.p_ios = p_ios + a.p_ios;
+    s.p_reads_ = p_reads_ + a.p_reads_;
+    s.p_writes_ = p_writes_ + a.p_writes_;
+    s.p_ios_ = p_ios_ + a.p_ios_;
     s.t_wait = t_wait + a.t_wait;
-    s.t_wait_read = t_wait_read + a.t_wait_read;
-    s.t_wait_write = t_wait_write + a.t_wait_write;
-    s.elapsed = elapsed + a.elapsed;
+    s.t_wait_read_ = t_wait_read_ + a.t_wait_read_;
+    s.t_wait_write_ = t_wait_write_ + a.t_wait_write_;
+    s.elapsed_ = elapsed_ + a.elapsed_;
     return s;
 }
 
@@ -425,13 +455,13 @@ stats_data stats_data::operator - (const stats_data& a) const
                     "The number of files has changed between the snapshots.");
     }
 
-    s.p_reads = p_reads - a.p_reads;
-    s.p_writes = p_writes - a.p_writes;
-    s.p_ios = p_ios - a.p_ios;
+    s.p_reads_ = p_reads_ - a.p_reads_;
+    s.p_writes_ = p_writes_ - a.p_writes_;
+    s.p_ios_ = p_ios_ - a.p_ios_;
     s.t_wait = t_wait - a.t_wait;
-    s.t_wait_read = t_wait_read - a.t_wait_read;
-    s.t_wait_write = t_wait_write - a.t_wait_write;
-    s.elapsed = elapsed - a.elapsed;
+    s.t_wait_read_ = t_wait_read_ - a.t_wait_read_;
+    s.t_wait_write_ = t_wait_write_ - a.t_wait_write_;
+    s.elapsed_ = elapsed_ - a.elapsed_;
     return s;
 }
 
@@ -517,17 +547,17 @@ stats_data::summary<double> stats_data::get_write_time_summary() const
 
 double stats_data::get_pread_time() const
 {
-    return p_reads;
+    return p_reads_;
 }
 
 double stats_data::get_pwrite_time() const
 {
-    return p_writes;
+    return p_writes_;
 }
 
 double stats_data::get_pio_time() const
 {
-    return p_ios;
+    return p_ios_;
 }
 
 stats_data::summary<double> stats_data::get_read_speed_summary() const
@@ -544,7 +574,7 @@ stats_data::summary<double> stats_data::get_pread_speed_summary() const
     return summary<double>(
         file_stats_data_list_,
         [this](const file_stats_data& fsd) {
-            return (double)fsd.get_read_bytes() / p_reads;
+            return (double)fsd.get_read_bytes() / p_reads_;
         });
 }
 
@@ -562,7 +592,7 @@ stats_data::summary<double> stats_data::get_pwrite_speed_summary() const
     return summary<double>(
         file_stats_data_list_,
         [this](const file_stats_data& fsd) {
-            return (double)fsd.get_write_bytes() / p_writes;
+            return (double)fsd.get_write_bytes() / p_writes_;
         });
 }
 
@@ -571,7 +601,7 @@ stats_data::summary<double> stats_data::get_pio_speed_summary() const
     return summary<double>(
         file_stats_data_list_,
         [this](const file_stats_data& fsd) {
-            return (double)(fsd.get_read_bytes() + fsd.get_write_bytes()) / p_ios;
+            return (double)(fsd.get_read_bytes() + fsd.get_write_bytes()) / p_ios_;
         });
 }
 
@@ -582,12 +612,12 @@ double stats_data::get_io_wait_time() const
 
 double stats_data::get_wait_read_time() const
 {
-    return t_wait_read;
+    return t_wait_read_;
 }
 
 double stats_data::get_wait_write_time() const
 {
-    return t_wait_write;
+    return t_wait_write_;
 }
 
 std::string format_with_SI_IEC_unit_multiplier(
@@ -650,10 +680,10 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << std::endl;
     o << "  reading speed per file                    : "
       << "min: " << pread_speed_summary.min / one_mib << " MiB/s, "
-      << "med: " << pread_speed_summary.med / one_mib << " MiB/s, "
+      << "median: " << pread_speed_summary.median / one_mib << " MiB/s, "
       << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
       << std::endl;
-    o << " total number of write_count_                     : "
+    o << " total number of writes                     : "
       << hr(s.get_write_count()) << std::endl;
     o << " average block size (write)                 : "
       << hr(s.get_write_count() ? s.get_write_bytes() / s.get_write_count() : 0, "B") << std::endl;
@@ -671,7 +701,7 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << std::endl;
     o << "   parallel write speed per file            : "
       << "min: " << pwrite_speed_summary.min / one_mib << " MiB/s, "
-      << "med: " << pwrite_speed_summary.med / one_mib << " MiB/s, "
+      << "median: " << pwrite_speed_summary.median / one_mib << " MiB/s, "
       << "max: " << pwrite_speed_summary.max / one_mib << " MiB/s"
       << std::endl;
 
@@ -680,10 +710,9 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << std::endl;
     o << "   parallel I/O speed per file              : "
       << "min: " << pio_speed_summary.min / one_mib << " MiB/s, "
-      << "med: " << pio_speed_summary.med / one_mib << " MiB/s, "
+      << "median: " << pio_speed_summary.median / one_mib << " MiB/s, "
       << "max: " << pio_speed_summary.max / one_mib << " MiB/s"
       << std::endl;
-    o << " n/a" << std::endl;
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     o << " I/O wait time                              : "
       << s.get_io_wait_time() << " s" << std::endl;
