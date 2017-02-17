@@ -59,7 +59,7 @@ class file_stats
 
 public:
     //! construct zero initialized
-    file_stats(unsigned int device_id);
+    explicit file_stats(unsigned int device_id);
 
     class scoped_read_write_timer
     {
@@ -258,7 +258,7 @@ public:
     { }
 
     //! construct file_stats_data by taking current values from file_stats
-    file_stats_data(const file_stats& fs)
+    explicit file_stats_data(const file_stats& fs)
         : device_id_(fs.get_device_id()),
           read_count_(fs.get_read_count()),
           write_count_(fs.get_write_count()),
@@ -366,7 +366,7 @@ public:
 #endif
 
     public:
-        scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
+        explicit scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
             : wait_op_(wait_op)
 #endif

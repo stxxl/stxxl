@@ -39,7 +39,7 @@ class memory_file final : public disk_queued_file
 
 public:
     //! constructs file object.
-    memory_file(
+    explicit memory_file(
         int queue_id = DEFAULT_QUEUE,
         int allocator_id = NO_ALLOCATOR,
         unsigned int device_id = DEFAULT_DEVICE_ID)

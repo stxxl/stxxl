@@ -2361,7 +2361,7 @@ public:
     //! Create overlapped writer beginning at the given iterator.
     //! \param begin iterator to position were to start writing in vector
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2D recommended)
-    vector_bufwriter(vector_iterator begin,
+    explicit vector_bufwriter(vector_iterator begin,
                      size_t nbuffers = 0)
         : m_iter(begin),
           m_end(m_iter.parent_vector()->end()),
@@ -2378,7 +2378,7 @@ public:
     //! Create overlapped writer for the vector's beginning
     //! \param vec vector to write
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2D recommended)
-    vector_bufwriter(vector_type& vec,
+    explicit vector_bufwriter(vector_type& vec,
                      size_t nbuffers = 0)
         : m_iter(vec.begin()),
           m_end(m_iter.parent_vector()->end()),

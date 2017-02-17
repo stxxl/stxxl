@@ -68,7 +68,7 @@ public:
     new_alloc() noexcept { }
     new_alloc(const new_alloc&) noexcept { }
     template <class Rebind>
-    new_alloc(const new_alloc<Rebind>&) noexcept { }
+    explicit new_alloc(const new_alloc<Rebind>&) noexcept { }
     ~new_alloc() noexcept { }
 
     template <class Rebind>

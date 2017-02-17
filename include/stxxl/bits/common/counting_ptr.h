@@ -106,7 +106,7 @@ public:
     template <typename Down,
               typename = typename std::enable_if<
                   std::is_convertible<Down*, Type*>::value, void>::type>
-    counting_ptr(const counting_ptr<Down, Deleter>& other) noexcept
+    counting_ptr(const counting_ptr<Down, Deleter>& other) noexcept // NOLINT
         : ptr_(other.ptr_) { inc_reference(); }
 
     //! move-constructor: just moves pointer, does not change reference counts.
@@ -117,7 +117,7 @@ public:
     template <typename Down,
               typename = typename std::enable_if<
                   std::is_convertible<Down*, Type*>::value, void>::type>
-    counting_ptr(counting_ptr<Down, Deleter>&& other) noexcept
+    counting_ptr(counting_ptr<Down, Deleter>&& other) noexcept // NOLINT
         : ptr_(other.ptr_) { other.ptr_ = nullptr; }
 
     //! copy-assignment operator: acquire reference on new one and dereference

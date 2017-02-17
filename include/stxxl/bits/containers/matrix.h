@@ -985,12 +985,12 @@ protected:
 
 public:
     //! implicit conversion from matrix_iterator
-    const_matrix_col_major_iterator(
+    const_matrix_col_major_iterator( // NOLINT
         const matrix_iterator<ValueType, BlockSideLength>& matrix_iterator) // NOLINT
         : const_matrix_iterator_type(matrix_iterator) { }
 
     //! implicit conversion from matrix_iterator
-    const_matrix_col_major_iterator(
+    const_matrix_col_major_iterator( // NOLINT
         const const_matrix_iterator_type& matrix_iterator) // NOLINT
         : const_matrix_iterator_type(matrix_iterator) { }
 

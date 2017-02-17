@@ -177,7 +177,7 @@ public:
      * \param buffer_size size of internal-memory buffer in bytes
      * \param a allocation-strategory for internal-memory buffer
      */
-    hash_map(internal_size_type n = 0,
+    explicit hash_map(internal_size_type n = 0,
              const hasher& hf = hasher(),
              const key_compare& cmp = key_compare(),
              internal_size_type buffer_size = 128*1024*1024,

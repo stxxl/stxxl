@@ -587,7 +587,7 @@ public:
     //! read_write_pool for prefetching and buffered writing.
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
-    grow_shrink_stack2(pool_type& pool_,
+    explicit grow_shrink_stack2(pool_type& pool_,
                        const size_t prefetch_aggressiveness = 0)
         : m_size(0),
           cache_offset(0),

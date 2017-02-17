@@ -72,7 +72,7 @@ protected:
     bool first_insert;
 
 public:
-    LoserTreeCopyBase(size_type _k,
+    explicit LoserTreeCopyBase(size_type _k,
                       Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(round_up_to_power_of_two(ik)),
@@ -525,7 +525,7 @@ protected:
     Comparator comp;
 
 public:
-    LoserTreePointerBase(size_type _k,
+    explicit LoserTreePointerBase(size_type _k,
                          Comparator _comp = std::less<ValueType>())
         : ik(_k),
           k(round_up_to_power_of_two(ik)),

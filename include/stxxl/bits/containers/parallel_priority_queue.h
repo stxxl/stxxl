@@ -302,7 +302,7 @@ public:
 
     //! Constructor which takes a value vector. The value vector is empty
     //! afterwards.
-    internal_array(std::vector<value_type>& values,
+    explicit internal_array(std::vector<value_type>& values,
                    const size_t min_index = 0,
                    const size_t level = 0)
         : m_values(), m_min_index(min_index), m_level(level),
@@ -2335,7 +2335,7 @@ public:
      * relevant if c_limit_extract_buffer==true. 0 = Default = total_ram *
      * c_default_extract_buffer_ram_part.
      */
-    parallel_priority_queue(
+    explicit parallel_priority_queue(
         const compare_type& compare = compare_type(),
         const size_type total_ram = DefaultMemSize,
         const float num_read_blocks_per_ea = 1.5f,
