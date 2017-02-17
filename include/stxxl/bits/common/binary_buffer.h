@@ -19,6 +19,7 @@
 #define STXXL_COMMON_BINARY_BUFFER_HEADER
 
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
 
 #include <cassert>
 #include <cstdlib>
@@ -174,7 +175,9 @@ public:
     {
         if (len > m_capacity) alloc(len);
 
-        memcpy(m_data, data, len);
+        if (LIKELY(len > 0)) {
+            memcpy(m_data, data, len);
+        }
         m_size = len;
 
         return *this;
