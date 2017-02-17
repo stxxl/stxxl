@@ -70,7 +70,7 @@ void long_test()
 void short_test()
 {
     static_assert(sizeof(int) == 4, "sizeof(int) == 4");
-    typedef stxxl::VECTOR_GENERATOR<int, 1, 2, 4096>::result vector_type;
+    typedef stxxl::vector<int, 1, stxxl::lru_pager<2>, 4096> vector_type;
     vector_type::size_type i;
     vector_type v(2048);
     for (i = 0; i < v.size(); ++i)

@@ -14,8 +14,7 @@
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
 //! \example containers/test_vector.cpp
-//! This is an example of use of \c stxxl::vector and
-//! \c stxxl::VECTOR_GENERATOR. Vector type is configured
+//! This is an example of use of \c stxxl::vector. Vector type is configured
 //! to store 64-bit integers and have 2 pages each of 1 block
 
 #include <algorithm>
@@ -72,8 +71,8 @@ void test_const_iterator(const my_vec_type& x)
 void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::VECTOR_GENERATOR<
-            element, 2, 2, STXXL_DEFAULT_BLOCK_SIZE(element), stxxl::striping>::result vector_type;
+    typedef stxxl::vector<
+            element, 2, stxxl::lru_pager<2>, STXXL_DEFAULT_BLOCK_SIZE(element), stxxl::striping> vector_type;
     vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
     // test assignment const_iterator = iterator
@@ -152,7 +151,7 @@ void test_vector1()
 //! check vector::resize(n,true)
 void test_resize_shrink()
 {
-    typedef stxxl::VECTOR_GENERATOR<int, 2, 4, 4096>::result vector_type;
+    typedef stxxl::vector<int, 2, stxxl::lru_pager<4>, 4096> vector_type;
     vector_type vector;
 
     int n = 1 << 16;
@@ -177,7 +176,7 @@ static_assert(std::is_same<stxxl::vector<double>, stxxl::vector<double>::iterato
 static_assert(std::is_same<stxxl::vector<double>, stxxl::vector<double>::const_iterator::vector_type>::value, "Vector const iterator has inconsistent vector type");
 
 // forced instantiation
-template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024* 1024), stxxl::striping>;
+template class stxxl::vector<element, 2, stxxl::lru_pager<2>, (1024* 1024), stxxl::striping>;
 template class stxxl::vector<double>;
 template class stxxl::vector_iterator<stxxl::vector<double>::configuration_type>;
 template class stxxl::const_vector_iterator<stxxl::vector<double>::configuration_type>;

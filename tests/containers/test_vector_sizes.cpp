@@ -16,7 +16,7 @@
 #include <stxxl/vector>
 
 typedef int my_type;
-typedef stxxl::VECTOR_GENERATOR<my_type>::result vector_type;
+typedef stxxl::vector<my_type> vector_type;
 typedef vector_type::block_type block_type;
 
 void test_write(const char* fn, const char* ft, size_t sz, my_type ofs)

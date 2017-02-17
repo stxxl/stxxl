@@ -111,7 +111,7 @@ int main()
 
     ///////////////////////////////////////////////////////////////////////
 
-    typedef stxxl::VECTOR_GENERATOR<unsigned>::result array_type;
+    typedef stxxl::vector<unsigned> array_type;
 
     array_type input(num_rows* num_cols);
     array_type output(num_cols* num_rows);

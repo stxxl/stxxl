@@ -75,9 +75,9 @@ void random_shuffle(ExtIterator first,
     int64_t i, j, size = 0;
 
     value_type* temp_array;
-    typedef typename VECTOR_GENERATOR<
-            value_type, PageSize, 4, BlockSize, AllocStrategy
-            >::result temp_vector_type;
+    typedef typename stxxl::vector<
+            value_type, PageSize, stxxl::lru_pager<4>, BlockSize, AllocStrategy
+            > temp_vector_type;
     temp_vector_type* temp_vector;
 
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets");
@@ -221,9 +221,9 @@ void random_shuffle(
     int64_t i, j, size = 0;
 
     value_type* temp_array;
-    typedef typename stxxl::VECTOR_GENERATOR<
-            value_type, PageSize, 4, BlockSize, AllocStrategy
-            >::result temp_vector_type;
+    typedef typename stxxl::vector<
+            value_type, PageSize, stxxl::lru_pager<4>, BlockSize, AllocStrategy
+            > temp_vector_type;
     temp_vector_type* temp_vector;
 
     // no read buffers and M/B-k write buffers

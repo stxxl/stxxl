@@ -813,12 +813,11 @@ public:
 //!
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
-//! \tparam PageSize number of blocks in a page
-//! \tparam PagerType pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
-//!  default is \c lru_pager<8>
-//! \tparam BlockSize external block size in bytes, default is 2 MiB
-//! \tparam AllocStr one of allocation strategies: \c striping , \c random_cyclic , \c simple_random , or \c fully_random
-//!  default is random_cyclic
+//! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)
+//! \tparam PagerType type of the pager: \c random_pager or \c lru_pager, default: \b lru_pager. Both take the number of pages as template parameters, default: \b 8 (recommended >= 2)
+//! \tparam BlockSize external block size in bytes, default is <b>2 MiB</b>
+//! \tparam AllocStr parallel disk block allocation strategies: \c striping , \c random_cyclic , \c simple_random , or \c fully_random
+//!  default is \c random_cyclic
 //!
 //! Memory consumption: BlockSize*x*PageSize bytes
 //! \warning Do not store references to the elements of an external vector. Such references
@@ -1021,6 +1020,8 @@ public:
         m_cache = nullptr;
     }
 
+    //! \}
+
     //! \name Size and Capacity
     //! \{
 
@@ -1187,6 +1188,8 @@ public:
         for (size_t i = 0; i < numpages(); ++i)
             m_free_slots.push(i);
     }
+
+    //! \}
 
     //! \name Front and Back Access
     //! \{
@@ -2525,35 +2528,6 @@ public:
             m_grown = false;
         }
     }
-};
-
-////////////////////////////////////////////////////////////////////////////
-
-//! External vector type generator.
-//!
-//! \tparam ValueType element type of contained objects (POD with no references to internal memory)
-//! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)
-//! \tparam CachePages number of pages in cache, default: \b 8 (recommended >= 2)
-//! \tparam BlockSize external block size \a B in bytes, default: <b>2 MiB</b>
-//! \tparam AllocStr parallel disk block allocation strategies: \c striping, random_cyclic, simple_random, or fully_random. default: \b random_cyclic.
-//! \tparam Pager pager type: \c random or \c lru, default: \b lru.
-//!
-//! \warning Do not store references to the elements of an external vector. Such references
-//! might be invalidated during any following access to elements of the vector
-template <
-    typename ValueType,
-    unsigned PageSize = 4,
-    unsigned CachePages = 8,
-    size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-    pager_type Pager = lru
-    >
-struct VECTOR_GENERATOR
-{
-    typedef typename IF<Pager == lru,
-                        lru_pager<CachePages>, random_pager<CachePages> >::result PagerType;
-
-    typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr> result;
 };
 
 //! \}

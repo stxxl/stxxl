@@ -27,12 +27,6 @@ namespace stxxl {
 //! \addtogroup stlcont_vector
 //! \{
 
-enum pager_type
-{
-    random,
-    lru
-};
-
 //! Pager with \b random replacement strategy
 template <unsigned npages_>
 class random_pager

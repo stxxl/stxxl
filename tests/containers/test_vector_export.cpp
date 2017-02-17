@@ -21,7 +21,7 @@
 int main()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::VECTOR_GENERATOR<int64_t, 2, 2, (2* 1024* 1024), stxxl::striping>::result vector_type;
+    typedef stxxl::vector<int64_t, 2, stxxl::lru_pager<2>, (2* 1024* 1024), stxxl::striping> vector_type;
     vector_type v(size_t(64 * 1024 * 1024) / sizeof(int64_t));
 
     stxxl::random_number32 rnd;

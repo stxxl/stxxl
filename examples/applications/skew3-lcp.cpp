@@ -586,7 +586,7 @@ public:
 
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_array_type;
+    typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size> offset_array_type;
     typedef stxxl::stream::vector_iterator2stream<typename offset_array_type::iterator> offset_array_it_rg;
 
     typedef stxxl::sequence<offset_type, block_size> simpleDeq;
@@ -2688,8 +2688,8 @@ int process(const std::string& input_filename, const std::string& output_filenam
 {
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::VECTOR_GENERATOR<alphabet_type, 1, 2>::result alphabet_vector_type;
-    typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
+    typedef typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2>> alphabet_vector_type;
+    typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size> offset_vector_type;
 
     // input and output files (if supplied via command line)
     stxxl::file_ptr input_file, output_file;

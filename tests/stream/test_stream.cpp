@@ -44,8 +44,8 @@ std::ostream& operator << (std::ostream& os, const tuple_type& t)
 } // namespace std
 
 #ifdef USE_EXTERNAL_ARRAY
-typedef stxxl::VECTOR_GENERATOR<char>::result input_array_type;
-typedef stxxl::VECTOR_GENERATOR<tuple_type>::result output_array_type;
+typedef stxxl::vector<char> input_array_type;
+typedef stxxl::vector<tuple_type> output_array_type;
 #else
 typedef std::vector<char> input_array_type;
 typedef std::vector<tuple_type> output_array_type;

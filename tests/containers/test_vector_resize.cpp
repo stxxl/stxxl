@@ -15,7 +15,7 @@
 #include <stxxl/io>
 #include <stxxl/vector>
 
-typedef stxxl::VECTOR_GENERATOR<int, 4, 4>::result vector_type;
+typedef stxxl::vector<int, 4, stxxl::lru_pager<4>> vector_type;
 
 int main()
 {

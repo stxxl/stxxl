@@ -30,7 +30,7 @@ struct my_less_int : std::less<int>
 int main()
 {
     // create vector
-    stxxl::VECTOR_GENERATOR<int>::result vector;
+    stxxl::vector<int> vector;
 
     // fill vector with random integers
     {

@@ -20,9 +20,7 @@ void test_vector_element(uint64_t size)
     stxxl::scoped_print_timer tm("vector element access", 2 * size * sizeof(uint64_t));
 
 //! [element]
-    typedef stxxl::VECTOR_GENERATOR<uint64_t>::result vector_type;
-
-    vector_type vec(size);
+    stxxl::vector<uint64_t> vec(size);
 
     for (uint64_t i = 0; i < vec.size(); ++i)
         vec[i] = (i % 1024);
@@ -41,16 +39,14 @@ void test_vector_iterator(uint64_t size)
     stxxl::scoped_print_timer tm("vector iterator access", 2 * size * sizeof(uint64_t));
 
 //! [iterator]
-    typedef stxxl::VECTOR_GENERATOR<uint64_t>::result vector_type;
-
-    vector_type vec(size);
+    stxxl::vector<uint64_t> vec(size);
 
     uint64_t i = 0;
-    for (vector_type::iterator it = vec.begin(); it != vec.end(); ++it, ++i)
+    for (auto it = vec.begin(); it != vec.end(); ++it, ++i)
         *it = (i % 1024);
 
     uint64_t sum = 0;
-    for (vector_type::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    for (auto it = vec.begin(); it != vec.end(); ++it)
         sum += *it;
 //! [iterator]
 
@@ -63,7 +59,7 @@ void test_vector_buffered(uint64_t size)
     stxxl::scoped_print_timer tm("vector buffered access", 2 * size * sizeof(uint64_t));
 
 //! [buffered]
-    typedef stxxl::VECTOR_GENERATOR<uint64_t>::result vector_type;
+    typedef stxxl::vector<uint64_t> vector_type;
 
     vector_type vec(size);
 
@@ -93,7 +89,7 @@ void test_vector_cxx11(uint64_t size)
 {
     stxxl::scoped_print_timer tm("vector C++11 loop access", 2 * size * sizeof(uint64_t));
 
-    typedef stxxl::VECTOR_GENERATOR<uint64_t>::result vector_type;
+    typedef stxxl::vector<uint64_t> vector_type;
 
     vector_type vec(size);
 

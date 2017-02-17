@@ -123,7 +123,7 @@ int main()
         forty_two _42(42);
 
         // materialize into stxxl vector
-        stxxl::VECTOR_GENERATOR<int>::result v(1000);
+        stxxl::vector<int> v(1000);
         stxxl::generate(v.begin(), v.end(), generate_0, 42);
 
         stxxl::stream::materialize(_42.reset(), v.begin());
@@ -142,7 +142,7 @@ int main()
         forty_two _42mill(42 * 10000);
 
         // materialize into larger stxxl vector (to cross block boundaries)
-        stxxl::VECTOR_GENERATOR<int>::result v(60 * 10000);
+        stxxl::vector<int> v(60 * 10000);
         stxxl::generate(v.begin(), v.end(), generate_0, 42);
 
         stxxl::stream::materialize(_42mill.reset(), v.begin());

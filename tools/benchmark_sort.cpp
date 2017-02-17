@@ -132,11 +132,9 @@ public:
     BenchmarkSort(const char* desc, external_size_type length, size_t memsize)
     {
         // construct vector
-        typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
-
         external_size_type vec_size = stxxl::div_ceil(length, sizeof(ValueType));
 
-        vector_type vec(vec_size);
+        stxxl::vector<ValueType> vec(vec_size);
 
         // construct random stream
 

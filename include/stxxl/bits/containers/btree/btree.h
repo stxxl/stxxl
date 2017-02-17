@@ -272,9 +272,9 @@ private:
         key_type last_key = m_key_compare.max_value();
 
         typedef std::pair<key_type, node_bid_type> key_bid_pair;
-        typedef typename stxxl::VECTOR_GENERATOR<
-                key_bid_pair, 1, 1, node_block_type::raw_size
-                >::result key_bid_vector_type;
+        typedef typename stxxl::vector<
+                key_bid_pair, 1, stxxl::random_pager<1>, node_block_type::raw_size
+                > key_bid_vector_type;
 
         key_bid_vector_type bids;
 

@@ -16,8 +16,7 @@
 
 int main()
 {
-    typedef stxxl::VECTOR_GENERATOR<int>::result vector;
-    vector my_vector;
+    stxxl::vector<int> my_vector;
 
     for (int i = 0; i < 1024 * 1024; i++)
     {

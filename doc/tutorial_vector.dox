@@ -23,12 +23,11 @@ This section introduces into the STXXL vector container (to learn more about the
 ### Creating a STXXL vector
 
 Before we can use a STXXL vector, we first have to define and then to instantiate a vector object.
-To manage the configuration of the vector type we use the generator template. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only only stricly neccessary
-parameter. See \ref design_vector_generator for additional configuration parameters and information.
+To manage the configuration of the vector type we use several template parameters. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only only stricly neccessary
+parameter. See \ref design_vector for additional configuration parameters and information.
 
 \code
-typedef stxxl::VECTOR_GENERATOR<int>::result vector;
-vector my_vector;  // creates empty vector object
+stxxl::vector<int> my_vector;  // creates empty vector object
 \endcode
 
 ### Insert elements
@@ -56,7 +55,7 @@ In addition, the STXXL vector provides different iterators to advance the vector
 
 \code
 // create iterator which starts at the beginning of my_vector
-vector::iterator iter = my_vector.begin();
+auto iter = my_vector.begin();
 // access an element
 std::cout << "first element: " << *iter << std::endl;
 // go to next element

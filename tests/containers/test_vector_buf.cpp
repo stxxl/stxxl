@@ -81,9 +81,7 @@ public:
 template <typename ValueType>
 void test_vector_buf(size_t size)
 {
-    typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
-
-    typedef typename vector_type::iterator vector_iterator_type;
+    typedef typename stxxl::vector<ValueType> vector_type;
 
     {   // fill vector using element access
         stxxl::scoped_print_timer tm("element access");
@@ -100,7 +98,7 @@ void test_vector_buf(size_t size)
 
         vector_type vec(size);
 
-        vector_iterator_type vi = vec.begin();
+        auto vi = vec.begin();
 
         for (size_t i = 0; i < size; ++i, ++vi)
             *vi = ValueType(i);

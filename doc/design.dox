@@ -197,31 +197,15 @@ V.push_back(3);
 assert(V.size() == 1 && V.capacity() >= 1 && V[0] == 3);
 \endcode
 
-\section design_vector_generator stxxl::VECTOR_GENERATOR
+Besides the type of the elements stxxl::vector has many other template parameters.
 
-Besides the type of the elements stxxl::vector has many other template parameters (block size, number of blocks per page, pager class, etc.). To make the configuration of the vector type easier STXXL provides special type generator template meta programs for its containers.
-
-The meta-program for \ref stxxl::vector is called \ref stxxl::VECTOR_GENERATOR.
-
-\code
-// Example of use
-typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
-vector_type V;
-V.push_back(3);
-assert(V.size() == 1 && V.capacity() >= 1 && V[0] == 3);
-\endcode
-
-The \ref stxxl::VECTOR_GENERATOR has the following template parameters:
-
-\copydetails stxxl::VECTOR_GENERATOR
+\copydetails stxxl::vector
 
 ### Notes:
 
 - All blocks of a page are read and written from/to disks together. Therefore to increase the I/O bandwidth, it is recommended to set the PageSize parameter to multiple of \a D.
 
 - Memory consumption of constructed vector is BlockSize x CachePages x PageSize bytes (see below).
-
-- The configured vector type is available as \ref VECTOR_GENERATOR<>::result.
 
 - Since there are defaults for the last five of the parameters, it is not necessary to specify them all.
 
@@ -239,14 +223,15 @@ strategy            | identifier
 random              | random
 least recently used | lru
 
+
 ### Examples:
 
-- VECTOR_GENERATOR<double>::result -- external vector of \b double's with four blocks per page, the cache with eight pages, 2 MiB blocks, Random Allocation and lru cache replacement strategy.
+- vector<double> -- external vector of \b double's with four blocks per page, the cache with eight pages and lru cache replacement strategy, 2 MiB blocks and Random Allocation.
 
-- VECTOR_GENERATOR<double,8>::result -- external vector of \b double's , with \b eight blocks per page, the cache with eight pages, 2 MiB blocks, Random Allocation and lru cache replacement strategy
+- vector<double,8> -- external vector of \b double's , with \b eight blocks per page, the cache with eight pages and lru cache replacement strategy, 2 MiB blocks and Random Allocation.
 
-- VECTOR_GENERATOR<double,8,2,524288,simple_random>::result -- external vector of \b double's, with \b eight blocks per page, the cache
-with \b two pages, \b 512 KiB blocks, <b>Simple Randomized</b> allocation and lru cache replacement strategy
+- vector<double,8,stxxl::lru_pager<2>,524288,simple_random> -- external vector of \b double's, with \b eight blocks per page, the cache
+with \b two pages and lru cache replacement strategy, \b 512 KiB blocks and <b>Simple Randomized</b> allocation.
 
 \section design_vector_memory Internal Memory Consumption of stxxl::vector
 
@@ -549,7 +534,7 @@ Iterators of \ref stxxl::vector are STL compatible. \ref stxxl::vector::iterator
 Example: STL Algorithms Running on STXXL containers (do not do this, read below!)
 
 \code
-typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
+using vector_type = stxxl::vector<int>;
 
 // Replace every number in an array with its negative.
 const int N = 1000000000;
@@ -788,9 +773,8 @@ struct MyCmp: public std::less<int> // ascending order
      static int max_value() const
      { return std::numeric_limits<int>::max(); }
 };
-typedef stxxl::VECTOR_GENERATOR<int>::result vec_type;
 
-vec_type V;
+stxxl::vector<int> V;
 // ... fill here the vector with some values
 
 // Sort in ascending order use 512 MiB of main memory
@@ -951,9 +935,7 @@ struct MyType
     { return MyType( std::numeric_limits<key_type>::max()); }
 };
 
-typedef stxxl::VECTOR_GENERATOR<MyType>::result vec_type;
-
-vec_type V;
+stxxl::vector<MyType> V;
 // ... fill here the vector with some values
 
 // Sort in ascending order use 512 MiB of main memory
@@ -1005,8 +987,7 @@ void generate ( ExtIterator first,
 \code
 // Fill a vector with random numbers, using the
 // standard C library function rand.
-typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
-vector_type V(some_size);
+stxxl::vector<int> V(some_size);
 // use 20 buffer blocks
 stxxl::generate(V.begin(), V.end(), rand, 20);
 \endcode
@@ -1061,10 +1042,10 @@ struct print : public unary_function<T, void>
     ostream& os;
     int count;
 };
-typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
+
 int main()
 {
-    vector_type A(N);
+    stxxl::vector<int> A(N);
     // fill A with some values
     // ...
 
@@ -1122,10 +1103,9 @@ struct AddX
     { val += x; }
 };
 
-typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
 int main()
 {
-    vector_type A(N);
+    stxxl::vector<int> A(N);
     // fill A with some values ...
 
     // Add 5 to each value in the vector
@@ -1174,13 +1154,11 @@ ExtIterator find ( ExtIterator               first,
 # Example
 
 \code
-typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
-
-vector_type V;
+stxxl::vector<int> V;
 // fill the vector ...
 
 // find 7 in V
-vector_type::iterator result = find(V.begin(), V.end(), 7);
+auto result = find(V.begin(), V.end(), 7);
 if(result != V.end())
     std::cout << "Found at position " << (result - V.begin()) << std::endl;
 else
