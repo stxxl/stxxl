@@ -11,9 +11,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <limits>
 #include <stxxl/bits/config.h>
 #include <stxxl/types>
+#include <limits>
+#include <ostream>
+#include <functional>
 
 template <unsigned kSize>
 struct bulk
