@@ -44,8 +44,6 @@ class file_stats
 
     unsigned reads, writes;                             // number of operations
     external_size_type volume_read, volume_written;     // number of bytes read/written
-    unsigned c_reads, c_writes;                         // number of cached operations
-    external_size_type c_volume_read, c_volume_written; // number of bytes read/written from/to cache
     double t_reads, t_writes;                           // seconds spent in operations
     double p_begin_read, p_begin_write;                 // start time of parallel operation
 
@@ -207,34 +205,6 @@ public:
         return volume_written;
     }
 
-    //! Returns total number of reads served from cache.
-    //! \return total number of cached reads
-    unsigned get_cached_reads() const
-    {
-        return c_reads;
-    }
-
-    //! Returns total number of cached writes.
-    //! \return total number of cached writes
-    unsigned get_cached_writes() const
-    {
-        return c_writes;
-    }
-
-    //! Returns number of bytes read from cache.
-    //! \return number of bytes read from cache
-    external_size_type get_cached_read_volume() const
-    {
-        return c_volume_read;
-    }
-
-    //! Returns number of bytes written to the cache.
-    //! \return number of bytes written to cache
-    external_size_type get_cached_written_volume() const
-    {
-        return c_volume_written;
-    }
-
     //! Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading
     double get_read_time() const
@@ -253,11 +223,9 @@ public:
     void write_started(size_t size_, double now = 0.0);
     void write_canceled(size_t size_);
     void write_finished();
-    void write_cached(size_t size_);
     void read_started(size_t size_, double now = 0.0);
     void read_canceled(size_t size_);
     void read_finished();
-    void read_cached(size_t size_);
 };
 
 class file_stats_data
@@ -268,10 +236,6 @@ class file_stats_data
     unsigned reads, writes;
     //! number of bytes read/written
     external_size_type volume_read, volume_written;
-    //! number of cached operations
-    unsigned c_reads, c_writes;
-    //! number of bytes read/written from/to cache
-    external_size_type c_volume_read, c_volume_written;
     //! seconds spent in operations
     double t_reads, t_writes;
 
@@ -282,10 +246,6 @@ public:
           writes(0),
           volume_read(0),
           volume_written(0),
-          c_reads(0),
-          c_writes(0),
-          c_volume_read(0),
-          c_volume_written(0),
           t_reads(0.0),
           t_writes(0.0)
     { }
@@ -296,10 +256,6 @@ public:
           writes(fs.get_writes()),
           volume_read(fs.get_read_volume()),
           volume_written(fs.get_written_volume()),
-          c_reads(fs.get_cached_reads()),
-          c_writes(fs.get_cached_writes()),
-          c_volume_read(fs.get_cached_read_volume()),
-          c_volume_written(fs.get_cached_written_volume()),
           t_reads(fs.get_read_time()),
           t_writes(fs.get_write_time())
     { }
@@ -316,10 +272,6 @@ public:
         fsd.writes = writes + a.writes;
         fsd.volume_read = volume_read + a.volume_read;
         fsd.volume_written = volume_written + a.volume_written;
-        fsd.c_reads = c_reads + a.c_reads;
-        fsd.c_writes = c_writes + a.c_writes;
-        fsd.c_volume_read = c_volume_read + a.c_volume_read;
-        fsd.c_volume_written = c_volume_written + a.c_volume_written;
         fsd.t_reads = t_reads + a.t_reads;
         fsd.t_writes = t_writes + a.t_writes;
         return fsd;
@@ -336,10 +288,6 @@ public:
         fsd.writes = writes - a.writes;
         fsd.volume_read = volume_read - a.volume_read;
         fsd.volume_written = volume_written - a.volume_written;
-        fsd.c_reads = c_reads - a.c_reads;
-        fsd.c_writes = c_writes - a.c_writes;
-        fsd.c_volume_read = c_volume_read - a.c_volume_read;
-        fsd.c_volume_written = c_volume_written - a.c_volume_written;
         fsd.t_reads = t_reads - a.t_reads;
         fsd.t_writes = t_writes - a.t_writes;
         return fsd;
@@ -368,26 +316,6 @@ public:
     external_size_type get_written_volume() const
     {
         return volume_written;
-    }
-
-    unsigned get_cached_reads() const
-    {
-        return c_reads;
-    }
-
-    unsigned get_cached_writes() const
-    {
-        return c_writes;
-    }
-
-    external_size_type get_cached_read_volume() const
-    {
-        return c_volume_read;
-    }
-
-    external_size_type get_cached_written_volume() const
-    {
-        return c_volume_written;
     }
 
     double get_read_time() const
@@ -739,38 +667,6 @@ public:
     //! Returns sum, min, max, avarage and median of all written bytes.
     //! \return a summary of the written bytes
     stats_data::measurement_summary<external_size_type> get_written_volume_summary() const;
-
-    //! Returns total number of reads served from cache.
-    //! \return the sum of all cached reads
-    unsigned get_cached_reads() const;
-
-    //! Returns sum, min, max, avarage and median of all cached reads.
-    //! \return a summary of the cached reads
-    stats_data::measurement_summary<unsigned> get_cached_reads_summary() const;
-
-    //! Retruns the sum of all cached writes.
-    //! \return the sum of all cached writes
-    unsigned get_cached_writes() const;
-
-    //! Returns sum, min, max, avarage and median of all cached writes
-    //! \return a summary of the cached writes
-    stats_data::measurement_summary<unsigned> get_cached_writes_summary() const;
-
-    //! Returns number of bytes read from cache.
-    //! \return number of bytes read from cache
-    external_size_type get_cached_read_volume() const;
-
-    //! Returns sum, min, max, avarage and median of all bytes read from cache.
-    //! \return a summary of the bytes read from cache
-    stats_data::measurement_summary<external_size_type> get_cached_read_volume_summary() const;
-
-    //! Returns number of bytes written to the cache.
-    //! \return number of bytes written to the cache
-    external_size_type get_cached_written_volume() const;
-
-    //! Returns sum, min, max, avarage and median of all cached written volumes
-    //! \return a summary of the cached written volumes
-    stats_data::measurement_summary<external_size_type> get_cached_written_volume_summary() const;
 
     //! Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading

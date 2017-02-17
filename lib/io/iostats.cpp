@@ -184,10 +184,6 @@ file_stats::file_stats(unsigned int device_id)
       writes(0),
       volume_read(0),
       volume_written(0),
-      c_reads(0),
-      c_writes(0),
-      c_volume_read(0),
-      c_volume_written(0),
       t_reads(0.0),
       t_writes(0.0),
       p_begin_read(0.0),
@@ -239,14 +235,6 @@ void file_stats::write_finished()
     stats::get_instance()->p_write_finished(now);
 }
 
-void file_stats::write_cached(size_t size_)
-{
-    std::unique_lock<std::mutex> WriteLock(write_mutex);
-
-    ++c_writes;
-    c_volume_written += size_;
-}
-
 void file_stats::read_started(size_t size_, double now)
 {
     if (now == 0.0)
@@ -289,14 +277,6 @@ void file_stats::read_finished()
     }
 
     stats::get_instance()->p_read_finished(now);
-}
-
-void file_stats::read_cached(size_t size_)
-{
-    std::unique_lock<std::mutex> read_lock(read_mutex);
-
-    ++c_reads;
-    c_volume_read += size_;
 }
 
 //! Returns the sum of all reads.
@@ -359,66 +339,6 @@ stats_data::measurement_summary<external_size_type> stats_data::get_written_volu
 {
     return measurement_summary<external_size_type>(m_file_stats_data_list,
                                                    [](const file_stats_data& fsd) { return fsd.get_written_volume(); });
-}
-
-//! Returns total number of reads served from cache.
-//! \return the sum of all cached reads
-unsigned stats_data::get_cached_reads() const
-{
-    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_cached_reads(); });
-}
-
-//! Returns sum, min, max, avarage and median of all cached reads.
-//! \return a summary of the cached reads
-stats_data::measurement_summary<unsigned> stats_data::get_cached_reads_summary() const
-{
-    return measurement_summary<unsigned>(m_file_stats_data_list,
-                                         [](const file_stats_data& fsd) { return fsd.get_cached_reads(); });
-}
-
-//! Retruns the sum of all cached writes.
-//! \return the sum of all cached writes
-unsigned stats_data::get_cached_writes() const
-{
-    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_cached_writes(); });
-}
-
-//! Returns sum, min, max, avarage and median of all cached writes
-//! \return a summary of the cached writes
-stats_data::measurement_summary<unsigned> stats_data::get_cached_writes_summary() const
-{
-    return measurement_summary<unsigned>(m_file_stats_data_list,
-                                         [](const file_stats_data& fsd) { return fsd.get_cached_writes(); });
-}
-
-//! Returns number of bytes read from cache.
-//! \return number of bytes read from cache
-external_size_type stats_data::get_cached_read_volume() const
-{
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_cached_read_volume(); });
-}
-
-//! Returns sum, min, max, avarage and median of all bytes read from cache.
-//! \return a summary of the bytes read from cache
-stats_data::measurement_summary<external_size_type> stats_data::get_cached_read_volume_summary() const
-{
-    return measurement_summary<external_size_type>(m_file_stats_data_list,
-                                                   [](const file_stats_data& fsd) { return fsd.get_cached_read_volume(); });
-}
-
-//! Returns number of bytes written to the cache.
-//! \return number of bytes written to the cache
-external_size_type stats_data::get_cached_written_volume() const
-{
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_cached_written_volume(); });
-}
-
-//! Returns sum, min, max, avarage and median of all cached written volumes
-//! \return a summary of the cached written volumes
-stats_data::measurement_summary<external_size_type> stats_data::get_cached_written_volume_summary() const
-{
-    return measurement_summary<external_size_type>(m_file_stats_data_list,
-                                                   [](const file_stats_data& fsd) { return fsd.get_cached_written_volume(); });
 }
 
 //! Time that would be spent in read syscalls if all parallel reads were serialized.
@@ -574,16 +494,6 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << "med: " << pread_speed_summary.med / one_mib << " MiB/s, "
       << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
       << std::endl;
-    if (s.get_cached_reads()) {
-        o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
-        o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
-        o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
-    }
-    if (s.get_cached_writes()) {
-        o << " total number of cached writes              : " << hr(s.get_cached_writes()) << std::endl;
-        o << " average block size (cached write)          : " << hr(s.get_cached_written_volume() / s.get_cached_writes(), "B") << std::endl;
-        o << " number of bytes written to cache           : " << hr(s.get_cached_written_volume(), "B") << std::endl;
-    }
     o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
     o << " average block size (write)                 : "
       << hr(s.get_writes() ? s.get_written_volume() / s.get_writes() : 0, "B") << std::endl;
