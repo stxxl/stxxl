@@ -934,6 +934,7 @@ class PRIORITY_QUEUE_GENERATOR
 public:
     // actual calculation of B, m, k and element_size
     using settings = typename priority_queue_local::find_settings<sizeof(ValueType), IntMemory, MaxItems>::result;
+    static_assert(!std::is_same<settings, priority_queue_local::Parameters_for_priority_queue_not_found_Increase_IntMem>::value, "Parameters for priority queue not found. Increase IntMem");
     enum {
         B = settings::B,
         m = settings::m,
@@ -942,6 +943,7 @@ public:
     };
     // derivation of N, AI, AE
     using ComputeN = typename priority_queue_local::compute_N<(1 << Tune), X, 4* Buffer1Size>::result;
+    static_assert(!std::is_same<ComputeN, priority_queue_local::Parameters_not_found_Try_to_change_the_Tune_parameter>::value, "Parameters not found. Try to change the Tune parameter.");
     enum
     {
         N = ComputeN::N,
