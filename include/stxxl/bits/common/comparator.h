@@ -17,8 +17,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <stxxl/bits/common/types.h>
-
 
 namespace stxxl {
 
@@ -65,7 +63,10 @@ struct is_tuple_or_pair<std::pair<T1, T2> >{
     static constexpr bool value = true;
 };
 
-template<typename> struct enable_if_typed { using type = int; };
+template <typename>
+struct enable_if_typed {
+    using type = int;
+};
 
 // Tuple
 template <
@@ -80,7 +81,6 @@ public:
     using simple_type = typename std::remove_reference<T1>::type;
     using value_type = std::tuple<simple_type, TTs...>;
 
-
 // compare
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -93,34 +93,33 @@ public:
             if (vb < va) return (M1 != direction::Less);
         }
 
-
         return recurse_cmp(
             tuple_slice<1, sizeof ... (TTs)+1>(a),
             tuple_slice<1, sizeof ... (TTs)+1>(b));
     }
 
 // sentinels
-    constexpr value_type min_value() const
+    const value_type min_value() const
     {
         return limit_helper<false>();
     }
 
-    constexpr value_type max_value() const
+    const value_type max_value() const
     {
         return limit_helper<true>();
     }
 
     template <bool Max>
-    constexpr value_type limit_helper() const
+    const value_type limit_helper() const
     {
         static_assert(
-                (M1 == direction::DontCare) ||
-                (std::numeric_limits<simple_type>::min() != std::numeric_limits<simple_type>::max()),
-                "std::numeric_limits<>::min/max gives identical results");
+            (M1 == direction::DontCare) ||
+            (std::numeric_limits<simple_type>::is_specialized),
+            "std::numeric_limits<> not specialized: Comparator cannot deduce min/max values");
 
         simple_type value = ((M1 == direction::Less) == Max)
-                           ? std::numeric_limits<simple_type>::max()
-                           : std::numeric_limits<simple_type>::min();
+                            ? std::numeric_limits<simple_type>::max()
+                            : std::numeric_limits<simple_type>::min();
 
         return std::tuple_cat(
             std::tuple<simple_type>{ value },
@@ -129,7 +128,6 @@ public:
 
 private:
     comparator_impl<std::tuple<TTs...>, void, Modes...> recurse_cmp;
-
 };
 
 // Default Mode to direction::Less, if missing
@@ -145,11 +143,11 @@ class comparator_impl<std::tuple<>, void>
 public:
     using value_type = std::tuple<>;
 
-    constexpr value_type min_value() const
+    value_type min_value() const
     {
         return { };
     }
-    constexpr value_type max_value() const
+    value_type max_value() const
     {
         return { };
     }
@@ -159,7 +157,7 @@ public:
     }
 
     template <bool Max>
-    constexpr value_type limit_helper() const
+    const value_type limit_helper() const
     {
         return { };
     }
@@ -180,13 +178,13 @@ class comparator_impl<std::pair<T1, T2>, void, M1, M2>
 public:
     using value_type = std::pair<T1, T2>;
 
-    constexpr value_type min_value() const
+    value_type min_value() const
     {
         auto val = comparator_type().min_value();
         return { std::get<0>(val), std::get<1>(val) };
     }
 
-    constexpr value_type max_value() const
+    value_type max_value() const
     {
         auto val = comparator_type().max_value();
         return { std::get<0>(val), std::get<1>(val) };
@@ -217,7 +215,6 @@ class comparator_impl<std::pair<T1, T2>, void>
     : public comparator_impl<std::pair<T1, T2>, void, direction::Less, direction::Less>
 { };
 
-
 // Singletons
 template <
     typename ValueType,
@@ -235,101 +232,108 @@ public:
         return (Mode == direction::Less) ? (a < b) : (b < a);
     }
 
-    constexpr value_type min_value() const {
-        return own_or_derive_switch_min<ValueType>::min_value();
+    value_type min_value() const
+    {
+        return (Mode == direction::Less)
+               ? own_or_derive_switch_min<ValueType>::min_value()
+               : own_or_derive_switch_max<ValueType>::max_value();
     }
 
-    constexpr value_type max_value() const
+    value_type max_value() const
     {
-        return own_or_derive_switch_max<ValueType>::max_value();
-
+        return (Mode == direction::Less)
+               ? own_or_derive_switch_max<ValueType>::max_value()
+               : own_or_derive_switch_min<ValueType>::min_value();
     }
 
 private:
     // Min Switch
-    template<typename S>
+    template <typename S>
     struct has_own_min_available
     {
-        template<typename T>
-        static auto sig_matches(ValueType(T::*)()) -> std::true_type;
+        template <typename T>
+        static auto sig_matches(T())->std::true_type;
 
         template <typename T>
-        static auto limit_exists(std::nullptr_t) -> decltype(sig_matches<T>(&T::min_value));
+        static auto sig_matches(const T())->std::true_type;
 
-        template<typename T>
-        static auto limit_exists(...) -> std::false_type;
+        template <typename T>
+        static auto limit_exists(std::nullptr_t)->decltype(sig_matches<T>(&T::min_value));
+
+        template <typename T>
+        static auto limit_exists(...)->std::false_type;
 
         static constexpr int value = decltype(limit_exists<S>(nullptr))::value;
     };
 
-
     template <typename T, class X = void>
-    struct own_or_derive_switch_min {  };
+    struct own_or_derive_switch_min { };
 
     template <typename T>
-    struct own_or_derive_switch_min<T, typename std::enable_if< !!has_own_min_available<T>::value >::type> {
-        static constexpr value_type min_value()
+    struct own_or_derive_switch_min<T, typename std::enable_if<!!has_own_min_available<T>::value>::type>{
+        static value_type min_value()
         {
             return value_type::min_value();
         }
     };
 
     template <typename T>
-    struct own_or_derive_switch_min<T, typename std::enable_if<  !has_own_min_available<T>::value >::type> {
-        static constexpr value_type min_value()
+    struct own_or_derive_switch_min<T, typename std::enable_if<!has_own_min_available<T>::value>::type>{
+        static value_type min_value()
         {
-            static_assert(
-                    std::numeric_limits<ValueType>::min() != std::numeric_limits<ValueType>::max(),
-                    "std::numeric_limits<>::min/max gives identical results");
+            static_assert(std::numeric_limits<ValueType>::is_specialized,
+                          "std::numeric_limits<> is not specialised for type. Provide static T T::min_value() and static T T::max_value()");
 
-            return (Mode == direction::Less)
-                   ? std::numeric_limits<ValueType>::min()
-                   : std::numeric_limits<ValueType>::max();
+            return std::numeric_limits<ValueType>::min();
         }
     };
 
     // Max Switch
-    template<typename S>
+    template <typename S>
     struct has_own_max_available
     {
-        template<typename T>
-        static auto sig_matches(ValueType(T::*)()) -> std::true_type;
+        template <typename T>
+        static auto sig_matches(T())->std::true_type;
 
         template <typename T>
-        static auto limit_exists(std::nullptr_t) -> decltype(sig_matches<T>(&T::max_value));
+        static auto sig_matches(const T())->std::true_type;
 
-        template<typename T>
-        static auto limit_exists(...) -> std::false_type;
+        template <typename T>
+        static auto limit_exists(std::nullptr_t)->decltype(sig_matches<T>(&T::max_value));
+
+        template <typename T>
+        static auto limit_exists(...)->std::false_type;
 
         static constexpr int value = decltype(limit_exists<S>(nullptr))::value;
     };
 
-
     template <typename T, class X = void>
-    struct own_or_derive_switch_max {  };
+    struct own_or_derive_switch_max { };
 
     template <typename T>
-    struct own_or_derive_switch_max<T, typename std::enable_if< !!has_own_max_available<T>::value >::type> {
-        static constexpr value_type max_value()
+    struct own_or_derive_switch_max<T, typename std::enable_if<!!has_own_max_available<T>::value>::type>{
+        static const value_type max_value()
         {
             return value_type::max_value();
         }
     };
 
     template <typename T>
-    struct own_or_derive_switch_max<T, typename std::enable_if<  !has_own_max_available<T>::value >::type> {
-        static constexpr value_type max_value()
+    struct own_or_derive_switch_max<T, typename std::enable_if<!has_own_max_available<T>::value>::type>{
+        static const value_type max_value()
         {
-            static_assert(
-                    std::numeric_limits<ValueType>::min() != std::numeric_limits<ValueType>::max(),
-                    "std::numeric_limits<>::min/max gives identical results");
+            static_assert(std::numeric_limits<ValueType>::is_specialized,
+                          "std::numeric_limits<> is not specialised for type. Provide static T T::min_value() and static T T::max_value()");
 
-            return (Mode == direction::Less)
-                   ? std::numeric_limits<ValueType>::max()
-                   : std::numeric_limits<ValueType>::max();
+            return std::numeric_limits<ValueType>::max();
         }
     };
 };
+
+template <typename ValueType>
+class comparator_impl<ValueType, typename std::enable_if<!is_tuple_or_pair<ValueType>::value>::type>
+    : public comparator_impl<ValueType, typename std::enable_if<!is_tuple_or_pair<ValueType>::value>::type, direction::Less>
+{ };
 
 } // namespace comparator_details
 
@@ -338,17 +342,75 @@ class comparator
 {
 public:
     // use wrapper to hide defaulted template parameters used for SFINAE
-    constexpr ValueType min_value() const {return cmp.min_value();}
-    constexpr ValueType max_value() const {return cmp.max_value();}
-    bool operator()(const ValueType& a, const ValueType& b) const {return cmp(a, b);}
+    const ValueType min_value() const { return cmp.min_value(); }
+    const ValueType max_value() const { return cmp.max_value(); }
+    bool operator () (const ValueType& a, const ValueType& b) const
+    {
+        return cmp(a, b);
+    }
 
 private:
-    using impl = comparator_details::comparator_impl<
-            ValueType,
-            void, // this void is only for enable_if
-            Modes...>;
-    impl cmp;
+    comparator_details::comparator_impl<
+        ValueType,
+        void,     // this void is only for enable_if
+        Modes...> cmp;
 };
+
+template <typename ValueType, typename KeyExtract, direction... Modes>
+class struct_comparator
+{
+public:
+    explicit struct_comparator(const KeyExtract keys) : keys(keys) { }
+
+    ValueType min_value() const
+    {
+        ValueType result;
+        keys(result) = impl.min_value();
+        return result;
+    }
+
+    ValueType max_value() const
+    {
+        ValueType result;
+        keys(result) = impl.max_value();
+        return result;
+    }
+
+    bool operator () (const ValueType& a, const ValueType& b)
+    {
+        return impl(keys(a), keys(b));
+    }
+
+private:
+    // store key extractor
+    KeyExtract keys;
+
+    template <typename... Ts>
+    using tuple_with_removed_refs = std::tuple<typename std::remove_reference<Ts>::type...>;
+
+    template <typename... Ts>
+    static tuple_with_removed_refs<Ts...> remove_ref_from_tuple_members(std::tuple<Ts...>)
+    {
+        return tuple_with_removed_refs<Ts...>{ }
+    }
+
+    using return_type = typename std::result_of<KeyExtract(ValueType&)>::type;
+    using tuple_type = decltype(remove_ref_from_tuple_members(std::declval<return_type>()));
+
+    comparator<tuple_type, Modes...> impl;
+
+    template <typename... Ts>
+    static tuple_with_removed_refs<Ts...> remove_ref_from_tuple_members(std::tuple<Ts...> const&)
+    {
+        return tuple_with_removed_refs<Ts...>{ }
+    }
+};
+
+template <typename ValueType, direction... Modes, typename KeyExtract>
+auto make_struct_comparator(KeyExtract extract)
+{
+    return struct_comparator<ValueType, KeyExtract, Modes...>(extract);
+}
 
 } // namespace stxxl
 

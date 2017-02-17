@@ -19,10 +19,10 @@
 
 using stxxl::direction;
 
-template <typename T, direction M>
-void test_singletons(std::vector<T> values)
+template <typename CompareT, typename T>
+void test_singletons(CompareT cmp, std::vector<T> values, direction M)
 {
-    stxxl::comparator<T, M> cmp;
+    std::cout << "Test singletons" << std::endl;
 
     STXXL_CHECK(cmp(cmp.min_value(), cmp.max_value()));
 
@@ -123,20 +123,115 @@ template <
     direction M1, direction M2>
 void test_two(std::vector<T1> v1, std::vector<T2> v2)
 {
+    std::cout << "Test pair and tuple<X,Y>" << std::endl;
+
     test_two_int<std::pair<T1, T2>, T1, T2, M1, M2>(v1, v2);
     test_two_int<std::tuple<T1, T2>, T1, T2, M1, M2>(v1, v2);
 }
 
+// this function tests the usage of own min/max values
+void test_own_implementation()
+{
+    std::cout << "Test own implementation of min/max" << std::endl;
 
+    struct my_type {
+        int a;
 
+        explicit my_type(int a = 0) : a(a) { }
+
+        bool operator < (const my_type& o) const
+        {
+            return a > o.a; // THIS IS THE WRONG WAY
+        }
+
+        static const my_type min_value()
+        {
+            return my_type { -1000 };
+        }
+
+        static my_type max_value()
+        {
+            return my_type { 1000 };
+        }
+    };
+
+    {
+        stxxl::comparator<my_type> cmp;
+        STXXL_CHECK(cmp.min_value().a == -1000);
+        STXXL_CHECK(cmp.max_value().a == 1000);
+
+        // compare is inverted due to own less implementation
+        STXXL_CHECK(cmp(cmp.max_value(), cmp.min_value()));
+        STXXL_CHECK(!cmp(cmp.min_value(), cmp.max_value()));
+    }
+
+    {
+        stxxl::comparator<my_type, direction::Greater> cmp;
+        STXXL_CHECK(cmp.min_value().a == 1000);
+        STXXL_CHECK(cmp.max_value().a == -1000);
+
+        // compare is inverted due to own less implementation
+        STXXL_CHECK(cmp(cmp.max_value(), cmp.min_value()));
+        STXXL_CHECK(!cmp(cmp.min_value(), cmp.max_value()));
+    }
+}
+
+void test_comparator_extract()
+{
+    std::cout << "Test structured comparator" << std::endl;
+
+    struct my_type {
+        explicit my_type(int a = 0, double b = 0.0, float c = 0.0)
+            : keyA(a), keyB(b), keyC(c)
+        { }
+
+        int keyA;
+        double keyB;
+        float keyC;
+
+        double val;
+
+        void dump()
+        {
+            std::cout
+                << "[a: " << keyA
+                << ", b: " << keyB
+                << ", c: " << keyC
+                << ", val: " << val
+                << "]" << std::endl;
+        }
+    };
+
+    auto cmp = stxxl::make_struct_comparator<my_type, direction::Less, direction::Greater>(
+        [](auto& o) { return std::tie(o.keyA, o.keyB, o.keyC); });
+
+    std::vector<my_type> values({
+                                    my_type { -1, 0.0, 0.0 },
+                                    my_type { -1, 0.0, 1.0 },
+                                    my_type { 0, 2.0, 0.0 },
+                                    my_type { 0, -1.0, 2.0 },
+                                    my_type { 1, -10.0, 0.0 }
+                                });
+
+    for (auto i1 = values.cbegin(); i1 != values.cend(); ++i1) {
+        STXXL_CHECK(!cmp(*i1, *i1));
+        STXXL_CHECK(cmp(*i1, cmp.max_value()));
+        STXXL_CHECK(cmp(cmp.min_value(), *i1));
+
+        for (auto i2 = i1 + 1; i2 != values.cend(); ++i2) {
+            STXXL_CHECK(cmp(*i1, *i2));
+            STXXL_CHECK(!cmp(*i2, *i1));
+        }
+    }
+}
 
 int main()
 {
     const std::vector<int> int_values({ -5, -1, 0, 1, 5 });
     const std::vector<char> char_values({ 'a', 'b', 'c', 'd', 'e' });
 
-    test_singletons<int, direction::Less>(int_values);
-    test_singletons<int, direction::Greater>(int_values);
+    test_singletons(stxxl::comparator<int, direction::Less>(), int_values, direction::Less);
+    test_singletons(stxxl::comparator<int, direction::Greater>(), int_values, direction::Greater);
 
     test_two<int, char, direction::Less, direction::Less>(int_values, char_values);
     test_two<int, char, direction::Less, direction::Greater>(int_values, char_values);
@@ -147,6 +242,9 @@ int main()
     test_two<int, char, direction::Greater, direction::DontCare>(int_values, char_values);
     test_two<int, char, direction::DontCare, direction::Less>(int_values, char_values);
     test_two<int, char, direction::DontCare, direction::Greater>(int_values, char_values);
+
+    test_own_implementation();
+    test_comparator_extract();
 
     std::cout << "Success." << std::endl;
     return 0;
