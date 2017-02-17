@@ -2688,7 +2688,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
 {
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2>> alphabet_vector_type;
+    typedef typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2> > alphabet_vector_type;
     typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size> offset_vector_type;
 
     // input and output files (if supplied via command line)

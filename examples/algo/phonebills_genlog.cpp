@@ -44,7 +44,7 @@ struct cmp
     }
 };
 
-typedef stxxl::vector<LogEntry, 1, stxxl::random_pager<1>> vector_type;
+typedef stxxl::vector<LogEntry, 1, stxxl::random_pager<1> > vector_type;
 
 std::ostream& operator << (std::ostream& i, const LogEntry& entry)
 {

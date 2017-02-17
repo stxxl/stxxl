@@ -1,7 +1,7 @@
 /***************************************************************************
  *  tests/common/test_comparator.cpp
  *
- *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2017 Manuel Penschuck <manuel@ae.cs.uni-frankfurt.de>
  *
@@ -13,9 +13,9 @@
 #include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/verbose.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
-#include <algorithm>
 
 template <typename T, stxxl::compare_mode M>
 void test_singletons(std::vector<T> values)
