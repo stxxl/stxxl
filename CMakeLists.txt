@@ -488,7 +488,7 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "R
 
 # globally adds top-level include directories
 set(STXXL_INCLUDE_DIRS
-  ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/ ${FOXXLL_INCLUDE_DIRS})
+  ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
 include_directories(${STXXL_INCLUDE_DIRS})
 
 # for targets using stxxl library
