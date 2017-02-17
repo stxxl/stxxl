@@ -20,12 +20,6 @@ set(LIBSTXXL_SOURCES
   common/verbose.cpp
   common/version.cpp
 
-  mng/block_manager.cpp
-  mng/config.cpp
-  mng/disk_block_allocator.cpp
-
-  algo/async_schedule.cpp
-
   )
 
 if(USE_MALLOC_COUNT)
