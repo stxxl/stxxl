@@ -499,6 +499,12 @@ set(STXXL_CXX_FLAGS "${STXXL_CXX_FLAGS}" CACHE STRING "Compiler flags for STXXL"
 set(STXXL_INCLUDE_DIRS "${STXXL_INCLUDE_DIRS}" CACHE STRING "Include paths for STXXL")
 set(STXXL_LIBRARIES "${STXXL_LIBRARIES}" CACHE STRING "Libraries to link for STXXL")
 
+###############################################################################
+# build foxxll and libstxxl
+
+# build foxxll library as extlib
+add_subdirectory(extlib/foxxll)
+
 # build libstxxl in /lib
 add_subdirectory(lib)
 
