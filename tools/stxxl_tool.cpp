@@ -44,11 +44,7 @@ int stxxl_info(int, char**)
     return 0;
 }
 
-extern int create_files(int argc, char* argv[]);
-extern int benchmark_disks(int argc, char* argv[]);
-extern int benchmark_files(int argc, char* argv[]);
 extern int benchmark_sort(int argc, char* argv[]);
-extern int benchmark_disks_random(int argc, char* argv[]);
 extern int benchmark_pqueue(int argc, char* argv[]);
 extern int do_mlock(int argc, char* argv[]);
 extern int do_mallinfo(int argc, char* argv[]);
@@ -68,25 +64,8 @@ struct SubTool subtools[] = {
         "modules where compiled into STXXL."
     },
     {
-        "create_files", &create_files, false,
-        "Precreate large files to keep file system allocation time out to measurements."
-    },
-    {
-        "benchmark_disks", &benchmark_disks, false,
-        "This program will benchmark the disks configured by the standard "
-        ".stxxl disk configuration files mechanism."
-    },
-    {
-        "benchmark_files", &benchmark_files, false,
-        "Benchmark different file access methods, e.g. syscall or mmap_files."
-    },
-    {
         "benchmark_sort", &benchmark_sort, false,
         "Run benchmark tests of different sorting methods in STXXL"
-    },
-    {
-        "benchmark_disks_random", &benchmark_disks_random, false,
-        "Benchmark random block access time to .stxxl configured disks."
     },
     {
         "benchmark_pqueue", &benchmark_pqueue, false,

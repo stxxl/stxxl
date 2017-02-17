@@ -20,24 +20,6 @@ set(LIBSTXXL_SOURCES
   common/verbose.cpp
   common/version.cpp
 
-  io/create_file.cpp
-  io/disk_queued_file.cpp
-  io/file.cpp
-  io/fileperblock_file.cpp
-  io/iostats.cpp
-  io/memory_file.cpp
-  io/request.cpp
-  io/request_queue_impl_1q.cpp
-  io/request_queue_impl_qwqr.cpp
-  io/request_queue_impl_worker.cpp
-  io/request_with_state.cpp
-  io/request_with_waiters.cpp
-  io/serving_request.cpp
-  io/syscall_file.cpp
-  io/ufs_file_base.cpp
-  io/wfs_file_base.cpp
-  io/wincall_file.cpp
-
   mng/block_manager.cpp
   mng/config.cpp
   mng/disk_block_allocator.cpp
@@ -45,22 +27,6 @@ set(LIBSTXXL_SOURCES
   algo/async_schedule.cpp
 
   )
-
-if(NOT MSVC)
-  # additional sources for non Visual Studio builds
-  set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
-    io/mmap_file.cpp
-    )
-endif(NOT MSVC)
-
-if(STXXL_HAVE_LINUXAIO_FILE)
-  # additional sources fo LinuxAIO fileio access method
-  set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
-    io/linuxaio_file.cpp
-    io/linuxaio_queue.cpp
-    io/linuxaio_request.cpp
-    )
-endif()
 
 if(USE_MALLOC_COUNT)
   # enable light-weight heap profiling tool malloc_count
