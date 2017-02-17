@@ -465,6 +465,11 @@ stats_data stats_data::operator - (const stats_data& a) const
     return s;
 }
 
+size_t stats_data::num_files() const
+{
+    return file_stats_data_list_.size();
+}
+
 unsigned stats_data::get_read_count() const
 {
     return fetch_sum<unsigned>(
@@ -652,6 +657,13 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
     static const double one_mib = 1048576.0;
 
     o << "STXXL I/O statistics" << std::endl;
+
+    size_t nf = s.num_files();
+    if (nf != 1) {
+        o << " number of disks/files                      : "
+          << nf << std::endl;
+    }
+
     auto read_bytes_summary = s.get_read_bytes_summary();
     auto write_bytes_summary = s.get_write_bytes_summary();
 
@@ -670,19 +682,23 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << hr(s.get_read_bytes(), "B") << std::endl;
     o << " time spent in serving all read requests    : "
       << s.get_read_time() << " s"
-      << " @ " << ((double)s.get_read_bytes() / one_mib / s.get_read_time()) << " MiB/s"
-      << " (min: " << read_speed_summary.min / one_mib << " MiB/s, "
-      << "max: " << read_speed_summary.max / one_mib << " MiB/s)"
-      << std::endl;
+      << " @ " << ((double)s.get_read_bytes() / one_mib / s.get_read_time()) << " MiB/s";
+    if (nf > 1) {
+        o << " (min: " << read_speed_summary.min / one_mib << " MiB/s, "
+          << "max: " << read_speed_summary.max / one_mib << " MiB/s)";
+    }
+    o << std::endl;
     o << " time spent in reading (parallel read time) : "
       << s.get_pread_time() << " s"
       << " @ " << ((double)s.get_read_bytes() / one_mib / s.get_pread_time()) << " MiB/s"
       << std::endl;
-    o << "  reading speed per file                    : "
-      << "min: " << pread_speed_summary.min / one_mib << " MiB/s, "
-      << "median: " << pread_speed_summary.median / one_mib << " MiB/s, "
-      << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
-      << std::endl;
+    if (nf > 1) {
+        o << "  reading speed per file                    : "
+          << "min: " << pread_speed_summary.min / one_mib << " MiB/s, "
+          << "median: " << pread_speed_summary.median / one_mib << " MiB/s, "
+          << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
+          << std::endl;
+    }
     o << " total number of writes                     : "
       << hr(s.get_write_count()) << std::endl;
     o << " average block size (write)                 : "
@@ -691,28 +707,34 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
       << hr(s.get_write_bytes(), "B") << std::endl;
     o << " time spent in serving all write requests   : "
       << s.get_write_time() << " s"
-      << " @ " << ((double)s.get_write_bytes() / one_mib / s.get_write_time()) << " MiB/s"
-      << "(min: " << write_speed_summary.min / one_mib << " MiB/s, "
-      << "max: " << write_speed_summary.max / one_mib << " MiB/s)"
-      << std::endl;
+      << " @ " << ((double)s.get_write_bytes() / one_mib / s.get_write_time()) << " MiB/s";
+    if (nf > 1) {
+        o << " (min: " << write_speed_summary.min / one_mib << " MiB/s, "
+          << "max: " << write_speed_summary.max / one_mib << " MiB/s)";
+    }
+    o << std::endl;
 
     o << " time spent in writing (parallel write time): " << s.get_pwrite_time() << " s"
       << " @ " << ((double)s.get_write_bytes() / one_mib / s.get_pwrite_time()) << " MiB/s"
       << std::endl;
-    o << "   parallel write speed per file            : "
-      << "min: " << pwrite_speed_summary.min / one_mib << " MiB/s, "
-      << "median: " << pwrite_speed_summary.median / one_mib << " MiB/s, "
-      << "max: " << pwrite_speed_summary.max / one_mib << " MiB/s"
-      << std::endl;
+    if (nf > 1) {
+        o << "   parallel write speed per file            : "
+          << "min: " << pwrite_speed_summary.min / one_mib << " MiB/s, "
+          << "median: " << pwrite_speed_summary.median / one_mib << " MiB/s, "
+          << "max: " << pwrite_speed_summary.max / one_mib << " MiB/s"
+          << std::endl;
+    }
 
     o << " time spent in I/O (parallel I/O time)      : " << s.get_pio_time() << " s"
       << " @ " << ((double)(s.get_read_bytes() + s.get_write_bytes()) / one_mib / s.get_pio_time()) << " MiB/s"
       << std::endl;
-    o << "   parallel I/O speed per file              : "
-      << "min: " << pio_speed_summary.min / one_mib << " MiB/s, "
-      << "median: " << pio_speed_summary.median / one_mib << " MiB/s, "
-      << "max: " << pio_speed_summary.max / one_mib << " MiB/s"
-      << std::endl;
+    if (nf > 1) {
+        o << "   parallel I/O speed per file              : "
+          << "min: " << pio_speed_summary.min / one_mib << " MiB/s, "
+          << "median: " << pio_speed_summary.median / one_mib << " MiB/s, "
+          << "max: " << pio_speed_summary.max / one_mib << " MiB/s"
+          << std::endl;
+    }
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     o << " I/O wait time                              : "
       << s.get_io_wait_time() << " s" << std::endl;

@@ -526,6 +526,9 @@ public:
     stats_data operator + (const stats_data& a) const;
     stats_data operator - (const stats_data& a) const;
 
+    //! Returns the number of file_stats_data objects
+    size_t num_files() const;
+
     //! Returns the sum of all read_count_.
     //! \return the sum of all read_count_
     unsigned get_read_count() const;
