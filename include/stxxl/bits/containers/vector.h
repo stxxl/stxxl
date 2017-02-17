@@ -957,7 +957,7 @@ public:
     //!
     //! \param n Number of elements.
     //! \param npages Number of cached pages.
-    explicit vector(const size_type n = 0, const size_t npages = pager_type().size())
+    explicit vector(const size_type n = 0, const size_t npages = pager_type::default_npages)
         : m_size(n),
           m_bids((size_t)div_ceil(n, block_type::size)),
           m_pager(npages),

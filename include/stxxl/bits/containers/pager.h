@@ -31,15 +31,15 @@ namespace stxxl {
 template <unsigned npages_>
 class random_pager
 {
-    enum { n_pages = npages_ };
-
     using size_type = size_t;
 
     size_type num_pages;
     random_number<random_uniform_fast> rnd;
 
 public:
-    explicit random_pager(size_type num_pages = n_pages)
+    static constexpr unsigned default_npages = npages_;
+
+    explicit random_pager(size_type num_pages = default_npages)
         : num_pages(num_pages) { }
 
     size_type kick()
@@ -62,8 +62,6 @@ public:
 template <unsigned npages_ = 0>
 class lru_pager
 {
-    enum { n_pages = npages_ };
-
     using size_type = size_t;
     using list_type = std::list<size_type>;
 
@@ -71,7 +69,9 @@ class lru_pager
     simple_vector<list_type::iterator> history_entry;
 
 public:
-    explicit lru_pager(size_type num_pages = n_pages)
+    static constexpr unsigned default_npages = npages_;
+
+    explicit lru_pager(size_type num_pages = default_npages)
         : history_entry(num_pages)
     {
         for (size_type i = 0; i < size(); ++i)
