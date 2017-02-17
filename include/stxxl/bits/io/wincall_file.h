@@ -52,8 +52,9 @@ public:
         int mode,
         int queue_id = DEFAULT_QUEUE,
         int allocator_id = NO_ALLOCATOR,
-        unsigned int device_id = DEFAULT_DEVICE_ID)
-        : file(device_id),
+        unsigned int device_id = DEFAULT_DEVICE_ID,
+        file_stats* file_stats = nullptr)
+        : file(device_id, file_stats),
           wfs_file_base(filename, mode),
           disk_queued_file(queue_id, allocator_id)
     { }

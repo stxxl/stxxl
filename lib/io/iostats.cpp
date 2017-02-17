@@ -26,201 +26,43 @@
 
 namespace stxxl {
 
-#ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-void stats::wait_started(wait_op_type wait_op)
-{
-    double now = timestamp();
-    {
-        std::unique_lock<std::mutex> WaitLock(wait_mutex);
-
-        double diff = now - p_begin_wait;
-        t_waits += double(acc_waits) * diff;
-        p_begin_wait = now;
-        p_waits += (acc_waits++) ? diff : 0.0;
-
-        if (wait_op == WAIT_OP_READ) {
-            diff = now - p_begin_wait_read;
-            t_wait_read += double(acc_wait_read) * diff;
-            p_begin_wait_read = now;
-            p_wait_read += (acc_wait_read++) ? diff : 0.0;
-        }
-        else /* if (wait_op == WAIT_OP_WRITE) */ {
-            // wait_any() is only used from write_pool and buffered_writer, so account WAIT_OP_ANY for WAIT_OP_WRITE, too
-            diff = now - p_begin_wait_write;
-            t_wait_write += double(acc_wait_write) * diff;
-            p_begin_wait_write = now;
-            p_wait_write += (acc_wait_write++) ? diff : 0.0;
-        }
-    }
-}
-
-void stats::wait_finished(wait_op_type wait_op)
-{
-    double now = timestamp();
-    {
-        std::unique_lock<std::mutex> WaitLock(wait_mutex);
-
-        double diff = now - p_begin_wait;
-        t_waits += double(acc_waits) * diff;
-        p_begin_wait = now;
-        p_waits += (acc_waits--) ? diff : 0.0;
-
-        if (wait_op == WAIT_OP_READ) {
-            double diff2 = now - p_begin_wait_read;
-            t_wait_read += double(acc_wait_read) * diff2;
-            p_begin_wait_read = now;
-            p_wait_read += (acc_wait_read--) ? diff2 : 0.0;
-        }
-        else /* if (wait_op == WAIT_OP_WRITE) */ {
-            double diff2 = now - p_begin_wait_write;
-            t_wait_write += double(acc_wait_write) * diff2;
-            p_begin_wait_write = now;
-            p_wait_write += (acc_wait_write--) ? diff2 : 0.0;
-        }
-#ifdef STXXL_WAIT_LOG_ENABLED
-        std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
-        if (waitlog)
-            *waitlog << (now - last_reset) << "\t"
-                     << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
-                     << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
-                     << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;
-#endif
-    }
-}
-#endif
-
-void stats::p_write_started(double now)
-{
-    {
-        std::unique_lock<std::mutex> WriteLock(write_mutex);
-
-        double diff = now - p_begin_write;
-        p_begin_write = now;
-        p_writes += (acc_writes++) ? diff : 0.0;
-    }
-    {
-        std::unique_lock<std::mutex> io_lock(io_mutex);
-
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios++) ? diff : 0.0;
-        p_begin_io = now;
-    }
-}
-
-void stats::p_write_finished(double now)
-{
-    {
-        std::unique_lock<std::mutex> WriteLock(write_mutex);
-
-        double diff = now - p_begin_write;
-        p_begin_write = now;
-        p_writes += (acc_writes--) ? diff : 0.0;
-    }
-    {
-        std::unique_lock<std::mutex> io_lock(io_mutex);
-
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios--) ? diff : 0.0;
-        p_begin_io = now;
-    }
-}
-
-void stats::p_read_started(double now)
-{
-    {
-        std::unique_lock<std::mutex> read_lock(read_mutex);
-
-        double diff = now - p_begin_read;
-        p_begin_read = now;
-        p_reads += (acc_reads++) ? diff : 0.0;
-    }
-    {
-        std::unique_lock<std::mutex> io_lock(io_mutex);
-
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios++) ? diff : 0.0;
-        p_begin_io = now;
-    }
-}
-
-void stats::p_read_finished(double now)
-{
-    {
-//        std::unique_lock<std::mutex> read_lock(read_mutex);
-
-        double diff = now - p_begin_read;
-        p_begin_read = now;
-        p_reads += (acc_reads--) ? diff : 0.0;
-    }
-    {
-//        std::unique_lock<std::mutex> io_lock(io_mutex);
-
-        double diff = now - p_begin_io;
-        p_ios += (acc_ios--) ? diff : 0.0;
-        p_begin_io = now;
-    }
-}
-
-file_stats* stats::create_file_stats(unsigned int device_id)
-{
-    file_stats_list.emplace_back(device_id);
-    return &file_stats_list.back();
-}
-
-std::vector<file_stats_data> stats::deepcopy_file_stats_data_list() const
-{
-    std::vector<file_stats_data> fsdl;
-    for (auto it = file_stats_list.begin(); it != file_stats_list.end(); it++)
-    {
-        fsdl.push_back(file_stats_data(*it));
-    }
-
-    return fsdl;
-}
+/******************************************************************************/
+// file_stats
 
 file_stats::file_stats(unsigned int device_id)
-    : m_device_id(device_id),
-      reads(0),
-      writes(0),
-      volume_read(0),
-      volume_written(0),
-      c_reads(0),
-      c_writes(0),
-      c_volume_read(0),
-      c_volume_written(0),
-      t_reads(0.0),
-      t_writes(0.0),
-      p_begin_read(0.0),
-      p_begin_write(0.0),
-      acc_reads(0), acc_writes(0)
+    : device_id_(device_id),
+      read_count_(0), write_count_(0),
+      read_bytes_(0), write_bytes_(0),
+      read_time_(0.0), write_time_(0.0),
+      p_begin_read_(0.0), p_begin_write_(0.0),
+      acc_reads_(0), acc_writes_(0)
 { }
 
-#if STXXL_IO_STATS
-void file_stats::write_started(size_t size_, double now)
+void file_stats::write_started(size_t size, double now)
 {
     if (now == 0.0)
         now = timestamp();
 
     {
-        std::unique_lock<std::mutex> WriteLock(write_mutex);
+        std::unique_lock<std::mutex> write_lock(write_mutex_);
 
-        ++writes;
-        volume_written += size_;
-        double diff = now - p_begin_write;
-        t_writes += double(acc_writes++) * diff;
-        p_begin_write = now;
+        ++write_count_;
+        write_bytes_ += size;
+        double diff = now - p_begin_write_;
+        write_time_ += double(acc_writes_++) * diff;
+        p_begin_write_ = now;
     }
 
     stats::get_instance()->p_write_started(now);
 }
 
-void file_stats::write_canceled(size_t size_)
+void file_stats::write_canceled(size_t size)
 {
     {
-        std::unique_lock<std::mutex> WriteLock(write_mutex);
+        std::unique_lock<std::mutex> write_lock(write_mutex_);
 
-        --writes;
-        volume_written -= size_;
+        --write_count_;
+        write_bytes_ -= size;
     }
     write_finished();
 }
@@ -230,49 +72,41 @@ void file_stats::write_finished()
     double now = timestamp();
 
     {
-        std::unique_lock<std::mutex> WriteLock(write_mutex);
+        std::unique_lock<std::mutex> write_lock(write_mutex_);
 
-        double diff = now - p_begin_write;
-        t_writes += double(acc_writes--) * diff;
-        p_begin_write = now;
+        double diff = now - p_begin_write_;
+        write_time_ += double(acc_writes_--) * diff;
+        p_begin_write_ = now;
     }
 
     stats::get_instance()->p_write_finished(now);
 }
 
-void file_stats::write_cached(size_t size_)
-{
-    std::unique_lock<std::mutex> WriteLock(write_mutex);
-
-    ++c_writes;
-    c_volume_written += size_;
-}
-
-void file_stats::read_started(size_t size_, double now)
+void file_stats::read_started(size_t size, double now)
 {
     if (now == 0.0)
         now = timestamp();
 
     {
-        std::unique_lock<std::mutex> read_lock(read_mutex);
+        std::unique_lock<std::mutex> read_lock(read_mutex_);
 
-        ++reads;
-        volume_read += size_;
-        double diff = now - p_begin_read;
-        t_reads += double(acc_reads++) * diff;
-        p_begin_read = now;
+        ++read_count_;
+        read_bytes_ += size;
+        double diff = now - p_begin_read_;
+        read_time_ += double(acc_reads_++) * diff;
+        p_begin_read_ = now;
     }
 
     stats::get_instance()->p_read_started(now);
 }
 
-void file_stats::read_canceled(size_t size_)
+void file_stats::read_canceled(size_t size)
 {
     {
-        std::unique_lock<std::mutex> read_lock(read_mutex);
+        std::unique_lock<std::mutex> read_lock(read_mutex_);
 
-        --reads;
-        volume_read -= size_;
+        --read_count_;
+        read_bytes_ -= size;
     }
     read_finished();
 }
@@ -282,230 +116,500 @@ void file_stats::read_finished()
     double now = timestamp();
 
     {
-        std::unique_lock<std::mutex> read_lock(read_mutex);
+        std::unique_lock<std::mutex> read_lock(read_mutex_);
 
-        double diff = now - p_begin_read;
-        t_reads += double(acc_reads--) * diff;
-        p_begin_read = now;
+        double diff = now - p_begin_read_;
+        read_time_ += double(acc_reads_--) * diff;
+        p_begin_read_ = now;
     }
 
     stats::get_instance()->p_read_finished(now);
 }
 
-void file_stats::read_cached(size_t size_)
-{
-    std::unique_lock<std::mutex> read_lock(read_mutex);
+/******************************************************************************/
+// file_stats_data
 
-    ++c_reads;
-    c_volume_read += size_;
+file_stats_data file_stats_data::operator + (const file_stats_data& a) const
+{
+    STXXL_THROW_IF(device_id_ != a.device_id_, std::runtime_error,
+                   "stxxl::file_stats_data objects do not belong to the same file/disk");
+
+    file_stats_data fsd;
+    fsd.device_id_ = device_id_;
+
+    fsd.read_count_ = read_count_ + a.read_count_;
+    fsd.write_count_ = write_count_ + a.write_count_;
+    fsd.read_bytes_ = read_bytes_ + a.read_bytes_;
+    fsd.write_bytes_ = write_bytes_ + a.write_bytes_;
+    fsd.read_time_ = read_time_ + a.read_time_;
+    fsd.write_time_ = write_time_ + a.write_time_;
+    return fsd;
+}
+
+file_stats_data file_stats_data::operator - (const file_stats_data& a) const
+{
+    STXXL_THROW_IF(device_id_ != a.device_id_, std::runtime_error,
+                   "stxxl::file_stats_data objects do not belong to the same file/disk");
+
+    file_stats_data fsd;
+    fsd.device_id_ = device_id_;
+
+    fsd.read_count_ = read_count_ - a.read_count_;
+    fsd.write_count_ = write_count_ - a.write_count_;
+    fsd.read_bytes_ = read_bytes_ - a.read_bytes_;
+    fsd.write_bytes_ = write_bytes_ - a.write_bytes_;
+    fsd.read_time_ = read_time_ - a.read_time_;
+    fsd.write_time_ = write_time_ - a.write_time_;
+    return fsd;
+}
+
+/******************************************************************************/
+// stats
+
+stats::stats()
+    : creation_time_(timestamp()),
+      p_reads_(0.0), p_writes_(0.0),
+      p_begin_read_(0.0), p_begin_write_(0.0),
+      p_ios_(0.0),
+      p_begin_io_(0.0),
+
+      acc_reads_(0.0), acc_writes_(0.0),
+      acc_ios_(0.0),
+
+      t_waits_(0.0), p_waits_(0.0),
+      p_begin_wait_(0.0),
+      t_wait_read_(0.0), p_wait_read_(0.0),
+      p_begin_wait_read_(0.0),
+      t_wait_write_(0.0), p_wait_write_(0.0),
+      p_begin_wait_write_(0.0),
+      acc_waits_(0.0),
+      acc_wait_read_(0.0), acc_wait_write_(0.0)
+{ }
+
+#ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
+void stats::wait_started(wait_op_type wait_op)
+{
+    double now = timestamp();
+    {
+        std::unique_lock<std::mutex> wait_lock(wait_mutex_);
+
+        double diff = now - p_begin_wait_;
+        t_waits_ += double(acc_waits_) * diff;
+        p_begin_wait_ = now;
+        p_waits_ += (acc_waits_++) ? diff : 0.0;
+
+        if (wait_op == WAIT_OP_READ) {
+            diff = now - p_begin_wait_read_;
+            t_wait_read_ += double(acc_wait_read_) * diff;
+            p_begin_wait_read_ = now;
+            p_wait_read_ += (acc_wait_read_++) ? diff : 0.0;
+        }
+        else /* if (wait_op == WAIT_OP_WRITE) */ {
+            // wait_any() is only used from write_pool and buffered_writer, so account WAIT_OP_ANY for WAIT_OP_WRITE, too
+            diff = now - p_begin_wait_write_;
+            t_wait_write_ += double(acc_wait_write_) * diff;
+            p_begin_wait_write_ = now;
+            p_wait_write_ += (acc_wait_write_++) ? diff : 0.0;
+        }
+    }
+}
+
+void stats::wait_finished(wait_op_type wait_op)
+{
+    double now = timestamp();
+    {
+        std::unique_lock<std::mutex> wait_lock(wait_mutex_);
+
+        double diff = now - p_begin_wait_;
+        t_waits_ += double(acc_waits_) * diff;
+        p_begin_wait_ = now;
+        p_waits_ += (acc_waits_--) ? diff : 0.0;
+
+        if (wait_op == WAIT_OP_READ) {
+            double diff2 = now - p_begin_wait_read_;
+            t_wait_read_ += double(acc_wait_read_) * diff2;
+            p_begin_wait_read_ = now;
+            p_wait_read_ += (acc_wait_read_--) ? diff2 : 0.0;
+        }
+        else /* if (wait_op == WAIT_OP_WRITE) */ {
+            double diff2 = now - p_begin_wait_write_;
+            t_wait_write_ += double(acc_wait_write_) * diff2;
+            p_begin_wait_write_ = now;
+            p_wait_write_ += (acc_wait_write_--) ? diff2 : 0.0;
+        }
+#ifdef STXXL_WAIT_LOG_ENABLED
+        std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
+        if (waitlog)
+            *waitlog << (now - last_reset) << "\t"
+                     << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << t_wait_read_ << "\t" << t_wait_write_ << std::endl << std::flush;
+#endif
+    }
 }
 #endif
 
-//! Returns the sum of all reads.
-//! \return the sum of all reads
-unsigned stats_data::get_reads() const
+void stats::p_write_started(double now)
 {
-    return fetch_sum<unsigned>([](const file_stats_data& fsd) -> unsigned { return fsd.get_reads(); });
+    {
+        std::unique_lock<std::mutex> write_lock(write_mutex_);
+
+        double diff = now - p_begin_write_;
+        p_begin_write_ = now;
+        p_writes_ += (acc_writes_++) ? diff : 0.0;
+    }
+    {
+        std::unique_lock<std::mutex> io_lock(io_mutex_);
+
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_++) ? diff : 0.0;
+        p_begin_io_ = now;
+    }
 }
 
-//! Retruns sum, min, max, avarage and median of all reads.
-//! \return a summary of the read measurements
-stats_data::measurement_summary<unsigned> stats_data::get_reads_summary() const
+void stats::p_write_finished(double now)
 {
-    return measurement_summary<unsigned>(m_file_stats_data_list,
-                                         [](const file_stats_data& fsd) { return fsd.get_reads(); });
+    {
+        std::unique_lock<std::mutex> write_lock(write_mutex_);
+
+        double diff = now - p_begin_write_;
+        p_begin_write_ = now;
+        p_writes_ += (acc_writes_--) ? diff : 0.0;
+    }
+    {
+        std::unique_lock<std::mutex> io_lock(io_mutex_);
+
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_--) ? diff : 0.0;
+        p_begin_io_ = now;
+    }
 }
 
-//! Returns the sum of all writes.
-//! \return the sum of all writes
-unsigned stats_data::get_writes() const
+void stats::p_read_started(double now)
 {
-    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_writes(); });
+    {
+        std::unique_lock<std::mutex> read_lock(read_mutex_);
+
+        double diff = now - p_begin_read_;
+        p_begin_read_ = now;
+        p_reads_ += (acc_reads_++) ? diff : 0.0;
+    }
+    {
+        std::unique_lock<std::mutex> io_lock(io_mutex_);
+
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_++) ? diff : 0.0;
+        p_begin_io_ = now;
+    }
 }
 
-//! Returns sum, min, max, avarage and median of all writes.
-//! \returns a summary of the write measurements
-stats_data::measurement_summary<unsigned> stats_data::get_writes_summary() const
+void stats::p_read_finished(double now)
 {
-    return measurement_summary<unsigned>(m_file_stats_data_list,
-                                         [](const file_stats_data& fsd) { return fsd.get_writes(); });
+    {
+//        std::unique_lock<std::mutex> read_lock(read_mutex_);
+
+        double diff = now - p_begin_read_;
+        p_begin_read_ = now;
+        p_reads_ += (acc_reads_--) ? diff : 0.0;
+    }
+    {
+//        std::unique_lock<std::mutex> io_lock(io_mutex_);
+
+        double diff = now - p_begin_io_;
+        p_ios_ += (acc_ios_--) ? diff : 0.0;
+        p_begin_io_ = now;
+    }
 }
 
-//! Returns number of bytes read from disks in total.
-//! \return number of bytes read
-external_size_type stats_data::get_read_volume() const
+file_stats* stats::create_file_stats(unsigned int device_id)
+{
+    file_stats_list_.emplace_back(device_id);
+    return &file_stats_list_.back();
+}
+
+std::vector<file_stats_data> stats::deepcopy_file_stats_data_list() const
+{
+    std::vector<file_stats_data> fsdl;
+    for (auto it = file_stats_list_.begin(); it != file_stats_list_.end(); it++)
+    {
+        fsdl.push_back(file_stats_data(*it));
+    }
+
+    return fsdl;
+}
+
+/******************************************************************************/
+// stats_data
+
+template <typename T, typename Functor>
+T stats_data::fetch_sum(const Functor& get_value) const
+{
+    T sum = 0;
+
+    for (auto it = file_stats_data_list_.begin(); it != file_stats_data_list_.end(); it++)
+        sum += get_value(*it);
+
+    return sum;
+}
+
+template <typename T>
+template <typename Functor>
+stats_data::summary<T>::summary(
+    const std::vector<file_stats_data>& fs, const Functor& get_value)
+{
+    values_per_device.reserve(fs.size());
+
+    for (auto it = fs.begin(); it != fs.end(); it++)
+    {
+        values_per_device.emplace_back(get_value(*it), it->get_device_id());
+    }
+
+    std::sort(values_per_device.begin(), values_per_device.end(),
+              [](std::pair<T, unsigned> a, std::pair<T, unsigned> b) {
+                  return a.first < b.first;
+              });
+
+    if (values_per_device.size() != 0)
+    {
+        min = values_per_device.front().first;
+        max = values_per_device.back().first;
+        long mid = values_per_device.size() / 2;
+        median =
+            (values_per_device.size() % 2 == 1)
+            ? values_per_device[mid].first
+            : (values_per_device[mid - 1].first + values_per_device[mid].first) / 2.0;
+
+        total = values_per_device.front().first;
+        for (auto it = values_per_device.begin() + 1; it != values_per_device.end(); ++it)
+            total += it->first;
+
+        average = (double)total / values_per_device.size();
+    }
+    else
+    {
+        min = std::numeric_limits<T>::quiet_NaN();
+        max = std::numeric_limits<T>::quiet_NaN();
+        median = std::numeric_limits<T>::quiet_NaN();
+        total = std::numeric_limits<T>::quiet_NaN();
+        average = std::numeric_limits<T>::quiet_NaN();
+    }
+}
+
+stats_data stats_data::operator + (const stats_data& a) const
+{
+    stats_data s;
+
+    if (a.file_stats_data_list_.size() == 0)
+    {
+        s.file_stats_data_list_ = file_stats_data_list_;
+    }
+    else if (file_stats_data_list_.size() == 0)
+    {
+        s.file_stats_data_list_ = a.file_stats_data_list_;
+    }
+    else if (file_stats_data_list_.size() == a.file_stats_data_list_.size())
+    {
+        for (auto it1 = file_stats_data_list_.begin(),
+             it2 = a.file_stats_data_list_.begin();
+             it1 != file_stats_data_list_.end(); it1++, it2++)
+        {
+            s.file_stats_data_list_.push_back((*it1) + (*it2));
+        }
+    }
+    else
+    {
+        STXXL_THROW(std::runtime_error,
+                    "The number of files has changed between the snapshots.");
+    }
+
+    s.p_reads_ = p_reads_ + a.p_reads_;
+    s.p_writes_ = p_writes_ + a.p_writes_;
+    s.p_ios_ = p_ios_ + a.p_ios_;
+    s.t_wait = t_wait + a.t_wait;
+    s.t_wait_read_ = t_wait_read_ + a.t_wait_read_;
+    s.t_wait_write_ = t_wait_write_ + a.t_wait_write_;
+    s.elapsed_ = elapsed_ + a.elapsed_;
+    return s;
+}
+
+stats_data stats_data::operator - (const stats_data& a) const
+{
+    stats_data s;
+
+    if (a.file_stats_data_list_.size() == 0)
+    {
+        s.file_stats_data_list_ = file_stats_data_list_;
+    }
+    else if (file_stats_data_list_.size() == a.file_stats_data_list_.size())
+    {
+        for (auto it1 = file_stats_data_list_.begin(),
+             it2 = a.file_stats_data_list_.begin();
+             it1 != file_stats_data_list_.end(); it1++, it2++)
+        {
+            s.file_stats_data_list_.push_back((*it1) - (*it2));
+        }
+    }
+    else
+    {
+        STXXL_THROW(std::runtime_error,
+                    "The number of files has changed between the snapshots.");
+    }
+
+    s.p_reads_ = p_reads_ - a.p_reads_;
+    s.p_writes_ = p_writes_ - a.p_writes_;
+    s.p_ios_ = p_ios_ - a.p_ios_;
+    s.t_wait = t_wait - a.t_wait;
+    s.t_wait_read_ = t_wait_read_ - a.t_wait_read_;
+    s.t_wait_write_ = t_wait_write_ - a.t_wait_write_;
+    s.elapsed_ = elapsed_ - a.elapsed_;
+    return s;
+}
+
+size_t stats_data::num_files() const
+{
+    return file_stats_data_list_.size();
+}
+
+unsigned stats_data::get_read_count() const
+{
+    return fetch_sum<unsigned>(
+        [](const file_stats_data& fsd) { return fsd.get_read_count(); });
+}
+
+stats_data::summary<unsigned> stats_data::get_read_count_summary() const
+{
+    return summary<unsigned>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) { return fsd.get_read_count(); });
+}
+
+unsigned stats_data::get_write_count() const
+{
+    return fetch_sum<unsigned>(
+        [](const file_stats_data& fsd) { return fsd.get_write_count(); });
+}
+
+stats_data::summary<unsigned> stats_data::get_write_count_summary() const
+{
+    return summary<unsigned>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) { return fsd.get_write_count(); });
+}
+
+external_size_type stats_data::get_read_bytes() const
 {
     return fetch_sum<external_size_type>(
-        [](const file_stats_data& fsd) { return fsd.get_read_volume(); });
+        [](const file_stats_data& fsd) { return fsd.get_read_bytes(); });
 }
 
-//! Returns sum, min, max, avarage and median of all read bytes.
-//! \returns a summary of the write measurements
-stats_data::measurement_summary<external_size_type> stats_data::get_read_volume_summary() const
+stats_data::summary<external_size_type>
+stats_data::get_read_bytes_summary() const
 {
-    return measurement_summary<external_size_type>(
-        m_file_stats_data_list,
-        [](const file_stats_data& fsd) { return fsd.get_read_volume(); });
+    return summary<external_size_type>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) { return fsd.get_read_bytes(); });
 }
 
-//! Returns number of bytes written to the disks in total.
-//! \return number of bytes written
-external_size_type stats_data::get_written_volume() const
+external_size_type stats_data::get_write_bytes() const
 {
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_written_volume(); });
+    return fetch_sum<external_size_type>(
+        [](const file_stats_data& fsd) { return fsd.get_write_bytes(); });
 }
 
-//! Returns sum, min, max, avarage and median of all written bytes.
-//! \return a summary of the written bytes
-stats_data::measurement_summary<external_size_type> stats_data::get_written_volume_summary() const
+stats_data::summary<external_size_type>
+stats_data::get_write_bytes_summary() const
 {
-    return measurement_summary<external_size_type>(m_file_stats_data_list,
-                                                   [](const file_stats_data& fsd) { return fsd.get_written_volume(); });
+    return summary<external_size_type>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) { return fsd.get_write_bytes(); });
 }
 
-//! Returns total number of reads served from cache.
-//! \return the sum of all cached reads
-unsigned stats_data::get_cached_reads() const
-{
-    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_cached_reads(); });
-}
-
-//! Returns sum, min, max, avarage and median of all cached reads.
-//! \return a summary of the cached reads
-stats_data::measurement_summary<unsigned> stats_data::get_cached_reads_summary() const
-{
-    return measurement_summary<unsigned>(m_file_stats_data_list,
-                                         [](const file_stats_data& fsd) { return fsd.get_cached_reads(); });
-}
-
-//! Retruns the sum of all cached writes.
-//! \return the sum of all cached writes
-unsigned stats_data::get_cached_writes() const
-{
-    return fetch_sum<unsigned>([](const file_stats_data& fsd) { return fsd.get_cached_writes(); });
-}
-
-//! Returns sum, min, max, avarage and median of all cached writes
-//! \return a summary of the cached writes
-stats_data::measurement_summary<unsigned> stats_data::get_cached_writes_summary() const
-{
-    return measurement_summary<unsigned>(m_file_stats_data_list,
-                                         [](const file_stats_data& fsd) { return fsd.get_cached_writes(); });
-}
-
-//! Returns number of bytes read from cache.
-//! \return number of bytes read from cache
-external_size_type stats_data::get_cached_read_volume() const
-{
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_cached_read_volume(); });
-}
-
-//! Returns sum, min, max, avarage and median of all bytes read from cache.
-//! \return a summary of the bytes read from cache
-stats_data::measurement_summary<external_size_type> stats_data::get_cached_read_volume_summary() const
-{
-    return measurement_summary<external_size_type>(m_file_stats_data_list,
-                                                   [](const file_stats_data& fsd) { return fsd.get_cached_read_volume(); });
-}
-
-//! Returns number of bytes written to the cache.
-//! \return number of bytes written to the cache
-external_size_type stats_data::get_cached_written_volume() const
-{
-    return fetch_sum<external_size_type>([](const file_stats_data& fsd) { return fsd.get_cached_written_volume(); });
-}
-
-//! Returns sum, min, max, avarage and median of all cached written volumes
-//! \return a summary of the cached written volumes
-stats_data::measurement_summary<external_size_type> stats_data::get_cached_written_volume_summary() const
-{
-    return measurement_summary<external_size_type>(m_file_stats_data_list,
-                                                   [](const file_stats_data& fsd) { return fsd.get_cached_written_volume(); });
-}
-
-//! Time that would be spent in read syscalls if all parallel reads were serialized.
-//! \return seconds spent in reading
 double stats_data::get_read_time() const
 {
-    return fetch_sum<double>([](const file_stats_data& fsd) { return fsd.get_read_time(); });
+    return fetch_sum<double>(
+        [](const file_stats_data& fsd) { return fsd.get_read_time(); });
 }
 
-//! Returns sum, min, max, avarage and median of all read times
-//! \return a summary of the read times
-stats_data::measurement_summary<double> stats_data::get_read_time_summary() const
+stats_data::summary<double> stats_data::get_read_time_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [](const file_stats_data& fsd) { return fsd.get_read_time(); });
+    return summary<double>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) { return fsd.get_read_time(); });
 }
 
-//! Time that would be spent in write syscalls if all parallel writes were serialized.
-//! \return the sum of the write times of all files
 double stats_data::get_write_time() const
 {
-    return fetch_sum<double>([](const file_stats_data& fsd) { return fsd.get_write_time(); });
+    return fetch_sum<double>(
+        [](const file_stats_data& fsd) { return fsd.get_write_time(); });
 }
 
-//! Returns sum, min, max, avarage and median of all write times
-//! \return a summary of the write times
-stats_data::measurement_summary<double> stats_data::get_write_time_summary() const
+stats_data::summary<double> stats_data::get_write_time_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [](const file_stats_data& fsd) { return fsd.get_write_time(); });
+    return summary<double>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) { return fsd.get_write_time(); });
 }
 
-//! Period of time when at least one I/O thread was executing a read.
-//! \return seconds spent in reading
 double stats_data::get_pread_time() const
 {
-    return p_reads;
+    return p_reads_;
 }
 
-//! Period of time when at least one I/O thread was executing a write.
-//! \return seconds spent in writing
 double stats_data::get_pwrite_time() const
 {
-    return p_writes;
+    return p_writes_;
 }
 
-//! Period of time when at least one I/O thread was executing a read or a write.
-//! \return seconds spent in I/O
 double stats_data::get_pio_time() const
 {
-    return p_ios;
+    return p_ios_;
 }
 
-stats_data::measurement_summary<double> stats_data::get_read_speed_summary() const
+stats_data::summary<double> stats_data::get_read_speed_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [](const file_stats_data& fsd) { return (double)fsd.get_read_volume() / fsd.get_read_time(); });
+    return summary<double>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) {
+            return (double)fsd.get_read_bytes() / fsd.get_read_time();
+        });
 }
 
-stats_data::measurement_summary<double> stats_data::get_pread_speed_summary() const
+stats_data::summary<double> stats_data::get_pread_speed_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [this](const file_stats_data& fsd) { return (double)fsd.get_read_volume() / p_reads; });
+    return summary<double>(
+        file_stats_data_list_,
+        [this](const file_stats_data& fsd) {
+            return (double)fsd.get_read_bytes() / p_reads_;
+        });
 }
 
-stats_data::measurement_summary<double> stats_data::get_write_speed_summary() const
+stats_data::summary<double> stats_data::get_write_speed_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [](const file_stats_data& fsd) { return (double)fsd.get_written_volume() / fsd.get_write_time(); });
+    return summary<double>(
+        file_stats_data_list_,
+        [](const file_stats_data& fsd) {
+            return (double)fsd.get_write_bytes() / fsd.get_write_time();
+        });
 }
 
-stats_data::measurement_summary<double> stats_data::get_pwrite_speed_summary() const
+stats_data::summary<double> stats_data::get_pwrite_speed_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [this](const file_stats_data& fsd) { return (double)fsd.get_written_volume() / p_writes; });
+    return summary<double>(
+        file_stats_data_list_,
+        [this](const file_stats_data& fsd) {
+            return (double)fsd.get_write_bytes() / p_writes_;
+        });
 }
 
-stats_data::measurement_summary<double> stats_data::get_pio_speed_summary() const
+stats_data::summary<double> stats_data::get_pio_speed_summary() const
 {
-    return measurement_summary<double>(m_file_stats_data_list,
-                                       [this](const file_stats_data& fsd) { return (double)(fsd.get_read_volume() + fsd.get_written_volume()) / p_ios; });
+    return summary<double>(
+        file_stats_data_list_,
+        [this](const file_stats_data& fsd) {
+            return (double)(fsd.get_read_bytes() + fsd.get_write_bytes()) / p_ios_;
+        });
 }
 
-//! I/O wait time counter.
-//! \return number of seconds spent in I/O waiting functions
 double stats_data::get_io_wait_time() const
 {
     return t_wait;
@@ -513,15 +617,16 @@ double stats_data::get_io_wait_time() const
 
 double stats_data::get_wait_read_time() const
 {
-    return t_wait_read;
+    return t_wait_read_;
 }
 
 double stats_data::get_wait_write_time() const
 {
-    return t_wait_write;
+    return t_wait_write_;
 }
 
-std::string format_with_SI_IEC_unit_multiplier(uint64_t number, const char* unit, int multiplier)
+std::string format_with_SI_IEC_unit_multiplier(
+    uint64_t number, const char* unit, int multiplier)
 {
     // may not overflow, std::numeric_limits<uint64_t>::max() == 16 EB
     static const char* endings[] = { "", "k", "M", "G", "T", "P", "E" };
@@ -548,11 +653,19 @@ std::string format_with_SI_IEC_unit_multiplier(uint64_t number, const char* unit
 std::ostream& operator << (std::ostream& o, const stats_data& s)
 {
 #define hr add_IEC_binary_multiplier
-#define one_mib 1048576.0
+
+    static const double one_mib = 1048576.0;
+
     o << "STXXL I/O statistics" << std::endl;
-#if STXXL_IO_STATS
-    auto read_bytes_summary = s.get_read_volume_summary();
-    auto written_bytes_summary = s.get_written_volume_summary();
+
+    size_t nf = s.num_files();
+    if (nf != 1) {
+        o << " number of disks/files                      : "
+          << nf << std::endl;
+    }
+
+    auto read_bytes_summary = s.get_read_bytes_summary();
+    auto write_bytes_summary = s.get_write_bytes_summary();
 
     auto read_speed_summary = s.get_read_speed_summary();
     auto pread_speed_summary = s.get_pread_speed_summary();
@@ -560,71 +673,80 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
     auto pwrite_speed_summary = s.get_pwrite_speed_summary();
     auto pio_speed_summary = s.get_pio_speed_summary();
 
-    o << " total number of reads                      : " << hr(s.get_reads()) << std::endl;
+    o << " total number of reads                      : "
+      << hr(s.get_read_count()) << std::endl;
     o << " average block size (read)                  : "
-      << hr(s.get_reads() ? s.get_read_volume() / s.get_reads() : 0, "B") << std::endl;
-    o << " number of bytes read from disks            : " << hr(s.get_read_volume(), "B") << std::endl;
-    o << " time spent in serving all read requests    : " << s.get_read_time() << " s"
-      << " @ " << ((double)s.get_read_volume() / one_mib / s.get_read_time()) << " MiB/s"
-      << " (min: " << read_speed_summary.min / one_mib << " MiB/s, "
-      << "max: " << read_speed_summary.max / one_mib << " MiB/s)"
+      << hr(s.get_read_count() ? s.get_read_bytes() / s.get_read_count() : 0, "B")
       << std::endl;
-    o << " time spent in reading (parallel read time) : " << s.get_pread_time() << " s"
-      << " @ " << ((double)s.get_read_volume() / one_mib / s.get_pread_time()) << " MiB/s"
-      << std::endl;
-    o << "  reading speed per file                    : "
-      << "min: " << pread_speed_summary.min / one_mib << " MiB/s, "
-      << "med: " << pread_speed_summary.med / one_mib << " MiB/s, "
-      << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
-      << std::endl;
-    if (s.get_cached_reads()) {
-        o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
-        o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
-        o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
+    o << " number of bytes read from disks            : "
+      << hr(s.get_read_bytes(), "B") << std::endl;
+    o << " time spent in serving all read requests    : "
+      << s.get_read_time() << " s"
+      << " @ " << ((double)s.get_read_bytes() / one_mib / s.get_read_time()) << " MiB/s";
+    if (nf > 1) {
+        o << " (min: " << read_speed_summary.min / one_mib << " MiB/s, "
+          << "max: " << read_speed_summary.max / one_mib << " MiB/s)";
     }
-    if (s.get_cached_writes()) {
-        o << " total number of cached writes              : " << hr(s.get_cached_writes()) << std::endl;
-        o << " average block size (cached write)          : " << hr(s.get_cached_written_volume() / s.get_cached_writes(), "B") << std::endl;
-        o << " number of bytes written to cache           : " << hr(s.get_cached_written_volume(), "B") << std::endl;
+    o << std::endl;
+    o << " time spent in reading (parallel read time) : "
+      << s.get_pread_time() << " s"
+      << " @ " << ((double)s.get_read_bytes() / one_mib / s.get_pread_time()) << " MiB/s"
+      << std::endl;
+    if (nf > 1) {
+        o << "  reading speed per file                    : "
+          << "min: " << pread_speed_summary.min / one_mib << " MiB/s, "
+          << "median: " << pread_speed_summary.median / one_mib << " MiB/s, "
+          << "max: " << pread_speed_summary.max / one_mib << " MiB/s"
+          << std::endl;
     }
-    o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
+    o << " total number of writes                     : "
+      << hr(s.get_write_count()) << std::endl;
     o << " average block size (write)                 : "
-      << hr(s.get_writes() ? s.get_written_volume() / s.get_writes() : 0, "B") << std::endl;
-    o << " number of bytes written to disks           : " << hr(s.get_written_volume(), "B") << std::endl;
-    o << " time spent in serving all write requests   : " << s.get_write_time() << " s"
-      << " @ " << ((double)s.get_written_volume() / one_mib / s.get_write_time()) << " MiB/s"
-      << "(min: " << write_speed_summary.min / one_mib << " MiB/s, "
-      << "max: " << write_speed_summary.max / one_mib << " MiB/s)"
-      << std::endl;
+      << hr(s.get_write_count() ? s.get_write_bytes() / s.get_write_count() : 0, "B") << std::endl;
+    o << " number of bytes written to disks           : "
+      << hr(s.get_write_bytes(), "B") << std::endl;
+    o << " time spent in serving all write requests   : "
+      << s.get_write_time() << " s"
+      << " @ " << ((double)s.get_write_bytes() / one_mib / s.get_write_time()) << " MiB/s";
+    if (nf > 1) {
+        o << " (min: " << write_speed_summary.min / one_mib << " MiB/s, "
+          << "max: " << write_speed_summary.max / one_mib << " MiB/s)";
+    }
+    o << std::endl;
 
     o << " time spent in writing (parallel write time): " << s.get_pwrite_time() << " s"
-      << " @ " << ((double)s.get_written_volume() / one_mib / s.get_pwrite_time()) << " MiB/s"
+      << " @ " << ((double)s.get_write_bytes() / one_mib / s.get_pwrite_time()) << " MiB/s"
       << std::endl;
-    o << "   parallel write speed per file            : "
-      << "min: " << pwrite_speed_summary.min / one_mib << " MiB/s, "
-      << "med: " << pwrite_speed_summary.med / one_mib << " MiB/s, "
-      << "max: " << pwrite_speed_summary.max / one_mib << " MiB/s"
-      << std::endl;
+    if (nf > 1) {
+        o << "   parallel write speed per file            : "
+          << "min: " << pwrite_speed_summary.min / one_mib << " MiB/s, "
+          << "median: " << pwrite_speed_summary.median / one_mib << " MiB/s, "
+          << "max: " << pwrite_speed_summary.max / one_mib << " MiB/s"
+          << std::endl;
+    }
 
     o << " time spent in I/O (parallel I/O time)      : " << s.get_pio_time() << " s"
-      << " @ " << ((double)(s.get_read_volume() + s.get_written_volume()) / one_mib / s.get_pio_time()) << " MiB/s"
+      << " @ " << ((double)(s.get_read_bytes() + s.get_write_bytes()) / one_mib / s.get_pio_time()) << " MiB/s"
       << std::endl;
-    o << "   parallel I/O speed per file              : "
-      << "min: " << pio_speed_summary.min / one_mib << " MiB/s, "
-      << "med: " << pio_speed_summary.med / one_mib << " MiB/s, "
-      << "max: " << pio_speed_summary.max / one_mib << " MiB/s"
-      << std::endl;
-#else
-    o << " n/a" << std::endl;
-#endif
+    if (nf > 1) {
+        o << "   parallel I/O speed per file              : "
+          << "min: " << pio_speed_summary.min / one_mib << " MiB/s, "
+          << "median: " << pio_speed_summary.median / one_mib << " MiB/s, "
+          << "max: " << pio_speed_summary.max / one_mib << " MiB/s"
+          << std::endl;
+    }
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-    o << " I/O wait time                              : " << s.get_io_wait_time() << " s" << std::endl;
+    o << " I/O wait time                              : "
+      << s.get_io_wait_time() << " s" << std::endl;
     if (s.get_wait_read_time() != 0.0)
-        o << " I/O wait4read time                         : " << s.get_wait_read_time() << " s" << std::endl;
+        o << " I/O wait4read time                         : "
+          << s.get_wait_read_time() << " s" << std::endl;
     if (s.get_wait_write_time() != 0.0)
-        o << " I/O wait4write time                        : " << s.get_wait_write_time() << " s" << std::endl;
+        o << " I/O wait4write time                        : "
+          << s.get_wait_write_time() << " s" << std::endl;
 #endif
-    o << " Time since the last reset                  : " << s.get_elapsed_time() << " s" << std::endl;
+    o << " Time since the last reset                  : "
+      << s.get_elapsed_time() << " s" << std::endl;
     // WARNINGS add useful warnings here
     if (pio_speed_summary.min / pio_speed_summary.max < 0.5 ||
         pread_speed_summary.min / pread_speed_summary.max < 0.5 ||
@@ -651,7 +773,7 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
         o << std::endl;
     }
     if ((double)read_bytes_summary.min / read_bytes_summary.max < 0.5 ||
-        (double)written_bytes_summary.min / written_bytes_summary.max < 0.5)
+        (double)write_bytes_summary.min / write_bytes_summary.max < 0.5)
     {
         o << "Warning: Bad load balancing." << std::endl
           << " Smallest read load on disk  "
@@ -663,12 +785,12 @@ std::ostream& operator << (std::ostream& o, const stats_data& s)
           << " @ " << hr(read_bytes_summary.values_per_device.back().first, "B")
           << std::endl
           << " Smallest write load on disk "
-          << written_bytes_summary.values_per_device.front().second
-          << " @ " << hr(written_bytes_summary.values_per_device.front().first, "B")
+          << write_bytes_summary.values_per_device.front().second
+          << " @ " << hr(write_bytes_summary.values_per_device.front().first, "B")
           << std::endl
           << " Biggest write load on disk  "
-          << written_bytes_summary.values_per_device.back().second
-          << " @ " << hr(written_bytes_summary.values_per_device.back().first, "B")
+          << write_bytes_summary.values_per_device.back().second
+          << " @ " << hr(write_bytes_summary.values_per_device.back().first, "B")
           << std::endl;
     }
     return o;
