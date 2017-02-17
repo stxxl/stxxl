@@ -14,12 +14,10 @@
 
 set(LIBSTXXL_SOURCES
 
-  common/cmdline.cpp
   common/exithandler.cpp
   common/log.cpp
   common/rand.cpp
   common/seed.cpp
-  common/utils.cpp
   common/verbose.cpp
   common/version.cpp
 

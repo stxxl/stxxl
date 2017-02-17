@@ -487,12 +487,13 @@ mark_as_advanced( CMAKE_CXX_FLAGS_RELWITHASSERT CMAKE_C_FLAGS_RELWITHASSERT CMAK
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "RelWithDebInfo" "MinSizeRel" "RelWithAssert")
 
 # globally adds top-level include directories
-set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
+set(STXXL_INCLUDE_DIRS
+  ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/ ${FOXXLL_INCLUDE_DIRS})
 include_directories(${STXXL_INCLUDE_DIRS})
 
 # for targets using stxxl library
 set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-set(STXXL_LIBRARIES stxxl ${STXXL_EXTRA_LIBRARIES})
+set(STXXL_LIBRARIES stxxl foxxll ${STXXL_EXTRA_LIBRARIES})
 
 # export STXXL_INCLUDE_DIRS and STXXL_LIBRARIES to global CACHE
 set(STXXL_CXX_FLAGS "${STXXL_CXX_FLAGS}" CACHE STRING "Compiler flags for STXXL")
