@@ -13,7 +13,5 @@
 add_subdirectory(algo)
 add_subdirectory(common)
 add_subdirectory(containers)
-add_subdirectory(io)
-add_subdirectory(mng)
 add_subdirectory(parallel)
 add_subdirectory(stream)

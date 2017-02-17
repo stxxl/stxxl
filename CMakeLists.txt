@@ -487,17 +487,24 @@ mark_as_advanced( CMAKE_CXX_FLAGS_RELWITHASSERT CMAKE_C_FLAGS_RELWITHASSERT CMAK
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "RelWithDebInfo" "MinSizeRel" "RelWithAssert")
 
 # globally adds top-level include directories
-set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
+set(STXXL_INCLUDE_DIRS
+  ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
 include_directories(${STXXL_INCLUDE_DIRS})
 
 # for targets using stxxl library
 set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-set(STXXL_LIBRARIES stxxl ${STXXL_EXTRA_LIBRARIES})
+set(STXXL_LIBRARIES stxxl foxxll ${STXXL_EXTRA_LIBRARIES})
 
 # export STXXL_INCLUDE_DIRS and STXXL_LIBRARIES to global CACHE
 set(STXXL_CXX_FLAGS "${STXXL_CXX_FLAGS}" CACHE STRING "Compiler flags for STXXL")
 set(STXXL_INCLUDE_DIRS "${STXXL_INCLUDE_DIRS}" CACHE STRING "Include paths for STXXL")
 set(STXXL_LIBRARIES "${STXXL_LIBRARIES}" CACHE STRING "Libraries to link for STXXL")
+
+###############################################################################
+# build foxxll and libstxxl
+
+# build foxxll library as extlib
+add_subdirectory(extlib/foxxll)
 
 # build libstxxl in /lib
 add_subdirectory(lib)

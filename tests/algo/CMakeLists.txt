@@ -10,7 +10,6 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
-stxxl_build_test(test_asch)
 stxxl_build_test(test_bad_cmp)
 stxxl_build_test(test_ksort)
 stxxl_build_test(test_random_shuffle)
@@ -23,7 +22,6 @@ add_define(test_ksort "STXXL_VERBOSE_LEVEL=1" "STXXL_CHECK_ORDER_IN_SORTS")
 add_define(test_random_shuffle "STXXL_VERBOSE_LEVEL=0")
 add_define(test_sort "STXXL_VERBOSE_LEVEL=0")
 
-stxxl_test(test_asch 3 100 1000 42)
 stxxl_test(test_bad_cmp 16)
 stxxl_test(test_ksort)
 stxxl_test(test_random_shuffle)

@@ -1,0 +1,3 @@
+[submodule "extlib/foxxll"]
+	path = extlib/foxxll
+	url = https://github.com/foxxll/foxxll.git

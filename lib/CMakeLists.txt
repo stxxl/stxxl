@@ -14,56 +14,13 @@
 
 set(LIBSTXXL_SOURCES
 
-  common/cmdline.cpp
-  common/exithandler.cpp
   common/log.cpp
   common/rand.cpp
   common/seed.cpp
-  common/utils.cpp
   common/verbose.cpp
   common/version.cpp
 
-  io/create_file.cpp
-  io/disk_queued_file.cpp
-  io/file.cpp
-  io/fileperblock_file.cpp
-  io/iostats.cpp
-  io/memory_file.cpp
-  io/request.cpp
-  io/request_queue_impl_1q.cpp
-  io/request_queue_impl_qwqr.cpp
-  io/request_queue_impl_worker.cpp
-  io/request_with_state.cpp
-  io/request_with_waiters.cpp
-  io/serving_request.cpp
-  io/syscall_file.cpp
-  io/ufs_file_base.cpp
-  io/wfs_file_base.cpp
-  io/wincall_file.cpp
-
-  mng/block_manager.cpp
-  mng/config.cpp
-  mng/disk_block_allocator.cpp
-
-  algo/async_schedule.cpp
-
   )
-
-if(NOT MSVC)
-  # additional sources for non Visual Studio builds
-  set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
-    io/mmap_file.cpp
-    )
-endif(NOT MSVC)
-
-if(STXXL_HAVE_LINUXAIO_FILE)
-  # additional sources fo LinuxAIO fileio access method
-  set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
-    io/linuxaio_file.cpp
-    io/linuxaio_queue.cpp
-    io/linuxaio_request.cpp
-    )
-endif()
 
 if(USE_MALLOC_COUNT)
   # enable light-weight heap profiling tool malloc_count
@@ -89,6 +46,7 @@ if(BUILD_SHARED_LIBS)
 
   # build stxxl SHARED library and link all programs again it
   add_library(stxxl SHARED ${LIBSTXXL_SOURCES})
+  target_link_libraries(stxxl foxxll)
   set_target_properties(stxxl PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")
   set_target_properties(stxxl PROPERTIES VERSION "${STXXL_VERSION_STRING}")
   install(TARGETS stxxl
@@ -99,6 +57,7 @@ if(BUILD_SHARED_LIBS)
   if(BUILD_STATIC_LIBS)
     # but also build STATIC library
     add_library(stxxl_static STATIC ${LIBSTXXL_SOURCES})
+    target_link_libraries(stxxl_static foxxll)
     set_target_properties(stxxl_static PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")
     set_target_properties(stxxl_static PROPERTIES VERSION "${STXXL_VERSION_STRING}")
     install(TARGETS stxxl_static
@@ -117,6 +76,7 @@ else()
 
   # build stxxl STATIC library and link all programs again it
   add_library(stxxl STATIC ${LIBSTXXL_SOURCES})
+  target_link_libraries(stxxl foxxll)
   set_target_properties(stxxl PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")
   set_target_properties(stxxl PROPERTIES VERSION "${STXXL_VERSION_STRING}")
   install(TARGETS stxxl
