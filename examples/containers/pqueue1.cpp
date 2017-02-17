@@ -27,8 +27,8 @@ struct ComparatorGreater
 
 int main()
 {
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
-    typedef pqueue_type::block_type block_type;
+    using pqueue_type = stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result;
+    using block_type = pqueue_type::block_type;
 
     // block_type::raw_size = 262144 bytes
     // use 64 block read and write pools each to enable overlapping between I/O and computation

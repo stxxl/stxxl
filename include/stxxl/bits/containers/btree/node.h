@@ -30,48 +30,48 @@ template <class KeyType, class KeyCmp, unsigned RawSize, class BTreeType>
 class normal_node
 {
 public:
-    typedef normal_node<KeyType, KeyCmp, RawSize, BTreeType> self_type;
+    using self_type = normal_node<KeyType, KeyCmp, RawSize, BTreeType>;
 
     friend class node_cache<self_type, BTreeType>;
 
-    typedef KeyType key_type;
-    typedef KeyCmp key_compare;
+    using key_type = KeyType;
+    using key_compare = KeyCmp;
 
     enum {
         raw_size = RawSize
     };
-    typedef BID<raw_size> bid_type;
-    typedef bid_type node_bid_type;
-    typedef self_type node_type;
-    typedef std::pair<key_type, bid_type> value_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
+    using bid_type = BID<raw_size>;
+    using node_bid_type = bid_type;
+    using node_type = self_type;
+    using value_type = std::pair<key_type, bid_type>;
+    using reference = value_type &;
+    using const_reference = const value_type &;
 
     struct metainfo_type
     {
         bid_type me;
         unsigned cur_size;
     };
-    typedef typed_block<raw_size, value_type, 0, metainfo_type> block_type;
+    using block_type = typed_block<raw_size, value_type, 0, metainfo_type>;
 
     enum {
         nelements = block_type::size - 1,
         max_size = nelements,
         min_size = nelements / 2
     };
-    typedef typename block_type::iterator block_iterator;
-    typedef typename block_type::const_iterator block_const_iterator;
+    using block_iterator = typename block_type::iterator;
+    using block_const_iterator = typename block_type::const_iterator;
 
-    typedef BTreeType btree_type;
-    typedef typename btree_type::size_type size_type;
-    typedef typename btree_type::iterator iterator;
-    typedef typename btree_type::const_iterator const_iterator;
+    using btree_type = BTreeType;
+    using size_type = typename btree_type::size_type;
+    using iterator = typename btree_type::iterator;
+    using const_iterator = typename btree_type::const_iterator;
 
-    typedef typename btree_type::value_type btree_value_type;
-    typedef typename btree_type::leaf_bid_type leaf_bid_type;
-    typedef typename btree_type::leaf_type leaf_type;
+    using btree_value_type = typename btree_type::value_type;
+    using leaf_bid_type = typename btree_type::leaf_bid_type;
+    using leaf_type = typename btree_type::leaf_type;
 
-    typedef node_cache<normal_node, btree_type> node_cache_type;
+    using node_cache_type = node_cache<normal_node, btree_type>;
 
 private:
     struct value_compare : public std::binary_function<value_type, value_type, bool>
@@ -143,8 +143,8 @@ private:
     template <class CacheType>
     void fuse_or_balance(block_iterator UIt, CacheType& cache)
     {
-        typedef typename CacheType::node_type local_node_type;
-        typedef typename local_node_type::bid_type local_bid_type;
+        using local_node_type = typename CacheType::node_type;
+        using local_bid_type = typename local_node_type::bid_type;
 
         block_iterator leftIt, rightIt;
         if (UIt == (m_block->begin() + size() - 1))                      // UIt is the last entry in the root

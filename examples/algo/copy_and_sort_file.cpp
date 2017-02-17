@@ -25,7 +25,7 @@
 
 struct my_type
 {
-    typedef unsigned key_type;
+    using key_type = unsigned;
 
     key_type m_key;
     char m_data[128 - sizeof(key_type)];
@@ -55,9 +55,9 @@ inline bool operator == (const my_type& a, const my_type& b)
 
 struct Cmp
 {
-    typedef my_type first_argument_type;
-    typedef my_type second_argument_type;
-    typedef bool result_type;
+    using first_argument_type = my_type;
+    using second_argument_type = my_type;
+    using result_type = bool;
     bool operator () (const my_type& a, const my_type& b) const
     {
         return a < b;
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     const size_t memory_to_use = 512 * 1024 * 1024;
     const size_t block_size = sizeof(my_type) * 4096;
 
-    typedef stxxl::vector<my_type, 1, stxxl::lru_pager<2>, block_size> vector_type;
+    using vector_type = stxxl::vector<my_type, 1, stxxl::lru_pager<2>, block_size>;
 
     stxxl::file_ptr in_file = stxxl::make_counting<stxxl::syscall_file>(
         argv[1], stxxl::file::DIRECT | stxxl::file::RDONLY);
@@ -99,11 +99,11 @@ int main(int argc, char** argv)
     vector_type output(out_file);
     output.resize(input.size());
 
-    typedef stxxl::stream::streamify_traits<vector_type::iterator>::stream_type input_stream_type;
+    using input_stream_type = stxxl::stream::streamify_traits<vector_type::iterator>::stream_type;
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
-    typedef Cmp comparator_type;
-    typedef stxxl::stream::sort<input_stream_type, comparator_type, block_size> sort_stream_type;
+    using comparator_type = Cmp;
+    using sort_stream_type = stxxl::stream::sort<input_stream_type, comparator_type, block_size>;
     sort_stream_type sort_stream(input_stream, comparator_type(), memory_to_use);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());

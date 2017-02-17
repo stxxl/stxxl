@@ -37,14 +37,14 @@ template <class NodeType, class BTreeType>
 class node_cache
 {
 public:
-    typedef BTreeType btree_type;
-    typedef NodeType node_type;
-    typedef typename node_type::block_type block_type;
-    typedef typename node_type::bid_type bid_type;
-    typedef typename btree_type::key_compare key_compare;
+    using btree_type = BTreeType;
+    using node_type = NodeType;
+    using block_type = typename node_type::block_type;
+    using bid_type = typename node_type::bid_type;
+    using key_compare = typename btree_type::key_compare;
 
-    typedef typename btree_type::alloc_strategy_type alloc_strategy_type;
-    typedef stxxl::lru_pager<> pager_type;
+    using alloc_strategy_type = typename btree_type::alloc_strategy_type;
+    using pager_type = stxxl::lru_pager<>;
 
 private:
     btree_type* m_btree;
@@ -76,7 +76,7 @@ private:
     std::vector<bool> m_fixed;
     std::vector<bool> m_dirty;
     std::vector<size_t> m_free_nodes;
-    typedef std::unordered_map<bid_type, size_t, bid_hash> bid2node_type;
+    using bid2node_type = std::unordered_map<bid_type, size_t, bid_hash>;
 
     bid2node_type m_bid2node;
     pager_type m_pager;

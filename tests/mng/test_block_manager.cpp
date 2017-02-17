@@ -38,7 +38,7 @@ struct my_handler
     }
 };
 
-typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
+using block_type = stxxl::typed_block<BLOCK_SIZE, MyType>;
 
 int main()
 {

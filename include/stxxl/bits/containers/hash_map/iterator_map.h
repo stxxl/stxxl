@@ -29,19 +29,19 @@ template <class HashMap>
 class iterator_map
 {
 public:
-    typedef HashMap hash_map_type;
-    typedef typename hash_map_type::node_type node_type;
-    typedef typename hash_map_type::source_type source_type;
-    typedef typename hash_map_type::key_type key_type;
+    using hash_map_type = HashMap;
+    using node_type = typename hash_map_type::node_type;
+    using source_type = typename hash_map_type::source_type;
+    using key_type = typename hash_map_type::key_type;
 
-    typedef typename hash_map_type::internal_size_type internal_size_type;
-    typedef typename hash_map_type::external_size_type external_size_type;
+    using internal_size_type = typename hash_map_type::internal_size_type;
+    using external_size_type = typename hash_map_type::external_size_type;
 
-    typedef hash_map_iterator_base<hash_map_type> iterator_base;
+    using iterator_base = hash_map_iterator_base<hash_map_type>;
 
 private:
 #if 0
-    typedef std::multimap<internal_size_type, iterator_base*> multimap_type;
+    using multimap_type = std::multimap<internal_size_type, iterator_base*>;
 #else
     struct hasher
     {
@@ -62,14 +62,14 @@ private:
 #endif
     };
     // store iterators by bucket-index
-    typedef typename std::unordered_multimap<
-            internal_size_type, iterator_base*, hasher> multimap_type;
+    using multimap_type = typename std::unordered_multimap<
+              internal_size_type, iterator_base*, hasher>;
 #endif
 
     //! bucket-index and pointer to iterator_base
-    typedef typename multimap_type::value_type pair_type;
-    typedef typename multimap_type::iterator mmiterator_type;
-    typedef typename multimap_type::const_iterator const_mmiterator_type;
+    using pair_type = typename multimap_type::value_type;
+    using mmiterator_type = typename multimap_type::iterator;
+    using const_mmiterator_type = typename multimap_type::const_iterator;
 
     hash_map_type* map_;
     multimap_type it_map_;

@@ -33,13 +33,13 @@ const size_t mega = 1024 * 1024;
 #define RECORD_SIZE 16
 #define LOAD 0
 
-typedef uint64_t my_key_type;
+using my_key_type = uint64_t;
 
 #define MAGIC 123
 
 struct my_type
 {
-    typedef my_key_type key_type;
+    using key_type = my_key_type;
 
     key_type key;
 #if LOAD
@@ -82,9 +82,9 @@ std::ostream& operator << (std::ostream& o, const my_type& obj)
 
 struct my_cmp /*: public std::binary_function<my_type, my_type, bool>*/ // greater
 {
-    typedef my_type first_argument_type;
-    typedef my_type second_argument_type;
-    typedef bool result_type;
+    using first_argument_type = my_type;
+    using second_argument_type = my_type;
+    using result_type = bool;
 
     bool operator () (const my_type& a, const my_type& b) const
     {
@@ -188,19 +188,19 @@ int main(int argc, char* argv[])
     const unsigned BlockSize = (4 * mega);
     const unsigned ExtKMAX = 8;                    // maximal arity for external mergers
     const unsigned ExtLevels = 2;                  // number of external levels
-    typedef stxxl::priority_queue<
-            stxxl::priority_queue_config<
-                my_type,
-                my_cmp,
-                BufferSize1,
-                N,
-                IntKMAX,
-                IntLevels,
-                BlockSize,
-                ExtKMAX,
-                ExtLevels
-                >
-            > pq_type;
+    using pq_type = stxxl::priority_queue<
+              stxxl::priority_queue_config<
+                  my_type,
+                  my_cmp,
+                  BufferSize1,
+                  N,
+                  IntKMAX,
+                  IntLevels,
+                  BlockSize,
+                  ExtKMAX,
+                  ExtLevels
+                  >
+              >;
 #elif MANUAL_PQ
     stxxl::STXXL_UNUSED(mem_for_queue);
     const unsigned BufferSize1 = 32;                    // equalize procedure call overheads etc.
@@ -210,23 +210,23 @@ int main(int argc, char* argv[])
     const unsigned BlockSize = (4 * mega);
     const unsigned ExtKMAX = 32;                        // maximal arity for external mergers
     const unsigned ExtLevels = 2;                       // number of external levels
-    typedef stxxl::priority_queue<
-            stxxl::priority_queue_config<
-                my_type,
-                my_cmp,
-                BufferSize1,
-                N,
-                IntKMAX,
-                IntLevels,
-                BlockSize,
-                ExtKMAX,
-                ExtLevels
-                >
-            > pq_type;
+    using pq_type = stxxl::priority_queue<
+              stxxl::priority_queue_config<
+                  my_type,
+                  my_cmp,
+                  BufferSize1,
+                  N,
+                  IntKMAX,
+                  IntLevels,
+                  BlockSize,
+                  ExtKMAX,
+                  ExtLevels
+                  >
+              >;
 #else
     const uint64_t volume = uint64_t(200000) * mega;     // in bytes
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1> gen;
-    typedef gen::result pq_type;
+    using gen = stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1>;
+    using pq_type = gen::result;
 //         BufferSize1 = Config::BufferSize1,
 //         N = Config::N,
 //         IntKMAX = Config::IntKMAX,

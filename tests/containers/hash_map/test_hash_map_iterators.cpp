@@ -51,7 +51,7 @@ struct cmp : public std::less<int>
 ////////////////////////////////////////////////////////////////////////////////
 void cmp_with_internal_map()
 {
-    typedef std::pair<int, int> value_type;
+    using value_type = std::pair<int, int>;
     const size_t value_size = sizeof(value_type);
 
     const size_t n_values = 6000;
@@ -63,12 +63,11 @@ void cmp_with_internal_map()
 
     const size_t subblock_raw_size = 4 * 1024;
     const size_t block_size = 4;
+    using hash_map = stxxl::hash_map::hash_map<int, int, hash_int, cmp,
+                                               subblock_raw_size, block_size>;
+    using const_iterator = hash_map::const_iterator;
 
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
-                                      subblock_raw_size, block_size> hash_map;
-    typedef hash_map::const_iterator const_iterator;
-
-    typedef std::unordered_map<int, int> int_hash_map;
+    using int_hash_map = std::unordered_map<int, int>;
 
     stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 
@@ -138,7 +137,7 @@ void cmp_with_internal_map()
 ////////////////////////////////////////////////////////////////////////////////
 void basic_iterator_test()
 {
-    typedef std::pair<int, int> value_type;
+    using value_type = std::pair<int, int>;
     const size_t value_size = sizeof(value_type);
 
     const size_t n_values = 2000;
@@ -151,11 +150,10 @@ void basic_iterator_test()
 
     const size_t subblock_raw_size = 4 * 1024;
     const size_t block_size = 4;
-
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
-                                      subblock_raw_size, block_size> hash_map;
-    typedef hash_map::iterator iterator;
-    typedef hash_map::const_iterator const_iterator;
+    using hash_map = stxxl::hash_map::hash_map<int, int, hash_int, cmp,
+                                               subblock_raw_size, block_size>;
+    using iterator = hash_map::iterator;
+    using const_iterator = hash_map::const_iterator;
 
     stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 
@@ -304,7 +302,7 @@ void basic_iterator_test()
 ////////////////////////////////////////////////////////////////////////////////
 void more_iterator_test()
 {
-    typedef std::pair<int, int> value_type;
+    using value_type = std::pair<int, int>;
     const size_t value_size = sizeof(value_type);
 
     const size_t n_values = 6000;
@@ -315,10 +313,9 @@ void more_iterator_test()
 
     const size_t subblock_raw_size = 4 * 1024;
     const size_t block_size = 4;
-
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp,
-                                      subblock_raw_size, block_size> hash_map;
-    typedef hash_map::const_iterator const_iterator;
+    using hash_map = stxxl::hash_map::hash_map<int, int, hash_int, cmp,
+                                               subblock_raw_size, block_size>;
+    using const_iterator = hash_map::const_iterator;
 
     stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
 

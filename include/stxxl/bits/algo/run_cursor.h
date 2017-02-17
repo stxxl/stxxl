@@ -56,10 +56,10 @@ struct run_cursor2 : public run_cursor<BlockType>
                      , public have_prefetcher<>
 #endif
 {
-    typedef BlockType block_type;
-    typedef PrefetcherType prefetcher_type;
-    typedef run_cursor2<block_type, prefetcher_type> _Self;
-    typedef typename block_type::value_type value_type;
+    using block_type = BlockType;
+    using prefetcher_type = PrefetcherType;
+    using _Self = run_cursor2<block_type, prefetcher_type>;
+    using value_type = typename block_type::value_type;
 
     using run_cursor<block_type>::pos;
     using run_cursor<block_type>::buffer;
@@ -113,7 +113,7 @@ void* have_prefetcher<MustBeVoid>::untyped_prefetcher = nullptr;
 template <typename block_type>
 struct run_cursor_cmp
 {
-    typedef run_cursor<block_type> cursor_type;
+    using cursor_type = run_cursor<block_type>;
 
     inline bool operator () (const cursor_type& a, const cursor_type& b)        // greater or equal
     {

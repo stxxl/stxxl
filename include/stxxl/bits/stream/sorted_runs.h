@@ -37,16 +37,16 @@ namespace stream {
 template <typename TriggerEntryType, typename CompareType>
 struct sorted_runs : public reference_count
 {
-    typedef TriggerEntryType trigger_entry_type;
-    typedef typename trigger_entry_type::block_type block_type;
+    using trigger_entry_type = TriggerEntryType;
+    using block_type = typename trigger_entry_type::block_type;
     //! may differ from trigger_entry_type::value_type
-    typedef typename block_type::value_type value_type;
-    typedef std::vector<trigger_entry_type> run_type;
-    typedef std::vector<value_type> small_run_type;
-    typedef stxxl::external_size_type size_type;
-    typedef typename std::vector<run_type>::size_type run_index_type;
+    using value_type = typename block_type::value_type;
+    using run_type = std::vector<trigger_entry_type>;
+    using small_run_type = std::vector<value_type>;
+    using size_type = stxxl::external_size_type;
+    using run_index_type = typename std::vector<run_type>::size_type;
 
-    typedef CompareType cmp_type;
+    using cmp_type = CompareType;
 
     //! total number of elements in all runs
     size_type elements;

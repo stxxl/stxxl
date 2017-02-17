@@ -129,9 +129,9 @@ void print_usage(const char* program)
 //! [prolog]
 
 #ifdef USE_STXXL
-typedef stxxl::vector<LogEntry> vector_type;
+using vector_type = stxxl::vector<LogEntry>;
 #else
-typedef std::vector<LogEntry> vector_type;
+using vector_type = std::vector<LogEntry>;
 #endif
 
 int main(int argc, char* argv[])

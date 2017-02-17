@@ -31,7 +31,7 @@ template <typename T, typename alloc_strategy_type, unsigned block_size>
 void test(uint64_t data_mem, size_t memory_to_use)
 {
     uint64_t records_to_sort = data_mem / sizeof(T);
-    typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
+    using vector_type = stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type>;
     vector_type v(records_to_sort);
 
     size_t ndisks = stxxl::config::get_instance()->disks_number();
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 
-    typedef my_type<unsigned, RECORD_SIZE> my_default_type;
+    using my_default_type = my_type<unsigned, RECORD_SIZE>;
 
     switch (block_size_switch)
     {

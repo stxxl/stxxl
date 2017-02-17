@@ -382,7 +382,7 @@ protected:
 
 protected:
     //! option and parameter list type
-    typedef std::vector<argument*> arglist_type;
+    using arglist_type = std::vector<argument*>;
 
     //! list of options available
     arglist_type m_optlist;

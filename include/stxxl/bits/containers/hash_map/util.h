@@ -98,14 +98,14 @@ template <class CacheType, class BidIterator>
 class buffered_reader
 {
 public:
-    typedef CacheType cache_type;
-    typedef BidIterator bid_iterator;
+    using cache_type = CacheType;
+    using bid_iterator = BidIterator;
 
-    typedef typename cache_type::block_type block_type;
-    typedef typename block_type::value_type subblock_type;
-    typedef typename subblock_type::value_type value_type;
+    using block_type = typename cache_type::block_type;
+    using subblock_type = typename block_type::value_type;
+    using value_type = typename subblock_type::value_type;
 
-    typedef typename bid_iterator::value_type bid_type;
+    using bid_type = typename bid_iterator::value_type;
 
     enum { block_size = block_type::size, subblock_size = subblock_type::size };
 
@@ -310,13 +310,13 @@ template <class BlockType, class BidContainer>
 class buffered_writer
 {
 public:
-    typedef BlockType block_type;
-    typedef BidContainer bid_container_type;
+    using block_type = BlockType;
+    using bid_container_type = BidContainer;
 
-    typedef typename block_type::value_type subblock_type;
-    typedef typename subblock_type::value_type value_type;
+    using subblock_type = typename block_type::value_type;
+    using value_type = typename subblock_type::value_type;
 
-    typedef stxxl::buffered_writer<block_type> writer_type;
+    using writer_type = stxxl::buffered_writer<block_type>;
 
     enum {
         block_size = block_type::size,
@@ -450,13 +450,13 @@ public:
 template <class HashMap>
 struct HashedValue
 {
-    typedef HashMap hash_map_type;
-    typedef typename hash_map_type::value_type value_type;
-    typedef typename hash_map_type::source_type source_type;
-    typedef typename hash_map_type::node_type node_type;
+    using hash_map_type = HashMap;
+    using value_type = typename hash_map_type::value_type;
+    using source_type = typename hash_map_type::source_type;
+    using node_type = typename hash_map_type::node_type;
 
-    typedef typename hash_map_type::internal_size_type internal_size_type;
-    typedef typename hash_map_type::external_size_type external_size_type;
+    using internal_size_type = typename hash_map_type::internal_size_type;
+    using external_size_type = typename hash_map_type::external_size_type;
 
     value_type value_;
     internal_size_type i_bucket_;
@@ -488,15 +488,15 @@ struct HashedValue
 template <class HashMap, class Reader>
 struct HashedValuesStream
 {
-    typedef HashMap hash_map_type;
-    typedef HashedValue<HashMap> value_type;
+    using hash_map_type = HashMap;
+    using value_type = HashedValue<HashMap>;
 
-    typedef typename hash_map_type::node_type node_type;
-    typedef typename hash_map_type::bid_container_type::iterator bid_iterator;
-    typedef typename hash_map_type::buckets_container_type::iterator bucket_iterator;
+    using node_type = typename hash_map_type::node_type;
+    using bid_iterator = typename hash_map_type::bid_container_type::iterator;
+    using bucket_iterator = typename hash_map_type::buckets_container_type::iterator;
 
-    typedef typename hash_map_type::internal_size_type internal_size_type;
-    typedef typename hash_map_type::external_size_type external_size_type;
+    using internal_size_type = typename hash_map_type::internal_size_type;
+    using external_size_type = typename hash_map_type::external_size_type;
 
     hash_map_type& map_;
     Reader& reader_;

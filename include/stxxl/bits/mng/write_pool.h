@@ -34,8 +34,8 @@ template <class BlockType>
 class write_pool
 {
 public:
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
 
     // a hack to make wait_any work with busy_entry type
     struct busy_entry
@@ -51,8 +51,8 @@ public:
 
         operator request_ptr () { return req; }
     };
-    typedef typename std::list<block_type*>::iterator free_blocks_iterator;
-    typedef typename std::list<busy_entry>::iterator busy_blocks_iterator;
+    using free_blocks_iterator = typename std::list<block_type*>::iterator;
+    using busy_blocks_iterator = typename std::list<busy_entry>::iterator;
 
 protected:
     // contains free write blocks

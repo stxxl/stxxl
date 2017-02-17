@@ -48,8 +48,8 @@ protected:
     static const size_t raw_block_size = BlockSize * sizeof(ValueType);
 
 public:
-    typedef typed_block<raw_block_size, ValueType> internal_block_type;
-    typedef typename internal_block_type::bid_type external_block_type;
+    using internal_block_type = typed_block<raw_block_size, ValueType>;
+    using external_block_type = typename internal_block_type::bid_type;
 
 protected:
     external_block_type external_data;      //!external_data.valid if no associated space on disk
@@ -263,12 +263,12 @@ protected:
     // This constant limits the number of internal_blocks allocated at once.
     static const int_type max_internal_blocks_alloc_at_once;
 
-    typedef int_type time_type;
+    using time_type = int_type;
 
 public:
-    typedef typename SwappableBlockType::internal_block_type internal_block_type;
-    typedef typename SwappableBlockType::external_block_type external_block_type;
-    typedef typename std::vector<SwappableBlockType>::size_type swappable_block_identifier_type;
+    using internal_block_type = typename SwappableBlockType::internal_block_type;
+    using external_block_type = typename SwappableBlockType::external_block_type;
+    using swappable_block_identifier_type = typename std::vector<SwappableBlockType>::size_type;
 
     /*/! Mode the block scheduler currently works in
     enum mode
@@ -303,7 +303,7 @@ public:
             : op(op), id(id), time(time) { }
     };
 
-    typedef std::list<prediction_sequence_element> prediction_sequence_type;
+    using prediction_sequence_type = std::list<prediction_sequence_element>;
     // ---- end prediction_sequence -------
 
 protected:
@@ -535,12 +535,12 @@ template <class SwappableBlockType>
 class block_scheduler_algorithm
 {
 protected:
-    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename block_scheduler_type::external_block_type external_block_type;
-    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef typename block_scheduler_type::prediction_sequence_type prediction_sequence_type;
-    typedef typename block_scheduler_type::time_type time_type;
+    using block_scheduler_type = block_scheduler<SwappableBlockType>;
+    using internal_block_type = typename block_scheduler_type::internal_block_type;
+    using external_block_type = typename block_scheduler_type::external_block_type;
+    using swappable_block_identifier_type = typename block_scheduler_type::swappable_block_identifier_type;
+    using prediction_sequence_type = typename block_scheduler_type::prediction_sequence_type;
+    using time_type = typename block_scheduler_type::time_type;
 
 public:
     block_scheduler_type& bs;
@@ -604,11 +604,11 @@ template <class SwappableBlockType>
 class block_scheduler_algorithm_online_lru : public block_scheduler_algorithm<SwappableBlockType>
 {
 protected:
-    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
-    typedef block_scheduler_algorithm<SwappableBlockType> block_scheduler_algorithm_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename block_scheduler_type::external_block_type external_block_type;
-    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
+    using block_scheduler_type = block_scheduler<SwappableBlockType>;
+    using block_scheduler_algorithm_type = block_scheduler_algorithm<SwappableBlockType>;
+    using internal_block_type = typename block_scheduler_type::internal_block_type;
+    using external_block_type = typename block_scheduler_type::external_block_type;
+    using swappable_block_identifier_type = typename block_scheduler_type::swappable_block_identifier_type;
 
     using block_scheduler_algorithm_type::bs;
     using block_scheduler_algorithm_type::swappable_blocks;
@@ -751,13 +751,13 @@ template <class SwappableBlockType>
 class block_scheduler_algorithm_simulation : public block_scheduler_algorithm<SwappableBlockType>
 {
 protected:
-    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
-    typedef block_scheduler_algorithm<SwappableBlockType> block_scheduler_algorithm_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename block_scheduler_type::external_block_type external_block_type;
-    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef typename block_scheduler_type::prediction_sequence_element prediction_sequence_element_type;
-    typedef typename block_scheduler_algorithm_type::time_type time_type;
+    using block_scheduler_type = block_scheduler<SwappableBlockType>;
+    using block_scheduler_algorithm_type = block_scheduler_algorithm<SwappableBlockType>;
+    using internal_block_type = typename block_scheduler_type::internal_block_type;
+    using external_block_type = typename block_scheduler_type::external_block_type;
+    using swappable_block_identifier_type = typename block_scheduler_type::swappable_block_identifier_type;
+    using prediction_sequence_element_type = typename block_scheduler_type::prediction_sequence_element;
+    using time_type = typename block_scheduler_algorithm_type::time_type;
 
     using block_scheduler_algorithm_type::bs;
     using block_scheduler_algorithm_type::prediction_sequence;
@@ -893,13 +893,13 @@ template <class SwappableBlockType>
 class block_scheduler_algorithm_offline_lfd : public block_scheduler_algorithm<SwappableBlockType>
 {
 protected:
-    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
-    typedef block_scheduler_algorithm<SwappableBlockType> block_scheduler_algorithm_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename block_scheduler_type::external_block_type external_block_type;
-    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef typename block_scheduler_algorithm_type::time_type time_type;
-    typedef typename block_scheduler_type::prediction_sequence_type prediction_sequence_type;
+    using block_scheduler_type = block_scheduler<SwappableBlockType>;
+    using block_scheduler_algorithm_type = block_scheduler_algorithm<SwappableBlockType>;
+    using internal_block_type = typename block_scheduler_type::internal_block_type;
+    using external_block_type = typename block_scheduler_type::external_block_type;
+    using swappable_block_identifier_type = typename block_scheduler_type::swappable_block_identifier_type;
+    using time_type = typename block_scheduler_algorithm_type::time_type;
+    using prediction_sequence_type = typename block_scheduler_type::prediction_sequence_type;
 
     using block_scheduler_algorithm_type::bs;
     using block_scheduler_algorithm_type::swappable_blocks;
@@ -1137,22 +1137,22 @@ protected:
     struct scheduled_block_meta;
     struct write_read_request;
 
-    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
-    typedef block_scheduler_algorithm<SwappableBlockType> block_scheduler_algorithm_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename block_scheduler_type::external_block_type external_block_type;
-    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef typename block_scheduler_algorithm_type::time_type time_type;
-    typedef typename block_scheduler_type::prediction_sequence_type prediction_sequence_type;
-    typedef typename block_scheduler_type::block_scheduler_operation block_scheduler_operation;
-    typedef typename std::vector<SwappableBlockType>::iterator swappable_blocks_iterator;
+    using block_scheduler_type = block_scheduler<SwappableBlockType>;
+    using block_scheduler_algorithm_type = block_scheduler_algorithm<SwappableBlockType>;
+    using internal_block_type = typename block_scheduler_type::internal_block_type;
+    using external_block_type = typename block_scheduler_type::external_block_type;
+    using swappable_block_identifier_type = typename block_scheduler_type::swappable_block_identifier_type;
+    using time_type = typename block_scheduler_algorithm_type::time_type;
+    using prediction_sequence_type = typename block_scheduler_type::prediction_sequence_type;
+    using block_scheduler_operation = typename block_scheduler_type::block_scheduler_operation;
+    using swappable_blocks_iterator = typename std::vector<SwappableBlockType>::iterator;
 
-    typedef std::map<swappable_block_identifier_type, scheduled_block_meta> scheduled_blocks_type;
-    typedef typename scheduled_blocks_type::iterator scheduled_blocks_iterator;
-    typedef typename scheduled_blocks_type::reference scheduled_blocks_reference;
-    typedef std::map<swappable_block_identifier_type, write_read_request*> write_scheduled_blocks_type;
-    typedef typename write_scheduled_blocks_type::iterator write_scheduled_blocks_iterator;
-    typedef typename write_scheduled_blocks_type::reference write_scheduled_blocks_reference;
+    using scheduled_blocks_type = std::map<swappable_block_identifier_type, scheduled_block_meta>;
+    using scheduled_blocks_iterator = typename scheduled_blocks_type::iterator;
+    using scheduled_blocks_reference = typename scheduled_blocks_type::reference;
+    using write_scheduled_blocks_type = std::map<swappable_block_identifier_type, write_read_request*>;
+    using write_scheduled_blocks_iterator = typename write_scheduled_blocks_type::iterator;
+    using write_scheduled_blocks_reference = typename write_scheduled_blocks_type::reference;
 
     using block_scheduler_algorithm_type::bs;
     using block_scheduler_algorithm_type::swappable_blocks;

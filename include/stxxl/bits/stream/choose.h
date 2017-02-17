@@ -37,11 +37,11 @@ class choose<Input, 1>
 {
     Input& in;
 
-    typedef typename Input::value_type tuple_type;
+    using tuple_type = typename Input::value_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename tuple_type::first_type value_type;
+    using value_type = typename tuple_type::first_type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
@@ -82,11 +82,11 @@ class choose<Input, 2>
 {
     Input& in;
 
-    typedef typename Input::value_type tuple_type;
+    using tuple_type = typename Input::value_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename tuple_type::second_type value_type;
+    using value_type = typename tuple_type::second_type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
@@ -127,11 +127,11 @@ class choose<Input, 3>
 {
     Input& in;
 
-    typedef typename Input::value_type tuple_type;
+    using tuple_type = typename Input::value_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename tuple_type::third_type value_type;
+    using value_type = typename tuple_type::third_type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
@@ -172,11 +172,11 @@ class choose<Input, 4>
 {
     Input& in;
 
-    typedef typename Input::value_type tuple_type;
+    using tuple_type = typename Input::value_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename tuple_type::fourth_type value_type;
+    using value_type = typename tuple_type::fourth_type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
@@ -217,11 +217,11 @@ class choose<Input, 5>
 {
     Input& in;
 
-    typedef typename Input::value_type tuple_type;
+    using tuple_type = typename Input::value_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename tuple_type::fifth_type value_type;
+    using value_type = typename tuple_type::fifth_type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
@@ -262,11 +262,11 @@ class choose<Input, 6>
 {
     Input& in;
 
-    typedef typename Input::value_type tuple_type;
+    using tuple_type = typename Input::value_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename tuple_type::sixth_type value_type;
+    using value_type = typename tuple_type::sixth_type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)

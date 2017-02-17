@@ -43,7 +43,7 @@ namespace mng_local {
 template <size_t Bytes>
 class filler_struct
 {
-    typedef unsigned char byte_type;
+    using byte_type = unsigned char;
     byte_type filler_array[Bytes];
 
 public:
@@ -53,7 +53,7 @@ public:
 template <>
 class filler_struct<0>
 {
-    typedef unsigned char byte_type;
+    using byte_type = unsigned char;
 
 public:
     filler_struct() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct<> is constructed"); }
@@ -64,13 +64,13 @@ template <typename Type, size_t Size>
 class element_block
 {
 public:
-    typedef Type type;
-    typedef Type value_type;
-    typedef Type& reference;
-    typedef const Type& const_reference;
-    typedef type* pointer;
-    typedef pointer iterator;
-    typedef const type* const_iterator;
+    using type = Type;
+    using value_type = Type;
+    using reference = Type &;
+    using const_reference = const Type &;
+    using pointer = type *;
+    using iterator = pointer;
+    using const_iterator = const type *;
 
     static constexpr size_t size = Size; //!< number of elements in the block
 
@@ -130,7 +130,7 @@ public:
     static constexpr size_t raw_size = RawSize;
     static constexpr size_t kNBIDs = NBids;
 
-    typedef BID<raw_size> bid_type;
+    using bid_type = BID<raw_size>;
 
     //! Array of BID references
     bid_type ref[kNBIDs];
@@ -152,7 +152,7 @@ public:
     static constexpr size_t raw_size = RawSize;
     static constexpr size_t kNBIDs = 0;
 
-    typedef BID<raw_size> bid_type;
+    using bid_type = BID<raw_size>;
 
     block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_bids<> is constructed"); }
 };
@@ -164,7 +164,7 @@ class block_w_info
 {
 public:
     //! Type of per block information element.
-    typedef MetaInfoType info_type;
+    using info_type = MetaInfoType;
 
     //! Per block information element.
     info_type info;
@@ -177,7 +177,7 @@ class block_w_info<Type, RawSize, NBids, void>
     : public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids) / sizeof(Type)), RawSize, NBids>
 {
 public:
-    typedef void info_type;
+    using info_type = void;
 
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_info<> is constructed"); }
 };
@@ -228,22 +228,22 @@ template <size_t RawSize, typename Type, size_t NRef = 0, typename MetaInfoType 
 class typed_block
     : public mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>
 {
-    typedef mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize> Base;
+    using Base = mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>;
 
 public:
-    typedef Type value_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef value_type* pointer;
-    typedef pointer iterator;
-    typedef const value_type* const_pointer;
-    typedef const_pointer const_iterator;
+    using value_type = Type;
+    using reference = value_type &;
+    using const_reference = const value_type &;
+    using pointer = value_type *;
+    using iterator = pointer;
+    using const_pointer = const value_type *;
+    using const_iterator = const_pointer;
 
     static constexpr size_t raw_size = RawSize;                                      //!< size of block in bytes
     static constexpr size_t size = Base::size;                                       //!< number of elements in block
     static constexpr bool has_only_data = (raw_size == (size * sizeof(value_type))); //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
 
-    typedef BID<raw_size> bid_type;
+    using bid_type = BID<raw_size>;
 
     typed_block()
     {

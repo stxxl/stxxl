@@ -25,7 +25,7 @@ Before using a STXXL queue, we initially have to define and then to instantiate 
 The default configuration initializes a write_pool and a prefetch_pool of size 1.
 
 \code
-typedef stxxl::queue<int> queue;
+using queue = stxxl::queue<int>;
 // create queue object with default parameters:
 // write_pool size = ?, prefetch_pool size = 1, blocks2prefetch = number of blocks in the prefetch pool (i.e. 1)
 queue my_queue;

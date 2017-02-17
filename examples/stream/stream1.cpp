@@ -22,7 +22,7 @@
 struct counter_object
 {
     // This stream produces a sequence of integers.
-    typedef int value_type;
+    using value_type = int;
 
 private:
     // A class attribute to save the current value.
@@ -58,7 +58,7 @@ template <typename InputStream>
 struct squaring_object
 {
     // This stream produces a sequence of integers.
-    typedef int value_type;
+    using value_type = int;
 
 private:
     // A reference to another stream of integers, which are our input.
@@ -160,7 +160,7 @@ int main()
         // (fill intvector)
 
         // define stream class iterating over an integer vector
-        typedef stxxl::stream::iterator2stream<std::vector<int>::const_iterator> intstream_type;
+        using intstream_type = stxxl::stream::iterator2stream<std::vector<int>::const_iterator>;
 
         // instantiate the stream object, iterate from begin to end of intvector.
         intstream_type intstream(intvector.begin(), intvector.end());
@@ -174,7 +174,7 @@ int main()
         // (fill intvector)
 
         // define stream class iterating over an integer vector
-        typedef stxxl::stream::vector_iterator2stream<stxxl::vector<int>::const_iterator> intstream_type;
+        using intstream_type = stxxl::stream::vector_iterator2stream<stxxl::vector<int>::const_iterator>;
 
         // instantiate the stream object, iterate from begin to end of intvector.
         intstream_type intstream(intvector.begin(), intvector.end());
@@ -213,7 +213,7 @@ int main()
         counter_object counter;                      // the counter stream from first examples
 
         // define a runs sorter for the counter stream which order by CompareMod10 object.
-        typedef stxxl::stream::runs_creator<counter_object, CompareMod10> rc_counter_type;
+        using rc_counter_type = stxxl::stream::runs_creator<counter_object, CompareMod10>;
 
         // instance of CompareMod10 comparator class
         CompareMod10 comparemod10;
@@ -222,7 +222,7 @@ int main()
         rc_counter_type rc_counter(counter, comparemod10, ram_use);
 
         // define a runs merger for the sorted runs from rc_counter.
-        typedef stxxl::stream::runs_merger<rc_counter_type::sorted_runs_type, CompareMod10> rm_counter_type;
+        using rm_counter_type = stxxl::stream::runs_merger<rc_counter_type::sorted_runs_type, CompareMod10>;
 
         // instance of runs_merger which merges sorted runs from rc_counter.
         rm_counter_type rm_counter(rc_counter.result(), comparemod10, ram_use);
@@ -240,7 +240,7 @@ int main()
         static const int ram_use = 10 * 1024 * 1024;   // amount of memory to use in runs creation
 
         // define a runs sorter which accepts imperative push()s and orders by CompareMod10 object.
-        typedef stxxl::stream::runs_creator<stxxl::stream::use_push<int>, CompareMod10> rc_counter_type;
+        using rc_counter_type = stxxl::stream::runs_creator<stxxl::stream::use_push<int>, CompareMod10>;
 
         // instance of CompareMod10 comparator class.
         CompareMod10 comparemod10;
@@ -253,7 +253,7 @@ int main()
             rc_counter.push(i);
 
         // define a runs merger for the sorted runs from rc_counter.
-        typedef stxxl::stream::runs_merger<rc_counter_type::sorted_runs_type, CompareMod10> rm_counter_type;
+        using rm_counter_type = stxxl::stream::runs_merger<rc_counter_type::sorted_runs_type, CompareMod10>;
 
         // instance of runs_merger which merges sorted runs from rc_counter.
         rm_counter_type rm_counter(rc_counter.result(), comparemod10, ram_use);
@@ -271,7 +271,7 @@ int main()
         static const int ram_use = 10 * 1024 * 1024;   // amount of memory to use in runs creation
 
         // define a runs sorter which accepts imperative push()s and orders by CompareMod10 object.
-        typedef stxxl::sorter<int, CompareMod10> sr_counter_type;
+        using sr_counter_type = stxxl::sorter<int, CompareMod10>;
 
         // instance of CompareMod10 comparator class.
         CompareMod10 comparemod10;

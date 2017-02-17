@@ -77,11 +77,10 @@ struct comp_type : std::binary_function<my_record, my_record, bool>
         return my_record(std::numeric_limits<int>::max(), 0);
     }
 };
+using pq_type = stxxl::PRIORITY_QUEUE_GENERATOR<my_record, comp_type,
+                                                PQ_MEM_SIZE, MAX_ELEMENTS / (1024 / 8)>::result;
 
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_record, comp_type,
-                                        PQ_MEM_SIZE, MAX_ELEMENTS / (1024 / 8)>::result pq_type;
-
-typedef pq_type::block_type block_type;
+using block_type = pq_type::block_type;
 
 #define    BLOCK_SIZE block_type::raw_size
 

@@ -31,7 +31,7 @@ struct my_handler
     }
 };
 
-typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
+using block_type = stxxl::typed_block<BLOCK_SIZE, MyType>;
 
 void testIO()
 {
@@ -77,7 +77,7 @@ void testIO()
 
 void testIO2()
 {
-    typedef stxxl::typed_block<128* 1024, double> block_type;
+    using block_type = stxxl::typed_block<128* 1024, double>;
     std::vector<block_type::bid_type> bids(32);
     std::vector<stxxl::request_ptr> requests;
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();
@@ -121,9 +121,9 @@ void testWritePool()
     pool.write(blk, bid);
 }
 
-typedef stxxl::typed_block<BLOCK_SIZE, int> block_type1;
-typedef stxxl::buf_ostream<block_type1, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
-typedef stxxl::buf_istream<block_type1, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
+using block_type1 = stxxl::typed_block<BLOCK_SIZE, int>;
+using buf_ostream_type = stxxl::buf_ostream<block_type1, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
+using buf_istream_type = stxxl::buf_istream<block_type1, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
 
 void testStreams()
 {

@@ -50,7 +50,7 @@ struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
     }
 };
 
-typedef std::pair<int_type, int_type> write_time_pair;
+using write_time_pair = std::pair<int_type, int_type>;
 struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
 {
     inline bool operator () (const write_time_pair& a, const write_time_pair& b) const
@@ -75,8 +75,8 @@ int_type simulate_async_write(
     const int_type D,
     std::pair<int_type, int_type>* o_time)
 {
-    typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
-    typedef std::queue<int_type> disk_queue_type;
+    using event_queue_type = std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp>;
+    using disk_queue_type = std::queue<int_type>;
     assert(L >= D);
     simple_vector<disk_queue_type> disk_queues(D + 1); // + sentinel for remapping NO_ALLOCATOR
     event_queue_type event_queue;
@@ -170,7 +170,7 @@ void compute_prefetch_schedule(
     int_type m,
     int_type D)
 {
-    typedef std::pair<int_type, int_type> pair_type;
+    using pair_type = std::pair<int_type, int_type>;
     int_type L = last - first;
     if (L <= D)
     {

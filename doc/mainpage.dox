@@ -127,7 +127,7 @@ The following list of authors have contributed to STXXL:
 
    struct stream_algorithm // stream, pipe, whatever
    {
-     typedef some_type value_type;
+     using value_type = some_type;
 
      const value_type & operator * () const; // return current element of the stream
      stream_algorithm & operator ++ ();      // go to next element. precondition: empty() == false

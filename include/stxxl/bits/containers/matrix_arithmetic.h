@@ -131,7 +131,7 @@ namespace matrix_local {
 template <typename ValueType, unsigned Level>
 struct static_quadtree
 {
-    typedef static_quadtree<ValueType, Level - 1> smaller_static_quadtree;
+    using smaller_static_quadtree =  static_quadtree<ValueType, Level - 1> ;
 
     smaller_static_quadtree ul, ur, dl, dr;
 
@@ -223,17 +223,17 @@ template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AEx
 struct feedable_strassen_winograd
 {
     typedef static_quadtree<bool, Level> zbt;     // true <=> is a zero-block
-    typedef static_quadtree<ValueType, Level> vt;
+    using vt =  static_quadtree<ValueType, Level> ;
 
-    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, AExists, BExists> smaller_feedable_strassen_winograd_ab;
-    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, AExists, false> smaller_feedable_strassen_winograd_a;
-    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, false, BExists> smaller_feedable_strassen_winograd_b;
-    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, false, false> smaller_feedable_strassen_winograd_n;
+    using smaller_feedable_strassen_winograd_ab =  feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, AExists, BExists> ;
+    using smaller_feedable_strassen_winograd_a =  feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, AExists, false> ;
+    using smaller_feedable_strassen_winograd_b =  feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, false, BExists> ;
+    using smaller_feedable_strassen_winograd_n =  feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, false, false> ;
 
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
 
     const size_type n, m, l;
     smaller_feedable_strassen_winograd_ab p1, p2;
@@ -446,12 +446,12 @@ template <typename ValueType, unsigned BlockSideLength, bool AExists, bool BExis
 struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExists>
 {
     typedef static_quadtree<bool, 0> zbt;     // true <=> is a zero-block
-    typedef static_quadtree<ValueType, 0> vt;
+    using vt =  static_quadtree<ValueType, 0> ;
 
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
 
     swappable_block_matrix_type a, b, c;
     const size_type n, m, l;
@@ -560,14 +560,14 @@ template <typename ValueType, unsigned BlockSideLength, unsigned Level>
 struct matrix_to_quadtree
 {
     typedef static_quadtree<bool, Level> zbt;     // true <=> is a zero-block
-    typedef static_quadtree<ValueType, Level> vt;
+    using vt =  static_quadtree<ValueType, Level> ;
 
-    typedef matrix_to_quadtree<ValueType, BlockSideLength, Level - 1> smaller_matrix_to_quadtree;
+    using smaller_matrix_to_quadtree =  matrix_to_quadtree<ValueType, BlockSideLength, Level - 1> ;
 
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
 
     smaller_matrix_to_quadtree ul, ur, dl, dr;
 
@@ -659,12 +659,12 @@ template <typename ValueType, unsigned BlockSideLength>
 struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
 {
     typedef static_quadtree<bool, 0> zbt;     // true <=> is a zero-block
-    typedef static_quadtree<ValueType, 0> vt;
+    using vt =  static_quadtree<ValueType, 0> ;
 
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
 
     swappable_block_matrix_type m;
     internal_block_type* iblock;
@@ -721,18 +721,18 @@ template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AEx
 struct feedable_strassen_winograd_block_grained
 {
     typedef static_quadtree<bool, Level> zbt;     // true <=> is a zero-block
-    typedef static_quadtree<ValueType, Level> vt;
+    using vt =  static_quadtree<ValueType, Level> ;
 
-    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, AExists, BExists> smaller_feedable_strassen_winograd_ab;
-    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, AExists, false> smaller_feedable_strassen_winograd_a;
-    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, false, BExists> smaller_feedable_strassen_winograd_b;
-    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, false, false> smaller_feedable_strassen_winograd_n;
+    using smaller_feedable_strassen_winograd_ab =  feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, AExists, BExists> ;
+    using smaller_feedable_strassen_winograd_a =  feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, AExists, false> ;
+    using smaller_feedable_strassen_winograd_b =  feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, false, BExists> ;
+    using smaller_feedable_strassen_winograd_n =  feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, false, false> ;
 
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
+    using Ops =  matrix_operations<ValueType, BlockSideLength> ;
 
     const size_type n, m, l;
     smaller_feedable_strassen_winograd_ab p1, p2;
@@ -868,13 +868,13 @@ struct feedable_strassen_winograd_block_grained
 template <typename ValueType, unsigned BlockSideLength, bool AExists, bool BExists>
 struct feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, 0, AExists, BExists>
 {
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using swappable_block_identifier_type =  typename swappable_block_matrix_type::swappable_block_identifier_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
+    using Ops =  matrix_operations<ValueType, BlockSideLength> ;
 
-    typedef static_quadtree<swappable_block_identifier_type, 0> bt;
+    using bt =  static_quadtree<swappable_block_identifier_type, 0> ;
 
     swappable_block_matrix_type a, b, c;
 
@@ -952,10 +952,10 @@ struct feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, 0, A
 template <typename ValueType, unsigned BlockSideLength, unsigned Level, unsigned Granularity>
 struct matrix_to_quadtree_block_grained
 {
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
 
-    typedef matrix_to_quadtree_block_grained<ValueType, BlockSideLength, Level - 1, Granularity> smaller_matrix_to_quadtree_block_grained;
+    using smaller_matrix_to_quadtree_block_grained =  matrix_to_quadtree_block_grained<ValueType, BlockSideLength, Level - 1, Granularity> ;
 
     smaller_matrix_to_quadtree_block_grained ul, ur, dl, dr;
 
@@ -989,8 +989,8 @@ struct matrix_to_quadtree_block_grained
 template <typename ValueType, unsigned BlockSideLength, unsigned Granularity>
 struct matrix_to_quadtree_block_grained<ValueType, BlockSideLength, 0, Granularity>
 {
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
 
     swappable_block_matrix_type m;
 
@@ -1022,14 +1022,14 @@ struct matrix_operations
     // you have to adapt choose_level_for_feedable_sw, too
     static const int_type strassen_winograd_base_case_size;
 
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef column_vector<ValueType> column_vector_type;
-    typedef row_vector<ValueType> row_vector_type;
-    typedef typename column_vector_type::size_type vector_size_type;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using swappable_block_identifier_type =  typename swappable_block_matrix_type::swappable_block_identifier_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using size_type =  typename swappable_block_matrix_type::size_type ;
+    using column_vector_type =  column_vector<ValueType> ;
+    using row_vector_type =  row_vector<ValueType> ;
+    using vector_size_type =  typename column_vector_type::size_type ;
 
     // +-+-+-+ addition +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

@@ -22,7 +22,7 @@ In reality, the STXXL sequence container is a STXXL deque container (see \ref de
 ### Create a STXXL sequence
 To create an empty stxxl::sequence object with own write and prefetch block pool, only the data value type must be specified:
 \code
-  typedef stxxl::sequence<int> sequence_type;
+  using sequence_type = stxxl::sequence<int>;
   sequence_type my_sequence;
 \endcode
 

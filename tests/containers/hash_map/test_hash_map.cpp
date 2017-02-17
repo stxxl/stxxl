@@ -99,7 +99,7 @@ template class stxxl::unordered_map<
 
 void basic_test()
 {
-    typedef std::pair<int, int> value_type;
+    using value_type = std::pair<int, int>;
     const size_t value_size = sizeof(value_type);
 
     const size_t n_values = 6000;
@@ -112,11 +112,10 @@ void basic_test()
 
     const size_t subblock_raw_size = 4 * 1024;
     const size_t block_size = 4;
-
-    typedef stxxl::unordered_map<int, int, hash_int, cmp,
-                                 subblock_raw_size, block_size> unordered_map;
-    typedef unordered_map::iterator iterator;
-    typedef unordered_map::const_iterator const_iterator;
+    using unordered_map = stxxl::unordered_map<int, int, hash_int, cmp,
+                                               subblock_raw_size, block_size>;
+    using iterator = unordered_map::iterator;
+    using const_iterator = unordered_map::const_iterator;
 
     stxxl::stats_data stats_begin;
 

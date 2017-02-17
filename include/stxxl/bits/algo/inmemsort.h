@@ -27,7 +27,7 @@ namespace stxxl {
 template <typename ExtIterator, typename StrictWeakOrdering>
 void stl_in_memory_sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp)
 {
-    typedef typename ExtIterator::block_type block_type;
+    using block_type = typename ExtIterator::block_type;
 
     STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
     first.flush();

@@ -23,7 +23,7 @@ template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 40
 
 int main(int argc, char* argv[])
 {
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result ext_stack_type;
+    using ext_stack_type = stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result;
 
     if (argc < 2)
     {

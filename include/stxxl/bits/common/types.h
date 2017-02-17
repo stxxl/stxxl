@@ -21,7 +21,7 @@
 
 namespace stxxl {
 
-typedef std::make_signed<size_t>::type int_type;
+using int_type = std::make_signed<size_t>::type;
 
 typedef uint64_t external_size_type;       // may require external memory
 typedef int64_t external_diff_type;        // may require external memory

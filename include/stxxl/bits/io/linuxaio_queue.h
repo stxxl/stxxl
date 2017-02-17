@@ -37,14 +37,14 @@ class linuxaio_queue : public request_queue_impl_worker
 {
     friend class linuxaio_request;
 
-    typedef linuxaio_queue self_type;
+    using self_type = linuxaio_queue;
 
 private:
     //! OS context_
     aio_context_t context_;
 
     //! storing linuxaio_request* would drop ownership
-    typedef std::list<request_ptr> queue_type;
+    using queue_type = std::list<request_ptr>;
 
     // "waiting" request have submitted to this queue, but not yet to the OS,
     // those are "posted"

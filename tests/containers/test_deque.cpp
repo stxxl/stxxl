@@ -111,6 +111,6 @@ int main(int argc, char* argv[])
 
 // forced instantiation
 template class stxxl::deque<int>;
-typedef stxxl::deque<int> deque_type;
+using deque_type = stxxl::deque<int>;
 template class stxxl::deque_iterator<deque_type>;
 template class stxxl::const_deque_iterator<deque_type>;

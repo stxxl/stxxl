@@ -15,7 +15,7 @@
 
 int main()
 {
-    typedef stxxl::deque<unsigned int> deque;
+    using deque = stxxl::deque<unsigned int>;
     deque my_deque;
 
     unsigned int random, p, x;

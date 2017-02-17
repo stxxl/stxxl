@@ -54,8 +54,8 @@ void run_test(external_size_type span, external_size_type worksize, bool do_init
 {
     const size_t raw_block_size = BlockSize;
 
-    typedef stxxl::typed_block<raw_block_size, size_t> block_type;
-    typedef stxxl::BID<raw_block_size> BID_type;
+    using block_type = stxxl::typed_block<raw_block_size, size_t>;
+    using BID_type = stxxl::BID<raw_block_size>;
 
     external_size_type num_blocks = stxxl::div_ceil(worksize, raw_block_size);
     external_size_type num_blocks_in_span = stxxl::div_ceil(span, raw_block_size);

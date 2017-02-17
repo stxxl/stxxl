@@ -28,11 +28,11 @@
 
 const unsigned long long megabyte = 1024 * 1024;
 
-typedef unsigned value_type;
+using value_type = unsigned;
 
 struct Cmp : public std::binary_function<value_type, value_type, bool>
 {
-    typedef unsigned value_type;
+    using value_type = unsigned;
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a < b;
@@ -53,10 +53,10 @@ int main()
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
     // special parameter type
-    typedef stxxl::stream::from_sorted_sequences<value_type> InputType;
-    typedef stxxl::stream::runs_creator<
-            InputType, Cmp, 4096, stxxl::random_cyclic> CreateRunsAlg;
-    typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
+    using InputType = stxxl::stream::from_sorted_sequences<value_type>;
+    using CreateRunsAlg = stxxl::stream::runs_creator<
+              InputType, Cmp, 4096, stxxl::random_cyclic>;
+    using SortedRunsType = CreateRunsAlg::sorted_runs_type;
 
     unsigned input_size = (10 * megabyte / sizeof(value_type));
 

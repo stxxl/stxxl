@@ -28,13 +28,13 @@ namespace stxxl {
 template <bool Flag, class Type1, class Type2>
 struct IF
 {
-    typedef Type1 result;
+    using result = Type1;
 };
 
 template <class Type1, class Type2>
 struct IF<false, Type1, Type2>
 {
-    typedef Type2 result;
+    using result = Type2;
 };
 
 //! If \c Flag is \c true then \c IF<>::result is Num1
@@ -65,14 +65,14 @@ template <int tag_, class Type_, class Next_ = NilCase>
 struct CASE
 {
     enum { tag = tag_ };
-    typedef Type_ Type;
-    typedef Next_ Next;
+    using Type = Type_;
+    using Next = Next_;
 };
 
 template <int tag, class Case>
 class SWITCH
 {
-    typedef typename Case::Next NextCase;
+    using NextCase = typename Case::Next;
     enum
     {
         caseTag = Case::tag,
@@ -80,17 +80,17 @@ class SWITCH
     };
 
 public:
-    typedef typename IF<found,
-                        typename Case::Type,
-                        typename SWITCH<tag, NextCase>::result
-                        >::result result;
+    using result = typename IF<found,
+                               typename Case::Type,
+                               typename SWITCH<tag, NextCase>::result
+                               >::result;
 };
 
 template <int tag>
 class SWITCH<tag, NilCase>
 {
 public:
-    typedef NilCase result;
+    using result = NilCase;
 };
 
 //! \internal, use LOG2 instead

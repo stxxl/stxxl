@@ -19,7 +19,7 @@
 
 struct Input
 {
-    typedef unsigned value_type;
+    using value_type = unsigned;
     value_type value;
     value_type rnd_value;
     stxxl::random_number32 rnd;
@@ -50,7 +50,7 @@ struct Input
 
 struct Cmp : std::binary_function<unsigned, unsigned, bool>
 {
-    typedef unsigned value_type;
+    using value_type = unsigned;
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a < b;
@@ -69,9 +69,9 @@ struct Cmp : std::binary_function<unsigned, unsigned, bool>
 
 int main()
 {
-    typedef stxxl::stream::runs_creator<
-            Input, Cmp, 4096* MULT, stxxl::random_cyclic> CreateRunsAlg;
-    typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
+    using CreateRunsAlg = stxxl::stream::runs_creator<
+              Input, Cmp, 4096* MULT, stxxl::random_cyclic>;
+    using SortedRunsType = CreateRunsAlg::sorted_runs_type;
 
     stxxl::stats* s = stxxl::stats::get_instance();
 

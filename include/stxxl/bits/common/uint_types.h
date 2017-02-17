@@ -52,9 +52,9 @@ class uint_pair
 {
 public:
     //! lower part type, always 32-bit
-    typedef uint32_t low_type;
+    using low_type = uint32_t;
     //! higher part type, currently either 8-bit or 16-bit
-    typedef HighType high_type;
+    using high_type = HighType;
 
 private:
     //! member containing lower significant integer value
@@ -245,10 +245,10 @@ __attribute__ ((packed)); // NOLINT
 //! \{
 
 //! Construct a 40-bit unsigned integer stored in five bytes.
-typedef uint_pair<uint8_t> uint40;
+using uint40 = uint_pair<uint8_t>;
 
 //! Construct a 48-bit unsigned integer stored in six bytes.
-typedef uint_pair<uint16_t> uint48;
+using uint48 = uint_pair<uint16_t>;
 
 //! \}
 

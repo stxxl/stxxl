@@ -44,10 +44,10 @@ namespace stream = stxxl::stream;
 size_t ram_use = 1024 * 1024 * 1024;
 
 // alphabet data type
-typedef unsigned char alphabet_type;
+using alphabet_type = unsigned char;
 
 // calculation data type
-typedef external_size_type size_type;
+using size_type = external_size_type;
 
 /// Suffix Array checker for correctness verification
 
@@ -64,22 +64,22 @@ typedef external_size_type size_type;
 template <typename InputT, typename InputSA>
 bool sacheck(InputT& inputT, InputSA& inputSA)
 {
-    typedef typename InputSA::value_type offset_type;
-    typedef stxxl::tuple<offset_type, offset_type> pair_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type> triple_type;
+    using offset_type = typename InputSA::value_type;
+    using pair_type = stxxl::tuple<offset_type, offset_type>;
+    using triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
 
     // *** Pipeline Declaration ***
 
     // Build tuples with index: (SA[i]) -> (i, SA[i])
-    typedef stxxl::stream::counter<offset_type> index_counter_type;
+    using index_counter_type = stxxl::stream::counter<offset_type>;
     index_counter_type index_counter;
 
-    typedef stream::make_tuple<index_counter_type, InputSA> tuple_index_sa_type;
+    using tuple_index_sa_type = stream::make_tuple<index_counter_type, InputSA>;
     tuple_index_sa_type tuple_index_sa(index_counter, inputSA);
 
     // take (i, SA[i]) and sort to (ISA[i], i)
-    typedef stxxl::tuple_less2nd<pair_type> pair_less_type;
-    typedef typename stream::sort<tuple_index_sa_type, pair_less_type> build_isa_type;
+    using pair_less_type = stxxl::tuple_less2nd<pair_type>;
+    using build_isa_type = typename stream::sort<tuple_index_sa_type, pair_less_type>;
 
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
@@ -87,8 +87,8 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     typedef stxxl::tuple_less1st<triple_type> triple_less_type;      // comparison relation
 
     typedef typename stream::use_push<triple_type> triple_push_type; // indicator use push()
-    typedef typename stream::runs_creator<triple_push_type, triple_less_type> triple_rc_type;
-    typedef typename stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type> triple_rm_type;
+    using triple_rc_type = typename stream::runs_creator<triple_push_type, triple_less_type>;
+    using triple_rm_type = typename stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type>;
 
     triple_rc_type triple_rc(triple_less_type(), ram_use / 3);
 
@@ -206,18 +206,18 @@ class skew
 {
 public:
     // 2-tuple, 3-tuple, 4-tuple (=quads), 5-tuple(=quints) definition
-    typedef stxxl::tuple<offset_type, offset_type> skew_pair_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type> skew_triple_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type> skew_quad_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type> skew_quint_type;
+    using skew_pair_type = stxxl::tuple<offset_type, offset_type>;
+    using skew_triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
+    using skew_quad_type = stxxl::tuple<offset_type, offset_type, offset_type, offset_type>;
+    using skew_quint_type = stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type>;
 
-    typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2> > offset_array_type;
-    typedef stream::vector_iterator2stream<typename offset_array_type::iterator> offset_array_it_rg;
+    using offset_array_type = typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2> >;
+    using offset_array_it_rg = stream::vector_iterator2stream<typename offset_array_type::iterator>;
 
     /** Comparison function for the mod0 tuples. */
     struct less_mod0
     {
-        typedef skew_quint_type value_type;
+        using value_type = skew_quint_type;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -231,13 +231,13 @@ public:
         static value_type max_value() { return value_type::max_value(); }
     };
 
-    typedef stxxl::tuple_less2nd<skew_quad_type> less_mod1;
-    typedef stxxl::tuple_less2nd<skew_quint_type> less_mod2;
+    using less_mod1 = stxxl::tuple_less2nd<skew_quad_type>;
+    using less_mod2 = stxxl::tuple_less2nd<skew_quint_type>;
 
     /** Put the (0 mod 2) [which are the 1,2 mod 3 tuples] tuples at the begin. */
     struct less_skew
     {
-        typedef skew_pair_type value_type;
+        using value_type = skew_pair_type;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -255,7 +255,7 @@ public:
     template <typename alphabet_type>
     struct less_quad
     {
-        typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
+        using value_type = stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -285,9 +285,9 @@ public:
     class naming
     {
     public:
-        typedef typename Input::value_type quad_type;
+        using quad_type = typename Input::value_type;
 
-        typedef skew_pair_type value_type;
+        using value_type = skew_pair_type;
 
     private:
         Input& A;
@@ -350,7 +350,7 @@ public:
     class make_pairs
     {
     public:
-        typedef stxxl::tuple<typename InputA::value_type, offset_type> value_type;
+        using value_type = stxxl::tuple<typename InputA::value_type, offset_type>;
 
     private:
         InputA& A;
@@ -403,7 +403,7 @@ public:
     class make_quads
     {
     public:
-        typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
+        using value_type = stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
 
     private:
         Input& A;
@@ -492,7 +492,7 @@ public:
     class extract_mod12
     {
     public:
-        typedef typename Input::value_type value_type;
+        using value_type = typename Input::value_type;
 
     private:
         Input& A;
@@ -551,7 +551,7 @@ public:
     class merge_sa
     {
     public:
-        typedef offset_type value_type;
+        using value_type = offset_type;
 
     private:
         Mod0& A;
@@ -726,31 +726,31 @@ public:
     class build_sa
     {
     public:
-        typedef offset_type value_type;
+        using value_type = offset_type;
 
         static const unsigned int add_rank = 1;  // free first rank to mark ranks beyond end of input
 
     private:
         // mod1 types
-        typedef typename stream::use_push<skew_quad_type> mod1_push_type;
-        typedef typename stream::runs_creator<mod1_push_type, less_mod1> mod1_runs_type;
-        typedef typename mod1_runs_type::sorted_runs_type sorted_mod1_runs_type;
-        typedef typename stream::runs_merger<sorted_mod1_runs_type, less_mod1> mod1_rm_type;
+        using mod1_push_type = typename stream::use_push<skew_quad_type>;
+        using mod1_runs_type = typename stream::runs_creator<mod1_push_type, less_mod1>;
+        using sorted_mod1_runs_type = typename mod1_runs_type::sorted_runs_type;
+        using mod1_rm_type = typename stream::runs_merger<sorted_mod1_runs_type, less_mod1>;
 
         // mod2 types
-        typedef typename stream::use_push<skew_quint_type> mod2_push_type;
-        typedef typename stream::runs_creator<mod2_push_type, less_mod2> mod2_runs_type;
-        typedef typename mod2_runs_type::sorted_runs_type sorted_mod2_runs_type;
-        typedef typename stream::runs_merger<sorted_mod2_runs_type, less_mod2> mod2_rm_type;
+        using mod2_push_type = typename stream::use_push<skew_quint_type>;
+        using mod2_runs_type = typename stream::runs_creator<mod2_push_type, less_mod2>;
+        using sorted_mod2_runs_type = typename mod2_runs_type::sorted_runs_type;
+        using mod2_rm_type = typename stream::runs_merger<sorted_mod2_runs_type, less_mod2>;
 
         // mod0 types
-        typedef typename stream::use_push<skew_quint_type> mod0_push_type;
-        typedef typename stream::runs_creator<mod0_push_type, less_mod0> mod0_runs_type;
-        typedef typename mod0_runs_type::sorted_runs_type sorted_mod0_runs_type;
-        typedef typename stream::runs_merger<sorted_mod0_runs_type, less_mod0> mod0_rm_type;
+        using mod0_push_type = typename stream::use_push<skew_quint_type>;
+        using mod0_runs_type = typename stream::runs_creator<mod0_push_type, less_mod0>;
+        using sorted_mod0_runs_type = typename mod0_runs_type::sorted_runs_type;
+        using mod0_rm_type = typename stream::runs_merger<sorted_mod0_runs_type, less_mod0>;
 
         // Merge type
-        typedef merge_sa<mod0_rm_type, mod1_rm_type, mod2_rm_type> merge_sa_type;
+        using merge_sa_type = merge_sa<mod0_rm_type, mod1_rm_type, mod2_rm_type>;
 
         // Functions
         less_mod0 c0;
@@ -946,8 +946,8 @@ public:
     class algorithm
     {
     public:
-        typedef offset_type value_type;
-        typedef typename Input::value_type alphabet_type;
+        using value_type = offset_type;
+        using alphabet_type = typename Input::value_type;
 
     protected:
         // finished reading final suffix array
@@ -958,16 +958,16 @@ public:
 
     protected:
         // generate (i) sequence
-        typedef stxxl::stream::counter<offset_type> counter_stream_type;
+        using counter_stream_type = stxxl::stream::counter<offset_type>;
 
         // Sorter
-        typedef stxxl::tuple_less1st<skew_pair_type> mod12cmp;
-        typedef stxxl::sorter<skew_pair_type, mod12cmp> mod12_sorter_type;
+        using mod12cmp = stxxl::tuple_less1st<skew_pair_type>;
+        using mod12_sorter_type = stxxl::sorter<skew_pair_type, mod12cmp>;
 
         // Additional streaming items
-        typedef stream::choose<mod12_sorter_type, 2> isa_second_type;
-        typedef build_sa<offset_array_it_rg, isa_second_type, isa_second_type> buildSA_type;
-        typedef make_pairs<buildSA_type, counter_stream_type> precompute_isa_type;
+        using isa_second_type = stream::choose<mod12_sorter_type, 2>;
+        using buildSA_type = build_sa<offset_array_it_rg, isa_second_type, isa_second_type>;
+        using precompute_isa_type = make_pairs<buildSA_type, counter_stream_type>;
 
         // Real recursive skew3 implementation
         // This part is the core of the skew algorithm and runs all class objects in their respective order
@@ -975,22 +975,22 @@ public:
         buildSA_type * skew3(RecInputType& p_Input)
         {
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
-            typedef make_quads<RecInputType, offset_type, 1> make_quads_input_type;
+            using make_quads_input_type = make_quads<RecInputType, offset_type, 1>;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2}) with i = 1,2 mod 3
-            typedef extract_mod12<make_quads_input_type> mod12_quads_input_type;
+            using mod12_quads_input_type = extract_mod12<make_quads_input_type>;
 
             // sort (i,t_i,t_{i+1},t_{i+2}) by (t_i,t_{i+1},t_{i+2})
-            typedef typename stream::sort<mod12_quads_input_type, less_quad<offset_type> > sort_mod12_input_type;
+            using sort_mod12_input_type = typename stream::sort<mod12_quads_input_type, less_quad<offset_type> >;
 
             // name (i,t_i,t_{i+1},t_{i+2}) -> (i,n_i)
-            typedef naming<sort_mod12_input_type> naming_input_type;
+            using naming_input_type = naming<sort_mod12_input_type>;
 
             mod12_sorter_type m1_sorter(mod12cmp(), ram_use / 5);
             mod12_sorter_type m2_sorter(mod12cmp(), ram_use / 5);
 
             // sorted mod1 runs -concatenate- sorted mod2 runs
-            typedef stxxl::stream::concatenate<mod12_sorter_type, mod12_sorter_type> concatenation_type;
+            using concatenation_type = stxxl::stream::concatenate<mod12_sorter_type, mod12_sorter_type>;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
             offset_array_type text;
@@ -1092,7 +1092,7 @@ public:
 
     protected:
         // Adapt (t_i) -> (i,t_i) for input to fit to recursive call
-        typedef make_pairs<counter_stream_type, Input> make_pairs_input_type;
+        using make_pairs_input_type = make_pairs<counter_stream_type, Input>;
 
         // points to final constructed suffix array generator
         buildSA_type* out_sa;
@@ -1156,7 +1156,7 @@ class cut_stream
 {
 public:
     //! same value type as input stream
-    typedef typename InputType::value_type value_type;
+    using value_type = typename InputType::value_type;
 
 protected:
     //! instance of input stream
@@ -1202,8 +1202,8 @@ int process(const std::string& input_filename, const std::string& output_filenam
 {
     static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2> > alphabet_vector_type;
-    typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size> offset_vector_type;
+    using alphabet_vector_type = typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2> >;
+    using offset_vector_type = typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size>;
 
     // input and output files (if supplied via command line)
     stxxl::file_ptr input_file, output_file;
@@ -1266,9 +1266,9 @@ int process(const std::string& input_filename, const std::string& output_filenam
     stxxl::stats_data stats_begin(*Stats);
 
     // construct skew class with bufreader input type
-    typedef alphabet_vector_type::bufreader_type input_type;
-    typedef cut_stream<input_type> cut_input_type;
-    typedef typename skew<offset_type>::template algorithm<cut_input_type> skew_type;
+    using input_type = alphabet_vector_type::bufreader_type;
+    using cut_input_type = cut_stream<input_type>;
+    using skew_type = typename skew<offset_type>::template algorithm<cut_input_type>;
 
     size_type size = input_vector.size();
     if (size > sizelimit) size = sizelimit;

@@ -83,30 +83,30 @@ template <class KeyType,
           >
 class map
 {
-    typedef btree::btree<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> impl_type;
+    using impl_type = btree::btree<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy>;
 
     impl_type impl;
 
 public:
-    typedef typename impl_type::node_block_type node_block_type;
-    typedef typename impl_type::leaf_block_type leaf_block_type;
+    using node_block_type = typename impl_type::node_block_type;
+    using leaf_block_type = typename impl_type::leaf_block_type;
 
-    typedef typename impl_type::key_type key_type;
-    typedef typename impl_type::data_type data_type;
-    typedef typename impl_type::data_type mapped_type;
-    typedef typename impl_type::value_type value_type;
-    typedef typename impl_type::key_compare key_compare;
-    typedef typename impl_type::value_compare value_compare;
-    typedef typename impl_type::pointer pointer;
-    typedef typename impl_type::const_pointer const_pointer;
-    typedef typename impl_type::reference reference;
-    typedef typename impl_type::const_reference const_reference;
-    typedef typename impl_type::size_type size_type;
-    typedef typename impl_type::difference_type difference_type;
-    typedef typename impl_type::iterator iterator;
-    typedef typename impl_type::const_iterator const_iterator;
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    using key_type = typename impl_type::key_type;
+    using data_type = typename impl_type::data_type;
+    using mapped_type = typename impl_type::data_type;
+    using value_type = typename impl_type::value_type;
+    using key_compare = typename impl_type::key_compare;
+    using value_compare = typename impl_type::value_compare;
+    using pointer = typename impl_type::pointer;
+    using const_pointer = typename impl_type::const_pointer;
+    using reference = typename impl_type::reference;
+    using const_reference = typename impl_type::const_reference;
+    using size_type = typename impl_type::size_type;
+    using difference_type = typename impl_type::difference_type;
+    using iterator = typename impl_type::iterator;
+    using const_iterator = typename impl_type::const_iterator;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     //! \name Iterators
     //! \{

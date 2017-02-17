@@ -34,8 +34,8 @@ template <typename ValueType>
 class swap_vector
 {
 public:
-    typedef ValueType value_type;
-    typedef size_t size_type;
+    using value_type = ValueType;
+    using size_type = size_t;
 
 protected:
     //! size of vector
@@ -50,10 +50,10 @@ protected:
 public:
     // *** simple pointer iterators
 
-    typedef value_type* iterator;
-    typedef const value_type* const_iterator;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
+    using iterator = value_type *;
+    using const_iterator = const value_type *;
+    using reference = value_type &;
+    using const_reference = const value_type &;
 
 public:
     //! Create an empty vector.

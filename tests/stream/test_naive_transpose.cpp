@@ -34,7 +34,7 @@ class streamop_matrix_transpose
     unsigned pos;
 
 public:
-    typedef unsigned value_type;
+    using value_type = unsigned;
 
     streamop_matrix_transpose(unsigned cut, unsigned repeat) : cut(cut), repeat(repeat), pos(0)
     { }
@@ -59,8 +59,8 @@ public:
 template <typename T>
 struct cmp_tuple_first : std::binary_function<T, T, bool>
 {
-    typedef T value_type;
-    typedef typename value_type::first_type first_value_type;
+    using value_type = T;
+    using first_value_type = typename value_type::first_type;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -111,7 +111,7 @@ int main()
 
     ///////////////////////////////////////////////////////////////////////
 
-    typedef stxxl::vector<unsigned> array_type;
+    using array_type = stxxl::vector<unsigned>;
 
     array_type input(num_rows* num_cols);
     array_type output(num_cols* num_rows);
@@ -127,24 +127,24 @@ int main()
 
     // HERE streaming part begins (streamifying)
     // create input stream
-    typedef stxxl::stream::streamify_traits<array_type::iterator>::stream_type input_stream_type;
+    using input_stream_type = stxxl::stream::streamify_traits<array_type::iterator>::stream_type;
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end(), numbuffers);
 
     // create stream of destination indices
-    typedef streamop_matrix_transpose destination_index_stream_type;
+    using destination_index_stream_type = streamop_matrix_transpose;
     destination_index_stream_type destination_index_stream(num_cols, num_rows);
 
     // create tuple stream: (key, value)
-    typedef stxxl::stream::make_tuple<destination_index_stream_type, input_stream_type> tuple_stream_type;
+    using tuple_stream_type = stxxl::stream::make_tuple<destination_index_stream_type, input_stream_type>;
     tuple_stream_type tuple_stream(destination_index_stream, input_stream);
 
     // sort tuples by first entry (key)
-    typedef cmp_tuple_first<tuple_stream_type::value_type> cmp_type;
-    typedef stxxl::stream::sort<tuple_stream_type, cmp_type> sorted_tuple_stream_type;
+    using cmp_type = cmp_tuple_first<tuple_stream_type::value_type>;
+    using sorted_tuple_stream_type = stxxl::stream::sort<tuple_stream_type, cmp_type>;
     sorted_tuple_stream_type sorted_tuple_stream(tuple_stream, cmp_type(), memory_for_sorting);
 
     // discard the key we used for sorting, keep second entry of the tuple only (value)
-    typedef stxxl::stream::choose<sorted_tuple_stream_type, 2> sorted_element_stream_type;
+    using sorted_element_stream_type = stxxl::stream::choose<sorted_tuple_stream_type, 2>;
     sorted_element_stream_type sorted_element_stream(sorted_tuple_stream);
 
     // HERE streaming part ends (materializing)

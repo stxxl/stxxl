@@ -25,9 +25,8 @@ struct comp_type : public std::less<int>
         return std::numeric_limits<int>::max();
     }
 };
-
-typedef stxxl::btree::btree<
-        int, double, comp_type, 4096, 4096, stxxl::simple_random> btree_type;
+using btree_type = stxxl::btree::btree<
+          int, double, comp_type, 4096, 4096, stxxl::simple_random>;
 
 // forced instantiation
 template class stxxl::btree::btree<

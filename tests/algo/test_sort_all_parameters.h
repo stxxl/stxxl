@@ -35,7 +35,7 @@ struct bulk<0>
 template <typename KEY, unsigned SIZE>
 struct my_type
 {
-    typedef KEY key_type;
+    using key_type = KEY;
 
     key_type m_key;
     bulk<SIZE - sizeof(key_type)> m_data;

@@ -49,8 +49,8 @@ struct actual_element   // 24 bytes, not a power of 2 intentionally
     }
 };
 
-typedef std::shared_ptr<actual_element> actual_element_ptr;
-typedef stxxl::external_shared_ptr<actual_element_ptr> element;
+using actual_element_ptr = std::shared_ptr<actual_element>;
+using element = stxxl::external_shared_ptr<actual_element_ptr>;
 
 struct counter
 {
@@ -81,7 +81,7 @@ void test_const_iterator(const my_vec_type& x)
 void test_vector()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::vector<element, 2, stxxl::lru_pager<2>, (2* 1024* 1024), stxxl::striping> vector_type;
+    using vector_type = stxxl::vector<element, 2, stxxl::lru_pager<2>, (2* 1024* 1024), stxxl::striping>;
     vector_type v(64 * 1024 * 1024 / sizeof(element));
 
     // test assignment const_iterator = iterator
@@ -183,7 +183,7 @@ void test_vector()
     }
 }
 
-typedef size_t key_type;
+using key_type = size_t;
 
 struct test_data {
     unsigned char a;
@@ -191,8 +191,8 @@ struct test_data {
     unsigned int c;
 };
 
-typedef std::shared_ptr<test_data> test_data_ptr;
-typedef stxxl::external_shared_ptr<test_data_ptr> data_type;
+using test_data_ptr = std::shared_ptr<test_data>;
+using data_type = stxxl::external_shared_ptr<test_data_ptr>;
 
 struct cmp : public std::less<key_type>
 {
@@ -211,7 +211,7 @@ struct cmp : public std::less<key_type>
 
 #define CACHE_ELEMENTS (BLOCK_SIZE * CACHE_SIZE / (sizeof(key_type) + sizeof(data_type)))
 
-typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
+using map_type = stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE>;
 
 void test_map()
 {

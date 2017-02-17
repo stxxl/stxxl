@@ -84,7 +84,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
     static const size_t item_size = sizeof(ValueType);
     const size_t seq_items = seq_size / item_size;
 
-    typedef std::vector<ValueType> sequence_type;
+    using sequence_type = std::vector<ValueType>;
 
     size_t total_size = seq_count * seq_items;
     size_t total_bytes = seq_count * seq_size;
@@ -132,10 +132,8 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
         stxxl::scoped_print_timer spt("Merging", total_bytes);
 
         const char* method_name = nullptr;
-
-        typedef std::pair<typename sequence_type::iterator,
-                          typename sequence_type::iterator>
-            sequence_iterator_pair_type;
+        using sequence_iterator_pair_type = std::pair<typename sequence_type::iterator,
+                                                      typename sequence_type::iterator>        ;
 
         std::vector<sequence_iterator_pair_type> iterpairs(seq_count);
 

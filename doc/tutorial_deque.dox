@@ -29,7 +29,7 @@ where that's only possible on one of the two endings.
 To create a stxxl::deque object, only the data value type must be specified:
 
 \code
-typedef stxxl::deque<int> deque;
+using deque = stxxl::deque<int>;
 deque my_deque;
 \endcode
 

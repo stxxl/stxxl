@@ -24,7 +24,7 @@
 
 struct my_type
 {
-    typedef unsigned key_type;
+    using key_type = unsigned;
 
     key_type m_key;
     char m_data[128 - sizeof(key_type)];
@@ -59,9 +59,9 @@ inline bool operator == (const my_type& a, const my_type& b)
 
 struct Cmp
 {
-    typedef my_type first_argument_type;
-    typedef my_type second_argument_type;
-    typedef bool result_type;
+    using first_argument_type = my_type;
+    using second_argument_type = my_type;
+    using result_type = bool;
     bool operator () (const my_type& a, const my_type& b) const
     {
         return a < b;
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
         stxxl::file_ptr f = stxxl::make_counting<stxxl::syscall_file>(
             argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
         unsigned memory_to_use = 50 * 1024 * 1024;
-        typedef stxxl::vector<my_type, 1, stxxl::lru_pager<8>, block_size> vector_type;
+        using vector_type = stxxl::vector<my_type, 1, stxxl::lru_pager<8>, block_size>;
         vector_type v(f);
 
         /*

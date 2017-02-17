@@ -63,20 +63,20 @@ template <class ValueType,
 class sequence
 {
 public:
-    typedef ValueType value_type;
-    typedef AllocStr alloc_strategy_type;
-    typedef SizeType size_type;
+    using value_type = ValueType;
+    using alloc_strategy_type = AllocStr;
+    using size_type = SizeType;
     enum {
         block_size = BlockSize
     };
 
-    typedef typed_block<block_size, value_type> block_type;
-    typedef BID<block_size> bid_type;
+    using block_type = typed_block<block_size, value_type>;
+    using bid_type = BID<block_size>;
 
-    typedef std::deque<bid_type> bid_deque_type;
+    using bid_deque_type = std::deque<bid_type>;
 
 private:
-    typedef read_write_pool<block_type> pool_type;
+    using pool_type = read_write_pool<block_type>;
 
     /// current number of items in the sequence
     size_type m_size;
@@ -575,9 +575,9 @@ public:
     class stream
     {
     public:
-        typedef typename sequence::value_type value_type;
+        using value_type = typename sequence::value_type;
 
-        typedef typename bid_deque_type::const_iterator bid_iter_type;
+        using bid_iter_type = typename bid_deque_type::const_iterator;
 
     protected:
         const sequence& m_sequence;
@@ -706,9 +706,9 @@ public:
     class reverse_stream
     {
     public:
-        typedef typename sequence::value_type value_type;
+        using value_type = typename sequence::value_type;
 
-        typedef typename bid_deque_type::const_reverse_iterator bid_iter_type;
+        using bid_iter_type = typename bid_deque_type::const_reverse_iterator;
 
     protected:
         const sequence& m_sequence;

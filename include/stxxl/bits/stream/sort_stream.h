@@ -56,20 +56,20 @@ template <
 class basic_runs_creator
 {
 public:
-    typedef Input input_type;
-    typedef CompareType cmp_type;
+    using input_type = Input;
+    using cmp_type = CompareType;
     static const size_t block_size = BlockSize;
-    typedef AllocStr allocation_strategy_type;
+    using allocation_strategy_type = AllocStr;
 
 public:
-    typedef typename Input::value_type value_type;
-    typedef typed_block<BlockSize, value_type> block_type;
-    typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-    typedef sorted_runs<trigger_entry_type, cmp_type> sorted_runs_data_type;
-    typedef typename sorted_runs_data_type::run_type run_type;
-    typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
+    using value_type = typename Input::value_type;
+    using block_type = typed_block<BlockSize, value_type>;
+    using trigger_entry_type = sort_helper::trigger_entry<block_type>;
+    using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
+    using run_type = typename sorted_runs_data_type::run_type;
+    using sorted_runs_type = counting_ptr<sorted_runs_data_type>;
 
-    typedef typename element_iterator_traits<block_type, external_size_type>::element_iterator element_iterator;
+    using element_iterator = typename element_iterator_traits<block_type, external_size_type>::element_iterator;
 
 protected:
     //! reference to the input stream
@@ -372,14 +372,14 @@ template <
 class runs_creator : public basic_runs_creator<Input, CompareType, BlockSize, AllocStr>
 {
 private:
-    typedef basic_runs_creator<Input, CompareType, BlockSize, AllocStr> base;
+    using base = basic_runs_creator<Input, CompareType, BlockSize, AllocStr>;
 
 public:
-    typedef typename base::cmp_type cmp_type;
-    typedef typename base::value_type value_type;
-    typedef typename base::block_type block_type;
-    typedef typename base::sorted_runs_data_type sorted_runs_data_type;
-    typedef typename base::sorted_runs_type sorted_runs_type;
+    using cmp_type = typename base::cmp_type;
+    using value_type = typename base::value_type;
+    using block_type = typename base::block_type;
+    using sorted_runs_data_type = typename base::sorted_runs_data_type;
+    using sorted_runs_type = typename base::sorted_runs_type;
 
 public:
     //! Creates the object.
@@ -402,7 +402,7 @@ public:
 template <class ValueType>
 struct use_push
 {
-    typedef ValueType value_type;
+    using value_type = ValueType;
 };
 
 //! Forms sorted runs of elements passed in push() method.
@@ -429,21 +429,21 @@ class runs_creator<
         >
 {
 public:
-    typedef CompareType cmp_type;
-    typedef ValueType value_type;
-    typedef typed_block<BlockSize, value_type> block_type;
-    typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-    typedef sorted_runs<trigger_entry_type, cmp_type> sorted_runs_data_type;
-    typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
-    typedef sorted_runs_type result_type;
+    using cmp_type = CompareType;
+    using value_type = ValueType;
+    using block_type = typed_block<BlockSize, value_type>;
+    using trigger_entry_type = sort_helper::trigger_entry<block_type>;
+    using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
+    using sorted_runs_type = counting_ptr<sorted_runs_data_type>;
+    using result_type = sorted_runs_type;
 
-    typedef typename element_iterator_traits<block_type, external_size_type>::element_iterator element_iterator;
+    using element_iterator = typename element_iterator_traits<block_type, external_size_type>::element_iterator;
 
 private:
     //! comparator object to sort runs
     CompareType m_cmp;
 
-    typedef typename sorted_runs_data_type::run_type run_type;
+    using run_type = typename sorted_runs_data_type::run_type;
 
     //! stores the result (sorted runs) in a reference counted object
     sorted_runs_type m_result;
@@ -715,7 +715,7 @@ public:
 template <class ValueType>
 struct from_sorted_sequences
 {
-    typedef ValueType value_type;
+    using value_type = ValueType;
 };
 
 //! Forms sorted runs of data taking elements in sorted order (element by element).
@@ -742,19 +742,19 @@ class runs_creator<
         >
 {
 public:
-    typedef ValueType value_type;
-    typedef typed_block<BlockSize, value_type> block_type;
-    typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-    typedef AllocStr alloc_strategy_type;
+    using value_type = ValueType;
+    using block_type = typed_block<BlockSize, value_type>;
+    using trigger_entry_type = sort_helper::trigger_entry<block_type>;
+    using alloc_strategy_type = AllocStr;
 
 public:
-    typedef CompareType cmp_type;
-    typedef sorted_runs<trigger_entry_type, cmp_type> sorted_runs_data_type;
-    typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
-    typedef sorted_runs_type result_type;
+    using cmp_type = CompareType;
+    using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
+    using sorted_runs_type = counting_ptr<sorted_runs_data_type>;
+    using result_type = sorted_runs_type;
 
 private:
-    typedef typename sorted_runs_data_type::run_type run_type;
+    using run_type = typename sorted_runs_data_type::run_type;
 
     CompareType cmp;
 
@@ -891,7 +891,7 @@ template <class RunsType, class CompareType>
 bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
-    typedef typename RunsType::element_type::block_type block_type;
+    using block_type = typename RunsType::element_type::block_type;
     STXXL_VERBOSE2("Elements: " << sruns->elements);
     size_t nruns = sruns->runs.size();
     STXXL_VERBOSE2("Runs: " << nruns);
@@ -952,27 +952,27 @@ template <class RunsType,
 class basic_runs_merger
 {
 public:
-    typedef RunsType sorted_runs_type;
-    typedef CompareType value_cmp;
-    typedef AllocStr alloc_strategy;
+    using sorted_runs_type = RunsType;
+    using value_cmp = CompareType;
+    using alloc_strategy = AllocStr;
 
-    typedef typename sorted_runs_type::element_type sorted_runs_data_type;
-    typedef typename sorted_runs_data_type::size_type size_type;
-    typedef typename sorted_runs_data_type::run_type run_type;
-    typedef typename sorted_runs_data_type::block_type block_type;
-    typedef block_type out_block_type;
-    typedef typename run_type::value_type trigger_entry_type;
-    typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
-    typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
-    typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
-    typedef loser_tree<run_cursor_type, run_cursor2_cmp_type> loser_tree_type;
-    typedef int64_t diff_type;
-    typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
-    typedef typename std::vector<sequence>::size_type seqs_size_type;
+    using sorted_runs_data_type = typename sorted_runs_type::element_type;
+    using size_type = typename sorted_runs_data_type::size_type;
+    using run_type = typename sorted_runs_data_type::run_type;
+    using block_type = typename sorted_runs_data_type::block_type;
+    using out_block_type = block_type;
+    using trigger_entry_type = typename run_type::value_type;
+    using prefetcher_type = block_prefetcher<block_type, typename run_type::iterator>;
+    using run_cursor_type = run_cursor2<block_type, prefetcher_type>;
+    using run_cursor2_cmp_type = sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp>;
+    using loser_tree_type = loser_tree<run_cursor_type, run_cursor2_cmp_type>;
+    using diff_type = int64_t;
+    using sequence = std::pair<typename block_type::iterator, typename block_type::iterator>;
+    using seqs_size_type = typename std::vector<sequence>::size_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename sorted_runs_data_type::value_type value_type;
+    using value_type = typename sorted_runs_data_type::value_type;
 
 private:
     //! comparator object to sort runs
@@ -1516,13 +1516,13 @@ template <class RunsType,
 class runs_merger : public basic_runs_merger<RunsType, CompareType, AllocStr>
 {
 protected:
-    typedef basic_runs_merger<RunsType, CompareType, AllocStr> base;
+    using base = basic_runs_merger<RunsType, CompareType, AllocStr>;
 
 public:
-    typedef RunsType sorted_runs_type;
-    typedef typename base::value_cmp value_cmp;
-    typedef typename base::value_cmp cmp_type;
-    typedef typename base::block_type block_type;
+    using sorted_runs_type = RunsType;
+    using value_cmp = typename base::value_cmp;
+    using cmp_type = typename base::value_cmp;
+    using block_type = typename base::block_type;
 
 public:
     //! Creates a runs merger object.
@@ -1564,16 +1564,16 @@ template <
     >
 class sort
 {
-    typedef RunsCreatorType runs_creator_type;
-    typedef typename runs_creator_type::sorted_runs_type sorted_runs_type;
-    typedef runs_merger<sorted_runs_type, CompareType, AllocStr> runs_merger_type;
+    using runs_creator_type = RunsCreatorType;
+    using sorted_runs_type = typename runs_creator_type::sorted_runs_type;
+    using runs_merger_type = runs_merger<sorted_runs_type, CompareType, AllocStr>;
 
     runs_creator_type creator;
     runs_merger_type merger;
 
 public:
     //! Standard stream typedef.
-    typedef typename Input::value_type value_type;
+    using value_type = typename Input::value_type;
 
     //! Creates the object.
     //! \param in input stream
@@ -1641,12 +1641,12 @@ template <
     >
 class compute_sorted_runs_type
 {
-    typedef ValueType value_type;
-    typedef BID<BlockSize> bid_type;
-    typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
+    using value_type = ValueType;
+    using bid_type = BID<BlockSize>;
+    using trigger_entry_type = sort_helper::trigger_entry<bid_type, value_type>;
 
 public:
-    typedef sorted_runs<trigger_entry_type, std::less<value_type> > result;
+    using result = sorted_runs<trigger_entry_type, std::less<value_type> >;
 };
 
 //! \}
@@ -1679,9 +1679,9 @@ void sort(RandomAccessIterator begin,
           AllocStr AS)
 {
     STXXL_UNUSED(AS);
-    typedef typename stream::streamify_traits<RandomAccessIterator>::stream_type InputType;
+    using InputType = typename stream::streamify_traits<RandomAccessIterator>::stream_type;
     InputType Input(begin, end);
-    typedef stream::sort<InputType, CmpType, BlockSize, AllocStr> sorter_type;
+    using sorter_type = stream::sort<InputType, CmpType, BlockSize, AllocStr>;
     sorter_type Sort(Input, cmp, MemSize);
     stream::materialize(Sort, begin);
 }

@@ -15,7 +15,7 @@
 
 int main()
 {
-    typedef stxxl::typed_block<128* 1024, double> block_type;
+    using block_type = stxxl::typed_block<128* 1024, double>;
     std::vector<block_type::bid_type> bids(32);
     std::vector<stxxl::request_ptr> requests;
     stxxl::block_manager* bm = stxxl::block_manager::get_instance();

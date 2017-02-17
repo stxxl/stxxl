@@ -105,7 +105,7 @@ template <typename KeyType, int ValueSize>
 struct my_type
 {
     enum { value_size = ValueSize };
-    typedef KeyType key_type;
+    using key_type = KeyType;
 
     union {
         key_type key;
@@ -134,8 +134,8 @@ template <typename ValueType>
 struct my_type_cmp_smaller
     : public std::binary_function<ValueType, ValueType, bool>
 {
-    typedef ValueType value_type;
-    typedef typename value_type::key_type key_type;
+    using value_type = ValueType;
+    using key_type = typename value_type::key_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a.key < b.key;
@@ -154,8 +154,8 @@ template <typename ValueType>
 struct my_type_cmp_greater
     : public std::binary_function<ValueType, ValueType, bool>
 {
-    typedef ValueType value_type;
-    typedef typename value_type::key_type key_type;
+    using value_type = ValueType;
+    using key_type = typename value_type::key_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a.key > b.key;
@@ -187,8 +187,8 @@ struct less_min_max : public std::binary_function<ValueType, ValueType, bool>
  * my_type specializations used in benchmarks
  */
 
-typedef my_type<uint64_t, sizeof(uint64_t)> my8_type;
-typedef my_type<uint64_t, 24> my24_type;
+using my8_type = my_type<uint64_t, sizeof(uint64_t)>;
+using my24_type = my_type<uint64_t, 24>;
 
 /*
  * Progress messages
@@ -297,13 +297,12 @@ class CStxxlPQ
           _num_elements / 1024>::result
 {
 public:
-    typedef ValueType value_type;
-
-    typedef typename stxxl::PRIORITY_QUEUE_GENERATOR<
-            value_type,
-            my_type_cmp_greater<value_type>,
-            _mem_for_queue,
-            _num_elements / 1024>::result pq_type;
+    using value_type = ValueType;
+    using pq_type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
+              value_type,
+              my_type_cmp_greater<value_type>,
+              _mem_for_queue,
+              _num_elements / 1024>::result;
 
     CStxxlPQ() :
 #if STXXL_PARALLEL
@@ -367,9 +366,9 @@ class CStxxlParallePQ
       public stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> >
 {
 public:
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
-    typedef stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> > pq_type;
+    using pq_type = stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> >;
 
     CStxxlParallePQ()
         : PQBase("Parallel PQ", "ppq"),
@@ -410,12 +409,11 @@ class CStdPriorityQueue
           >
 {
 public:
-    typedef ValueType value_type;
-
-    typedef std::priority_queue<
-            ValueType, std::vector<ValueType>,
-            my_type_cmp_greater<ValueType>
-            > pq_type;
+    using value_type = ValueType;
+    using pq_type = std::priority_queue<
+              ValueType, std::vector<ValueType>,
+              my_type_cmp_greater<ValueType>
+              >;
 
     CStdPriorityQueue()
         : PQBaseDefaults("STL PQ", "stl"), pq_type()
@@ -469,10 +467,10 @@ class CStxxlSorter
       public stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> >
 {
 public:
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
     // note that we use SMALLER here:
-    typedef stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> > pq_type;
+    using pq_type = stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> >;
 
     CStxxlSorter()
         : PQBaseDefaults("STXXL Sorter", "sorter"),
@@ -621,7 +619,7 @@ protected:
 template <typename ContainerType>
 void do_push_asc(ContainerType& c)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     scoped_stats stats(c, g_testset + "|push-asc",
                        "Filling " + c.name() + " sequentially");
@@ -638,7 +636,7 @@ void do_push_asc(ContainerType& c)
 template <typename ContainerType>
 void do_push_rand(ContainerType& c, unsigned int seed)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     scoped_stats stats(c, g_testset + "|push-rand",
                        "Filling " + c.name() + " randomly");
@@ -675,7 +673,7 @@ void do_pop(ContainerType& c)
 template <typename ContainerType>
 void do_pop_asc_check(ContainerType& c)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     scoped_stats stats(c, g_testset + "|pop-check",
                        "Reading " + c.name() + " and checking order");
@@ -697,7 +695,7 @@ void do_pop_asc_check(ContainerType& c)
 template <typename ContainerType>
 void do_pop_rand_check(ContainerType& c, unsigned int seed)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     stxxl::sorter<uint64_t, less_min_max<uint64_t> >
     sorted_vals(less_min_max<uint64_t>(), RAM / 2);
@@ -737,7 +735,7 @@ void do_pop_rand_check(ContainerType& c, unsigned int seed)
 template <typename ContainerType>
 void do_bulk_push_asc(ContainerType& c, bool do_parallel)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
@@ -805,7 +803,7 @@ template <typename ContainerType>
 void do_bulk_push_rand(ContainerType& c,
                        unsigned int _seed, bool do_parallel)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
@@ -882,7 +880,7 @@ void do_bulk_push_rand(ContainerType& c,
 template <typename ContainerType>
 void do_bulk_pop(ContainerType& c)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     scoped_stats stats(c, g_testset + "|bulk-pop",
                        "Reading " + c.name() + " in bulks");
@@ -908,7 +906,7 @@ void do_bulk_pop(ContainerType& c)
 template <typename ContainerType>
 void do_bulk_pop_check_asc(ContainerType& c)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     scoped_stats stats(c, g_testset + "|bulk-pop-check",
                        "Reading " + c.name() + " in bulks");
@@ -939,7 +937,7 @@ template <typename ContainerType>
 void do_bulk_pop_check_rand(ContainerType& c,
                             unsigned int _seed, bool do_parallel)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
@@ -1254,7 +1252,7 @@ template <typename ContainerType>
 void do_bulk_prefill(ContainerType& c, bool do_parallel,
                      typename ContainerType::value_type::key_type& windex)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     // fill PQ with num_elements items
 
@@ -1286,7 +1284,7 @@ template <typename ContainerType>
 void do_bulk_postempty(ContainerType& c, bool /* parallel */,
                        typename ContainerType::value_type::key_type& rindex)
 {
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     // extract remaining items
 
@@ -1313,8 +1311,8 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
 template <bool RandomizeBulkSize, typename ContainerType>
 void do_bulk_limit(ContainerType& c, bool do_parallel)
 {
-    typedef typename ContainerType::value_type value_type;
-    typedef typename value_type::key_type key_type;
+    using value_type = typename ContainerType::value_type;
+    using key_type = typename value_type::key_type;
 
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
@@ -1384,8 +1382,8 @@ void do_bulk_limit(ContainerType& c, bool do_parallel)
 template <bool RandomizeBulkSize, typename ContainerType>
 void do_bulk_pop_push(ContainerType& c, bool do_parallel)
 {
-    typedef typename ContainerType::value_type value_type;
-    typedef typename value_type::key_type key_type;
+    using value_type = typename ContainerType::value_type;
+    using key_type = typename value_type::key_type;
 
     key_type windex = 0; // continuous insertion index
     key_type rindex = 0; // continuous pop index
@@ -1461,7 +1459,7 @@ template <typename ContainerType>
 class dijkstra_graph
 {
 public:
-    typedef size_t size_type;
+    using size_type = size_t;
 
 protected:
     size_type n, m;
@@ -1624,7 +1622,7 @@ void run_benchmark(ContainerType& c, const std::string& testset)
 {
     std::string testdesc = "Running benchmark " + testset + " on " + c.name();
 
-    typedef typename ContainerType::value_type value_type;
+    using value_type = typename ContainerType::value_type;
 
     g_testset = testset;
     // calculate_depending_parameters
@@ -1800,14 +1798,14 @@ int main(int argc, char* argv[])
 
     if (opt_queue == "ppq")
     {
-        typedef CStxxlParallePQ<my8_type> ppq_type;
+        using ppq_type = CStxxlParallePQ<my8_type>;
         ppq_type* ppq = new ppq_type();
         run_benchmark(*ppq, opt_benchmark);
         delete ppq;
     }
     else if (opt_queue == "spq")
     {
-        typedef CStxxlPQ<my8_type> spq_type;
+        using spq_type = CStxxlPQ<my8_type>;
         spq_type* spq = new spq_type();
 
         STXXL_DEBUG1("PQ parameters:" <<
@@ -1837,14 +1835,14 @@ int main(int argc, char* argv[])
 #if 1
     else if (opt_queue == "ppq24")
     {
-        typedef CStxxlParallePQ<my24_type> ppq_type;
+        using ppq_type = CStxxlParallePQ<my24_type>;
         ppq_type* ppq = new ppq_type();
         run_benchmark(*ppq, opt_benchmark);
         delete ppq;
     }
     else if (opt_queue == "spq24")
     {
-        typedef CStxxlPQ<my24_type> spq_type;
+        using spq_type = CStxxlPQ<my24_type>;
         spq_type* spq = new spq_type();
         run_benchmark(*spq, opt_benchmark);
         delete spq;

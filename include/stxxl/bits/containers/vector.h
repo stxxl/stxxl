@@ -50,7 +50,7 @@ template <typename SizeType, SizeType modulo2, SizeType modulo1>
 class double_blocked_index
 {
     static_assert(std::is_unsigned<SizeType>::value, "SizeType is expected to be unsigned");
-    typedef SizeType size_type;
+    using size_type = SizeType;
 
     static constexpr size_type modulo12 = modulo1 * modulo2;
 
@@ -287,9 +287,9 @@ class vector_bufwriter;
 template <typename VectorConfig>
 class vector_iterator
 {
-    typedef vector_iterator<VectorConfig> self_type;
+    using self_type = vector_iterator<VectorConfig>;
 
-    typedef const_vector_iterator<VectorConfig> const_self_type;
+    using const_self_type = const_vector_iterator<VectorConfig>;
 
     friend class const_vector_iterator<VectorConfig>;
 
@@ -297,26 +297,26 @@ public:
     //! \name Types
     //! \{
 
-    typedef self_type iterator;
-    typedef const_self_type const_iterator;
+    using iterator = self_type;
+    using const_iterator = const_self_type;
 
-    typedef unsigned block_offset_type;
+    using block_offset_type = unsigned;
     using vector_type = typename VectorConfig::vector_type;
     friend vector_type;
-    typedef typename vector_type::bids_container_type bids_container_type;
-    typedef typename bids_container_type::iterator bids_container_iterator;
-    typedef typename bids_container_type::bid_type bid_type;
-    typedef typename vector_type::block_type block_type;
-    typedef typename vector_type::blocked_index_type blocked_index_type;
+    using bids_container_type = typename vector_type::bids_container_type;
+    using bids_container_iterator = typename bids_container_type::iterator;
+    using bid_type = typename bids_container_type::bid_type;
+    using block_type = typename vector_type::block_type;
+    using blocked_index_type = typename vector_type::blocked_index_type;
 
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef typename vector_type::size_type size_type;
-    typedef typename vector_type::difference_type difference_type;
-    typedef typename vector_type::value_type value_type;
-    typedef typename vector_type::reference reference;
-    typedef typename vector_type::const_reference const_reference;
-    typedef typename vector_type::pointer pointer;
-    typedef typename vector_type::const_pointer const_pointer;
+    using iterator_category = std::random_access_iterator_tag;
+    using size_type = typename vector_type::size_type;
+    using difference_type = typename vector_type::difference_type;
+    using value_type = typename vector_type::value_type;
+    using reference = typename vector_type::reference;
+    using const_reference = typename vector_type::const_reference;
+    using pointer = typename vector_type::pointer;
+    using const_pointer = typename vector_type::const_pointer;
 
     //! \}
 
@@ -559,9 +559,9 @@ public:
 template <typename VectorConfig>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<VectorConfig> self_type;
+    using self_type = const_vector_iterator<VectorConfig>;
 
-    typedef vector_iterator<VectorConfig> mutable_self_type;
+    using mutable_self_type = vector_iterator<VectorConfig>;
 
     friend class vector_iterator<VectorConfig>;
 
@@ -569,26 +569,26 @@ public:
     //! \name Types
     //! \{
 
-    typedef self_type const_iterator;
-    typedef mutable_self_type iterator;
+    using const_iterator = self_type;
+    using iterator = mutable_self_type;
 
-    typedef unsigned block_offset_type;
+    using block_offset_type = unsigned;
     using vector_type = typename VectorConfig::vector_type;
     friend vector_type;
-    typedef typename vector_type::bids_container_type bids_container_type;
-    typedef typename bids_container_type::iterator bids_container_iterator;
-    typedef typename bids_container_type::bid_type bid_type;
-    typedef typename vector_type::block_type block_type;
-    typedef typename vector_type::blocked_index_type blocked_index_type;
+    using bids_container_type = typename vector_type::bids_container_type;
+    using bids_container_iterator = typename bids_container_type::iterator;
+    using bid_type = typename bids_container_type::bid_type;
+    using block_type = typename vector_type::block_type;
+    using blocked_index_type = typename vector_type::blocked_index_type;
 
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef typename vector_type::size_type size_type;
-    typedef typename vector_type::difference_type difference_type;
-    typedef typename vector_type::value_type value_type;
-    typedef typename vector_type::const_reference reference;
-    typedef typename vector_type::const_reference const_reference;
-    typedef typename vector_type::const_pointer pointer;
-    typedef typename vector_type::const_pointer const_pointer;
+    using iterator_category = std::random_access_iterator_tag;
+    using size_type = typename vector_type::size_type;
+    using difference_type = typename vector_type::difference_type;
+    using value_type = typename vector_type::value_type;
+    using reference = typename vector_type::const_reference;
+    using const_reference = typename vector_type::const_reference;
+    using pointer = typename vector_type::const_pointer;
+    using const_pointer = typename vector_type::const_pointer;
 
     //! \}
 
@@ -835,39 +835,39 @@ public:
     //! \{
 
     //! The type of elements stored in the vector.
-    typedef ValueType value_type;
+    using value_type = ValueType;
     //! reference to value_type
-    typedef value_type& reference;
+    using reference = value_type &;
     //! constant reference to value_type
-    typedef const value_type& const_reference;
+    using const_reference = const value_type &;
     //! pointer to value_type
-    typedef value_type* pointer;
+    using pointer = value_type *;
     //! constant pointer to value_type
-    typedef const value_type* const_pointer;
+    using const_pointer = const value_type *;
 
-    typedef external_size_type size_type;
-    typedef external_diff_type difference_type;
+    using size_type = external_size_type;
+    using difference_type = external_diff_type;
 
-    typedef PagerType pager_type;
-    typedef AllocStr alloc_strategy_type;
+    using pager_type = PagerType;
+    using alloc_strategy_type = AllocStr;
 
     static constexpr size_t page_size = PageSize;
     static constexpr size_t block_size = BlockSize;
 
     enum { on_disk = -1 };
 
-    typedef vector_configuration<ValueType, PageSize, PagerType, BlockSize, AllocStr> configuration_type;
+    using configuration_type = vector_configuration<ValueType, PageSize, PagerType, BlockSize, AllocStr>;
     static_assert(std::is_same<vector, typename configuration_type::vector_type>::value, "Inconsistent vector type in config");
 
     //! iterator used to iterate through a vector, see \ref design_vector_notes.
-    typedef vector_iterator<configuration_type> iterator;
+    using iterator = vector_iterator<configuration_type>;
     friend iterator;
 
     //! constant iterator used to iterate through a vector, see \ref design_vector_notes.
-    typedef const_vector_iterator<configuration_type> const_iterator;
+    using const_iterator = const_vector_iterator<configuration_type>;
     friend const_iterator;
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     //! \}
 
@@ -875,33 +875,33 @@ public:
     //! \{
 
     //! vector_bufwriter compatible with this vector
-    typedef vector_bufwriter<iterator> bufwriter_type;
+    using bufwriter_type = vector_bufwriter<iterator>;
 
     //! vector_bufreader compatible with this vector
-    typedef vector_bufreader<const_iterator> bufreader_type;
+    using bufreader_type = vector_bufreader<const_iterator>;
 
     //! vector_bufreader compatible with this vector
-    typedef vector_bufreader_reverse<const_iterator> bufreader_reverse_type;
+    using bufreader_reverse_type = vector_bufreader_reverse<const_iterator>;
 
     //! \internal
     class bid_vector : public std::vector<BID<block_size> >
     {
     public:
-        typedef std::vector<BID<block_size> > super_type;
-        typedef typename super_type::size_type size_type;
-        typedef typename super_type::value_type bid_type;
+        using super_type = std::vector<BID<block_size> >;
+        using size_type = typename super_type::size_type;
+        using bid_type = typename super_type::value_type;
 
         explicit bid_vector(size_type sz) : super_type(sz) { }
     };
 
-    typedef bid_vector bids_container_type;
-    typedef typename bids_container_type::iterator bids_container_iterator;
-    typedef typename bids_container_type::const_iterator const_bids_container_iterator;
+    using bids_container_type = bid_vector;
+    using bids_container_iterator = typename bids_container_type::iterator;
+    using const_bids_container_iterator = typename bids_container_type::const_iterator;
 
     //! type of the block used in disk-memory transfers
-    typedef typed_block<BlockSize, ValueType> block_type;
+    using block_type = typed_block<BlockSize, ValueType>;
     //! double-index type to reference individual elements in a block
-    typedef double_blocked_index<size_type, PageSize, block_type::size> blocked_index_type;
+    using blocked_index_type = double_blocked_index<size_type, PageSize, block_type::size>;
 
     //! \}
 
@@ -1860,28 +1860,28 @@ class vector_bufreader
 {
 public:
     //! template parameter: the vector iterator type
-    typedef VectorIterator vector_iterator;
+    using vector_iterator = VectorIterator;
 
     //! value type of the output vector
-    typedef typename vector_iterator::value_type value_type;
+    using value_type = typename vector_iterator::value_type;
 
     //! block type used in the vector
-    typedef typename vector_iterator::block_type block_type;
+    using block_type = typename vector_iterator::block_type;
 
     //! type of the input vector
-    typedef typename vector_iterator::vector_type vector_type;
+    using vector_type = typename vector_iterator::vector_type;
 
     //! block identifier iterator of the vector
-    typedef typename vector_iterator::bids_container_iterator bids_container_iterator;
+    using bids_container_iterator = typename vector_iterator::bids_container_iterator;
 
     //! construct output buffered stream used for overlapped reading
-    typedef buf_istream<block_type, bids_container_iterator> buf_istream_type;
+    using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
 
     //! construct an iterator for vector_bufreader (for C++11 range-based for loop)
-    typedef vector_bufreader_iterator<vector_bufreader> bufreader_iterator;
+    using bufreader_iterator = vector_bufreader_iterator<vector_bufreader>;
 
     //! size of remaining data
-    typedef typename vector_type::size_type size_type;
+    using size_type = typename vector_type::size_type;
 
 protected:
     //! iterator to the beginning of the range.
@@ -2052,13 +2052,13 @@ class vector_bufreader_iterator
 {
 public:
     //! The underlying buffered reader type
-    typedef VectorBufReaderType vector_bufreader_type;
+    using vector_bufreader_type = VectorBufReaderType;
 
     //! Value type of vector
-    typedef typename vector_bufreader_type::value_type value_type;
+    using value_type = typename vector_bufreader_type::value_type;
 
     //! Use vector_iterator to reference a point in the vector.
-    typedef typename vector_bufreader_type::vector_iterator vector_iterator;
+    using vector_iterator = typename vector_bufreader_type::vector_iterator;
 
 protected:
     //! Buffered reader used to access elements in vector
@@ -2136,25 +2136,25 @@ class vector_bufreader_reverse
 {
 public:
     //! template parameter: the vector iterator type
-    typedef VectorIterator vector_iterator;
+    using vector_iterator = VectorIterator;
 
     //! value type of the output vector
-    typedef typename vector_iterator::value_type value_type;
+    using value_type = typename vector_iterator::value_type;
 
     //! block type used in the vector
-    typedef typename vector_iterator::block_type block_type;
+    using block_type = typename vector_iterator::block_type;
 
     //! type of the input vector
-    typedef typename vector_iterator::vector_type vector_type;
+    using vector_type = typename vector_iterator::vector_type;
 
     //! block identifier iterator of the vector
-    typedef typename vector_iterator::bids_container_iterator bids_container_iterator;
+    using bids_container_iterator = typename vector_iterator::bids_container_iterator;
 
     //! construct output buffered stream used for overlapped reading
-    typedef buf_istream_reverse<block_type, bids_container_iterator> buf_istream_type;
+    using buf_istream_type = buf_istream_reverse<block_type, bids_container_iterator>;
 
     //! size of remaining data
-    typedef typename vector_type::size_type size_type;
+    using size_type = typename vector_type::size_type;
 
 protected:
     //! iterator to the beginning of the range.
@@ -2316,26 +2316,26 @@ class vector_bufwriter
 {
 public:
     //! template parameter: the vector iterator type
-    typedef VectorIterator iterator;
+    using iterator = VectorIterator;
 
     //! type of the output vector
-    typedef typename iterator::vector_type vector_type;
+    using vector_type = typename iterator::vector_type;
 
     //! value type of the output vector
-    typedef typename iterator::value_type value_type;
+    using value_type = typename iterator::value_type;
 
     //! block type used in the vector
-    typedef typename iterator::block_type block_type;
+    using block_type = typename iterator::block_type;
 
     //! block identifier iterator of the vector
-    typedef typename iterator::bids_container_iterator bids_container_iterator;
+    using bids_container_iterator = typename iterator::bids_container_iterator;
 
     //! iterator type of vector
-    typedef typename iterator::iterator vector_iterator;
-    typedef typename iterator::const_iterator vector_const_iterator;
+    using vector_iterator = typename iterator::iterator;
+    using vector_const_iterator = typename iterator::const_iterator;
 
     //! construct output buffered stream used for overlapped writing
-    typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
+    using buf_ostream_type = buf_ostream<block_type, bids_container_iterator>;
 
 protected:
     //! internal iterator into the vector.

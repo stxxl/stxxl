@@ -30,25 +30,25 @@ template <class T1,
           >
 struct tuple_base
 {
-    typedef T1 first_type;
-    typedef T2 second_type;
-    typedef T3 third_type;
-    typedef T4 fourth_type;
-    typedef T5 fifth_type;
-    typedef T6 sixth_type;
+    using first_type = T1;
+    using second_type = T2;
+    using third_type = T3;
+    using fourth_type = T4;
+    using fifth_type = T5;
+    using sixth_type = T6;
 
     template <int I>
     struct item_type
     {
 /*
-        typedef typename SWITCH<I, CASE<1,first_type,
+        using result =  typename SWITCH<I, CASE<1,first_type,
                                 CASE<2,second_type,
                                 CASE<3,third_type,
                                 CASE<4,fourth_type,
                                 CASE<5,fifth_type,
                                 CASE<6,sixth_type,
                                 CASE<DEFAULT,void
-                            > > > > > > > >::result result;
+                            > > > > > > > >::result ;
 */
     };
 };
@@ -66,29 +66,29 @@ template <class T1,
 struct tuple
 {
     //! First tuple component type
-    typedef T1 first_type;
+    using first_type = T1;
     //! Second tuple component type
-    typedef T2 second_type;
+    using second_type = T2;
     //! Third tuple component type
-    typedef T3 third_type;
+    using third_type = T3;
     //! Fourth tuple component type
-    typedef T4 fourth_type;
+    using fourth_type = T4;
     //! Fifth tuple component type
-    typedef T5 fifth_type;
+    using fifth_type = T5;
     //! Sixth tuple component type
-    typedef T6 sixth_type;
+    using sixth_type = T6;
 
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH<I, CASE<1, first_type,
-                                        CASE<2, second_type,
-                                             CASE<3, third_type,
-                                                  CASE<4, fourth_type,
-                                                       CASE<5, fifth_type,
-                                                            CASE<6, sixth_type,
-                                                                 CASE<DEFAULT, void
-                                                                      > > > > > > > >::result result;
+        using result = typename SWITCH<I, CASE<1, first_type,
+                                               CASE<2, second_type,
+                                                    CASE<3, third_type,
+                                                         CASE<4, fourth_type,
+                                                              CASE<5, fifth_type,
+                                                                   CASE<6, sixth_type,
+                                                                        CASE<DEFAULT, void
+                                                                             > > > > > > > >::result;
     };
 
     //! First tuple component
@@ -173,7 +173,7 @@ template <class T1>
 struct tuple<T1, Plug, Plug, Plug, Plug>
 {
     //! First tuple component type
-    typedef T1 first_type;
+    using first_type = T1;
 
     //! First tuple component
     first_type first;
@@ -181,7 +181,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename IF<I == 1, first_type, void>::result result;
+        using result = typename IF<I == 1, first_type, void>::result;
     };
 
     //! Empty constructor
@@ -228,17 +228,17 @@ template <class T1, class T2>
 struct tuple<T1, T2, Plug, Plug, Plug, Plug>
 {
     //! First tuple component type
-    typedef T1 first_type;
+    using first_type = T1;
     //! Second tuple component type
-    typedef T2 second_type;
+    using second_type = T2;
 
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH<I, CASE<1, first_type,
-                                        CASE<2, second_type,
-                                             CASE<DEFAULT, void>
-                                             > > >::result result;
+        using result = typename SWITCH<I, CASE<1, first_type,
+                                               CASE<2, second_type,
+                                                    CASE<DEFAULT, void>
+                                                    > > >::result;
     };
 
     //! First tuple component
@@ -297,20 +297,20 @@ template <class T1,
 struct tuple<T1, T2, T3, Plug, Plug, Plug>
 {
     //! First tuple component type
-    typedef T1 first_type;
+    using first_type = T1;
     //! Second tuple component type
-    typedef T2 second_type;
+    using second_type = T2;
     //! Third tuple component type
-    typedef T3 third_type;
+    using third_type = T3;
 
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH<I, CASE<1, first_type,
-                                        CASE<2, second_type,
-                                             CASE<3, second_type,
-                                                  CASE<DEFAULT, void>
-                                                  > > > >::result result;
+        using result = typename SWITCH<I, CASE<1, first_type,
+                                               CASE<2, second_type,
+                                                    CASE<3, second_type,
+                                                         CASE<DEFAULT, void>
+                                                         > > > >::result;
     };
 
     //! First tuple component
@@ -377,23 +377,23 @@ template <class T1,
 struct tuple<T1, T2, T3, T4, Plug, Plug>
 {
     //! First tuple component type
-    typedef T1 first_type;
+    using first_type = T1;
     //! Second tuple component type
-    typedef T2 second_type;
+    using second_type = T2;
     //! Third tuple component type
-    typedef T3 third_type;
+    using third_type = T3;
     //! Fourth tuple component type
-    typedef T4 fourth_type;
+    using fourth_type = T4;
 
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH<I, CASE<1, first_type,
-                                        CASE<2, second_type,
-                                             CASE<3, third_type,
-                                                  CASE<4, fourth_type,
-                                                       CASE<DEFAULT, void
-                                                            > > > > > >::result result;
+        using result = typename SWITCH<I, CASE<1, first_type,
+                                               CASE<2, second_type,
+                                                    CASE<3, third_type,
+                                                         CASE<4, fourth_type,
+                                                              CASE<DEFAULT, void
+                                                                   > > > > > >::result;
     };
 
     //! First tuple component
@@ -469,26 +469,26 @@ template <class T1,
 struct tuple<T1, T2, T3, T4, T5, Plug> // NOLINT
 {
     //! First tuple component type
-    typedef T1 first_type;
+    using first_type = T1;
     //! Second tuple component type
-    typedef T2 second_type;
+    using second_type = T2;
     //! Third tuple component type
-    typedef T3 third_type;
+    using third_type = T3;
     //! Fourth tuple component type
-    typedef T4 fourth_type;
+    using fourth_type = T4;
     //! Fifth tuple component type
-    typedef T5 fifth_type;
+    using fifth_type = T5;
 
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH<I, CASE<1, first_type,
-                                        CASE<2, second_type,
-                                             CASE<3, third_type,
-                                                  CASE<4, fourth_type,
-                                                       CASE<5, fifth_type,
-                                                            CASE<DEFAULT, void
-                                                                 > > > > > > >::result result;
+        using result = typename SWITCH<I, CASE<1, first_type,
+                                               CASE<2, second_type,
+                                                    CASE<3, third_type,
+                                                         CASE<4, fourth_type,
+                                                              CASE<5, fifth_type,
+                                                                   CASE<DEFAULT, void
+                                                                        > > > > > > >::result;
     };
 
     //! First tuple component
@@ -571,7 +571,7 @@ struct tuple<T1, T2, T3, T4, T5, Plug> // NOLINT
 template <typename TupleType>
 struct tuple_less1st
 {
-    typedef TupleType value_type;
+    using value_type = TupleType;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -585,7 +585,7 @@ struct tuple_less1st
 template <typename TupleType>
 struct tuple_greater1st
 {
-    typedef TupleType value_type;
+    using value_type = TupleType;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -599,7 +599,7 @@ struct tuple_greater1st
 template <typename TupleType>
 struct tuple_less1st_less2nd
 {
-    typedef TupleType value_type;
+    using value_type = TupleType;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -615,7 +615,7 @@ struct tuple_less1st_less2nd
 template <typename TupleType>
 struct tuple_less2nd
 {
-    typedef TupleType value_type;
+    using value_type = TupleType;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -629,7 +629,7 @@ struct tuple_less2nd
 template <typename TupleType>
 struct tuple_less2nd_less1st
 {
-    typedef TupleType value_type;
+    using value_type = TupleType;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
@@ -651,7 +651,7 @@ template <class ValueType>
 struct counter
 {
 public:
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
 protected:
     value_type m_count;
@@ -685,7 +685,7 @@ template <class StreamA, class StreamB>
 class concatenate
 {
 public:
-    typedef typename StreamA::value_type value_type;
+    using value_type = typename StreamA::value_type;
 
 private:
     StreamA& A;

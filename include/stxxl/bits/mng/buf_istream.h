@@ -35,14 +35,14 @@ template <typename BlockType, typename BidIteratorType>
 class buf_istream
 {
 public:
-    typedef BlockType block_type;
-    typedef BidIteratorType bid_iterator_type;
+    using block_type = BlockType;
+    using bid_iterator_type = BidIteratorType;
 
 private:
     buf_istream() { }
 
 protected:
-    typedef block_prefetcher<block_type, bid_iterator_type> prefetcher_type;
+    using prefetcher_type = block_prefetcher<block_type, bid_iterator_type>;
     prefetcher_type* prefetcher;
     size_t current_elem;
     block_type* current_blk;
@@ -52,8 +52,8 @@ protected:
 #endif
 
 public:
-    typedef typename block_type::reference reference;
-    typedef buf_istream<block_type, bid_iterator_type> self_type;
+    using reference = typename block_type::reference;
+    using self_type = buf_istream<block_type, bid_iterator_type>;
 
     //! Constructs input stream object.
     //! \param begin \c bid_iterator pointing to the first block of the stream

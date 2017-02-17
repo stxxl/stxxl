@@ -55,9 +55,9 @@ template <
     >
 struct priority_queue_config
 {
-    typedef ValueType value_type;
-    typedef CompareTypeWithMin comparator_type;
-    typedef AllocStr_ alloc_strategy_type;
+    using value_type = ValueType;
+    using comparator_type = CompareTypeWithMin;
+    using alloc_strategy_type = AllocStr_;
     enum
     {
         kDeleteBufferSize = BufferSize1_,
@@ -102,7 +102,7 @@ template <class ConfigType>
 class priority_queue
 {
 public:
-    typedef ConfigType Config;
+    using Config = ConfigType;
     enum
     {
         kDeleteBufferSize = Config::kDeleteBufferSize,
@@ -116,29 +116,27 @@ public:
     };
 
     //! The type of object stored in the priority_queue.
-    typedef typename Config::value_type value_type;
+    using value_type = typename Config::value_type;
     //! Comparison object.
-    typedef typename Config::comparator_type comparator_type;
-    typedef typename Config::alloc_strategy_type alloc_strategy_type;
-    typedef external_size_type size_type;
+    using comparator_type = typename Config::comparator_type;
+    using alloc_strategy_type = typename Config::alloc_strategy_type;
+    using size_type = external_size_type;
     //! Type of the block used in disk-memory transfers
-    typedef typed_block<BlockSize, value_type> block_type;
-    typedef read_write_pool<block_type> pool_type;
+    using block_type = typed_block<BlockSize, value_type>;
+    using pool_type = read_write_pool<block_type>;
 
 protected:
-    typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
-        insert_heap_type;
-
-    typedef priority_queue_local::int_merger<
-            value_type,
-            comparator_type,
-            IntKMAX> int_merger_type;
-
-    typedef priority_queue_local::ext_merger<
-            block_type,
-            comparator_type,
-            ExtKMAX,
-            alloc_strategy_type> ext_merger_type;
+    using insert_heap_type = priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
+    ;
+    using int_merger_type = priority_queue_local::int_merger<
+              value_type,
+              comparator_type,
+              IntKMAX>;
+    using ext_merger_type = priority_queue_local::ext_merger<
+              block_type,
+              comparator_type,
+              ExtKMAX,
+              alloc_strategy_type>;
 
     int_merger_type int_mergers[kNumIntGroups];
     pool_type* pool;
@@ -855,21 +853,21 @@ namespace priority_queue_local {
 struct Parameters_for_priority_queue_not_found_Increase_IntMem
 {
     enum { fits = false };
-    typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
+    using result = Parameters_for_priority_queue_not_found_Increase_IntMem;
 };
 
 struct dummy
 {
     enum { fits = false };
-    typedef dummy result;
+    using result = dummy;
 };
 
 template <size_t ElementSize, size_t IntMem, external_size_type MaxItems, size_t BlockSize,
           size_t m_, bool stop = false>
 struct find_B_m
 {
-    typedef find_B_m<ElementSize, IntMem,
-                     MaxItems, BlockSize, m_, stop> self_type;
+    using self_type = find_B_m<ElementSize, IntMem,
+                               MaxItems, BlockSize, m_, stop>;
 
     //! element size
     static constexpr size_t element_size = ElementSize;
@@ -900,14 +898,14 @@ struct find_B_m
     static constexpr size_t step = 1;
 
     //! if not fits, recurse into configuration with +step more internal buffers
-    typedef typename find_B_m<ElementSize, IntMem, MaxItems, B,
-                              m + step, fits || (m + step >= k)>::result candidate1;
+    using candidate1 = typename find_B_m<ElementSize, IntMem, MaxItems, B,
+                                         m + step, fits || (m + step >= k)>::result;
     //! if not fits, recurse into configuration with block size halved.
-    typedef typename find_B_m<ElementSize, IntMem, MaxItems, B / 2,
-                              1, fits || candidate1::fits>::result candidate2;
+    using candidate2 = typename find_B_m<ElementSize, IntMem, MaxItems, B / 2,
+                                         1, fits || candidate1::fits>::result;
 
     //! return a fitting configuration.
-    typedef typename IF<fits, self_type, typename IF<candidate1::fits, candidate1, candidate2>::result>::result result;
+    using result = typename IF<fits, self_type, typename IF<candidate1::fits, candidate1, candidate2>::result>::result;
 };
 
 // specialization for the case when no valid parameters are found
@@ -915,7 +913,7 @@ template <size_t ElementSize, size_t IntMem, external_size_type MaxItems, bool s
 struct find_B_m<ElementSize, IntMem, MaxItems, 2048, 1, stop>
 {
     enum { fits = false };
-    typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
+    using result = Parameters_for_priority_queue_not_found_Increase_IntMem;
 };
 
 // to speedup search
@@ -925,7 +923,7 @@ template <size_t ElementSize, size_t IntMem,
 struct find_B_m<ElementSize, IntMem, MaxItems, BlockSize, m_, true>
 {
     enum { fits = false };
-    typedef dummy result;
+    using result = dummy;
 };
 
 // start search
@@ -934,31 +932,31 @@ template <size_t ElementSize, size_t IntMem,
 struct find_settings
 {
     // start from block size (8*1024*1024) bytes
-    typedef typename find_B_m<ElementSize, IntMem,
-                              MaxItems, (8* 1024* 1024), 1>::result result;
+    using result = typename find_B_m<ElementSize, IntMem,
+                                     MaxItems, (8* 1024* 1024), 1>::result;
 };
 
 struct Parameters_not_found_Try_to_change_the_Tune_parameter
 {
-    typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
+    using result = Parameters_not_found_Try_to_change_the_Tune_parameter;
 };
 
 template <size_t AI_, size_t X_, size_t CriticalSize>
 struct compute_N
 {
-    typedef compute_N<AI_, X_, CriticalSize> Self;
+    using Self = compute_N<AI_, X_, CriticalSize>;
 
     static const size_t X = X_;
     static const size_t AI = AI_;
     static const size_t N = X / (AI * AI);     // two stage internal
 
-    typedef typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result result;
+    using result = typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result;
 };
 
 template <size_t X_, size_t CriticalSize_>
 struct compute_N<1, X_, CriticalSize_>
 {
-    typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
+    using result = Parameters_not_found_Try_to_change_the_Tune_parameter;
 };
 
 } // namespace priority_queue_local
@@ -998,7 +996,7 @@ class PRIORITY_QUEUE_GENERATOR
 {
 public:
     // actual calculation of B, m, k and element_size
-    typedef typename priority_queue_local::find_settings<sizeof(ValueType), IntMemory, MaxItems>::result settings;
+    using settings = typename priority_queue_local::find_settings<sizeof(ValueType), IntMemory, MaxItems>::result;
     enum {
         B = settings::B,
         m = settings::m,
@@ -1006,7 +1004,7 @@ public:
         Buffer1Size = 32                                     // fixed
     };
     // derivation of N, AI, AE
-    typedef typename priority_queue_local::compute_N<(1 << Tune), X, 4* Buffer1Size>::result ComputeN;
+    using ComputeN = typename priority_queue_local::compute_N<(1 << Tune), X, 4* Buffer1Size>::result;
     enum
     {
         N = ComputeN::N,
@@ -1026,7 +1024,7 @@ public:
         unsigned ExtKMAX_ = 64,     // maximal arity for external mergers
         unsigned ExtLevels_ = 2,
      */
-    typedef priority_queue<priority_queue_config<ValueType, CompareTypeWithMin, Buffer1Size, N, AI, 2, B, AE, 2> > result;
+    using result = priority_queue<priority_queue_config<ValueType, CompareTypeWithMin, Buffer1Size, N, AI, 2, B, AE, 2> >;
 };
 
 //! \}

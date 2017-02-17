@@ -39,45 +39,45 @@ template <class KeyType,
 class btree
 {
 public:
-    typedef KeyType key_type;
-    typedef DataType data_type;
-    typedef KeyCompareWithMaxType key_compare;
+    using key_type = KeyType;
+    using data_type = DataType;
+    using key_compare = KeyCompareWithMaxType;
 
-    typedef btree<KeyType, DataType, KeyCompareWithMaxType,
-                  RawNodeSize, RawLeafSize, PDAllocStrategy> self_type;
+    using self_type = btree<KeyType, DataType, KeyCompareWithMaxType,
+                            RawNodeSize, RawLeafSize, PDAllocStrategy>;
 
-    typedef PDAllocStrategy alloc_strategy_type;
+    using alloc_strategy_type = PDAllocStrategy;
 
-    typedef external_size_type size_type;
-    typedef external_diff_type difference_type;
-    typedef std::pair<const key_type, data_type> value_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef value_type* pointer;
-    typedef value_type const* const_pointer;
+    using size_type = external_size_type;
+    using difference_type = external_diff_type;
+    using value_type = std::pair<const key_type, data_type>;
+    using reference = value_type &;
+    using const_reference = const value_type &;
+    using pointer = value_type *;
+    using const_pointer = value_type const*;
 
     // leaf type declarations
-    typedef normal_leaf<key_type, data_type, key_compare, RawLeafSize, self_type> leaf_type;
+    using leaf_type = normal_leaf<key_type, data_type, key_compare, RawLeafSize, self_type>;
     friend class normal_leaf<key_type, data_type, key_compare, RawLeafSize, self_type>;
-    typedef typename leaf_type::block_type leaf_block_type;
-    typedef typename leaf_type::bid_type leaf_bid_type;
-    typedef node_cache<leaf_type, self_type> leaf_cache_type;
+    using leaf_block_type = typename leaf_type::block_type;
+    using leaf_bid_type = typename leaf_type::bid_type;
+    using leaf_cache_type = node_cache<leaf_type, self_type>;
     friend class node_cache<leaf_type, self_type>;
     // iterator types
-    typedef btree_iterator<self_type> iterator;
-    typedef btree_const_iterator<self_type> const_iterator;
+    using iterator = btree_iterator<self_type>;
+    using const_iterator = btree_const_iterator<self_type>;
     friend class btree_iterator_base<self_type>;
     // iterator map type
-    typedef iterator_map<self_type> iterator_map_type;
+    using iterator_map_type = iterator_map<self_type>;
     // node type declarations
-    typedef normal_node<key_type, key_compare, RawNodeSize, self_type> node_type;
-    typedef typename node_type::block_type node_block_type;
+    using node_type = normal_node<key_type, key_compare, RawNodeSize, self_type>;
+    using node_block_type = typename node_type::block_type;
     friend class normal_node<key_type, key_compare, RawNodeSize, self_type>;
-    typedef typename node_type::bid_type node_bid_type;
-    typedef node_cache<node_type, self_type> node_cache_type;
+    using node_bid_type = typename node_type::bid_type;
+    using node_cache_type = node_cache<node_type, self_type>;
     friend class node_cache<node_type, self_type>;
 
-    typedef typename leaf_type::value_compare value_compare;
+    using value_compare = typename leaf_type::value_compare;
 
     enum {
         min_node_size = node_type::min_size,
@@ -97,10 +97,10 @@ private:
     block_manager* m_bm;
     alloc_strategy_type m_alloc_strategy;
 
-    typedef std::map<key_type, node_bid_type, key_compare> root_node_type;
-    typedef typename root_node_type::iterator root_node_iterator_type;
-    typedef typename root_node_type::const_iterator root_node_const_iterator_type;
-    typedef std::pair<key_type, node_bid_type> root_node_pair_type;
+    using root_node_type = std::map<key_type, node_bid_type, key_compare>;
+    using root_node_iterator_type = typename root_node_type::iterator;
+    using root_node_const_iterator_type = typename root_node_type::const_iterator;
+    using root_node_pair_type = std::pair<key_type, node_bid_type>;
 
     root_node_type m_root_node;
     iterator m_end_iterator;
@@ -171,8 +171,8 @@ private:
     template <class CacheType>
     void fuse_or_balance(root_node_iterator_type uit, CacheType& cache)
     {
-        typedef typename CacheType::node_type local_node_type;
-        typedef typename local_node_type::bid_type local_bid_type;
+        using local_node_type = typename CacheType::node_type;
+        using local_bid_type = typename local_node_type::bid_type;
 
         root_node_iterator_type left_it, right_it;
         if (uit->first == m_key_compare.max_value())
@@ -271,10 +271,10 @@ private:
         assert(leaf_fill_factor >= 0.5);
         key_type last_key = m_key_compare.max_value();
 
-        typedef std::pair<key_type, node_bid_type> key_bid_pair;
-        typedef typename stxxl::vector<
-                key_bid_pair, 1, stxxl::random_pager<1>, node_block_type::raw_size
-                > key_bid_vector_type;
+        using key_bid_pair = std::pair<key_type, node_bid_type>;
+        using key_bid_vector_type = typename stxxl::vector<
+                  key_bid_pair, 1, stxxl::random_pager<1>, node_block_type::raw_size
+                  >;
 
         key_bid_vector_type bids;
 

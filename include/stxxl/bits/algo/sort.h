@@ -54,7 +54,7 @@ namespace sort_local {
 template <typename BlockType, typename BidType>
 struct read_next_after_write_completed
 {
-    typedef BlockType block_type;
+    using block_type = BlockType;
     block_type* block;
     BidType bid;
     request_ptr* req;
@@ -77,10 +77,10 @@ create_runs(
     int_type _m,
     ValueCmp cmp)
 {
-    typedef BlockType block_type;
-    typedef RunType run_type;
+    using block_type = BlockType;
+    using run_type = RunType;
 
-    typedef typename block_type::bid_type bid_type;
+    using bid_type = typename block_type::bid_type;
     STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
 
     int_type m2 = _m / 2;
@@ -212,8 +212,8 @@ bool check_sorted_runs(RunType** runs,
                        size_t m,
                        ValueCmp cmp)
 {
-    typedef BlockType block_type;
-    typedef typename block_type::value_type value_type;
+    using block_type = BlockType;
+    using value_type = typename block_type::value_type;
 
     STXXL_MSG("check_sorted_runs  Runs: " << nruns);
     size_t irun = 0;
@@ -310,13 +310,13 @@ template <typename BlockType, typename RunType, typename ValueCmp>
 void merge_runs(RunType** in_runs, int_type nruns,
                 RunType* out_run, size_t _m, ValueCmp cmp)
 {
-    typedef BlockType block_type;
-    typedef RunType run_type;
-    typedef ValueCmp value_cmp;
-    typedef typename run_type::value_type trigger_entry_type;
-    typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
-    typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
-    typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
+    using block_type = BlockType;
+    using run_type = RunType;
+    using value_cmp = ValueCmp;
+    using trigger_entry_type = typename run_type::value_type;
+    using prefetcher_type = block_prefetcher<block_type, typename run_type::iterator>;
+    using run_cursor_type = run_cursor2<block_type, prefetcher_type>;
+    using run_cursor2_cmp_type = sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp>;
 
     run_type consume_seq(out_run->size());
 
@@ -381,8 +381,8 @@ void merge_runs(RunType** in_runs, int_type nruns,
 // begin of STL-style merging
 
         // this is only for internal elements, no EM involved - internal difference is enough
-        typedef typename std::iterator_traits<typename block_type::iterator>::difference_type diff_type;
-        typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
+        using diff_type = typename std::iterator_traits<typename block_type::iterator>::difference_type;
+        using sequence = std::pair<typename block_type::iterator, typename block_type::iterator>;
         std::vector<sequence> seqs(nruns);
         std::vector<block_type*> buffers(nruns);
 
@@ -521,14 +521,14 @@ sort_blocks(InputBidIterator input_bids,
             size_t _m,
             ValueCmp cmp)
 {
-    typedef BlockType block_type;
-    typedef AllocStrategy alloc_strategy;
-    typedef InputBidIterator input_bid_iterator;
-    typedef ValueCmp value_cmp;
-    typedef typename block_type::bid_type bid_type;
-    typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-    typedef simple_vector<trigger_entry_type> run_type;
-    typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
+    using block_type = BlockType;
+    using alloc_strategy = AllocStrategy;
+    using input_bid_iterator = InputBidIterator;
+    using value_cmp = ValueCmp;
+    using bid_type = typename block_type::bid_type;
+    using trigger_entry_type = sort_helper::trigger_entry<block_type>;
+    using run_type = simple_vector<trigger_entry_type>;
+    using interleaved_alloc_strategy = typename interleaved_alloc_traits<alloc_strategy>::strategy;
 
     size_t m2 = _m / 2;
     size_t full_runs = _n / m2;
@@ -685,13 +685,13 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
-    typedef typename ExtIterator::vector_type::value_type value_type;
-    typedef typename ExtIterator::block_type block_type;
-    typedef typename ExtIterator::bid_type bid_type;
-    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy_type;
-    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
+    using value_type = typename ExtIterator::vector_type::value_type;
+    using block_type = typename ExtIterator::block_type;
+    using bid_type = typename ExtIterator::bid_type;
+    using alloc_strategy_type = typename ExtIterator::vector_type::alloc_strategy_type;
+    using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
-    typedef simple_vector<sort_helper::trigger_entry<block_type> > run_type;
+    using run_type = simple_vector<sort_helper::trigger_entry<block_type> >;
 
     size_t n = 0;
 
@@ -995,7 +995,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    typedef typename ExtIterator::const_iterator const_iterator;
+    using const_iterator = typename ExtIterator::const_iterator;
     assert(stxxl::is_sorted(const_iterator(first), const_iterator(last), cmp));
 #endif
 }

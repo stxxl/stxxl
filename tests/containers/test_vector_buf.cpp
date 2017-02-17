@@ -40,7 +40,7 @@ struct my_type  // 24 bytes, not a power of 2 intentionally
 template <typename VectorType>
 void check_vector(const VectorType& v)
 {
-    typedef typename VectorType::value_type value_type;
+    using value_type = typename VectorType::value_type;
 
     for (size_t i = 0; i < v.size(); ++i)
     {
@@ -55,7 +55,7 @@ class MyStream
     uint64_t i;
 
 public:
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
     MyStream()
         : i(0)
@@ -81,7 +81,7 @@ public:
 template <typename ValueType>
 void test_vector_buf(size_t size)
 {
-    typedef typename stxxl::vector<ValueType> vector_type;
+    using vector_type = typename stxxl::vector<ValueType>;
 
     {   // fill vector using element access
         stxxl::scoped_print_timer tm("element access");
@@ -247,7 +247,7 @@ void test_vector_buf(size_t size)
     }
     {   // read vector using C++11 for loop construct
         stxxl::scoped_print_timer tm("C++11 bufreader for loop");
-        typedef typename vector_type::bufreader_type bufreader_type;
+        using bufreader_type = typename vector_type::bufreader_type;
 
         uint64_t i = 0;
 

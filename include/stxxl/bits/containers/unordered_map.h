@@ -65,8 +65,8 @@ template <
     >
 class unordered_map
 {
-    typedef hash_map::hash_map<KeyType, MappedType, HashType, CompareType,
-                               SubBlockSize, SubBlocksPerBlock, AllocType> impl_type;
+    using impl_type = hash_map::hash_map<KeyType, MappedType, HashType, CompareType,
+                                         SubBlockSize, SubBlocksPerBlock, AllocType>;
 
     impl_type impl;
 
@@ -75,34 +75,34 @@ public:
     //! \{
 
     //! the first template parameter (Key)
-    typedef typename impl_type::key_type key_type;
+    using key_type = typename impl_type::key_type;
     //! the second template parameter (T)
-    typedef typename impl_type::mapped_type mapped_type;
+    using mapped_type = typename impl_type::mapped_type;
     //! pair<const key_type,mapped_type>
-    typedef typename impl_type::value_type value_type;
+    using value_type = typename impl_type::value_type;
     //! the third template parameter (HashType)
-    typedef typename impl_type::hasher hasher;
+    using hasher = typename impl_type::hasher;
     //! the fourth template parameter (CompareType) (!!! not: equality compare)
-    typedef typename impl_type::key_compare key_compare;
+    using key_compare = typename impl_type::key_compare;
     //! the fifth template parameter (AllocType)
-    typedef AllocType allocator_type;
+    using allocator_type = AllocType;
 
-    typedef typename impl_type::reference reference;
-    typedef typename impl_type::const_reference const_reference;
-    typedef typename impl_type::pointer pointer;
-    typedef typename impl_type::const_pointer const_pointer;
+    using reference = typename impl_type::reference;
+    using const_reference = typename impl_type::const_reference;
+    using pointer = typename impl_type::pointer;
+    using const_pointer = typename impl_type::const_pointer;
 
-    typedef typename impl_type::external_size_type size_type;
-    typedef typename impl_type::difference_type difference_type;
+    using size_type = typename impl_type::external_size_type;
+    using difference_type = typename impl_type::difference_type;
 
-    typedef typename impl_type::external_size_type external_size_type;
-    typedef typename impl_type::internal_size_type internal_size_type;
+    using external_size_type = typename impl_type::external_size_type;
+    using internal_size_type = typename impl_type::internal_size_type;
 
-    typedef typename impl_type::iterator iterator;
-    typedef typename impl_type::const_iterator const_iterator;
+    using iterator = typename impl_type::iterator;
+    using const_iterator = typename impl_type::const_iterator;
 
     //! constructed equality predicate for key
-    typedef typename impl_type::key_equal key_equal;
+    using key_equal = typename impl_type::key_equal;
 
     //! \}
 

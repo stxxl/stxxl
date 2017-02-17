@@ -18,7 +18,7 @@
 
 void reader_writer_test()
 {
-    typedef std::pair<unsigned, unsigned> value_type;
+    using value_type = std::pair<unsigned, unsigned>;
 
     const unsigned subblock_raw_size = 1024 * 8; // 8KB subblocks
     const unsigned block_size = 128;             // 1MB blocks (=128 subblocks)
@@ -28,19 +28,19 @@ void reader_writer_test()
 
     const unsigned buffer_size = 4;              // write buffer size in blocks
 
-    typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
-    typedef stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type> block_type;
+    using subblock_type = stxxl::typed_block<subblock_raw_size, value_type>;
+    using block_type = stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type>;
 
     const unsigned subblock_size = subblock_type::size;  // size in values
 
-    typedef block_type::bid_type bid_type;
-    typedef std::vector<bid_type> bid_container_type;
-    typedef bid_container_type::iterator bid_iterator_type;
+    using bid_type = block_type::bid_type;
+    using bid_container_type = std::vector<bid_type>;
+    using bid_iterator_type = bid_container_type::iterator;
 
-    typedef stxxl::hash_map::block_cache<block_type> cache_type;
+    using cache_type = stxxl::hash_map::block_cache<block_type>;
 
-    typedef stxxl::hash_map::buffered_writer<block_type, bid_container_type> writer_type;
-    typedef stxxl::hash_map::buffered_reader<cache_type, bid_iterator_type> reader_type;
+    using writer_type = stxxl::hash_map::buffered_writer<block_type, bid_container_type>;
+    using reader_type = stxxl::hash_map::buffered_reader<cache_type, bid_iterator_type>;
 
     bid_container_type bids;
     cache_type cache(cache_size);

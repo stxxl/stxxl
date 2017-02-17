@@ -43,11 +43,11 @@ template <class ValueType,
           class SizeType = external_size_type>
 struct stack_config_generator
 {
-    typedef ValueType value_type;
+    using value_type = ValueType;
     enum { blocks_per_page = BlocksPerPage };
-    typedef AllocStr alloc_strategy;
+    using alloc_strategy = AllocStr;
     enum { block_size = BlockSize };
-    typedef SizeType size_type;
+    using size_type = SizeType;
 };
 
 //! External stack container.
@@ -62,20 +62,20 @@ template <class StackConfig>
 class normal_stack
 {
 public:
-    typedef StackConfig cfg;
+    using cfg = StackConfig;
     //! type of the elements stored in the stack
-    typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy_type;
+    using value_type = typename cfg::value_type;
+    using alloc_strategy_type = typename cfg::alloc_strategy;
     //! type for sizes (64-bit)
-    typedef typename cfg::size_type size_type;
+    using size_type = typename cfg::size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
         block_size = cfg::block_size
     };
 
     //! type of block used in disk-memory transfers
-    typedef typed_block<block_size, value_type> block_type;
-    typedef BID<block_size> bid_type;
+    using block_type = typed_block<block_size, value_type>;
+    using bid_type = BID<block_size>;
 
 private:
     size_type m_size;
@@ -308,20 +308,20 @@ template <class StackConfig>
 class grow_shrink_stack
 {
 public:
-    typedef StackConfig cfg;
+    using cfg = StackConfig;
     //! type of the elements stored in the stack
-    typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy_type;
+    using value_type = typename cfg::value_type;
+    using alloc_strategy_type = typename cfg::alloc_strategy;
     //! type for sizes (64-bit)
-    typedef typename cfg::size_type size_type;
+    using size_type = typename cfg::size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
         block_size = cfg::block_size
     };
 
     //! type of block used in disk-memory transfers
-    typedef typed_block<block_size, value_type> block_type;
-    typedef BID<block_size> bid_type;
+    using block_type = typed_block<block_size, value_type>;
+    using bid_type = BID<block_size>;
 
 private:
     size_type m_size;
@@ -552,23 +552,23 @@ template <class StackConfig>
 class grow_shrink_stack2
 {
 public:
-    typedef StackConfig cfg;
+    using cfg = StackConfig;
     //! type of the elements stored in the stack
-    typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy_type;
+    using value_type = typename cfg::value_type;
+    using alloc_strategy_type = typename cfg::alloc_strategy;
     //! type for sizes (64-bit)
-    typedef typename cfg::size_type size_type;
+    using size_type = typename cfg::size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,     // stack of this type has only one page
         block_size = cfg::block_size
     };
 
     //! type of block used in disk-memory transfers
-    typedef typed_block<block_size, value_type> block_type;
-    typedef BID<block_size> bid_type;
+    using block_type = typed_block<block_size, value_type>;
+    using bid_type = BID<block_size>;
 
 private:
-    typedef read_write_pool<block_type> pool_type;
+    using pool_type = read_write_pool<block_type>;
 
     size_type m_size;
     size_t cache_offset;
@@ -834,18 +834,18 @@ template <size_t CritSize, class ExternalStack, class InternalStack>
 class migrating_stack
 {
 public:
-    typedef typename ExternalStack::cfg cfg;
+    using cfg = typename ExternalStack::cfg;
     //! type of the elements stored in the stack
-    typedef typename cfg::value_type value_type;
+    using value_type = typename cfg::value_type;
     //! type for sizes (64-bit)
-    typedef typename cfg::size_type size_type;
+    using size_type = typename cfg::size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
         block_size = cfg::block_size
     };
 
-    typedef InternalStack int_stack_type;
-    typedef ExternalStack ext_stack_type;
+    using int_stack_type = InternalStack;
+    using ext_stack_type = ExternalStack;
 
 private:
     enum { critical_size = CritSize };
@@ -1034,17 +1034,16 @@ template <
     >
 class STACK_GENERATOR
 {
-    typedef stack_config_generator<ValueType, BlocksPerPage, BlockSize, AllocStr, SizeType> cfg;
-
-    typedef typename IF<Behaviour == grow_shrink,
-                        grow_shrink_stack<cfg>,
-                        grow_shrink_stack2<cfg> >::result GrShrTp;
-    typedef typename IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result ExtStackType;
-    typedef typename IF<Externality == migrating,
-                        migrating_stack<MigrCritSize, ExtStackType, IntStackType>, ExtStackType>::result MigrOrNotStackType;
+    using cfg = stack_config_generator<ValueType, BlocksPerPage, BlockSize, AllocStr, SizeType>;
+    using GrShrTp = typename IF<Behaviour == grow_shrink,
+                                grow_shrink_stack<cfg>,
+                                grow_shrink_stack2<cfg> >::result;
+    using ExtStackType = typename IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result;
+    using MigrOrNotStackType = typename IF<Externality == migrating,
+                                           migrating_stack<MigrCritSize, ExtStackType, IntStackType>, ExtStackType>::result;
 
 public:
-    typedef typename IF<Externality == internal, IntStackType, MigrOrNotStackType>::result result;
+    using result = typename IF<Externality == internal, IntStackType, MigrOrNotStackType>::result;
 };
 
 //! \}

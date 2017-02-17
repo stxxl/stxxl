@@ -14,8 +14,8 @@
 #include <limits>
 #include <stxxl/priority_queue>
 
-typedef int my_type;
-typedef stxxl::typed_block<4096, my_type> block_type;
+using my_type = int;
+using block_type = stxxl::typed_block<4096, my_type>;
 
 struct dummy_merger
 {
@@ -69,7 +69,7 @@ int main()
     if (1) {
         const size_t volume = 3 * 1024 * 1024; // in KiB
         const size_t mem_for_queue = 256 * 1024 * 1024;
-        typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result pq_type;
+        using pq_type = stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result;
         pq_type pq(mem_for_queue, mem_for_queue);
         pq.push(42);
         STXXL_CHECK(pq.top() == 42);

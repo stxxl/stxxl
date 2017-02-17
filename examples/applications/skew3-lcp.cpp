@@ -52,10 +52,10 @@ using stxxl::external_size_type;
 size_t ram_use = size_t(0.8 * 1024 * 1024 * 1024);
 
 // alphabet data type
-typedef unsigned char alphabet_type;
+using alphabet_type = unsigned char;
 
 // calculation data type
-typedef external_size_type size_type;
+using size_type = external_size_type;
 
 /// Suffix array checker for correctness verification.
 
@@ -73,22 +73,22 @@ typedef external_size_type size_type;
 template <typename InputT, typename InputSA>
 bool sacheck(InputT& inputT, InputSA& inputSA)
 {
-    typedef typename InputSA::value_type offset_type;
-    typedef stxxl::tuple<offset_type, offset_type> pair_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type> triple_type;
+    using offset_type = typename InputSA::value_type;
+    using pair_type = stxxl::tuple<offset_type, offset_type>;
+    using triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
 
     /// Pipeline Declaration
 
     // build tuples with index: (SA[i]) -> (i, SA[i])
-    typedef stxxl::stream::counter<offset_type> index_counter_type;
+    using index_counter_type = stxxl::stream::counter<offset_type>;
     index_counter_type index_counter;
 
-    typedef stxxl::stream::make_tuple<index_counter_type, InputSA> tuple_index_sa_type;
+    using tuple_index_sa_type = stxxl::stream::make_tuple<index_counter_type, InputSA>;
     tuple_index_sa_type tuple_index_sa(index_counter, inputSA);
 
     // take (i, SA[i]) and sort to (ISA[i], i)
-    typedef stxxl::tuple_less2nd<pair_type> pair_less_type;
-    typedef typename stxxl::stream::sort<tuple_index_sa_type, pair_less_type> build_isa_type;
+    using pair_less_type = stxxl::tuple_less2nd<pair_type>;
+    using build_isa_type = typename stxxl::stream::sort<tuple_index_sa_type, pair_less_type>;
 
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
@@ -96,8 +96,8 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     typedef stxxl::tuple_less1st<triple_type> triple_less_type;             // comparison relation
 
     typedef typename stxxl::stream::use_push<triple_type> triple_push_type; // indicator use push()
-    typedef typename stxxl::stream::runs_creator<triple_push_type, triple_less_type> triple_rc_type;
-    typedef typename stxxl::stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type> triple_rm_type;
+    using triple_rc_type = typename stxxl::stream::runs_creator<triple_push_type, triple_less_type>;
+    using triple_rm_type = typename stxxl::stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type>;
 
     triple_rc_type triple_rc(triple_less_type(), ram_use / 3);
 
@@ -201,8 +201,8 @@ bool sacheck_vectors(InputT& inputT, InputSA& inputSA)
 template <typename InputStream>
 struct sa_index_stream_type
 {
-    typedef typename InputStream::value_type offset_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type> value_type;
+    using offset_type = typename InputStream::value_type;
+    using value_type = stxxl::tuple<offset_type, offset_type, offset_type>;
 
 private:
     size_type m_counter;
@@ -255,34 +255,34 @@ void lcparray_stxxl_kasai(const StringContainer& string,
 
     /// Generate ISA.
 
-    typedef typename StringContainer::value_type alphabet_type;
-    typedef typename SAContainer::value_type offset_type;
-    typedef typename SAContainer::size_type size_type;
+    using alphabet_type = typename StringContainer::value_type;
+    using offset_type = typename SAContainer::value_type;
+    using size_type = typename SAContainer::size_type;
 
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef stxxl::tuple<offset_type, offset_type> offset_pair_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type> offset_triple_type;
+    using offset_pair_type = stxxl::tuple<offset_type, offset_type>;
+    using offset_triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
 
     // define stream iterating over a STXXL vector
-    typedef stxxl::stream::iterator2stream<typename SAContainer::const_iterator> sa_stream_type;
+    using sa_stream_type = stxxl::stream::iterator2stream<typename SAContainer::const_iterator>;
     sa_stream_type sa_stream(SA.begin(), SA.end());
     sa_index_stream_type<sa_stream_type> sa_index_stream(sa_stream);
 
     // comparator for ISA sort: 1st component ascending
-    typedef stxxl::tuple_less1st<offset_triple_type> offset_triple_less1st_type;
+    using offset_triple_less1st_type = stxxl::tuple_less1st<offset_triple_type>;
     offset_triple_less1st_type offset_triple_less1st;
 
     // runs creator for ISA stream
-    typedef stxxl::stream::sort<sa_index_stream_type<sa_stream_type>, offset_triple_less1st_type, block_size> isa_sort_type;
+    using isa_sort_type = stxxl::stream::sort<sa_index_stream_type<sa_stream_type>, offset_triple_less1st_type, block_size>;
     isa_sort_type isa_sort(sa_index_stream, offset_triple_less1st, ram_use / 8, ram_use / 8);
 
     /// Output sorter.
 
-    typedef stxxl::tuple_less1st_less2nd<offset_pair_type> offset_pair_less1st_type;
+    using offset_pair_less1st_type = stxxl::tuple_less1st_less2nd<offset_pair_type>;
     offset_pair_less1st_type offset_pair_less1st;
 
-    typedef stxxl::sorter<offset_pair_type, offset_pair_less1st_type, block_size> lcp_sorter_type;
+    using lcp_sorter_type = stxxl::sorter<offset_pair_type, offset_pair_less1st_type, block_size>;
     lcp_sorter_type lcp_sorter(offset_pair_less1st, ram_use / 8);
 
     /// Kasai algorithm: iterate over ISA.
@@ -579,26 +579,26 @@ public:
     };
 
     // 2-tuple, 3-tuple, 4-tuple (=quads), 5-tuple(=quints) definition
-    typedef stxxl::tuple<offset_type, offset_type> skew_pair_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type> skew_triple_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type> skew_quad_type;
-    typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type> skew_quint_type;
+    using skew_pair_type = stxxl::tuple<offset_type, offset_type>;
+    using skew_triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
+    using skew_quad_type = stxxl::tuple<offset_type, offset_type, offset_type, offset_type>;
+    using skew_quint_type = stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type>;
 
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size> offset_array_type;
-    typedef stxxl::stream::vector_iterator2stream<typename offset_array_type::iterator> offset_array_it_rg;
+    using offset_array_type = typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size>;
+    using offset_array_it_rg = stxxl::stream::vector_iterator2stream<typename offset_array_type::iterator>;
 
-    typedef stxxl::sequence<offset_type, block_size> simpleDeq;
-    typedef stxxl::sequence<intPair, block_size> pairDeq;
-    typedef stxxl::sequence<two_tuple, block_size> twoDeq;
+    using simpleDeq = stxxl::sequence<offset_type, block_size>;
+    using pairDeq = stxxl::sequence<intPair, block_size>;
+    using twoDeq = stxxl::sequence<two_tuple, block_size>;
 
     /**
      * Comparison function for the mod0 tuples.
      */
     struct less_mod0
     {
-        typedef skew_quint_type value_type;
+        using value_type = skew_quint_type;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -618,7 +618,7 @@ public:
     template <class ValueType>
     struct counter
     {
-        typedef ValueType value_type;
+        using value_type = ValueType;
 
         value_type cnt;
 
@@ -646,7 +646,7 @@ public:
      */
     struct less_quad_2nd
     {
-        typedef skew_quad_type value_type;
+        using value_type = skew_quad_type;
 
         bool operator () (const skew_quad_type& a, const skew_quad_type& b) const
         {
@@ -662,7 +662,7 @@ public:
      */
     struct less_quint_2nd
     {
-        typedef skew_quint_type value_type;
+        using value_type = skew_quint_type;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -678,7 +678,7 @@ public:
      */
     struct less_skew
     {
-        typedef skew_pair_type value_type;
+        using value_type = skew_pair_type;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -697,7 +697,7 @@ public:
      */
     struct mod12Comparator
     {
-        typedef skew_pair_type value_type;
+        using value_type = skew_pair_type;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -722,7 +722,7 @@ public:
     class concat
     {
     public:
-        typedef StreamType value_type;
+        using value_type = StreamType;
 
     private:
         StreamA& A;
@@ -768,7 +768,7 @@ public:
     template <typename alphabet_type>
     struct less_quad
     {
-        typedef typename stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
+        using value_type = typename stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
@@ -819,8 +819,8 @@ public:
     class naming
     {
     public:
-        typedef typename Input::value_type quad_type;
-        typedef skew_pair_type value_type;
+        using quad_type = typename Input::value_type;
+        using value_type = skew_pair_type;
 
     private:
         Input& A;
@@ -892,7 +892,7 @@ public:
     class make_pairs
     {
     public:
-        typedef skew_pair_type value_type;
+        using value_type = skew_pair_type;
 
     private:
         InputA& A;
@@ -947,7 +947,7 @@ public:
     class make_quads
     {
     public:
-        typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
+        using value_type = stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
 
     private:
         Input& A;
@@ -1034,7 +1034,7 @@ public:
     class extract_mod12
     {
     public:
-        typedef typename Input::value_type value_type;
+        using value_type = typename Input::value_type;
 
     private:
         Input& A;
@@ -1168,13 +1168,13 @@ public:
     template <class Stream1, class Stream2>
     class sparseTableAlgo
     {
-        typedef leftRmqComparator left_cmp;
-        typedef rightRmqComparator right_cmp;
-        typedef finalPairComparator final_cmp;
+        using left_cmp = leftRmqComparator;
+        using right_cmp = rightRmqComparator;
+        using final_cmp = finalPairComparator;
 
-        typedef stxxl::sorter<leftRmq, left_cmp, block_size> left_sorter_type;
-        typedef stxxl::sorter<rightRmq, right_cmp, block_size> right_sorter_type;
-        typedef stxxl::sorter<finalPair, final_cmp, block_size> final_sorter_type;
+        using left_sorter_type = stxxl::sorter<leftRmq, left_cmp, block_size>;
+        using right_sorter_type = stxxl::sorter<rightRmq, right_cmp, block_size>;
+        using final_sorter_type = stxxl::sorter<finalPair, final_cmp, block_size>;
 
         left_sorter_type left_sorter;
         right_sorter_type right_sorter;
@@ -1414,25 +1414,25 @@ public:
     class build_lcp
     {
     private:
-        typedef l3Tuple l3_type;
-        typedef innerTuple inner_type;
-        typedef two_tuple two_tuple_type;
-        typedef pos_pair pos_pair_type;
+        using l3_type = l3Tuple;
+        using inner_type = innerTuple;
+        using two_tuple_type = two_tuple;
+        using pos_pair_type = pos_pair;
 
-        typedef l3TupleComparator l3Tuple_cmp;
-        typedef innerTupleComparator innerTuple_cmp;
-        typedef PairComparator pair_cmp;
+        using l3Tuple_cmp = l3TupleComparator;
+        using innerTuple_cmp = innerTupleComparator;
+        using pair_cmp = PairComparator;
 
-        typedef stxxl::sorter<l3Tuple, l3Tuple_cmp, block_size> l3_tuple_type;
-        typedef stxxl::sorter<innerTuple, innerTuple_cmp, block_size> inner_tuple_type;
-        typedef stxxl::sorter<pos_pair, pair_cmp, block_size> pair_type;
+        using l3_tuple_type = stxxl::sorter<l3Tuple, l3Tuple_cmp, block_size>;
+        using inner_tuple_type = stxxl::sorter<innerTuple, innerTuple_cmp, block_size>;
+        using pair_type = stxxl::sorter<pos_pair, pair_cmp, block_size>;
 
-        typedef typename simpleDeq::stream simpleDeqStream;
-        typedef typename pairDeq::stream pairDeqStream;
-        typedef typename twoDeq::stream twoDeqStream;
+        using simpleDeqStream = typename simpleDeq::stream;
+        using pairDeqStream = typename pairDeq::stream;
+        using twoDeqStream = typename twoDeq::stream;
 
-        //typedef single_concat<simpleDeqStream, simpleDeqStream> s_concatenation;
-        typedef concat<offset_type, simpleDeqStream, simpleDeqStream> s_concatenation;
+        //using s_concatenation =  single_concat<simpleDeqStream, simpleDeqStream> ;
+        using s_concatenation = concat<offset_type, simpleDeqStream, simpleDeqStream>;
 
         simpleDeq l1Deq, l2Deq, l3Deq;
         simpleDeq* lcpn_ptr, * isa1_ptr, * isa2_ptr, * sa12_ptr;
@@ -1738,7 +1738,7 @@ public:
     class merge_sa_lcp
     {
     public:
-        typedef offset_type value_type;
+        using value_type = offset_type;
 
     private:
         Mod0& A;
@@ -2194,30 +2194,30 @@ public:
     class build_sa
     {
     public:
-        typedef offset_type value_type;
+        using value_type = offset_type;
         static const unsigned int add_rank = 1; // free first rank to mark ranks beyond end of input
 
     private:
         // Mod1 types
-        typedef typename stxxl::stream::use_push<skew_quad_type> mod1_push_type;
-        typedef typename stxxl::stream::runs_creator<mod1_push_type, less_quad_2nd, block_size> mod1_runs_type;
-        typedef typename mod1_runs_type::sorted_runs_type sorted_mod1_runs_type;
-        typedef typename stxxl::stream::runs_merger<sorted_mod1_runs_type, less_quad_2nd> mod1_rm_type;
+        using mod1_push_type = typename stxxl::stream::use_push<skew_quad_type>;
+        using mod1_runs_type = typename stxxl::stream::runs_creator<mod1_push_type, less_quad_2nd, block_size>;
+        using sorted_mod1_runs_type = typename mod1_runs_type::sorted_runs_type;
+        using mod1_rm_type = typename stxxl::stream::runs_merger<sorted_mod1_runs_type, less_quad_2nd>;
 
         // Mod2 types
-        typedef typename stxxl::stream::use_push<skew_quint_type> mod2_push_type;
-        typedef typename stxxl::stream::runs_creator<mod2_push_type, less_quint_2nd, block_size> mod2_runs_type;
-        typedef typename mod2_runs_type::sorted_runs_type sorted_mod2_runs_type;
-        typedef typename stxxl::stream::runs_merger<sorted_mod2_runs_type, less_quint_2nd> mod2_rm_type;
+        using mod2_push_type = typename stxxl::stream::use_push<skew_quint_type>;
+        using mod2_runs_type = typename stxxl::stream::runs_creator<mod2_push_type, less_quint_2nd, block_size>;
+        using sorted_mod2_runs_type = typename mod2_runs_type::sorted_runs_type;
+        using mod2_rm_type = typename stxxl::stream::runs_merger<sorted_mod2_runs_type, less_quint_2nd>;
 
         // Mod0 types
-        typedef typename stxxl::stream::use_push<skew_quint_type> mod0_push_type;
-        typedef typename stxxl::stream::runs_creator<mod0_push_type, less_mod0, block_size> mod0_runs_type;
-        typedef typename mod0_runs_type::sorted_runs_type sorted_mod0_runs_type;
-        typedef typename stxxl::stream::runs_merger<sorted_mod0_runs_type, less_mod0> mod0_rm_type;
+        using mod0_push_type = typename stxxl::stream::use_push<skew_quint_type>;
+        using mod0_runs_type = typename stxxl::stream::runs_creator<mod0_push_type, less_mod0, block_size>;
+        using sorted_mod0_runs_type = typename mod0_runs_type::sorted_runs_type;
+        using mod0_rm_type = typename stxxl::stream::runs_merger<sorted_mod0_runs_type, less_mod0>;
 
         // Merge type
-        typedef merge_sa_lcp<mod0_rm_type, mod1_rm_type, mod2_rm_type> merge_sa_lcp_type;
+        using merge_sa_lcp_type = merge_sa_lcp<mod0_rm_type, mod1_rm_type, mod2_rm_type>;
 
         // Functions
         less_mod0 c0;
@@ -2428,24 +2428,24 @@ public:
     class algorithm
     {
     public:
-        typedef offset_type value_type;
-        typedef typename Input::value_type alphabet_type;
+        using value_type = offset_type;
+        using alphabet_type = typename Input::value_type;
 
     private:
-        typedef counter<offset_type> counter_stream_type;
+        using counter_stream_type = counter<offset_type>;
         // (t_i) -> (i,t_i)
-        typedef make_pairs<counter_stream_type, Input> make_pairs_input_type;
+        using make_pairs_input_type = make_pairs<counter_stream_type, Input>;
 
         bool finished;          // used for empty() check
         bool unique;            // is the current quad array unique?
         unsigned int rec_depth; // current recusion depth of the algorithm
 
-        typedef mod12Comparator mod12cmp;
-        typedef stxxl::sorter<stxxl::tuple<offset_type, offset_type>, mod12cmp, block_size> mod12_sorter_type;
+        using mod12cmp = mod12Comparator;
+        using mod12_sorter_type = stxxl::sorter<stxxl::tuple<offset_type, offset_type>, mod12cmp, block_size>;
 
-        typedef stxxl::stream::choose<mod12_sorter_type, 2> isa_second_type;
-        typedef build_sa<offset_array_it_rg, isa_second_type, isa_second_type> buildSA_type;
-        typedef make_pairs<buildSA_type, counter_stream_type> precompute_isa_type;
+        using isa_second_type = stxxl::stream::choose<mod12_sorter_type, 2>;
+        using buildSA_type = build_sa<offset_array_it_rg, isa_second_type, isa_second_type>;
+        using precompute_isa_type = make_pairs<buildSA_type, counter_stream_type>;
 
         buildSA_type* out_sa; // points at final constructed suffix array
 
@@ -2456,16 +2456,16 @@ public:
         buildSA_type * dc3_lcp(InputType1& p_Input)
         {
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
-            typedef make_quads<InputType1, offset_type, 1> make_quads_input_type;
+            using make_quads_input_type = make_quads<InputType1, offset_type, 1>;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2}) with i = 1,2 mod 3
-            typedef extract_mod12<make_quads_input_type> mod12_quads_input_type;
+            using mod12_quads_input_type = extract_mod12<make_quads_input_type>;
 
             // sort (i,t_i,t_{i+1},t_{i+2}) by (t_i,t_{i+1},t_{i+2})
-            typedef typename stxxl::stream::sort<mod12_quads_input_type, less_quad<offset_type>, block_size> sort_mod12_input_type;
+            using sort_mod12_input_type = typename stxxl::stream::sort<mod12_quads_input_type, less_quad<offset_type>, block_size>;
 
             // name (i,t_i,t_{i+1},t_{i+2}) -> (i,n_i)
-            typedef naming<sort_mod12_input_type> naming_input_type;
+            using naming_input_type = naming<sort_mod12_input_type>;
 
             unique = false;
             offset_type sticking_length = 0; // holds length of current s^12
@@ -2474,7 +2474,7 @@ public:
             mod12_sorter_type m2_sorter(mod12cmp(), ram_use / 6);
 
             // sorted mod1 runs -concat- sorted mod2 runs
-            typedef concat<stxxl::tuple<offset_type, offset_type>, mod12_sorter_type, mod12_sorter_type> concatenation;
+            using concatenation = concat<stxxl::tuple<offset_type, offset_type>, mod12_sorter_type, mod12_sorter_type>;
 
             offset_array_type text;
 
@@ -2644,7 +2644,7 @@ class cut_stream
 {
 public:
     // same value type as input stream
-    typedef typename InputType::value_type value_type;
+    using value_type = typename InputType::value_type;
 
 protected:
     // instance of input stream
@@ -2688,8 +2688,8 @@ int process(const std::string& input_filename, const std::string& output_filenam
 {
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2> > alphabet_vector_type;
-    typedef typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size> offset_vector_type;
+    using alphabet_vector_type = typename stxxl::vector<alphabet_type, 1, stxxl::lru_pager<2> >;
+    using offset_vector_type = typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size>;
 
     // input and output files (if supplied via command line)
     stxxl::file_ptr input_file, output_file;
@@ -2752,9 +2752,9 @@ int process(const std::string& input_filename, const std::string& output_filenam
     stxxl::stats_data stats_begin(*Stats);
 
     // construct skew class with bufreader input type
-    typedef alphabet_vector_type::bufreader_type input_type;
-    typedef cut_stream<input_type> cut_input_type;
-    typedef typename algo::skew<offset_type>::template algorithm<cut_input_type> skew_type;
+    using input_type = alphabet_vector_type::bufreader_type;
+    using cut_input_type = cut_stream<input_type>;
+    using skew_type = typename algo::skew<offset_type>::template algorithm<cut_input_type>;
 
     size_type size = input_vector.size();
     if (size > sizelimit) size = sizelimit;

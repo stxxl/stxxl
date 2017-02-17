@@ -15,8 +15,8 @@
 #include <limits>
 #include <stxxl/priority_queue>
 
-typedef int my_type;
-typedef stxxl::typed_block<4096, my_type> block_type;
+using my_type = int;
+using block_type = stxxl::typed_block<4096, my_type>;
 
 struct dummy_merger
 {

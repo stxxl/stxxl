@@ -23,7 +23,7 @@ void test_strategy()
     strategy s0;
     strategy s2(1, 3);
     stxxl::offset_allocator<strategy> o(1, s0);
-    typedef typename stxxl::interleaved_alloc_traits<strategy>::strategy interleaved;
+    using interleaved = typename stxxl::interleaved_alloc_traits<strategy>::strategy;
     interleaved itl(23, strategy(1, 3));
     for (int i = 0; i < 16; ++i)
         STXXL_MSG(s0(i) << " " << s2(i) << " " << o(i) << " " << itl(i));

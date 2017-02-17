@@ -17,8 +17,8 @@
 #include <algorithm>
 #include <cmath>
 
-typedef unsigned int key_type;
-typedef unsigned int data_type;
+using key_type = unsigned int;
+using data_type = unsigned int;
 
 struct cmp : public std::less<key_type>
 {
@@ -37,7 +37,7 @@ struct cmp : public std::less<key_type>
 
 #define CACHE_ELEMENTS (BLOCK_SIZE * CACHE_SIZE / (sizeof(key_type) + sizeof(data_type)))
 
-typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
+using map_type = stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE>;
 
 // forced instantiation
 template class stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE>;

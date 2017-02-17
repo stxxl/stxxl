@@ -26,7 +26,7 @@ struct type
     ~type() { }
 };
 
-typedef stxxl::typed_block<BLOCK_SIZE, type> block_type;
+using block_type = stxxl::typed_block<BLOCK_SIZE, type>;
 template class stxxl::typed_block<BLOCK_SIZE, type>; // forced instantiation
 
 void test_typed_block()

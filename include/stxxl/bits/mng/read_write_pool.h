@@ -28,13 +28,13 @@ template <typename BlockType>
 class read_write_pool
 {
 public:
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
-    typedef size_t size_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
+    using size_type = size_t;
 
 protected:
-    typedef write_pool<block_type> write_pool_type;
-    typedef prefetch_pool<block_type> prefetch_pool_type;
+    using write_pool_type = write_pool<block_type>;
+    using prefetch_pool_type = prefetch_pool<block_type>;
 
     write_pool_type* w_pool;
     prefetch_pool_type* p_pool;

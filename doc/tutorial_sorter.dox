@@ -27,7 +27,7 @@ BlockSize and AllocStr are optional (see \ref stxxl::sorter for additional infor
 
 \code
 // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
-typedef stxxl::sorter<int, my_comparator, 1*1024*1024> sorter_type;
+using sorter_type = stxxl::sorter<int, my_comparator, 1*1024*1024>;
 
 // create sorter object (CompareType(), MemoryToUse)
 sorter_type int_sorter(my_comparator(), 64*1024*1024);

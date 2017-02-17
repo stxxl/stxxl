@@ -24,7 +24,7 @@
 
 struct my_type
 {
-    typedef unsigned key_type;
+    using key_type = unsigned;
 
     key_type m_key;
     char m_data[128 - sizeof(key_type)];
@@ -58,7 +58,7 @@ int main()
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
     unsigned memory_to_use = 22 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
-    typedef stxxl::vector<my_type> vector_type;
+    using vector_type = stxxl::vector<my_type>;
     const uint64_t n_records = 2 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(uint64_t)) / sizeof(my_type);
     vector_type v(n_records);
 

@@ -33,7 +33,7 @@ class random_pager
 {
     enum { n_pages = npages_ };
 
-    typedef size_t size_type;
+    using size_type = size_t;
 
     size_type num_pages;
     random_number<random_uniform_fast> rnd;
@@ -64,8 +64,8 @@ class lru_pager
 {
     enum { n_pages = npages_ };
 
-    typedef size_t size_type;
-    typedef std::list<size_type> list_type;
+    using size_type = size_t;
+    using list_type = std::list<size_type>;
 
     list_type history;
     simple_vector<list_type::iterator> history_entry;

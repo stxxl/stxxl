@@ -19,7 +19,7 @@
 
 #include <stxxl/queue>
 
-typedef uint64_t my_type;
+using my_type = uint64_t;
 
 // forced instantiation
 template class stxxl::queue<my_type>;

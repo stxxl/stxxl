@@ -28,8 +28,8 @@ template <typename BlockType, typename BidIteratorType>
 class buf_ostream
 {
 public:
-    typedef BlockType block_type;
-    typedef BidIteratorType bid_iterator_type;
+    using block_type = BlockType;
+    using bid_iterator_type = BidIteratorType;
 
 protected:
     buffered_writer<block_type> writer;
@@ -38,9 +38,9 @@ protected:
     block_type* current_blk;
 
 public:
-    typedef typename block_type::const_reference const_reference;
-    typedef typename block_type::reference reference;
-    typedef buf_ostream<block_type, bid_iterator_type> self_type;
+    using const_reference = typename block_type::const_reference;
+    using reference = typename block_type::reference;
+    using self_type = buf_ostream<block_type, bid_iterator_type>;
 
     //! Constructs output stream object.
     //! \param first_bid \c bid_iterator pointing to the first block of the stream

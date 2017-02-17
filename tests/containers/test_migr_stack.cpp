@@ -25,7 +25,7 @@ template class stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4
 
 int main()
 {
-    typedef stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<size_t>, critical_size>::result migrating_stack_type;
+    using migrating_stack_type = stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<size_t>, critical_size>::result;
 
     STXXL_MSG("Starting test.");
 

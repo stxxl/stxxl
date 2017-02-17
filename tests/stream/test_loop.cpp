@@ -37,8 +37,8 @@ bool verbose;
 
 struct random_generator
 {
-    typedef stxxl::random_number32::value_type value_type;
-    typedef size_t size_type;
+    using value_type = stxxl::random_number32::value_type;
+    using size_type = size_t;
     value_type current;
     size_type count;
     stxxl::random_number32 rnd;
@@ -89,8 +89,8 @@ struct Cmp : std::binary_function<value_type, value_type, bool>
 template <typename Input>
 struct filter
 {
-    typedef typename Input::value_type value_type;
-    typedef size_t size_type;
+    using value_type = typename Input::value_type;
+    using size_type = size_t;
     Input& input;
     value_type filter_value;
     size_type& counter;
@@ -129,7 +129,7 @@ struct filter
 template <typename Input>
 struct output
 {
-    typedef typename Input::value_type value_type;
+    using value_type = typename Input::value_type;
     Input& input;
 
     explicit output(Input& _input) : input(_input) { }
@@ -157,7 +157,7 @@ struct output
 template <typename Input>
 struct shuffle
 {
-    typedef typename Input::value_type value_type;
+    using value_type = typename Input::value_type;
     Input& input;
     value_type current, next;
     bool even, is_empty;
@@ -221,16 +221,16 @@ struct shuffle
     }
 };
 
-typedef random_generator input_generator_type;
-typedef Cmp<input_generator_type::value_type> cmp;
-typedef stxxl::stream::runs_creator<input_generator_type, cmp> runs_creator_type0;
-typedef runs_creator_type0::sorted_runs_type sorted_runs_type;
-typedef stxxl::stream::runs_merger<sorted_runs_type, cmp> runs_merger_type;
-typedef output<runs_merger_type> output_type;
-typedef filter<output_type> filter_type0;
-typedef filter<filter_type0> filter_type1;
-typedef shuffle<filter_type1> shuffle_type;
-typedef stxxl::stream::runs_creator<shuffle_type, cmp> runs_creator_type1;
+using input_generator_type = random_generator;
+using cmp = Cmp<input_generator_type::value_type>;
+using runs_creator_type0 = stxxl::stream::runs_creator<input_generator_type, cmp>;
+using sorted_runs_type = runs_creator_type0::sorted_runs_type;
+using runs_merger_type = stxxl::stream::runs_merger<sorted_runs_type, cmp>;
+using output_type = output<runs_merger_type>;
+using filter_type0 = filter<output_type>;
+using filter_type1 = filter<filter_type0>;
+using shuffle_type = shuffle<filter_type1>;
+using runs_creator_type1 = stxxl::stream::runs_creator<shuffle_type, cmp>;
 
 // force instantiation of whole chain
 template class stxxl::stream::runs_creator<shuffle_type, cmp>;

@@ -38,7 +38,7 @@ class unique
 
 public:
     //! Standard stream typedef.
-    typedef typename Input::value_type value_type;
+    using value_type = typename Input::value_type;
 
     unique(Input& input_, BinaryPredicate binary_pred_)
         : input(input_), binary_pred(binary_pred_)
@@ -87,7 +87,7 @@ class unique<Input, dummy_cmp_unique>
 
 public:
     //! Standard stream typedef.
-    typedef typename Input::value_type value_type;
+    using value_type = typename Input::value_type;
 
     explicit unique(Input& input_) : input(input_)
     {

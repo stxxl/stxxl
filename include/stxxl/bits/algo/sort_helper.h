@@ -37,9 +37,9 @@ inline void verify_sentinel_strict_weak_ordering(StrictWeakOrdering cmp)
 template <typename BlockType, typename ValueType = typename BlockType::value_type>
 struct trigger_entry
 {
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
-    typedef ValueType value_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
+    using value_type = ValueType;
 
     bid_type bid;
     value_type value;
@@ -54,7 +54,7 @@ template <typename TriggerEntryType, typename ValueCmp>
 struct trigger_entry_cmp
     : public std::binary_function<TriggerEntryType, TriggerEntryType, bool>
 {
-    typedef TriggerEntryType trigger_entry_type;
+    using trigger_entry_type = TriggerEntryType;
     ValueCmp cmp;
     explicit trigger_entry_cmp(ValueCmp c) : cmp(c) { }
     trigger_entry_cmp(const trigger_entry_cmp& a) : cmp(a.cmp) { }
@@ -74,11 +74,11 @@ struct run_cursor2_cmp
           bool
           >
 {
-    typedef BlockType block_type;
-    typedef PrefetcherType prefetcher_type;
-    typedef ValueCmp value_cmp;
+    using block_type = BlockType;
+    using prefetcher_type = PrefetcherType;
+    using value_cmp = ValueCmp;
 
-    typedef run_cursor2<block_type, prefetcher_type> cursor_type;
+    using cursor_type = run_cursor2<block_type, prefetcher_type>;
     value_cmp cmp;
 
     explicit run_cursor2_cmp(value_cmp c) : cmp(c) { }
@@ -102,8 +102,8 @@ inline size_t
 count_elements_less_equal(const SequenceVector& seqs,
                           const ValueType& bound, Comparator cmp)
 {
-    typedef typename SequenceVector::size_type seqs_size_type;
-    typedef typename SequenceVector::value_type::first_type iterator;
+    using seqs_size_type = typename SequenceVector::size_type;
+    using iterator = typename SequenceVector::value_type::first_type;
     size_t count = 0;
 
     for (seqs_size_type i = 0; i < seqs.size(); ++i)
@@ -123,7 +123,7 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
                                  BufferPtrVector& buffers,
                                  Prefetcher& prefetcher)
 {
-    typedef typename SequenceVector::size_type seqs_size_type;
+    using seqs_size_type = typename SequenceVector::size_type;
 
     for (seqs_size_type i = 0; i < seqs.size(); ++i)
     {

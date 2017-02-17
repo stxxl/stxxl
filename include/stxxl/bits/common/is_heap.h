@@ -25,8 +25,8 @@ bool is_heap(
         std::less<typename std::iterator_traits<RandomAccessIterator>
                   ::value_type>())
 {
-    typedef typename std::iterator_traits<RandomAccessIterator>
-        ::difference_type diff_type;
+    using diff_type = typename std::iterator_traits<RandomAccessIterator>
+                      ::difference_type;
 
     if (first == last) return true;
 

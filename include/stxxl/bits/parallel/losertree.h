@@ -44,9 +44,9 @@ class LoserTreeCopyBase
 {
 public:
     //! size of counters and array indexes
-    typedef unsigned int size_type;
+    using size_type = unsigned int;
     //! type of the source field
-    typedef int source_type;
+    using source_type = int;
 
 protected:
     //! Internal representation of a loser tree player/node
@@ -189,10 +189,10 @@ template <bool Stable /* == false */,
 class LoserTreeCopy : public LoserTreeCopyBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreeCopyBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreeCopyBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
@@ -244,10 +244,10 @@ class LoserTreeCopy</* Stable == */ true, ValueType, Comparator>
     : public LoserTreeCopyBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreeCopyBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreeCopyBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
@@ -292,9 +292,9 @@ class LoserTreeReference
 {
 public:
     //! size of counters and array indexes
-    typedef unsigned int size_type;
+    using size_type = unsigned int;
     //! type of the source field
-    typedef int source_type;
+    using source_type = int;
 #undef COPY
 #ifdef COPY
         #define KEY(i) losers[i].key
@@ -497,11 +497,11 @@ class LoserTreePointerBase
 {
 public:
     //! size of counters and array indexes
-    typedef typename LoserTreeCopyBase<ValueType, Comparator>
-        ::size_type size_type;
+    using size_type = typename LoserTreeCopyBase<ValueType, Comparator>
+                      ::size_type;
     //! type of the source field
-    typedef typename LoserTreeCopyBase<ValueType, Comparator>
-        ::source_type source_type;
+    using source_type = typename LoserTreeCopyBase<ValueType, Comparator>
+                        ::source_type;
 
 protected:
     //! Internal representation of a loser tree player/node
@@ -624,10 +624,10 @@ template <bool Stable /* == false */,
 class LoserTreePointer : public LoserTreePointerBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreePointerBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreePointerBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
@@ -675,10 +675,10 @@ class LoserTreePointer</* Stable == */ true, ValueType, Comparator>
     : public LoserTreePointerBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreePointerBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreePointerBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
     using base_type::k;
     using base_type::losers;
     using base_type::comp;
@@ -727,9 +727,9 @@ class LoserTreeCopyUnguardedBase
 {
 public:
     //! size of counters and array indexes
-    typedef unsigned int size_type;
+    using size_type = unsigned int;
     //! type of the source field
-    typedef int source_type;
+    using source_type = int;
 
 protected:
     //! Internal representation of a loser tree player/node
@@ -830,10 +830,10 @@ template <bool Stable /* == false */,
 class LoserTreeCopyUnguarded : public LoserTreeCopyUnguardedBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreeCopyUnguardedBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreeCopyUnguardedBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
 
 protected:
     using base_type::k;
@@ -873,10 +873,10 @@ class LoserTreeCopyUnguarded</* Stable == */ true, ValueType, Comparator>
     : public LoserTreeCopyUnguardedBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreeCopyUnguardedBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreeCopyUnguardedBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
 
 protected:
     using base_type::k;
@@ -925,9 +925,9 @@ class LoserTreePointerUnguardedBase
 {
 public:
     //! size of counters and array indexes
-    typedef unsigned int size_type;
+    using size_type = unsigned int;
     //! type of the source field
-    typedef int source_type;
+    using source_type = int;
 
 protected:
     //! Internal representation of a loser tree player/node
@@ -1027,10 +1027,10 @@ class LoserTreePointerUnguarded
     : public LoserTreePointerUnguardedBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreePointerUnguardedBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreePointerUnguardedBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
 
 protected:
     using base_type::k;
@@ -1070,10 +1070,10 @@ class LoserTreePointerUnguarded</* Stable == */ true, ValueType, Comparator>
     : public LoserTreePointerUnguardedBase<ValueType, Comparator>
 {
 public:
-    typedef LoserTreePointerUnguardedBase<ValueType, Comparator> base_type;
+    using base_type = LoserTreePointerUnguardedBase<ValueType, Comparator>;
 
-    typedef typename base_type::size_type size_type;
-    typedef typename base_type::source_type source_type;
+    using size_type = typename base_type::size_type;
+    using source_type = typename base_type::source_type;
 
 protected:
     using base_type::k;

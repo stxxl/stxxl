@@ -203,9 +203,9 @@ struct low_level_matrix_multiply_and_add
 };
 
 #if STXXL_BLAS
-typedef int_type blas_int;
-typedef std::complex<double> blas_double_complex;
-typedef std::complex<float> blas_single_complex;
+using blas_int =  int_type ;
+using blas_double_complex =  std::complex<double> ;
+using blas_single_complex =  std::complex<float> ;
 
 // --- vector add (used as matrix-add) -----------------
 

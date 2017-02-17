@@ -210,12 +210,12 @@ template <class OneDimArrayType, class DataType, class PosType>
 struct two2one_dim_array_adapter_base
     : public std::iterator<std::random_access_iterator_tag, DataType, size_t>
 {
-    typedef OneDimArrayType one_dim_array_type;
-    typedef DataType data_type;
-    typedef PosType pos_type;
+    using one_dim_array_type = OneDimArrayType;
+    using data_type = DataType;
+    using pos_type = PosType;
 
-    typedef two2one_dim_array_adapter_base<one_dim_array_type,
-                                           data_type, pos_type> self_type;
+    using self_type = two2one_dim_array_adapter_base<one_dim_array_type,
+                                                     data_type, pos_type>;
 
     one_dim_array_type* array;
     pos_type pos;
@@ -320,16 +320,14 @@ template <class OneDimArrayType, class DataType,
 struct two2one_dim_array_row_adapter
     : public two2one_dim_array_adapter_base<OneDimArrayType, DataType, PosType>
 {
-    typedef OneDimArrayType one_dim_array_type;
-    typedef DataType data_type;
-    typedef DimSize dim_type;
-    typedef PosType pos_type;
-
-    typedef two2one_dim_array_row_adapter<one_dim_array_type,
-                                          data_type, dim_size, pos_type> self_type;
-
-    typedef two2one_dim_array_adapter_base<one_dim_array_type,
-                                           data_type, pos_type> base_type;
+    using one_dim_array_type = OneDimArrayType;
+    using data_type = DataType;
+    using dim_type = DimSize;
+    using pos_type = PosType;
+    using self_type = two2one_dim_array_row_adapter<one_dim_array_type,
+                                                    data_type, dim_size, pos_type>;
+    using base_type = two2one_dim_array_adapter_base<one_dim_array_type,
+                                                     data_type, pos_type>;
     using base_type::array;
     using base_type::pos;
 
@@ -371,8 +369,8 @@ template <class OneDimArrayType, class DataType,
 struct two2one_dim_array_column_adapter
     : public two2one_dim_array_adapter_base<OneDimArrayType, DataType, PosType>
 {
-    typedef two2one_dim_array_column_adapter<one_dim_array_type,
-                                             data_type, dim_size, pos_type> self_type;
+    using self_type = two2one_dim_array_column_adapter<one_dim_array_type,
+                                                       data_type, dim_size, pos_type>;
 
     using two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>::pos;
     using two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>::array;
@@ -415,8 +413,8 @@ class array_of_sequences_iterator
     : public std::iterator<std::random_access_iterator_tag, ValueType, size_t>
 {
 public:
-    typedef ArrayType array_type;
-    typedef ValueType value_type;
+    using array_type = ArrayType;
+    using value_type = ValueType;
 
 protected:
     size_t pos;
@@ -601,13 +599,13 @@ class element_iterator_generator
 template <typename BlockType, typename SizeType>
 class element_iterator_generator<BlockType, SizeType, false>
 {
-    typedef BlockType block_type;
-    typedef typename block_type::value_type value_type;
+    using block_type = BlockType;
+    using value_type = typename block_type::value_type;
 
-    typedef SizeType size_type;
+    using size_type = SizeType;
 
 public:
-    typedef array_of_sequences_iterator<block_type, value_type, block_type::size> iterator;
+    using iterator = array_of_sequences_iterator<block_type, value_type, block_type::size>;
 
     iterator operator () (block_type* blocks, SizeType offset) const
     {
@@ -619,13 +617,13 @@ public:
 template <typename BlockType, typename SizeType>
 class element_iterator_generator<BlockType, SizeType, true>
 {
-    typedef BlockType block_type;
-    typedef typename block_type::value_type value_type;
+    using block_type = BlockType;
+    using value_type = typename block_type::value_type;
 
-    typedef SizeType size_type;
+    using size_type = SizeType;
 
 public:
-    typedef value_type* iterator;
+    using iterator = value_type *;
 
     iterator operator () (block_type* blocks, SizeType offset) const
     {
@@ -638,9 +636,9 @@ public:
 template <typename BlockType, typename SizeType>
 struct element_iterator_traits
 {
-    typedef typename helper::element_iterator_generator<
-            BlockType, SizeType, BlockType::has_only_data
-            >::iterator element_iterator;
+    using element_iterator = typename helper::element_iterator_generator<
+              BlockType, SizeType, BlockType::has_only_data
+              >::iterator;
 };
 
 template <typename BlockType, typename SizeType>

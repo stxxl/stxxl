@@ -35,8 +35,8 @@ The constructor of parallel_priority_queue takes an instance of the comparator a
 Thus the definition may look as follows:
 
 \code
-typedef std::greater<int> comparator_type;
-typedef stxxl::parallel_priority_queue<int, comparator_type> ppq_type;
+using comparator_type = std::greater<int>;
+using ppq_type = stxxl::parallel_priority_queue<int, comparator_type>;
 ppq_type ppq(comparator_type(), 2 * 1024L * 1024L * 1024L);
 \endcode
 

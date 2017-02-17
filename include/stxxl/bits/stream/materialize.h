@@ -94,9 +94,9 @@ stxxl::vector_iterator<VectorConfig> materialize(
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<VectorConfig> ExtIterator;
-    typedef stxxl::const_vector_iterator<VectorConfig> ConstExtIterator;
-    typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
+    using ExtIterator = stxxl::vector_iterator<VectorConfig>;
+    using ConstExtIterator = stxxl::const_vector_iterator<VectorConfig>;
+    using buf_ostream_type = buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator>;
 
     while (outbegin.block_offset())     //  go to the beginning of the block
     //  of the external vector
@@ -170,9 +170,9 @@ stxxl::vector_iterator<VectorConfig> materialize(
     size_t nbuffers = 0)
 {
     STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
-    typedef stxxl::vector_iterator<VectorConfig> ExtIterator;
-    typedef stxxl::const_vector_iterator<VectorConfig> ConstExtIterator;
-    typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
+    using ExtIterator = stxxl::vector_iterator<VectorConfig>;
+    using ConstExtIterator = stxxl::const_vector_iterator<VectorConfig>;
+    using buf_ostream_type = buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator>;
 
     // on the I/O complexity of "materialize":
     // crossing block boundary causes O(1) I/Os

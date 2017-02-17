@@ -32,7 +32,7 @@ namespace stxxl {
 namespace parallel {
 
 /** Type of of point in time, used for the Timing classes. */
-typedef double point_in_time;
+using point_in_time = double;
 
 template <typename tag, typename must_be_int = int>
 class Timing;

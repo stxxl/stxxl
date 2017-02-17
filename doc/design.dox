@@ -98,7 +98,7 @@ The full signature of the STXXL "block of elements" class is \ref stxxl::typed_b
 In the following listing, we give an example of how to program block I/O using objects of the BM layer. In line 2 we define the type of block: its size is one megabyte and the type of elements is \c double. The pointer to the only instance of the singleton object \ref stxxl::block_manager is obtained in line 5. Line 6 asks the block manager to allocate 32 blocks in external memory. The <tt>new_blocks</tt> call writes the allocated BIDs to the output iterator, given by the last parameter. The <tt>std::back_inserter</tt> iterator adapter will insert the output BIDs at the end of the array \c bids. The manager assigns blocks to disks in a round-robin fashion as the <tt>striping()</tt> strategy suggests. Line 7 allocates 32 internal memory blocks. The internal memory allocator \ref stxxl::new_alloc\<block_type> of STXXL allocates blocks on a virtual memory page boundary, which is a requirement for unbuffered file access. Along lines 8--10 the elements of blocks are filled with some values. Then, the blocks are submitted for writing (lines 11-12). The request objects are stored in an <tt>std::vector</tt> for the further status tracking. As in the AIO example, I/O is overlapped with computations in the function <tt>do_something()</tt>. After the completion of all write requests (line 15) we perform some useful processing with the written data (function <tt>do_something1()</tt>). Finally we free the external memory space occupied by the 32 blocks (line 18).
 
 \code
-typedef stxxl::typed_block<1024*1024,double> block_type;
+using block_type = stxxl::typed_block<1024*1024,double>;
 std::vector<block_type::bid_type> bids; //empty array of BIDs
 std::vector<stxxl::request_ptr> requests;
 stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
@@ -371,8 +371,8 @@ The \ref stxxl::STACK_GENERATOR has the following template parameters:
 TODO-df : but use read_write_pool instead of the two pools.
 
 \code
-typedef STACK_GENERATOR<int,external,grow_shrink2>::result stack_type;
-typedef stack_type::block_type block_type;
+using stack_type = STACK_GENERATOR<int,external,grow_shrink2>::result;
+using block_type = stack_type::block_type;
 
 stxxl::prefetch_pool p_pool(10); // 10 read buffers
 stxxl::write_pool w_pool(6);     // 6 write buffers
@@ -730,7 +730,7 @@ A comparator class \b my_less, that could be instantiated as e.g. \c my_less<int
 template <typename ValueType>
 struct my_less
 {
-    typedef ValueType value_type;
+    using value_type = ValueType;
     bool operator() (const value_type & a, const value_type & b) const
     {
         return a < b;
@@ -834,7 +834,7 @@ Example:
 \code
 struct MyType
 {
-    typedef unsigned long long key_type;
+    using key_type = unsigned long long;
     key_type m_key;
     char m_data[32];
     MyType() {}
@@ -864,7 +864,7 @@ A key extractor object for ordering elements having 64 bit integer keys:
 \code
 struct MyType
 {
-    typedef unsigned long long key_type;
+    using key_type = unsigned long long;
     key_type m_key;
     char m_data[32];
     MyType() {}
@@ -872,7 +872,7 @@ struct MyType
 };
 struct GetKey
 {
-    typedef MyType::key_type key_type;
+    using key_type = MyType::key_type;
     key_type operator() (const MyType & obj)
     { return obj.m_key; }
     MyType min_value() const
@@ -892,7 +892,7 @@ struct Edge
 
 struct GetWeight
 {
-    typedef unsigned key_type;
+    using key_type = unsigned;
     key_type operator() (const Edge & e) const
     {
         return e.weight;
@@ -923,7 +923,7 @@ The same as for \ref design_algo_sort "stxxl::sort".
 \code
 struct MyType
 {
-    typedef unsigned long long key_type;
+    using key_type = unsigned long long;
     key_type m_key;
     char m_data[32];
     MyType() {}

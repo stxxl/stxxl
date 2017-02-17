@@ -94,12 +94,12 @@ template <typename ValueType, typename ContainerType = std::vector<ValueType>,
 class internal_priority_queue
 {
 public:
-    typedef ValueType value_type;
-    typedef ContainerType container_type;
-    typedef CompareType compare_type;
-    typedef typename container_type::reference reference;
-    typedef typename container_type::const_reference const_reference;
-    typedef typename container_type::size_type size_type;
+    using value_type = ValueType;
+    using container_type = ContainerType;
+    using compare_type = CompareType;
+    using reference = typename container_type::reference;
+    using const_reference = typename container_type::const_reference;
+    using size_type = typename container_type::size_type;
 
 protected:
     //  See queue::heap for notes on these names.
@@ -207,8 +207,8 @@ public:
 template <typename ValueType, size_t MaxSize>
 class internal_bounded_stack
 {
-    typedef ValueType value_type;
-    typedef size_t size_type;
+    using value_type = ValueType;
+    using size_type = size_t;
     enum { max_size = MaxSize };
 
     size_type m_size;
@@ -254,16 +254,16 @@ public:
 template <typename Iterator>
 class short_sequence : public std::pair<Iterator, Iterator>
 {
-    typedef std::pair<Iterator, Iterator> pair;
+    using pair = std::pair<Iterator, Iterator>;
 
 public:
-    typedef Iterator iterator;
-    typedef const iterator const_iterator;
-    typedef typename std::iterator_traits<iterator>::value_type value_type;
-    typedef typename std::iterator_traits<iterator>::difference_type size_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef size_t origin_type;
+    using iterator = Iterator;
+    using const_iterator = const iterator;
+    using value_type = typename std::iterator_traits<iterator>::value_type;
+    using size_type = typename std::iterator_traits<iterator>::difference_type;
+    using reference = value_type &;
+    using const_reference = const value_type &;
+    using origin_type = size_t;
 
 private:
     origin_type m_origin;

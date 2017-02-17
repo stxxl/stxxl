@@ -132,7 +132,7 @@ public:
 };
 
 /** Convenience typedef to avoid to have write \c Settings<>. */
-typedef Settings<> SETTINGS;
+using SETTINGS = Settings<>;
 
 template <typename must_be_int>
 volatile bool Settings<must_be_int>::force_parallel = false;

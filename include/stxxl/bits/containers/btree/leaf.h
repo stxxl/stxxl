@@ -31,22 +31,22 @@ template <class KeyType, class DataType, class KeyCmp, unsigned RawSize, class B
 class normal_leaf
 {
 public:
-    typedef normal_leaf<KeyType, DataType, KeyCmp, RawSize, BTreeType> self_type;
+    using self_type = normal_leaf<KeyType, DataType, KeyCmp, RawSize, BTreeType>;
 
     friend class node_cache<self_type, BTreeType>;
 
-    typedef KeyType key_type;
-    typedef DataType data_type;
-    typedef KeyCmp key_compare;
-    typedef std::pair<key_type, data_type> value_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
+    using key_type = KeyType;
+    using data_type = DataType;
+    using key_compare = KeyCmp;
+    using value_type = std::pair<key_type, data_type>;
+    using reference = value_type &;
+    using const_reference = const value_type &;
 
     enum {
         raw_size = RawSize
     };
 
-    typedef BID<raw_size> bid_type;
+    using bid_type = BID<raw_size>;
 
     struct metainfo_type
     {
@@ -54,20 +54,20 @@ public:
         unsigned cur_size;
     };
 
-    typedef typed_block<raw_size, value_type, 0, metainfo_type> block_type;
+    using block_type = typed_block<raw_size, value_type, 0, metainfo_type>;
     enum {
         nelements = block_type::size - 1,
         max_size = nelements,
         min_size = nelements / 2
     };
 
-    typedef BTreeType btree_type;
-    typedef typename btree_type::size_type size_type;
-    typedef btree_iterator_base<btree_type> iterator_base;
-    typedef btree_iterator<btree_type> iterator;
-    typedef btree_const_iterator<btree_type> const_iterator;
+    using btree_type = BTreeType;
+    using size_type = typename btree_type::size_type;
+    using iterator_base = btree_iterator_base<btree_type>;
+    using iterator = btree_iterator<btree_type>;
+    using const_iterator = btree_const_iterator<btree_type>;
 
-    typedef node_cache<normal_leaf, btree_type> leaf_cache_type;
+    using leaf_cache_type = node_cache<normal_leaf, btree_type>;
 
 public:
     struct value_compare : public std::binary_function<value_type, value_type, bool>
@@ -109,7 +109,7 @@ private:
         }
         pred() = new_bid;
 
-        typedef std::vector<iterator_base*> iterators2fix_type;
+        using iterators2fix_type = std::vector<iterator_base*>;
         iterators2fix_type iterators2fix;
         m_btree->m_iterator_map.find(my_bid(), 0, size(), iterators2fix);
 

@@ -33,7 +33,7 @@ class malloc_stats
 #if STXXL_HAVE_MALLINFO_PROTO
 
 public:
-    typedef int return_type;
+    using return_type = int;
 
     //! Returns number of bytes allocated from system not including mmapped regions.
     return_type from_system_nmmap() const

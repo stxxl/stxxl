@@ -27,7 +27,7 @@ STXXL stacks are last in first out (LIFO), i.e. inserting and extracting element
 Before using a STXXL stack, we initially have to define and then to instantiate a stack object. To manage the configuration of the stack type we used the generator template. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only stricly neccessary parameter. See \ref design_stack_generator for additional configuration parameters and information.
 
 \code
-typedef stxxl::STACK_GENERATOR<int>::result stack;
+using stack = stxxl::STACK_GENERATOR<int>::result;
 stack my_stack;  // create empty stack object
 \endcode
 

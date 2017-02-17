@@ -49,7 +49,7 @@ struct TwoIntegerComparator
 int main()
 {
     // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
-    typedef stxxl::sorter<TwoInteger, TwoIntegerComparator, 1*1024*1024> sorter_type;
+    using sorter_type = stxxl::sorter<TwoInteger, TwoIntegerComparator, 1*1024*1024>;
 
     // create sorter object (CompareType(), MainMemoryLimit)
     sorter_type int_sorter(TwoIntegerComparator(), 64 * 1024 * 1024);

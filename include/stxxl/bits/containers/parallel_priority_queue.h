@@ -71,15 +71,15 @@ template <class ValueType>
 class ppq_iterator
 {
 public:
-    typedef ValueType value_type;
-    typedef value_type& reference;
-    typedef value_type* pointer;
-    typedef ptrdiff_t difference_type;
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef std::vector<std::pair<pointer, pointer> > block_pointers_type;
+    using value_type = ValueType;
+    using reference = value_type &;
+    using pointer = value_type *;
+    using difference_type = ptrdiff_t;
+    using iterator_category = std::random_access_iterator_tag;
+    using block_pointers_type = std::vector<std::pair<pointer, pointer> >;
 
 protected:
-    typedef ppq_iterator self_type;
+    using self_type = ppq_iterator;
 
     //! pointer to a vector of begin/end pointer pairs
     //! They allow access to the data blocks.
@@ -276,11 +276,11 @@ template <class ValueType>
 class internal_array
 {
 public:
-    typedef ValueType value_type;
-    typedef ppq_iterator<value_type> iterator;
+    using value_type = ValueType;
+    using iterator = ppq_iterator<value_type>;
 
 protected:
-    typedef typename iterator::block_pointers_type block_pointers_type;
+    using block_pointers_type = typename iterator::block_pointers_type;
 
     //! Contains the items of the sorted sequence.
     std::vector<value_type> m_values;
@@ -448,19 +448,19 @@ template <
 class external_array
 {
 public:
-    typedef ValueType value_type;
-    typedef ppq_iterator<value_type> iterator;
+    using value_type = ValueType;
+    using iterator = ppq_iterator<value_type>;
 
-    typedef external_array<value_type, BlockSize, AllocStrategy> self_type;
-    typedef typed_block<BlockSize, value_type> block_type;
-    typedef read_write_pool<block_type> pool_type;
-    typedef std::vector<BID<BlockSize> > bid_vector;
-    typedef typename bid_vector::iterator bid_iterator;
-    typedef std::vector<block_type*> block_vector;
-    typedef std::vector<request_ptr> request_vector;
-    typedef std::vector<value_type> minima_vector;
-    typedef typename iterator::block_pointers_type block_pointers_type;
-    typedef external_array_writer<self_type> writer_type;
+    using self_type = external_array<value_type, BlockSize, AllocStrategy>;
+    using block_type = typed_block<BlockSize, value_type>;
+    using pool_type = read_write_pool<block_type>;
+    using bid_vector = std::vector<BID<BlockSize> >;
+    using bid_iterator = typename bid_vector::iterator;
+    using block_vector = std::vector<block_type*>;
+    using request_vector = std::vector<request_ptr>;
+    using minima_vector = std::vector<value_type>;
+    using block_pointers_type = typename iterator::block_pointers_type;
+    using writer_type = external_array_writer<self_type>;
 
     //! The number of elements fitting into one block
     enum {
@@ -1239,12 +1239,12 @@ template <class ExternalArrayType>
 class external_array_writer
 {
 public:
-    typedef ExternalArrayType ea_type;
+    using ea_type = ExternalArrayType;
 
-    typedef external_array_writer self_type;
+    using self_type = external_array_writer;
 
-    typedef typename ea_type::value_type value_type;
-    typedef typename ea_type::block_type block_type;
+    using value_type = typename ea_type::value_type;
+    using block_type = typename ea_type::block_type;
 
     //! prototype declaration of nested class.
     class iterator;
@@ -1334,16 +1334,16 @@ public:
     class iterator
     {
     public:
-        typedef external_array_writer writer_type;
-        typedef ExternalArrayType ea_type;
+        using writer_type = external_array_writer;
+        using ea_type = ExternalArrayType;
 
-        typedef typename ea_type::value_type value_type;
-        typedef value_type& reference;
-        typedef value_type* pointer;
-        typedef ptrdiff_t difference_type;
-        typedef std::random_access_iterator_tag iterator_category;
+        using value_type = typename ea_type::value_type;
+        using reference = value_type &;
+        using pointer = value_type *;
+        using difference_type = ptrdiff_t;
+        using iterator_category = std::random_access_iterator_tag;
 
-        typedef iterator self_type;
+        using self_type = iterator;
 
         static const size_t block_items = ea_type::block_items;
 
@@ -1593,14 +1593,14 @@ template <class ParentType>
 class minima_tree
 {
 public:
-    typedef ParentType parent_type;
-    typedef minima_tree<ParentType> self_type;
+    using parent_type = ParentType;
+    using self_type = minima_tree<ParentType>;
 
-    typedef typename parent_type::inv_compare_type compare_type;
-    typedef typename parent_type::value_type value_type;
-    typedef typename parent_type::proc_vector_type proc_vector_type;
-    typedef typename parent_type::internal_arrays_type ias_type;
-    typedef typename parent_type::external_arrays_type eas_type;
+    using compare_type = typename parent_type::inv_compare_type;
+    using value_type = typename parent_type::value_type;
+    using proc_vector_type = typename parent_type::proc_vector_type;
+    using ias_type = typename parent_type::internal_arrays_type;
+    using eas_type = typename parent_type::external_arrays_type;
 
     static const unsigned initial_ia_size = 2;
     static const unsigned initial_ea_size = 2;
@@ -1886,22 +1886,22 @@ class parallel_priority_queue
     //! \{
 
 public:
-    typedef ValueType value_type;
-    typedef CompareType compare_type;
-    typedef AllocStrategy alloc_strategy;
+    using value_type = ValueType;
+    using compare_type = CompareType;
+    using alloc_strategy = AllocStrategy;
     static const size_t block_size = BlockSize;
-    typedef external_size_type size_type;
+    using size_type = external_size_type;
 
-    typedef typed_block<block_size, value_type> block_type;
-    typedef std::vector<BID<block_size> > bid_vector;
-    typedef bid_vector bids_container_type;
-    typedef read_write_pool<block_type> pool_type;
-    typedef ppq_local::internal_array<value_type> internal_array_type;
-    typedef ppq_local::external_array<value_type, block_size, AllocStrategy> external_array_type;
-    typedef typename external_array_type::writer_type external_array_writer_type;
-    typedef typename std::vector<value_type>::iterator value_iterator;
-    typedef typename internal_array_type::iterator iterator;
-    typedef std::pair<iterator, iterator> iterator_pair_type;
+    using block_type = typed_block<block_size, value_type>;
+    using bid_vector = std::vector<BID<block_size> >;
+    using bids_container_type = bid_vector;
+    using pool_type = read_write_pool<block_type>;
+    using internal_array_type = ppq_local::internal_array<value_type>;
+    using external_array_type = ppq_local::external_array<value_type, block_size, AllocStrategy>;
+    using external_array_writer_type = typename external_array_type::writer_type;
+    using value_iterator = typename std::vector<value_type>::iterator;
+    using iterator = typename internal_array_type::iterator;
+    using iterator_pair_type = std::pair<iterator, iterator>;
 
     static const bool debug = false;
 
@@ -1913,16 +1913,16 @@ public:
 
 protected:
     //! type of insertion heap itself
-    typedef std::vector<value_type> heap_type;
+    using heap_type = std::vector<value_type>;
 
     //! type of internal arrays vector
-    typedef typename stxxl::swap_vector<internal_array_type> internal_arrays_type;
+    using internal_arrays_type = typename stxxl::swap_vector<internal_array_type>;
     //! type of external arrays vector
-    typedef typename stxxl::swap_vector<external_array_type> external_arrays_type;
+    using external_arrays_type = typename stxxl::swap_vector<external_array_type>;
     //! type of minima tree combining the structures
-    typedef ppq_local::minima_tree<
-            parallel_priority_queue<value_type, compare_type, alloc_strategy,
-                                    block_size, DefaultMemSize, MaxItems> > minima_type;
+    using minima_type = ppq_local::minima_tree<
+              parallel_priority_queue<value_type, compare_type, alloc_strategy,
+                                      block_size, DefaultMemSize, MaxItems> >;
     //! allow minima tree access to internal data structures
     friend class ppq_local::minima_tree<
             parallel_priority_queue<value_type, compare_type, alloc_strategy,
@@ -1951,10 +1951,10 @@ protected:
 
     //! Defines if statistics are gathered: dummy_custom_stats_counter or
     //! custom_stats_counter
-    typedef dummy_custom_stats_counter<uint64_t> stats_counter;
+    using stats_counter = dummy_custom_stats_counter<uint64_t>;
 
     //! Defines if statistics are gathered: fake_timer or timer
-    typedef fake_timer stats_timer;
+    using stats_timer = fake_timer;
 
     //! \}
 
@@ -2089,7 +2089,7 @@ protected:
         size_type heap_add_size;
     };
 
-    typedef std::vector<ProcessorData*> proc_vector_type;
+    using proc_vector_type = std::vector<ProcessorData*>;
 
     //! Array of processor local data structures, including the insertion heaps.
     proc_vector_type m_proc;
@@ -2219,7 +2219,7 @@ protected:
     //! Clean up empty external arrays, free their memory and capacity
     void cleanup_external_arrays()
     {
-        typedef typename external_arrays_type::iterator ea_iterator;
+        using ea_iterator = typename external_arrays_type::iterator;
         empty_external_array_eraser pred;
 
         // The following is a modified implementation of swap_remove_if().
@@ -2288,8 +2288,8 @@ protected:
     push_heap(RandomAccessIterator first, RandomAccessIterator last,
               HeapCompareType comp)
     {
-        typedef typename std::iterator_traits<RandomAccessIterator>::value_type
-            value_type;
+        using value_type =
+            typename std::iterator_traits<RandomAccessIterator>::value_type        ;
 
         value_type value = STXXL_MOVE(*(last - 1));
 

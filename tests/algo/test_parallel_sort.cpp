@@ -41,7 +41,7 @@ size_t buffer_size;
 
 struct my_type
 {
-    typedef unsigned long long key_type;
+    using key_type = unsigned long long;
 
     key_type m_key;
     key_type m_load;
@@ -86,7 +86,7 @@ struct cmp_less_key : public std::less<my_type>
     my_type max_value() const { return my_type(std::numeric_limits<my_type::key_type>::max(), MAGIC); }
 };
 
-typedef stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> vector_type;
+using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY>;
 
 my_type::key_type checksum(vector_type& input)
 {
@@ -124,14 +124,14 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
-    typedef stxxl::stream::streamify_traits<vector_type::iterator>::stream_type input_stream_type;
+    using input_stream_type = stxxl::stream::streamify_traits<vector_type::iterator>::stream_type;
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
-    typedef cmp_less_key comparator_type;
+    using comparator_type = cmp_less_key;
     comparator_type cl;
 
-    typedef stxxl::stream::sort<input_stream_type, comparator_type, block_size> sort_stream_type;
+    using sort_stream_type = stxxl::stream::sort<input_stream_type, comparator_type, block_size>;
 
     sort_stream_type sort_stream(input_stream, cl, run_size);
 

@@ -21,7 +21,7 @@
 
 struct my_type
 {
-    typedef uint64_t key_type1;
+    using key_type1 = uint64_t;
 
     key_type1 m_key;
     key_type1 m_key_copy;
@@ -47,7 +47,7 @@ std::ostream& operator << (std::ostream& o, const my_type& obj)
 
 struct get_key
 {
-    typedef my_type::key_type1 key_type;
+    using key_type = my_type::key_type1;
     my_type dummy;
     key_type operator () (const my_type& obj) const
     {
@@ -83,7 +83,7 @@ int main()
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
     unsigned memory_to_use = 16 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
-    typedef stxxl::vector<my_type, 4, stxxl::lru_pager<4> > vector_type;
+    using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<4> >;
     const uint64_t n_records = 3 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(my_type)) / sizeof(my_type);
     vector_type v(n_records);
 

@@ -68,25 +68,25 @@ class sorter
 public:
     // *** Template Parameters
 
-    typedef ValueType value_type;
-    typedef CompareType cmp_type;
+    using value_type = ValueType;
+    using cmp_type = CompareType;
     enum {
         block_size = BlockSize
     };
-    typedef AllocStrategy alloc_strategy_type;
+    using alloc_strategy_type = AllocStrategy;
 
     // *** Constructed Types
 
     //! runs creator type with push() method
-    typedef stream::runs_creator<stream::use_push<ValueType>, cmp_type,
-                                 block_size, alloc_strategy_type> runs_creator_type;
+    using runs_creator_type = stream::runs_creator<stream::use_push<ValueType>, cmp_type,
+                                                   block_size, alloc_strategy_type>;
 
     //! corresponding runs merger type
-    typedef stream::runs_merger<typename runs_creator_type::sorted_runs_type,
-                                cmp_type, alloc_strategy_type> runs_merger_type;
+    using runs_merger_type = stream::runs_merger<typename runs_creator_type::sorted_runs_type,
+                                                 cmp_type, alloc_strategy_type>;
 
     //! size type
-    typedef typename runs_merger_type::size_type size_type;
+    using size_type = typename runs_merger_type::size_type;
 
 protected:
     // *** Object Attributes

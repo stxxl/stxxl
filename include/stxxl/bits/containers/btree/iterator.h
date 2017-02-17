@@ -36,15 +36,15 @@ template <class BTreeType>
 class btree_iterator_base
 {
 public:
-    typedef BTreeType btree_type;
-    typedef typename btree_type::leaf_bid_type bid_type;
-    typedef typename btree_type::value_type value_type;
-    typedef typename btree_type::reference reference;
-    typedef typename btree_type::const_reference const_reference;
-    typedef std::bidirectional_iterator_tag iterator_category;
-    typedef typename btree_type::difference_type difference_type;
+    using btree_type = BTreeType;
+    using bid_type = typename btree_type::leaf_bid_type;
+    using value_type = typename btree_type::value_type;
+    using reference = typename btree_type::reference;
+    using const_reference = typename btree_type::const_reference;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using difference_type = typename btree_type::difference_type;
 
-    typedef typename btree_type::leaf_type leaf_type;
+    using leaf_type = typename btree_type::leaf_type;
 
     friend class iterator_map<btree_type>;
     template <class KeyType, class DataType,
@@ -172,14 +172,14 @@ template <class BTreeType>
 class btree_iterator : public btree_iterator_base<BTreeType>
 {
 public:
-    typedef BTreeType btree_type;
-    typedef typename btree_type::leaf_bid_type bid_type;
-    typedef typename btree_type::value_type value_type;
-    typedef typename btree_type::reference reference;
-    typedef typename btree_type::const_reference const_reference;
-    typedef typename btree_type::pointer pointer;
+    using btree_type = BTreeType;
+    using bid_type = typename btree_type::leaf_bid_type;
+    using value_type = typename btree_type::value_type;
+    using reference = typename btree_type::reference;
+    using const_reference = typename btree_type::const_reference;
+    using pointer = typename btree_type::pointer;
 
-    typedef btree_iterator_base<btree_type> base_type;
+    using base_type = btree_iterator_base<btree_type>;
 
     template <class KeyType, class DataType,
               class KeyCmp, unsigned LogNElem, class AnyBTreeType>
@@ -261,15 +261,15 @@ template <class BTreeType>
 class btree_const_iterator : public btree_iterator_base<BTreeType>
 {
 public:
-    typedef btree_iterator<BTreeType> iterator;
+    using iterator = btree_iterator<BTreeType>;
 
-    typedef BTreeType btree_type;
-    typedef typename btree_type::leaf_bid_type bid_type;
-    typedef typename btree_type::value_type value_type;
-    typedef typename btree_type::const_reference reference;
-    typedef typename btree_type::const_pointer pointer;
+    using btree_type = BTreeType;
+    using bid_type = typename btree_type::leaf_bid_type;
+    using value_type = typename btree_type::value_type;
+    using reference = typename btree_type::const_reference;
+    using pointer = typename btree_type::const_pointer;
 
-    typedef btree_iterator_base<btree_type> base_type;
+    using base_type = btree_iterator_base<btree_type>;
 
     template <class KeyType, class DataType,
               class KeyCmp, unsigned LogNElem, class AnyBTreeType>

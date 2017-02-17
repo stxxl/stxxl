@@ -21,7 +21,7 @@
 
 struct forty_two
 {
-    typedef int value_type;
+    using value_type = int;
 
     unsigned counter, length;
 

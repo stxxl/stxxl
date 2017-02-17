@@ -16,7 +16,7 @@
 
 #define BLOCK_SIZE (1024 * 1024 * 32)
 
-typedef stxxl::typed_block<BLOCK_SIZE, int> block_type;
+using block_type = stxxl::typed_block<BLOCK_SIZE, int>;
 template class stxxl::typed_block<BLOCK_SIZE, int>; // forced instantiation
 
 int main()

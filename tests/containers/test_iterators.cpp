@@ -147,8 +147,8 @@ void test(svt& sv)
 {
     dump_container_info(sv);
 
-    typedef const svt csvt;
-    typedef typename svt::value_type value_type;
+    using csvt = const svt;
+    using value_type = typename svt::value_type;
 
     sv[0] = 108;
 
@@ -222,8 +222,8 @@ void test_reverse(svt& sv)
 {
     dump_container_info(sv);
 
-    typedef const svt csvt;
-    typedef typename svt::value_type value_type;
+    using csvt = const svt;
+    using value_type = typename svt::value_type;
 
     sv[0] = 108;
 
@@ -347,8 +347,8 @@ void test_random_access_reverse(svt& sv)
     test_inc_dec_random(xsvri);
 }
 
-typedef float key_type;
-typedef double data_type;
+using key_type = float;
+using data_type = double;
 
 struct cmp : public std::less<key_type>
 {
@@ -393,7 +393,7 @@ int main()
     test_reverse(M);
 
 #if !defined(__GNUG__) || (GCC_VERSION >= 30400)
-    typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
+    using map_type = stxxl::map<key_type, data_type, cmp, 4096, 4096>;
     map_type Map(4096 * 10, 4096 * 10);
     Map[4] = 8;
     Map[15] = 16;

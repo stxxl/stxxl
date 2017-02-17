@@ -212,7 +212,7 @@ class comparator_impl<ValueType, typename std::enable_if<!is_tuple_or_pair<Value
 public:
     static_assert(Mode != DontCare, "DontCare is available only for collections as compare_mode");
 
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
     bool operator () (const value_type& a, const value_type& b) const
     {

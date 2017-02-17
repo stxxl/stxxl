@@ -64,38 +64,38 @@ template <class KeyType,
 class hash_map
 {
 protected:
-    typedef hash_map<KeyType, MappedType, HashType, KeyCompareType,
-                     SubBlockSize, SubBlocksPerBlock> self_type;
+    using self_type = hash_map<KeyType, MappedType, HashType, KeyCompareType,
+                               SubBlockSize, SubBlocksPerBlock>;
 
 public:
     //! type of the keys being used
-    typedef KeyType key_type;
+    using key_type = KeyType;
     //! type of the data to be stored
-    typedef MappedType mapped_type;
+    using mapped_type = MappedType;
     //! actually store (key-data)-pairs
-    typedef std::pair<KeyType, MappedType> value_type;
+    using value_type = std::pair<KeyType, MappedType>;
     //! type for value-references
-    typedef value_type& reference;
+    using reference = value_type &;
     //! type for constant value-references
-    typedef const value_type& const_reference;
+    using const_reference = const value_type &;
     //! pointer to type of keys
-    typedef value_type* pointer;
+    using pointer = value_type *;
     //! const pointer to type of keys
-    typedef value_type const* const_pointer;
+    using const_pointer = value_type const*;
 
-    typedef stxxl::external_size_type external_size_type;
-    typedef size_t internal_size_type;
-    typedef stxxl::external_diff_type difference_type;
+    using external_size_type = stxxl::external_size_type;
+    using internal_size_type = size_t;
+    using difference_type = stxxl::external_diff_type;
 
     //! type of (mother) hash-function
-    typedef HashType hasher;
+    using hasher = HashType;
     //! functor that imposes a ordering on keys (but see _lt())
-    typedef KeyCompareType key_compare;
+    using key_compare = KeyCompareType;
     //! allocator template type
-    typedef AllocatorType allocator_type;
+    using allocator_type = AllocatorType;
 
-    typedef hash_map_iterator<self_type> iterator;
-    typedef hash_map_const_iterator<self_type> const_iterator;
+    using iterator = hash_map_iterator<self_type>;
+    using const_iterator = hash_map_const_iterator<self_type>;
 
     //! subblock- and block-size in bytes
     enum {
@@ -110,36 +110,36 @@ public:
     };
 
     //! a subblock consists of subblock_size values
-    typedef typed_block<subblock_raw_size, value_type> subblock_type;
+    using subblock_type = typed_block<subblock_raw_size, value_type>;
     //! a block consists of block_size subblocks
-    typedef typed_block<block_raw_size, subblock_type> block_type;
+    using block_type = typed_block<block_raw_size, subblock_type>;
 
     //! block-identifier for subblocks
-    typedef typename subblock_type::bid_type subblock_bid_type;
+    using subblock_bid_type = typename subblock_type::bid_type;
     //! block-identifier for blocks
-    typedef typename block_type::bid_type bid_type;
+    using bid_type = typename block_type::bid_type;
     //! container for block-bids
-    typedef std::vector<bid_type> bid_container_type;
+    using bid_container_type = std::vector<bid_type>;
     //! iterator for block-bids
-    typedef typename bid_container_type::iterator bid_iterator_type;
+    using bid_iterator_type = typename bid_container_type::iterator;
 
     enum source_type { src_internal, src_external, src_unknown };
 
     //! nodes for internal-memory buffer
-    typedef node<value_type> node_type;
+    using node_type = node<value_type>;
     //! buckets
-    typedef bucket<node_type> bucket_type;
+    using bucket_type = bucket<node_type>;
 
-    typedef std::vector<bucket_type> buckets_container_type;
+    using buckets_container_type = std::vector<bucket_type>;
 
     //! for tracking active iterators
-    typedef iterator_map<self_type> iterator_map_type;
+    using iterator_map_type = iterator_map<self_type>;
 
-    typedef block_cache<block_type> block_cache_type;
+    using block_cache_type = block_cache<block_type>;
 
-    typedef buffered_reader<block_cache_type, bid_iterator_type> reader_type;
+    using reader_type = buffered_reader<block_cache_type, bid_iterator_type>;
 
-    typedef typename allocator_type::template rebind<node_type>::other node_allocator_type;
+    using node_allocator_type = typename allocator_type::template rebind<node_type>::other;
 
 protected:
     //! user supplied mother hash-function
@@ -268,7 +268,7 @@ protected:
         if (!oblivious_)
             return;
 
-        typedef HashedValuesStream<self_type, reader_type> values_stream_type;
+        using values_stream_type = HashedValuesStream<self_type, reader_type>;
 
         // this will start prefetching automatically
         reader_type reader(bids_.begin(), bids_.end(), block_cache_);
@@ -1052,7 +1052,7 @@ protected:
         return block_cache_.get_subblock(bid, i_subblock_within);
     }
 
-    typedef HashedValue<self_type> hashed_value_type;
+    using hashed_value_type = HashedValue<self_type>;
 
     //! Functor to extracts the actual value from a HashedValue-struct
     struct HashedValueExtractor
@@ -1069,7 +1069,7 @@ protected:
     template <class InputStream, class ValueExtractor>
     struct HashingStream
     {
-        typedef typename InputStream::value_type value_type;
+        using value_type = typename InputStream::value_type;
 
         self_type* map_;
         InputStream& input_;
@@ -1118,9 +1118,9 @@ protected:
     {
         STXXL_VERBOSE_HASH_MAP("_rebuild_buckets()");
 
-        typedef buffered_writer<block_type, bid_container_type> writer_type;
-        typedef HashedValuesStream<self_type, reader_type> values_stream_type;
-        typedef HashingStream<values_stream_type, HashedValueExtractor> hashing_stream_type;
+        using writer_type = buffered_writer<block_type, bid_container_type>;
+        using values_stream_type = HashedValuesStream<self_type, reader_type>;
+        using hashing_stream_type = HashingStream<values_stream_type, HashedValueExtractor>;
 
         const size_t write_buffer_size = config::get_instance()->disks_number() * 4;
 
@@ -1208,7 +1208,7 @@ protected:
     template <class InputStream>
     struct UniqueValueStream
     {
-        typedef typename InputStream::value_type value_type;
+        using value_type = typename InputStream::value_type;
         self_type& map_;
         InputStream& in_;
 
@@ -1233,7 +1233,7 @@ protected:
     struct AddHashStream
     {
         //! (hash,value)
-        typedef std::pair<internal_size_type, typename InputStream::value_type> value_type;
+        using value_type = std::pair<internal_size_type, typename InputStream::value_type>;
         self_type& map_;
         InputStream& in_;
 
@@ -1301,23 +1301,23 @@ public:
     void insert(InputIterator f, InputIterator l, internal_size_type mem)
     {
         //! values already stored in the hashtable ("old values")
-        typedef HashedValuesStream<self_type, reader_type> old_values_stream;
+        using old_values_stream = HashedValuesStream<self_type, reader_type>;
         //! old values, that are to be stored in a certain (new) bucket
-        typedef HashingStream<old_values_stream, HashedValueExtractor> old_hashing_stream;
+        using old_hashing_stream = HashingStream<old_values_stream, HashedValueExtractor>;
 
         //! values to insert ("new values")
-        typedef typename stxxl::stream::streamify_traits<InputIterator>::stream_type input_stream;
+        using input_stream = typename stxxl::stream::streamify_traits<InputIterator>::stream_type;
 
         //! new values with added hash: (hash, (key, mapped))
-        typedef AddHashStream<input_stream> new_values_stream;
+        using new_values_stream = AddHashStream<input_stream>;
         //! new values sorted by <hash-value, key>
-        typedef stxxl::stream::sort<new_values_stream, Cmp> new_sorted_values_stream;
+        using new_sorted_values_stream = stxxl::stream::sort<new_values_stream, Cmp>;
         //! new values sorted by <hash-value, key> with duplicates eliminated
-        typedef UniqueValueStream<new_sorted_values_stream> new_unique_values_stream;
+        using new_unique_values_stream = UniqueValueStream<new_sorted_values_stream>;
         //! new values, that are to be stored in a certain bucket
-        typedef HashingStream<new_unique_values_stream, StripHashFunctor> new_hashing_stream;
+        using new_hashing_stream = HashingStream<new_unique_values_stream, StripHashFunctor>;
 
-        typedef buffered_writer<block_type, bid_container_type> writer_type;
+        using writer_type = buffered_writer<block_type, bid_container_type>;
 
         const size_t write_buffer_size = config::get_instance()->disks_number() * 2;
 
@@ -1539,15 +1539,15 @@ public:
         }
 
         //! C++11 required type
-        typedef key_type first_argument_type;
+        using first_argument_type = key_type;
         //! C++11 required type
-        typedef key_type second_argument_type;
+        using second_argument_type = key_type;
         //! C++11 required type
-        typedef bool result_type;
+        using result_type = bool;
     };
 
     //! Type of constructed equality predicate
-    typedef equal_to key_equal;
+    using key_equal = equal_to;
 
     //! Constructed equality predicate used by this hash-map
     key_equal key_eq() const

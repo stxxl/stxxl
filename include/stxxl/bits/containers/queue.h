@@ -53,18 +53,18 @@ template <class ValueType,
 class queue
 {
 public:
-    typedef ValueType value_type;
-    typedef AllocStr alloc_strategy_type;
-    typedef SizeType size_type;
+    using value_type = ValueType;
+    using alloc_strategy_type = AllocStr;
+    using size_type = SizeType;
     enum {
         block_size = BlockSize
     };
 
-    typedef typed_block<block_size, value_type> block_type;
-    typedef BID<block_size> bid_type;
+    using block_type = typed_block<block_size, value_type>;
+    using bid_type = BID<block_size>;
 
 private:
-    typedef read_write_pool<block_type> pool_type;
+    using pool_type = read_write_pool<block_type>;
 
     size_type m_size;
     bool delete_pool;

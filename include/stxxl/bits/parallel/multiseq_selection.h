@@ -109,15 +109,14 @@ void multiseq_partition(
         >())         //std::less<T>
 {
     STXXL_PARALLEL_PCALL(end_seqs - begin_seqs);
+    using iterator = typename std::iterator_traits<RanSeqs>
+                     ::value_type::first_type;
+    using diff_type = typename std::iterator_traits<iterator>
+                      ::difference_type;
+    using value_type = typename std::iterator_traits<iterator>
+                       ::value_type;
 
-    typedef typename std::iterator_traits<RanSeqs>
-        ::value_type::first_type iterator;
-    typedef typename std::iterator_traits<iterator>
-        ::difference_type diff_type;
-    typedef typename std::iterator_traits<iterator>
-        ::value_type value_type;
-
-    typedef std::pair<value_type, diff_type> sample_pair;
+    using sample_pair = std::pair<value_type, diff_type>;
     // comparators for sample_pair
     lexicographic<value_type, diff_type, Comparator> lcomp(comp);
     lexicographic_rev<value_type, diff_type, Comparator> lrcomp(comp);
@@ -350,13 +349,12 @@ ValueType multiseq_selection(const RanSeqs& begin_seqs, const RanSeqs& end_seqs,
                              Comparator comp = std::less<ValueType>())
 {
     STXXL_PARALLEL_PCALL(end_seqs - begin_seqs);
+    using iterator = typename std::iterator_traits<RanSeqs>
+                     ::value_type::first_type;
+    using diff_type = typename std::iterator_traits<iterator>
+                      ::difference_type;
 
-    typedef typename std::iterator_traits<RanSeqs>
-        ::value_type::first_type iterator;
-    typedef typename std::iterator_traits<iterator>
-        ::difference_type diff_type;
-
-    typedef std::pair<ValueType, diff_type> sample_pair;
+    using sample_pair = std::pair<ValueType, diff_type>;
     // comparators for sample_pair
     lexicographic<ValueType, diff_type, Comparator> lcomp(comp);
     lexicographic_rev<ValueType, diff_type, Comparator> lrcomp(comp);

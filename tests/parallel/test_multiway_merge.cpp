@@ -103,8 +103,8 @@ void test_vecs(unsigned int vecnum)
     }
 
     // construct vector of input iterator ranges
-    typedef typename std::vector<ValueType>::iterator input_iterator;
-    typedef typename std::iterator_traits<input_iterator>::difference_type difference_type;
+    using input_iterator = typename std::vector<ValueType>::iterator;
+    using difference_type = typename std::iterator_traits<input_iterator>::difference_type;
 
     std::vector<std::pair<input_iterator, input_iterator> > sequences(vecnum);
 

@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     double totaltimereadchunk = 0.0, totaltimewritechunk = 0.0;
     external_size_type totalsizereadchunk = 0, totalsizewritechunk = 0;
 
-    typedef stxxl::syscall_file file_type;
+    using file_type = stxxl::syscall_file;
 
     file_type input_file(filebase, file::RDWR | file::DIRECT, 0);
 

@@ -35,7 +35,7 @@ namespace stxxl {
 class wfs_file_base : public virtual file
 {
 protected:
-    typedef void* HANDLE;
+    using HANDLE = void*;
 
     mutex fd_mutex_;       // sequentialize function calls involving file_des_
     HANDLE file_des_;      // file descriptor

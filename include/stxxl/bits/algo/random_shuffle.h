@@ -50,12 +50,12 @@ void random_shuffle(ExtIterator first,
                     AllocStrategy AS = STXXL_DEFAULT_ALLOC_STRATEGY())
 {
     STXXL_UNUSED(AS);  // FIXME: Why is this not being used?
-    typedef typename ExtIterator::value_type value_type;
-    typedef typename STACK_GENERATOR<
-            value_type, external, grow_shrink2, PageSize,
-            BlockSize, void, 0, AllocStrategy
-            >::result stack_type;
-    typedef typename stack_type::block_type block_type;
+    using value_type = typename ExtIterator::value_type;
+    using stack_type = typename STACK_GENERATOR<
+              value_type, external, grow_shrink2, PageSize,
+              BlockSize, void, 0, AllocStrategy
+              >::result;
+    using block_type = typename stack_type::block_type;
 
     STXXL_VERBOSE1("random_shuffle: Plain Version");
     static_assert(int(BlockSize) < 0,
@@ -75,9 +75,9 @@ void random_shuffle(ExtIterator first,
     int64_t i, j, size = 0;
 
     value_type* temp_array;
-    typedef typename stxxl::vector<
-            value_type, PageSize, stxxl::lru_pager<4>, BlockSize, AllocStrategy
-            > temp_vector_type;
+    using temp_vector_type = typename stxxl::vector<
+              value_type, PageSize, stxxl::lru_pager<4>, BlockSize, AllocStrategy
+              >;
     temp_vector_type* temp_vector;
 
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets");
@@ -91,7 +91,7 @@ void random_shuffle(ExtIterator first,
         buckets[j] = new stack_type(pool, 0);
 
     ///// Reading input /////////////////////
-    typedef typename stream::streamify_traits<ExtIterator>::stream_type input_stream;
+    using input_stream = typename stream::streamify_traits<ExtIterator>::stream_type;
     input_stream in = stream::streamify(first, last);
 
     // distribute input into random buckets
@@ -196,15 +196,15 @@ void random_shuffle(
     RandomNumberGenerator& rand,
     size_t M)
 {
-    typedef stxxl::vector_iterator<VectorConfig> ExtIterator;
-    typedef typename ExtIterator::vector_type::alloc_strategy_type AllocStrategy;
+    using ExtIterator = stxxl::vector_iterator<VectorConfig>;
+    using AllocStrategy = typename ExtIterator::vector_type::alloc_strategy_type;
     constexpr unsigned PageSize = ExtIterator::vector_type::page_size;
     constexpr unsigned BlockSize = ExtIterator::vector_type::block_size;
-    typedef typename ExtIterator::value_type value_type;
-    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
-    typedef typename stxxl::STACK_GENERATOR<value_type, stxxl::external,
-                                            stxxl::grow_shrink2, PageSize, BlockSize>::result stack_type;
-    typedef typename stack_type::block_type block_type;
+    using value_type = typename ExtIterator::value_type;
+    using bids_container_iterator = typename ExtIterator::bids_container_iterator;
+    using stack_type = typename stxxl::STACK_GENERATOR<value_type, stxxl::external,
+                                                       stxxl::grow_shrink2, PageSize, BlockSize>::result;
+    using block_type = typename stack_type::block_type;
 
     STXXL_VERBOSE1("random_shuffle: Vector Version");
 
@@ -221,9 +221,9 @@ void random_shuffle(
     int64_t i, j, size = 0;
 
     value_type* temp_array;
-    typedef typename stxxl::vector<
-            value_type, PageSize, stxxl::lru_pager<4>, BlockSize, AllocStrategy
-            > temp_vector_type;
+    using temp_vector_type = typename stxxl::vector<
+              value_type, PageSize, stxxl::lru_pager<4>, BlockSize, AllocStrategy
+              >;
     temp_vector_type* temp_vector;
 
     // no read buffers and M/B-k write buffers
@@ -236,8 +236,8 @@ void random_shuffle(
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 
-    typedef buf_istream<block_type, bids_container_iterator> buf_istream_type;
-    typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
+    using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
+    using buf_ostream_type = buf_ostream<block_type, bids_container_iterator>;
 
     first.flush();     // flush container
 

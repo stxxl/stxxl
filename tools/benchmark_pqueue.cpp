@@ -38,9 +38,9 @@ using stxxl::external_size_type;
 
 // *** Integer Pair Types
 
-typedef stxxl::tuple<uint32_t, uint32_t> uint32_pair_type;
+using uint32_pair_type = stxxl::tuple<uint32_t, uint32_t>;
 
-typedef stxxl::tuple<uint64_t, uint64_t> uint64_pair_type;
+using uint64_pair_type = stxxl::tuple<uint64_t, uint64_t>;
 
 // *** Larger Structure Type
 
@@ -48,7 +48,7 @@ typedef stxxl::tuple<uint64_t, uint64_t> uint64_pair_type;
 
 struct my_type : public uint32_pair_type
 {
-    typedef uint32_t key_type;
+    using key_type = uint32_t;
 
     char data[MY_TYPE_SIZE - sizeof(uint32_pair_type)];
     my_type() { }
@@ -93,8 +93,8 @@ static inline void progress(const char* text, external_size_type i, external_siz
 template <typename PQType>
 void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools)
 {
-    typedef typename PQType::value_type ValueType;
-    typedef typename ValueType::first_type KeyType;
+    using ValueType = typename PQType::value_type;
+    using KeyType = typename ValueType::first_type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -145,8 +145,8 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
 template <typename PQType>
 void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_pools)
 {
-    typedef typename PQType::value_type ValueType;
-    typedef typename ValueType::first_type KeyType;
+    using ValueType = typename PQType::value_type;
+    using KeyType = typename ValueType::first_type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -212,13 +212,12 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
 {
     const size_t mem_for_queue = mib_for_queue * MiB;
     const size_t mem_for_pools = mib_for_pools * MiB;
+    using gen = typename stxxl::PRIORITY_QUEUE_GENERATOR<
+              ValueType, my_cmp<ValueType>,
+              mem_for_queue,
+              maxvolume* MiB / sizeof(ValueType)>;
 
-    typedef typename stxxl::PRIORITY_QUEUE_GENERATOR<
-            ValueType, my_cmp<ValueType>,
-            mem_for_queue,
-            maxvolume* MiB / sizeof(ValueType)> gen;
-
-    typedef typename gen::result pq_type;
+    using pq_type = typename gen::result;
 
     STXXL_MSG("Given PQ parameters: " << mib_for_queue << " MiB for queue, "
                                       << mib_for_pools << " MiB for pools, " << maxvolume << " GiB maximum volume.");

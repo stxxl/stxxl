@@ -27,9 +27,9 @@ template <class BTreeType>
 class iterator_map
 {
 public:
-    typedef BTreeType btree_type;
-    typedef typename btree_type::leaf_bid_type bid_type;
-    typedef btree_iterator_base<btree_type> iterator_base;
+    using btree_type = BTreeType;
+    using bid_type = typename btree_type::leaf_bid_type;
+    using iterator_base = btree_iterator_base<btree_type>;
 
 private:
     struct Key
@@ -57,14 +57,14 @@ private:
         }
     };
 
-    typedef std::multimap<Key, iterator_base*, KeyCmp> multimap_type;
+    using multimap_type = std::multimap<Key, iterator_base*, KeyCmp>;
 
     multimap_type m_it2addr;
     btree_type* m_btree;
 
-    typedef typename multimap_type::value_type pair_type;
-    typedef typename multimap_type::iterator mmiterator_type;
-    typedef typename multimap_type::const_iterator mmconst_iterator_type;
+    using pair_type = typename multimap_type::value_type;
+    using mmiterator_type = typename multimap_type::iterator;
+    using mmconst_iterator_type = typename multimap_type::const_iterator;
 
     //! changes btree pointer in all contained iterators
     void change_btree_pointers(btree_type* b)

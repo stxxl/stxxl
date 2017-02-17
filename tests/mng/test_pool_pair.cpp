@@ -26,7 +26,7 @@ struct MyType
     char chars[5];
 };
 
-typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
+using block_type = stxxl::typed_block<BLOCK_SIZE, MyType>;
 
 // forced instantiation
 template class stxxl::typed_block<BLOCK_SIZE, MyType>;

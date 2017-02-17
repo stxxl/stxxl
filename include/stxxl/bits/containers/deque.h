@@ -34,26 +34,26 @@ template <class DequeType>
 class deque_iterator
 {
 public:
-    typedef DequeType deque_type;
-    typedef typename deque_type::vector_type vector_type;
+    using deque_type = DequeType;
+    using vector_type = typename deque_type::vector_type;
 
-    typedef typename deque_type::value_type value_type;
-    typedef typename deque_type::pointer pointer;
-    typedef typename deque_type::const_pointer const_pointer;
-    typedef typename deque_type::reference reference;
-    typedef typename deque_type::const_reference const_reference;
-    typedef typename deque_type::size_type size_type;
-    typedef typename deque_type::difference_type difference_type;
-    typedef deque_iterator<deque_type> iterator;
-    typedef const_deque_iterator<deque_type> const_iterator;
+    using value_type = typename deque_type::value_type;
+    using pointer = typename deque_type::pointer;
+    using const_pointer = typename deque_type::const_pointer;
+    using reference = typename deque_type::reference;
+    using const_reference = typename deque_type::const_reference;
+    using size_type = typename deque_type::size_type;
+    using difference_type = typename deque_type::difference_type;
+    using iterator = deque_iterator<deque_type>;
+    using const_iterator = const_deque_iterator<deque_type>;
 
-    typedef std::random_access_iterator_tag iterator_category;
+    using iterator_category = std::random_access_iterator_tag;
 
     friend class const_deque_iterator<deque_type>;
     friend class deque<value_type, vector_type>;
 
 protected:
-    typedef deque_iterator<deque_type> self_type;
+    using self_type = deque_iterator<deque_type>;
 
     deque_type* m_deque;
     size_type m_offset;
@@ -228,27 +228,27 @@ template <class DequeType>
 class const_deque_iterator
 {
 public:
-    typedef DequeType deque_type;
-    typedef typename deque_type::vector_type vector_type;
+    using deque_type = DequeType;
+    using vector_type = typename deque_type::vector_type;
 
-    typedef typename deque_type::value_type value_type;
-    typedef typename deque_type::const_pointer pointer;
-    typedef typename deque_type::const_pointer const_pointer;
-    typedef typename deque_type::const_reference reference;
-    typedef typename deque_type::const_reference const_reference;
-    typedef typename deque_type::size_type size_type;
-    typedef typename deque_type::difference_type difference_type;
+    using value_type = typename deque_type::value_type;
+    using pointer = typename deque_type::const_pointer;
+    using const_pointer = typename deque_type::const_pointer;
+    using reference = typename deque_type::const_reference;
+    using const_reference = typename deque_type::const_reference;
+    using size_type = typename deque_type::size_type;
+    using difference_type = typename deque_type::difference_type;
 
-    typedef deque_iterator<deque_type> iterator;
-    typedef const_deque_iterator<deque_type> const_iterator;
+    using iterator = deque_iterator<deque_type>;
+    using const_iterator = const_deque_iterator<deque_type>;
 
-    typedef std::random_access_iterator_tag iterator_category;
+    using iterator_category = std::random_access_iterator_tag;
 
     friend class deque_iterator<deque_type>;
     friend class deque<value_type, vector_type>;
 
 protected:
-    typedef const_deque_iterator<deque_type> self_type;
+    using self_type = const_deque_iterator<deque_type>;
 
     const deque_type* m_deque;
     size_type m_offset;
@@ -424,21 +424,21 @@ public:
 template <class ValueType, class VectorType = stxxl::vector<ValueType> >
 class deque
 {
-    typedef deque<ValueType, VectorType> self_type;
+    using self_type = deque<ValueType, VectorType>;
 
 public:
-    typedef typename VectorType::size_type size_type;
-    typedef typename VectorType::difference_type difference_type;
-    typedef VectorType vector_type;
-    typedef ValueType value_type;
-    typedef ValueType* pointer;
-    typedef const value_type* const_pointer;
-    typedef ValueType& reference;
-    typedef const ValueType& const_reference;
-    typedef deque_iterator<self_type> iterator;
-    typedef const_deque_iterator<self_type> const_iterator;
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    using size_type = typename VectorType::size_type;
+    using difference_type = typename VectorType::difference_type;
+    using vector_type = VectorType;
+    using value_type = ValueType;
+    using pointer = ValueType *;
+    using const_pointer = const value_type *;
+    using reference = ValueType &;
+    using const_reference = const ValueType &;
+    using iterator = deque_iterator<self_type>;
+    using const_iterator = const_deque_iterator<self_type>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     friend class deque_iterator<self_type>;
     friend class const_deque_iterator<self_type>;

@@ -29,10 +29,9 @@ struct comp_type : public std::less<int>
         return std::numeric_limits<int>::min();
     }
 };
-
-typedef stxxl::btree::btree<
-        int, double, comp_type, 4096, 4096, stxxl::simple_random> btree_type;
-//typedef stxxl::btree::btree<int,double,comp_type,10,11,stxxl::simple_random> btree_type;
+using btree_type = stxxl::btree::btree<
+          int, double, comp_type, 4096, 4096, stxxl::simple_random>;
+//using btree_type =  stxxl::btree::btree<int,double,comp_type,10,11,stxxl::simple_random> ;
 
 std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {

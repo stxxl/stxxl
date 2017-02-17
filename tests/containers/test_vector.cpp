@@ -71,8 +71,8 @@ void test_const_iterator(const my_vec_type& x)
 void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
-    typedef stxxl::vector<
-            element, 2, stxxl::lru_pager<2>, STXXL_DEFAULT_BLOCK_SIZE(element), stxxl::striping> vector_type;
+    using vector_type = stxxl::vector<
+              element, 2, stxxl::lru_pager<2>, STXXL_DEFAULT_BLOCK_SIZE(element), stxxl::striping>;
     vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
     // test assignment const_iterator = iterator
@@ -80,7 +80,7 @@ void test_vector1()
     STXXL_UNUSED(c_it);
 
     unsigned int big_size = 2 * 32 * STXXL_DEFAULT_BLOCK_SIZE(double);
-    typedef stxxl::vector<double> vec_big;
+    using vec_big = stxxl::vector<double>;
     vec_big my_vec(big_size);
 
     vec_big::iterator big_it = my_vec.begin();
@@ -151,7 +151,7 @@ void test_vector1()
 //! check vector::resize(n,true)
 void test_resize_shrink()
 {
-    typedef stxxl::vector<int, 2, stxxl::lru_pager<4>, 4096> vector_type;
+    using vector_type = stxxl::vector<int, 2, stxxl::lru_pager<4>, 4096>;
     vector_type vector;
 
     int n = 1 << 16;
@@ -182,10 +182,10 @@ template class stxxl::vector_iterator<stxxl::vector<double>::configuration_type>
 template class stxxl::const_vector_iterator<stxxl::vector<double>::configuration_type>;
 
 //-tb bufreader instantiation work only for const_iterator!
-typedef stxxl::vector<double>::const_iterator const_vector_iterator;
+using const_vector_iterator = stxxl::vector<double>::const_iterator;
 template class stxxl::vector_bufreader<const_vector_iterator>;
 template class stxxl::vector_bufreader_reverse<const_vector_iterator>;
 template class stxxl::vector_bufreader_iterator<stxxl::vector_bufreader<const_vector_iterator> >;
 
-typedef stxxl::vector<double>::iterator vector_iterator;
+using vector_iterator = stxxl::vector<double>::iterator;
 template class stxxl::vector_bufwriter<vector_iterator>;

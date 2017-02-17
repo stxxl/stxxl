@@ -23,7 +23,7 @@ namespace stxxl {
 template <typename ValueType = size_t>
 class shared_state
 {
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
     //! mutex for condition variable
     std::mutex mutex_;

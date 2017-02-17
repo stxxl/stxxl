@@ -37,28 +37,28 @@ class int_merger
 {
 public:
     //! type of values in merger
-    typedef ValueType value_type;
+    using value_type = ValueType;
     //! comparator object type
-    typedef CompareType compare_type;
+    using compare_type = CompareType;
 
     enum { max_arity = MaxArity };
 
     //! our type
-    typedef int_merger<ValueType, CompareType, MaxArity> self_type;
+    using self_type = int_merger<ValueType, CompareType, MaxArity>;
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
     //! type of embedded adapter to parallel multiway_merge
-    typedef parallel_merger_adapter<self_type, CompareType, MaxArity> tree_type;
+    using tree_type = parallel_merger_adapter<self_type, CompareType, MaxArity>;
 #else
     //! type of embedded loser tree
-    typedef loser_tree<self_type, CompareType, MaxArity> tree_type;
+    using tree_type = loser_tree<self_type, CompareType, MaxArity>;
 #endif
 
     //! type of sequences in which the values are stored: memory arrays
-    typedef value_type* sequence_type;
+    using sequence_type = value_type *;
 
     //! size type of total number of item in merger
-    typedef size_t size_type;
+    using size_type = size_t;
 
 protected:
     //! loser tree instance

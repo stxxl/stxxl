@@ -63,7 +63,7 @@ public:
 
     class scoped_read_write_timer
     {
-        typedef size_t size_type;
+        using size_type = size_t;
         file_stats& file_stats_;
 
         bool is_write_;
@@ -107,7 +107,7 @@ public:
 
     class scoped_write_timer
     {
-        typedef size_t size_type;
+        using size_type = size_t;
         file_stats& file_stats_;
 
         bool running_ = false;
@@ -143,7 +143,7 @@ public:
 
     class scoped_read_timer
     {
-        typedef size_t size_type;
+        using size_type = size_t;
         file_stats& file_stats_;
 
         bool running_ = false;

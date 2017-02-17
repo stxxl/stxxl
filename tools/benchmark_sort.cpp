@@ -32,10 +32,10 @@ using stxxl::external_size_type;
 #define MB (1024 * 1024)
 
 // pair of uint32_t = 8 bytes
-typedef stxxl::tuple<uint32_t, uint32_t> pair32_type;
+using pair32_type = stxxl::tuple<uint32_t, uint32_t>;
 
 // pair of uint64_t = 16 bytes
-typedef stxxl::tuple<uint64_t, uint64_t> pair64_type;
+using pair64_type = stxxl::tuple<uint64_t, uint64_t>;
 
 // larger struct of 64 bytes
 struct struct64_type : public pair64_type
@@ -53,7 +53,7 @@ struct struct64_type : public pair64_type
 template <typename ValueType, typename RandomGenerator>
 class BenchmarkSort
 {
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
     struct value_less
     {
@@ -71,7 +71,7 @@ class BenchmarkSort
 
     struct value_key_second
     {
-        typedef typename value_type::second_type key_type;
+        using key_type = typename value_type::second_type;
 
         key_type operator () (const value_type& p) const
         { return p.second; }
@@ -85,7 +85,7 @@ class BenchmarkSort
 
     struct random_stream
     {
-        typedef ValueType value_type;
+        using value_type = ValueType;
 
         RandomGenerator m_rng;
 
@@ -173,9 +173,7 @@ public:
         {
             std::cout << "# stxxl::stream::sort of size " << vec_size << std::endl;
             double ts1 = timestamp();
-
-            typedef stxxl::stream::sort<random_stream, value_less>
-                random_stream_sort_type;
+            using random_stream_sort_type = stxxl::stream::sort<random_stream, value_less>            ;
 
             random_stream stream(vec_size);
             random_stream_sort_type stream_sort(stream, value_less(), memsize);

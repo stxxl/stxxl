@@ -24,9 +24,9 @@ namespace stxxl {
 template <typename INSTANCE, bool destroy_on_exit = true>
 class singleton
 {
-    typedef INSTANCE instance_type;
-    typedef instance_type* instance_pointer;
-    typedef volatile instance_pointer volatile_instance_pointer;
+    using instance_type = INSTANCE;
+    using instance_pointer = instance_type *;
+    using volatile_instance_pointer = volatile instance_pointer;
 
     static volatile_instance_pointer instance;
 

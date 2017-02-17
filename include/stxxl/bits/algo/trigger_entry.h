@@ -25,8 +25,8 @@ namespace stxxl {
 template <size_t BlockSize, typename RunType, class PosType = int_type>
 struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
 {
-    typedef runs2bid_array_adaptor<BlockSize, RunType, PosType> self_type;
-    typedef BID<BlockSize> data_type;
+    using self_type = runs2bid_array_adaptor<BlockSize, RunType, PosType>;
+    using data_type = BID<BlockSize>;
 
     enum {
         block_size = BlockSize
@@ -34,7 +34,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
 
     size_t dim_size;
 
-    typedef two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType> parent_type;
+    using parent_type = two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>;
     using parent_type::array;
     using parent_type::pos;
 
@@ -79,10 +79,10 @@ template <size_t BlockSize, typename RunType, class PosType = int_type>
 struct runs2bid_array_adaptor2
     : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
 {
-    typedef runs2bid_array_adaptor2<BlockSize, RunType, PosType> self_type;
-    typedef BID<BlockSize> data_type;
+    using self_type = runs2bid_array_adaptor2<BlockSize, RunType, PosType>;
+    using data_type = BID<BlockSize>;
 
-    typedef two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType> base_type;
+    using base_type = two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>;
 
     using base_type::pos;
     using base_type::array;
@@ -159,15 +159,15 @@ BLOCK_ADAPTOR_OPERATORS(runs2bid_array_adaptor2)
 template <typename trigger_iterator_type>
 struct trigger_entry_iterator
 {
-    typedef trigger_entry_iterator<trigger_iterator_type> self_type;
-    typedef typename std::iterator_traits<trigger_iterator_type>::value_type::bid_type bid_type;
+    using self_type = trigger_entry_iterator<trigger_iterator_type>;
+    using bid_type = typename std::iterator_traits<trigger_iterator_type>::value_type::bid_type;
 
     // STL typedefs
-    typedef bid_type value_type;
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef int_type difference_type;
-    typedef value_type* pointer;
-    typedef value_type& reference;
+    using value_type = bid_type;
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = int_type;
+    using pointer = value_type *;
+    using reference = value_type &;
 
     trigger_iterator_type value;
 

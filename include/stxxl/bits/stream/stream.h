@@ -45,7 +45,7 @@ class iterator2stream
 
 public:
     //! Standard stream typedef.
-    typedef typename std::iterator_traits<InputIterator>::value_type value_type;
+    using value_type = typename std::iterator_traits<InputIterator>::value_type;
 
     iterator2stream(InputIterator begin, InputIterator end)
         : m_current(begin), m_end(end)
@@ -96,7 +96,7 @@ template <typename InputIterator>
 struct streamify_traits
 {
     //! return type (stream type) of \c streamify for \c InputIterator.
-    typedef iterator2stream<InputIterator> stream_type;
+    using stream_type = iterator2stream<InputIterator>;
 };
 
 //! A model of stream that retrieves data from an external \c stxxl::vector
@@ -107,10 +107,10 @@ template <typename InputIterator>
 class vector_iterator2stream
 {
     InputIterator m_current, m_end;
-    typedef buf_istream<typename InputIterator::block_type,
-                        typename InputIterator::bids_container_iterator> buf_istream_type;
+    using buf_istream_type = buf_istream<typename InputIterator::block_type,
+                                         typename InputIterator::bids_container_iterator>;
 
-    typedef std::unique_ptr<buf_istream_type> buf_istream_unique_ptr_type;
+    using buf_istream_unique_ptr_type = std::unique_ptr<buf_istream_type>;
     mutable buf_istream_unique_ptr_type in;
 
     void delete_stream()
@@ -120,7 +120,7 @@ class vector_iterator2stream
 
 public:
     //! Standard stream typedef.
-    typedef typename std::iterator_traits<InputIterator>::value_type value_type;
+    using value_type = typename std::iterator_traits<InputIterator>::value_type;
 
     vector_iterator2stream(InputIterator begin, InputIterator end,
                            size_t nbuffers = 0)
@@ -214,8 +214,8 @@ auto streamify(
 template <typename VectorConfig>
 struct streamify_traits<stxxl::vector_iterator<VectorConfig> >
 {
-    typedef vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >
-        stream_type;
+    using stream_type = vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >
+    ;
 };
 
 //! Input external \c stxxl::vector const iterator range to stream converter.
@@ -240,8 +240,8 @@ auto streamify(
 template <typename VectorConfig>
 struct streamify_traits<stxxl::const_vector_iterator<VectorConfig> >
 {
-    typedef vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >
-        stream_type;
+    using stream_type = vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >
+    ;
 };
 
 //! Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
@@ -256,11 +256,11 @@ class vector_iterator2stream_sr
     vector_iterator2stream<InputIterator>* vec_it_stream;
     iterator2stream<InputIterator>* it_stream;
 
-    typedef typename InputIterator::block_type block_type;
+    using block_type = typename InputIterator::block_type;
 
 public:
     //! Standard stream typedef.
-    typedef typename std::iterator_traits<InputIterator>::value_type value_type;
+    using value_type = typename std::iterator_traits<InputIterator>::value_type;
 
     vector_iterator2stream_sr(InputIterator begin, InputIterator end,
                               size_t nbuffers = 0)
@@ -365,7 +365,7 @@ class generator2stream
 {
 public:
     //! Standard stream typedef.
-    typedef T value_type;
+    using value_type = T;
 
 private:
     Generator gen_;
@@ -448,7 +448,7 @@ class transform
 
 public:
     //! Standard stream typedef.
-    typedef typename Operation::value_type value_type;
+    using value_type = typename Operation::value_type;
 
 private:
     value_type current;
@@ -519,7 +519,7 @@ class transform<Operation, Input1, Stopper, Stopper, Stopper, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename Operation::value_type value_type;
+    using value_type = typename Operation::value_type;
 
 private:
     value_type current;
@@ -583,7 +583,7 @@ class transform<Operation, Input1, Input2, Stopper, Stopper, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename Operation::value_type value_type;
+    using value_type = typename Operation::value_type;
 
 private:
     value_type current;
@@ -651,7 +651,7 @@ class transform<Operation, Input1, Input2, Input3, Stopper, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename Operation::value_type value_type;
+    using value_type = typename Operation::value_type;
 
 private:
     value_type current;
@@ -724,7 +724,7 @@ class transform<Operation, Input1, Input2, Input3, Input4, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename Operation::value_type value_type;
+    using value_type = typename Operation::value_type;
 
 private:
     value_type current;
@@ -801,7 +801,7 @@ class transform<Operation, Input1, Input2, Input3, Input4, Input5, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename Operation::value_type value_type;
+    using value_type = typename Operation::value_type;
 
 private:
     value_type current;
@@ -878,14 +878,14 @@ class make_tuple
 
 public:
     //! Standard stream typedef.
-    typedef typename stxxl::tuple<
-            typename Input1::value_type,
-            typename Input2::value_type,
-            typename Input3::value_type,
-            typename Input4::value_type,
-            typename Input5::value_type,
-            typename Input6::value_type
-            > value_type;
+    using value_type = typename stxxl::tuple<
+              typename Input1::value_type,
+              typename Input2::value_type,
+              typename Input3::value_type,
+              typename Input4::value_type,
+              typename Input5::value_type,
+              typename Input6::value_type
+              >;
 
 private:
     value_type current;
@@ -954,10 +954,10 @@ class make_tuple<Input1, Input2, Stopper, Stopper, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename stxxl::tuple<
-            typename Input1::value_type,
-            typename Input2::value_type
-            > value_type;
+    using value_type = typename stxxl::tuple<
+              typename Input1::value_type,
+              typename Input2::value_type
+              >;
 
 private:
     value_type current;
@@ -1020,11 +1020,11 @@ class make_tuple<Input1, Input2, Input3, Stopper, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename stxxl::tuple<
-            typename Input1::value_type,
-            typename Input2::value_type,
-            typename Input3::value_type
-            > value_type;
+    using value_type = typename stxxl::tuple<
+              typename Input1::value_type,
+              typename Input2::value_type,
+              typename Input3::value_type
+              >;
 
 private:
     value_type current;
@@ -1092,12 +1092,12 @@ class make_tuple<Input1, Input2, Input3, Input4, Stopper, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename stxxl::tuple<
-            typename Input1::value_type,
-            typename Input2::value_type,
-            typename Input3::value_type,
-            typename Input4::value_type
-            > value_type;
+    using value_type = typename stxxl::tuple<
+              typename Input1::value_type,
+              typename Input2::value_type,
+              typename Input3::value_type,
+              typename Input4::value_type
+              >;
 
 private:
     value_type current;
@@ -1172,13 +1172,13 @@ class make_tuple<Input1, Input2, Input3, Input4, Input5, Stopper>
 
 public:
     //! Standard stream typedef.
-    typedef typename stxxl::tuple< // NOLINT
-            typename Input1::value_type,
-            typename Input2::value_type,
-            typename Input3::value_type,
-            typename Input4::value_type,
-            typename Input5::value_type
-            > value_type;
+    using value_type = typename stxxl::tuple<// NOLINT
+              typename Input1::value_type,
+              typename Input2::value_type,
+              typename Input3::value_type,
+              typename Input4::value_type,
+              typename Input5::value_type
+              >;
 
 private:
     value_type current;

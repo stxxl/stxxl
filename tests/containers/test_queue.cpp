@@ -20,7 +20,7 @@
 #include <stxxl/queue>
 #include <stxxl/random>
 
-typedef unsigned my_type;
+using my_type = unsigned;
 
 template <class q1type, class q2type>
 void check(const q1type& q1, const q2type& q2)
@@ -139,7 +139,7 @@ int main()
             check(xqueue, squeue);
         }
     }
-    typedef stxxl::queue<my_type>::block_type block_type;
+    using block_type = stxxl::queue<my_type>::block_type;
     stxxl::read_write_pool<block_type> pool(5, 5);
     stxxl::queue<my_type> xqueue1(pool, -1);
     std::queue<my_type> squeue1;

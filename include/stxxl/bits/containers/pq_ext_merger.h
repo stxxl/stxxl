@@ -43,34 +43,34 @@ class ext_merger
 {
 public:
     //! class is parameterized by the block of the external arrays
-    typedef BlockType block_type;
-    typedef CompareType compare_type;
+    using block_type = BlockType;
+    using compare_type = CompareType;
 
     // kMaxArity / 2  <  arity  <=  kMaxArity
     enum { arity = Arity, kMaxArity = 1UL << (LOG2<Arity>::ceil) };
 
-    typedef AllocStr alloc_strategy;
+    using alloc_strategy = AllocStr;
 
-    typedef typename block_type::bid_type bid_type;
-    typedef typename block_type::value_type value_type;
+    using bid_type = typename block_type::bid_type;
+    using value_type = typename block_type::value_type;
 
-    typedef typename std::deque<bid_type> bid_container_type;
+    using bid_container_type = typename std::deque<bid_type>;
 
-    typedef read_write_pool<block_type> pool_type;
+    using pool_type = read_write_pool<block_type>;
 
     //! our type
-    typedef ext_merger<BlockType, CompareType, Arity, AllocStr> self_type;
+    using self_type = ext_merger<BlockType, CompareType, Arity, AllocStr>;
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
     //! type of embedded adapter to parallel multiway_merge
-    typedef parallel_merger_adapter<self_type, CompareType, Arity> tree_type;
+    using tree_type = parallel_merger_adapter<self_type, CompareType, Arity>;
 #else
     //! type of embedded loser tree
-    typedef loser_tree<self_type, CompareType, Arity> tree_type;
+    using tree_type = loser_tree<self_type, CompareType, Arity>;
 #endif
 
     //! size type of total number of item in merger
-    typedef external_size_type size_type;
+    using size_type = external_size_type;
 
 public:
     struct sequence_state
@@ -178,7 +178,7 @@ public:
     };
 
     //! type of sequences in which the values are stored: external arrays
-    typedef sequence_state sequence_type;
+    using sequence_type = sequence_state;
 
 protected:
     //! loser tree instance
@@ -476,9 +476,9 @@ protected:
         if (begin == end)
             return;
 
-        typedef external_diff_type diff_type;
+        using diff_type = external_diff_type;
 
-        typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
+        using sequence = std::pair<typename block_type::iterator, typename block_type::iterator>;
 
         std::vector<sequence> seqs;
         std::vector<size_t> orig_seq_index;

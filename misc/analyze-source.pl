@@ -226,11 +226,16 @@ sub process_cpp {
         }
     }
 
-    foreach my $ln (@data)
+    for(my $i = 0; $i < @data-1; ++$i)
     {
         # replace all NULL with nullptr
-        if ($ln =~ /\bNULL\b/ && $ln !~ /NOLINT/) {
-            $ln =~ s/\bNULL\b/nullptr/g;
+        if ($data[$i] =~ /\bNULL\b/ && $data[$i] !~ /NOLINT/) {
+            $data[$i] =~ s/\bNULL\b/nullptr/g;
+        }
+
+        # replace all typedef with using
+        if ($data[$i] =~ s/\btypedef\b(.+)\b(\w+);$/using $2 = $1;/) {
+            print("found typedef in $path:$i\n");
         }
     }
 
@@ -607,7 +612,7 @@ if ($disable_authors) {
            $mail = (sort keys(%{$mail}))[0]; # pick first
        }
        $mail = $mail ? " <$mail>" : "";
-   
+
        print "  $a$mail\n";
        print A "$a$mail\n";
    }

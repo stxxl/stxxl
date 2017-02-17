@@ -29,8 +29,8 @@ struct my_int : public stxxl::reference_count
     { ++count_deletes; }
 };
 
-typedef stxxl::counting_ptr<my_int> int_ptr;
-typedef stxxl::counting_ptr<const my_int> int_cptr;
+using int_ptr = stxxl::counting_ptr<my_int>;
+using int_cptr = stxxl::counting_ptr<const my_int>;
 
 int_cptr run_test()
 {

@@ -43,9 +43,8 @@ std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
     o << obj.first << " " << obj.second;
     return o;
 }
-
-typedef stxxl::btree::btree<int, my_type, comp_type,
-                            NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::simple_random> btree_type;
+using btree_type = stxxl::btree::btree<int, my_type, comp_type,
+                                       NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::simple_random>;
 
 // forced instantiation
 template class stxxl::btree::btree<

@@ -37,18 +37,18 @@ template <typename BlockType, typename BidIteratorType>
 class buf_istream_reverse
 {
 public:
-    typedef BlockType block_type;
-    typedef BidIteratorType bid_iterator_type;
+    using block_type = BlockType;
+    using bid_iterator_type = BidIteratorType;
 
     //-tb note that we redefine the BID type here, because there is no way to
     //-derive it from BidIteratorType (which is usually just a POD pointer).
-    typedef BIDArray<block_type::raw_size> bid_vector_type;
+    using bid_vector_type = BIDArray<block_type::raw_size>;
 
 private:
     buf_istream_reverse() { }
 
 protected:
-    typedef block_prefetcher<block_type, typename bid_vector_type::iterator> prefetcher_type;
+    using prefetcher_type = block_prefetcher<block_type, typename bid_vector_type::iterator>;
     prefetcher_type* prefetcher;
     int_type current_elem;
     block_type* current_blk;
@@ -59,8 +59,8 @@ protected:
     bid_vector_type bids_;
 
 public:
-    typedef typename block_type::reference reference;
-    typedef buf_istream_reverse<block_type, bid_iterator_type> self_type;
+    using reference = typename block_type::reference;
+    using self_type = buf_istream_reverse<block_type, bid_iterator_type>;
 
     //! Constructs input stream object, reading [first,last) blocks in reverse.
     //! \param begin \c bid_iterator pointing to the first block of the stream

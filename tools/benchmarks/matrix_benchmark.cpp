@@ -70,7 +70,7 @@ int main(int argc, char** argv)
               " using " << internal_memory / 1024 / 1024 << "MiB internal memory, multiplication-algo " <<
               mult_algo_num << ", scheduling-algo " << sched_algo_num);
 
-    typedef double value_type;
+    using value_type = double;
 
     stxxl::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
@@ -107,10 +107,10 @@ int main(int argc, char** argv)
     }
     else
     {
-        typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> > bst;
-        typedef stxxl::matrix<value_type, block_order> mt;
-        typedef mt::row_major_iterator mitt;
-        typedef mt::const_row_major_iterator cmitt;
+        using bst = stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> >;
+        using mt = stxxl::matrix<value_type, block_order>;
+        using mitt = mt::row_major_iterator;
+        using cmitt = mt::const_row_major_iterator;
 
         bst* b_s = new bst(internal_memory);  // the block_scheduler may use internal_memory byte for caching
         bst& bs = *b_s;

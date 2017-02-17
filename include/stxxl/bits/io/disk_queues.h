@@ -37,8 +37,8 @@ class disk_queues : public singleton<disk_queues>
 {
     friend class singleton<disk_queues>;
 
-    typedef int64_t disk_id_type;
-    typedef std::map<disk_id_type, request_queue*> request_queue_map;
+    using disk_id_type = int64_t;
+    using request_queue_map = std::map<disk_id_type, request_queue*>;
 
 protected:
     request_queue_map queues_;

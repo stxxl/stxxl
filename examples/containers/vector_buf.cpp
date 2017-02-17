@@ -59,7 +59,7 @@ void test_vector_buffered(uint64_t size)
     stxxl::scoped_print_timer tm("vector buffered access", 2 * size * sizeof(uint64_t));
 
 //! [buffered]
-    typedef stxxl::vector<uint64_t> vector_type;
+    using vector_type = stxxl::vector<uint64_t>;
 
     vector_type vec(size);
 
@@ -89,7 +89,7 @@ void test_vector_cxx11(uint64_t size)
 {
     stxxl::scoped_print_timer tm("vector C++11 loop access", 2 * size * sizeof(uint64_t));
 
-    typedef stxxl::vector<uint64_t> vector_type;
+    using vector_type = stxxl::vector<uint64_t>;
 
     vector_type vec(size);
 

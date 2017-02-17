@@ -44,9 +44,9 @@ int main()
 #define SUB_BLOCKS_PER_BLOCK 256
 
     // template parameter <KeyType, MappedType, HashType, CompareType, SubBlockSize, SubBlocksPerBlock>
-    typedef stxxl::unordered_map<
-            int, char, HashFunctor, CompareLess, SUB_BLOCK_SIZE, SUB_BLOCKS_PER_BLOCK
-            > unordered_map_type;
+    using unordered_map_type = stxxl::unordered_map<
+              int, char, HashFunctor, CompareLess, SUB_BLOCK_SIZE, SUB_BLOCKS_PER_BLOCK
+              >;
 
     // constructor: use defaults for all parameters
     unordered_map_type my_map;

@@ -46,7 +46,7 @@ extern unsigned ran32State;
 //! \warning Uses a global state and is not reentrant or thread-safe!
 struct random_number32
 {
-    typedef unsigned value_type;
+    using value_type = unsigned;
 
     //! Returns a random number from [0, 2^32)
     inline value_type operator () () const
@@ -72,7 +72,7 @@ inline void srandom_number32(unsigned seed = get_next_seed())
 //! Reentrant variant of random_number32 that keeps it's private state.
 struct random_number32_r
 {
-    typedef unsigned value_type;
+    using value_type = unsigned;
     mutable unsigned state;
 
     explicit random_number32_r(unsigned seed = get_next_seed())
@@ -102,7 +102,7 @@ class random_number8_r
     unsigned int m_pos;
 
 public:
-    typedef uint8_t value_type;
+    using value_type = uint8_t;
 
     explicit random_number8_r(unsigned seed = get_next_seed())
         : m_rnd32(seed), m_pos(4)
@@ -123,7 +123,7 @@ public:
 //! \warning Uses a global state and is not reentrant or thread-safe!
 struct random_uniform_fast
 {
-    typedef double value_type;
+    using value_type = double;
     random_number32 rnd32;
 
     explicit random_uniform_fast(unsigned /*seed*/ = get_next_seed())
@@ -147,18 +147,18 @@ struct random_uniform_fast
 //! \warning Seed is not the same as in the fast generator \c random_uniform_fast
 struct random_uniform_slow
 {
-    typedef double value_type;
+    using value_type = double;
 #if STXXL_STD_RANDOM
-    typedef std::default_random_engine gen_type;
+    using gen_type = std::default_random_engine;
     mutable gen_type gen;
-    typedef std::uniform_real_distribution<> uni_type;
+    using uni_type = std::uniform_real_distribution<>;
     mutable uni_type uni;
 
     explicit random_uniform_slow(unsigned seed = get_next_seed())
         : gen(seed), uni(0.0, 1.0)
     { }
 #elif STXXL_BOOST_RANDOM
-    typedef boost::minstd_rand base_generator_type;
+    using base_generator_type = boost::minstd_rand;
     base_generator_type generator;
     boost::uniform_real<> uni_dist;
     mutable boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
@@ -243,7 +243,7 @@ struct random_uniform_slow
 template <class UniformRGen = random_uniform_fast>
 struct random_number
 {
-    typedef unsigned value_type;
+    using value_type = unsigned;
     UniformRGen uniform;
 
     explicit random_number(unsigned seed = get_next_seed())
@@ -260,7 +260,7 @@ struct random_number
 //! Slow and precise uniform [0, 2^64) pseudo-random generator
 struct random_number64
 {
-    typedef uint64_t value_type;
+    using value_type = uint64_t;
     random_uniform_slow uniform;
 
     explicit random_number64(unsigned seed = get_next_seed())

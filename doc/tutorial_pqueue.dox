@@ -31,7 +31,7 @@ Thus the definition may look as follows:
 
 \code
 // template parameter <value_type, CompareType, internal_memory_limit, number_of_elements>
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 64*1024*1024, 1024*1024>::result pqueue_type;
+using pqueue_type = stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 64*1024*1024, 1024*1024>::result;
 \endcode
 
 The ComparatorGreater(a,b) class is needed to compare two given elements a and b and has to be defined by hand (and before the priority queue definition above):
@@ -67,7 +67,7 @@ Note that CompareType must define a strict weak ordering. These and some other d
 To create a STXXL priority queue instance, a resizable buffered writing and prefetched reading pool (to overlap I/O and computation) is needed:
 
 \code
-  typedef pqueue_type::block_type block_type;
+  using block_type = pqueue_type::block_type;
   const unsigned int mem_for_pools = 16 * 1024 * 1024;  // restricts memory consumption of the pools
 
   stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);

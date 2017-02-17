@@ -111,7 +111,7 @@ public:
 template <class CompareIterator, typename ValueType>
 class iterator_compare
 {
-    typedef std::pair<ValueType, ValueType> error_type;
+    using error_type =  std::pair<ValueType, ValueType> ;
 
     CompareIterator& compiter;
     ValueType current_value;
@@ -148,14 +148,14 @@ uint64_t internal_memory = 16 * 1024 * 1024;
 void test1(int rank)
 {
     STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
-    typedef int_type value_type;
+    using value_type = int_type;
 
-    typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, small_block_order> > block_scheduler_type;
-    typedef stxxl::matrix<value_type, small_block_order> matrix_type;
-    typedef matrix_type::row_vector_type row_vector_type;
-    typedef matrix_type::column_vector_type column_vector_type;
-    typedef matrix_type::row_major_iterator row_major_iterator;
-    typedef matrix_type::const_row_major_iterator const_row_major_iterator;
+    using block_scheduler_type = stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, small_block_order> >;
+    using matrix_type = stxxl::matrix<value_type, small_block_order>;
+    using row_vector_type = matrix_type::row_vector_type;
+    using column_vector_type = matrix_type::column_vector_type;
+    using row_major_iterator = matrix_type::row_major_iterator;
+    using const_row_major_iterator = matrix_type::const_row_major_iterator;
 
     // the block_scheduler may use internal_memory byte for caching
     block_scheduler_type* bs_ptr = new block_scheduler_type(internal_memory);
@@ -288,12 +288,12 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
                                                               << " using " << internal_memory << " bytes internal memory, multiplication-algo "
                                                               << mult_algo_num << ", scheduling-algo " << sched_algo_num);
 
-    typedef double value_type;
+    using value_type = double;
 
-    typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> > block_scheduler_type;
-    typedef stxxl::matrix<value_type, block_order> matrix_type;
-    typedef matrix_type::row_major_iterator row_major_iterator;
-    typedef matrix_type::const_row_major_iterator const_row_major_iterator;
+    using block_scheduler_type = stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> >;
+    using matrix_type = stxxl::matrix<value_type, block_order>;
+    using row_major_iterator = matrix_type::row_major_iterator;
+    using const_row_major_iterator = matrix_type::const_row_major_iterator;
 
     // the block_scheduler may use internal_memory byte for caching
     block_scheduler_type* bs_ptr = new block_scheduler_type(internal_memory);

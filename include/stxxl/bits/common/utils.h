@@ -173,7 +173,7 @@ typename std::remove_const<Integral>::type
 div_ceil(Integral n, Integral2 d)
 {
 #if 0   // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
-    typedef __typeof__ (std::div (n, d)) div_type;
+    using div_type = __typeof__(std::div(n, d));
     div_type result = std::div(n, d);
     return result.quot + (result.rem != 0);
 #else

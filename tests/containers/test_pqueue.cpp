@@ -30,7 +30,7 @@ const size_t volume = 128 * 1024; // in KiB
 
 struct my_type
 {
-    typedef int key_type;
+    using key_type = int;
     key_type key;
     char data[RECORD_SIZE - sizeof(key_type)];
     my_type() { }
@@ -78,12 +78,11 @@ int main()
  */
     //typedef priority_queue<priority_queue_config<my_type,my_cmp,
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<
-            my_type, my_cmp, 700* 1024, volume / sizeof(my_type)
-            > gen;
-    typedef gen::result pq_type;
-    typedef pq_type::block_type block_type;
+    using gen = stxxl::PRIORITY_QUEUE_GENERATOR<
+              my_type, my_cmp, 700* 1024, volume / sizeof(my_type)
+              >;
+    using pq_type = gen::result;
+    using block_type = pq_type::block_type;
 
     STXXL_MSG("Block size: " << block_type::raw_size);
     STXXL_MSG("AI: " << gen::AI);

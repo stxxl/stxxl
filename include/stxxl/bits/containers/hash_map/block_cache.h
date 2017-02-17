@@ -31,8 +31,8 @@ template <class BlockType>
 class block_cache_write_buffer
 {
 public:
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
 
 protected:
     std::vector<block_type*> blocks_;
@@ -119,10 +119,10 @@ template <class BlockType>
 class block_cache
 {
 public:
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
-    typedef typename block_type::value_type subblock_type;
-    typedef typename subblock_type::bid_type subblock_bid_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
+    using subblock_type = typename block_type::value_type;
+    using subblock_bid_type = typename subblock_type::bid_type;
 
 protected:
     struct bid_eq
@@ -153,11 +153,11 @@ protected:
 #endif
     };
 
-    typedef stxxl::lru_pager<> pager_type;
-    typedef block_cache_write_buffer<block_type> write_buffer_type;
+    using pager_type = stxxl::lru_pager<>;
+    using write_buffer_type = block_cache_write_buffer<block_type>;
 
-    typedef typename std::unordered_map<
-            bid_type, size_t, bid_hash> bid_map_type;
+    using bid_map_type = typename std::unordered_map<
+              bid_type, size_t, bid_hash>;
 
     enum { valid_all = block_type::size };
 

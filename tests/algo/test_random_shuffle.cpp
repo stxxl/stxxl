@@ -38,7 +38,7 @@ struct counter
 
 void long_test()
 {
-    typedef stxxl::vector<int> ext_vec_type;
+    using ext_vec_type = stxxl::vector<int>;
     ext_vec_type STXXLVector(128 * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int));
 
     STXXL_MSG("Filling vector with increasing values...");
@@ -70,7 +70,7 @@ void long_test()
 void short_test()
 {
     static_assert(sizeof(int) == 4, "sizeof(int) == 4");
-    typedef stxxl::vector<int, 1, stxxl::lru_pager<2>, 4096> vector_type;
+    using vector_type = stxxl::vector<int, 1, stxxl::lru_pager<2>, 4096>;
     vector_type::size_type i;
     vector_type v(2048);
     for (i = 0; i < v.size(); ++i)

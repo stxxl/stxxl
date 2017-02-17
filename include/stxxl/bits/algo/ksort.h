@@ -56,8 +56,8 @@ namespace ksort_local {
 template <typename BIDType, typename KeyType>
 struct trigger_entry
 {
-    typedef BIDType bid_type;
-    typedef KeyType key_type;
+    using bid_type = BIDType;
+    using key_type = KeyType;
 
     bid_type bid;
     key_type key;
@@ -85,7 +85,7 @@ inline bool operator > (const trigger_entry<BIDType, KeyType>& a,
 template <typename Type, typename KeyType>
 struct type_key
 {
-    typedef KeyType key_type;
+    using key_type = KeyType;
     key_type key;
     Type* ptr;
 
@@ -138,7 +138,7 @@ inline void write_out(
     InputBidIterator& it,
     KeyExtractor keyobj)
 {
-    typedef typename BlockType::type type;
+    using type = typename BlockType::type;
 
     type* elem = cur_blk->elem;
     for (TypeKey* p = begin; p < end; p++)
@@ -188,10 +188,10 @@ create_runs(
     const size_t m2,
     KeyExtractor keyobj)
 {
-    typedef typename BlockType::value_type type;
-    typedef typename BlockType::bid_type bid_type;
-    typedef typename KeyExtractor::key_type key_type;
-    typedef type_key<type, key_type> type_key_;
+    using type = typename BlockType::value_type;
+    using bid_type = typename BlockType::bid_type;
+    using key_type = typename KeyExtractor::key_type;
+    using type_key_ = type_key<type, key_type>;
 
     block_manager* bm = block_manager::get_instance();
     BlockType* Blocks1 = new BlockType[m2];
@@ -308,7 +308,7 @@ struct run_cursor2_cmp : public std::binary_function<
                              bool
                              >
 {
-    typedef run_cursor2<BlockType, prefetcher_type> cursor_type;
+    using cursor_type = run_cursor2<BlockType, prefetcher_type>;
     KeyExtractor keyobj;
     explicit run_cursor2_cmp(KeyExtractor _keyobj)
         : keyobj(_keyobj)
@@ -349,8 +349,8 @@ bool check_ksorted_runs(RunType** runs,
                         size_t m,
                         KeyExtractor keyext)
 {
-    typedef BlockType block_type;
-    typedef typename BlockType::value_type value_type;
+    using block_type = BlockType;
+    using value_type = typename BlockType::value_type;
 
     STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
     size_t irun = 0;
@@ -445,9 +445,9 @@ bool check_ksorted_runs(RunType** runs,
 template <typename BlockType, typename RunType, typename KeyExtractor>
 void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, KeyExtractor keyobj)
 {
-    typedef BlockType block_type;
-    typedef block_prefetcher<BlockType, typename RunType::iterator> prefetcher_type;
-    typedef run_cursor2<BlockType, prefetcher_type> run_cursor_type;
+    using block_type = BlockType;
+    using prefetcher_type = block_prefetcher<BlockType, typename RunType::iterator>;
+    using run_cursor_type = run_cursor2<BlockType, prefetcher_type>;
 
     size_t i;
     RunType consume_seq(out_run->size());
@@ -538,13 +538,13 @@ simple_vector<
 ksort_blocks(InputBidIterator input_bids, size_t _n,
              size_t _m, KeyExtractor keyobj)
 {
-    typedef BlockType block_type;
-    typedef typename BlockType::value_type type;
-    typedef typename KeyExtractor::key_type key_type;
-    typedef typename BlockType::bid_type bid_type;
-    typedef trigger_entry<bid_type, typename KeyExtractor::key_type> trigger_entry_type;
-    typedef simple_vector<trigger_entry_type> run_type;
-    typedef typename interleaved_alloc_traits<AllocStrategy>::strategy interleaved_alloc_strategy;
+    using block_type = BlockType;
+    using type = typename BlockType::value_type;
+    using key_type = typename KeyExtractor::key_type;
+    using bid_type = typename BlockType::bid_type;
+    using trigger_entry_type = trigger_entry<bid_type, typename KeyExtractor::key_type>;
+    using run_type = simple_vector<trigger_entry_type>;
+    using interleaved_alloc_strategy = typename interleaved_alloc_traits<AllocStrategy>::strategy;
 
     size_t m2 = div_ceil(_m, 2);
     const size_t m2_rf = m2 * block_type::raw_size /
@@ -727,16 +727,16 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 template <typename ExtIterator, typename KeyExtractor>
 void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
 {
-    typedef simple_vector<
-            ksort_local::trigger_entry<
-                typename ExtIterator::bid_type, typename KeyExtractor::key_type
-                >
-            > run_type;
-    typedef typename ExtIterator::vector_type::value_type value_type;
-    typedef typename ExtIterator::bid_type bid_type;
-    typedef typename ExtIterator::block_type block_type;
-    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy_type;
-    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
+    using run_type = simple_vector<
+              ksort_local::trigger_entry<
+                  typename ExtIterator::bid_type, typename KeyExtractor::key_type
+                  >
+              >;
+    using value_type = typename ExtIterator::vector_type::value_type;
+    using bid_type = typename ExtIterator::bid_type;
+    using block_type = typename ExtIterator::block_type;
+    using alloc_strategy_type = typename ExtIterator::vector_type::alloc_strategy_type;
+    using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
     size_t n = 0;
     block_manager* mng = block_manager::get_instance();
@@ -1031,7 +1031,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    typedef typename ExtIterator::const_iterator const_iterator;
+    using const_iterator = typename ExtIterator::const_iterator;
     STXXL_ASSERT(stxxl::is_sorted(const_iterator(first), const_iterator(last),
                                   ksort_local::key_comparison<value_type, KeyExtractor>()));
 #endif
@@ -1040,7 +1040,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
 template <typename RecordType>
 struct ksort_defaultkey
 {
-    typedef typename RecordType::key_type key_type;
+    using key_type = typename RecordType::key_type;
     key_type operator () (const RecordType& obj) const
     {
         return obj.key();

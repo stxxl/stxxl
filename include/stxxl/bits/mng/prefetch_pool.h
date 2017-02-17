@@ -32,8 +32,8 @@ template <class BlockType>
 class prefetch_pool
 {
 public:
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
 
 protected:
     struct bid_hash
@@ -57,10 +57,10 @@ protected:
         };
 #endif
     };
-    typedef std::pair<block_type*, request_ptr> busy_entry;
-    typedef typename std::unordered_map<bid_type, busy_entry, bid_hash> unordered_map_type;
-    typedef typename std::list<block_type*>::iterator free_blocks_iterator;
-    typedef typename unordered_map_type::iterator busy_blocks_iterator;
+    using busy_entry = std::pair<block_type*, request_ptr>;
+    using unordered_map_type = typename std::unordered_map<bid_type, busy_entry, bid_hash>;
+    using free_blocks_iterator = typename std::list<block_type*>::iterator;
+    using busy_blocks_iterator = typename unordered_map_type::iterator;
 
     //! contains free prefetch blocks
     std::list<block_type*> free_blocks;

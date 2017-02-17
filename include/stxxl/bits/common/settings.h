@@ -30,7 +30,7 @@ public:
 template <typename MustBeInt>
 bool settings<MustBeInt>::native_merge = false;
 
-typedef settings<> SETTINGS;
+using SETTINGS = settings<>;
 
 } // namespace stxxl
 

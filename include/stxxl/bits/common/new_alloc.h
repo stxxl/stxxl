@@ -27,12 +27,12 @@ struct new_alloc_rebind;
 
 template <typename Type>
 struct new_alloc_rebind<Type, Type>{
-    typedef new_alloc<Type> other;
+    using other = new_alloc<Type>;
 };
 
 template <typename Type, typename Rebind>
 struct new_alloc_rebind {
-    typedef std::allocator<Rebind> other;
+    using other = std::allocator<Rebind>;
 };
 
 // designed for typed_block (to use with std::vector)
@@ -41,18 +41,18 @@ class new_alloc
 {
 public:
     // type definitions
-    typedef Type value_type;
-    typedef Type* pointer;
-    typedef const Type* const_pointer;
-    typedef Type& reference;
-    typedef const Type& const_reference;
-    typedef std::size_t size_type;
-    typedef std::ptrdiff_t difference_type;
+    using value_type = Type;
+    using pointer = Type *;
+    using const_pointer = const Type *;
+    using reference = Type &;
+    using const_reference = const Type &;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     // rebind allocator to type Rebind, use new_alloc only if Rebind == Type
     template <class Rebind>
     struct rebind {
-        typedef typename new_alloc_rebind<Type, Rebind>::other other;
+        using other = typename new_alloc_rebind<Type, Rebind>::other;
     };
 
     // return address of values

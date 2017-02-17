@@ -22,12 +22,12 @@
 
 #define BLOCK_SIZE (1024 * 512)
 
-typedef stxxl::typed_block<BLOCK_SIZE, unsigned> block_type;
-typedef stxxl::BIDArray<BLOCK_SIZE>::iterator bid_iterator_type;
+using block_type = stxxl::typed_block<BLOCK_SIZE, unsigned>;
+using bid_iterator_type = stxxl::BIDArray<BLOCK_SIZE>::iterator;
 
-typedef stxxl::buf_ostream<block_type, bid_iterator_type> buf_ostream_type;
-typedef stxxl::buf_istream<block_type, bid_iterator_type> buf_istream_type;
-typedef stxxl::buf_istream_reverse<block_type, bid_iterator_type> buf_istream_reverse_type;
+using buf_ostream_type = stxxl::buf_ostream<block_type, bid_iterator_type>;
+using buf_istream_type = stxxl::buf_istream<block_type, bid_iterator_type>;
+using buf_istream_reverse_type = stxxl::buf_istream_reverse<block_type, bid_iterator_type>;
 
 // forced instantiations
 template class stxxl::buf_ostream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator>;

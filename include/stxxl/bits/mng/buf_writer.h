@@ -34,8 +34,8 @@ namespace stxxl {
 template <typename BlockType>
 class buffered_writer
 {
-    typedef BlockType block_type;
-    typedef typename block_type::bid_type bid_type;
+    using block_type = BlockType;
+    using bid_type = typename block_type::bid_type;
 
 protected:
     const size_t nwriteblocks;
@@ -62,7 +62,7 @@ protected:
         }
     };
 
-    typedef std::priority_queue<batch_entry, std::vector<batch_entry>, batch_entry_cmp> batch_type;
+    using batch_type = std::priority_queue<batch_entry, std::vector<batch_entry>, batch_entry_cmp>;
     batch_type batch_write_blocks;      // sorted sequence of blocks to write
 
 public:

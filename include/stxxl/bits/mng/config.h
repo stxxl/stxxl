@@ -115,7 +115,7 @@ class config : public singleton<config>
     friend class singleton<config>;
 
     //! typedef of list of configured disks
-    typedef std::vector<disk_config> disk_list_type;
+    using disk_list_type = std::vector<disk_config>;
 
     //! list of configured disks
     disk_list_type disks_list;

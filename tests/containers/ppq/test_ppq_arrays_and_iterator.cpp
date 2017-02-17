@@ -22,9 +22,9 @@
 
 #include <cstddef>
 
-typedef std::pair<uint64_t, uint64_t> value_type;
-typedef stxxl::ppq_local::external_array<value_type> ea_type;
-typedef stxxl::ppq_local::internal_array<value_type> ia_type;
+using value_type = std::pair<uint64_t, uint64_t>;
+using ea_type = stxxl::ppq_local::external_array<value_type>;
+using ia_type = stxxl::ppq_local::internal_array<value_type>;
 
 //! Comparator for value_type / size_t-pairs
 struct value_comp {
@@ -245,8 +245,8 @@ int run_multiway_merge(size_t volume)
 
     ia_type ia(v);
 
-    typedef std::vector<ea_type*> ea_vector_type;
-    typedef ea_vector_type::iterator ea_iterator;
+    using ea_vector_type = std::vector<ea_type*>;
+    using ea_iterator = ea_vector_type::iterator;
 
     ea_type::pool_type rw_pool1;
     ea_vector_type ealist;
@@ -385,7 +385,7 @@ int run_internal_array_test(size_t volume)
         ia.inc_min();
         ia.inc_min(2);
 
-        typedef ia_type::iterator iterator;
+        using iterator = ia_type::iterator;
         size_t index = 4;
 
         // test iterator

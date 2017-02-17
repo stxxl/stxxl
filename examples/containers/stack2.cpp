@@ -18,7 +18,7 @@
 int main()
 {
     // template parameter <data_type, externality, behaviour, blocks_per_page, block_size, internal_stack_type, migrating_critical_size, allocation_strategy, size_type>
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink>::result simple_stack;
+    using simple_stack = stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink>::result;
 
     // create stack instance
     simple_stack a_stack;

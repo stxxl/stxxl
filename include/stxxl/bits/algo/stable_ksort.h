@@ -58,7 +58,7 @@ void classify_block(Type* begin, Type* end, TypeKey*& out,
 template <typename Type>
 struct type_key
 {
-    typedef typename Type::key_type key_type;
+    using key_type = typename Type::key_type;
     key_type key;
     Type* ptr;
 
@@ -83,11 +83,11 @@ template <typename BIDType, typename AllocStrategy>
 class bid_sequence
 {
 public:
-    typedef BIDType bid_type;
-    typedef bid_type& reference;
-    typedef AllocStrategy alloc_strategy;
-    typedef typename simple_vector<bid_type>::size_type size_type;
-    typedef typename simple_vector<bid_type>::iterator iterator;
+    using bid_type = BIDType;
+    using reference = bid_type &;
+    using alloc_strategy = AllocStrategy;
+    using size_type = typename simple_vector<bid_type>::size_type;
+    using iterator = typename simple_vector<bid_type>::iterator;
 
 protected:
     simple_vector<bid_type>* bids;
@@ -142,12 +142,12 @@ void distribute(
     const int_type nread_buffers,
     const int_type nwrite_buffers)
 {
-    typedef typename ExtIterator::vector_type::value_type value_type;
-    typedef typename value_type::key_type key_type;
-    typedef typename ExtIterator::block_type block_type;
-    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
+    using value_type = typename ExtIterator::vector_type::value_type;
+    using key_type = typename value_type::key_type;
+    using block_type = typename ExtIterator::block_type;
+    using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
-    typedef buf_istream<block_type, bids_container_iterator> buf_istream_type;
+    using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
 
     int_type i = 0;
 
@@ -223,14 +223,14 @@ template <typename ExtIterator>
 void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
 {
     STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
-    typedef typename ExtIterator::vector_type::value_type value_type;
-    typedef typename value_type::key_type key_type;
-    typedef typename ExtIterator::block_type block_type;
-    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
-    typedef typename block_type::bid_type bid_type;
-    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy;
-    typedef stable_ksort_local::bid_sequence<bid_type, alloc_strategy> bucket_bids_type;
-    typedef stable_ksort_local::type_key<value_type> type_key_;
+    using value_type = typename ExtIterator::vector_type::value_type;
+    using key_type = typename value_type::key_type;
+    using block_type = typename ExtIterator::block_type;
+    using bids_container_iterator = typename ExtIterator::bids_container_iterator;
+    using bid_type = typename block_type::bid_type;
+    using alloc_strategy = typename ExtIterator::vector_type::alloc_strategy_type;
+    using bucket_bids_type = stable_ksort_local::bid_sequence<bid_type, alloc_strategy>;
+    using type_key_ = stable_ksort_local::type_key<value_type>;
 
     first.flush();     // flush container
 
@@ -313,7 +313,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         const size_t nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
         STXXL_VERBOSE_STABLE_KSORT("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
-        typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
+        using buf_ostream_type = buf_ostream<block_type, bids_container_iterator>;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
         disk_queues::get_instance()->set_priority_op(request_queue::READ);

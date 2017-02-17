@@ -55,15 +55,15 @@ size_t test_pattern_B(IBT& ib)
 }
 
 const size_t block_size = 1024;
-typedef size_t value_type;
+using value_type = size_t;
 
 size_t internal_memory = 0;
 
-typedef stxxl::block_scheduler<stxxl::swappable_block<value_type, block_size> > block_scheduler_type;
-typedef stxxl::swappable_block<value_type, block_size> swappable_block_type;
-typedef block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
-typedef block_scheduler_type::internal_block_type internal_block_type;
-typedef block_scheduler_type::external_block_type external_block_type;
+using block_scheduler_type = stxxl::block_scheduler<stxxl::swappable_block<value_type, block_size> >;
+using swappable_block_type = stxxl::swappable_block<value_type, block_size>;
+using swappable_block_identifier_type = block_scheduler_type::swappable_block_identifier_type;
+using internal_block_type = block_scheduler_type::internal_block_type;
+using external_block_type = block_scheduler_type::external_block_type;
 
 void test1()
 {

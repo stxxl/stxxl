@@ -16,7 +16,7 @@
 
 int main()
 {
-    typedef stxxl::sequence<int> sequence_type;
+    using sequence_type = stxxl::sequence<int>;
     sequence_type my_sequence;
 
     for (int i = 0; i < 100; ++i)

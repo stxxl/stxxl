@@ -30,8 +30,8 @@ namespace stxxl {
 class request_queue_impl_1q : public request_queue_impl_worker
 {
 private:
-    typedef request_queue_impl_1q self;
-    typedef std::list<request_ptr> queue_type;
+    using self = request_queue_impl_1q;
+    using queue_type = std::list<request_ptr>;
 
     std::mutex queue_mutex_;
     queue_type queue_;

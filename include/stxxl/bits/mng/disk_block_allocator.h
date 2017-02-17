@@ -44,8 +44,8 @@ namespace stxxl {
 class disk_block_allocator
 {
     //! pair (offset, size) used for free space calculation
-    typedef std::pair<uint64_t, uint64_t> place;
-    typedef std::map<uint64_t, uint64_t> space_map_type;
+    using place = std::pair<uint64_t, uint64_t>;
+    using space_map_type = std::map<uint64_t, uint64_t>;
 
     std::mutex mutex_;
     //! map of free space as places

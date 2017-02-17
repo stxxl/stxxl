@@ -15,7 +15,7 @@
 
 int main()
 {
-    typedef stxxl::STACK_GENERATOR<int>::result stack_type;
+    using stack_type = stxxl::STACK_GENERATOR<int>::result;
     stack_type my_stack;
 
     my_stack.push(8);

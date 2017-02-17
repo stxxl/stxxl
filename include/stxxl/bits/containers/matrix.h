@@ -53,8 +53,8 @@ template <typename ValueType>
 class column_vector : public vector<ValueType>
 {
 public:
-    typedef vector<ValueType> vector_type;
-    typedef typename vector_type::size_type size_type;
+    using vector_type =  vector<ValueType> ;
+    using size_type =  typename vector_type::size_type ;
 
     using vector_type::size;
 
@@ -124,8 +124,8 @@ template <typename ValueType>
 class row_vector : public vector<ValueType>
 {
 public:
-    typedef vector<ValueType> vector_type;
-    typedef typename vector_type::size_type size_type;
+    using vector_type =  vector<ValueType> ;
+    using size_type =  typename vector_type::size_type ;
 
     using vector_type::size;
 
@@ -210,7 +210,7 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength* BlockSideLength>
 {
 public:
-    typedef typename swappable_block<ValueType, BlockSideLength* BlockSideLength>::internal_block_type internal_block_type;
+    using internal_block_type =  typename swappable_block<ValueType, BlockSideLength* BlockSideLength>::internal_block_type ;
 
     using swappable_block<ValueType, BlockSideLength* BlockSideLength>::get_internal_block;
 
@@ -236,12 +236,12 @@ template <typename ValueType, unsigned BlockSideLength>
 class swappable_block_matrix : public reference_count
 {
 public:
-    typedef int_type size_type;
-    typedef int_type elem_size_type;
-    typedef block_scheduler<matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
-    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
-    typedef std::vector<swappable_block_identifier_type> blocks_type;
-    typedef matrix_local::matrix_operations<ValueType, BlockSideLength> Ops;
+    using size_type =  int_type ;
+    using elem_size_type =  int_type ;
+    using block_scheduler_type =  block_scheduler<matrix_swappable_block<ValueType, BlockSideLength> > ;
+    using swappable_block_identifier_type =  typename block_scheduler_type::swappable_block_identifier_type ;
+    using blocks_type =  std::vector<swappable_block_identifier_type> ;
+    using Ops =  matrix_local::matrix_operations<ValueType, BlockSideLength> ;
 
     block_scheduler_type& bs;
 
@@ -430,12 +430,12 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_iterator
 {
 protected:
-    typedef matrix<ValueType, BlockSideLength> matrix_type;
-    typedef typename matrix_type::swappable_block_matrix_type swappable_block_matrix_type;
-    typedef typename matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename matrix_type::elem_size_type elem_size_type;
-    typedef typename matrix_type::block_size_type block_size_type;
+    using matrix_type =  matrix<ValueType, BlockSideLength> ;
+    using swappable_block_matrix_type =  typename matrix_type::swappable_block_matrix_type ;
+    using block_scheduler_type =  typename matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using elem_size_type =  typename matrix_type::elem_size_type ;
+    using block_size_type =  typename matrix_type::block_size_type ;
 
     template <typename VT, unsigned BSL>
     friend class matrix;
@@ -592,9 +592,9 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_row_major_iterator : public matrix_iterator<ValueType, BlockSideLength>
 {
 protected:
-    typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
-    typedef typename matrix_iterator_type::matrix_type matrix_type;
-    typedef typename matrix_iterator_type::elem_size_type elem_size_type;
+    using matrix_iterator_type =  matrix_iterator<ValueType, BlockSideLength> ;
+    using matrix_type =  typename matrix_iterator_type::matrix_type ;
+    using elem_size_type =  typename matrix_iterator_type::elem_size_type ;
 
     template <typename VT, unsigned BSL>
     friend class matrix;
@@ -658,9 +658,9 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_col_major_iterator : public matrix_iterator<ValueType, BlockSideLength>
 {
 protected:
-    typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
-    typedef typename matrix_iterator_type::matrix_type matrix_type;
-    typedef typename matrix_iterator_type::elem_size_type elem_size_type;
+    using matrix_iterator_type =  matrix_iterator<ValueType, BlockSideLength> ;
+    using matrix_type =  typename matrix_iterator_type::matrix_type ;
+    using elem_size_type =  typename matrix_iterator_type::elem_size_type ;
 
     template <typename VT, unsigned BSL>
     friend class matrix;
@@ -724,12 +724,12 @@ template <typename ValueType, unsigned BlockSideLength>
 class const_matrix_iterator
 {
 protected:
-    typedef matrix<ValueType, BlockSideLength> matrix_type;
-    typedef typename matrix_type::swappable_block_matrix_type swappable_block_matrix_type;
-    typedef typename matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename matrix_type::elem_size_type elem_size_type;
-    typedef typename matrix_type::block_size_type block_size_type;
+    using matrix_type =  matrix<ValueType, BlockSideLength> ;
+    using swappable_block_matrix_type =  typename matrix_type::swappable_block_matrix_type ;
+    using block_scheduler_type =  typename matrix_type::block_scheduler_type ;
+    using internal_block_type =  typename block_scheduler_type::internal_block_type ;
+    using elem_size_type =  typename matrix_type::elem_size_type ;
+    using block_size_type =  typename matrix_type::block_size_type ;
 
     template <typename VT, unsigned BSL>
     friend class matrix;
@@ -895,9 +895,9 @@ template <typename ValueType, unsigned BlockSideLength>
 class const_matrix_row_major_iterator : public const_matrix_iterator<ValueType, BlockSideLength>
 {
 protected:
-    typedef const_matrix_iterator<ValueType, BlockSideLength> const_matrix_iterator_type;
-    typedef typename const_matrix_iterator_type::matrix_type matrix_type;
-    typedef typename const_matrix_iterator_type::elem_size_type elem_size_type;
+    using const_matrix_iterator_type =  const_matrix_iterator<ValueType, BlockSideLength> ;
+    using matrix_type =  typename const_matrix_iterator_type::matrix_type ;
+    using elem_size_type =  typename const_matrix_iterator_type::elem_size_type ;
 
     template <typename VT, unsigned BSL>
     friend class matrix;
@@ -965,9 +965,9 @@ template <typename ValueType, unsigned BlockSideLength>
 class const_matrix_col_major_iterator : public const_matrix_iterator<ValueType, BlockSideLength>
 {
 protected:
-    typedef const_matrix_iterator<ValueType, BlockSideLength> const_matrix_iterator_type;
-    typedef typename const_matrix_iterator_type::matrix_type matrix_type;
-    typedef typename const_matrix_iterator_type::elem_size_type elem_size_type;
+    using const_matrix_iterator_type =  const_matrix_iterator<ValueType, BlockSideLength> ;
+    using matrix_type =  typename const_matrix_iterator_type::matrix_type ;
+    using elem_size_type =  typename const_matrix_iterator_type::elem_size_type ;
 
     template <typename VT, unsigned BSL>
     friend class matrix;
@@ -1044,24 +1044,24 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix
 {
 protected:
-    typedef matrix<ValueType, BlockSideLength> matrix_type;
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef counting_ptr<swappable_block_matrix_type> swappable_block_matrix_pointer_type;
-    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
-    typedef typename swappable_block_matrix_type::size_type block_size_type;
-    typedef typename swappable_block_matrix_type::elem_size_type elem_size_type;
-    typedef matrix_local::matrix_operations<ValueType, BlockSideLength> Ops;
-    typedef matrix_swappable_block<ValueType, BlockSideLength> swappable_block_type;
+    using matrix_type =  matrix<ValueType, BlockSideLength> ;
+    using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
+    using swappable_block_matrix_pointer_type =  counting_ptr<swappable_block_matrix_type> ;
+    using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
+    using block_size_type =  typename swappable_block_matrix_type::size_type ;
+    using elem_size_type =  typename swappable_block_matrix_type::elem_size_type ;
+    using Ops =  matrix_local::matrix_operations<ValueType, BlockSideLength> ;
+    using swappable_block_type =  matrix_swappable_block<ValueType, BlockSideLength> ;
 
 public:
-    typedef matrix_iterator<ValueType, BlockSideLength> iterator;
-    typedef const_matrix_iterator<ValueType, BlockSideLength> const_iterator;
-    typedef matrix_row_major_iterator<ValueType, BlockSideLength> row_major_iterator;
-    typedef matrix_col_major_iterator<ValueType, BlockSideLength> col_major_iterator;
-    typedef const_matrix_row_major_iterator<ValueType, BlockSideLength> const_row_major_iterator;
-    typedef const_matrix_col_major_iterator<ValueType, BlockSideLength> const_col_major_iterator;
-    typedef column_vector<ValueType> column_vector_type;
-    typedef row_vector<ValueType> row_vector_type;
+    using iterator =  matrix_iterator<ValueType, BlockSideLength> ;
+    using const_iterator =  const_matrix_iterator<ValueType, BlockSideLength> ;
+    using row_major_iterator =  matrix_row_major_iterator<ValueType, BlockSideLength> ;
+    using col_major_iterator =  matrix_col_major_iterator<ValueType, BlockSideLength> ;
+    using const_row_major_iterator =  const_matrix_row_major_iterator<ValueType, BlockSideLength> ;
+    using const_col_major_iterator =  const_matrix_col_major_iterator<ValueType, BlockSideLength> ;
+    using column_vector_type =  column_vector<ValueType> ;
+    using row_vector_type =  row_vector<ValueType> ;
 
 protected:
     template <typename VT, unsigned BSL>

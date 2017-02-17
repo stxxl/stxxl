@@ -31,7 +31,7 @@
 
 #define block_size (8 * 1024)
 
-typedef stxxl::tuple<char, int> tuple_type;
+using tuple_type = stxxl::tuple<char, int>;
 
 namespace std {
 
@@ -44,11 +44,11 @@ std::ostream& operator << (std::ostream& os, const tuple_type& t)
 } // namespace std
 
 #ifdef USE_EXTERNAL_ARRAY
-typedef stxxl::vector<char> input_array_type;
-typedef stxxl::vector<tuple_type> output_array_type;
+using input_array_type = stxxl::vector<char>;
+using output_array_type = stxxl::vector<tuple_type>;
 #else
-typedef std::vector<char> input_array_type;
-typedef std::vector<tuple_type> output_array_type;
+using input_array_type = std::vector<char>;
+using output_array_type = std::vector<tuple_type>;
 #endif
 
 using stxxl::stream::streamify;
@@ -71,7 +71,7 @@ void fill_input_array(Container_& container, It_ p)
 template <class ValTp>
 struct counter
 {
-    typedef ValTp value_type;
+    using value_type = ValTp;
 
     value_type cnt;
     counter() : cnt(0) { }
@@ -84,11 +84,11 @@ struct counter
     }
 };
 
-typedef counter<int> counter_type;
+using counter_type = counter<int>;
 
 struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
 {
-    typedef tuple_type value_type;
+    using value_type = tuple_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
         if (a.first == b.first)
@@ -109,7 +109,7 @@ struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
 
 struct cmp_int : std::binary_function<int, int, bool>
 {
-    typedef int value_type;
+    using value_type = int;
     bool operator () (const value_type& a, const value_type& b) const
     {
         return a > b;
@@ -128,7 +128,7 @@ struct cmp_int : std::binary_function<int, int, bool>
 template <typename T>
 struct identity : std::unary_function<T, T>
 {
-    typedef T value_type;
+    using value_type = T;
 
     const T& operator () (const T& t)
     {
@@ -151,34 +151,34 @@ int main()
 
     // HERE streaming part begins (streamifying)
     // create input stream
-    typedef streamify_traits<input_array_type::iterator>::stream_type input_stream_type;
+    using input_stream_type = streamify_traits<input_array_type::iterator>::stream_type;
     input_stream_type input_stream = streamify(input.begin(), input.end());
 
     // create counter stream
-    typedef stxxl::stream::generator2stream<counter_type> counter_stream_type;
+    using counter_stream_type = stxxl::stream::generator2stream<counter_type>;
     counter_stream_type counter_stream = streamify(counter_type());
 
     // create tuple stream
-    typedef make_tuple<input_stream_type, counter_stream_type> tuple_stream_type;
+    using tuple_stream_type = make_tuple<input_stream_type, counter_stream_type>;
     tuple_stream_type tuple_stream(input_stream, counter_stream);
 
     const uint64_t sorter_memory = 128 * 1024;
 #ifdef USE_FORMRUNS_N_MERGE
     // sort tuples by character
     // 1. form runs
-    typedef stxxl::stream::runs_creator<tuple_stream_type, cmp_type, block_size> runs_creator_stream_type;
+    using runs_creator_stream_type = stxxl::stream::runs_creator<tuple_stream_type, cmp_type, block_size>;
     runs_creator_stream_type runs_creator_stream(tuple_stream, cmp_type(), sorter_memory);
     // 2. merge runs
-    typedef stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> sorted_stream_type;
+    using sorted_stream_type = stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type>;
     sorted_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), sorter_memory);
 #else
     // sort tuples by character
     // (combination of the previous two steps in one algorithm: form runs and merge)
-    typedef stxxl::stream::sort<tuple_stream_type, cmp_type, block_size> sorted_stream_type;
+    using sorted_stream_type = stxxl::stream::sort<tuple_stream_type, cmp_type, block_size>;
     sorted_stream_type sorted_stream(tuple_stream, cmp_type(), sorter_memory);
 #endif
 
-    typedef stxxl::stream::transform<identity<stxxl::tuple<char, int> >, sorted_stream_type> transformed_stream_type;
+    using transformed_stream_type = stxxl::stream::transform<identity<stxxl::tuple<char, int> >, sorted_stream_type>;
     identity<stxxl::tuple<char, int> > id;
     transformed_stream_type transformed_stream(id, sorted_stream);
 

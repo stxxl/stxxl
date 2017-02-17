@@ -18,7 +18,7 @@
 
 bool test_block_cache()
 {
-    typedef std::pair<int, int> value_type;
+    using value_type = std::pair<int, int>;
 
     const unsigned subblock_raw_size = 1024 * 8; // 8KB subblocks
     const unsigned block_size = 128;             // 1MB blocks (=128 subblocks)
@@ -26,13 +26,13 @@ bool test_block_cache()
     const unsigned num_blocks = 64;              // number of blocks to use for this test
     const unsigned cache_size = 8;               // size of cache in blocks
 
-    typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
-    typedef stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type> block_type;
+    using subblock_type = stxxl::typed_block<subblock_raw_size, value_type>;
+    using block_type = stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type>;
 
     const unsigned subblock_size = subblock_type::size;          // size in values
 
-    typedef block_type::bid_type bid_type;
-    typedef std::vector<bid_type> bid_container_type;
+    using bid_type = block_type::bid_type;
+    using bid_container_type = std::vector<bid_type>;
 
     // prepare test: allocate blocks, fill them with values and write to disk
     bid_container_type bids(num_blocks);
@@ -54,7 +54,7 @@ bool test_block_cache()
     stxxl::random_number32 rand32;
 
     // create block_cache
-    typedef stxxl::hash_map::block_cache<block_type> cache_type;
+    using cache_type = stxxl::hash_map::block_cache<block_type>;
     cache_type cache(cache_size);
 
     // load random subblocks and check for values

@@ -33,7 +33,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
     stxxl::file_ptr OutputFile = stxxl::make_counting<stxxl::syscall_file>(
         output_path, file::RDWR | file::CREAT | file::DIRECT);
 
-    typedef stxxl::vector<unsigned char> vector_type;
+    using vector_type = stxxl::vector<unsigned char>;
 
     std::cout << "Copying file " << input_path << " to " << output_path << std::endl;
 

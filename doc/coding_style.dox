@@ -43,7 +43,7 @@ protected:
 public:
     //! types are almost always suffixes with _type,
     //! with _iterator being an exception.
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
     //! \name Group of Functions
     //! \{

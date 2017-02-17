@@ -56,8 +56,8 @@ class loser_tree
     }
 
 public:
-    typedef typename RunCursorType::prefetcher_type prefetcher_type;
-    typedef typename RunCursorType::value_type value_type;
+    using prefetcher_type = typename RunCursorType::prefetcher_type;
+    using value_type = typename RunCursorType::value_type;
 
     loser_tree(
         prefetcher_type* p,

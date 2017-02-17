@@ -52,12 +52,12 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end,
     if (begin == end)
         return functor;
 
-    typedef typename ExtIterator::value_type value_type;
+    using value_type = typename ExtIterator::value_type;
 
-    typedef buf_istream<
-            typename ExtIterator::block_type,
-            typename ExtIterator::bids_container_iterator
-            > buf_istream_type;
+    using buf_istream_type = buf_istream<
+              typename ExtIterator::block_type,
+              typename ExtIterator::bids_container_iterator
+              >;
 
     begin.flush();     // flush container
 
@@ -127,17 +127,15 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
     if (begin == end)
         return functor;
 
-    typedef typename ExtIterator::value_type value_type;
-
-    typedef buf_istream<
-            typename ExtIterator::block_type,
-            typename ExtIterator::bids_container_iterator
-            > buf_istream_type;
-
-    typedef buf_ostream<
-            typename ExtIterator::block_type,
-            typename ExtIterator::bids_container_iterator
-            > buf_ostream_type;
+    using value_type = typename ExtIterator::value_type;
+    using buf_istream_type = buf_istream<
+              typename ExtIterator::block_type,
+              typename ExtIterator::bids_container_iterator
+              >;
+    using buf_ostream_type = buf_ostream<
+              typename ExtIterator::block_type,
+              typename ExtIterator::bids_container_iterator
+              >;
 
     begin.flush();     // flush container
 
@@ -206,11 +204,10 @@ template <typename ExtIterator, typename Generator>
 void generate(ExtIterator begin, ExtIterator end,
               Generator generator, int_type nbuffers = 0)
 {
-    typedef typename ExtIterator::block_type block_type;
-
-    typedef buf_ostream<
-            block_type, typename ExtIterator::bids_container_iterator
-            > buf_ostream_type;
+    using block_type = typename ExtIterator::block_type;
+    using buf_ostream_type = buf_ostream<
+              block_type, typename ExtIterator::bids_container_iterator
+              >;
 
     while (begin.block_offset())    //  go to the beginning of the block
     //  of the external vector
@@ -290,11 +287,10 @@ ExtIterator find(ExtIterator begin, ExtIterator end,
 {
     if (begin == end)
         return end;
-
-    typedef buf_istream<
-            typename ExtIterator::block_type,
-            typename ExtIterator::bids_container_iterator
-            > buf_istream_type;
+    using buf_istream_type = buf_istream<
+              typename ExtIterator::block_type,
+              typename ExtIterator::bids_container_iterator
+              >;
 
     begin.flush();     // flush container
 

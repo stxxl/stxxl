@@ -254,17 +254,17 @@ class loser_tree
 {
 public:
     //! type of arrays container linked with loser tree
-    typedef ArraysType arrays_type;
+    using arrays_type = ArraysType;
     //! comparator object type
-    typedef CompareType compare_type;
+    using compare_type = CompareType;
 
     // arity_bound / 2  <  arity  <=  arity_bound
     enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
     //! type of values stored in the arrays container
-    typedef typename arrays_type::value_type value_type;
+    using value_type = typename arrays_type::value_type;
     //! type of the ordered sequences in the arrays container
-    typedef typename arrays_type::sequence_type sequence_type;
+    using sequence_type = typename arrays_type::sequence_type;
 
 public:
     //! the comparator object
@@ -788,17 +788,17 @@ class parallel_merger_adapter
 {
 public:
     //! type of arrays container linked with loser tree
-    typedef ArraysType arrays_type;
+    using arrays_type = ArraysType;
     //! comparator object type
-    typedef CompareType compare_type;
+    using compare_type = CompareType;
 
     // arity_bound / 2  <  arity  <=  arity_bound
     enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
 
     //! type of values stored in the arrays container
-    typedef typename arrays_type::value_type value_type;
+    using value_type = typename arrays_type::value_type;
     //! type of the ordered sequences in the arrays container
-    typedef typename arrays_type::sequence_type sequence_type;
+    using sequence_type = typename arrays_type::sequence_type;
 
 public:
     //! the comparator object

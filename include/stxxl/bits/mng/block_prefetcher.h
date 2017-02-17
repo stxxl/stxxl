@@ -56,10 +56,10 @@ template <typename BlockType, typename BidIteratorType>
 class block_prefetcher
 {
 public:
-    typedef BlockType block_type;
-    typedef BidIteratorType bid_iterator_type;
+    using block_type = BlockType;
+    using bid_iterator_type = BidIteratorType;
 
-    typedef typename block_type::bid_type bid_type;
+    using bid_type = typename block_type::bid_type;
 
 protected:
     bid_iterator_type consume_seq_begin;

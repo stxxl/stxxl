@@ -28,17 +28,17 @@ namespace stxxl {
 template <typename KeyType>
 class addressable_fifo_queue
 {
-    typedef std::list<KeyType> container_type;
-    typedef typename container_type::iterator container_iterator;
-    typedef std::map<KeyType, container_iterator> meta_type;
-    typedef typename meta_type::iterator meta_iterator;
+    using container_type = std::list<KeyType>;
+    using container_iterator = typename container_type::iterator;
+    using meta_type = std::map<KeyType, container_iterator>;
+    using meta_iterator = typename meta_type::iterator;
 
     container_type vals;
     meta_type meta;
 
 public:
     //! Type of handle to an entry. For use with insert and remove.
-    typedef meta_iterator handle;
+    using handle = meta_iterator;
 
     //! Create an empty queue.
     addressable_fifo_queue() { }
@@ -123,17 +123,17 @@ class addressable_priority_queue
         }
     };
 
-    typedef std::set<std::pair<PriorityType, KeyType>, cmp> container_type;
-    typedef typename container_type::iterator container_iterator;
-    typedef std::map<KeyType, container_iterator> meta_type;
-    typedef typename meta_type::iterator meta_iterator;
+    using container_type = std::set<std::pair<PriorityType, KeyType>, cmp>;
+    using container_iterator = typename container_type::iterator;
+    using meta_type = std::map<KeyType, container_iterator>;
+    using meta_iterator = typename meta_type::iterator;
 
     container_type vals;
     meta_type meta;
 
 public:
     //! Type of handle to an entry. For use with insert and remove.
-    typedef meta_iterator handle;
+    using handle = meta_iterator;
 
     //! Create an empty queue.
     addressable_priority_queue() { }

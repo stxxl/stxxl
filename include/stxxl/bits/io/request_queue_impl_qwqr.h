@@ -32,8 +32,8 @@ namespace stxxl {
 class request_queue_impl_qwqr final : public request_queue_impl_worker
 {
 private:
-    typedef request_queue_impl_qwqr self;
-    typedef std::list<request_ptr> queue_type;
+    using self = request_queue_impl_qwqr;
+    using queue_type = std::list<request_ptr>;
 
     std::mutex write_mutex_;
     std::mutex read_mutex_;

@@ -53,7 +53,7 @@ protected:
     size_t m_num_slots;
 
     //! Defines if statistics are gathered: fake_timer or timer
-    typedef fake_timer stats_timer;
+    using stats_timer = fake_timer;
 
     //! Collection of stats from the winner_tree
     struct stats_type

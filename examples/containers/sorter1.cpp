@@ -37,7 +37,7 @@ struct my_comparator
 int main()
 {
     // template parameter <ValueType, CompareType, BlockSize, AllocStr(optional)>
-    typedef stxxl::sorter<int, my_comparator> sorter_type;
+    using sorter_type = stxxl::sorter<int, my_comparator>;
 
     // create sorter object (CompareType(), MainMemoryLimit)
     sorter_type int_sorter(my_comparator(), 64 * 1024 * 1024);

@@ -18,7 +18,7 @@
 int main()
 {
     // template parameter <value_type, block_size, allocation_strategy, size_type>
-    typedef stxxl::queue<unsigned int> a_queue;
+    using a_queue = stxxl::queue<unsigned int>;
 
     // construct queue with default parameters
     a_queue my_queue;

@@ -33,7 +33,7 @@ struct CompareGreater
 int main()
 {
     // template parameter <KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy (optional)>
-    typedef stxxl::map<int, char, CompareGreater, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> map_type;
+    using map_type = stxxl::map<int, char, CompareGreater, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE>;
 
     // Constructor map(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     map_type my_map((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);

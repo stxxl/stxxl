@@ -16,7 +16,7 @@
 
 int main()
 {
-    typedef stxxl::queue<unsigned int> queue;
+    using queue = stxxl::queue<unsigned int>;
     queue my_queue;
 
     my_queue.push(5);

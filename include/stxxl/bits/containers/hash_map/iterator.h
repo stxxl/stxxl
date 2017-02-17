@@ -37,21 +37,21 @@ public:
     friend class iterator_map<HashMap>;
     friend void HashMap::erase(hash_map_const_iterator<HashMap> it);
 
-    typedef HashMap hash_map_type;
-    typedef typename hash_map_type::internal_size_type internal_size_type;
-    typedef typename hash_map_type::external_size_type external_size_type;
-    typedef typename hash_map_type::value_type value_type;
-    typedef typename hash_map_type::key_type key_type;
-    typedef typename hash_map_type::reference reference;
-    typedef typename hash_map_type::const_reference const_reference;
-    typedef typename hash_map_type::node_type node_type;
-    typedef typename hash_map_type::bucket_type bucket_type;
-    typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
-    typedef typename hash_map_type::source_type source_type;
+    using hash_map_type = HashMap;
+    using internal_size_type = typename hash_map_type::internal_size_type;
+    using external_size_type = typename hash_map_type::external_size_type;
+    using value_type = typename hash_map_type::value_type;
+    using key_type = typename hash_map_type::key_type;
+    using reference = typename hash_map_type::reference;
+    using const_reference = typename hash_map_type::const_reference;
+    using node_type = typename hash_map_type::node_type;
+    using bucket_type = typename hash_map_type::bucket_type;
+    using bid_iterator_type = typename hash_map_type::bid_iterator_type;
+    using source_type = typename hash_map_type::source_type;
 
-    typedef buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
+    using reader_type = buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type>;
 
-    typedef std::forward_iterator_tag iterator_category;
+    using iterator_category = std::forward_iterator_tag;
 
 protected:
     HashMap* map_;
@@ -380,27 +380,27 @@ template <class HashMap>
 class hash_map_iterator : public hash_map_iterator_base<HashMap>
 {
 public:
-    typedef HashMap hash_map_type;
-    typedef typename hash_map_type::internal_size_type internal_size_type;
-    typedef typename hash_map_type::external_size_type external_size_type;
-    typedef typename hash_map_type::value_type value_type;
-    typedef typename hash_map_type::key_type key_type;
-    typedef typename hash_map_type::reference reference;
-    typedef typename hash_map_type::const_reference const_reference;
-    typedef typename hash_map_type::pointer pointer;
-    typedef typename hash_map_type::const_pointer const_pointer;
-    typedef typename hash_map_type::node_type node_type;
-    typedef typename hash_map_type::bucket_type bucket_type;
-    typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
-    typedef typename hash_map_type::source_type source_type;
+    using hash_map_type = HashMap;
+    using internal_size_type = typename hash_map_type::internal_size_type;
+    using external_size_type = typename hash_map_type::external_size_type;
+    using value_type = typename hash_map_type::value_type;
+    using key_type = typename hash_map_type::key_type;
+    using reference = typename hash_map_type::reference;
+    using const_reference = typename hash_map_type::const_reference;
+    using pointer = typename hash_map_type::pointer;
+    using const_pointer = typename hash_map_type::const_pointer;
+    using node_type = typename hash_map_type::node_type;
+    using bucket_type = typename hash_map_type::bucket_type;
+    using bid_iterator_type = typename hash_map_type::bid_iterator_type;
+    using source_type = typename hash_map_type::source_type;
 
-    typedef buffered_reader<typename hash_map_type::block_cache_type,
-                            bid_iterator_type> reader_type;
+    using reader_type = buffered_reader<typename hash_map_type::block_cache_type,
+                                        bid_iterator_type>;
 
-    typedef std::forward_iterator_tag iterator_category;
+    using iterator_category = std::forward_iterator_tag;
 
-    typedef stxxl::hash_map::hash_map_iterator_base<hash_map_type> base_type;
-    typedef stxxl::hash_map::hash_map_const_iterator<hash_map_type> hash_map_const_iterator;
+    using base_type = stxxl::hash_map::hash_map_iterator_base<hash_map_type>;
+    using hash_map_const_iterator = stxxl::hash_map::hash_map_const_iterator<hash_map_type>;
 
 public:
     hash_map_iterator(hash_map_type* map, internal_size_type i_bucket,
@@ -483,27 +483,26 @@ template <class HashMap>
 class hash_map_const_iterator : public hash_map_iterator_base<HashMap>
 {
 public:
-    typedef HashMap hash_map_type;
-    typedef typename hash_map_type::internal_size_type internal_size_type;
-    typedef typename hash_map_type::external_size_type external_size_type;
-    typedef typename hash_map_type::value_type value_type;
-    typedef typename hash_map_type::key_type key_type;
-    typedef typename hash_map_type::reference reference;
-    typedef typename hash_map_type::const_reference const_reference;
-    typedef typename hash_map_type::pointer pointer;
-    typedef typename hash_map_type::const_pointer const_pointer;
-    typedef typename hash_map_type::node_type node_type;
-    typedef typename hash_map_type::bucket_type bucket_type;
-    typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
-    typedef typename hash_map_type::source_type source_type;
+    using hash_map_type = HashMap;
+    using internal_size_type = typename hash_map_type::internal_size_type;
+    using external_size_type = typename hash_map_type::external_size_type;
+    using value_type = typename hash_map_type::value_type;
+    using key_type = typename hash_map_type::key_type;
+    using reference = typename hash_map_type::reference;
+    using const_reference = typename hash_map_type::const_reference;
+    using pointer = typename hash_map_type::pointer;
+    using const_pointer = typename hash_map_type::const_pointer;
+    using node_type = typename hash_map_type::node_type;
+    using bucket_type = typename hash_map_type::bucket_type;
+    using bid_iterator_type = typename hash_map_type::bid_iterator_type;
+    using source_type = typename hash_map_type::source_type;
+    using reader_type = buffered_reader<typename hash_map_type::block_cache_type,
+                                        bid_iterator_type>;
 
-    typedef buffered_reader<typename hash_map_type::block_cache_type,
-                            bid_iterator_type> reader_type;
+    using iterator_category = std::forward_iterator_tag;
 
-    typedef std::forward_iterator_tag iterator_category;
-
-    typedef stxxl::hash_map::hash_map_iterator_base<hash_map_type> base_type;
-    typedef stxxl::hash_map::hash_map_iterator<hash_map_type> hash_map_iterator;
+    using base_type = stxxl::hash_map::hash_map_iterator_base<hash_map_type>;
+    using hash_map_iterator = stxxl::hash_map::hash_map_iterator<hash_map_type>;
 
 public:
     hash_map_const_iterator(hash_map_type* map, internal_size_type i_bucket,

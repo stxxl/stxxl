@@ -21,7 +21,7 @@
 
 struct my_type
 {
-    typedef unsigned key_type;
+    using key_type = unsigned;
 
     key_type m_key;
     char m_data[RECORD_SIZE - sizeof(key_type)];
@@ -99,7 +99,7 @@ int main()
     Comparator cmp;
 
     // construct sorter type: stxxl::sorter<ValueType, ComparatorType, BlockSize>
-    typedef stxxl::sorter<my_type, Comparator, block_size> sorter_type;
+    using sorter_type = stxxl::sorter<my_type, Comparator, block_size>;
 
     {
         // test small number of items that can be sorted internally

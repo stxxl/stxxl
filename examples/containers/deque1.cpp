@@ -16,7 +16,7 @@
 
 int main()
 {
-    typedef stxxl::deque<int> deque;
+    using deque = stxxl::deque<int>;
     deque my_deque;
 
     my_deque.push_front(2);

@@ -121,45 +121,45 @@ struct interleaved_alloc_traits
 template <>
 struct interleaved_alloc_traits<striping>
 {
-    typedef interleaved_striping strategy;
+    using strategy = interleaved_striping;
 };
 
 template <>
 struct interleaved_alloc_traits<fully_random>
 {
-    typedef interleaved_fully_random strategy;
+    using strategy = interleaved_fully_random;
 };
 
 template <>
 struct interleaved_alloc_traits<simple_random>
 {
-    typedef interleaved_simple_random strategy;
+    using strategy = interleaved_simple_random;
 };
 
 template <>
 struct interleaved_alloc_traits<random_cyclic>
 {
-    typedef interleaved_random_cyclic strategy;
+    using strategy = interleaved_random_cyclic;
 };
 
 template <>
 struct interleaved_alloc_traits<random_cyclic_disk>
 {
     // FIXME! HACK!
-    typedef interleaved_random_cyclic strategy;
+    using strategy = interleaved_random_cyclic;
 };
 
 template <>
 struct interleaved_alloc_traits<random_cyclic_flash>
 {
     // FIXME! HACK!
-    typedef interleaved_random_cyclic strategy;
+    using strategy = interleaved_random_cyclic;
 };
 
 template <>
 struct interleaved_alloc_traits<single_disk>
 {
-    typedef first_disk_only strategy;
+    using strategy = first_disk_only;
 };
 
 } // namespace stxxl

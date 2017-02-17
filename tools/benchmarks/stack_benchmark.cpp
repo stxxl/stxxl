@@ -52,7 +52,7 @@ inline std::ostream& operator << (std::ostream& o, const my_record_<RECORD_SIZE>
 template <typename stack_type>
 void benchmark_insert(stack_type& Stack, uint64_t volume)
 {
-    typedef typename stack_type::value_type value_type;
+    using value_type = typename stack_type::value_type;
 
     STXXL_MSG("Record size: " << sizeof(value_type) << " bytes");
 
@@ -94,7 +94,7 @@ void benchmark_insert(stack_type& Stack, uint64_t volume)
 template <typename stack_type>
 void benchmark_delete(stack_type& Stack, uint64_t volume)
 {
-    typedef typename stack_type::value_type value_type;
+    using value_type = typename stack_type::value_type;
 
     uint64_t ops = volume / sizeof(value_type);
 
@@ -129,9 +129,9 @@ void benchmark_delete(stack_type& Stack, uint64_t volume)
 template <class my_record>
 void run_stxxl_growshrink2_stack(uint64_t volume)
 {
-    typedef typename stxxl::STACK_GENERATOR<my_record, stxxl::external,
-                                            stxxl::grow_shrink2, DISKS, BLOCK_SIZE>::result stack_type;
-    typedef typename stack_type::block_type block_type;
+    using stack_type = typename stxxl::STACK_GENERATOR<my_record, stxxl::external,
+                                                       stxxl::grow_shrink2, DISKS, BLOCK_SIZE>::result;
+    using block_type = typename stack_type::block_type;
 
     stxxl::read_write_pool<block_type> pool(DISKS * 4, DISKS * 4);
     stack_type Stack(pool);
@@ -146,8 +146,8 @@ void run_stxxl_growshrink2_stack(uint64_t volume)
 template <class my_record>
 void run_stxxl_normal_stack(uint64_t volume)
 {
-    typedef typename stxxl::STACK_GENERATOR<my_record, stxxl::external,
-                                            stxxl::normal, DISKS, BLOCK_SIZE>::result stack_type;
+    using stack_type = typename stxxl::STACK_GENERATOR<my_record, stxxl::external,
+                                                       stxxl::normal, DISKS, BLOCK_SIZE>::result;
 
     stack_type Stack;
 
@@ -158,7 +158,7 @@ void run_stxxl_normal_stack(uint64_t volume)
 template <class my_record>
 void run_stl_stack(uint64_t volume)
 {
-    typedef std::stack<my_record> stack_type;
+    using stack_type = std::stack<my_record>;
 
     stack_type Stack;
 

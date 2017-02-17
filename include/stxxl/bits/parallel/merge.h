@@ -99,8 +99,8 @@ merge_advance_movc(RandomAccessIterator1& begin1, RandomAccessIterator1 end1,
                    OutputIterator target,
                    DiffType max_length, Comparator comp)
 {
-    typedef typename std::iterator_traits<RandomAccessIterator1>::value_type ValueType1;
-    typedef typename std::iterator_traits<RandomAccessIterator2>::value_type ValueType2;
+    using ValueType1 = typename std::iterator_traits<RandomAccessIterator1>::value_type;
+    using ValueType2 = typename std::iterator_traits<RandomAccessIterator2>::value_type;
 
     while (begin1 != end1 && begin2 != end2 && max_length > 0)
     {

@@ -54,10 +54,10 @@ struct PMWMSPiece
 template <typename RandomAccessIterator>
 struct PMWMSSortingData
 {
-    typedef typename std::iterator_traits<RandomAccessIterator>::value_type
-        ValueType;
-    typedef typename std::iterator_traits<RandomAccessIterator>::difference_type
-        DiffType;
+    using ValueType =
+        typename std::iterator_traits<RandomAccessIterator>::value_type    ;
+    using DiffType =
+        typename std::iterator_traits<RandomAccessIterator>::difference_type    ;
 
     //! Input begin.
     RandomAccessIterator source;
@@ -132,10 +132,10 @@ template <bool Stable, typename RandomAccessIterator, typename Comparator>
 inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
                                   Comparator& comp)
 {
-    typedef typename std::iterator_traits<RandomAccessIterator>::value_type
-        ValueType;
-    typedef typename std::iterator_traits<RandomAccessIterator>::difference_type
-        DiffType;
+    using ValueType =
+        typename std::iterator_traits<RandomAccessIterator>::value_type    ;
+    using DiffType =
+        typename std::iterator_traits<RandomAccessIterator>::difference_type    ;
 
     Timing<inactive_tag> t;
 
@@ -148,11 +148,11 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     DiffType length_local = sd->starts[iam + 1] - sd->starts[iam];
 
 #if STXXL_MULTIWAY_MERGESORT_COPY_LAST
-    typedef RandomAccessIterator SortingPlacesIterator;
+    using SortingPlacesIterator = RandomAccessIterator;
     // sort in input storage
     sd->sorting_places[iam] = sd->source + sd->starts[iam];
 #else
-    typedef ValueType* SortingPlacesIterator;
+    using SortingPlacesIterator = ValueType *;
     // sort in temporary storage, leave space for sentinel
     sd->sorting_places[iam] = sd->temporaries[iam] = static_cast<ValueType*>(::operator new (sizeof(ValueType) * (length_local + 1)));
     // copy there
@@ -315,11 +315,10 @@ parallel_sort_mwms(RandomAccessIterator begin,
                    int num_threads)
 {
     STXXL_PARALLEL_PCALL(end - begin)
-
-    typedef typename std::iterator_traits<RandomAccessIterator>::value_type
-        ValueType;
-    typedef typename std::iterator_traits<RandomAccessIterator>::difference_type
-        DiffType;
+    using ValueType =
+        typename std::iterator_traits<RandomAccessIterator>::value_type    ;
+    using DiffType =
+        typename std::iterator_traits<RandomAccessIterator>::difference_type    ;
 
     DiffType n = end - begin;
 

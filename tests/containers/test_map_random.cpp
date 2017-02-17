@@ -21,8 +21,8 @@
 
 #include "map_test_handlers.h"
 
-typedef int key_type;
-typedef int data_type;
+using key_type = int;
+using data_type = int;
 
 struct cmp2 : public std::less<int>
 {
@@ -35,9 +35,9 @@ struct cmp2 : public std::less<int>
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)
 
-typedef std::map<key_type, data_type, cmp2> std_map_type;
-typedef stxxl::map<key_type, data_type, cmp2,
-                   DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> xxl_map_type;
+using std_map_type = std::map<key_type, data_type, cmp2>;
+using xxl_map_type = stxxl::map<key_type, data_type, cmp2,
+                                DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE>;
 
 #define PERCENT_CLEAR 1
 #define PERCENT_ERASE_BULK 9
@@ -63,7 +63,7 @@ typedef stxxl::map<key_type, data_type, cmp2,
 
 int main(int argc, char* argv[])
 {
-    typedef std::vector<std::pair<key_type, data_type> > vector_type;
+    using vector_type = std::vector<std::pair<key_type, data_type> >;
 
     STXXL_MSG("Node block size: " << NODE_BLOCK_SIZE << " bytes");
     STXXL_MSG("Leaf block size: " << LEAF_BLOCK_SIZE << " bytes");

@@ -34,7 +34,7 @@ class custom_stats_counter
 {
 public:
     //! The counter's value type
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
 protected:
     //! The counter's value
@@ -115,7 +115,7 @@ template <typename ValueType>
 class dummy_custom_stats_counter
 {
 public:
-    typedef ValueType value_type;
+    using value_type = ValueType;
 
 public:
     dummy_custom_stats_counter() { }

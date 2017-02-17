@@ -28,10 +28,10 @@ Can be some specialized subclass. We used matrix_swappable_block as a subclass w
 // Define integer matrix
 
 // template paramter <ValueType, BlockSideLength>
-typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<int, 32> > block_schedular_type;
+using block_schedular_type = stxxl::block_scheduler<stxxl::matrix_swappable_block<int, 32> >;
 
 // template paramter <ValueType, BlockSideLength>
-typedef stxxl::matrix<int, 32> matrix_type;
+using matrix_type = stxxl::matrix<int, 32>;
 
 // construct block schedular object which uses 64 MiB internal memory for caching
 block_schedular_type my_bs(64*1024*1024);
@@ -54,7 +54,7 @@ matrix_type C(my_bs, height, width);  //                      C
 To insert and access elements, the STXXL matrix container intends different iterators. Iterate for example row-by-row beginning with the top row can be done with the row_major_iterator.
 The operator * accesses a single element the iterator points to just now.
 \code
-typedef matrix_type::row_major_iterator row_iterator;
+using row_iterator = matrix_type::row_major_iterator;
 
 // let it_A point to the first element of matrix A and advance till the very last element of matrix A is reached
 for (row_iterator it_A = A.begin(); it_A != A.end(); ++it_A)

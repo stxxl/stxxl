@@ -24,7 +24,7 @@ using stxxl::scoped_print_timer;
 
 struct my_type
 {
-    typedef int key_type;
+    using key_type = int;
     key_type key;
     char data[RECORD_SIZE - sizeof(key_type)];
     my_type() { }
@@ -62,13 +62,12 @@ template class stxxl::parallel_priority_queue<
         1* 64L* 1024L* 1024L,                /* RamSize */
         0                                    /* MaxItems */
         >;
-
-typedef stxxl::parallel_priority_queue<
-        my_type, my_cmp,
-        STXXL_DEFAULT_ALLOC_STRATEGY,
-        STXXL_DEFAULT_BLOCK_SIZE(my_type),   /* BlockSize */
-        512* 64L* 1024L                      /* RamSize */
-        > ppq_type;
+using ppq_type = stxxl::parallel_priority_queue<
+          my_type, my_cmp,
+          STXXL_DEFAULT_ALLOC_STRATEGY,
+          STXXL_DEFAULT_BLOCK_SIZE(my_type), /* BlockSize */
+          512* 64L* 1024L                    /* RamSize */
+          >;
 
 void test_simple()
 {

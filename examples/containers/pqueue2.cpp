@@ -26,8 +26,8 @@ struct Cmp
 int main()
 {
     // use 64 GiB on main memory and 1 billion items at most
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64*1024*1024, 1024*1024>::result pq_type;
-    typedef pq_type::block_type block_type;
+    using pq_type = stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64*1024*1024, 1024*1024>::result;
+    using block_type = pq_type::block_type;
 
     // block_type::raw_size = 262144 bytes
     // use 64 block read and write pools each to enable overlapping between I/O and computation
