@@ -21,7 +21,7 @@
 //! next pass. The loop will terminate if at most one element remains.
 //! A split sorter is used to cut the data flow (and type dependency) cycle.
 
-#include <stxxl/mng>
+#include <foxxll/mng.hpp>
 #include <stxxl/stream>
 #include <stxxl/vector>
 
@@ -242,11 +242,11 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    stxxl::block_manager::get_instance();
+    foxxll::block_manager::get_instance();
 
     verbose = (argc == 3) && !strcmp(argv[2], "-v");
 
-    size_t total = stxxl::atouint64(argv[1]);
+    size_t total = foxxll::atouint64(argv[1]);
 
     input_generator_type input_stream(total);
 

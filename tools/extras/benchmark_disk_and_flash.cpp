@@ -10,16 +10,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/aligned_alloc>
-#include <stxxl/io>
+#include <foxxll/io.hpp>
 
 #include <iomanip>
 #include <vector>
 
-using stxxl::request_ptr;
-using stxxl::file;
-using stxxl::timestamp;
-using stxxl::external_size_type;
+using foxxll::request_ptr;
+using foxxll::file;
+using foxxll::timestamp;
+using foxxll::external_size_type;
 
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
@@ -120,15 +119,15 @@ int main(int argc, char* argv[])
     size_t i;
 
     file** disks = new file*[ndisks];
-    unsigned* buffer = (unsigned*)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size);
+    unsigned* buffer = (unsigned*)foxxll::aligned_alloc<BLOCK_ALIGN>(buffer_size);
 
     for (i = 0; i < buffer_size_int; i++)
         buffer[i] = unsigned(i);
 
     for (i = 0; i < ndisks; i++)
     {
-        disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR | file::DIRECT, static_cast<int>(i));
+        disks[i] = new foxxll::syscall_file(disks_arr[i],
+                                            file::CREAT | file::RDWR | file::DIRECT, static_cast<int>(i));
     }
 
     try {
@@ -154,7 +153,7 @@ int main(int argc, char* argv[])
         delete disks[i];
 
     delete[] disks;
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
+    foxxll::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
     return 0;
 }

@@ -34,7 +34,7 @@ int main()
 
     // fill vector with random integers
     {
-        stxxl::scoped_print_timer
+        foxxll::scoped_print_timer
             timer("write random numbers", 100 * 1024 * 1024 * sizeof(int));
 
         stxxl::random_number32 random;
@@ -46,7 +46,7 @@ int main()
 
     // sort vector using 16 MiB RAM
     {
-        stxxl::scoped_print_timer
+        foxxll::scoped_print_timer
             timer("sorting random numbers", 100 * 1024 * 1024 * sizeof(int));
 
         stxxl::sort(vector.begin(), vector.end(), my_less_int(), 16 * 1024 * 1024);

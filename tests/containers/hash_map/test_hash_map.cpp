@@ -117,7 +117,7 @@ void basic_test()
     using iterator = unordered_map::iterator;
     using const_iterator = unordered_map::const_iterator;
 
-    stxxl::stats_data stats_begin;
+    foxxll::stats_data stats_begin;
 
     unordered_map map;
     map.max_buffer_size(buffer_size);
@@ -135,7 +135,7 @@ void basic_test()
 
     // --- initial import
     std::cout << "Initial import...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     STXXL_CHECK(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
@@ -143,7 +143,7 @@ void basic_test()
     STXXL_CHECK(map.size() == n_values);
 
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     // (*) all these values are stored in external memory; the remaining
     // changes will be buffered in internal memory
@@ -151,7 +151,7 @@ void basic_test()
     // --- insert: new (from values2) and existing (from values1) values, with
     // --- and without checking
     std::cout << "Insert...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     for (size_t i = 0; i < n_values / 2; i++) {
         // new without checking
@@ -168,7 +168,7 @@ void basic_test()
 
     STXXL_CHECK(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     // "old" values are stored in external memory, "new" values are stored in
     // internal memory
@@ -176,7 +176,7 @@ void basic_test()
     // --- find: existing (from external and internal memory) and non-existing
     // --- values
     std::cout << "Find...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
@@ -186,11 +186,11 @@ void basic_test()
         STXXL_CHECK(cmap.find(values3[i].first) == cmap.end());
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     // --- insert with overwriting
     std::cout << "Insert with overwriting...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
@@ -213,11 +213,11 @@ void basic_test()
         STXXL_CHECK((*it2).second == values2[i].second + 1);
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     // --- erase: existing and non-existing values, with and without checking
     std::cout << "Erase...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
@@ -239,7 +239,7 @@ void basic_test()
     }
     STXXL_CHECK(map.size() == 2 * n_values - 2 * n_tests);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     map.clear();
     STXXL_CHECK(map.size() == 0);
@@ -249,7 +249,7 @@ void basic_test()
     // make sure there are some values in our unordered_map: externally
     // [0..n/2) and internally [n/2..n) from values1
     std::cout << "[ ]-operator...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     for (size_t i = n_values / 2; i < n_values; i++) {
@@ -277,14 +277,14 @@ void basic_test()
     }
     STXXL_CHECK(map.size() == n_values + 2);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     map.clear();
     STXXL_CHECK(map.size() == 0);
 
     // --- additional bulk insert test
     std::cout << "additional bulk-insert...";
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
 
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     map.insert(values1.begin() + n_values / 2, values1.end(), mem_to_sort);
@@ -294,7 +294,7 @@ void basic_test()
     for (size_t i = 0; i < n_tests; i++)
         STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 
     // --- test equality predicate
     unordered_map::key_equal key_eq = map.key_eq();

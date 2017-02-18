@@ -14,7 +14,7 @@
 #define STXXL_CONTAINERS_MATRIX_HEADER
 
 #include <stxxl/bits/containers/vector.h>
-#include <stxxl/bits/mng/block_scheduler.h>
+#include <foxxll/mng/block_scheduler.hpp>
 #include <stxxl/bits/containers/matrix_arithmetic.h>
 
 #include <foxxll/common/counting_ptr.hpp>
@@ -208,12 +208,12 @@ public:
 //!
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
-class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength* BlockSideLength>
+class matrix_swappable_block : public foxxll::swappable_block<ValueType, BlockSideLength* BlockSideLength>
 {
 public:
-    using internal_block_type =  typename swappable_block<ValueType, BlockSideLength* BlockSideLength>::internal_block_type ;
+    using internal_block_type =  typename foxxll::swappable_block<ValueType, BlockSideLength* BlockSideLength>::internal_block_type ;
 
-    using swappable_block<ValueType, BlockSideLength* BlockSideLength>::get_internal_block;
+    using foxxll::swappable_block<ValueType, BlockSideLength* BlockSideLength>::get_internal_block;
 
     void fill_default()
     {
@@ -239,7 +239,7 @@ class swappable_block_matrix : public foxxll::reference_count
 public:
     using size_type =  int_type ;
     using elem_size_type =  int_type ;
-    using block_scheduler_type =  block_scheduler<matrix_swappable_block<ValueType, BlockSideLength> > ;
+    using block_scheduler_type =  foxxll::block_scheduler<matrix_swappable_block<ValueType, BlockSideLength> > ;
     using swappable_block_identifier_type =  typename block_scheduler_type::swappable_block_identifier_type ;
     using blocks_type =  std::vector<swappable_block_identifier_type> ;
     using Ops =  matrix_local::matrix_operations<ValueType, BlockSideLength> ;
@@ -1091,8 +1091,8 @@ public:
           data(
               new swappable_block_matrix_type(
                   bs,
-                  div_ceil(height, BlockSideLength),
-                  div_ceil(width, BlockSideLength))
+                  foxxll::div_ceil(height, BlockSideLength),
+                  foxxll::div_ceil(width, BlockSideLength))
               )
     { }
 
@@ -1103,8 +1103,8 @@ public:
           data(
               new swappable_block_matrix_type(
                   bs,
-                  div_ceil(height, BlockSideLength),
-                  div_ceil(width, BlockSideLength))
+                  foxxll::div_ceil(height, BlockSideLength),
+                  foxxll::div_ceil(width, BlockSideLength))
               )
     { Ops::recursive_matrix_from_vectors(*data, left, right); }
 
@@ -1165,7 +1165,8 @@ public:
             data->set_zero();
         else
             data = foxxll::make_counting<swappable_block_matrix_type>(
-                data->bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength));
+                data->bs, foxxll::div_ceil(height, BlockSideLength),
+                foxxll::div_ceil(width, BlockSideLength));
     }
     //! \}
 
@@ -1264,7 +1265,7 @@ public:
         {
             // all offline algos need a simulation-run
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
             switch (multiplication_algorithm)
             {
             case 0:
@@ -1297,15 +1298,15 @@ public:
         {
         case 0:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
             break;
         case 1:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
             break;
         case 2:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
             break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
@@ -1338,7 +1339,7 @@ public:
             break;
         }
         delete data->bs.switch_algorithm_to(
-            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+            new foxxll::block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
 
@@ -1353,29 +1354,29 @@ public:
         {
             // all offline algos need a simulation-run
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
             multiply_internal(right, res);
         }
         switch (scheduling_algorithm)
         {
         case 0:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
             break;
         case 1:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
             break;
         case 2:
             delete data->bs.switch_algorithm_to(
-                new block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
+                new foxxll::block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
             break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
         }
         multiply_internal(right, res);
         delete data->bs.switch_algorithm_to(
-            new block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+            new foxxll::block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
     //! \}

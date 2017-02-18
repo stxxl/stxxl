@@ -18,7 +18,7 @@
 #include <stxxl/random>
 #include <stxxl/timer>
 
-using stxxl::scoped_print_timer;
+using foxxll::scoped_print_timer;
 
 #define RECORD_SIZE 128
 
@@ -255,18 +255,18 @@ void test_bulk_limit(const size_t bulk_size)
 
 int main()
 {
-    stxxl::stats* stats = stxxl::stats::get_instance();
-    stxxl::stats_data stats_begin(*stats);
+    foxxll::stats* stats = foxxll::stats::get_instance();
+    foxxll::stats_data stats_begin(*stats);
     test_simple();
-    std::cout << "Stats after test_simple :" << (stxxl::stats_data(*stats) - stats_begin);
-    stats_begin = *stxxl::stats::get_instance();
+    std::cout << "Stats after test_simple :" << (foxxll::stats_data(*stats) - stats_begin);
+    stats_begin = *foxxll::stats::get_instance();
     test_bulk_pop();
-    std::cout << "Stats after bulk_pop :" << (stxxl::stats_data(*stats) - stats_begin);
-    stats_begin = *stxxl::stats::get_instance();
+    std::cout << "Stats after bulk_pop :" << (foxxll::stats_data(*stats) - stats_begin);
+    stats_begin = *foxxll::stats::get_instance();
     test_bulk_limit(1000);
-    std::cout << "Stats after bulk_limit_1000 :" << (stxxl::stats_data(*stats) - stats_begin);
-    stats_begin = *stxxl::stats::get_instance();
+    std::cout << "Stats after bulk_limit_1000 :" << (foxxll::stats_data(*stats) - stats_begin);
+    stats_begin = *foxxll::stats::get_instance();
     test_bulk_limit(1024 * 1024);
-    std::cout << "Stats after bulk_limit_1M: " << (stxxl::stats_data(*stats) - stats_begin);
+    std::cout << "Stats after bulk_limit_1M: " << (foxxll::stats_data(*stats) - stats_begin);
     return 0;
 }

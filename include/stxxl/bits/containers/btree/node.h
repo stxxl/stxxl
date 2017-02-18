@@ -40,7 +40,7 @@ public:
     enum {
         raw_size = RawSize
     };
-    using bid_type = BID<raw_size>;
+    using bid_type = foxxll::BID<raw_size>;
     using node_bid_type = bid_type;
     using node_type = self_type;
     using value_type = std::pair<key_type, bid_type>;
@@ -52,7 +52,7 @@ public:
         bid_type me;
         unsigned cur_size;
     };
-    using block_type = typed_block<raw_size, value_type, 0, metainfo_type>;
+    using block_type = foxxll::typed_block<raw_size, value_type, 0, metainfo_type>;
 
     enum {
         nelements = block_type::size - 1,
@@ -269,19 +269,19 @@ public:
 
     void save()
     {
-        request_ptr req = m_block->write(my_bid());
+        foxxll::request_ptr req = m_block->write(my_bid());
         req->wait();
     }
 
-    request_ptr load(const bid_type& bid)
+    foxxll::request_ptr load(const bid_type& bid)
     {
-        request_ptr req = m_block->read(bid);
+        foxxll::request_ptr req = m_block->read(bid);
         req->wait();
         assert(bid == my_bid());
         return req;
     }
 
-    request_ptr prefetch(const bid_type& bid)
+    foxxll::request_ptr prefetch(const bid_type& bid)
     {
         return m_block->read(bid);
     }

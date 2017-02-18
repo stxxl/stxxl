@@ -17,7 +17,7 @@
 //! This is an example of how NOT to use \c stxxl::sort() algorithm.
 //! Here min_value and max_value are used as keys which is forbidden.
 
-#include <stxxl/mng>
+#include <foxxll/mng.hpp>
 #include <stxxl/sort>
 #include <stxxl/vector>
 

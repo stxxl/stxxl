@@ -15,8 +15,8 @@
 //! \example algo/test_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
+#include <foxxll/mng.hpp>
 #include <stxxl/ksort>
-#include <stxxl/mng>
 #include <stxxl/vector>
 
 struct my_type
@@ -72,7 +72,7 @@ int main()
 {
     STXXL_MSG("Check config...");
     try {
-        stxxl::block_manager::get_instance();
+        foxxll::block_manager::get_instance();
     }
     catch (std::exception& e)
     {

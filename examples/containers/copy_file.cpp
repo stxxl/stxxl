@@ -14,23 +14,23 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
+#include <foxxll/io.hpp>
 #include <stxxl/stream>
 #include <stxxl/vector>
 
 void copy_file(const char* input_path, const char* output_path, unsigned int method)
 {
-    using stxxl::file;
+    using foxxll::file;
 
     file::unlink(output_path); // delete output file
 
-    stxxl::timer tm(true);     // start a timer
+    foxxll::timer tm(true);    // start a timer
 
     // input file object
-    stxxl::file_ptr InputFile = foxxll::make_counting<stxxl::syscall_file>(
+    foxxll::file_ptr InputFile = foxxll::make_counting<foxxll::syscall_file>(
         input_path, file::RDONLY | file::DIRECT);
     // output file object
-    stxxl::file_ptr OutputFile = foxxll::make_counting<stxxl::syscall_file>(
+    foxxll::file_ptr OutputFile = foxxll::make_counting<foxxll::syscall_file>(
         output_path, file::RDWR | file::CREAT | file::DIRECT);
 
     using vector_type = stxxl::vector<unsigned char>;

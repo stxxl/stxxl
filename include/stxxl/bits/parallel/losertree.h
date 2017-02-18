@@ -17,7 +17,7 @@
 #ifndef STXXL_PARALLEL_LOSERTREE_HEADER
 #define STXXL_PARALLEL_LOSERTREE_HEADER
 
-#include <stxxl/bits/common/utils.h>
+#include <foxxll/common/utils.hpp>
 #include <stxxl/bits/parallel/base.h>
 
 #include <algorithm>
@@ -75,7 +75,7 @@ public:
     explicit LoserTreeCopyBase(size_type _k,
                                Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(round_up_to_power_of_two(ik)),
+          k(foxxll::round_up_to_power_of_two(ik)),
           comp(_comp),
           first_insert(true)
     {
@@ -325,7 +325,7 @@ public:
     explicit LoserTreeReference(size_type _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = round_up_to_power_of_two(ik);
+        k = foxxll::round_up_to_power_of_two(ik);
         losers = new Loser[k * 2];
 #ifndef COPY
         keys = new T[ik];
@@ -528,7 +528,7 @@ public:
     explicit LoserTreePointerBase(size_type _k,
                                   Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(round_up_to_power_of_two(ik)),
+          k(foxxll::round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
@@ -754,7 +754,7 @@ public:
     LoserTreeCopyUnguardedBase(size_type _k, const ValueType& _sentinel,
                                Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(round_up_to_power_of_two(ik)),
+          k(foxxll::round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
@@ -952,7 +952,7 @@ public:
     LoserTreePointerUnguardedBase(size_type _k, const ValueType& _sentinel,
                                   Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(round_up_to_power_of_two(ik)),
+          k(foxxll::round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {

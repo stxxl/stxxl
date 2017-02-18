@@ -15,7 +15,7 @@
 #ifndef STXXL_VERBOSE_HEADER
 #define STXXL_VERBOSE_HEADER
 
-#include <stxxl/bits/unused.h>
+#include <foxxll/unused.hpp>
 
 #include <cstdlib>
 #include <iostream>

@@ -69,7 +69,7 @@ void cmp_with_internal_map()
 
     using int_hash_map = std::unordered_map<int, int>;
 
-    stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
+    foxxll::stats_data stats_begin = *foxxll::stats::get_instance();
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -131,7 +131,7 @@ void cmp_with_internal_map()
         STXXL_CHECK(int_map.find(key) != int_map.end());
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ void basic_iterator_test()
     using iterator = hash_map::iterator;
     using const_iterator = hash_map::const_iterator;
 
-    stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
+    foxxll::stats_data stats_begin = *foxxll::stats::get_instance();
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -296,7 +296,7 @@ void basic_iterator_test()
     }
     std::cout << "passed" << std::endl;
 
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +317,7 @@ void more_iterator_test()
                                                subblock_raw_size, block_size>;
     using const_iterator = hash_map::const_iterator;
 
-    stxxl::stats_data stats_begin = *stxxl::stats::get_instance();
+    foxxll::stats_data stats_begin = *foxxll::stats::get_instance();
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -370,7 +370,7 @@ void more_iterator_test()
     }
     std::cout << "passed" << std::endl;
 
-    STXXL_MSG(stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin);
+    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

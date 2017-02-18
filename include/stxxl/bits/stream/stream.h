@@ -15,10 +15,10 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
-#include <stxxl/bits/common/error_handling.h>
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/mng/buf_istream.hpp>
+#include <foxxll/mng/buf_ostream.hpp>
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/mng/buf_istream.h>
-#include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/vector>
 
 #include <memory>
@@ -107,8 +107,8 @@ template <typename InputIterator>
 class vector_iterator2stream
 {
     InputIterator m_current, m_end;
-    using buf_istream_type = buf_istream<typename InputIterator::block_type,
-                                         typename InputIterator::bids_container_iterator>;
+    using buf_istream_type = foxxll::buf_istream<typename InputIterator::block_type,
+                                                 typename InputIterator::bids_container_iterator>;
 
     using buf_istream_unique_ptr_type = std::unique_ptr<buf_istream_type>;
     mutable buf_istream_unique_ptr_type in;
@@ -138,7 +138,7 @@ public:
         {
             in.reset(new buf_istream_type(
                          begin.bid(), end_iter, nbuffers ? nbuffers :
-                         (2 * config::get_instance()->disks_number())));
+                         (2 * foxxll::config::get_instance()->disks_number())));
 
             InputIterator cur = begin - begin.block_offset();
 

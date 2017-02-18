@@ -13,11 +13,9 @@
 #ifndef STXXL_MAIN_HEADER
 #define STXXL_MAIN_HEADER
 
-#include <stxxl/bits/common/utils.h>
-
-#include <stxxl/io>
-
-#include <stxxl/mng>
+#include <foxxll/common/utils.hpp>
+#include <foxxll/io.hpp>
+#include <foxxll/mng.hpp>
 
 #include <stxxl/priority_queue>
 #include <stxxl/stack>

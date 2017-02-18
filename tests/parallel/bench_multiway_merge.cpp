@@ -11,10 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/common/cmdline.h>
+#include <foxxll/common/cmdline.hpp>
+#include <foxxll/common/timer.hpp>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 
@@ -94,7 +94,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
     std::vector<sequence_type> seqs(seq_count);
 
     {
-        stxxl::scoped_print_timer spt(
+        foxxll::scoped_print_timer spt(
             "Filling sequences with random numbers in parallel", total_bytes);
 
         for (size_t i = 0; i < seq_count; ++i)
@@ -124,12 +124,12 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
     std::vector<ValueType> out;
 
     {
-        stxxl::scoped_print_timer spt("Allocating output buffer", total_bytes);
+        foxxll::scoped_print_timer spt("Allocating output buffer", total_bytes);
         out.resize(total_size);
     }
 
     {
-        stxxl::scoped_print_timer spt("Merging", total_bytes);
+        foxxll::scoped_print_timer spt("Merging", total_bytes);
 
         const char* method_name = nullptr;
         using sequence_iterator_pair_type = std::pair<typename sequence_type::iterator,
@@ -357,7 +357,7 @@ int main(int argc, char* argv[])
 {
     std::string benchset;
 
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
     cp.set_description("STXXL multiway_merge benchmark");
 
     cp.add_param_string("sequ/para/both", benchset,

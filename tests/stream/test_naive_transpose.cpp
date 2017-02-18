@@ -104,7 +104,7 @@ int main()
 
     // buffers for streamify and materialize,
     // block size matches the block size of the input/output vector
-    size_t numbuffers = 2 * stxxl::config::get_instance()->disks_number();
+    size_t numbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
     // RAM to be used for sorting (in bytes)
     size_t memory_for_sorting = 1 << 28;
@@ -123,7 +123,7 @@ int main()
     std::cout << "Before transpose:" << std::endl;
     dump_upper_left(input, num_rows, num_cols, 10, 10);
 
-    stxxl::stats_data stats_before(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_before(*foxxll::stats::get_instance());
 
     // HERE streaming part begins (streamifying)
     // create input stream
@@ -152,7 +152,7 @@ int main()
     STXXL_CHECK(o == output.end());
     STXXL_CHECK(sorted_element_stream.empty());
 
-    stxxl::stats_data stats_after(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_after(*foxxll::stats::get_instance());
 
     std::cout << "After transpose:" << std::endl;
     dump_upper_left(output, num_cols, num_rows, 10, 10);

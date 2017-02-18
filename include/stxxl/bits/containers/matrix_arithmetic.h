@@ -13,7 +13,7 @@
 #ifndef STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER
 #define STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER
 
-#include <stxxl/bits/mng/block_manager.h>
+#include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/containers/matrix_low_level.h>
 
 #include <algorithm>
@@ -74,7 +74,7 @@ struct matrix_operation_statistic_dataset
 };
 
 struct matrix_operation_statistic
-    : public singleton<matrix_operation_statistic>, public matrix_operation_statistic_dataset
+    : public foxxll::singleton<matrix_operation_statistic>, public matrix_operation_statistic_dataset
 { };
 
 struct matrix_operation_statistic_data : public matrix_operation_statistic_dataset
@@ -1400,10 +1400,10 @@ struct matrix_operations
                 & ul, & ur, & dl, & dr;
 
         explicit swappable_block_matrix_padding_quarterer(const swappable_block_matrix_type & whole)
-            : upleft   (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2),                              0,                             0),
-              upright  (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2),                              0, div_ceil(whole.get_width(),2)),
-              downleft (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2), div_ceil(whole.get_height(),2),                             0),
-              downright(whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2), div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2)),
+            : upleft   (whole, foxxll::div_ceil(whole.get_height(),2), foxxll::div_ceil(whole.get_width(),2),                              0,                             0),
+              upright  (whole, foxxll::div_ceil(whole.get_height(),2), foxxll::div_ceil(whole.get_width(),2),                              0, foxxll::div_ceil(whole.get_width(),2)),
+              downleft (whole, foxxll::div_ceil(whole.get_height(),2), foxxll::div_ceil(whole.get_width(),2), foxxll::div_ceil(whole.get_height(),2),                             0),
+              downright(whole, foxxll::div_ceil(whole.get_height(),2), foxxll::div_ceil(whole.get_width(),2), foxxll::div_ceil(whole.get_height(),2), foxxll::div_ceil(whole.get_width(),2)),
               ul(upleft), ur(upright), dl(downleft), dr(downright) {}
     };
 
@@ -1428,17 +1428,18 @@ struct matrix_operations
                                                                  const swappable_block_matrix_type& B,
                                                                  swappable_block_matrix_type& C)
     {
-        int_type num_levels = ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        int_type num_levels = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
         if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
         {
             if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS)
                 num_levels = STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS;
-            swappable_block_matrix_type padded_a(A, round_up_to_power_of_two(A.get_height(), num_levels),
-                                                 round_up_to_power_of_two(A.get_width(), num_levels), 0, 0),
-            padded_b(B, round_up_to_power_of_two(B.get_height(), num_levels),
-                     round_up_to_power_of_two(B.get_width(), num_levels), 0, 0),
-            padded_c(C, round_up_to_power_of_two(C.get_height(), num_levels),
-                     round_up_to_power_of_two(C.get_width(), num_levels), 0, 0);
+            swappable_block_matrix_type padded_a(
+                A, foxxll::round_up_to_power_of_two(A.get_height(), num_levels),
+                foxxll::round_up_to_power_of_two(A.get_width(), num_levels), 0, 0),
+            padded_b(B, foxxll::round_up_to_power_of_two(B.get_height(), num_levels),
+                     foxxll::round_up_to_power_of_two(B.get_width(), num_levels), 0, 0),
+            padded_c(C, foxxll::round_up_to_power_of_two(C.get_height(), num_levels),
+                     foxxll::round_up_to_power_of_two(C.get_width(), num_levels), 0, 0);
             switch (num_levels)
             {
             #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 5 && 5 > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
@@ -1517,14 +1518,15 @@ struct matrix_operations
                                                    const swappable_block_matrix_type& B,
                                                    swappable_block_matrix_type& C)
     {
-        int_type p = ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        int_type p = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
 
-        swappable_block_matrix_type padded_a(A, round_up_to_power_of_two(A.get_height(), p),
-                                             round_up_to_power_of_two(A.get_width(), p), 0, 0),
-        padded_b(B, round_up_to_power_of_two(B.get_height(), p),
-                 round_up_to_power_of_two(B.get_width(), p), 0, 0),
-        padded_c(C, round_up_to_power_of_two(C.get_height(), p),
-                 round_up_to_power_of_two(C.get_width(), p), 0, 0);
+        swappable_block_matrix_type padded_a(
+            A, foxxll::round_up_to_power_of_two(A.get_height(), p),
+            foxxll::round_up_to_power_of_two(A.get_width(), p), 0, 0),
+        padded_b(B, foxxll::round_up_to_power_of_two(B.get_height(), p),
+                 foxxll::round_up_to_power_of_two(B.get_width(), p), 0, 0),
+        padded_c(C, foxxll::round_up_to_power_of_two(C.get_height(), p),
+                 foxxll::round_up_to_power_of_two(C.get_width(), p), 0, 0);
         choose_level_for_feedable_sw(padded_a, padded_b, padded_c);
         return C;
     }
@@ -1534,7 +1536,7 @@ struct matrix_operations
                                              const swappable_block_matrix_type& B,
                                              swappable_block_matrix_type& C)
     {
-        switch (ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
+        switch (foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
         {
         default:
             /*

@@ -17,15 +17,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/common/cmdline.hpp>
+#include <foxxll/common/uint_types.hpp>
+#include <foxxll/common/utils.hpp>
+#include <foxxll/io.hpp>
 #include <stxxl/algorithm>
-#include <stxxl/bits/common/uint_types.h>
-#include <stxxl/bits/common/utils.h>
-#include <stxxl/cmdline>
-#include <stxxl/io>
 #include <stxxl/random>
 #include <stxxl/sequence>
 #include <stxxl/sorter>
-#include <stxxl/stats>
 #include <stxxl/stream>
 #include <stxxl/timer>
 #include <stxxl/vector>
@@ -43,7 +42,7 @@
 #include <string>
 #include <vector>
 
-using stxxl::external_size_type;
+using foxxll::external_size_type;
 
 /// Global variables, types and helpers.
 
@@ -1097,8 +1096,8 @@ public:
     public:
         explicit sparseTable(std::vector<offset_type>& fieldVector)
         {
-            std::size_t dimI = fieldVector.size();          // y-Dimension of QTable
-            std::size_t dimK = stxxl::log2_floor(dimI) + 1; // x-Dimension of QTable
+            std::size_t dimI = fieldVector.size();           // y-Dimension of QTable
+            std::size_t dimK = foxxll::log2_floor(dimI) + 1; // x-Dimension of QTable
             createQTable(fieldVector, dimI, dimK);
         }
 
@@ -1140,7 +1139,7 @@ public:
         {
             std::size_t i = I;
             std::size_t j = J;
-            std::size_t k = stxxl::log2_floor(j - i + 1);
+            std::size_t k = foxxll::log2_floor(j - i + 1);
             offset_type r = QTable[k][i];
             offset_type s = QTable[k][j - (1 << k) + 1];
 
@@ -2692,7 +2691,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     using offset_vector_type = typename stxxl::vector<offset_type, 1, stxxl::lru_pager<2>, block_size>;
 
     // input and output files (if supplied via command line)
-    stxxl::file_ptr input_file, output_file;
+    foxxll::file_ptr input_file, output_file;
 
     // input and output vectors for suffix array construction
     alphabet_vector_type input_vector;
@@ -2703,7 +2702,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     // to verify lcparray with kasai's semi external algorithm
     offset_vector_type checker_lcp;
 
-    using stxxl::file;
+    using foxxll::file;
 
     if (input_verbatim) {
         // copy input verbatim into vector
@@ -2733,7 +2732,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     }
     else {
         // define input file object and map input_vector to input_file (no copying)
-        input_file = foxxll::make_counting<stxxl::syscall_file>(
+        input_file = foxxll::make_counting<foxxll::syscall_file>(
             input_filename, file::RDONLY | file::DIRECT);
         alphabet_vector_type file_input_vector(input_file);
         input_vector.swap(file_input_vector);
@@ -2741,15 +2740,15 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
     if (output_filename.size()) {
         // define output file object and map output_vector to output_file
-        output_file = foxxll::make_counting<stxxl::syscall_file>(
+        output_file = foxxll::make_counting<foxxll::syscall_file>(
             output_filename, file::RDWR | file::CREAT | file::DIRECT);
         offset_vector_type file_output_vector(output_file);
         output_vector.swap(file_output_vector);
     }
 
     // initialize and start I/O measurement
-    stxxl::stats* Stats = stxxl::stats::get_instance();
-    stxxl::stats_data stats_begin(*Stats);
+    foxxll::stats* Stats = foxxll::stats::get_instance();
+    foxxll::stats_data stats_begin(*Stats);
 
     // construct skew class with bufreader input type
     using input_type = alphabet_vector_type::bufreader_type;
@@ -2782,7 +2781,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     stxxl::stream::materialize(*lcp, lcparray.begin(), lcparray.end());
 
     std::cout << "output size = " << output_vector.size() << std::endl;
-    std::cout << (stxxl::stats_data(*Stats) - stats_begin); // print i/o statistics
+    std::cout << (foxxll::stats_data(*Stats) - stats_begin); // print i/o statistics
 
     if (text_output_flag) {
         std::cout << std::endl << "resulting suffix array:" << std::endl;
@@ -2852,7 +2851,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
 int main(int argc, char* argv[])
 {
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
 
     cp.set_description(
         "DC3-LCP aka skew3-lcp algorithm for external memory suffix array and LCP array construction.");
@@ -2900,7 +2899,7 @@ int main(int argc, char* argv[])
             text_output_flag, check_flag, input_verbatim);
 #if 0
     else if (wordsize == 40)
-        return process<stxxl::uint40>(
+        return process<foxxll::uint40>(
             input_filename, output_filename, sizelimit,
             text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 64)

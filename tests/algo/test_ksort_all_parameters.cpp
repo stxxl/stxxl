@@ -13,8 +13,8 @@
 
 //#define PLAY_WITH_OPT_PREF
 
+#include <foxxll/mng.hpp>
 #include <stxxl/ksort>
-#include <stxxl/mng>
 #include <stxxl/random>
 #include <stxxl/scan>
 #include <stxxl/vector>
@@ -39,7 +39,7 @@ void test(uint64_t data_mem, size_t memory_to_use)
     memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
 
     vector_type v(records_to_sort);
-    size_t ndisks = stxxl::config::get_instance()->disks_number();
+    size_t ndisks = foxxll::config::get_instance()->disks_number();
     STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
     STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MiB");
     STXXL_MSG("Using " << memory_to_use / MB << " MiB");
@@ -53,17 +53,17 @@ void test(uint64_t data_mem, size_t memory_to_use)
 
     STXXL_MSG("Sorting vector...");
 
-    stxxl::stats_data before(*stxxl::stats::get_instance());
+    foxxll::stats_data before(*foxxll::stats::get_instance());
 
     stxxl::ksort(v.begin(), v.end(), memory_to_use);
 
-    stxxl::stats_data after(*stxxl::stats::get_instance());
+    foxxll::stats_data after(*foxxll::stats::get_instance());
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
 
     STXXL_MSG("Sorting: " << (after - before));
-    STXXL_MSG("Total:   " << *stxxl::stats::get_instance());
+    STXXL_MSG("Total:   " << *foxxll::stats::get_instance());
 }
 
 template <typename T, unsigned block_size>
@@ -78,13 +78,13 @@ void test_all_strategies(
         test<T, stxxl::striping, block_size>(data_mem, memory_to_use);
         break;
     case 1:
-        test<T, stxxl::simple_random, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::simple_random, block_size>(data_mem, memory_to_use);
         break;
     case 2:
         test<T, stxxl::fully_random, block_size>(data_mem, memory_to_use);
         break;
     case 3:
-        test<T, stxxl::random_cyclic, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::random_cyclic, block_size>(data_mem, memory_to_use);
         break;
     default:
         STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");

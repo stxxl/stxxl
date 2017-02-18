@@ -15,9 +15,9 @@
 //! This example imports a file into an \c stxxl::vector without copying its
 //! content and then sorts it using stxxl::sort / stxxl::ksort / ...
 
-#include <stxxl/io>
+#include <foxxll/io.hpp>
+#include <foxxll/mng.hpp>
 #include <stxxl/ksort>
-#include <stxxl/mng>
 #include <stxxl/sort>
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
@@ -96,8 +96,8 @@ int main(int argc, char** argv)
     if (strcmp(argv[1], "generate") == 0) {
         const my_type::key_type num_elements = 1 * 1024 * 1024;
         const size_t records_in_block = block_size / sizeof(my_type);
-        stxxl::syscall_file f(argv[2], stxxl::file::CREAT | stxxl::file::RDWR);
-        my_type* array = (my_type*)stxxl::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
+        foxxll::syscall_file f(argv[2], foxxll::file::CREAT | foxxll::file::RDWR);
+        my_type* array = (my_type*)foxxll::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
         memset(array, 0, block_size);
 
         my_type::key_type cur_key = num_elements;
@@ -106,17 +106,17 @@ int main(int argc, char** argv)
             for (unsigned j = 0; j < records_in_block; j++)
                 array[j].m_key = cur_key--;
 
-            stxxl::request_ptr req = f.awrite((void*)array, uint64_t(i) * block_size, block_size);
+            foxxll::request_ptr req = f.awrite((void*)array, uint64_t(i) * block_size, block_size);
             req->wait();
         }
-        stxxl::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);
+        foxxll::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);
     }
     else {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
         STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-        stxxl::file_ptr f = foxxll::make_counting<stxxl::syscall_file>(
-            argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
+        foxxll::file_ptr f = foxxll::make_counting<foxxll::syscall_file>(
+            argv[2], foxxll::file::DIRECT | foxxll::file::RDWR);
         unsigned memory_to_use = 50 * 1024 * 1024;
         using vector_type = stxxl::vector<my_type, 1, stxxl::lru_pager<8>, block_size>;
         vector_type v(f);

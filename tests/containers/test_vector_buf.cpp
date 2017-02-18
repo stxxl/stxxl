@@ -84,7 +84,7 @@ void test_vector_buf(size_t size)
     using vector_type = typename stxxl::vector<ValueType>;
 
     {   // fill vector using element access
-        stxxl::scoped_print_timer tm("element access");
+        foxxll::scoped_print_timer tm("element access");
 
         vector_type vec(size);
 
@@ -94,7 +94,7 @@ void test_vector_buf(size_t size)
         check_vector(vec);
     }
     {   // fill vector using iterator access
-        stxxl::scoped_print_timer tm("iterator access");
+        foxxll::scoped_print_timer tm("iterator access");
 
         vector_type vec(size);
 
@@ -106,7 +106,7 @@ void test_vector_buf(size_t size)
         check_vector(vec);
     }
     {   // fill vector using vector_bufwriter
-        stxxl::scoped_print_timer tm("vector_bufwriter");
+        foxxll::scoped_print_timer tm("vector_bufwriter");
 
         vector_type vec(size);
 
@@ -120,7 +120,7 @@ void test_vector_buf(size_t size)
         check_vector(vec);
     }
     {   // fill empty vector using vector_bufwriter
-        stxxl::scoped_print_timer tm("empty vector_bufwriter");
+        foxxll::scoped_print_timer tm("empty vector_bufwriter");
 
         vector_type vec;
 
@@ -137,7 +137,7 @@ void test_vector_buf(size_t size)
     vector_type vec(size);
 
     {   // fill vector using materialize
-        stxxl::scoped_print_timer tm("materialize");
+        foxxll::scoped_print_timer tm("materialize");
 
         MyStream<ValueType> stream;
         stxxl::stream::materialize(stream, vec.begin(), vec.end());
@@ -145,7 +145,7 @@ void test_vector_buf(size_t size)
         check_vector(vec);
     }
     {   // read vector using vector_bufreader
-        stxxl::scoped_print_timer tm("vector_bufreader");
+        foxxll::scoped_print_timer tm("vector_bufreader");
 
         const vector_type& cvec = vec;
 
@@ -189,7 +189,7 @@ void test_vector_buf(size_t size)
         STXXL_CHECK(reader.empty());
     }
     {   // read vector using vector_bufreader_reverse
-        stxxl::scoped_print_timer tm("vector_bufreader_reverse");
+        foxxll::scoped_print_timer tm("vector_bufreader_reverse");
 
         const vector_type& cvec = vec;
 
@@ -233,7 +233,7 @@ void test_vector_buf(size_t size)
         STXXL_CHECK(reader.empty());
     }
     {   // read vector using C++11 for loop construct
-        stxxl::scoped_print_timer tm("C++11 for loop");
+        foxxll::scoped_print_timer tm("C++11 for loop");
 
         uint64_t i = 0;
 
@@ -246,7 +246,7 @@ void test_vector_buf(size_t size)
         STXXL_CHECK(i == vec.size());
     }
     {   // read vector using C++11 for loop construct
-        stxxl::scoped_print_timer tm("C++11 bufreader for loop");
+        foxxll::scoped_print_timer tm("C++11 bufreader for loop");
         using bufreader_type = typename vector_type::bufreader_type;
 
         uint64_t i = 0;

@@ -17,8 +17,8 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
+#include <foxxll/common/utils.hpp>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/parallel/equally_split.h>
 #include <stxxl/bits/parallel/losertree.h>
 #include <stxxl/bits/parallel/merge.h>

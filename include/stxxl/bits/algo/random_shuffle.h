@@ -81,7 +81,7 @@ void random_shuffle(ExtIterator first,
     temp_vector_type* temp_vector;
 
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets");
-    read_write_pool<block_type> pool(0, M / BlockSize - k);  // no read buffers and M/B-k write buffers
+    foxxll::read_write_pool<block_type> pool(0, M / BlockSize - k);  // no read buffers and M/B-k write buffers
 
     stack_type** buckets;
 
@@ -227,7 +227,7 @@ void random_shuffle(
     temp_vector_type* temp_vector;
 
     // no read buffers and M/B-k write buffers
-    stxxl::read_write_pool<block_type> pool(0, M / BlockSize - k);
+    foxxll::read_write_pool<block_type> pool(0, M / BlockSize - k);
 
     stack_type** buckets;
 
@@ -236,8 +236,8 @@ void random_shuffle(
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 
-    using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
-    using buf_ostream_type = buf_ostream<block_type, bids_container_iterator>;
+    using buf_istream_type = foxxll::buf_istream<block_type, bids_container_iterator>;
+    using buf_ostream_type = foxxll::buf_ostream<block_type, bids_container_iterator>;
 
     first.flush();     // flush container
 

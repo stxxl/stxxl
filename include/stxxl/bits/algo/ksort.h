@@ -15,7 +15,14 @@
 #ifndef STXXL_ALGO_KSORT_HEADER
 #define STXXL_ALGO_KSORT_HEADER
 
-#include <stxxl/bits/mng/async_schedule.h>
+#include <foxxll/common/onoff_switch.hpp>
+#include <foxxll/common/simple_vector.hpp>
+#include <foxxll/common/utils.hpp>
+#include <foxxll/mng/async_schedule.hpp>
+#include <foxxll/mng/block_alloc_strategy_interleaved.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/block_prefetcher.hpp>
+#include <foxxll/mng/buf_writer.hpp>
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/intksort.h>
@@ -24,14 +31,7 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/block_prefetcher.h>
-#include <stxxl/bits/mng/buf_writer.h>
 
 #include <algorithm>
 #include <functional>
@@ -111,8 +111,8 @@ struct write_completion_handler
 {
     BlockType* block;
     BidType bid;
-    request_ptr* req;
-    void operator () (request* /*completed_req*/, bool /* success */)
+    foxxll::request_ptr* req;
+    void operator () (foxxll::request* /*completed_req*/, bool /* success */)
     {
         * req = block->read(bid);
     }
@@ -133,8 +133,8 @@ inline void write_out(
     RunType& run,
     write_completion_handler<BlockType, typename BlockType::bid_type>*& next_read,
     typename BlockType::bid_type*& bids,
-    request_ptr* write_reqs,
-    request_ptr* read_reqs,
+    foxxll::request_ptr* write_reqs,
+    foxxll::request_ptr* read_reqs,
     InputBidIterator& it,
     KeyExtractor keyobj)
 {
@@ -192,8 +192,9 @@ create_runs(
     using bid_type = typename BlockType::bid_type;
     using key_type = typename KeyExtractor::key_type;
     using type_key_ = type_key<type, key_type>;
+    using request_ptr = foxxll::request_ptr;
 
-    block_manager* bm = block_manager::get_instance();
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
     BlockType* Blocks1 = new BlockType[m2];
     BlockType* Blocks2 = new BlockType[m2];
     bid_type* bids = new bid_type[m2];
@@ -208,9 +209,10 @@ create_runs(
     run = *runs;
     int_type run_size = (*runs)->size();
     key_type offset = 0;
-    const int log_k1 = ilog2_ceil((m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
-                                  (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
-    const int log_k2 = ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
+    const int log_k1 = foxxll::ilog2_ceil(
+        (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
+        (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
+    const int log_k2 = foxxll::ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
     STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
     const int_type k1 = int_type(1) << log_k1;
     const int_type k2 = int_type(1) << log_k2;
@@ -218,7 +220,7 @@ create_runs(
     int_type* bucket2 = new int_type[k2];
     int_type i;
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
     for (i = 0; i < run_size; i++)
     {
@@ -351,6 +353,7 @@ bool check_ksorted_runs(RunType** runs,
 {
     using block_type = BlockType;
     using value_type = typename BlockType::value_type;
+    using request_ptr = foxxll::request_ptr;
 
     STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
     size_t irun = 0;
@@ -446,7 +449,7 @@ template <typename BlockType, typename RunType, typename KeyExtractor>
 void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, KeyExtractor keyobj)
 {
     using block_type = BlockType;
-    using prefetcher_type = block_prefetcher<BlockType, typename RunType::iterator>;
+    using prefetcher_type = foxxll::block_prefetcher<BlockType, typename RunType::iterator>;
     using run_cursor_type = run_cursor2<BlockType, prefetcher_type>;
 
     size_t i;
@@ -465,7 +468,7 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
     }
     std::stable_sort(consume_seq.begin(), consume_seq.end() _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
-    size_t disks_number = config::get_instance()->disks_number();
+    size_t disks_number = foxxll::config::get_instance()->disks_number();
 
 #ifdef PLAY_WITH_OPT_PREF
     const int_type n_write_buffers = 4 * disks_number;
@@ -484,7 +487,7 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        config::get_instance()->get_max_device_id());
+        foxxll::config::get_instance()->get_max_device_id());
 #else
     for (i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;
@@ -496,7 +499,7 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
                                prefetch_seq,
                                nruns + n_prefetch_buffers);
 
-    buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
+    foxxll::buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
 
     size_t out_run_size = out_run->size();
 
@@ -517,7 +520,7 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
 
     delete[] prefetch_seq;
 
-    block_manager* bm = block_manager::get_instance();
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
     for (i = 0; i < nruns; i++)
     {
         size_t sz = in_runs[i]->size();
@@ -532,7 +535,7 @@ template <typename BlockType,
           typename AllocStrategy,
           typename InputBidIterator,
           typename KeyExtractor>
-simple_vector<
+foxxll::simple_vector<
     trigger_entry<typename BlockType::bid_type, typename KeyExtractor::key_type>
     >*
 ksort_blocks(InputBidIterator input_bids, size_t _n,
@@ -543,10 +546,10 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     using key_type = typename KeyExtractor::key_type;
     using bid_type = typename BlockType::bid_type;
     using trigger_entry_type = trigger_entry<bid_type, typename KeyExtractor::key_type>;
-    using run_type = simple_vector<trigger_entry_type>;
-    using interleaved_alloc_strategy = typename interleaved_alloc_traits<AllocStrategy>::strategy;
+    using run_type = foxxll::simple_vector<trigger_entry_type>;
+    using interleaved_alloc_strategy = typename foxxll::interleaved_alloc_traits<AllocStrategy>::strategy;
 
-    size_t m2 = div_ceil(_m, 2);
+    size_t m2 = foxxll::div_ceil(_m, 2);
     const size_t m2_rf = m2 * block_type::raw_size /
                          (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
     STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
@@ -557,11 +560,11 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     size_t nruns = full_runs + partial_runs;
     size_t i;
 
-    block_manager* mng = block_manager::get_instance();
+    foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
     STXXL_VERBOSE("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
-    double begin = timestamp(), after_runs_creation, end;
+    double begin = foxxll::timestamp(), after_runs_creation, end;
 
     run_type** runs = new run_type*[nruns];
 
@@ -600,18 +603,18 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     create_runs<block_type, run_type, InputBidIterator, KeyExtractor>(
         input_bids, runs, nruns, m2, keyobj);
 
-    after_runs_creation = timestamp();
+    after_runs_creation = foxxll::timestamp();
 
-    double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
+    double io_wait_after_rf = foxxll::stats::get_instance()->get_io_wait_time();
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
     const int_type merge_factor = optimal_merge_factor(nruns, _m);
     run_type** new_runs;
 
     while (nruns > 1)
     {
-        int_type new_nruns = div_ceil(nruns, merge_factor);
+        int_type new_nruns = foxxll::div_ceil(nruns, merge_factor);
         STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                       " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 
@@ -647,14 +650,14 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(fully_random(), firstBID);
+                mng->new_block(foxxll::fully_random(), firstBID);
             }
             bid_type& lastBID = (*new_runs[0])[_n - 1].bid;
             if (lastBID.is_managed())
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(fully_random(), lastBID);
+                mng->new_block(foxxll::fully_random(), lastBID);
             }
         }
         else
@@ -687,12 +690,12 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     run_type* result = *runs;
     delete[] runs;
 
-    end = timestamp();
+    end = foxxll::timestamp();
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                   after_runs_creation - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-    STXXL_VERBOSE(*stats::get_instance());
+    STXXL_VERBOSE(*foxxll::stats::get_instance());
 
     return result;
 }
@@ -727,7 +730,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 template <typename ExtIterator, typename KeyExtractor>
 void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
 {
-    using run_type = simple_vector<
+    using run_type = foxxll::simple_vector<
               ksort_local::trigger_entry<
                   typename ExtIterator::bid_type, typename KeyExtractor::key_type
                   >
@@ -737,9 +740,10 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
     using block_type = typename ExtIterator::block_type;
     using alloc_strategy_type = typename ExtIterator::vector_type::alloc_strategy_type;
     using bids_container_iterator = typename ExtIterator::bids_container_iterator;
+    using request_ptr = foxxll::request_ptr;
 
     size_t n = 0;
-    block_manager* mng = block_manager::get_instance();
+    foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
     first.flush();
 
@@ -763,8 +767,8 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(fully_random(), first_bid);                // try to overlap
-                mng->new_block(fully_random(), last_bid);
+                mng->new_block(foxxll::fully_random(), first_bid);                // try to overlap
+                mng->new_block(foxxll::fully_random(), last_bid);
                 req->wait();
 
                 req = last_block->read(*last.bid());
@@ -869,7 +873,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(fully_random(), first_bid);                // try to overlap
+                mng->new_block(foxxll::fully_random(), first_bid);                // try to overlap
                 req->wait();
 
                 size_t i = 0;
@@ -947,7 +951,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 size_t i;
 
                 req = last_block->read(*last.bid());
-                mng->new_block(fully_random(), last_bid);
+                mng->new_block(foxxll::fully_random(), last_bid);
                 req->wait();
 
                 for (i = last.block_offset(); i < block_type::size; i++)

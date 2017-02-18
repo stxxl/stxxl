@@ -13,7 +13,6 @@
 #include <limits>
 #include <stxxl/random>
 #include <stxxl/sorter>
-#include <stxxl/stats>
 #include <stxxl/timer>
 
 struct TwoInteger
@@ -56,7 +55,7 @@ int main()
 
     stxxl::random_number32 rand32;
 
-    stxxl::timer Timer1;
+    foxxll::timer Timer1;
     Timer1.start();
 
     // insert random numbers from [0,100000)
@@ -69,7 +68,7 @@ int main()
 
     STXXL_MSG("push time: " << (Timer1.mseconds() / 1000));
 
-    stxxl::timer Timer2;
+    foxxll::timer Timer2;
 
     Timer2.start();
     int_sorter.sort();  // switch to output state and sort

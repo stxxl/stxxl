@@ -16,7 +16,7 @@
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
-#include <stxxl/mng>
+#include <foxxll/mng.hpp>
 #include <stxxl/sort>
 #include <stxxl/vector>
 
@@ -94,7 +94,7 @@ int main()
     unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     using vector_type = stxxl::vector<my_type>;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     {
         // test small vector that can be sorted internally
@@ -128,7 +128,7 @@ int main()
 
     STXXL_MSG("Done, output size=" << v.size());
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     return 0;
 }

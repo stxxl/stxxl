@@ -15,9 +15,10 @@
 #ifndef STXXL_ALGO_SCAN_HEADER
 #define STXXL_ALGO_SCAN_HEADER
 
-#include <stxxl/bits/mng/buf_istream.h>
-#include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/mng/config.h>
+#include <foxxll/mng/buf_istream.hpp>
+#include <foxxll/mng/buf_ostream.hpp>
+#include <foxxll/mng/config.hpp>
+#include <stxxl/types>
 
 namespace stxxl {
 
@@ -54,7 +55,7 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end,
 
     using value_type = typename ExtIterator::value_type;
 
-    using buf_istream_type = buf_istream<
+    using buf_istream_type = foxxll::buf_istream<
               typename ExtIterator::block_type,
               typename ExtIterator::bids_container_iterator
               >;
@@ -62,7 +63,7 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end,
     begin.flush();     // flush container
 
     if (nbuffers == 0)
-        nbuffers = 2 * config::get_instance()->disks_number();
+        nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
     // create prefetching stream,
     buf_istream_type in(begin.bid(), end.bid() + ((end.block_offset()) ? 1 : 0), nbuffers);
@@ -128,11 +129,11 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
         return functor;
 
     using value_type = typename ExtIterator::value_type;
-    using buf_istream_type = buf_istream<
+    using buf_istream_type = foxxll::buf_istream<
               typename ExtIterator::block_type,
               typename ExtIterator::bids_container_iterator
               >;
-    using buf_ostream_type = buf_ostream<
+    using buf_ostream_type = foxxll::buf_ostream<
               typename ExtIterator::block_type,
               typename ExtIterator::bids_container_iterator
               >;
@@ -140,7 +141,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
     begin.flush();     // flush container
 
     if (nbuffers == 0)
-        nbuffers = 2 * config::get_instance()->disks_number();
+        nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
     // create prefetching stream,
     buf_istream_type in(begin.bid(), end.bid() + ((end.block_offset()) ? 1 : 0), nbuffers / 2);
@@ -205,7 +206,7 @@ void generate(ExtIterator begin, ExtIterator end,
               Generator generator, int_type nbuffers = 0)
 {
     using block_type = typename ExtIterator::block_type;
-    using buf_ostream_type = buf_ostream<
+    using buf_ostream_type = foxxll::buf_ostream<
               block_type, typename ExtIterator::bids_container_iterator
               >;
 
@@ -222,7 +223,7 @@ void generate(ExtIterator begin, ExtIterator end,
     begin.flush();     // flush container
 
     if (nbuffers == 0)
-        nbuffers = 2 * config::get_instance()->disks_number();
+        nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
     // create buffered write stream for blocks
     buf_ostream_type outstream(begin.bid(), nbuffers);
@@ -287,7 +288,7 @@ ExtIterator find(ExtIterator begin, ExtIterator end,
 {
     if (begin == end)
         return end;
-    using buf_istream_type = buf_istream<
+    using buf_istream_type = foxxll::buf_istream<
               typename ExtIterator::block_type,
               typename ExtIterator::bids_container_iterator
               >;
@@ -295,7 +296,7 @@ ExtIterator find(ExtIterator begin, ExtIterator end,
     begin.flush();     // flush container
 
     if (nbuffers == 0)
-        nbuffers = 2 * config::get_instance()->disks_number();
+        nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
     // create prefetching stream,
     buf_istream_type in(begin.bid(), end.bid() + ((end.block_offset()) ? 1 : 0), nbuffers);

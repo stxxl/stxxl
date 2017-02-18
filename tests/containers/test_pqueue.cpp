@@ -22,7 +22,7 @@
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 
-using stxxl::scoped_print_timer;
+using foxxll::scoped_print_timer;
 
 #define RECORD_SIZE 128
 
@@ -91,13 +91,13 @@ int main()
     STXXL_MSG("AE: " << gen::AE);
 
     const unsigned mem_for_pools = 128 * 1024 * 1024;
-    stxxl::read_write_pool<block_type> pool(
+    foxxll::read_write_pool<block_type> pool(
         (mem_for_pools / 2) / block_type::raw_size,
         (mem_for_pools / 2) / block_type::raw_size
         );
     pq_type p(pool);
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     size_t nelements = 1024 * volume / sizeof(my_type);
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
@@ -146,7 +146,7 @@ int main()
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     return 0;
 }

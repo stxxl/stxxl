@@ -17,16 +17,17 @@
 #ifndef STXXL_ALGO_TRIGGER_ENTRY_HEADER
 #define STXXL_ALGO_TRIGGER_ENTRY_HEADER
 
+#include <foxxll/mng/bid.hpp>
 #include <stxxl/bits/algo/bid_adapter.h>
-#include <stxxl/bits/mng/bid.h>
+#include <stxxl/types>
 
 namespace stxxl {
 
 template <size_t BlockSize, typename RunType, class PosType = int_type>
-struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
+struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, foxxll::BID<BlockSize>, PosType>
 {
     using self_type = runs2bid_array_adaptor<BlockSize, RunType, PosType>;
-    using data_type = BID<BlockSize>;
+    using data_type = foxxll::BID<BlockSize>;
 
     enum {
         block_size = BlockSize
@@ -34,15 +35,15 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
 
     size_t dim_size;
 
-    using parent_type = two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>;
+    using parent_type = two2one_dim_array_adapter_base<RunType*, data_type, PosType>;
     using parent_type::array;
     using parent_type::pos;
 
     runs2bid_array_adaptor(RunType** a, PosType p, size_t d)
-        : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a, p), dim_size(d)
+        : two2one_dim_array_adapter_base<RunType*, data_type, PosType>(a, p), dim_size(d)
     { }
     runs2bid_array_adaptor(const self_type& a)
-        : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a), dim_size(a.dim_size)
+        : two2one_dim_array_adapter_base<RunType*, data_type, PosType>(a), dim_size(a.dim_size)
     { }
 
     const self_type& operator = (const self_type& a)
@@ -56,7 +57,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     data_type& operator * ()
     {
         CHECK_RUN_BOUNDS(pos);
-        return (BID<BlockSize>&)((*(array[(pos) % dim_size]))[(pos) / dim_size].bid);
+        return (data_type&)((*(array[(pos) % dim_size]))[(pos) / dim_size].bid);
     }
 
     const data_type* operator -> () const
@@ -69,7 +70,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     {
         n += pos;
         CHECK_RUN_BOUNDS(n);
-        return (BID<BlockSize>&)((*(array[(n) % dim_size]))[(n) / dim_size].bid);
+        return (data_type&)((*(array[(n) % dim_size]))[(n) / dim_size].bid);
     }
 };
 
@@ -77,12 +78,12 @@ BLOCK_ADAPTOR_OPERATORS(runs2bid_array_adaptor)
 
 template <size_t BlockSize, typename RunType, class PosType = int_type>
 struct runs2bid_array_adaptor2
-    : public two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>
+    : public two2one_dim_array_adapter_base<RunType*, foxxll::BID<BlockSize>, PosType>
 {
     using self_type = runs2bid_array_adaptor2<BlockSize, RunType, PosType>;
-    using data_type = BID<BlockSize>;
+    using data_type = foxxll::BID<BlockSize>;
 
-    using base_type = two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>;
+    using base_type = two2one_dim_array_adapter_base<RunType*, data_type, PosType>;
 
     using base_type::pos;
     using base_type::array;
@@ -94,12 +95,12 @@ struct runs2bid_array_adaptor2
     PosType w, h, K;
 
     runs2bid_array_adaptor2(RunType** a, PosType p, int_type _w, int_type _h)
-        : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a, p),
+        : two2one_dim_array_adapter_base<RunType*, data_type, PosType>(a, p),
           w(_w), h(_h), K(_w * _h)
     { }
 
     runs2bid_array_adaptor2(const runs2bid_array_adaptor2& a)
-        : two2one_dim_array_adapter_base<RunType*, BID<BlockSize>, PosType>(a),
+        : two2one_dim_array_adapter_base<RunType*, data_type, PosType>(a),
           w(a.w), h(a.h), K(a.K)
     { }
 
@@ -117,22 +118,22 @@ struct runs2bid_array_adaptor2
     {
         PosType i = pos - K;
         if (i < 0)
-            return (BID<BlockSize>&)((*(array[(pos) % w]))[(pos) / w].bid);
+            return (data_type&)((*(array[(pos) % w]))[(pos) / w].bid);
 
         PosType _w = w;
         _w--;
-        return (BID<BlockSize>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
+        return (data_type&)((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 
     const data_type& operator * () const
     {
         PosType i = pos - K;
         if (i < 0)
-            return (BID<BlockSize>&)((*(array[(pos) % w]))[(pos) / w].bid);
+            return (data_type&)((*(array[(pos) % w]))[(pos) / w].bid);
 
         PosType _w = w;
         _w--;
-        return (BID<BlockSize>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
+        return (data_type&)((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 
     data_type* operator -> ()
@@ -146,11 +147,11 @@ struct runs2bid_array_adaptor2
         n += pos;
         PosType i = n - K;
         if (i < 0)
-            return (BID<BlockSize>&)((*(array[(n) % w]))[(n) / w].bid);
+            return (data_type&)((*(array[(n) % w]))[(n) / w].bid);
 
         PosType _w = w;
         _w--;
-        return (BID<BlockSize>&)((*(array[(i) % _w]))[h + (i / _w)].bid);
+        return (data_type&)((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 };
 

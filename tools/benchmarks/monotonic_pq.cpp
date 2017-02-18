@@ -25,7 +25,6 @@
 #define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
-#include <stxxl/stats>
 #include <stxxl/timer>
 
 const size_t mega = 1024 * 1024;
@@ -123,7 +122,7 @@ int main(int argc, char* argv[])
 
     STXXL_MSG("----------------------------------------");
 
-    stxxl::config::get_instance();
+    foxxll::config::get_instance();
     std::string Flags = std::string("")
 #if STXXL_CHECK_ORDER_IN_SORTS
                         + " STXXL_CHECK_ORDER_IN_SORTS"
@@ -249,8 +248,8 @@ int main(int argc, char* argv[])
     STXXL_MSG("Data type size: " << sizeof(my_type));
     STXXL_MSG("");
 
-    stxxl::stats_data sd_start(*stxxl::stats::get_instance());
-    stxxl::timer Timer;
+    foxxll::stats_data sd_start(*foxxll::stats::get_instance());
+    foxxll::timer Timer;
     Timer.start();
 
     pq_type p(mem_for_pools / 2, mem_for_pools / 2);
@@ -319,7 +318,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-    stxxl::stats_data sd_middle(*stxxl::stats::get_instance());
+    foxxll::stats_data sd_middle(*foxxll::stats::get_instance());
     std::cout << sd_middle - sd_start;
     Timer.reset();
     Timer.start();
@@ -388,8 +387,8 @@ int main(int argc, char* argv[])
 
     STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
-    std::cout << *stxxl::stats::get_instance();
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - sd_middle;
+    std::cout << *foxxll::stats::get_instance();
 
     assert(sum_input == sum_output);
 }

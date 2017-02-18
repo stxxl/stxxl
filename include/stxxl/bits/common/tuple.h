@@ -13,9 +13,9 @@
 #ifndef STXXL_COMMON_TUPLE_HEADER
 #define STXXL_COMMON_TUPLE_HEADER
 
+#include <foxxll/common/tmeta.hpp>
 #include <limits>
 #include <ostream>
-#include <stxxl/bits/common/tmeta.h>
 
 namespace stxxl {
 
@@ -41,13 +41,13 @@ struct tuple_base
     struct item_type
     {
 /*
-        using result =  typename SWITCH<I, CASE<1,first_type,
-                                CASE<2,second_type,
-                                CASE<3,third_type,
-                                CASE<4,fourth_type,
-                                CASE<5,fifth_type,
-                                CASE<6,sixth_type,
-                                CASE<DEFAULT,void
+        using result =  typename foxxll::SWITCH<I, foxxll::CASE<1,first_type,
+                                foxxll::CASE<2,second_type,
+                                foxxll::CASE<3,third_type,
+                                foxxll::CASE<4,fourth_type,
+                                foxxll::CASE<5,fifth_type,
+                                foxxll::CASE<6,sixth_type,
+                                foxxll::CASE<foxxll::DEFAULT,void
                             > > > > > > > >::result ;
 */
     };
@@ -81,14 +81,14 @@ struct tuple
     template <int I>
     struct item_type
     {
-        using result = typename SWITCH<I, CASE<1, first_type,
-                                               CASE<2, second_type,
-                                                    CASE<3, third_type,
-                                                         CASE<4, fourth_type,
-                                                              CASE<5, fifth_type,
-                                                                   CASE<6, sixth_type,
-                                                                        CASE<DEFAULT, void
-                                                                             > > > > > > > >::result;
+        using result = typename foxxll::SWITCH<I, foxxll::CASE<1, first_type,
+                                                               foxxll::CASE<2, second_type,
+                                                                            foxxll::CASE<3, third_type,
+                                                                                         foxxll::CASE<4, fourth_type,
+                                                                                                      foxxll::CASE<5, fifth_type,
+                                                                                                                   foxxll::CASE<6, sixth_type,
+                                                                                                                                foxxll::CASE<foxxll::DEFAULT, void
+                                                                                                                                             > > > > > > > >::result;
     };
 
     //! First tuple component
@@ -181,7 +181,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        using result = typename IF<I == 1, first_type, void>::result;
+        using result = typename foxxll::IF<I == 1, first_type, void>::result;
     };
 
     //! Empty constructor
@@ -235,10 +235,10 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        using result = typename SWITCH<I, CASE<1, first_type,
-                                               CASE<2, second_type,
-                                                    CASE<DEFAULT, void>
-                                                    > > >::result;
+        using result = typename foxxll::SWITCH<I, foxxll::CASE<1, first_type,
+                                                               foxxll::CASE<2, second_type,
+                                                                            foxxll::CASE<foxxll::DEFAULT, void>
+                                                                            > > >::result;
     };
 
     //! First tuple component
@@ -306,11 +306,11 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        using result = typename SWITCH<I, CASE<1, first_type,
-                                               CASE<2, second_type,
-                                                    CASE<3, second_type,
-                                                         CASE<DEFAULT, void>
-                                                         > > > >::result;
+        using result = typename foxxll::SWITCH<I, foxxll::CASE<1, first_type,
+                                                               foxxll::CASE<2, second_type,
+                                                                            foxxll::CASE<3, second_type,
+                                                                                         foxxll::CASE<foxxll::DEFAULT, void>
+                                                                                         > > > >::result;
     };
 
     //! First tuple component
@@ -388,12 +388,12 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     template <int I>
     struct item_type
     {
-        using result = typename SWITCH<I, CASE<1, first_type,
-                                               CASE<2, second_type,
-                                                    CASE<3, third_type,
-                                                         CASE<4, fourth_type,
-                                                              CASE<DEFAULT, void
-                                                                   > > > > > >::result;
+        using result = typename foxxll::SWITCH<I, foxxll::CASE<1, first_type,
+                                                               foxxll::CASE<2, second_type,
+                                                                            foxxll::CASE<3, third_type,
+                                                                                         foxxll::CASE<4, fourth_type,
+                                                                                                      foxxll::CASE<foxxll::DEFAULT, void
+                                                                                                                   > > > > > >::result;
     };
 
     //! First tuple component
@@ -482,13 +482,13 @@ struct tuple<T1, T2, T3, T4, T5, Plug> // NOLINT
     template <int I>
     struct item_type
     {
-        using result = typename SWITCH<I, CASE<1, first_type,
-                                               CASE<2, second_type,
-                                                    CASE<3, third_type,
-                                                         CASE<4, fourth_type,
-                                                              CASE<5, fifth_type,
-                                                                   CASE<DEFAULT, void
-                                                                        > > > > > > >::result;
+        using result = typename foxxll::SWITCH<I, foxxll::CASE<1, first_type,
+                                                               foxxll::CASE<2, second_type,
+                                                                            foxxll::CASE<3, third_type,
+                                                                                         foxxll::CASE<4, fourth_type,
+                                                                                                      foxxll::CASE<5, fifth_type,
+                                                                                                                   foxxll::CASE<foxxll::DEFAULT, void
+                                                                                                                                > > > > > > >::result;
     };
 
     //! First tuple component

@@ -94,7 +94,7 @@ private:
     size_type m_size;
     unsigned int m_height;
     bool m_prefetching_enabled;
-    block_manager* m_bm;
+    foxxll::block_manager* m_bm;
     alloc_strategy_type m_alloc_strategy;
 
     using root_node_type = std::map<key_type, node_bid_type, key_compare>;
@@ -346,7 +346,7 @@ private:
         {
             key_bid_vector_type parent_bids;
 
-            size_t nparents = div_ceil(bids.size(), max_node_elements);
+            size_t nparents = foxxll::div_ceil(bids.size(), max_node_elements);
             assert(nparents >= 2);
             STXXL_VERBOSE1("btree bulk construct"
                            << " bids.size=" << bids.size()
@@ -440,7 +440,7 @@ public:
           m_size(0),
           m_height(2),
           m_prefetching_enabled(true),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
@@ -463,7 +463,7 @@ public:
           m_size(0),
           m_height(2),
           m_prefetching_enabled(true),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
@@ -990,7 +990,7 @@ public:
           m_size(0),
           m_height(2),
           m_prefetching_enabled(true),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
@@ -1024,7 +1024,7 @@ public:
           m_size(0),
           m_height(2),
           m_prefetching_enabled(true),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE1("Creating a btree, addr=" << this);
         STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);

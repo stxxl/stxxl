@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/common/types.hpp>
 #include <stxxl/bits/config.h>
-#include <stxxl/types>
 
 #include <functional>
 #include <limits>

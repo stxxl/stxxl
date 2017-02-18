@@ -21,7 +21,7 @@
 #include <stxxl/scan>
 #include <stxxl/vector>
 
-using stxxl::timestamp;
+using foxxll::timestamp;
 
 template <typename type>
 struct counter
@@ -63,7 +63,7 @@ int main()
     stxxl::vector<int64_t> v(128 * STXXL_DEFAULT_BLOCK_SIZE(int64_t));
     double b, e;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     STXXL_MSG("write " << (v.end() - v.begin()) << " elements ...");
 
@@ -103,7 +103,7 @@ int main()
         STXXL_CHECK2(v[i] == 555, "Error at position " << i);
     }
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     return 0;
 }

@@ -17,7 +17,7 @@
 #ifndef STXXL_ALGO_BID_ADAPTER_HEADER
 #define STXXL_ALGO_BID_ADAPTER_HEADER
 
-#include <stxxl/bits/common/types.h>
+#include <foxxll/common/types.hpp>
 
 #include <iterator>
 

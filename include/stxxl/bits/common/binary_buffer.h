@@ -18,8 +18,8 @@
 #ifndef STXXL_COMMON_BINARY_BUFFER_HEADER
 #define STXXL_COMMON_BINARY_BUFFER_HEADER
 
-#include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/utils.h>
+#include <foxxll/common/types.hpp>
+#include <foxxll/common/utils.hpp>
 
 #include <cassert>
 #include <cstdlib>

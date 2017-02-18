@@ -10,13 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/common/uint_types.hpp>
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/common/uint_types.h>
 #include <stxxl/bits/verbose.h>
 
 #include <sstream>
 
-using stxxl::uint40;
+using foxxll::uint40;
 
 // force instantiation of some tuple types
 template struct stxxl::tuple<int>;

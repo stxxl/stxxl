@@ -104,7 +104,7 @@ void check_42_fill(VectorType& v, typename VectorType::size_type length)
 
 int main()
 {
-    stxxl::config::get_instance();
+    foxxll::config::get_instance();
 
     {
         forty_two _42(42);

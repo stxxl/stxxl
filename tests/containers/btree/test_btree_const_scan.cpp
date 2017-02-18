@@ -44,12 +44,12 @@ std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
     return o;
 }
 using btree_type = stxxl::btree::btree<int, my_type, comp_type,
-                                       NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::simple_random>;
+                                       NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, foxxll::simple_random>;
 
 // forced instantiation
 template class stxxl::btree::btree<
         int, my_type, comp_type,
-        NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::simple_random>;
+        NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, foxxll::simple_random>;
 
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (6 * LEAF_BLOCK_SIZE)
@@ -59,7 +59,7 @@ uint64_t checksum = 0;
 void NC(btree_type& BTree)
 {
     uint64_t sum = 0;
-    stxxl::timer Timer1;
+    foxxll::timer Timer1;
     Timer1.start();
     btree_type::iterator it = BTree.begin(), end = BTree.end();
     for ( ; it != end; ++it)
@@ -73,7 +73,7 @@ void NC(btree_type& BTree)
 void C(btree_type& BTree)
 {
     uint64_t sum = 0;
-    stxxl::timer Timer1;
+    foxxll::timer Timer1;
     Timer1.start();
     btree_type::const_iterator it = BTree.begin(), end = BTree.end();
     for ( ; it != end; ++it)
@@ -112,15 +112,15 @@ int main(int argc, char* argv[])
         btree_type BTree1(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
         btree_type BTree2(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
 
-        //STXXL_MSG(*stxxl::stats::get_instance());
+        //STXXL_MSG(*foxxll::stats::get_instance());
 
         C(BTree1);
 
-        //STXXL_MSG(*stxxl::stats::get_instance());
+        //STXXL_MSG(*foxxll::stats::get_instance());
 
         NC(BTree2);
 
-        //STXXL_MSG(*stxxl::stats::get_instance());
+        //STXXL_MSG(*foxxll::stats::get_instance());
     }
 
     {
@@ -131,15 +131,15 @@ int main(int argc, char* argv[])
         BTree1.disable_prefetching();
         BTree2.disable_prefetching();
 
-        //STXXL_MSG(*stxxl::stats::get_instance());
+        //STXXL_MSG(*foxxll::stats::get_instance());
 
         C(BTree1);
 
-        //STXXL_MSG(*stxxl::stats::get_instance());
+        //STXXL_MSG(*foxxll::stats::get_instance());
 
         NC(BTree2);
 
-        //STXXL_MSG(*stxxl::stats::get_instance());
+        //STXXL_MSG(*foxxll::stats::get_instance());
     }
     STXXL_MSG("All tests passed successfully");
 

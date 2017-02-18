@@ -17,6 +17,7 @@
 #define STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 
 #include <stxxl/bits/containers/pq_mergers.h>
+#include <stxxl/types>
 
 #include <algorithm>
 #include <deque>
@@ -47,7 +48,7 @@ public:
     using compare_type = CompareType;
 
     // kMaxArity / 2  <  arity  <=  kMaxArity
-    enum { arity = Arity, kMaxArity = 1UL << (LOG2<Arity>::ceil) };
+    enum { arity = Arity, kMaxArity = 1UL << (foxxll::LOG2<Arity>::ceil) };
 
     using alloc_strategy = AllocStr;
 
@@ -56,7 +57,7 @@ public:
 
     using bid_container_type = typename std::deque<bid_type>;
 
-    using pool_type = read_write_pool<block_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
 
     //! our type
     using self_type = ext_merger<BlockType, CompareType, Arity, AllocStr>;
@@ -103,7 +104,7 @@ public:
         {
             STXXL_VERBOSE2("ext_merger sequence_state::~sequence_state()");
 
-            block_manager* bm = block_manager::get_instance();
+            foxxll::block_manager* bm = foxxll::block_manager::get_instance();
             bm->delete_blocks(bids.begin(), bids.end());
         }
 
@@ -169,7 +170,7 @@ public:
                     //req-ostream STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
                     if (!(bids.empty()))
                         merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
-                    block_manager::get_instance()->delete_block(bid);
+                    foxxll::block_manager::get_instance()->delete_block(bid);
                     current = 0;
                 }
             }
@@ -411,7 +412,7 @@ public:
         }
 
         // allocate blocks
-        block_manager* bm = block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bid_container_type bids(nblocks);
         bm->new_blocks(alloc_strategy(), bids.begin(), bids.end());
         block_type* first_block = new block_type;
@@ -629,7 +630,7 @@ protected:
                             pool->hint(state.bids.front());  // re-hint, reading might have made a block free
                         state.current = 0;
                         seqs[i] = std::make_pair(state.block->begin() + state.current, state.block->end());
-                        block_manager::get_instance()->delete_block(bid);
+                        foxxll::block_manager::get_instance()->delete_block(bid);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
                         STXXL_VERBOSE1("before " << last_elem << " after " << *seqs[i].first << " newly loaded block " << bid);

@@ -12,9 +12,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/common/cmdline.hpp>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/cmdline>
 
 #if STXXL_HAVE_MALLINFO_PROTO
 
@@ -47,7 +47,7 @@ void print_malloc_stats()
 int do_mallinfo(int argc, char* argv[])
 {
     // parse command line
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
 
     cp.set_description(
         "Allocate some memory and mlock() it to consume physical memory. "

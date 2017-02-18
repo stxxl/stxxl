@@ -15,12 +15,16 @@
 #ifndef STXXL_ALGO_LOSERTREE_HEADER
 #define STXXL_ALGO_LOSERTREE_HEADER
 
-#include <stxxl/bits/common/utils.h>
+#include <foxxll/common/types.hpp>
+#include <foxxll/common/utils.hpp>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/types>
 
 #include <algorithm>
 
 namespace stxxl {
+
+using int_type = int_type;
 
 template <typename RunCursorType,
           typename RunCursorCmpType>
@@ -66,7 +70,7 @@ public:
         : cmp(c)
     {
         int_type i;
-        logK = ilog2_ceil(nruns);
+        logK = foxxll::ilog2_ceil(nruns);
         int_type kReg = k = (int_type(1) << logK);
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);

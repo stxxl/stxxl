@@ -14,13 +14,13 @@
 #ifndef STXXL_COMMON_LOG_HEADER
 #define STXXL_COMMON_LOG_HEADER
 
-#include <stxxl/bits/singleton.h>
+#include <foxxll/singleton.hpp>
 
 #include <fstream>
 
 namespace stxxl {
 
-class logger : public singleton<logger>
+class logger : public foxxll::singleton<logger>
 {
     friend class singleton<logger>;
 

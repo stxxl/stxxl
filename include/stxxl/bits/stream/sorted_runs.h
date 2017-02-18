@@ -15,9 +15,9 @@
 #ifndef STXXL_STREAM_SORTED_RUNS_HEADER
 #define STXXL_STREAM_SORTED_RUNS_HEADER
 
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/typed_block.hpp>
 #include <stxxl/bits/algo/trigger_entry.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/typed_block.h>
 
 #include <foxxll/common/counting_ptr.hpp>
 
@@ -116,7 +116,7 @@ private:
     //! object, then this function can be used to clear its state.
     void deallocate_blocks()
     {
-        block_manager* bm = block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         for (size_t i = 0; i < runs.size(); ++i)
         {
             bm->delete_blocks(make_bid_iterator(runs[i].begin()),

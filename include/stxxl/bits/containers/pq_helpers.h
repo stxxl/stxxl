@@ -16,17 +16,17 @@
 #ifndef STXXL_CONTAINERS_PQ_HELPERS_HEADER
 #define STXXL_CONTAINERS_PQ_HELPERS_HEADER
 
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/common/tmeta.hpp>
+#include <foxxll/mng/block_alloc_strategy.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
+#include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/algo/sort_base.h>
-#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/mng/block_alloc_strategy.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/mng/read_write_pool.h>
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/parallel.h>
 
 #include <algorithm>

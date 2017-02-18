@@ -15,12 +15,13 @@
 //! content and then sorts it using \c stxxl::stream::sort while writing the
 //! sorted output to a different file.
 
+#include <foxxll/io.hpp>
+#include <stxxl/stream>
+#include <stxxl/vector>
+
 #include <algorithm>
 #include <iostream>
 #include <limits>
-#include <stxxl/io>
-#include <stxxl/stream>
-#include <stxxl/vector>
 #include <vector>
 
 struct my_type
@@ -91,10 +92,10 @@ int main(int argc, char** argv)
 
     using vector_type = stxxl::vector<my_type, 1, stxxl::lru_pager<2>, block_size>;
 
-    stxxl::file_ptr in_file = foxxll::make_counting<stxxl::syscall_file>(
-        argv[1], stxxl::file::DIRECT | stxxl::file::RDONLY);
-    stxxl::file_ptr out_file = foxxll::make_counting<stxxl::syscall_file>(
-        argv[2], stxxl::file::DIRECT | stxxl::file::RDWR | stxxl::file::CREAT);
+    foxxll::file_ptr in_file = foxxll::make_counting<foxxll::syscall_file>(
+        argv[1], foxxll::file::DIRECT | foxxll::file::RDONLY);
+    foxxll::file_ptr out_file = foxxll::make_counting<foxxll::syscall_file>(
+        argv[2], foxxll::file::DIRECT | foxxll::file::RDWR | foxxll::file::CREAT);
     vector_type input(in_file);
     vector_type output(out_file);
     output.resize(input.size());

@@ -18,7 +18,7 @@
 #define STXXL_PARALLEL_TYPES_HEADER
 
 #include <cstdlib>
-#include <stxxl/bits/common/types.h>
+#include <foxxll/common/types.hpp>
 
 namespace stxxl {
 namespace parallel {

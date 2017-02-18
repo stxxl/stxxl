@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     }
     {
         // prefetch/write pool with 10 blocks prefetching and 10 block write cache (> D is recommended)
-        stxxl::read_write_pool<ext_stack_type2::block_type> pool(10, 10);
+        foxxll::read_write_pool<ext_stack_type2::block_type> pool(10, 10);
         // create a stack that does not prefetch (level of prefetch aggressiveness 0)
         ext_stack_type2 my_stack(pool, 0);
         size_t test_size = atoi(argv[1]) * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int);

@@ -19,7 +19,6 @@
 //! DOI: 10.1002/spe.844
 
 #include <stxxl/stack>
-#include <stxxl/stats>
 #include <stxxl/timer>
 
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
@@ -65,9 +64,9 @@ void benchmark_insert(stack_type& Stack, uint64_t volume)
     Stack.top() = cur;
     Stack.pop();
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
-    stxxl::timer Timer;
+    foxxll::timer Timer;
     Timer.start();
 
     for (uint64_t i = 0; i < ops; ++i)
@@ -88,7 +87,7 @@ void benchmark_insert(stack_type& Stack, uint64_t volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MiB/s");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 template <typename stack_type>
@@ -100,9 +99,9 @@ void benchmark_delete(stack_type& Stack, uint64_t volume)
 
     value_type cur;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
-    stxxl::timer Timer;
+    foxxll::timer Timer;
     Timer.start();
 
     for (uint64_t i = 0; i < ops; ++i)
@@ -123,7 +122,7 @@ void benchmark_delete(stack_type& Stack, uint64_t volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MiB/s");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 template <class my_record>
@@ -133,7 +132,7 @@ void run_stxxl_growshrink2_stack(uint64_t volume)
                                                        stxxl::grow_shrink2, DISKS, BLOCK_SIZE>::result;
     using block_type = typename stack_type::block_type;
 
-    stxxl::read_write_pool<block_type> pool(DISKS * 4, DISKS * 4);
+    foxxll::read_write_pool<block_type> pool(DISKS * 4, DISKS * 4);
     stack_type Stack(pool);
 
     benchmark_insert(Stack, volume);
@@ -190,7 +189,7 @@ int main(int argc, char* argv[])
     }
 
     int variant = atoi(argv[1]);
-    uint64_t volume = stxxl::atouint64(argv[2]);
+    uint64_t volume = foxxll::atouint64(argv[2]);
 
     STXXL_MSG("Allocating array with size " <<
               MEM_2_RESERVE << " bytes to prevent file buffering.");

@@ -24,7 +24,8 @@ int main()
     int internal_memory = 64 * 1024 * 1024;
     const int small_block_order = 32;  // must be multiple of matrix valueType in bits
 
-    using block_schedular_type = stxxl::block_scheduler<stxxl::matrix_swappable_block<int, small_block_order> >;
+    using block_schedular_type = foxxll::block_scheduler<
+              stxxl::matrix_swappable_block<int, small_block_order> >;
     using matrix_type = stxxl::matrix<int, small_block_order>;
 
     block_schedular_type my_bs(internal_memory);

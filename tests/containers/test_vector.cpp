@@ -72,7 +72,7 @@ void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
     using vector_type = stxxl::vector<
-              element, 2, stxxl::lru_pager<2>, STXXL_DEFAULT_BLOCK_SIZE(element), stxxl::striping>;
+              element, 2, stxxl::lru_pager<2>, STXXL_DEFAULT_BLOCK_SIZE(element), foxxll::striping>;
     vector_type v(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
     // test assignment const_iterator = iterator
@@ -176,7 +176,7 @@ static_assert(std::is_same<stxxl::vector<double>, stxxl::vector<double>::iterato
 static_assert(std::is_same<stxxl::vector<double>, stxxl::vector<double>::const_iterator::vector_type>::value, "Vector const iterator has inconsistent vector type");
 
 // forced instantiation
-template class stxxl::vector<element, 2, stxxl::lru_pager<2>, (1024* 1024), stxxl::striping>;
+template class stxxl::vector<element, 2, stxxl::lru_pager<2>, (1024* 1024), foxxll::striping>;
 template class stxxl::vector<double>;
 template class stxxl::vector_iterator<stxxl::vector<double>::configuration_type>;
 template class stxxl::const_vector_iterator<stxxl::vector<double>::configuration_type>;

@@ -26,8 +26,8 @@ bool test_block_cache()
     const unsigned num_blocks = 64;              // number of blocks to use for this test
     const unsigned cache_size = 8;               // size of cache in blocks
 
-    using subblock_type = stxxl::typed_block<subblock_raw_size, value_type>;
-    using block_type = stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type>;
+    using subblock_type = foxxll::typed_block<subblock_raw_size, value_type>;
+    using block_type = foxxll::typed_block<block_size* sizeof(subblock_type), subblock_type>;
 
     const unsigned subblock_size = subblock_type::size;          // size in values
 
@@ -36,8 +36,8 @@ bool test_block_cache()
 
     // prepare test: allocate blocks, fill them with values and write to disk
     bid_container_type bids(num_blocks);
-    stxxl::block_manager* bm = stxxl::block_manager::get_instance();
-    bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
+    bm->new_blocks(foxxll::striping(), bids.begin(), bids.end());
 
     block_type* block = new block_type;
     for (unsigned i_block = 0; i_block < num_blocks; i_block++) {
@@ -47,7 +47,7 @@ bool test_block_cache()
                 (*block)[i_subblock][i_value] = value_type(value, value);
             }
         }
-        stxxl::request_ptr req = block->write(bids[i_block]);
+        foxxll::request_ptr req = block->write(bids[i_block]);
         req->wait();
     }
 

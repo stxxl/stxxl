@@ -14,14 +14,15 @@
 #ifndef STXXL_CONTAINERS_QUEUE_HEADER
 #define STXXL_CONTAINERS_QUEUE_HEADER
 
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/tmeta.h>
+#include <foxxll/common/simple_vector.hpp>
+#include <foxxll/common/tmeta.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
+#include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/mng/read_write_pool.h>
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/types>
 
 #include <algorithm>
 #include <deque>
@@ -60,11 +61,11 @@ public:
         block_size = BlockSize
     };
 
-    using block_type = typed_block<block_size, value_type>;
-    using bid_type = BID<block_size>;
+    using block_type = foxxll::typed_block<block_size, value_type>;
+    using bid_type = foxxll::BID<block_size>;
 
 private:
-    using pool_type = read_write_pool<block_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
 
     size_type m_size;
     bool delete_pool;
@@ -76,7 +77,7 @@ private:
     alloc_strategy_type alloc_strategy;
     size_t alloc_count;
     std::deque<bid_type> bids;
-    block_manager* bm;
+    foxxll::block_manager* bm;
     size_t blocks2prefetch;
 
 public:
@@ -92,11 +93,11 @@ public:
         : m_size(0),
           delete_pool(true),
           alloc_count(0),
-          bm(block_manager::get_instance())
+          bm(foxxll::block_manager::get_instance())
     {
         const size_t disks =
             (D < 1)
-            ? config::get_instance()->disks_number()
+            ? foxxll::config::get_instance()->disks_number()
             : static_cast<size_t>(D);
 
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(D)");
@@ -114,7 +115,7 @@ public:
         : m_size(0),
           delete_pool(true),
           alloc_count(0),
-          bm(block_manager::get_instance())
+          bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
         pool = new pool_type(p_pool_size, w_pool_size);
@@ -133,7 +134,7 @@ public:
           delete_pool(false),
           pool(&pool_),
           alloc_count(0),
-          bm(block_manager::get_instance())
+          bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
         init(blocks2prefetch_);
@@ -309,7 +310,7 @@ public:
             STXXL_VERBOSE1("queue::pop Case 5");
 
             assert(!bids.empty());
-            request_ptr req = pool->read(front_block, bids.front());
+            foxxll::request_ptr req = pool->read(front_block, bids.front());
             STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << FMT_BID(bids.front()));
 
             // give prefetching hints

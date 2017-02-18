@@ -17,7 +17,8 @@
 int main()
 {
     // template parameter <value_type, page_size, number_of_pages, block_size, alloc_strategy, paging_strategy>
-    using vector_type = stxxl::vector<unsigned int, 4, stxxl::lru_pager<8>, 1*1024*1024, stxxl::random_cyclic>;
+    using vector_type = stxxl::vector<
+              unsigned int, 4, stxxl::lru_pager<8>, 1*1024*1024, foxxll::random_cyclic>;
 
     vector_type my_vector;
     unsigned int counter = 0;

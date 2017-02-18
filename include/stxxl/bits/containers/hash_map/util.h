@@ -15,11 +15,12 @@
 #define STXXL_CONTAINERS_HASH_MAP_UTIL_HEADER
 #define STXXL_CONTAINERS_HASHMAP__UTIL_H
 
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/buf_writer.h>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/buf_writer.hpp>
 
 #include <stxxl/bits/containers/hash_map/block_cache.h>
 #include <stxxl/bits/containers/hash_map/tuning.h>
+#include <stxxl/types>
 
 namespace stxxl {
 namespace hash_map {
@@ -316,7 +317,7 @@ public:
     using subblock_type = typename block_type::value_type;
     using value_type = typename subblock_type::value_type;
 
-    using writer_type = stxxl::buffered_writer<block_type>;
+    using writer_type = foxxll::buffered_writer<block_type>;
 
     enum {
         block_size = block_type::size,
@@ -350,7 +351,7 @@ public:
           bids_(c),
           i_block_(0),
           i_value_(0),
-          increase_(config::get_instance()->disks_number() * 3)
+          increase_(foxxll::config::get_instance()->disks_number() * 3)
     {
         block_ = writer_.get_free_block();
     }
@@ -393,8 +394,8 @@ public:
             if (i_block_ == bids_->size())
             {
                 bids_->resize(bids_->size() + increase_);
-                block_manager* bm = stxxl::block_manager::get_instance();
-                bm->new_blocks(striping(), bids_->end() - increase_, bids_->end());
+                foxxll::block_manager* bm = foxxll::block_manager::get_instance();
+                bm->new_blocks(foxxll::striping(), bids_->end() - increase_, bids_->end());
             }
             // ... and write current block
             block_ = writer_.write(block_, (*bids_)[i_block_]);
@@ -418,8 +419,8 @@ public:
         if (i_block_ == bids_->size())
         {
             bids_->resize(bids_->size() + increase_);
-            block_manager* bm = stxxl::block_manager::get_instance();
-            bm->new_blocks(striping(), bids_->end() - increase_, bids_->end());
+            foxxll::block_manager* bm = foxxll::block_manager::get_instance();
+            bm->new_blocks(foxxll::striping(), bids_->end() - increase_, bids_->end());
         }
         block_ = writer_.write(block_, (*bids_)[i_block_]);
         i_block_++;

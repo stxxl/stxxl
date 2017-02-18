@@ -17,13 +17,13 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
+#include <foxxll/common/simple_vector.hpp>
+#include <foxxll/common/utils.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/buf_istream.hpp>
+#include <foxxll/mng/buf_ostream.hpp>
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/buf_istream.h>
-#include <stxxl/bits/mng/buf_ostream.h>
 
 #include <algorithm>
 
@@ -86,25 +86,25 @@ public:
     using bid_type = BIDType;
     using reference = bid_type &;
     using alloc_strategy = AllocStrategy;
-    using size_type = typename simple_vector<bid_type>::size_type;
-    using iterator = typename simple_vector<bid_type>::iterator;
+    using size_type = typename foxxll::simple_vector<bid_type>::size_type;
+    using iterator = typename foxxll::simple_vector<bid_type>::iterator;
 
 protected:
-    simple_vector<bid_type>* bids;
+    foxxll::simple_vector<bid_type>* bids;
     alloc_strategy alloc_strategy_;
 
 public:
     bid_sequence() : bids(nullptr) { }
     explicit bid_sequence(size_type size_)
     {
-        bids = new simple_vector<bid_type>(size_);
-        block_manager* mng = block_manager::get_instance();
+        bids = new foxxll::simple_vector<bid_type>(size_);
+        foxxll::block_manager* mng = foxxll::block_manager::get_instance();
         mng->new_blocks(alloc_strategy_, bids->begin(), bids->end());
     }
     void init(size_type size_)
     {
-        bids = new simple_vector<bid_type>(size_);
-        block_manager* mng = block_manager::get_instance();
+        bids = new foxxll::simple_vector<bid_type>(size_);
+        foxxll::block_manager* mng = foxxll::block_manager::get_instance();
         mng->new_blocks(alloc_strategy_, bids->begin(), bids->end());
     }
     reference operator [] (size_type i)
@@ -113,8 +113,8 @@ public:
         if (i < size_)
             return *(bids->begin() + i);
 
-        block_manager* mng = block_manager::get_instance();
-        simple_vector<bid_type>* larger_bids = new simple_vector<bid_type>((i + 1) * 2);
+        foxxll::block_manager* mng = foxxll::block_manager::get_instance();
+        foxxll::simple_vector<bid_type>* larger_bids = new foxxll::simple_vector<bid_type>((i + 1) * 2);
         std::copy(bids->begin(), bids->end(), larger_bids->begin());
         mng->new_blocks(alloc_strategy_, larger_bids->begin() + size_, larger_bids->end());
         delete bids;
@@ -125,7 +125,7 @@ public:
     iterator begin() { return bids->begin(); }
     ~bid_sequence()
     {
-        block_manager::get_instance()->delete_blocks(bids->begin(), bids->end());
+        foxxll::block_manager::get_instance()->delete_blocks(bids->begin(), bids->end());
         delete bids;
     }
 };
@@ -147,14 +147,14 @@ void distribute(
     using block_type = typename ExtIterator::block_type;
     using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
-    using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
+    using buf_istream_type = foxxll::buf_istream<block_type, bids_container_iterator>;
 
     int_type i = 0;
 
     buf_istream_type in(first.bid(), last.bid() + ((first.block_offset()) ? 1 : 0),
                         nread_buffers);
 
-    buffered_writer<block_type> out(
+    foxxll::buffered_writer<block_type> out(
         nbuckets + nwrite_buffers,
         nwrite_buffers);
 
@@ -231,13 +231,14 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     using alloc_strategy = typename ExtIterator::vector_type::alloc_strategy_type;
     using bucket_bids_type = stable_ksort_local::bid_sequence<bid_type, alloc_strategy>;
     using type_key_ = stable_ksort_local::type_key<value_type>;
+    using request_ptr = foxxll::request_ptr;
 
     first.flush();     // flush container
 
-    double begin = timestamp();
+    double begin = foxxll::timestamp();
 
     size_t i = 0;
-    config* cfg = config::get_instance();
+    foxxll::config* cfg = foxxll::config::get_instance();
     const size_t m = M / block_type::raw_size;
     assert(2 * block_type::raw_size <= M);
     const size_t write_buffers_multiple = 2;
@@ -245,15 +246,15 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     const size_t ndisks = cfg->disks_number();
     const size_t min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const size_t nmaxbuckets = m - min_num_read_write_buffers;
-    const unsigned int lognbuckets = ilog2_floor(nmaxbuckets);
+    const unsigned int lognbuckets = foxxll::ilog2_floor(nmaxbuckets);
     const size_t nbuckets = size_t(1) << lognbuckets;
-    const size_t est_bucket_size = (size_t)div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
+    const size_t est_bucket_size = (size_t)foxxll::div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
         STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
                      ", required for r/w buffers: " << min_num_read_write_buffers <<
                      ", required for buckets: 2, nbuckets: " << nbuckets);
-        throw bad_parameter("stxxl::stable_ksort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
+        throw foxxll::bad_parameter("stxxl::stable_ksort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
     }
     STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
     STXXL_VERBOSE_STABLE_KSORT("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
@@ -269,7 +270,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
 
     int64_t* bucket_sizes = new int64_t[nbuckets];
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
     stable_ksort_local::distribute(
         bucket_bids,
@@ -281,8 +282,8 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         nread_buffers,
         nwrite_buffers);
 
-    double dist_end = timestamp(), end;
-    double io_wait_after_d = stats::get_instance()->get_io_wait_time();
+    double dist_end = foxxll::timestamp(), end;
+    double io_wait_after_d = foxxll::stats::get_instance()->get_io_wait_time();
 
     {
         // sort buckets
@@ -305,7 +306,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
-        const int_type max_bucket_size_act_bl = (int_type)div_ceil(max_bucket_size_act, block_type::size);
+        const int_type max_bucket_size_act_bl = (int_type)foxxll::div_ceil(max_bucket_size_act, block_type::size);
         STXXL_VERBOSE_STABLE_KSORT("Reducing required number of required blocks per bucket from " <<
                                    max_bucket_size_bl << " to " << max_bucket_size_act_bl);
         max_bucket_size_rec = max_bucket_size_act;
@@ -313,10 +314,10 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         const size_t nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
         STXXL_VERBOSE_STABLE_KSORT("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
-        using buf_ostream_type = buf_ostream<block_type, bids_container_iterator>;
+        using buf_ostream_type = foxxll::buf_ostream<block_type, bids_container_iterator>;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
-        disk_queues::get_instance()->set_priority_op(request_queue::READ);
+        foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::READ);
 
         if (first.block_offset())
         {
@@ -340,16 +341,17 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         type_key_* refs2 = new type_key_[(size_t)max_bucket_size_rec];
 
         // submit reading first 2 buckets (Peter's scheme)
-        size_t nbucket_blocks = (size_t)div_ceil(bucket_sizes[0], block_type::size);
+        size_t nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[0], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs1[i] = blocks1[i].read(bucket_bids[0][i]);
 
-        nbucket_blocks = (size_t)div_ceil(bucket_sizes[1], block_type::size);
+        nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[1], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
 
         key_type offset = 0;
-        const unsigned log_k1 = std::max<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+        const unsigned log_k1 = std::max<unsigned>(
+            foxxll::ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
         size_t k1 = size_t(1) << log_k1;
         int_type* bucket1 = new int_type[k1];
 
@@ -361,8 +363,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
 
         for (size_t k = 0; k < nbuckets; k++)
         {
-            nbucket_blocks = (size_t)div_ceil(bucket_sizes[k], block_type::size);
-            const unsigned log_k1_k = std::max<unsigned>(ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+            nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[k], block_type::size);
+            const unsigned log_k1_k = std::max<unsigned>(
+                foxxll::ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
             k1 = (size_t)(1) << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
@@ -398,7 +401,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
                 type_key_* cEnd = refs2 + bucket1[i];
                 type_key_* dEnd = refs1 + bucket1[i];
 
-                const unsigned log_k2 = ilog2_floor(bucket1[i]) - 1;        // adaptive bucket size
+                const unsigned log_k2 = foxxll::ilog2_floor(bucket1[i]) - 1;        // adaptive bucket size
                 const size_t k2 = size_t(1) << log_k2;
                 int_type* bucket2 = new int_type[k2];
                 const unsigned shift2 = shift1 - log_k2;
@@ -420,7 +423,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
             const size_t bucket2submit = k + 2;
             if (bucket2submit < nbuckets)
             {
-                nbucket_blocks = (size_t)div_ceil(bucket_sizes[bucket2submit], block_type::size);
+                nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[bucket2submit], block_type::size);
                 for (i = 0; i < nbucket_blocks; i++)
                     reqs1[i] = blocks1[i].read(bucket_bids[bucket2submit][i]);
             }
@@ -453,13 +456,13 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
             delete block;
         }
 
-        end = timestamp();
+        end = foxxll::timestamp();
     }
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Distribution time: " <<
                   dist_end - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
-    STXXL_VERBOSE(*stats::get_instance());
+    STXXL_VERBOSE(*foxxll::stats::get_instance());
 }
 
 //! \}

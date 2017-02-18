@@ -14,16 +14,16 @@
 #define STXXL_CONTAINERS_HASH_MAP_TUNING_HEADER
 #define _STXXL_TUNING_H_
 
-#include <stxxl/bits/singleton.h>
-#include <stxxl/mng>
+#include <foxxll/mng.hpp>
+#include <foxxll/singleton.hpp>
 
 namespace stxxl {
 namespace hash_map {
 
 //! Tuning parameters for external memory hash map.
-class tuning : public singleton<tuning>
+class tuning : public foxxll::singleton<tuning>
 {
-    friend class singleton<tuning>;
+    friend class foxxll::singleton<tuning>;
 
 public:
     //! see buffered_reader
@@ -36,9 +36,9 @@ public:
 private:
     /*! set reasonable default values for tuning params */
     tuning()
-        : prefetch_page_size(config::get_instance()->disks_number() * 2),
+        : prefetch_page_size(foxxll::config::get_instance()->disks_number() * 2),
           prefetch_pages(2),
-          blockcache_size(config::get_instance()->disks_number() * 12)
+          blockcache_size(foxxll::config::get_instance()->disks_number() * 12)
     { }
 };
 

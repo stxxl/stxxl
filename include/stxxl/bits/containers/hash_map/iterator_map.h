@@ -47,7 +47,7 @@ private:
     {
         size_t operator () (const internal_size_type& key) const
         {
-            return longhash1(key);
+            return foxxll::longhash1(key);
         }
 #if STXXL_MSVC
         bool operator () (const internal_size_type& a, const internal_size_type& b) const

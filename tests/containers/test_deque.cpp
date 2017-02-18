@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     stxxl::deque<int> XXLDeque;
     std::deque<int> STDDeque;
 
-    uint64_t ops = stxxl::atouint64(argv[1]);
+    uint64_t ops = foxxll::atouint64(argv[1]);
     for (uint64_t i = 0; i < ops; ++i)
     {
         unsigned curOP = rand() % 6;

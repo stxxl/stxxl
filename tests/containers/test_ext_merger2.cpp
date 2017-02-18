@@ -15,7 +15,7 @@
 #include <stxxl/priority_queue>
 
 using my_type = int;
-using block_type = stxxl::typed_block<4096, my_type>;
+using block_type = foxxll::typed_block<4096, my_type>;
 
 struct dummy_merger
 {
@@ -62,7 +62,7 @@ template class stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5>;
 
 int main()
 {
-    stxxl::config::get_instance();
+    foxxll::config::get_instance();
     const size_t B = block_type::size;
     dummy_merger dummy;
 
@@ -95,7 +95,7 @@ int main()
     }
 
     if (1) { // ext_merger test
-        stxxl::read_write_pool<block_type> pool(1, 2);
+        foxxll::read_write_pool<block_type> pool(1, 2);
         stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger;
         merger.set_pool(&pool);
         dummy(1, 0);

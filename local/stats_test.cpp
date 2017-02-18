@@ -15,13 +15,13 @@
  **************************************************************************/
 
 #include <stxxl/sequence>
-#include <stxxl/bits/io/iostats.h>
+#include <foxxll/io/iostats.hpp>
 
 int main()
 {
-    stxxl::stats* Stats = stxxl::stats::get_instance();
+    foxxll::stats* Stats = foxxll::stats::get_instance();
 
-    stxxl::stats_data stats_begin(*Stats);
+    foxxll::stats_data stats_begin(*Stats);
 
     stxxl::sequence<uint64_t> seq(60, 60);
 
@@ -31,5 +31,5 @@ int main()
     for(auto stream = seq.get_stream(); !stream.empty(); ++stream){}
 
     std::cout << "--------------------------------------------" << std::endl;
-    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
+    std::cout << (foxxll::stats_data(*Stats) - stats_begin);
 }

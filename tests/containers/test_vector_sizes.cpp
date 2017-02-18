@@ -12,7 +12,7 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
-#include <stxxl/io>
+#include <foxxll/io.hpp>
 #include <stxxl/vector>
 
 using my_type = int;
@@ -21,8 +21,8 @@ using block_type = vector_type::block_type;
 
 void test_write(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
-    stxxl::file_ptr f = stxxl::create_file(
-        ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
+    foxxll::file_ptr f = foxxll::create_file(
+        ft, fn, foxxll::file::CREAT | foxxll::file::DIRECT | foxxll::file::RDWR);
     {
         vector_type v(f);
         v.resize(sz);
@@ -35,8 +35,8 @@ void test_write(const char* fn, const char* ft, size_t sz, my_type ofs)
 template <typename Vector>
 void test_rdwr(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
-    stxxl::file_ptr f = stxxl::create_file(
-        ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+    foxxll::file_ptr f = foxxll::create_file(
+        ft, fn, foxxll::file::DIRECT | foxxll::file::RDWR);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
@@ -49,8 +49,8 @@ void test_rdwr(const char* fn, const char* ft, size_t sz, my_type ofs)
 template <typename Vector>
 void test_rdonly(const char* fn, const char* ft, size_t sz, my_type ofs)
 {
-    stxxl::file_ptr f = stxxl::create_file(
-        ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
+    foxxll::file_ptr f = foxxll::create_file(
+        ft, fn, foxxll::file::DIRECT | foxxll::file::RDONLY);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    stxxl::config::get_instance();
+    foxxll::config::get_instance();
 
     const char* fn = argv[1];
     const char* ft = (argc >= 3) ? argv[2] : "syscall";
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
     // truncate 1 byte
     {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
         STXXL_MSG("file size is " << f.size() << " bytes");
         f.set_size(f.size() - 1);
         STXXL_MSG("truncated to " << f.size() << " bytes");
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 
     // truncate 1 more byte
     {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
         STXXL_MSG("file size is " << f.size() << " bytes");
         f.set_size(f.size() - 1);
         STXXL_MSG("truncated to " << f.size() << " bytes");
@@ -132,13 +132,13 @@ int main(int argc, char** argv)
 
     // check final size
     {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
         STXXL_MSG("file size is " << f.size() << " bytes");
         STXXL_CHECK(f.size() == (start_elements + 4096 + 23 - 1) * sizeof(my_type) - 1);
     }
 
     {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
         f.close_remove();
     }
 }

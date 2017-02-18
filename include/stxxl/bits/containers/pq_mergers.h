@@ -259,7 +259,7 @@ public:
     using compare_type = CompareType;
 
     // arity_bound / 2  <  arity  <=  arity_bound
-    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
+    enum { arity = Arity, max_arity = 1UL << (foxxll::LOG2<Arity>::ceil) };
 
     //! type of values stored in the arrays container
     using value_type = typename arrays_type::value_type;
@@ -793,7 +793,7 @@ public:
     using compare_type = CompareType;
 
     // arity_bound / 2  <  arity  <=  arity_bound
-    enum { arity = Arity, max_arity = 1UL << (LOG2<Arity>::ceil) };
+    enum { arity = Arity, max_arity = 1UL << (foxxll::LOG2<Arity>::ceil) };
 
     //! type of values stored in the arrays container
     using value_type = typename arrays_type::value_type;

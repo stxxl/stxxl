@@ -141,7 +141,7 @@ int main()
     input_array_type input;
     output_array_type output;
 
-    stxxl::stats* s = stxxl::stats::get_instance();
+    foxxll::stats* s = foxxll::stats::get_instance();
 
     std::cout << *s;
 
@@ -226,7 +226,7 @@ int main()
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
     //convenience function based on streaming
     stxxl::sort<1024* 1024>(InternalArray.begin(), InternalArray.end(),
-                            cmp_int(), 1024 * 1024 * 31, stxxl::random_cyclic());
+                            cmp_int(), 1024 * 1024 * 31, foxxll::random_cyclic());
 
     return 0;
 }

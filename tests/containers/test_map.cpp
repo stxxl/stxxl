@@ -12,7 +12,6 @@
  **************************************************************************/
 
 #include <stxxl/map>
-#include <stxxl/stats>
 
 #include <algorithm>
 #include <cmath>
@@ -44,8 +43,8 @@ template class stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE>;
 
 int main(int argc, char** argv)
 {
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
-    stxxl::stats_data stats_elapsed;
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
+    foxxll::stats_data stats_elapsed;
     STXXL_MSG(stats_begin);
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
@@ -53,7 +52,7 @@ int main(int argc, char** argv)
     int max_mult = (argc > 1) ? atoi(argv[1]) : 256;
     for (int mult = 1; mult < max_mult; mult *= 2)
     {
-        stats_begin = *stxxl::stats::get_instance();
+        stats_begin = *foxxll::stats::get_instance();
         const size_t el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
@@ -68,7 +67,7 @@ int main(int argc, char** argv)
             Map[i] = i + 1;
         }
         STXXL_CHECK(Map.size() == el);
-        stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+        stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double writes = double(stats_elapsed.get_write_count()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
         STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
@@ -76,7 +75,7 @@ int main(int argc, char** argv)
 
         // search for keys
 
-        stats_begin = *stxxl::stats::get_instance();
+        stats_begin = *foxxll::stats::get_instance();
         STXXL_MSG("Doing search");
         size_t queries = el / 16;
         const map_type& ConstMap = Map;
@@ -88,7 +87,7 @@ int main(int argc, char** argv)
             STXXL_CHECK((*result).second == key + 1);
             STXXL_CHECK(result->second == key + 1);
         }
-        stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+        stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;
         double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);

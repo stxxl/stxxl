@@ -20,7 +20,6 @@
 
 #include <limits>
 #include <stxxl/priority_queue>
-#include <stxxl/stats>
 #include <stxxl/timer>
 
 #define TOTAL_PQ_MEM_SIZE    (768 * 1024 * 1024)
@@ -104,9 +103,9 @@ void run_stxxl_insert_all_delete_all(uint64_t ops)
 
     my_record cur;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
-    stxxl::timer Timer;
+    foxxll::timer Timer;
     Timer.start();
 
     for (uint64_t i = 0; i < ops; ++i)
@@ -127,11 +126,11 @@ void run_stxxl_insert_all_delete_all(uint64_t ops)
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     ////////////////////////////////////////////////
 
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
     Timer.reset();
     Timer.start();
 
@@ -152,7 +151,7 @@ void run_stxxl_insert_all_delete_all(uint64_t ops)
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 void run_stxxl_intermixed(uint64_t ops)
@@ -161,9 +160,9 @@ void run_stxxl_intermixed(uint64_t ops)
 
     my_record cur;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
-    stxxl::timer Timer;
+    foxxll::timer Timer;
     Timer.start();
 
     for (uint64_t i = 0; i < ops; ++i)
@@ -184,11 +183,11 @@ void run_stxxl_intermixed(uint64_t ops)
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     ////////////////////////////////////////////////
 
-    stats_begin = *stxxl::stats::get_instance();
+    stats_begin = *foxxll::stats::get_instance();
     Timer.reset();
     Timer.start();
 
@@ -214,12 +213,12 @@ void run_stxxl_intermixed(uint64_t ops)
     STXXL_MSG("Deletions/Insertion elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 int main(int argc, char* argv[])
 {
-    STXXL_MSG("stxxl::pq lock size: " << BLOCK_SIZE << " bytes");
+    STXXL_MSG("foxxll::pq lock size: " << BLOCK_SIZE << " bytes");
 
 #if STXXL_DIRECT_IO_OFF
     STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");
@@ -236,7 +235,7 @@ int main(int argc, char* argv[])
     }
 
     int version = atoi(argv[1]);
-    uint64_t ops = stxxl::atouint64(argv[2]);
+    uint64_t ops = foxxll::atouint64(argv[2]);
 
     STXXL_MSG("Running version      : " << version);
     STXXL_MSG("Operations to perform: " << ops);

@@ -13,8 +13,8 @@
 #ifndef STXXL_COMMON_CUSTOM_STATS_HEADER
 #define STXXL_COMMON_CUSTOM_STATS_HEADER
 
-#include <stxxl/bits/common/timer.h>
-#include <stxxl/bits/common/utils.h>
+#include <foxxll/common/timer.hpp>
+#include <foxxll/common/utils.hpp>
 
 #include <algorithm>
 #include <string>

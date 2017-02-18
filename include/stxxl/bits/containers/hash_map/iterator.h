@@ -14,7 +14,7 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_ITERATOR_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_ITERATOR_HEADER
 
-#include <stxxl/bits/mng/block_manager.h>
+#include <foxxll/mng/block_manager.hpp>
 
 #include <stxxl/bits/containers/hash_map/util.h>
 

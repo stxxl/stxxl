@@ -17,12 +17,12 @@ static const char* description =
     "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
+#include <foxxll/common/cmdline.hpp>
+#include <foxxll/unused.hpp>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
-#include <stxxl/bits/unused.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/cmdline>
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
@@ -38,7 +38,7 @@ static const char* description =
   #include <omp.h>
 #endif
 
-using stxxl::scoped_print_timer;
+using foxxll::scoped_print_timer;
 using stxxl::random_number32_r;
 
 static const size_t KiB = 1024L;
@@ -536,7 +536,7 @@ public:
  * Timer and Statistics
  */
 
-class scoped_stats : public stxxl::scoped_print_timer
+class scoped_stats : public foxxll::scoped_print_timer
 {
 protected:
     //! short name of tested PQ
@@ -546,7 +546,7 @@ protected:
     std::string m_op;
 
     //! stxxl stats at start of operation
-    stxxl::stats_data m_stxxl_stats;
+    foxxll::stats_data m_stxxl_stats;
 
     //! size of values in container
     size_t m_value_size;
@@ -556,19 +556,19 @@ public:
     scoped_stats(ContainerType& c, const std::string& op,
                  const std::string& message,
                  unsigned int rwcycles = 1)
-        : stxxl::scoped_print_timer(message,
-                                    rwcycles * num_elements *
-                                    ContainerType::value_type::value_size),
+        : foxxll::scoped_print_timer(message,
+                                     rwcycles * num_elements *
+                                     ContainerType::value_type::value_size),
           m_shortname(c.shortname()),
           m_op(op),
-          m_stxxl_stats(*stxxl::stats::get_instance()),
+          m_stxxl_stats(*foxxll::stats::get_instance()),
           m_value_size(ContainerType::value_type::value_size)
     { }
 
     ~scoped_stats()
     {
-        stxxl::stats_data s =
-            stxxl::stats_data(*stxxl::stats::get_instance()) - m_stxxl_stats;
+        foxxll::stats_data s =
+            foxxll::stats_data(*foxxll::stats::get_instance()) - m_stxxl_stats;
 
         const char* hostname = getenv("HOSTNAME");
 
@@ -1723,7 +1723,7 @@ int main(int argc, char* argv[])
     std::string opt_queue = "ppq";
     std::string opt_benchmark = "undefined";
 
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
     cp.set_description(description);
 
     cp.add_param_string(
@@ -1794,7 +1794,7 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     if (opt_queue == "ppq")
     {
@@ -1863,7 +1863,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     return EXIT_SUCCESS;
 }

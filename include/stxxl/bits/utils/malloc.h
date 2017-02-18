@@ -14,8 +14,8 @@
 #ifndef STXXL_UTILS_MALLOC_HEADER
 #define STXXL_UTILS_MALLOC_HEADER
 
+#include <foxxll/unused.hpp>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/unused.h>
 
 #include <ostream>
 #if STXXL_HAVE_MALLINFO_PROTO

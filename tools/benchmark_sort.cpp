@@ -16,8 +16,8 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
+#include <foxxll/common/cmdline.hpp>
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/cmdline>
 #include <stxxl/ksort>
 #include <stxxl/sort>
 #include <stxxl/stream>
@@ -26,8 +26,8 @@
 #include <cstdint>
 #include <limits>
 
-using stxxl::timestamp;
-using stxxl::external_size_type;
+using foxxll::timestamp;
+using foxxll::external_size_type;
 
 #define MB (1024 * 1024)
 
@@ -132,7 +132,7 @@ public:
     BenchmarkSort(const char* desc, external_size_type length, size_t memsize)
     {
         // construct vector
-        external_size_type vec_size = stxxl::div_ceil(length, sizeof(ValueType));
+        external_size_type vec_size = foxxll::div_ceil(length, sizeof(ValueType));
 
         stxxl::vector<ValueType> vec(vec_size);
 
@@ -192,7 +192,7 @@ public:
 int benchmark_sort(int argc, char* argv[])
 {
     // parse command line
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
 
     cp.set_description(
         "This program will benchmark the different sorting methods provided by "

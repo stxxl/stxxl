@@ -16,7 +16,14 @@
 #ifndef STXXL_ALGO_SORT_HEADER
 #define STXXL_ALGO_SORT_HEADER
 
-#include <stxxl/bits/mng/async_schedule.h>
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/common/simple_vector.hpp>
+#include <foxxll/io/request_operations.hpp>
+#include <foxxll/mng/async_schedule.hpp>
+#include <foxxll/mng/block_alloc_strategy_interleaved.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/block_prefetcher.hpp>
+#include <foxxll/mng/buf_writer.hpp>
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/intksort.h>
@@ -25,16 +32,9 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/trigger_entry.h>
-#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/settings.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/mng/block_alloc_strategy_interleaved.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/block_prefetcher.h>
-#include <stxxl/bits/mng/buf_writer.h>
 #include <stxxl/bits/parallel.h>
 
 #include <algorithm>
@@ -57,8 +57,8 @@ struct read_next_after_write_completed
     using block_type = BlockType;
     block_type* block;
     BidType bid;
-    request_ptr* req;
-    void operator () (request* /* completed_req */, bool /* success */)
+    foxxll::request_ptr* req;
+    void operator () (foxxll::request* /* completed_req */, bool /* success */)
     {
         * req = block->read(bid);
     }
@@ -79,12 +79,13 @@ create_runs(
 {
     using block_type = BlockType;
     using run_type = RunType;
+    using request_ptr = foxxll::request_ptr;
 
     using bid_type = typename block_type::bid_type;
     STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
 
     int_type m2 = _m / 2;
-    block_manager* bm = block_manager::get_instance();
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
     block_type* Blocks1 = new block_type[m2];
     block_type* Blocks2 = new block_type[m2];
     bid_type* bids1 = new bid_type[m2];
@@ -95,7 +96,7 @@ create_runs(
     read_next_after_write_completed<block_type, bid_type>* next_run_reads =
         new read_next_after_write_completed<block_type, bid_type>[m2];
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
     int_type i;
     int_type run_size = 0;
@@ -214,6 +215,7 @@ bool check_sorted_runs(RunType** runs,
 {
     using block_type = BlockType;
     using value_type = typename block_type::value_type;
+    using request_ptr = foxxll::request_ptr;
 
     STXXL_MSG("check_sorted_runs  Runs: " << nruns);
     size_t irun = 0;
@@ -314,7 +316,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
     using run_type = RunType;
     using value_cmp = ValueCmp;
     using trigger_entry_type = typename run_type::value_type;
-    using prefetcher_type = block_prefetcher<block_type, typename run_type::iterator>;
+    using prefetcher_type = foxxll::block_prefetcher<block_type, typename run_type::iterator>;
     using run_cursor_type = run_cursor2<block_type, prefetcher_type>;
     using run_cursor2_cmp_type = sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp>;
 
@@ -335,7 +337,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
     std::stable_sort(consume_seq.begin(), consume_seq.end(),
                      sort_helper::trigger_entry_cmp<trigger_entry_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
-    int_type disks_number = config::get_instance()->disks_number();
+    int_type disks_number = foxxll::config::get_instance()->disks_number();
 
 #ifdef PLAY_WITH_OPT_PREF
     const int_type n_write_buffers = 4 * disks_number;
@@ -353,7 +355,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        config::get_instance()->get_max_device_id());
+        foxxll::config::get_instance()->get_max_device_id());
 #else
     for (size_t i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;
@@ -365,7 +367,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
                                prefetch_seq,
                                nruns + n_prefetch_buffers);
 
-    buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
+    foxxll::buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
 
     int_type out_run_size = out_run->size();
 
@@ -500,7 +502,7 @@ void merge_runs(RunType** in_runs, int_type nruns,
 
     delete[] prefetch_seq;
 
-    block_manager* bm = block_manager::get_instance();
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
     for (int_type i = 0; i < nruns; ++i)
     {
         size_t sz = in_runs[i]->size();
@@ -515,7 +517,7 @@ template <typename BlockType,
           typename AllocStrategy,
           typename InputBidIterator,
           typename ValueCmp>
-simple_vector<sort_helper::trigger_entry<BlockType> >*
+foxxll::simple_vector<sort_helper::trigger_entry<BlockType> >*
 sort_blocks(InputBidIterator input_bids,
             size_t _n,
             size_t _m,
@@ -527,8 +529,9 @@ sort_blocks(InputBidIterator input_bids,
     using value_cmp = ValueCmp;
     using bid_type = typename block_type::bid_type;
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
-    using run_type = simple_vector<trigger_entry_type>;
-    using interleaved_alloc_strategy = typename interleaved_alloc_traits<alloc_strategy>::strategy;
+    using run_type = foxxll::simple_vector<trigger_entry_type>;
+    using interleaved_alloc_strategy =
+              typename foxxll::interleaved_alloc_traits<alloc_strategy>::strategy;
 
     size_t m2 = _m / 2;
     size_t full_runs = _n / m2;
@@ -536,11 +539,11 @@ sort_blocks(InputBidIterator input_bids,
     size_t nruns = full_runs + partial_runs;
     size_t i;
 
-    block_manager* mng = block_manager::get_instance();
+    foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
     //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
-    double begin = timestamp(), after_runs_creation, end;
+    double begin = foxxll::timestamp(), after_runs_creation, end;
 
     run_type** runs = new run_type*[nruns];
 
@@ -560,18 +563,18 @@ sort_blocks(InputBidIterator input_bids,
                             input_bid_iterator,
                             value_cmp>(input_bids, runs, nruns, _m, cmp);
 
-    after_runs_creation = timestamp();
+    after_runs_creation = foxxll::timestamp();
 
-    double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
+    double io_wait_after_rf = foxxll::stats::get_instance()->get_io_wait_time();
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
     const int_type merge_factor = optimal_merge_factor(nruns, _m);
     run_type** new_runs;
 
     while (nruns > 1)
     {
-        int_type new_nruns = div_ceil(nruns, merge_factor);
+        int_type new_nruns = foxxll::div_ceil(nruns, merge_factor);
         STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                       " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 
@@ -607,14 +610,14 @@ sort_blocks(InputBidIterator input_bids,
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(fully_random(), firstBID);
+                mng->new_block(foxxll::fully_random(), firstBID);
             }
             bid_type& lastBID = (*new_runs[0])[_n - 1].bid;
             if (lastBID.is_managed())
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_block(fully_random(), lastBID);
+                mng->new_block(foxxll::fully_random(), lastBID);
             }
         }
         else
@@ -649,12 +652,12 @@ sort_blocks(InputBidIterator input_bids,
     run_type* result = *runs;
     delete[] runs;
 
-    end = timestamp();
+    end = foxxll::timestamp();
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                   after_runs_creation - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-    STXXL_VERBOSE(*stats::get_instance());
+    STXXL_VERBOSE(*foxxll::stats::get_instance());
 
     return result;
 }
@@ -691,11 +694,11 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
     using alloc_strategy_type = typename ExtIterator::vector_type::alloc_strategy_type;
     using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
-    using run_type = simple_vector<sort_helper::trigger_entry<block_type> >;
+    using run_type = foxxll::simple_vector<sort_helper::trigger_entry<block_type> >;
 
     size_t n = 0;
 
-    block_manager* mng = block_manager::get_instance();
+    foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
     first.flush();
 
@@ -706,7 +709,8 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
     else
     {
         if (!(2 * block_type::raw_size * (size_t)sort_memory_usage_factor() <= M)) {
-            throw bad_parameter("stxxl::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
+            throw foxxll::bad_parameter(
+                      "stxxl::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
         }
 
         if (first.block_offset())
@@ -717,11 +721,11 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
                 block_type* first_block = new block_type;
                 block_type* last_block = new block_type;
                 typename ExtIterator::bid_type first_bid, last_bid;
-                request_ptr req;
+                foxxll::request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(fully_random(), first_bid);                // try to overlap
-                mng->new_block(fully_random(), last_bid);
+                mng->new_block(foxxll::fully_random(), first_bid);                // try to overlap
+                mng->new_block(foxxll::fully_random(), last_bid);
                 req->wait();
 
                 req = last_block->read(*last.bid());
@@ -764,7 +768,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
                 last_block = new block_type;
                 block_type* sorted_first_block = new block_type;
                 block_type* sorted_last_block = new block_type;
-                request_ptr* reqs = new request_ptr[2];
+                foxxll::request_ptr* reqs = new foxxll::request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
                 reqs[1] = sorted_first_block->read((*(out->begin())).bid);
@@ -826,10 +830,10 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
                 // not the first element of its block
                 block_type* first_block = new block_type;
                 bid_type first_bid;
-                request_ptr req;
+                foxxll::request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_block(fully_random(), first_bid);                // try to overlap
+                mng->new_block(foxxll::fully_random(), first_bid);                // try to overlap
                 req->wait();
 
                 size_t i = 0;
@@ -858,7 +862,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
 
                 block_type* sorted_first_block = new block_type;
 
-                request_ptr* reqs = new request_ptr[2];
+                foxxll::request_ptr* reqs = new foxxll::request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
                 reqs[1] = sorted_first_block->read((*(out->begin())).bid);
@@ -905,11 +909,11 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
             {
                 block_type* last_block = new block_type;
                 bid_type last_bid;
-                request_ptr req;
+                foxxll::request_ptr req;
                 size_t i;
 
                 req = last_block->read(*last.bid());
-                mng->new_block(fully_random(), last_bid);
+                mng->new_block(foxxll::fully_random(), last_bid);
                 req->wait();
 
                 for (i = last.block_offset(); i < block_type::size; ++i)
@@ -935,7 +939,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
 
                 last_block = new block_type;
                 block_type* sorted_last_block = new block_type;
-                request_ptr* reqs = new request_ptr[2];
+                foxxll::request_ptr* reqs = new foxxll::request_ptr[2];
 
                 reqs[0] = last_block->read(last_bid);
                 reqs[1] = sorted_last_block->read(((*out)[out->size() - 1]).bid);

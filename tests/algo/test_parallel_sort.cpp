@@ -100,13 +100,13 @@ void linear_sort_normal(vector_type& input)
 {
     my_type::key_type sum1 = checksum(input);
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
-    double start = stxxl::timestamp();
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
+    double start = foxxll::timestamp();
 
     stxxl::sort(input.begin(), input.end(), cmp_less_key(), run_size);
 
-    double stop = stxxl::timestamp();
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    double stop = foxxll::timestamp();
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     my_type::key_type sum2 = checksum(input);
 
@@ -121,8 +121,8 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 {
     my_type::key_type sum1 = checksum(input);
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
-    double start = stxxl::timestamp();
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
+    double start = foxxll::timestamp();
 
     using input_stream_type = stxxl::stream::streamify_traits<vector_type::iterator>::stream_type;
 
@@ -138,8 +138,8 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
     STXXL_CHECK(o == output.end());
 
-    double stop = stxxl::timestamp();
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    double stop = foxxll::timestamp();
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     my_type::key_type sum2 = checksum(output);
 
@@ -159,7 +159,7 @@ int main(int argc, const char** argv)
         return -1;
     }
 
-    stxxl::config::get_instance();
+    foxxll::config::get_instance();
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
@@ -231,13 +231,13 @@ int main(int argc, const char** argv)
         uint64_t(megabytes_to_process) * uint64_t(megabyte) / sizeof(my_type);
     vector_type input(n_records);
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
-    double generate_start = stxxl::timestamp();
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
+    double generate_start = foxxll::timestamp();
 
     stxxl::generate(input.begin(), input.end(), stxxl::random_number64(), memory_to_use / STXXL_DEFAULT_BLOCK_SIZE(my_type));
 
-    double generate_stop = stxxl::timestamp();
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    double generate_stop = foxxll::timestamp();
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 

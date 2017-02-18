@@ -14,7 +14,7 @@
 #ifndef STXXL_ALGO_RUN_CURSOR_HEADER
 #define STXXL_ALGO_RUN_CURSOR_HEADER
 
-#include <stxxl/bits/common/types.h>
+#include <foxxll/common/types.hpp>
 
 #include <cassert>
 #include <cstdlib>

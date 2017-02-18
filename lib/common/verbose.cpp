@@ -10,9 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/common/timer.hpp>
+#include <foxxll/msvc_compatibility.hpp>
 #include <stxxl/bits/common/log.h>
-#include <stxxl/bits/common/timer.h>
-#include <stxxl/bits/msvc_compatibility.h>
 #include <stxxl/bits/verbose.h>
 
 #include <cmath>
@@ -23,7 +23,7 @@
 
 namespace stxxl {
 
-static const double program_start_time_stamp = timestamp();
+static const double program_start_time_stamp = foxxll::timestamp();
 
 void print_msg(const char* label, const std::string& msg, unsigned flags)
 {
@@ -34,7 +34,7 @@ void print_msg(const char* label, const std::string& msg, unsigned flags)
     const bool timestamp_always = false;
 #endif
     if (timestamp_always || (flags & _STXXL_PRNT_TIMESTAMP)) {
-        double t = timestamp() - program_start_time_stamp;
+        double t = foxxll::timestamp() - program_start_time_stamp;
         char tstr[40]; /* "[364:23:59:59.999999] " */
         snprintf(tstr, sizeof(tstr), "[%d.%02d:%02d:%02d.%06d] ",
                  int(t / (24 * 60 * 60)),

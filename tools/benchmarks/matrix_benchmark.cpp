@@ -13,7 +13,7 @@
 #include <iostream>
 #include <limits>
 
-#include <stxxl/bits/common/cmdline.h>
+#include <foxxll/common/cmdline.hpp>
 #include <stxxl/bits/containers/matrix.h>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     int mult_algo_num = 5;
     int sched_algo_num = 2;
 
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
     cp.add_int('r', "rank", "N", rank,
                "rank of the matrices, default: 10000");
     cp.add_bytes('m', "memory", "L", internal_memory,
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 
     using value_type = double;
 
-    stxxl::stats_data stats_before, stats_after;
+    foxxll::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
     if (mult_algo_num == -2)
@@ -92,12 +92,12 @@ int main(int argc, char** argv)
             D[i] = 1;
         delete[] D;
         #if STXXL_BLAS
-        stats_before = *stxxl::stats::get_instance();
+        stats_before = *foxxll::stats::get_instance();
         gemm_wrapper(rank, rank, rank,
                      value_type(1), false, A,
                      false, B,
                      value_type(0), false, C);
-        stats_after = *stxxl::stats::get_instance();
+        stats_after = *foxxll::stats::get_instance();
         #else
         STXXL_ERRMSG("internal multiplication is only available for testing with blas");
         #endif
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        using bst = stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> >;
+        using bst = foxxll::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> >;
         using mt = stxxl::matrix<value_type, block_order>;
         using mitt = mt::row_major_iterator;
         using cmitt = mt::const_row_major_iterator;
@@ -127,13 +127,13 @@ int main(int argc, char** argv)
         bs.flush();
         STXXL_MSG("start of multiplication");
         matrix_stats_before.set();
-        stats_before = *stxxl::stats::get_instance();
+        stats_before = *foxxll::stats::get_instance();
         if (mult_algo_num >= 0)
             *c = a->multiply(*b, mult_algo_num, sched_algo_num);
         else
             *c = a->multiply_internal(*b, sched_algo_num);
         bs.flush();
-        stats_after = *stxxl::stats::get_instance();
+        stats_after = *foxxll::stats::get_instance();
         matrix_stats_after.set();
         STXXL_MSG("end of multiplication");
 

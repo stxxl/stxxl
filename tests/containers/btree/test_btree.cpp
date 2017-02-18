@@ -12,11 +12,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-
 #include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/stats>
 #include <stxxl/timer>
+
+#include <iostream>
 
 struct comp_type : public std::less<int>
 {
@@ -26,11 +25,11 @@ struct comp_type : public std::less<int>
     }
 };
 using btree_type = stxxl::btree::btree<
-          int, double, comp_type, 4096, 4096, stxxl::simple_random>;
+          int, double, comp_type, 4096, 4096, foxxll::simple_random>;
 
 // forced instantiation
 template class stxxl::btree::btree<
-        int, double, comp_type, 4096, 4096, stxxl::simple_random>;
+        int, double, comp_type, 4096, 4096, foxxll::simple_random>;
 
 std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
 {
@@ -265,9 +264,9 @@ int main(int argc, char* argv[])
 
     double sum = 0.0;
 
-    STXXL_MSG(*stxxl::stats::get_instance());
+    STXXL_MSG(*foxxll::stats::get_instance());
 
-    stxxl::timer Timer2;
+    foxxll::timer Timer2;
     Timer2.start();
     cit = BTree5.begin();
     for ( ; cit != BTree5.end(); ++cit)
@@ -276,9 +275,9 @@ int main(int argc, char* argv[])
     Timer2.stop();
     STXXL_MSG("Scanning with const iterator: " << Timer2.mseconds() << " msec");
 
-    STXXL_MSG(*stxxl::stats::get_instance());
+    STXXL_MSG(*foxxll::stats::get_instance());
 
-    stxxl::timer Timer1;
+    foxxll::timer Timer1;
     Timer1.start();
     it = BTree5.begin();
     for ( ; it != BTree5.end(); ++it)
@@ -287,7 +286,7 @@ int main(int argc, char* argv[])
     Timer1.stop();
     STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec");
 
-    STXXL_MSG(*stxxl::stats::get_instance());
+    STXXL_MSG(*foxxll::stats::get_instance());
 
     BTree5.disable_prefetching();
     BTree5.enable_prefetching();

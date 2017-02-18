@@ -12,19 +12,19 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
-#include <stxxl/io>
+#include <foxxll/io.hpp>
 #include <stxxl/vector>
 
 using vector_type = stxxl::vector<int, 4, stxxl::lru_pager<4> >;
 
 int main()
 {
-    stxxl::config* config = stxxl::config::get_instance();
+    foxxll::config* config = foxxll::config::get_instance();
 
-    stxxl::disk_config disk1("/tmp/stxxl-###.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(int),
-                             "syscall autogrow=no");
+    foxxll::disk_config disk1("/tmp/stxxl-###.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(int),
+                              "syscall autogrow=no");
     disk1.unlink_on_open = true;
-    disk1.direct = stxxl::disk_config::DIRECT_OFF;
+    disk1.direct = foxxll::disk_config::DIRECT_OFF;
     config->add_disk(disk1);
 
     vector_type* vector = new vector_type();

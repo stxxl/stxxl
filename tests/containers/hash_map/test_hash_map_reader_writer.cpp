@@ -28,8 +28,8 @@ void reader_writer_test()
 
     const unsigned buffer_size = 4;              // write buffer size in blocks
 
-    using subblock_type = stxxl::typed_block<subblock_raw_size, value_type>;
-    using block_type = stxxl::typed_block<block_size* sizeof(subblock_type), subblock_type>;
+    using subblock_type = foxxll::typed_block<subblock_raw_size, value_type>;
+    using block_type = foxxll::typed_block<block_size* sizeof(subblock_type), subblock_type>;
 
     const unsigned subblock_size = subblock_type::size;  // size in values
 
@@ -58,7 +58,7 @@ void reader_writer_test()
         block_type* block = new block_type;
         i = 0;
         for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
-            stxxl::request_ptr req = block->read(bids[i_block]);
+            foxxll::request_ptr req = block->read(bids[i_block]);
             req->wait();
 
             for (unsigned inner = 0; inner < block_size * subblock_size; ++inner) {
@@ -125,7 +125,7 @@ void reader_writer_test()
         block_type* block = new block_type;
         unsigned i = 0;
         for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
-            stxxl::request_ptr req = block->read(bids[i_block]);
+            foxxll::request_ptr req = block->read(bids[i_block]);
             req->wait();
 
             for (unsigned inner = 0; inner < block_size * subblock_size; ++inner) {

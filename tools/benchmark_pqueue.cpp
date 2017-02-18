@@ -21,8 +21,8 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
+#include <foxxll/common/cmdline.hpp>
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/cmdline>
 #include <stxxl/priority_queue>
 #include <stxxl/random>
 #include <stxxl/timer>
@@ -102,10 +102,10 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
     pq.dump_sizes();
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     {
-        stxxl::scoped_print_timer timer("Filling PQ", nelements * sizeof(ValueType));
+        foxxll::scoped_print_timer timer("Filling PQ", nelements * sizeof(ValueType));
 
         for (external_size_type i = 0; i < nelements; i++)
         {
@@ -121,11 +121,11 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
 
     pq.dump_sizes();
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
-    stats_begin = *stxxl::stats::get_instance();
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
+    stats_begin = *foxxll::stats::get_instance();
 
     {
-        stxxl::scoped_print_timer timer("Reading PQ", nelements * sizeof(ValueType));
+        foxxll::scoped_print_timer timer("Reading PQ", nelements * sizeof(ValueType));
 
         for (external_size_type i = 0; i < nelements; ++i)
         {
@@ -139,7 +139,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
     }
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 template <typename PQType>
@@ -154,10 +154,10 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
     pq.dump_sizes();
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     {
-        stxxl::scoped_print_timer timer("Filling PQ", nelements * sizeof(ValueType));
+        foxxll::scoped_print_timer timer("Filling PQ", nelements * sizeof(ValueType));
 
         for (external_size_type i = 0; i < nelements; i++)
         {
@@ -173,13 +173,13 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
 
     pq.dump_sizes();
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
-    stats_begin = *stxxl::stats::get_instance();
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
+    stats_begin = *foxxll::stats::get_instance();
 
     stxxl::random_number32 rand;
 
     {
-        stxxl::scoped_print_timer timer("Intermixed Insert/Delete", nelements * sizeof(ValueType));
+        foxxll::scoped_print_timer timer("Intermixed Insert/Delete", nelements * sizeof(ValueType));
 
         for (external_size_type i = 0; i < nelements; ++i)
         {
@@ -202,7 +202,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
 
     pq.dump_sizes();
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 template <typename ValueType,
@@ -299,7 +299,7 @@ int do_benchmark_pqueue_type(unsigned type, unsigned pqconfig, external_size_typ
 int benchmark_pqueue(int argc, char* argv[])
 {
     // parse command line
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
 
     cp.set_description(description);
 
@@ -335,7 +335,7 @@ int benchmark_pqueue(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    stxxl::config::get_instance();
+    foxxll::config::get_instance();
 
     if (!do_benchmark_pqueue_type(type, pqconfig, size, opseq))
     {

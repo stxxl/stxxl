@@ -16,7 +16,7 @@
 #include <stxxl/priority_queue>
 
 using my_type = int;
-using block_type = stxxl::typed_block<4096, my_type>;
+using block_type = foxxll::typed_block<4096, my_type>;
 
 struct dummy_merger
 {
@@ -63,7 +63,7 @@ using stxxl::priority_queue_local::int_merger;
 
 int main()
 {
-    stxxl::read_write_pool<block_type> pool(1, 2);
+    foxxll::read_write_pool<block_type> pool(1, 2);
     int cnt = 0;
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);

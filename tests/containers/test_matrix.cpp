@@ -14,7 +14,7 @@
 #include <iostream>
 #include <limits>
 
-#include <stxxl/bits/common/cmdline.h>
+#include <foxxll/common/cmdline.hpp>
 #include <stxxl/bits/containers/matrix.h>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -150,7 +150,8 @@ void test1(int rank)
     STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
     using value_type = int_type;
 
-    using block_scheduler_type = stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, small_block_order> >;
+    using block_scheduler_type = foxxll::block_scheduler<
+              stxxl::matrix_swappable_block<value_type, small_block_order> >;
     using matrix_type = stxxl::matrix<value_type, small_block_order>;
     using row_vector_type = matrix_type::row_vector_type;
     using column_vector_type = matrix_type::column_vector_type;
@@ -169,7 +170,7 @@ void test1(int rank)
         * b = new matrix_type(bs, rank, rank),
         * c = new matrix_type(bs, rank, rank);
 
-    stxxl::stats_data stats_before, stats_after;
+    foxxll::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
     // ------ first run
@@ -181,12 +182,12 @@ void test1(int rank)
     bs.flush();
     STXXL_MSG("start mult");
     matrix_stats_before.set();
-    stats_before = *stxxl::stats::get_instance();
+    stats_before = *foxxll::stats::get_instance();
 
     *c = (*a) * (*b);
     bs.flush();
 
-    stats_after = *stxxl::stats::get_instance();
+    stats_after = *foxxll::stats::get_instance();
     matrix_stats_after.set();
     STXXL_MSG("end mult");
 
@@ -219,12 +220,12 @@ void test1(int rank)
     bs.flush();
     STXXL_MSG("start mult");
     matrix_stats_before.set();
-    stats_before = *stxxl::stats::get_instance();
+    stats_before = *foxxll::stats::get_instance();
 
     *c = (*a) * (*b);
     bs.flush();
 
-    stats_after = *stxxl::stats::get_instance();
+    stats_after = *foxxll::stats::get_instance();
     matrix_stats_after.set();
     STXXL_MSG("end mult");
 
@@ -273,7 +274,7 @@ void test1(int rank)
         value_type v;
         v = w * x;
 
-        stxxl::STXXL_UNUSED(v);
+        foxxll::STXXL_UNUSED(v);
     }
 
     delete a;
@@ -290,7 +291,8 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
 
     using value_type = double;
 
-    using block_scheduler_type = stxxl::block_scheduler<stxxl::matrix_swappable_block<value_type, block_order> >;
+    using block_scheduler_type = foxxll::block_scheduler<
+              stxxl::matrix_swappable_block<value_type, block_order> >;
     using matrix_type = stxxl::matrix<value_type, block_order>;
     using row_major_iterator = matrix_type::row_major_iterator;
     using const_row_major_iterator = matrix_type::const_row_major_iterator;
@@ -302,7 +304,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     * a = new matrix_type(bs, rank, rank),
         * b = new matrix_type(bs, rank, rank),
         * c = new matrix_type(bs, rank, rank);
-    stxxl::stats_data stats_before, stats_after;
+    foxxll::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
     STXXL_MSG("writing input matrices");
@@ -314,7 +316,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     bs.flush();
     STXXL_MSG("start of multiplication");
     matrix_stats_before.set();
-    stats_before = *stxxl::stats::get_instance();
+    stats_before = *foxxll::stats::get_instance();
 
     if (mult_algo_num >= 0)
         *c = a->multiply(*b, mult_algo_num, sched_algo_num);
@@ -322,7 +324,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
         *c = a->multiply_internal(*b, sched_algo_num);
 
     bs.flush();
-    stats_after = *stxxl::stats::get_instance();
+    stats_after = *foxxll::stats::get_instance();
     matrix_stats_after.set();
     STXXL_MSG("end of multiplication");
 
@@ -348,7 +350,7 @@ int main(int argc, char** argv)
     int mult_algo_num = 2;
     int sched_algo_num = 1;
 
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
 
     cp.set_description("stxxl matrix test");
     cp.set_author("Raoul Steffen <R-Steffen@gmx.de>");
@@ -386,7 +388,7 @@ int main(int argc, char** argv)
     if (!cp.process(argc, argv))
         return 0;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     switch (test_case)
     {
@@ -411,7 +413,7 @@ int main(int argc, char** argv)
 
     STXXL_MSG("end of test");
 
-    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     return 0;
 }

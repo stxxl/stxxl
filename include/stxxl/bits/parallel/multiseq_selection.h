@@ -153,7 +153,7 @@ void multiseq_partition(
 
     // pad all lists to this length, at least as long as any ns[i], equality
     // iff nmax = 2^k - 1
-    diff_type l = round_up_to_power_of_two(nmax + 1) - 1;
+    diff_type l = foxxll::round_up_to_power_of_two(nmax + 1) - 1;
 
     diff_type* a = new diff_type[m], * b = new diff_type[m];
 

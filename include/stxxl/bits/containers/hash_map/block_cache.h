@@ -14,8 +14,8 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_BLOCK_CACHE_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_BLOCK_CACHE_HEADER
 
+#include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/containers/pager.h>
-#include <stxxl/bits/mng/block_manager.h>
 
 #include <algorithm>
 #include <list>
@@ -36,7 +36,7 @@ public:
 
 protected:
     std::vector<block_type*> blocks_;
-    std::vector<request_ptr> reqs_;
+    std::vector<foxxll::request_ptr> reqs_;
     std::vector<size_t> free_blocks_;
     std::list<size_t> busy_blocks_; // TODO make that a circular-buffer
 
@@ -137,7 +137,7 @@ protected:
     {
         size_t operator () (const bid_type& bid) const
         {
-            return longhash1(bid.offset + reinterpret_cast<intptr_t>(bid.storage));
+            return foxxll::longhash1(bid.offset + reinterpret_cast<intptr_t>(bid.storage));
         }
 #ifdef STXXL_MSVC
         bool operator () (const bid_type& a, const bid_type& b) const
@@ -177,7 +177,7 @@ protected:
 
     //! free blocks as indices to blocks_-vector
     std::vector<size_t> free_blocks_;
-    std::vector<request_ptr> reqs_;
+    std::vector<foxxll::request_ptr> reqs_;
 
     bid_map_type bid_map_;
     pager_type pager_;
@@ -194,7 +194,7 @@ public:
     //! Construct a new block-cache.
     //! \param cache_size cache-size in number of blocks
     explicit block_cache(const size_t cache_size)
-        : write_buffer_(config::get_instance()->disks_number() * 2),
+        : write_buffer_(foxxll::config::get_instance()->disks_number() * 2),
           blocks_(cache_size),
           bids_(cache_size),
           retain_count_(cache_size),
@@ -417,7 +417,7 @@ public:
         // now actually load the wanted subblock and store it within *block
         subblock_bid_type subblock_bid(
             bid.storage, bid.offset + i_subblock * subblock_type::raw_size);
-        request_ptr req = ((*block)[i_subblock]).read(subblock_bid);
+        foxxll::request_ptr req = ((*block)[i_subblock]).read(subblock_bid);
         req->wait();
 
         valid_subblock_[i_block] = i_subblock;

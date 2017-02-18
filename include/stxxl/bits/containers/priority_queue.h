@@ -122,8 +122,8 @@ public:
     using alloc_strategy_type = typename Config::alloc_strategy_type;
     using size_type = external_size_type;
     //! Type of the block used in disk-memory transfers
-    using block_type = typed_block<BlockSize, value_type>;
-    using pool_type = read_write_pool<block_type>;
+    using block_type = foxxll::typed_block<BlockSize, value_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
 
 protected:
     using insert_heap_type = priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
@@ -905,7 +905,9 @@ struct find_B_m
                                          1, fits || candidate1::fits>::result;
 
     //! return a fitting configuration.
-    using result = typename IF<fits, self_type, typename IF<candidate1::fits, candidate1, candidate2>::result>::result;
+    using result = typename foxxll::IF<
+              fits, self_type, typename foxxll::IF<
+                  candidate1::fits, candidate1, candidate2>::result>::result;
 };
 
 // specialization for the case when no valid parameters are found
@@ -950,7 +952,8 @@ struct compute_N
     static const size_t AI = AI_;
     static const size_t N = X / (AI * AI);     // two stage internal
 
-    using result = typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result;
+    using result = typename foxxll::IF<
+              (N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result;
 };
 
 template <size_t X_, size_t CriticalSize_>

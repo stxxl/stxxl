@@ -15,13 +15,14 @@
 #ifndef STXXL_CONTAINERS_SEQUENCE_HEADER
 #define STXXL_CONTAINERS_SEQUENCE_HEADER
 
-#include <stxxl/bits/common/tmeta.h>
+#include <foxxll/common/tmeta.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
+#include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/mng/read_write_pool.h>
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/types>
 
 #include <algorithm>
 #include <deque>
@@ -70,13 +71,13 @@ public:
         block_size = BlockSize
     };
 
-    using block_type = typed_block<block_size, value_type>;
-    using bid_type = BID<block_size>;
+    using block_type = foxxll::typed_block<block_size, value_type>;
+    using bid_type = foxxll::BID<block_size>;
 
     using bid_deque_type = std::deque<bid_type>;
 
 private:
-    using pool_type = read_write_pool<block_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
 
     /// current number of items in the sequence
     size_type m_size;
@@ -109,7 +110,7 @@ private:
     bid_deque_type m_bids;
 
     /// block manager used
-    block_manager* m_bm;
+    foxxll::block_manager* m_bm;
 
     /// number of blocks to prefetch
     size_t m_blocks2prefetch;
@@ -127,10 +128,10 @@ public:
         : m_size(0),
           m_owns_pool(true),
           m_alloc_count(0),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         const size_t disks = (D < 1)
-                             ? config::get_instance()->disks_number()
+                             ? foxxll::config::get_instance()->disks_number()
                              : static_cast<size_t>(D);
 
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(D)");
@@ -148,7 +149,7 @@ public:
         : m_size(0),
           m_owns_pool(true),
           m_alloc_count(0),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(sizes)");
         m_pool = new pool_type(p_pool_size, w_pool_size);
@@ -166,7 +167,7 @@ public:
           m_owns_pool(false),
           m_pool(&pool),
           m_alloc_count(0),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(pool)");
         init(blocks2prefetch);
@@ -417,7 +418,7 @@ public:
             STXXL_VERBOSE1("sequence::pop_front Case 3");
 
             assert(!m_bids.empty());
-            request_ptr req = m_pool->read(m_front_block, m_bids.front());
+            foxxll::request_ptr req = m_pool->read(m_front_block, m_bids.front());
             STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_front block  " << m_front_block << " @ " << FMT_BID(m_bids.front()));
 
             // give prefetching hints
@@ -476,7 +477,7 @@ public:
             STXXL_VERBOSE1("sequence::pop_back Case 3");
 
             assert(!m_bids.empty());
-            request_ptr req = m_pool->read(m_back_block, m_bids.back());
+            foxxll::request_ptr req = m_pool->read(m_back_block, m_bids.back());
             STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_back block  " << m_back_block << " @ " << FMT_BID(m_bids.back()));
 
             // give prefetching hints
@@ -665,7 +666,7 @@ public:
                 STXXL_VERBOSE1("sequence::stream::operator++ default case: fetch next block");
 
                 assert(m_next_bid != m_sequence.m_bids.end());
-                request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
+                foxxll::request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
                 STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::stream::operator++ read block " << m_current_block << " @ " << FMT_BID(*m_next_bid));
 
                 // give prefetching hints
@@ -796,7 +797,7 @@ public:
                 STXXL_VERBOSE1("sequence::reverse_stream::operator++ default case: fetch previous block");
 
                 assert(m_next_bid != m_sequence.m_bids.rend());
-                request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
+                foxxll::request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
                 STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::reverse_stream::operator++ read block " << m_current_block << " @ " << FMT_BID(*m_next_bid));
 
                 // give prefetching hints

@@ -14,16 +14,17 @@
 #ifndef STXXL_CONTAINERS_STACK_HEADER
 #define STXXL_CONTAINERS_STACK_HEADER
 
-#include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/tmeta.h>
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/common/simple_vector.hpp>
+#include <foxxll/common/tmeta.hpp>
+#include <foxxll/io/request_operations.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
+#include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/mng/read_write_pool.h>
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/types>
 
 #include <algorithm>
 #include <stack>
@@ -74,16 +75,16 @@ public:
     };
 
     //! type of block used in disk-memory transfers
-    using block_type = typed_block<block_size, value_type>;
-    using bid_type = BID<block_size>;
+    using block_type = foxxll::typed_block<block_size, value_type>;
+    using bid_type = foxxll::BID<block_size>;
 
 private:
     size_type m_size;
     size_t cache_offset;
     value_type* current_element;
-    simple_vector<block_type> cache;
-    typename simple_vector<block_type>::iterator front_page;
-    typename simple_vector<block_type>::iterator back_page;
+    foxxll::simple_vector<block_type> cache;
+    typename foxxll::simple_vector<block_type>::iterator front_page;
+    typename foxxll::simple_vector<block_type>::iterator back_page;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
 
@@ -161,7 +162,7 @@ public:
     virtual ~normal_stack()
     {
         STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
-        block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
+        foxxll::block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
 
     //! \}
@@ -215,9 +216,9 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
+            foxxll::block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
-            simple_vector<request_ptr> requests(blocks_per_page);
+            foxxll::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
@@ -257,7 +258,7 @@ public:
         {
             STXXL_VERBOSE2("shrinking, size: " << m_size);
 
-            simple_vector<request_ptr> requests(blocks_per_page);
+            foxxll::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
 
             {
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end();
@@ -275,7 +276,7 @@ public:
 
             wait_all(requests.begin(), blocks_per_page);
 
-            block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page, bids.end());
+            foxxll::block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page, bids.end());
             bids.resize(bids.size() - blocks_per_page);
 
             return;
@@ -320,17 +321,17 @@ public:
     };
 
     //! type of block used in disk-memory transfers
-    using block_type = typed_block<block_size, value_type>;
-    using bid_type = BID<block_size>;
+    using block_type = foxxll::typed_block<block_size, value_type>;
+    using bid_type = foxxll::BID<block_size>;
 
 private:
     size_type m_size;
     size_t cache_offset;
     value_type* current_element;
-    simple_vector<block_type> cache;
-    typename simple_vector<block_type>::iterator cache_buffers;
-    typename simple_vector<block_type>::iterator overlap_buffers;
-    simple_vector<request_ptr> requests;
+    foxxll::simple_vector<block_type> cache;
+    typename foxxll::simple_vector<block_type>::iterator cache_buffers;
+    typename foxxll::simple_vector<block_type>::iterator overlap_buffers;
+    foxxll::simple_vector<foxxll::request_ptr> requests;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
 
@@ -419,9 +420,9 @@ public:
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
         }
-        catch (const io_error&)
+        catch (const foxxll::io_error&)
         { }
-        block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
+        foxxll::block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
 
     //! \}
@@ -474,7 +475,7 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
+            foxxll::block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
@@ -528,7 +529,7 @@ public:
                     requests[i] = (overlap_buffers + i)->read(*(--cur_bid));
             }
 
-            block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page, bids.end());
+            foxxll::block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page, bids.end());
             bids.resize(bids.size() - blocks_per_page);
 
             cache_offset = blocks_per_page * block_type::size;
@@ -564,11 +565,11 @@ public:
     };
 
     //! type of block used in disk-memory transfers
-    using block_type = typed_block<block_size, value_type>;
-    using bid_type = BID<block_size>;
+    using block_type = foxxll::typed_block<block_size, value_type>;
+    using bid_type = foxxll::BID<block_size>;
 
 private:
-    using pool_type = read_write_pool<block_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
 
     size_type m_size;
     size_t cache_offset;
@@ -608,8 +609,8 @@ public:
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     STXXL_DEPRECATED(
-        grow_shrink_stack2(prefetch_pool<block_type>&p_pool_,
-                           write_pool<block_type>&w_pool_,
+        grow_shrink_stack2(foxxll::prefetch_pool<block_type>&p_pool_,
+                           foxxll::write_pool<block_type>&w_pool_,
                            const size_t prefetch_aggressiveness = 0)
         )
         : m_size(0),
@@ -676,9 +677,9 @@ public:
             }
             delete cache;
         }
-        catch (const io_error&)
+        catch (const foxxll::io_error&)
         { }
-        block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
+        foxxll::block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
         delete owned_pool;
     }
 
@@ -716,7 +717,7 @@ public:
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
-            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
+            foxxll::block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
             pool->write(cache, bids.back());
             cache = pool->steal();
 
@@ -773,7 +774,7 @@ public:
             bid_type last_block = bids.back();
             bids.pop_back();
             pool->read(cache, last_block)->wait();
-            block_manager::get_instance()->delete_block(last_block);
+            foxxll::block_manager::get_instance()->delete_block(last_block);
             rehint();
             cache_offset = block_type::size + 1;
         }
@@ -1035,15 +1036,15 @@ template <
 class STACK_GENERATOR
 {
     using cfg = stack_config_generator<ValueType, BlocksPerPage, BlockSize, AllocStr, SizeType>;
-    using GrShrTp = typename IF<Behaviour == grow_shrink,
-                                grow_shrink_stack<cfg>,
-                                grow_shrink_stack2<cfg> >::result;
-    using ExtStackType = typename IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result;
-    using MigrOrNotStackType = typename IF<Externality == migrating,
-                                           migrating_stack<MigrCritSize, ExtStackType, IntStackType>, ExtStackType>::result;
+    using GrShrTp = typename foxxll::IF<Behaviour == grow_shrink,
+                                        grow_shrink_stack<cfg>,
+                                        grow_shrink_stack2<cfg> >::result;
+    using ExtStackType = typename foxxll::IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result;
+    using MigrOrNotStackType = typename foxxll::IF<Externality == migrating,
+                                                   migrating_stack<MigrCritSize, ExtStackType, IntStackType>, ExtStackType>::result;
 
 public:
-    using result = typename IF<Externality == internal, IntStackType, MigrOrNotStackType>::result;
+    using result = typename foxxll::IF<Externality == internal, IntStackType, MigrOrNotStackType>::result;
 };
 
 //! \}

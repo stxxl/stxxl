@@ -191,10 +191,10 @@ public:
     void swap(int_merger& obj)
     {
         std::swap(sentinel, obj.sentinel);
-        swap_1D_arrays(current, obj.current, MaxArity);
-        swap_1D_arrays(current_end, obj.current_end, MaxArity);
-        swap_1D_arrays(segment, obj.segment, MaxArity);
-        swap_1D_arrays(segment_size, obj.segment_size, MaxArity);
+        foxxll::swap_1D_arrays(current, obj.current, MaxArity);
+        foxxll::swap_1D_arrays(current_end, obj.current_end, MaxArity);
+        foxxll::swap_1D_arrays(segment, obj.segment, MaxArity);
+        foxxll::swap_1D_arrays(segment_size, obj.segment_size, MaxArity);
         std::swap(mem_cons_, obj.mem_cons_);
     }
 

@@ -13,12 +13,12 @@
 #ifndef STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 #define STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 
-#include <stxxl/bits/common/error_handling.h>
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/io/request.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/typed_block.hpp>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/containers/pager.h>
-#include <stxxl/bits/io/request.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/typed_block.h>
 
 #include <algorithm>
 #include <unordered_map>
@@ -55,7 +55,7 @@ private:
         size_t operator () (const bid_type& bid) const
         {
             size_t result =
-                longhash1(bid.offset + reinterpret_cast<intptr_t>(bid.storage));
+                foxxll::longhash1(bid.offset + reinterpret_cast<intptr_t>(bid.storage));
             return result;
         }
 #if STXXL_MSVC
@@ -72,7 +72,7 @@ private:
     };
 
     std::vector<node_type*> m_nodes;
-    std::vector<request_ptr> m_reqs;
+    std::vector<foxxll::request_ptr> m_reqs;
     std::vector<bool> m_fixed;
     std::vector<bool> m_dirty;
     std::vector<size_t> m_free_nodes;
@@ -80,7 +80,7 @@ private:
 
     bid2node_type m_bid2node;
     pager_type m_pager;
-    block_manager* m_bm;
+    foxxll::block_manager* m_bm;
     alloc_strategy_type m_alloc_strategy;
 
     uint64_t n_found { 0 };
@@ -107,7 +107,7 @@ public:
                key_compare cmp)
         : m_btree(btree),
           m_cmp(cmp),
-          m_bm(block_manager::get_instance())
+          m_bm(foxxll::block_manager::get_instance())
     {
         const size_t nnodes = cache_size_in_bytes / block_type::raw_size;
         STXXL_BTREE_CACHE_VERBOSE("btree::node_cache constructor nodes=" << nnodes);
@@ -447,10 +447,10 @@ public:
                 m_fixed[nodeindex] = false;
             }
             ++n_deleted;
-        } catch (const io_error& ex)
+        } catch (const foxxll::io_error& ex)
         {
             m_bm->delete_block(bid);
-            throw io_error(ex.what());
+            throw foxxll::io_error(ex.what());
         }
         m_bm->delete_block(bid);
     }

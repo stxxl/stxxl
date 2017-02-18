@@ -11,13 +11,13 @@
  **************************************************************************/
 
 // [example]
-#include <stxxl/cmdline>
+#include <foxxll/common/cmdline.hpp>
 
 #include <string>
 
 int main(int argc, char* argv[])
 {
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
 
     // add description and author
     cp.set_description("This may some day be a useful program, which solves "

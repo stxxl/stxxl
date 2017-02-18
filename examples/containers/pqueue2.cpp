@@ -32,7 +32,9 @@ int main()
     // block_type::raw_size = 262144 bytes
     // use 64 block read and write pools each to enable overlapping between I/O and computation
     const unsigned int mem_for_pools = 32 * 1024 * 1024;
-    stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
+    foxxll::read_write_pool<block_type> pool(
+        (mem_for_pools / 2) / block_type::raw_size,
+        (mem_for_pools / 2) / block_type::raw_size);
 
     pq_type Q(pool);
 

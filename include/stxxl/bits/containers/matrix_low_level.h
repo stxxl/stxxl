@@ -17,8 +17,9 @@
 #define STXXL_BLAS 0
 #endif
 
-#include <stxxl/bits/common/types.h>
+#include <foxxll/common/types.hpp>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/types>
 
 #include <complex>
 #include <algorithm>

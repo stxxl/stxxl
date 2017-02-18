@@ -16,13 +16,13 @@
 #ifndef STXXL_STREAM_SORT_STREAM_HEADER
 #define STXXL_STREAM_SORT_STREAM_HEADER
 
+#include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/stream/sorted_runs.h>
 #include <stxxl/bits/stream/stream.h>
@@ -65,7 +65,7 @@ public:
 
 public:
     using value_type = typename Input::value_type;
-    using block_type = typed_block<BlockSize, value_type>;
+    using block_type = foxxll::typed_block<BlockSize, value_type>;
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
     using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
     using run_type = typename sorted_runs_data_type::run_type;
@@ -144,9 +144,10 @@ public:
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         if (!(2 * BlockSize * sort_memory_usage_factor() <= memory_to_use)) {
-            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): "
-                                "INSUFFICIENT MEMORY provided, "
-                                "please increase parameter 'memory_to_use'");
+            throw foxxll::bad_parameter(
+                      "stxxl::runs_creator<>:runs_creator(): "
+                      "INSUFFICIENT MEMORY provided, "
+                      "please increase parameter 'memory_to_use'");
         }
         assert(m_memsize > 0);
     }
@@ -179,6 +180,8 @@ public:
 template <class Input, class CompareType, size_t BlockSize, class AllocStr>
 void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result()
 {
+    using request_ptr = foxxll::request_ptr;
+
     size_t i = 0;
     size_t m2 = m_memsize / 2;
     const size_t el_in_run = m2 * block_type::size;     // # el in a run
@@ -232,15 +235,15 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     }
 
     block_type* Blocks2 = Blocks1 + m2;
-    block_manager* bm = block_manager::get_instance();
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
     request_ptr* write_reqs = new request_ptr[m2];
     run_type run;
 
-    size_t cur_run_size = div_ceil(blocks1_length, block_type::size);      // in blocks
+    size_t cur_run_size = foxxll::div_ceil(blocks1_length, block_type::size);      // in blocks
     run.resize(cur_run_size);
     bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
     // fill the rest of the last block with max values
     fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
@@ -275,7 +278,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
         wait_all(write_reqs, write_reqs + cur_run_size);
         bm->delete_blocks(make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        cur_run_size = div_ceil(blocks2_length, block_type::size);
+        cur_run_size = foxxll::div_ceil(blocks2_length, block_type::size);
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
@@ -317,7 +320,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
 
     sort_run(Blocks2, blocks2_length);
 
-    cur_run_size = div_ceil(blocks2_length, block_type::size);      // in blocks
+    cur_run_size = foxxll::div_ceil(blocks2_length, block_type::size);      // in blocks
     run.resize(cur_run_size);
     bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
@@ -335,7 +338,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     {
         blocks1_length = fetch(Blocks1, 0, el_in_run);
         sort_run(Blocks1, blocks1_length);
-        cur_run_size = div_ceil(blocks1_length, block_type::size);      // in blocks
+        cur_run_size = foxxll::div_ceil(blocks1_length, block_type::size);      // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
@@ -433,10 +436,11 @@ class runs_creator<
 public:
     using cmp_type = CompareType;
     using value_type = ValueType;
-    using block_type = typed_block<BlockSize, value_type>;
+    using block_type = foxxll::typed_block<BlockSize, value_type>;
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
     using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
     using sorted_runs_type = foxxll::counting_ptr<sorted_runs_data_type>;
+    using request_ptr = foxxll::request_ptr;
     using result_type = sorted_runs_type;
 
     using element_iterator = typename element_iterator_traits<block_type, external_size_type>::element_iterator;
@@ -522,12 +526,12 @@ protected:
             return;
         }
 
-        const size_t cur_run_size = div_ceil(m_cur_el, block_type::size);         // in blocks
+        const size_t cur_run_size = foxxll::div_ceil(m_cur_el, block_type::size);         // in blocks
         run.resize(cur_run_size);
-        block_manager* bm = block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+        foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
         // fill the rest of the last block with max values
         fill_with_max_value(m_blocks1, cur_run_size, m_cur_el);
@@ -565,9 +569,10 @@ public:
     {
         sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
         if (!(2 * BlockSize * sort_memory_usage_factor() <= m_memory_to_use)) {
-            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): "
-                                "INSUFFICIENT MEMORY provided, "
-                                "please increase parameter 'memory_to_use'");
+            throw foxxll::bad_parameter(
+                      "stxxl::runs_creator<>:runs_creator(): "
+                      "INSUFFICIENT MEMORY provided, "
+                      "please increase parameter 'memory_to_use'");
         }
         assert(m_m2 > 0);
 
@@ -650,12 +655,12 @@ public:
         // sort and store m_blocks1
         sort_run(m_blocks1, m_el_in_run);
 
-        const size_t cur_run_blocks = div_ceil(m_el_in_run, block_type::size);        // in blocks
+        const size_t cur_run_blocks = foxxll::div_ceil(m_el_in_run, block_type::size);        // in blocks
         run.resize(cur_run_blocks);
-        block_manager* bm = block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+        foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
         for (size_t i = 0; i < cur_run_blocks; ++i)
         {
@@ -745,7 +750,7 @@ class runs_creator<
 {
 public:
     using value_type = ValueType;
-    using block_type = typed_block<BlockSize, value_type>;
+    using block_type = foxxll::typed_block<BlockSize, value_type>;
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
     using alloc_strategy_type = AllocStr;
 
@@ -764,7 +769,7 @@ private:
     sorted_runs_type result_;
     //! memory for internal use in blocks
     size_t m_;
-    buffered_writer<block_type> writer;
+    foxxll::buffered_writer<block_type> writer;
     block_type* cur_block;
     size_t offset;
     size_t iblock;
@@ -790,9 +795,10 @@ public:
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         assert(m_ > 0);
         if (!(2 * BlockSize * sort_memory_usage_factor() <= memory_to_use)) {
-            throw bad_parameter("stxxl::runs_creator<>:runs_creator(): "
-                                "INSUFFICIENT MEMORY provided, "
-                                "please increase parameter 'memory_to_use'");
+            throw foxxll::bad_parameter(
+                      "stxxl::runs_creator<>:runs_creator(): "
+                      "INSUFFICIENT MEMORY provided, "
+                      "please increase parameter 'memory_to_use'");
         }
     }
 
@@ -814,7 +820,7 @@ public:
         {
             // write current block
 
-            block_manager* bm = block_manager::get_instance();
+            foxxll::block_manager* bm = foxxll::block_manager::get_instance();
             // allocate space for the block
             result_->runs.resize(irun + 1);
             result_->runs[irun].resize(iblock + 1);
@@ -852,7 +858,7 @@ public:
             }
             offset = 0;
 
-            block_manager* bm = block_manager::get_instance();
+            foxxll::block_manager* bm = foxxll::block_manager::get_instance();
             // allocate space for the block
             result_->runs.resize(irun + 1);
             result_->runs[irun].resize(iblock + 1);
@@ -902,7 +908,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
     {
         const size_t nblocks = sruns->runs[irun].size();
         block_type* blocks = new block_type[nblocks];
-        request_ptr* reqs = new request_ptr[nblocks];
+        foxxll::request_ptr* reqs = new foxxll::request_ptr[nblocks];
         for (size_t j = 0; j < nblocks; ++j)
         {
             reqs[j] = blocks[j].read(sruns->runs[irun][j].bid);
@@ -964,7 +970,7 @@ public:
     using block_type = typename sorted_runs_data_type::block_type;
     using out_block_type = block_type;
     using trigger_entry_type = typename run_type::value_type;
-    using prefetcher_type = block_prefetcher<block_type, typename run_type::iterator>;
+    using prefetcher_type = foxxll::block_prefetcher<block_type, typename run_type::iterator>;
     using run_cursor_type = run_cursor2<block_type, prefetcher_type>;
     using run_cursor2_cmp_type = sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp>;
     using loser_tree_type = loser_tree<run_cursor_type, run_cursor2_cmp_type>;
@@ -1180,9 +1186,9 @@ public:
 
         // *** test whether recursive merging is necessary
 
-        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+        foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
-        int_type disks_number = config::get_instance()->disks_number();
+        int_type disks_number = foxxll::config::get_instance()->disks_number();
         size_t min_prefetch_buffers = 2 * disks_number;
         size_t input_buffers =
             (m_memory_to_use > sizeof(out_block_type)
@@ -1207,7 +1213,8 @@ public:
                 STXXL_ERRMSG("There are only m=" << recursive_merge_buffers << " blocks available for recursive merging, but "
                                                  << min_prefetch_buffers << "+" << min_prefetch_buffers << "+1 are needed read-ahead/write-back/output, and");
                 STXXL_ERRMSG("the merger requires memory to store at least two input blocks internally. Aborting.");
-                throw bad_parameter("basic_runs_merger::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+                throw foxxll::bad_parameter(
+                          "basic_runs_merger::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
 
             merge_recursively();
@@ -1251,7 +1258,7 @@ public:
             m_consume_seq,
             m_prefetch_seq,
             n_opt_prefetch_buffers,
-            config::get_instance()->get_max_device_id());
+            foxxll::config::get_instance()->get_max_device_id());
 #else
         for (size_t i = 0; i < prefetch_seq_size; ++i)
             m_prefetch_seq[i] = i;
@@ -1365,8 +1372,8 @@ public:
 template <class RunsType, class CompareType, class AllocStr>
 void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 {
-    block_manager* bm = block_manager::get_instance();
-    size_t ndisks = config::get_instance()->disks_number();
+    foxxll::block_manager* bm = foxxll::block_manager::get_instance();
+    size_t ndisks = foxxll::config::get_instance()->disks_number();
     size_t nwrite_buffers = 2 * ndisks;
     size_t memory_for_write_buffers = nwrite_buffers * sizeof(block_type);
 
@@ -1387,7 +1394,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 
     while (nruns > max_arity)
     {
-        size_t new_nruns = div_ceil(nruns, merge_factor);
+        size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
         STXXL_MSG("Starting new merge phase: nruns: " << nruns <<
                   " opt_merge_factor: " << merge_factor <<
                   " max_arity: " << max_arity << " new_nruns: " << new_nruns);
@@ -1422,7 +1429,8 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                 new_runs.runs_sizes[cur_out_run] = elements_in_new_run;
 
                 // calculate blocks in run
-                const size_t blocks_in_new_run = (size_t)div_ceil(elements_in_new_run, block_type::size);
+                const size_t blocks_in_new_run = (size_t)foxxll::div_ceil(
+                    elements_in_new_run, block_type::size);
 
                 // allocate blocks for the new runs
                 new_runs.runs[cur_out_run].resize(blocks_in_new_run);
@@ -1451,8 +1459,9 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                 merger(m_cmp, m_memory_to_use - memory_for_write_buffers);
                 merger.initialize(cur_runs);
 
-                {           // make sure everything is being destroyed in right time
-                    buf_ostream<block_type, typename run_type::iterator> out(
+                {
+                    // make sure everything is being destroyed in right time
+                    foxxll::buf_ostream<block_type, typename run_type::iterator> out(
                         new_runs.runs[cur_out_run].begin(),
                         nwrite_buffers);
 
@@ -1644,7 +1653,7 @@ template <
 class compute_sorted_runs_type
 {
     using value_type = ValueType;
-    using bid_type = BID<BlockSize>;
+    using bid_type = foxxll::BID<BlockSize>;
     using trigger_entry_type = sort_helper::trigger_entry<bid_type, value_type>;
 
 public:

@@ -13,10 +13,10 @@
 //! \example containers/external_array.cpp
 //! This is an example of how to use \c stxxl::external_array
 
-#include <stxxl/bits/common/cmdline.h>
-#include <stxxl/bits/common/utils.h>
+#include <foxxll/common/cmdline.hpp>
+#include <foxxll/common/utils.hpp>
+#include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/timer>
 
@@ -85,7 +85,7 @@ int run_external_array_test(size_t volume)
 {
     const size_t block_size = ea_type::block_size;
     const size_t N = volume / sizeof(value_type);
-    const size_t num_blocks = stxxl::div_ceil(N, block_size);
+    const size_t num_blocks = foxxll::div_ceil(N, block_size);
 
     STXXL_VARDUMP(block_size);
     STXXL_VARDUMP(N);
@@ -95,7 +95,7 @@ int run_external_array_test(size_t volume)
     ea_type ea(N, &rw_pool);
 
     {
-        stxxl::scoped_print_timer timer("filling", volume);
+        foxxll::scoped_print_timer timer("filling", volume);
 
         STXXL_CHECK(N >= 10 + 355 + 2 * block_size);
 
@@ -103,7 +103,7 @@ int run_external_array_test(size_t volume)
     }
 
     {
-        stxxl::scoped_print_timer timer("reading and checking", volume);
+        foxxll::scoped_print_timer timer("reading and checking", volume);
 
         STXXL_CHECK(N > 5 * block_size + 876);
         STXXL_CHECK(block_size > 34);
@@ -225,7 +225,7 @@ int run_multiway_merge(size_t volume)
 {
     const size_t block_size = ea_type::block_size;
     const size_t size = volume / sizeof(value_type);
-    const size_t num_blocks = stxxl::div_ceil(size, block_size);
+    const size_t num_blocks = foxxll::div_ceil(size, block_size);
 
     STXXL_MSG("--- Running run_multiway_merge() test with " <<
               NumEAs << " external arrays");
@@ -237,7 +237,7 @@ int run_multiway_merge(size_t volume)
     std::vector<value_type> v(size);
 
     {
-        stxxl::scoped_print_timer timer("filling vector / internal array for multiway_merge test", volume);
+        foxxll::scoped_print_timer timer("filling vector / internal array for multiway_merge test", volume);
         for (size_t i = 0; i < size; ++i) {
             v[i] = std::make_pair(i + 1, i + 1);
         }
@@ -257,14 +257,14 @@ int run_multiway_merge(size_t volume)
     ea_type out(size * (NumEAs + 1), &rw_pool2);
 
     {
-        stxxl::scoped_print_timer timer("filling external arrays for multiway_merge test", volume* NumEAs);
+        foxxll::scoped_print_timer timer("filling external arrays for multiway_merge test", volume* NumEAs);
 
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
             fill(*(*ea), 0, size);
     }
 
     {
-        stxxl::scoped_print_timer timer("loading input arrays into RAM and requesting output buffer", volume* NumEAs);
+        foxxll::scoped_print_timer timer("loading input arrays into RAM and requesting output buffer", volume* NumEAs);
 
         if (ealist.size())
             rw_pool1.resize_prefetch(ealist.size() * ealist[0]->num_blocks());
@@ -284,7 +284,7 @@ int run_multiway_merge(size_t volume)
 
     if (NumEAs > 0) // test ea ppq_iterators
     {
-        stxxl::scoped_print_timer timer("test ea ppq_iterators", volume);
+        foxxll::scoped_print_timer timer("test ea ppq_iterators", volume);
 
         ea_type::iterator begin = ealist[0]->begin(), end = ealist[0]->end();
         size_t index = 1;
@@ -315,7 +315,7 @@ int run_multiway_merge(size_t volume)
     }
 
     {
-        stxxl::scoped_print_timer timer("running multiway merge", volume * (NumEAs + 1));
+        foxxll::scoped_print_timer timer("running multiway merge", volume * (NumEAs + 1));
 
         std::vector<std::pair<ea_type::iterator, ea_type::iterator> > seqs;
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
@@ -335,7 +335,7 @@ int run_multiway_merge(size_t volume)
     }
 
     {
-        stxxl::scoped_print_timer timer("checking the order", volume* NumEAs);
+        foxxll::scoped_print_timer timer("checking the order", volume* NumEAs);
 
         // each index is contained (NumEAs + 1) times
         size_t index = 1 * (NumEAs + 1);
@@ -371,7 +371,7 @@ int run_internal_array_test(size_t volume)
     std::vector<value_type> v(size);
 
     {
-        stxxl::scoped_print_timer timer("filling vector / internal array", volume);
+        foxxll::scoped_print_timer timer("filling vector / internal array", volume);
         for (size_t i = 0; i < size; ++i) {
             v[i] = std::make_pair(i + 1, i + 1);
         }
@@ -380,7 +380,7 @@ int run_internal_array_test(size_t volume)
     ia_type ia(v);
 
     {
-        stxxl::scoped_print_timer timer("reading and checking the order", volume);
+        foxxll::scoped_print_timer timer("reading and checking the order", volume);
 
         ia.inc_min();
         ia.inc_min(2);
@@ -419,7 +419,7 @@ int run_upper_bound_test(size_t volume)
     std::vector<value_type> v(size);
 
     {
-        stxxl::scoped_print_timer timer("filling vector / internal array", volume);
+        foxxll::scoped_print_timer timer("filling vector / internal array", volume);
         for (size_t i = 0; i < size; ++i) {
             v[i] = std::make_pair(i + 1, i + 1);
         }
@@ -429,7 +429,7 @@ int run_upper_bound_test(size_t volume)
     ea_type b(size - 10, &rw_pool);
 
     {
-        stxxl::scoped_print_timer timer("filling external array", volume);
+        foxxll::scoped_print_timer timer("filling external array", volume);
 
         ea_type::writer_type ea_writer(b, 1);
 
@@ -446,7 +446,7 @@ int run_upper_bound_test(size_t volume)
     }
 
     {
-        stxxl::scoped_print_timer timer("running upper_bound", 2 * volume);
+        foxxll::scoped_print_timer timer("running upper_bound", 2 * volume);
 
         b.hint_next_block();
         b.wait_next_blocks();
@@ -476,7 +476,7 @@ int main(int argc, char** argv)
     unsigned numpbs = 1;
     unsigned numwbs = 14;
 
-    stxxl::cmdline_parser cp;
+    foxxll::cmdline_parser cp;
     cp.set_description("STXXL external array test");
     cp.set_author("Thomas Keh <thomas.keh@student.kit.edu>");
     cp.add_bytes('v', "volume", volume,

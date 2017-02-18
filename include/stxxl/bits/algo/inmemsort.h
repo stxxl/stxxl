@@ -14,10 +14,10 @@
 #ifndef STXXL_ALGO_INMEMSORT_HEADER
 #define STXXL_ALGO_INMEMSORT_HEADER
 
+#include <foxxll/common/simple_vector.hpp>
+#include <foxxll/io/request_operations.hpp>
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/algo/trigger_entry.h>
-#include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/parallel.h>
 
 #include <algorithm>
@@ -32,8 +32,8 @@ void stl_in_memory_sort(ExtIterator first, ExtIterator last, StrictWeakOrdering 
     STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
     first.flush();
     size_t nblocks = last.bid() - first.bid() + (last.block_offset() ? 1 : 0);
-    simple_vector<block_type> blocks(nblocks);
-    simple_vector<request_ptr> reqs(nblocks);
+    foxxll::simple_vector<block_type> blocks(nblocks);
+    foxxll::simple_vector<foxxll::request_ptr> reqs(nblocks);
     size_t i;
 
     for (i = 0; i < nblocks; ++i)

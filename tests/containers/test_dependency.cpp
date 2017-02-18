@@ -79,7 +79,7 @@ struct HashFunctor
 };
 
 template class stxxl::priority_queue<
-        stxxl::priority_queue_config<MinimalType, CompareLessWithMin<MinimalType>, 32ul, 256ul, 16ul, 2ul, 16384ul, 16ul, 2ul, stxxl::random_cyclic>
+        stxxl::priority_queue_config<MinimalType, CompareLessWithMin<MinimalType>, 32ul, 256ul, 16ul, 2ul, 16384ul, 16ul, 2ul, foxxll::random_cyclic>
         >;
 
 template class stxxl::vector<MinimalType>;

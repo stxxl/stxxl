@@ -11,8 +11,8 @@
  **************************************************************************/
 
 #include <cmath>
+#include <foxxll/common/types.hpp>
 #include <iostream>
-#include <stxxl/types>
 
 int64_t D(int64_t m, int64_t k, int64_t MaxS, int64_t E, int64_t B)
 {

@@ -13,7 +13,7 @@
 #ifndef STXXL_ALGO_SORT_BASE_HEADER
 #define STXXL_ALGO_SORT_BASE_HEADER
 
-#include <stxxl/bits/common/types.h>
+#include <foxxll/common/types.hpp>
 
 #include <cmath>
 

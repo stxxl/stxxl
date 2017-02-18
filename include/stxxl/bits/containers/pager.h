@@ -14,8 +14,8 @@
 #ifndef STXXL_CONTAINERS_PAGER_HEADER
 #define STXXL_CONTAINERS_PAGER_HEADER
 
+#include <foxxll/common/simple_vector.hpp>
 #include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/common/simple_vector.h>
 
 #include <algorithm>
 #include <cassert>
@@ -66,7 +66,7 @@ class lru_pager
     using list_type = std::list<size_type>;
 
     list_type history;
-    simple_vector<list_type::iterator> history_entry;
+    foxxll::simple_vector<list_type::iterator> history_entry;
 
 public:
     static constexpr unsigned default_npages = npages_;

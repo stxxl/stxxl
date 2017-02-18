@@ -18,7 +18,6 @@
 #include <stxxl/bits/common/external_shared_ptr.h>
 #include <stxxl/map>
 #include <stxxl/scan>
-#include <stxxl/stats>
 #include <stxxl/vector>
 
 #include <algorithm>
@@ -81,7 +80,7 @@ void test_const_iterator(const my_vec_type& x)
 void test_vector()
 {
     // use non-randomized striping to avoid side effects on random generator
-    using vector_type = stxxl::vector<element, 2, stxxl::lru_pager<2>, (2* 1024* 1024), stxxl::striping>;
+    using vector_type = stxxl::vector<element, 2, stxxl::lru_pager<2>, (2* 1024* 1024), foxxll::striping>;
     vector_type v(64 * 1024 * 1024 / sizeof(element));
 
     // test assignment const_iterator = iterator
@@ -217,8 +216,8 @@ void test_map()
 {
     const unsigned max_mult = 8;
 
-    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
-    stxxl::stats_data stats_elapsed;
+    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
+    foxxll::stats_data stats_elapsed;
     STXXL_MSG(stats_begin);
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
@@ -226,7 +225,7 @@ void test_map()
 
     for (unsigned mult = 1; mult < max_mult; mult *= 2)
     {
-        stats_begin = *stxxl::stats::get_instance();
+        stats_begin = *foxxll::stats::get_instance();
         const size_t el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
@@ -245,13 +244,13 @@ void test_map()
             data_type data(test);
             Map[i] = data;
         }
-        stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+        stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double writes = double(stats_elapsed.get_write_count()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
         STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
         STXXL_MSG(stats_elapsed);
 
-        stats_begin = *stxxl::stats::get_instance();
+        stats_begin = *foxxll::stats::get_instance();
         STXXL_MSG("Doing search");
         size_t queries = el;
         stxxl::random_number32 myrandom;
@@ -268,7 +267,7 @@ void test_map()
                 STXXL_CHECK(tmp->b[j] == (unsigned long)(key + 2));
             STXXL_CHECK(tmp->c == (unsigned int)(key + 3));
         }
-        stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+        stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;
         double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);

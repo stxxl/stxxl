@@ -16,17 +16,18 @@
 #ifndef STXXL_CONTAINERS_VECTOR_HEADER
 #define STXXL_CONTAINERS_VECTOR_HEADER
 
+#include <foxxll/common/tmeta.hpp>
+#include <foxxll/common/types.hpp>
+#include <foxxll/io/request_operations.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/buf_istream.hpp>
+#include <foxxll/mng/buf_istream_reverse.hpp>
+#include <foxxll/mng/buf_ostream.hpp>
+#include <foxxll/mng/typed_block.hpp>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/tmeta.h>
-#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/buf_istream.h>
-#include <stxxl/bits/mng/buf_istream_reverse.h>
-#include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/types>
 
 #include <algorithm>
 #include <queue>
@@ -845,8 +846,8 @@ public:
     //! constant pointer to value_type
     using const_pointer = const value_type *;
 
-    using size_type = external_size_type;
-    using difference_type = external_diff_type;
+    using size_type = foxxll::external_size_type;
+    using difference_type = foxxll::external_diff_type;
 
     using pager_type = PagerType;
     using alloc_strategy_type = AllocStr;
@@ -884,10 +885,10 @@ public:
     using bufreader_reverse_type = vector_bufreader_reverse<const_iterator>;
 
     //! \internal
-    class bid_vector : public std::vector<BID<block_size> >
+    class bid_vector : public std::vector<foxxll::BID<block_size> >
     {
     public:
-        using super_type = std::vector<BID<block_size> >;
+        using super_type = std::vector<foxxll::BID<block_size> >;
         using size_type = typename super_type::size_type;
         using bid_type = typename super_type::value_type;
 
@@ -899,7 +900,7 @@ public:
     using const_bids_container_iterator = typename bids_container_type::const_iterator;
 
     //! type of the block used in disk-memory transfers
-    using block_type = typed_block<BlockSize, ValueType>;
+    using block_type = foxxll::typed_block<BlockSize, ValueType>;
     //! double-index type to reference individual elements in a block
     using blocked_index_type = double_blocked_index<size_type, PageSize, block_type::size>;
 
@@ -921,19 +922,19 @@ private:
     //! status of each page (valid_on_disk, uninitialized or dirty)
     mutable std::vector<page_status> m_page_status;
     mutable std::vector<ptrdiff_t> m_page_to_slot;
-    mutable simple_vector<size_t> m_slot_to_page;
+    mutable foxxll::simple_vector<size_t> m_slot_to_page;
     mutable std::queue<size_t> m_free_slots;
-    mutable simple_vector<block_type>* m_cache;
+    mutable foxxll::simple_vector<block_type>* m_cache;
 
-    file_ptr m_from;
-    block_manager* m_bm;
+    foxxll::file_ptr m_from;
+    foxxll::block_manager* m_bm;
     bool m_exported;
 
-    size_type size_from_file_length(external_size_type file_length) const
+    size_type size_from_file_length(foxxll::external_size_type file_length) const
     {
         size_t blocks_fit = file_length / external_size_type(block_type::raw_size);
         size_type cur_size = blocks_fit * external_size_type(block_type::size);
-        external_size_type rest = file_length - blocks_fit * external_size_type(block_type::raw_size);
+        foxxll::external_size_type rest = file_length - blocks_fit * external_size_type(block_type::raw_size);
         return (cur_size + rest / external_size_type(sizeof(value_type)));
     }
 
@@ -959,15 +960,15 @@ public:
     //! \param npages Number of cached pages.
     explicit vector(const size_type n = 0, const size_t npages = pager_type::default_npages)
         : m_size(n),
-          m_bids((size_t)div_ceil(n, block_type::size)),
+          m_bids((size_t)foxxll::div_ceil(n, block_type::size)),
           m_pager(npages),
-          m_page_status(div_ceil(m_bids.size(), page_size), uninitialized),
-          m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
+          m_page_status(foxxll::div_ceil(m_bids.size(), page_size), uninitialized),
+          m_page_to_slot(foxxll::div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
           m_cache(nullptr),
           m_exported(false)
     {
-        m_bm = block_manager::get_instance();
+        m_bm = foxxll::block_manager::get_instance();
 
         allocate_page_cache();
 
@@ -1008,7 +1009,7 @@ public:
     {
         //  numpages() might be zero
         if (!m_cache && numpages() > 0)
-            m_cache = new simple_vector<block_type>(numpages() * page_size);
+            m_cache = new foxxll::simple_vector<block_type>(numpages() * page_size);
     }
 
     //! allows to free the cache, but you may not access any element until call
@@ -1062,8 +1063,9 @@ public:
             return;
 
         const size_t old_bids_size = m_bids.size();
-        const size_t new_bids_size = static_cast<size_t>(div_ceil(n, block_type::size));
-        const size_t new_pages = div_ceil(new_bids_size, page_size);
+        const size_t new_bids_size = static_cast<size_t>(
+            foxxll::div_ceil(n, block_type::size));
+        const size_t new_pages = foxxll::div_ceil(new_bids_size, page_size);
         m_page_status.resize(new_pages, uninitialized);
         m_page_to_slot.resize(new_pages, on_disk);
 
@@ -1116,7 +1118,8 @@ private:
         reserve(n);
         if (n < m_size) {
             // mark excess pages as uninitialized and evict them from cache
-            const size_t first_page_to_evict = static_cast<size_t>(div_ceil(n, block_type::size * page_size));
+            const size_t first_page_to_evict = static_cast<size_t>(
+                foxxll::div_ceil(n, block_type::size * page_size));
             for (size_t i = first_page_to_evict; i < m_page_status.size(); ++i) {
                 if (m_page_to_slot[i] != on_disk) {
                     m_free_slots.push(m_page_to_slot[i]);
@@ -1132,7 +1135,7 @@ private:
     void _resize_shrink_capacity(size_type n)
     {
         const size_t old_bids_size = m_bids.size();
-        const size_t new_bids_size = static_cast<size_t>(div_ceil(n, block_type::size));
+        const size_t new_bids_size = static_cast<size_t>(foxxll::div_ceil(n, block_type::size));
 
         if (new_bids_size > old_bids_size)
         {
@@ -1140,7 +1143,7 @@ private:
         }
         else if (new_bids_size < old_bids_size)
         {
-            const size_t new_pages_size = div_ceil(new_bids_size, page_size);
+            const size_t new_pages_size = foxxll::div_ceil(new_bids_size, page_size);
 
             STXXL_VERBOSE_VECTOR("shrinking from " << old_bids_size << " to " <<
                                  new_bids_size << " blocks = from " <<
@@ -1245,13 +1248,13 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    explicit vector(file_ptr from, const size_type size = size_type(-1),
+    explicit vector(foxxll::file_ptr from, const size_type size = size_type(-1),
                     const size_t npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-          m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
+          m_bids((size_t)foxxll::div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
-          m_page_status(div_ceil(m_bids.size(), page_size), valid_on_disk),
-          m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
+          m_page_status(foxxll::div_ceil(m_bids.size(), page_size), valid_on_disk),
+          m_page_to_slot(foxxll::div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(npages),
           m_cache(nullptr),
           m_from(from),
@@ -1266,7 +1269,7 @@ public:
             throw std::runtime_error(str.str());
         }
 
-        m_bm = block_manager::get_instance();
+        m_bm = foxxll::block_manager::get_instance();
 
         allocate_page_cache();
 
@@ -1287,16 +1290,16 @@ public:
     //! copy-constructor
     vector(const vector& obj)
         : m_size(obj.size()),
-          m_bids((size_t)div_ceil(obj.size(), block_type::size)),
+          m_bids((size_t)foxxll::div_ceil(obj.size(), block_type::size)),
           m_pager(obj.numpages()),
-          m_page_status(div_ceil(m_bids.size(), page_size), uninitialized),
-          m_page_to_slot(div_ceil(m_bids.size(), page_size), on_disk),
+          m_page_status(foxxll::div_ceil(m_bids.size(), page_size), uninitialized),
+          m_page_to_slot(foxxll::div_ceil(m_bids.size(), page_size), on_disk),
           m_slot_to_page(obj.numpages()),
           m_cache(nullptr),
           m_exported(false)
     {
         assert(!obj.m_exported);
-        m_bm = block_manager::get_instance();
+        m_bm = foxxll::block_manager::get_instance();
 
         allocate_page_cache();
 
@@ -1436,7 +1439,7 @@ public:
     //! Flushes the cache pages to the external memory.
     void flush() const
     {
-        simple_vector<bool> non_free_slots(numpages());
+        foxxll::simple_vector<bool> non_free_slots(numpages());
 
         for (size_t i = 0; i < numpages(); i++)
             non_free_slots[i] = true;
@@ -1476,7 +1479,7 @@ public:
         {
             flush();
         }
-        catch (io_error e)
+        catch (foxxll::io_error e)
         {
             STXXL_ERRMSG("io_error thrown in ~vector(): " << e.what());
         }
@@ -1532,7 +1535,7 @@ public:
     }
 
     //! Get the file associated with this vector, or nullptr.
-    const file_ptr & get_file() const
+    const foxxll::file_ptr & get_file() const
     {
         return m_from;
     }
@@ -1547,10 +1550,10 @@ public:
     template <typename ForwardIterator>
     void set_content(const ForwardIterator& bid_begin, const ForwardIterator& bid_end, size_type n)
     {
-        const size_t new_bids_size = div_ceil(n, block_type::size);
+        const size_t new_bids_size = foxxll::div_ceil(n, block_type::size);
         m_bids.resize(new_bids_size);
         std::copy(bid_begin, bid_end, m_bids.begin());
-        const size_t new_pages = div_ceil(new_bids_size, page_size);
+        const size_t new_pages = foxxll::div_ceil(new_bids_size, page_size);
         m_page_status.resize(new_pages, valid_on_disk);
         m_page_to_slot.resize(new_pages, on_disk);
         m_size = n;
@@ -1598,7 +1601,7 @@ private:
             return;
 
         STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
-        std::vector<request_ptr> reqs;
+        std::vector<foxxll::request_ptr> reqs;
         reqs.reserve(page_size);
 
         size_t block_no = page_no * page_size;
@@ -1620,7 +1623,7 @@ private:
 
         STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
 
-        std::vector<request_ptr> reqs;
+        std::vector<foxxll::request_ptr> reqs;
         reqs.reserve(page_size);
 
         size_t block_no = page_no * page_size;
@@ -1875,7 +1878,7 @@ public:
     using bids_container_iterator = typename vector_iterator::bids_container_iterator;
 
     //! construct output buffered stream used for overlapped reading
-    using buf_istream_type = buf_istream<block_type, bids_container_iterator>;
+    using buf_istream_type = foxxll::buf_istream<block_type, bids_container_iterator>;
 
     //! construct an iterator for vector_bufreader (for C++11 range-based for loop)
     using bufreader_iterator = vector_bufreader_iterator<vector_bufreader>;
@@ -1916,7 +1919,7 @@ public:
         m_begin.flush(); // flush container
 
         if (m_nbuffers == 0)
-            m_nbuffers = 2 * config::get_instance()->disks_number();
+            m_nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
         rewind();
     }
@@ -1932,7 +1935,7 @@ public:
         m_begin.flush(); // flush container
 
         if (m_nbuffers == 0)
-            m_nbuffers = 2 * config::get_instance()->disks_number();
+            m_nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
         rewind();
     }
@@ -2151,7 +2154,7 @@ public:
     using bids_container_iterator = typename vector_iterator::bids_container_iterator;
 
     //! construct output buffered stream used for overlapped reading
-    using buf_istream_type = buf_istream_reverse<block_type, bids_container_iterator>;
+    using buf_istream_type = foxxll::buf_istream_reverse<block_type, bids_container_iterator>;
 
     //! size of remaining data
     using size_type = typename vector_type::size_type;
@@ -2186,7 +2189,7 @@ public:
         m_begin.flush(); // flush container
 
         if (m_nbuffers == 0)
-            m_nbuffers = 2 * config::get_instance()->disks_number();
+            m_nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
         rewind();
     }
@@ -2202,7 +2205,7 @@ public:
         m_begin.flush(); // flush container
 
         if (m_nbuffers == 0)
-            m_nbuffers = 2 * config::get_instance()->disks_number();
+            m_nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
         rewind();
     }
@@ -2335,7 +2338,7 @@ public:
     using vector_const_iterator = typename iterator::const_iterator;
 
     //! construct output buffered stream used for overlapped writing
-    using buf_ostream_type = buf_ostream<block_type, bids_container_iterator>;
+    using buf_ostream_type = foxxll::buf_ostream<block_type, bids_container_iterator>;
 
 protected:
     //! internal iterator into the vector.
@@ -2370,7 +2373,7 @@ public:
           m_nbuffers(nbuffers)
     {
         if (m_nbuffers == 0)
-            m_nbuffers = 2 * config::get_instance()->disks_number();
+            m_nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
         assert(m_iter <= m_end);
     }
@@ -2387,7 +2390,7 @@ public:
           m_nbuffers(nbuffers)
     {
         if (m_nbuffers == 0)
-            m_nbuffers = 2 * config::get_instance()->disks_number();
+            m_nbuffers = 2 * foxxll::config::get_instance()->disks_number();
 
         assert(m_iter <= m_end);
     }

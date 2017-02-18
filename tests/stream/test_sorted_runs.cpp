@@ -55,7 +55,7 @@ int main()
     // special parameter type
     using InputType = stxxl::stream::from_sorted_sequences<value_type>;
     using CreateRunsAlg = stxxl::stream::runs_creator<
-              InputType, Cmp, 4096, stxxl::random_cyclic>;
+              InputType, Cmp, 4096, foxxll::random_cyclic>;
     using SortedRunsType = CreateRunsAlg::sorted_runs_type;
 
     unsigned input_size = (10 * megabyte / sizeof(value_type));

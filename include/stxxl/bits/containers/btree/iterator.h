@@ -13,7 +13,7 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
-#include <stxxl/bits/common/types.h>
+#include <foxxll/common/types.hpp>
 #include <stxxl/bits/verbose.h>
 
 #include <cassert>

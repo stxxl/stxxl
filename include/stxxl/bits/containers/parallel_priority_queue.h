@@ -24,20 +24,21 @@
 #define STXXL_MOVE(T) T
 #endif
 
+#include <foxxll/common/timer.hpp>
+#include <foxxll/common/types.hpp>
+#include <foxxll/io/request_operations.hpp>
+#include <foxxll/mng/block_alloc_strategy.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/buf_ostream.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/swap_vector.h>
-#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/mng/block_alloc_strategy.h>
-#include <stxxl/bits/mng/block_manager.h>
-#include <stxxl/bits/mng/buf_ostream.h>
-#include <stxxl/bits/mng/prefetch_pool.h>
-#include <stxxl/bits/mng/read_write_pool.h>
-#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/types>
@@ -452,11 +453,12 @@ public:
     using iterator = ppq_iterator<value_type>;
 
     using self_type = external_array<value_type, BlockSize, AllocStrategy>;
-    using block_type = typed_block<BlockSize, value_type>;
-    using pool_type = read_write_pool<block_type>;
-    using bid_vector = std::vector<BID<BlockSize> >;
+    using block_type = foxxll::typed_block<BlockSize, value_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
+    using bid_vector = std::vector<foxxll::BID<BlockSize> >;
     using bid_iterator = typename bid_vector::iterator;
     using block_vector = std::vector<block_type*>;
+    using request_ptr = foxxll::request_ptr;
     using request_vector = std::vector<request_ptr>;
     using minima_vector = std::vector<value_type>;
     using block_pointers_type = typename iterator::block_pointers_type;
@@ -540,7 +542,7 @@ public:
     external_array(const external_size_type size, pool_type* pool, const size_t level = 0)
         :   // constants
           m_capacity(size),
-          m_num_blocks(static_cast<size_t>(div_ceil(m_capacity, block_items))),
+          m_num_blocks(static_cast<size_t>(foxxll::div_ceil(m_capacity, block_items))),
           m_level(level),
           m_pool(pool),
 
@@ -563,7 +565,7 @@ public:
     {
         assert(m_capacity > 0);
         // allocate blocks in EM.
-        block_manager* bm = block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bm->new_blocks(AllocStrategy(), m_bids.begin(), m_bids.end());
     }
 
@@ -667,7 +669,7 @@ public:
 
         // figure out first block that is still allocated in EM.
         bid_iterator i_begin = m_bids.begin() + block_index;
-        block_manager::get_instance()->delete_blocks(i_begin, m_bids.end());
+        foxxll::block_manager::get_instance()->delete_blocks(i_begin, m_bids.end());
 
         // check that all is empty
         for (size_t i = block_index; i < end_block_index; ++i)
@@ -708,7 +710,7 @@ public:
     //! in RAM. Blocks belong to prefetch pool.
     static size_t int_memory(size_t capacity)
     {
-        size_t num_blocks = div_ceil(capacity, block_items);
+        size_t num_blocks = foxxll::div_ceil(capacity, block_items);
 
         return sizeof(external_array)
                + num_blocks * sizeof(typename bid_vector::value_type)
@@ -821,8 +823,8 @@ public:
         // for holding boundary blocks
         write_blocks *= 2;
         // more disks than threads?
-        if (write_blocks < config::get_instance()->disks_number())
-            write_blocks = config::get_instance()->disks_number();
+        if (write_blocks < foxxll::config::get_instance()->disks_number())
+            write_blocks = foxxll::config::get_instance()->disks_number();
 #if STXXL_DEBUG_ASSERTIONS
         // required for re-reading the external array
         write_blocks = 2 * write_blocks;
@@ -1140,7 +1142,7 @@ public:
         bid_iterator i_begin = m_bids.begin() + block_index;
         bid_iterator i_end = m_bids.begin() + block_index_after;
         assert(i_begin <= i_end);
-        block_manager::get_instance()->delete_blocks(i_begin, i_end);
+        foxxll::block_manager::get_instance()->delete_blocks(i_begin, i_end);
 
         for (size_t i = block_index; i < block_index_after; ++i) {
             assert(block_valid(i));
@@ -1892,10 +1894,10 @@ public:
     static const size_t block_size = BlockSize;
     using size_type = external_size_type;
 
-    using block_type = typed_block<block_size, value_type>;
-    using bid_vector = std::vector<BID<block_size> >;
+    using block_type = foxxll::typed_block<block_size, value_type>;
+    using bid_vector = std::vector<foxxll::BID<block_size> >;
     using bids_container_type = bid_vector;
-    using pool_type = read_write_pool<block_type>;
+    using pool_type = foxxll::read_write_pool<block_type>;
     using internal_array_type = ppq_local::internal_array<value_type>;
     using external_array_type = ppq_local::external_array<value_type, block_size, AllocStrategy>;
     using external_array_writer_type = typename external_array_type::writer_type;
@@ -1954,7 +1956,7 @@ protected:
     using stats_counter = dummy_custom_stats_counter<uint64_t>;
 
     //! Defines if statistics are gathered: fake_timer or timer
-    using stats_timer = fake_timer;
+    using stats_timer = foxxll::fake_timer;
 
     //! \}
 

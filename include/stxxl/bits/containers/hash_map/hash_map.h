@@ -14,8 +14,8 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 
+#include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/stream/sort_stream.h>
 #include <stxxl/bits/stream/stream.h>
 
@@ -110,9 +110,9 @@ public:
     };
 
     //! a subblock consists of subblock_size values
-    using subblock_type = typed_block<subblock_raw_size, value_type>;
+    using subblock_type = foxxll::typed_block<subblock_raw_size, value_type>;
     //! a block consists of block_size subblocks
-    using block_type = typed_block<block_raw_size, subblock_type>;
+    using block_type = foxxll::typed_block<block_raw_size, subblock_type>;
 
     //! block-identifier for subblocks
     using subblock_bid_type = typename subblock_type::bid_type;
@@ -568,7 +568,7 @@ public:
         buffer_size_ = 0;
 
         // free external memory
-        block_manager* bm = block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bm->delete_blocks(bids_.begin(), bids_.end());
         bids_.clear();
     }
@@ -1122,7 +1122,7 @@ protected:
         using values_stream_type = HashedValuesStream<self_type, reader_type>;
         using hashing_stream_type = HashingStream<values_stream_type, HashedValueExtractor>;
 
-        const size_t write_buffer_size = config::get_instance()->disks_number() * 4;
+        const size_t write_buffer_size = foxxll::config::get_instance()->disks_number() * 4;
 
         // determine new number of buckets from desired load_factor ...
         internal_size_type n_new;
@@ -1186,7 +1186,7 @@ protected:
         block_cache_.clear();
 
         // get rid of old blocks and buckets
-        block_manager* bm = stxxl::block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bm->delete_blocks(old_bids.begin(), old_bids.end());
 
         for (internal_size_type i_bucket = 0;
@@ -1319,7 +1319,7 @@ public:
 
         using writer_type = buffered_writer<block_type, bid_container_type>;
 
-        const size_t write_buffer_size = config::get_instance()->disks_number() * 2;
+        const size_t write_buffer_size = foxxll::config::get_instance()->disks_number() * 2;
 
         // calculate new number of buckets
         external_size_type num_total_new = num_total_ + (l - f);         // estimated number of elements
@@ -1417,7 +1417,7 @@ public:
         block_cache_.clear();
 
         // release old blocks
-        block_manager* bm = stxxl::block_manager::get_instance();
+        foxxll::block_manager* bm = foxxll::block_manager::get_instance();
         bm->delete_blocks(old_bids.begin(), old_bids.end());
 
         // free nodes in old bucket lists
