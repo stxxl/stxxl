@@ -60,6 +60,11 @@ private:
     size_t i;
 };
 
+//! omp_int_type should be a size_t. But since OpenMP < 3.0 only support
+//! signed integer types we have to go with this. It can be changed to size_t
+//! as soon as MSVC supports OpenMP 3.0...
+using omp_int_type = std::make_signed<size_t>::type;
+
 //! c = a [op] b; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, bool b_transposed, class Op>
 struct low_level_matrix_binary_ass_op
@@ -71,7 +76,7 @@ struct low_level_matrix_binary_ass_op
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+                for (omp_int_type row = 0; row < omp_int_type(BlockSideLength); ++row)
                     for (size_t col = 0; col < BlockSideLength; ++col)
                         op(c[switch_major_index < BlockSideLength, false > (row, col)],
                            a[switch_major_index < BlockSideLength, a_transposed > (row, col)],
@@ -80,7 +85,7 @@ struct low_level_matrix_binary_ass_op
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+                for (omp_int_type row = 0; row < omp_int_type(BlockSideLength); ++row)
                     for (size_t col = 0; col < BlockSideLength; ++col)
                         op(c[switch_major_index < BlockSideLength, false > (row, col)],
                            a[switch_major_index < BlockSideLength, a_transposed > (row, col)], 0);
@@ -90,7 +95,7 @@ struct low_level_matrix_binary_ass_op
             #if STXXL_PARALLEL
             #pragma omp parallel for
             #endif
-            for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+            for (omp_int_type row = 0; row < omp_int_type(BlockSideLength); ++row)
                 for (size_t col = 0; col < BlockSideLength; ++col)
                     op(c[switch_major_index < BlockSideLength, false > (row, col)],
                        0, b[switch_major_index < BlockSideLength, b_transposed > (row, col)]);
@@ -108,7 +113,7 @@ struct low_level_matrix_unary_ass_op
             #if STXXL_PARALLEL
             #pragma omp parallel for
             #endif
-            for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+            for (omp_int_type row = 0; row < omp_int_type(BlockSideLength); ++row)
                 for (size_t col = 0; col < BlockSideLength; ++col)
                     op(c[switch_major_index < BlockSideLength, false > (row, col)],
                        a[switch_major_index < BlockSideLength, a_transposed > (row, col)]);
@@ -125,7 +130,7 @@ struct low_level_matrix_unary_op
         #if STXXL_PARALLEL
         #pragma omp parallel for
         #endif
-        for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+        for (omp_int_type row = 0; row < omp_int_type(BlockSideLength); ++row)
             for (size_t col = 0; col < BlockSideLength; ++col)
                 c[switch_major_index < BlockSideLength, false > (row, col)] =
                     op(a[switch_major_index < BlockSideLength, a_transposed > (row, col)]);
@@ -160,7 +165,7 @@ struct low_level_matrix_multiply_and_add
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
+                for (omp_int_type i = 0; i < omp_int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
                     for (size_t k = 0; k < BlockSideLength; ++k)
                         for (size_t j = 0; j < BlockSideLength; ++j)
                             c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
@@ -170,7 +175,7 @@ struct low_level_matrix_multiply_and_add
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
+                for (omp_int_type i = 0; i < omp_int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
                     for (size_t j = 0; j < BlockSideLength; ++j)
                         for (size_t k = 0; k < BlockSideLength; ++k)
                             c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k + j * BlockSideLength];
@@ -183,7 +188,7 @@ struct low_level_matrix_multiply_and_add
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
+                for (omp_int_type i = 0; i < omp_int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
                     for (size_t k = 0; k < BlockSideLength; ++k)
                         for (size_t j = 0; j < BlockSideLength; ++j)
                             c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k * BlockSideLength + j];
@@ -193,7 +198,7 @@ struct low_level_matrix_multiply_and_add
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
+                for (omp_int_type i = 0; i < omp_int_type(BlockSideLength); ++i) //OpenMP does not like unsigned iteration variables
                     for (size_t k = 0; k < BlockSideLength; ++k)
                         for (size_t j = 0; j < BlockSideLength; ++j)
                             c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k + j * BlockSideLength];
@@ -203,7 +208,7 @@ struct low_level_matrix_multiply_and_add
 };
 
 #if STXXL_BLAS
-using blas_int =  int_type ;
+using blas_int =  size_t ;
 using blas_double_complex =  std::complex<double> ;
 using blas_single_complex =  std::complex<float> ;
 

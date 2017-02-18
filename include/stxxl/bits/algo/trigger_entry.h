@@ -230,7 +230,7 @@ struct trigger_entry_iterator
         value -= n;
         return *this;
     }
-    int_type operator - (const self_type& a) const
+    int64_t operator - (const self_type& a) const
     {
         return value - a.value;
     }

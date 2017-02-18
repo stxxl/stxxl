@@ -770,7 +770,7 @@ protected:
     std::stack<swappable_block_identifier_type> evictable_blocks;
     time_type time_count;
     bool last_op_release;
-    std::vector<int_type> reference_counts;
+    std::vector<size_t> reference_counts;
     internal_block_type dummy_block;
 
     void return_free_internal_block(internal_block_type* iblock)

@@ -19,8 +19,6 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-using stxxl::int_type;
-
 // forced instantiation
 template class stxxl::matrix<int, 32>;
 template class stxxl::matrix_iterator<int, 32>;
