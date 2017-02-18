@@ -19,6 +19,7 @@
 #ifndef STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 #define STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 
+#include <foxxll/common/utils.hpp>
 #include <stxxl/bits/parallel/compiletime_settings.h>
 #include <stxxl/bits/parallel/types.h>
 
