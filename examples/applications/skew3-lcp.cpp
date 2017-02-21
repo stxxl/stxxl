@@ -2732,7 +2732,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     }
     else {
         // define input file object and map input_vector to input_file (no copying)
-        input_file = foxxll::make_counting<foxxll::syscall_file>(
+        input_file = tlx::make_counting<foxxll::syscall_file>(
             input_filename, file::RDONLY | file::DIRECT);
         alphabet_vector_type file_input_vector(input_file);
         input_vector.swap(file_input_vector);
@@ -2740,7 +2740,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
     if (output_filename.size()) {
         // define output file object and map output_vector to output_file
-        output_file = foxxll::make_counting<foxxll::syscall_file>(
+        output_file = tlx::make_counting<foxxll::syscall_file>(
             output_filename, file::RDWR | file::CREAT | file::DIRECT);
         offset_vector_type file_output_vector(output_file);
         output_vector.swap(file_output_vector);

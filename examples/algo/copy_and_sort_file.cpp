@@ -92,9 +92,9 @@ int main(int argc, char** argv)
 
     using vector_type = stxxl::vector<my_type, 1, stxxl::lru_pager<2>, block_size>;
 
-    foxxll::file_ptr in_file = foxxll::make_counting<foxxll::syscall_file>(
+    foxxll::file_ptr in_file = tlx::make_counting<foxxll::syscall_file>(
         argv[1], foxxll::file::DIRECT | foxxll::file::RDONLY);
-    foxxll::file_ptr out_file = foxxll::make_counting<foxxll::syscall_file>(
+    foxxll::file_ptr out_file = tlx::make_counting<foxxll::syscall_file>(
         argv[2], foxxll::file::DIRECT | foxxll::file::RDWR | foxxll::file::CREAT);
     vector_type input(in_file);
     vector_type output(out_file);

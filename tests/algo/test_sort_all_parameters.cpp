@@ -69,13 +69,13 @@ void test_all_strategies(
     switch (strategy)
     {
     case 0:
-        test<T, stxxl::striping, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::striping, block_size>(data_mem, memory_to_use);
         break;
     case 1:
         test<T, foxxll::simple_random, block_size>(data_mem, memory_to_use);
         break;
     case 2:
-        test<T, stxxl::fully_random, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::fully_random, block_size>(data_mem, memory_to_use);
         break;
     case 3:
         test<T, foxxll::random_cyclic, block_size>(data_mem, memory_to_use);
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    uint64_t data_mem = stxxl::atouint64(argv[1]) * MB;
+    uint64_t data_mem = foxxll::atouint64(argv[1]) * MB;
     size_t sort_mem = strtoul(argv[2], nullptr, 0) * MB;
     int strategy = atoi(argv[3]);
     int block_size_switch = atoi(argv[4]);

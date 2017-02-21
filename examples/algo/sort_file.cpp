@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 #if STXXL_PARALLEL_MULTIWAY_MERGE
         STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-        foxxll::file_ptr f = foxxll::make_counting<foxxll::syscall_file>(
+        foxxll::file_ptr f = tlx::make_counting<foxxll::syscall_file>(
             argv[2], foxxll::file::DIRECT | foxxll::file::RDWR);
         unsigned memory_to_use = 50 * 1024 * 1024;
         using vector_type = stxxl::vector<my_type, 1, stxxl::lru_pager<8>, block_size>;

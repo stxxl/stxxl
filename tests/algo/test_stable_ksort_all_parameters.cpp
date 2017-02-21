@@ -33,7 +33,7 @@ void test(size_t data_mem, size_t memory_to_use)
     size_t records_to_sort = data_mem / sizeof(T);
     using vector_type = stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type>;
 
-    memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
+    memory_to_use = foxxll::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
 
     vector_type v(records_to_sort);
     size_t ndisks = foxxll::config::get_instance()->disks_number();
@@ -72,13 +72,13 @@ void test_all_strategies(
     switch (strategy)
     {
     case 0:
-        test<T, stxxl::striping, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::striping, block_size>(data_mem, memory_to_use);
         break;
     case 1:
         test<T, foxxll::simple_random, block_size>(data_mem, memory_to_use);
         break;
     case 2:
-        test<T, stxxl::fully_random, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::fully_random, block_size>(data_mem, memory_to_use);
         break;
     case 3:
         test<T, foxxll::random_cyclic, block_size>(data_mem, memory_to_use);

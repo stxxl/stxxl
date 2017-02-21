@@ -17,7 +17,7 @@
 #include <foxxll/mng/block_scheduler.hpp>
 #include <stxxl/bits/containers/matrix_arithmetic.h>
 
-#include <foxxll/common/counting_ptr.hpp>
+#include <tlx/counting_ptr.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -234,7 +234,7 @@ public:
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
-class swappable_block_matrix : public foxxll::reference_count
+class swappable_block_matrix : public tlx::reference_counter
 {
 public:
     using size_type =  int_type ;
@@ -343,7 +343,7 @@ public:
     }
 
     swappable_block_matrix(const swappable_block_matrix& other)
-        : reference_count(other),
+        : tlx::reference_counter(other),
           bs(other.bs),
           height(other.height),
           width(other.width),
@@ -1048,7 +1048,7 @@ protected:
     using matrix_type = matrix<ValueType, BlockSideLength>;
     using swappable_block_matrix_type = swappable_block_matrix<ValueType, BlockSideLength>;
     using swappable_block_matrix_pointer_type =
-        foxxll::counting_ptr<swappable_block_matrix_type>;
+        tlx::counting_ptr<swappable_block_matrix_type>;
     using block_scheduler_type = typename swappable_block_matrix_type::block_scheduler_type;
     using block_size_type = typename swappable_block_matrix_type::size_type;
     using elem_size_type = typename swappable_block_matrix_type::elem_size_type;
@@ -1164,7 +1164,7 @@ public:
         if (data.unique())
             data->set_zero();
         else
-            data = foxxll::make_counting<swappable_block_matrix_type>(
+            data = tlx::make_counting<swappable_block_matrix_type>(
                 data->bs, foxxll::div_ceil(height, BlockSideLength),
                 foxxll::div_ceil(width, BlockSideLength));
     }

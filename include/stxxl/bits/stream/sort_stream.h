@@ -27,7 +27,7 @@
 #include <stxxl/bits/stream/sorted_runs.h>
 #include <stxxl/bits/stream/stream.h>
 
-#include <foxxll/common/counting_ptr.hpp>
+#include <tlx/counting_ptr.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -69,7 +69,7 @@ public:
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
     using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
     using run_type = typename sorted_runs_data_type::run_type;
-    using sorted_runs_type = foxxll::counting_ptr<sorted_runs_data_type>;
+    using sorted_runs_type = tlx::counting_ptr<sorted_runs_data_type>;
 
     using element_iterator = typename element_iterator_traits<block_type, external_size_type>::element_iterator;
 
@@ -439,7 +439,7 @@ public:
     using block_type = foxxll::typed_block<BlockSize, value_type>;
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
     using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
-    using sorted_runs_type = foxxll::counting_ptr<sorted_runs_data_type>;
+    using sorted_runs_type = tlx::counting_ptr<sorted_runs_data_type>;
     using request_ptr = foxxll::request_ptr;
     using result_type = sorted_runs_type;
 
@@ -757,7 +757,7 @@ public:
 public:
     using cmp_type = CompareType;
     using sorted_runs_data_type = sorted_runs<trigger_entry_type, cmp_type>;
-    using sorted_runs_type = foxxll::counting_ptr<sorted_runs_data_type>;
+    using sorted_runs_type = tlx::counting_ptr<sorted_runs_data_type>;
     using result_type = sorted_runs_type;
 
 private:

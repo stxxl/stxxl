@@ -19,7 +19,7 @@
 #include <foxxll/mng/typed_block.hpp>
 #include <stxxl/bits/algo/trigger_entry.h>
 
-#include <foxxll/common/counting_ptr.hpp>
+#include <tlx/counting_ptr.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -36,7 +36,7 @@ namespace stream {
 
 //! All sorted runs of a sort operation.
 template <typename TriggerEntryType, typename CompareType>
-struct sorted_runs : public foxxll::reference_count
+struct sorted_runs : public tlx::reference_counter
 {
     using trigger_entry_type = TriggerEntryType;
     using block_type = typename trigger_entry_type::block_type;

@@ -27,10 +27,10 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
     foxxll::timer tm(true);    // start a timer
 
     // input file object
-    foxxll::file_ptr InputFile = foxxll::make_counting<foxxll::syscall_file>(
+    foxxll::file_ptr InputFile = tlx::make_counting<foxxll::syscall_file>(
         input_path, file::RDONLY | file::DIRECT);
     // output file object
-    foxxll::file_ptr OutputFile = foxxll::make_counting<foxxll::syscall_file>(
+    foxxll::file_ptr OutputFile = tlx::make_counting<foxxll::syscall_file>(
         output_path, file::RDWR | file::CREAT | file::DIRECT);
 
     using vector_type = stxxl::vector<unsigned char>;
