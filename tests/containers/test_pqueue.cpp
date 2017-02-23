@@ -49,6 +49,9 @@ struct my_type
 
 struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 {
+    my_cmp() = delete;       // make sure that comparator does not
+    explicit my_cmp(int) {}  // get default constructed
+
     bool operator () (const my_type& a, const my_type& b) const
     {
         return a.key > b.key;
@@ -67,17 +70,6 @@ template class stxxl::PRIORITY_QUEUE_GENERATOR<
 
 int main()
 {
-/*
-  unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
-  unsigned N_ = 512, // bandwidth
-  unsigned IntKMAX_ = 64, // maximal arity for internal mergers
-  unsigned IntLevels_ = 4,
-  unsigned BlockSize_ = (2*1024*1024),
-  unsigned ExtKMAX_ = 64, // maximal arity for external mergers
-  unsigned ExtLevels_ = 2,
- */
-    //typedef priority_queue<priority_queue_config<my_type,my_cmp,
-    //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
     using gen = stxxl::PRIORITY_QUEUE_GENERATOR<
               my_type, my_cmp, 700* 1024, volume / sizeof(my_type)
               >;
@@ -95,7 +87,7 @@ int main()
         (mem_for_pools / 2) / block_type::raw_size,
         (mem_for_pools / 2) / block_type::raw_size
         );
-    pq_type p(pool);
+    pq_type p(pool, my_cmp{1});
 
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
