@@ -202,7 +202,7 @@ void test_comparator_extract()
         }
     };
 
-    auto cmp = stxxl::make_struct_comparator<my_type, direction::Less, direction::Greater>(
+    const auto cmp = stxxl::make_struct_comparator<my_type, direction::Less, direction::Greater>(
         [](auto& o) { return std::tie(o.keyA, o.keyB, o.keyC); });
 
     std::vector<my_type> values({
