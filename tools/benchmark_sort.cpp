@@ -17,7 +17,7 @@
  */
 
 #include <foxxll/common/cmdline.hpp>
-#include <stxxl/bits/common/tuple.h>
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/ksort>
 #include <stxxl/sort>
 #include <stxxl/stream>
@@ -25,6 +25,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <random>
 
 using foxxll::timestamp;
 using foxxll::external_size_type;
@@ -32,62 +33,52 @@ using foxxll::external_size_type;
 #define MB (1024 * 1024)
 
 // pair of uint32_t = 8 bytes
-using pair32_type = stxxl::tuple<uint32_t, uint32_t>;
+using pair32_type = std::pair<uint32_t, uint32_t>;
 
 // pair of uint64_t = 16 bytes
-using pair64_type = stxxl::tuple<uint64_t, uint64_t>;
+using pair64_type = std::pair<uint64_t, uint64_t>;
 
 // larger struct of 64 bytes
-struct struct64_type : public pair64_type
-{
-    char junk[16 + 32];
-
-    struct64_type() { }
-
-    explicit struct64_type(const pair64_type& pt)
-        : pair64_type(pt)
-    { }
-};
+using pair64_with_junk_type = std::tuple<
+          uint64_t, uint64_t,                                        // keys
+          uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t // junk
+          >;
 
 // construct a simple sorting benchmark for the value type
-template <typename ValueType, typename RandomGenerator>
+template <typename ValueType>
 class BenchmarkSort
 {
     using value_type = ValueType;
 
-    struct value_less
+    struct value_key_second
     {
-        bool operator () (const value_type& a, const value_type& b) const
+        using key_type = typename std::tuple_element<1, value_type>::type;
+
+        key_type operator () (const value_type& p) const
         {
-            return a.first < b.first;
+            return std::get<1>(p);
         }
 
         static value_type min_value()
-        { return value_type(value_type::min_value()); }
+        {
+            value_type res;
+            std::get<0>(res) = std::numeric_limits<key_type>::min();
+            std::get<1>(res) = std::numeric_limits<key_type>::min();
+            return res;
+        }
 
         static value_type max_value()
-        { return value_type(value_type::max_value()); }
-    };
-
-    struct value_key_second
-    {
-        using key_type = typename value_type::second_type;
-
-        key_type operator () (const value_type& p) const
-        { return p.second; }
-
-        static value_type min_value()
-        { return value_type(value_type::min_value()); }
-
-        static value_type max_value()
-        { return value_type(value_type::max_value()); }
+        {
+            value_type res;
+            std::get<0>(res) = std::numeric_limits<key_type>::max();
+            std::get<1>(res) = std::numeric_limits<key_type>::max();
+            return res;
+        }
     };
 
     struct random_stream
     {
         using value_type = ValueType;
-
-        RandomGenerator m_rng;
 
         value_type m_value;
 
@@ -96,8 +87,8 @@ class BenchmarkSort
         explicit random_stream(external_size_type size)
             : m_counter(size)
         {
-            m_value.first = m_rng();
-            m_value.second = m_rng();
+            std::get<0>(m_value) = m_rng();
+            std::get<1>(m_value) = m_rng();
         }
 
         const value_type& operator * () const
@@ -110,8 +101,8 @@ class BenchmarkSort
             assert(m_counter > 0);
             --m_counter;
 
-            m_value.first = m_rng();
-            m_value.second = m_rng();
+            std::get<0>(m_value) = m_rng();
+            std::get<1>(m_value) = m_rng();
             return *this;
         }
 
@@ -119,6 +110,10 @@ class BenchmarkSort
         {
             return (m_counter == 0);
         }
+
+    private:
+        using key_type = typename std::tuple_element<0, value_type>::type;
+        std::default_random_engine m_rng;
     };
 
     static void output_result(double elapsed, external_size_type vec_size)
@@ -136,8 +131,9 @@ public:
 
         stxxl::vector<ValueType> vec(vec_size);
 
-        // construct random stream
+        auto comp_fst = stxxl::make_struct_comparator<value_type>([](auto& o) { return std::tie(std::get<0>(o)); });
 
+        // construct random stream
         std::cout << "#!!! running sorting test with " << desc << " = " << sizeof(ValueType) << " bytes."
                   << std::endl;
         {
@@ -154,7 +150,7 @@ public:
             std::cout << "# stxxl::sort vector of size " << vec.size() << std::endl;
             double ts1 = timestamp();
 
-            stxxl::sort(vec.begin(), vec.end(), value_less(), memsize);
+            stxxl::sort(vec.begin(), vec.end(), comp_fst, memsize);
 
             double elapsed = timestamp() - ts1;
             output_result(elapsed, vec_size);
@@ -173,10 +169,10 @@ public:
         {
             std::cout << "# stxxl::stream::sort of size " << vec_size << std::endl;
             double ts1 = timestamp();
-            using random_stream_sort_type = stxxl::stream::sort<random_stream, value_less>;
+            using random_stream_sort_type = stxxl::stream::sort<random_stream, decltype(comp_fst)>;
 
             random_stream stream(vec_size);
-            random_stream_sort_type stream_sort(stream, value_less(), memsize);
+            random_stream_sort_type stream_sort(stream, comp_fst, memsize);
 
             stxxl::stream::discard(stream_sort);
 
@@ -211,13 +207,14 @@ int benchmark_sort(int argc, char* argv[])
     if (!cp.process(argc, argv))
         return -1;
 
-    BenchmarkSort<pair32_type, stxxl::random_number32>(
+    BenchmarkSort<pair32_type>(
         "pair of uint32_t", length, memsize);
 
-    BenchmarkSort<pair64_type, stxxl::random_number32>(
+    BenchmarkSort<pair64_type>(
         "pair of uint64_t", length, memsize);
 
-    BenchmarkSort<struct64_type, stxxl::random_number32>(
+    static_assert(sizeof(pair64_with_junk_type) == 64, "Junk type too small");
+    BenchmarkSort<pair64_with_junk_type>(
         "struct of 64 bytes", length, memsize);
 
     return 0;
