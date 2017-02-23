@@ -109,8 +109,10 @@ protected:
 
 public:
     //! Default constructor creates no elements.
-    explicit internal_priority_queue(size_type capacity)
-        : heap(capacity), current_size(0)
+    explicit internal_priority_queue(size_type capacity, const CompareType& compare)
+        : heap(capacity),
+          comp(compare),
+          current_size(0)
     { }
 
     //! Returns true if the %queue is empty.

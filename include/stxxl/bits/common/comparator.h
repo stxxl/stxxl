@@ -234,14 +234,14 @@ public:
 
     value_type min_value() const
     {
-        return (Mode == direction::Less)
+        return (Mode != direction::Greater)
                ? own_or_derive_switch_min<ValueType>::min_value()
                : own_or_derive_switch_max<ValueType>::max_value();
     }
 
     value_type max_value() const
     {
-        return (Mode == direction::Less)
+        return (Mode != direction::Greater)
                ? own_or_derive_switch_max<ValueType>::max_value()
                : own_or_derive_switch_min<ValueType>::min_value();
     }
@@ -360,7 +360,8 @@ template <typename ValueType, typename KeyExtract, direction... Modes>
 class struct_comparator
 {
 public:
-    explicit struct_comparator(const KeyExtract keys) : keys(keys) { }
+    explicit struct_comparator(const KeyExtract keys = KeyExtract()) : keys(keys) { }
+
 
     ValueType min_value() const
     {
@@ -376,7 +377,7 @@ public:
         return result;
     }
 
-    bool operator () (const ValueType& a, const ValueType& b)
+    bool operator () (const ValueType& a, const ValueType& b) const
     {
         return impl(keys(a), keys(b));
     }
@@ -407,7 +408,7 @@ private:
 };
 
 template <typename ValueType, direction... Modes, typename KeyExtract>
-auto make_struct_comparator(KeyExtract extract)
+auto make_struct_comparator(const KeyExtract extract)
 {
     return struct_comparator<ValueType, KeyExtract, Modes...>(extract);
 }

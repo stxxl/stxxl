@@ -138,7 +138,13 @@ protected:
               ExtKMAX,
               alloc_strategy_type>;
 
-    int_merger_type int_mergers[kNumIntGroups];
+    comparator_type cmp;
+
+    // this is realy hacky: int_merger_buffer does not have a default constructor
+    char int_merger_buffer[ kNumIntGroups * sizeof(int_merger_type) ];
+    int_merger_type* int_mergers;
+
+
     pool_type* pool;
     bool pool_owned;
     ext_merger_type** ext_mergers;
@@ -152,7 +158,6 @@ protected:
     value_type* delete_buffer_current_min;                     // current start of delete_buffer
     value_type* delete_buffer_end;                             // end of delete_buffer
 
-    comparator_type cmp;
 
     // insert buffer
     insert_heap_type insert_heap;
@@ -196,7 +201,7 @@ public:
     //! for data writing and prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    explicit priority_queue(pool_type& pool_);
+    explicit priority_queue(pool_type& pool_, const comparator_type& comp_ = comparator_type());
 
     //! Constructs external priority queue object.
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
@@ -207,7 +212,7 @@ public:
     //! for writing data for the memory<->disk transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    priority_queue(const size_t p_pool_mem, const size_t w_pool_mem);
+    priority_queue(const size_t p_pool_mem, const size_t w_pool_mem, const comparator_type& comp_ = comparator_type());
 
     //! non-copyable: delete copy-constructor
     priority_queue(const priority_queue&) = delete;
@@ -223,7 +228,6 @@ public:
     //! Implementation correctness is questionable.
     void swap(priority_queue& obj)
     {
-        //swap_1D_arrays(int_mergers,obj.int_mergers,kNumIntGroups); // does not work in g++ 3.4.3 :( bug?
         for (size_t i = 0; i < kNumIntGroups; ++i)
             std::swap(int_mergers[i], obj.int_mergers[i]);
 
@@ -377,11 +381,13 @@ inline void priority_queue<ConfigType>::push(const value_type& obj)
 ////////////////////////////////////////////////////////////////
 
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(pool_type& pool_)
-    : pool(&pool_),
+priority_queue<ConfigType>::priority_queue(pool_type& pool_, const comparator_type& comp_)
+    : cmp(comp_),
+      int_mergers(reinterpret_cast<int_merger_type*>(int_merger_buffer)),
+      pool(&pool_),
       pool_owned(false),
       delete_buffer_end(delete_buffer + kDeleteBufferSize),
-      insert_heap(N + 2),
+      insert_heap(N + 2, comp_),
       num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE_PQ("priority_queue(pool)");
@@ -389,11 +395,13 @@ priority_queue<ConfigType>::priority_queue(pool_type& pool_)
 }
 
 template <class ConfigType>
-priority_queue<ConfigType>::priority_queue(const size_t p_pool_mem, const size_t w_pool_mem)
-    : pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
+priority_queue<ConfigType>::priority_queue(const size_t p_pool_mem, const size_t w_pool_mem, const comparator_type& comp_)
+    : cmp(comp_),
+      int_mergers(reinterpret_cast<int_merger_type*>(int_merger_buffer)),
+      pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
       pool_owned(true),
       delete_buffer_end(delete_buffer + kDeleteBufferSize),
-      insert_heap(N + 2),
+      insert_heap(N + 2, comp_),
       num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE_PQ("priority_queue(pool sizes)");
@@ -405,9 +413,14 @@ void priority_queue<ConfigType>::init()
 {
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
+    for (size_t j = 0; j < kNumIntGroups; ++j) {
+        // construct a int_merger at fixed position
+        new (&int_mergers[j]) int_merger_type(cmp);
+    }
+
     ext_mergers = new ext_merger_type*[kNumExtGroups];
     for (size_t j = 0; j < kNumExtGroups; ++j) {
-        ext_mergers[j] = new ext_merger_type;
+        ext_mergers[j] = new ext_merger_type(cmp);
         ext_mergers[j]->set_pool(pool);
     }
 
@@ -431,6 +444,7 @@ priority_queue<ConfigType>::~priority_queue()
 
     for (size_t j = 0; j < kNumExtGroups; ++j)
         delete ext_mergers[j];
+
     delete[] ext_mergers;
 }
 
@@ -687,7 +701,7 @@ size_t priority_queue<ConfigType>::make_space_available(const size_t level)
         const size_t extLevel = level - kNumIntGroups;
         const size_type segmentSize = ext_mergers[extLevel]->size();
         STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
-        ext_merger_type* overflow_merger = new ext_merger_type;
+        ext_merger_type* overflow_merger = new ext_merger_type(cmp);
         overflow_merger->set_pool(pool);
         overflow_merger->append_merger(*ext_mergers[extLevel], segmentSize);
         std::swap(ext_mergers[extLevel], overflow_merger);

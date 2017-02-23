@@ -79,12 +79,11 @@ public:
         block_type* block;       //!< current block
         size_t current;          //!< current index in current block
         bid_container_type bids; //!< list of blocks forming this sequence
-        compare_type cmp;
         ext_merger* merger;
         bool allocated;
 
         //! \returns current element
-        const value_type& operator * () const
+        const value_type& current_front() const
         {
             return (*block)[current];
         }
@@ -108,21 +107,17 @@ public:
             bm->delete_blocks(bids.begin(), bids.end());
         }
 
-        void make_inf()
+        void make_inf(const compare_type& cmp)
         {
             current = 0;
             (*block)[0] = cmp.min_value();
         }
 
-        bool is_sentinel(const value_type& a) const
+        bool is_sentinel(const value_type& a, const compare_type& cmp) const
         {
             return !(cmp(cmp.min_value(), a));
         }
 
-        bool not_sentinel(const value_type& a) const
-        {
-            return cmp(cmp.min_value(), a);
-        }
 
         void swap(sequence_state& obj)
         {
@@ -134,47 +129,6 @@ public:
                 assert(merger == obj.merger);
                 std::swap(allocated, obj.allocated);
             }
-        }
-
-        sequence_state& operator ++ ()
-        {
-            assert(not_sentinel((*block)[current]));
-            assert(current < block->size);
-
-            ++current;
-
-            if (current == block->size)
-            {
-                STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
-                // go to the next block
-                if (bids.empty()) // if there is no next block
-                {
-                    STXXL_VERBOSE2("ext_merger sequence_state operator++ it was the last block in the sequence ");
-                    // swap memory area and delete other object.
-                    bid_container_type to_delete;
-                    std::swap(to_delete, bids);
-                    make_inf();
-                }
-                else
-                {
-                    STXXL_VERBOSE2("ext_merger sequence_state operator++ there is another block ");
-                    bid_type bid = bids.front();
-                    bids.pop_front();
-                    merger->pool->hint(bid);
-                    if (!(bids.empty()))
-                    {
-                        STXXL_VERBOSE2("ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next");
-                        merger->pool->hint(bids.front());
-                    }
-                    merger->pool->read(block, bid)->wait();
-                    //req-ostream STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
-                    if (!(bids.empty()))
-                        merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
-                    foxxll::block_manager::get_instance()->delete_block(bid);
-                    current = 0;
-                }
-            }
-            return *this;
         }
     };
 
@@ -197,11 +151,14 @@ protected:
     //! total number of elements stored
     size_type m_size;
 
+    compare_type cmp;
+
 public:
-    explicit ext_merger(const compare_type& c = compare_type()) // TODO: pass pool as parameter
-        : tree(c, *this),
+    explicit ext_merger(const compare_type& cmp = compare_type()) // TODO: pass pool as parameter
+        : tree(cmp, *this),
           pool(nullptr),
-          m_size(0)
+          m_size(0),
+          cmp(cmp)
     {
         init();
 
@@ -235,7 +192,7 @@ public:
     //! is this segment empty ?
     bool is_array_empty(const size_t slot) const
     {
-        return is_sentinel(*(states[slot]));
+        return is_sentinel(states[slot].current_front());
     }
 
     //! Is this segment allocated? Otherwise it's empty, already on the stack
@@ -260,7 +217,7 @@ public:
     //! Set a usually empty array to the sentinel
     void make_array_sentinel(const size_t a)
     {
-        states[a].make_inf();
+        states[a].make_inf(cmp);
     }
 
     //! free an empty segment.
@@ -269,7 +226,7 @@ public:
         STXXL_VERBOSE1("ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot)));
         assert(is_array_allocated(slot));
         states[slot].allocated = false;
-        states[slot].make_inf();
+        states[slot].make_inf(cmp);
 
         // free player in loser tree
         tree.free_player(slot);
@@ -313,7 +270,7 @@ protected:
             else
                 states[i].block = sentinel_block;
 
-            states[i].make_inf();
+            states[i].make_inf(cmp);
         }
     }
 
@@ -442,7 +399,7 @@ public:
         m_size += segment_size;
 
         // propagate new information up the tree
-        tree.update_on_insert((index + tree.k) >> 1, *(states[index]), index);
+        tree.update_on_insert((index + tree.k) >> 1, states[index].current_front(), index);
     }
 
     // delete the (length = end-begin) smallest elements and write them to [begin..end)
@@ -488,14 +445,14 @@ protected:
 
         for (size_t i = 0; i < k; ++i) //initialize sequences
         {
-            if (states[i].current == states[i].block->size || is_sentinel(*states[i]))
+            if (states[i].current == states[i].block->size || is_sentinel(states[i].current_front()))
                 continue;
 
             seqs.push_back(std::make_pair(states[i].block->begin() + states[i].current, states[i].block->end()));
             orig_seq_index.push_back(i);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-            if (!is_sentinel(*seqs.back().first) && !stxxl::is_sorted(seqs.back().first, seqs.back().second, inv_cmp))
+            if (!is_sentinel(*seqs.back().first, cmp) && !stxxl::is_sorted(seqs.back().first, seqs.back().second, inv_cmp))
             {
                 STXXL_VERBOSE1("length " << i << " " << (seqs.back().second - seqs.back().first));
                 for (value_type* v = seqs.back().first + 1; v < seqs.back().second; ++v)
@@ -504,7 +461,7 @@ protected:
                     {
                         STXXL_VERBOSE1("Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v);
                     }
-                    if (is_sentinel(*v))
+                    if (is_sentinel(*v, cmp))
                     {
                         STXXL_VERBOSE1("Wrong sentinel at position " << (v - seqs.back().first));
                     }
@@ -606,7 +563,7 @@ protected:
                     {
                         // if there is no next block
                         STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
-                        state.make_inf();
+                        state.make_inf(cmp);
                     }
                     else
                     {
@@ -643,7 +600,7 @@ protected:
                                 {
                                     STXXL_VERBOSE1("Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v);
                                 }
-                                if (is_sentinel(*v))
+                                if (is_sentinel(*v, cmp))
                                 {
                                     STXXL_VERBOSE1("Wrong sentinel at position " << (v - seqs[i].first));
                                 }
