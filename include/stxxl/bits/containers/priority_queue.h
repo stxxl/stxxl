@@ -31,16 +31,7 @@
 
 namespace stxxl {
 
-/*
-   KNBufferSize1 = 32;
-   KNN = 512; // length of group 1 sequences
-   KNKMAX = 64;  // maximal arity
-   LogKNKMAX = 6;  // ceil(log KNKMAX)
-   KNLevels = 4; // overall capacity >= KNN*KNKMAX^KNLevels
- */
-
 // internal memory consumption >= N_*(KMAX_^IntLevels_) + ext
-
 template <
     class ValueType,
     class CompareTypeWithMin,
@@ -158,6 +149,9 @@ public:
         STXXL_VERBOSE_PQ("~priority_queue()");
         if (pool_owned)
             delete pool;
+
+        for (size_t j = 0; j < kNumIntGroups; ++j)
+            int_mergers[j].~int_merger();
 
         for (size_t j = 0; j < kNumExtGroups; ++j)
             delete ext_mergers[j];

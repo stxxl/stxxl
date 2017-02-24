@@ -80,17 +80,19 @@ public:
         size_t current;          //!< current index in current block
         bid_container_type bids; //!< list of blocks forming this sequence
         ext_merger* merger;
+        compare_type cmp;
         bool allocated;
 
         //! \returns current element
-        const value_type& current_front() const
+        const value_type & current_front() const
         {
             return (*block)[current];
         }
 
-        sequence_state()
+        sequence_state(const compare_type& cmp)
             : block(nullptr), current(0),
               merger(nullptr),
+              cmp(cmp),
               allocated(false)
         { }
 
@@ -107,17 +109,16 @@ public:
             bm->delete_blocks(bids.begin(), bids.end());
         }
 
-        void make_inf(const compare_type& cmp)
+        void make_inf()
         {
             current = 0;
             (*block)[0] = cmp.min_value();
         }
 
-        bool is_sentinel(const value_type& a, const compare_type& cmp) const
+        bool is_sentinel(const value_type& a) const
         {
             return !(cmp(cmp.min_value(), a));
         }
-
 
         void swap(sequence_state& obj)
         {
@@ -130,6 +131,58 @@ public:
                 std::swap(allocated, obj.allocated);
             }
         }
+
+        sequence_state & advance()
+        {
+            assert(!is_sentinel((*block)[current]));
+            assert(current < block->size);
+
+            ++current;
+
+            if (current == block->size)
+            {
+                STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
+                // go to the next block
+                if (bids.empty()) // if there is no next block
+                {
+                    STXXL_VERBOSE2("ext_merger sequence_state operator++ it was the last block in the sequence ");
+                    // swap memory area and delete other object.
+                    bid_container_type to_delete;
+                    std::swap(to_delete, bids);
+                    make_inf();
+                }
+                else
+                {
+                    STXXL_VERBOSE2("ext_merger sequence_state operator++ there is another block ");
+                    bid_type bid = bids.front();
+                    bids.pop_front();
+                    merger->pool->hint(bid);
+                    if (!(bids.empty()))
+                    {
+                        STXXL_VERBOSE2("ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next");
+                        merger->pool->hint(bids.front());
+                    }
+                    merger->pool->read(block, bid)->wait();
+                    //req-ostream STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
+                    if (!(bids.empty()))
+                        merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
+                    foxxll::block_manager::get_instance()->delete_block(bid);
+                    current = 0;
+                }
+            }
+            return *this;
+        }
+
+        // legacy adapters
+        sequence_state& operator ++ ()
+        {
+            return advance();
+        }
+
+        const value_type& operator * () const
+        {
+            return current_front();
+        }
     };
 
     //! type of sequences in which the values are stored: external arrays
@@ -140,7 +193,7 @@ protected:
     tree_type tree;
 
     //! sequence including current position, dereference gives current element
-    sequence_state states[kMaxArity];
+    sequence_state* states;
 
     //! read and writer block pool
     pool_type* pool;
@@ -178,6 +231,11 @@ public:
             delete states[i].block;
         }
         delete sentinel_block;
+
+        for (size_t i = 0; i < kMaxArity; ++i)
+            states[i].~sequence_state();
+
+        delete reinterpret_cast<uint8_t*>(states);
     }
 
     void set_pool(pool_type* pool_)
@@ -217,7 +275,7 @@ public:
     //! Set a usually empty array to the sentinel
     void make_array_sentinel(const size_t a)
     {
-        states[a].make_inf(cmp);
+        states[a].make_inf();
     }
 
     //! free an empty segment.
@@ -226,7 +284,7 @@ public:
         STXXL_VERBOSE1("ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot)));
         assert(is_array_allocated(slot));
         states[slot].allocated = false;
-        states[slot].make_inf(cmp);
+        states[slot].make_inf();
 
         // free player in loser tree
         tree.free_player(slot);
@@ -250,6 +308,10 @@ protected:
     {
         STXXL_VERBOSE2("ext_merger::init()");
 
+        states = reinterpret_cast<sequence_state*>(new uint8_t[sizeof(sequence_state) * kMaxArity]);
+        for (size_t i = 0; i < kMaxArity; ++i)
+            new (&states[i])sequence_state(cmp);
+
         sentinel_block = nullptr;
         if (arity < kMaxArity)
         {
@@ -270,7 +332,7 @@ protected:
             else
                 states[i].block = sentinel_block;
 
-            states[i].make_inf(cmp);
+            states[i].make_inf();
         }
     }
 
@@ -563,7 +625,7 @@ protected:
                     {
                         // if there is no next block
                         STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
-                        state.make_inf(cmp);
+                        state.make_inf();
                     }
                     else
                     {
