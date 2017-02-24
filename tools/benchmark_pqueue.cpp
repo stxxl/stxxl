@@ -21,7 +21,7 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
-#include <foxxll/common/cmdline.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/priority_queue>
 #include <stxxl/random>
@@ -299,7 +299,7 @@ int do_benchmark_pqueue_type(unsigned type, unsigned pqconfig, external_size_typ
 int benchmark_pqueue(int argc, char* argv[])
 {
     // parse command line
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
 
     cp.set_description(description);
 

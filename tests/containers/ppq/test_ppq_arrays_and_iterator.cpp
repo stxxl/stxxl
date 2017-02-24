@@ -13,9 +13,9 @@
 //! \example containers/external_array.cpp
 //! This is an example of how to use \c stxxl::external_array
 
-#include <foxxll/common/cmdline.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/timer>
@@ -476,7 +476,7 @@ int main(int argc, char** argv)
     unsigned numpbs = 1;
     unsigned numwbs = 14;
 
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
     cp.set_description("STXXL external array test");
     cp.set_author("Thomas Keh <thomas.keh@student.kit.edu>");
     cp.add_bytes('v', "volume", volume,

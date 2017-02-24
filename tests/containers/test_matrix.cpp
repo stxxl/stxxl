@@ -14,7 +14,7 @@
 #include <iostream>
 #include <limits>
 
-#include <foxxll/common/cmdline.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -348,7 +348,7 @@ int main(int argc, char** argv)
     int mult_algo_num = 2;
     int sched_algo_num = 1;
 
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
 
     cp.set_description("stxxl matrix test");
     cp.set_author("Raoul Steffen <R-Steffen@gmx.de>");

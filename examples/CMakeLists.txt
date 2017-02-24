@@ -12,7 +12,6 @@
 
 add_subdirectory(algo)
 add_subdirectory(applications)
-add_subdirectory(common)
 add_subdirectory(containers)
 add_subdirectory(stream)
 

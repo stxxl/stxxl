@@ -16,8 +16,9 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
-#include <foxxll/common/cmdline.hpp>
 #include <stxxl/bits/common/comparator.h>
+#include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/tuple.h>
 #include <stxxl/ksort>
 #include <stxxl/sort>
 #include <stxxl/stream>
@@ -188,7 +189,7 @@ public:
 int benchmark_sort(int argc, char* argv[])
 {
     // parse command line
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
 
     cp.set_description(
         "This program will benchmark the different sorting methods provided by "

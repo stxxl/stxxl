@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/common/cmdline.hpp>
 #include <foxxll/common/timer.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/parallel.h>
@@ -357,7 +357,7 @@ int main(int argc, char* argv[])
 {
     std::string benchset;
 
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
     cp.set_description("STXXL multiway_merge benchmark");
 
     cp.add_param_string("sequ/para/both", benchset,

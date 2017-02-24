@@ -13,7 +13,7 @@
 #include <iostream>
 #include <limits>
 
-#include <foxxll/common/cmdline.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     int mult_algo_num = 5;
     int sched_algo_num = 2;
 
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
     cp.add_int('r', "rank", "N", rank,
                "rank of the matrices, default: 10000");
     cp.add_bytes('m', "memory", "L", internal_memory,

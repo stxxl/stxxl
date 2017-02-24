@@ -17,11 +17,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/common/cmdline.hpp>
 #include <foxxll/common/uint_types.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/io.hpp>
 #include <stxxl/algorithm>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/random>
 #include <stxxl/sequence>
 #include <stxxl/sorter>
@@ -2851,7 +2851,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
 int main(int argc, char* argv[])
 {
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
 
     cp.set_description(
         "DC3-LCP aka skew3-lcp algorithm for external memory suffix array and LCP array construction.");

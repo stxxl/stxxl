@@ -11,10 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/common/cmdline.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/io.hpp>
 #include <foxxll/mng.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/version.h>
 
@@ -101,7 +101,8 @@ int main_usage(const char* arg0)
     {
         if (subtools[i].shortline) continue;
         std::cout << "  " << subtools[i].name << std::endl;
-        foxxll::cmdline_parser::output_wrap(std::cout, subtools[i].description, 80, 6, 6);
+        stxxl::cmdline_parser::output_wrap(
+            std::cout, subtools[i].description, 80, 6, 6);
         std::cout << std::endl;
     }
 

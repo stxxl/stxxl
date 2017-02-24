@@ -17,8 +17,8 @@ static const char* description =
     "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
-#include <foxxll/common/cmdline.hpp>
 #include <foxxll/unused.hpp>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
@@ -1723,7 +1723,7 @@ int main(int argc, char* argv[])
     std::string opt_queue = "ppq";
     std::string opt_benchmark = "undefined";
 
-    foxxll::cmdline_parser cp;
+    stxxl::cmdline_parser cp;
     cp.set_description(description);
 
     cp.add_param_string(
