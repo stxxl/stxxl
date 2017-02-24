@@ -24,8 +24,6 @@
 
 namespace stxxl {
 
-using int_type = int_type;
-
 template <typename RunCursorType,
           typename RunCursorCmpType>
 class loser_tree

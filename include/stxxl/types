@@ -15,7 +15,6 @@
 
 namespace stxxl {
 
-using int_type = foxxll::int_type;
 using external_size_type = foxxll::external_size_type;
 using external_diff_type = foxxll::external_diff_type;
 
