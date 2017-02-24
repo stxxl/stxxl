@@ -25,6 +25,7 @@
 #include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
+#include <tlx/meta/if.hpp>
 
 #include <algorithm>
 #include <stack>
@@ -1036,15 +1037,19 @@ template <
 class STACK_GENERATOR
 {
     using cfg = stack_config_generator<ValueType, BlocksPerPage, BlockSize, AllocStr, SizeType>;
-    using GrShrTp = typename foxxll::IF<Behaviour == grow_shrink,
-                                        grow_shrink_stack<cfg>,
-                                        grow_shrink_stack2<cfg> >::result;
-    using ExtStackType = typename foxxll::IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result;
-    using MigrOrNotStackType = typename foxxll::IF<Externality == migrating,
-                                                   migrating_stack<MigrCritSize, ExtStackType, IntStackType>, ExtStackType>::result;
+    using GrShrTp = typename tlx::If<
+              Behaviour == grow_shrink,
+              grow_shrink_stack<cfg>, grow_shrink_stack2<cfg> >::type;
+    using ExtStackType = typename tlx::If<
+              Behaviour == normal, normal_stack<cfg>, GrShrTp>::type;
+    using MigrOrNotStackType = typename tlx::If<
+              Externality == migrating,
+              migrating_stack<MigrCritSize, ExtStackType, IntStackType>,
+              ExtStackType>::type;
 
 public:
-    using result = typename foxxll::IF<Externality == internal, IntStackType, MigrOrNotStackType>::result;
+    using result = typename tlx::If<
+              Externality == internal, IntStackType, MigrOrNotStackType>::type;
 };
 
 //! \}

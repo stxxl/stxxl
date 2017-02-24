@@ -24,6 +24,7 @@
 #include <stxxl/bits/containers/pq_helpers.h>
 #include <stxxl/bits/containers/pq_int_merger.h>
 #include <stxxl/bits/containers/pq_mergers.h>
+#include <tlx/meta/if.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -837,9 +838,9 @@ struct find_B_m
                                          1, fits || candidate1::fits>::result;
 
     //! return a fitting configuration.
-    using result = typename foxxll::IF<
-              fits, self_type, typename foxxll::IF<
-                  candidate1::fits, candidate1, candidate2>::result>::result;
+    using result = typename tlx::If<
+              fits, self_type, typename tlx::If<
+                  candidate1::fits, candidate1, candidate2>::type>::type;
 };
 
 // specialization for the case when no valid parameters are found
@@ -884,8 +885,9 @@ struct compute_N
     static const size_t AI = AI_;
     static const size_t N = X / (AI * AI);     // two stage internal
 
-    using result = typename foxxll::IF<
-              (N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result;
+    using result = typename tlx::If<
+              (N >= CriticalSize), Self,
+              typename compute_N<AI / 2, X, CriticalSize>::result>::type;
 };
 
 template <size_t X_, size_t CriticalSize_>

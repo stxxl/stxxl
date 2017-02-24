@@ -48,7 +48,7 @@ public:
     using compare_type = CompareType;
 
     // kMaxArity / 2  <  arity  <=  kMaxArity
-    enum { arity = Arity, kMaxArity = 1UL << (foxxll::LOG2<Arity>::ceil) };
+    enum { arity = Arity, kMaxArity = 1UL << (tlx::Log2<Arity>::ceil) };
 
     using alloc_strategy = AllocStr;
 
