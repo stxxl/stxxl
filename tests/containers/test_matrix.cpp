@@ -19,19 +19,17 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-using stxxl::int_type;
-
 // forced instantiation
-template class stxxl::matrix<int_type, 32>;
-template class stxxl::matrix_iterator<int_type, 32>;
-template class stxxl::const_matrix_iterator<int_type, 32>;
-template class stxxl::matrix_row_major_iterator<int_type, 32>;
-template class stxxl::matrix_col_major_iterator<int_type, 32>;
-template class stxxl::const_matrix_row_major_iterator<int_type, 32>;
-template class stxxl::const_matrix_col_major_iterator<int_type, 32>;
-template class stxxl::column_vector<int_type>;
-template class stxxl::row_vector<int_type>;
-template struct stxxl::matrix_local::matrix_operations<int_type, 32>;
+template class stxxl::matrix<int, 32>;
+template class stxxl::matrix_iterator<int, 32>;
+template class stxxl::const_matrix_iterator<int, 32>;
+template class stxxl::matrix_row_major_iterator<int, 32>;
+template class stxxl::matrix_col_major_iterator<int, 32>;
+template class stxxl::const_matrix_row_major_iterator<int, 32>;
+template class stxxl::const_matrix_col_major_iterator<int, 32>;
+template class stxxl::column_vector<int>;
+template class stxxl::row_vector<int>;
+template struct stxxl::matrix_local::matrix_operations<int, 32>;
 /*
 
 struct constant_one
@@ -147,8 +145,8 @@ uint64_t internal_memory = 16 * 1024 * 1024;
 
 void test1(int rank)
 {
-    STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
-    using value_type = int_type;
+    STXXL_MSG("multiplying two int64_t matrices of rank " << rank << " block order " << small_block_order);
+    using value_type = int64_t;
 
     using block_scheduler_type = foxxll::block_scheduler<
               stxxl::matrix_swappable_block<value_type, small_block_order> >;
@@ -194,7 +192,7 @@ void test1(int rank)
     STXXL_MSG(matrix_stats_after - matrix_stats_before);
     STXXL_MSG(stats_after - stats_before);
     {
-        int_type num_err = 0;
+        size_t num_err = 0;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit)
             num_err += (*mit != rank);
         STXXL_CHECK2(num_err == 0,
@@ -203,14 +201,14 @@ void test1(int rank)
 
     // ------ second run
     {
-        int_type i = 1;
+        size_t i = 1;
         for (row_major_iterator mit = a->begin(); mit != a->end(); ++mit, ++i)
             *mit = i;
     }
     {
         b->set_zero();
         matrix_type::iterator mit = b->begin();
-        for (int_type i = 0; i < b->get_height(); ++i)
+        for (size_t i = 0; i < b->get_height(); ++i)
         {
             mit.set_pos(i, i);
             *mit = 1;
@@ -235,8 +233,8 @@ void test1(int rank)
     STXXL_MSG(matrix_stats_after - matrix_stats_before);
     STXXL_MSG(stats_after - stats_before);
     {
-        int_type num_err = 0;
-        int_type i = 1;
+        size_t num_err = 0;
+        int64_t i = 1;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit, ++i)
             num_err += (*mit != (i * 4));
 
@@ -246,7 +244,7 @@ void test1(int rank)
 
     {
         column_vector_type x(rank), y;
-        int_type i = 0;
+        size_t i = 0;
         for (column_vector_type::iterator it = x.begin(); it != x.end(); ++it)
             *it = ++i;
         y = *b * x;
@@ -331,7 +329,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     STXXL_MSG(matrix_stats_after - matrix_stats_before);
     STXXL_MSG(stats_after - stats_before);
     {
-        int_type num_err = 0;
+        size_t num_err = 0;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit)
             num_err += (*mit != rank);
         STXXL_CHECK2(num_err == 0, "c had " << num_err << " errors");

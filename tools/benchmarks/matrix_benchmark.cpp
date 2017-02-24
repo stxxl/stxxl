@@ -18,8 +18,6 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-using stxxl::int_type;
-
 int main(int argc, char** argv)
 {
     #ifndef STXXL_MATRIX_BLOCK_ORDER
@@ -77,18 +75,18 @@ int main(int argc, char** argv)
 
     if (mult_algo_num == -2)
     {
-        const int_type size = rank * rank;
+        const size_t size = rank * rank;
         value_type* A = new value_type[size];
         value_type* B = new value_type[size];
         value_type* C = new value_type[size];
         // write A and B
-        for (int_type i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
             A[i] = B[i] = 1;
         // evict A and B by accessing lots of memory
-        int_type int_mem_size = 50 * 2 ^ 30 / sizeof(int_type);
+        size_t int_mem_size = 50 * (size_t(1) << 30) / sizeof(size_t);
         assert(int_mem_size > 0);
-        int_type* D = new int_type[int_mem_size];
-        for (int_type i = 0; i < int_mem_size; ++i)
+        size_t* D = new size_t[int_mem_size];
+        for (size_t i = 0; i < int_mem_size; ++i)
             D[i] = 1;
         delete[] D;
         #if STXXL_BLAS
@@ -142,7 +140,7 @@ int main(int argc, char** argv)
         stats_after = stats_after - stats_before;
         STXXL_MSG(stats_after);
         {
-            int_type num_err = 0;
+            size_t num_err = 0;
             for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit)
                 num_err += (*mit != rank);
             if (num_err)

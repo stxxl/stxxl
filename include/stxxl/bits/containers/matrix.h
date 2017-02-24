@@ -222,8 +222,8 @@ public:
         #if STXXL_PARALLEL
         #pragma omp parallel for
         #endif
-        for (int_type row = 0; row < int_type(BlockSideLength); ++row)
-            for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+        for (unsigned row = 0; row < BlockSideLength; ++row)
+            for (unsigned col = 0; col < BlockSideLength; ++col)
                 data[row * BlockSideLength + col] = 0;
     }
 };
@@ -237,8 +237,8 @@ template <typename ValueType, unsigned BlockSideLength>
 class swappable_block_matrix : public tlx::reference_counter
 {
 public:
-    using size_type =  int_type ;
-    using elem_size_type =  int_type ;
+    using size_type =  size_t ;
+    using elem_size_type =  size_t ;
     using block_scheduler_type =  foxxll::block_scheduler<matrix_swappable_block<ValueType, BlockSideLength> > ;
     using swappable_block_identifier_type =  typename block_scheduler_type::swappable_block_identifier_type ;
     using blocks_type =  std::vector<swappable_block_identifier_type> ;
@@ -374,11 +374,11 @@ public:
     static size_type block_index_from_elem(elem_size_type index)
     { return index / BlockSideLength; }
 
-    static int_type elem_index_in_block_from_elem(elem_size_type index)
+    static elem_size_type elem_index_in_block_from_elem(elem_size_type index)
     { return index % BlockSideLength; }
 
     // regards transposed
-    int_type elem_index_in_block_from_elem(elem_size_type row, elem_size_type col) const
+    elem_size_type elem_index_in_block_from_elem(elem_size_type row, elem_size_type col) const
     {
         return (is_transposed())
                ? row % BlockSideLength + col % BlockSideLength * BlockSideLength
@@ -478,19 +478,19 @@ protected:
     //! create empty iterator
     explicit matrix_iterator(matrix_type& matrix)
         : m(&matrix),
-          current_row(-1), // empty iterator
-          current_col(-1),
-          current_block_row(-1),
-          current_block_col(-1),
+          current_row(static_cast<elem_size_type>(-1)), // empty iterator
+          current_col(static_cast<elem_size_type>(-1)),
+          current_block_row(static_cast<block_size_type>(-1)),
+          current_block_col(static_cast<block_size_type>(-1)),
           current_iblock(0) { }
 
     void set_empty()
     {
         release_current_iblock();
-        current_row = -1;
-        current_col = -1;
-        current_block_row = -1;
-        current_block_col = -1;
+        current_row = static_cast<elem_size_type>(-1);
+        current_col = static_cast<elem_size_type>(-1);
+        current_block_row = static_cast<block_size_type>(-1);
+        current_block_col = static_cast<block_size_type>(-1);
     }
 
 public:
@@ -567,7 +567,7 @@ public:
     { return std::make_pair(current_row, current_col); }
 
     bool empty() const
-    { return current_row == -1 && current_col == -1; }
+    { return current_row == static_cast<elem_size_type>(-1) && current_col == static_cast<elem_size_type>(-1); }
 
     operator bool () const
     { return ! empty(); }
@@ -870,7 +870,7 @@ public:
     { return std::make_pair(current_row, current_col); }
 
     bool empty() const
-    { return current_row == -1 && current_col == -1; }
+    { return current_row == static_cast<elem_size_type>(-1) && current_col == static_cast<elem_size_type>(-1); }
 
     operator bool () const
     { return ! empty(); }
@@ -1255,7 +1255,7 @@ public:
     //!    4: strassen_winograd_multiply, optimized pre- and postadditions (sometimes fast but unstable time and I/O complexity) \n
     //!    5: strassen_winograd_multiply_and_add_interleaved, optimized preadditions (sometimes fast but unstable time and I/O complexity) \n
     //!    6: multi_level_strassen_winograd_multiply_and_add_block_grained (sometimes fast but unstable time and I/O complexity)
-    matrix_type multiply(const matrix_type& right, const int_type multiplication_algorithm = 1, const int_type scheduling_algorithm = 2) const
+    matrix_type multiply(const matrix_type& right, const int multiplication_algorithm = 1, const int scheduling_algorithm = 2) const
     {
         assert(width == right.height);
         assert(&data->bs == &right.data->bs);
@@ -1344,7 +1344,7 @@ public:
     }
 
     //! Use internal memory multiplication. Designated for testing. May exceed memory limitations.
-    matrix_type multiply_internal(const matrix_type& right, const int_type scheduling_algorithm = 2) const
+    matrix_type multiply_internal(const matrix_type& right, const int scheduling_algorithm = 2) const
     {
         assert(width == right.height);
         assert(&data->bs == &right.data->bs);

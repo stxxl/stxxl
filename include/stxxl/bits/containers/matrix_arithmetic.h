@@ -41,7 +41,7 @@ class swappable_block_matrix;
 
 struct matrix_operation_statistic_dataset
 {
-    int_type block_multiplication_calls,
+    int64_t block_multiplication_calls,
         block_multiplications_saved_through_zero,
         block_addition_calls,
         block_additions_saved_through_zero;
@@ -305,7 +305,7 @@ struct feedable_strassen_winograd
         p7.begin_feeding_a_block(block_row, block_col, zb.dr);
     }
 
-    void feed_a_element(const int_type element_num, const vt v)
+    void feed_a_element(const size_t element_num, const vt v)
     {
         typename vt::smaller_static_quadtree
         s1 = v.dl + v.dr,
@@ -353,7 +353,7 @@ struct feedable_strassen_winograd
         p7.begin_feeding_b_block(block_row, block_col, t4);
     }
 
-    void feed_b_element(const int_type element_num, const vt v)
+    void feed_b_element(const size_t element_num, const vt v)
     {
         typename vt::smaller_static_quadtree
         t1 = v.ur - v.ul,
@@ -411,7 +411,7 @@ struct feedable_strassen_winograd
         return r;
     }
 
-    vt read_element(int_type element_num)
+    vt read_element(const size_t element_num)
     {
         vt r;
         r.ur = r.ul = p1.read_element(element_num);
@@ -499,7 +499,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
             iblock = &a.bs.acquire(a(block_row, block_col), true);
     }
 
-    void feed_a_element(const int_type element_num, const vt v)
+    void feed_a_element(const size_t element_num, const vt v)
     {
         if (! AExists)
             (*iblock)[element_num] = v;
@@ -520,7 +520,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
             iblock = &b.bs.acquire(b(block_row, block_col), true);
     }
 
-    void feed_b_element(const int_type element_num, const vt v)
+    void feed_b_element(const size_t element_num, const vt v)
     {
         if (! BExists)
             (*iblock)[element_num] = v;
@@ -545,7 +545,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
         return zb;
     }
 
-    vt read_element(const int_type element_num)
+    vt read_element(const size_t element_num)
     { return vt((*iblock)[element_num]); }
 
     zbt end_reading_block(const size_type& block_row, const size_type& block_col)
@@ -594,7 +594,7 @@ struct matrix_to_quadtree
         dr.begin_feeding_block(block_row, block_col, zb.dr);
     }
 
-    void feed_element(const int_type element_num, const vt v)
+    void feed_element(const size_t element_num, const vt v)
     {
         ul.feed_element(element_num, v.ul);
         ur.feed_element(element_num, v.ur);
@@ -602,7 +602,7 @@ struct matrix_to_quadtree
         dr.feed_element(element_num, v.dr);
     }
 
-    void feed_and_add_element(const int_type element_num, const vt v)
+    void feed_and_add_element(const size_t element_num, const vt v)
     {
         ul.feed_and_add_element(element_num, v.ul);
         ur.feed_and_add_element(element_num, v.ur);
@@ -628,7 +628,7 @@ struct matrix_to_quadtree
         return zb;
     }
 
-    vt read_element(const int_type element_num)
+    vt read_element(const size_t element_num)
     {
         vt v;
         v.ul = ul.read_element(element_num);
@@ -681,10 +681,10 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     void begin_feeding_block(const size_type& block_row, const size_type& block_col, const zbt)
     { iblock = &m.bs.acquire(m(block_row, block_col)); }
 
-    void feed_element(const int_type element_num, const vt v)
+    void feed_element(const size_t element_num, const vt v)
     { (*iblock)[element_num] = v; }
 
-    void feed_and_add_element(const int_type element_num, const vt v)
+    void feed_and_add_element(const size_t element_num, const vt v)
     { (*iblock)[element_num] += v; }
 
     void end_feeding_block(const size_type& block_row, const size_type& block_col, const zbt zb)
@@ -700,7 +700,7 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
         return zb;
     }
 
-    vt read_element(const int_type element_num)
+    vt read_element(const size_t element_num)
     { return vt((*iblock)[element_num]); }
 
     zbt end_reading_block(const size_type& block_row, const size_type& block_col)
@@ -1020,7 +1020,7 @@ struct matrix_operations
 {
     // tuning-parameter: Only matrices larger than this (in blocks) are processed by Strassen-Winograd.
     // you have to adapt choose_level_for_feedable_sw, too
-    static const int_type strassen_winograd_base_case_size;
+    static const unsigned strassen_winograd_base_case_size;
 
     using swappable_block_matrix_type =  swappable_block_matrix<ValueType, BlockSideLength> ;
     using block_scheduler_type =  typename swappable_block_matrix_type::block_scheduler_type ;
@@ -1428,7 +1428,7 @@ struct matrix_operations
                                                                  const swappable_block_matrix_type& B,
                                                                  swappable_block_matrix_type& C)
     {
-        int_type num_levels = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        size_t num_levels = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
         if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
         {
             if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS)
@@ -1518,7 +1518,7 @@ struct matrix_operations
                                                    const swappable_block_matrix_type& B,
                                                    swappable_block_matrix_type& C)
     {
-        int_type p = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        size_t p = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
 
         swappable_block_matrix_type padded_a(
             A, foxxll::round_up_to_power_of_two(A.get_height(), p),
@@ -1577,8 +1577,8 @@ struct matrix_operations
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type element_row_in_block = 0; element_row_in_block < int_type(BlockSideLength); ++element_row_in_block)
-                    for (int_type element_col_in_block = 0; element_col_in_block < int_type(BlockSideLength); ++element_col_in_block)
+                for (unsigned int element_row_in_block = 0; element_row_in_block < BlockSideLength; ++element_row_in_block)
+                    for (unsigned int element_col_in_block = 0; element_col_in_block < BlockSideLength; ++element_col_in_block)
                         fsw.feed_a_element(element_row_in_block * BlockSideLength + element_col_in_block,
                                            mtq_a.read_element(element_row_in_block * BlockSideLength + element_col_in_block));
                 fsw.end_feeding_a_block(block_row, block_col,
@@ -1595,8 +1595,8 @@ struct matrix_operations
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type element_row_in_block = 0; element_row_in_block < int_type(BlockSideLength); ++element_row_in_block)
-                    for (int_type element_col_in_block = 0; element_col_in_block < int_type(BlockSideLength); ++element_col_in_block)
+                for (int64_t element_row_in_block = 0; element_row_in_block < BlockSideLength; ++element_row_in_block)
+                    for (unsigned int element_col_in_block = 0; element_col_in_block < BlockSideLength; ++element_col_in_block)
                         fsw.feed_b_element(element_row_in_block * BlockSideLength + element_col_in_block,
                                            mtq_b.read_element(element_row_in_block * BlockSideLength + element_col_in_block));
                 fsw.end_feeding_b_block(block_row, block_col,
@@ -1615,8 +1615,8 @@ struct matrix_operations
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
-                for (int_type element_row_in_block = 0; element_row_in_block < int_type(BlockSideLength); ++element_row_in_block)
-                    for (int_type element_col_in_block = 0; element_col_in_block < int_type(BlockSideLength); ++element_col_in_block)
+                for (int64_t element_row_in_block = 0; element_row_in_block < BlockSideLength; ++element_row_in_block)
+                    for (unsigned int element_col_in_block = 0; element_col_in_block < BlockSideLength; ++element_col_in_block)
                         mtq_c.feed_and_add_element(element_row_in_block * BlockSideLength + element_col_in_block,
                                                    fsw.read_element(element_row_in_block * BlockSideLength + element_col_in_block));
                 mtq_c.end_feeding_block(block_row, block_col,
@@ -1910,15 +1910,15 @@ struct matrix_operations
         // multiply
         if (! bs_a.is_simulating())
         {
-            int_type row_limit = std::min(BlockSideLength, unsigned(z.size() - offset_z)),
+            unsigned row_limit = std::min(BlockSideLength, unsigned(z.size() - offset_z)),
                 col_limit = std::min(BlockSideLength, unsigned(x.size() - offset_x));
             if (a_is_transposed)
-                for (int_type col = 0; col < col_limit; ++col)
-                    for (int_type row = 0; row < row_limit; ++row)
+                for (unsigned col = 0; col < col_limit; ++col)
+                    for (unsigned row = 0; row < row_limit; ++row)
                         z[offset_z + row] += x[offset_x + col] * ia[row + col * BlockSideLength];
             else
-                for (int_type row = 0; row < row_limit; ++row)
-                    for (int_type col = 0; col < col_limit; ++col)
+                for (unsigned row = 0; row < row_limit; ++row)
+                    for (unsigned col = 0; col < col_limit; ++col)
                         z[offset_z + row] += x[offset_x + col] * ia[row * BlockSideLength + col];
         }
         // release
@@ -1978,15 +1978,15 @@ struct matrix_operations
         // multiply
         if (! bs_a.is_simulating())
         {
-            int_type row_limit = std::min(BlockSideLength, unsigned(y.size() - offset_y)),
+            unsigned row_limit = std::min(BlockSideLength, unsigned(y.size() - offset_y)),
                 col_limit = std::min(BlockSideLength, unsigned(z.size() - offset_z));
             if (a_is_transposed)
-                for (int_type col = 0; col < col_limit; ++col)
-                    for (int_type row = 0; row < row_limit; ++row)
+                for (unsigned col = 0; col < col_limit; ++col)
+                    for (unsigned row = 0; row < row_limit; ++row)
                         z[offset_z + col] += ia[row + col * BlockSideLength] * y[offset_y + row];
             else
-                for (int_type row = 0; row < row_limit; ++row)
-                    for (int_type col = 0; col < col_limit; ++col)
+                for (unsigned row = 0; row < row_limit; ++row)
+                    for (unsigned col = 0; col < col_limit; ++col)
                         z[offset_z + col] += ia[row * BlockSideLength + col] * y[offset_y + row];
         }
         // release
@@ -2039,15 +2039,15 @@ struct matrix_operations
         // multiply
         if (! bs_a.is_simulating())
         {
-            int_type row_limit = std::min(BlockSideLength, unsigned(l.size() - offset_l)),
+            unsigned row_limit = std::min(BlockSideLength, unsigned(l.size() - offset_l)),
                 col_limit = std::min(BlockSideLength, unsigned(r.size() - offset_r));
             if (a_is_transposed)
-                for (int_type col = 0; col < col_limit; ++col)
-                    for (int_type row = 0; row < row_limit; ++row)
+                for (unsigned col = 0; col < col_limit; ++col)
+                    for (unsigned row = 0; row < row_limit; ++row)
                         ia[row + col * BlockSideLength] = l[row + offset_l] * r[col + offset_r];
             else
-                for (int_type row = 0; row < row_limit; ++row)
-                    for (int_type col = 0; col < col_limit; ++col)
+                for (unsigned row = 0; row < row_limit; ++row)
+                    for (unsigned col = 0; col < col_limit; ++col)
                         ia[row * BlockSideLength + col] = l[row + offset_l] * r[col + offset_r];
         }
         // release
@@ -2059,7 +2059,7 @@ struct matrix_operations
 
 // Adjust choose_level_for_feedable_sw, too!
 template <typename ValueType, unsigned BlockSideLength>
-const int_type matrix_operations<ValueType, BlockSideLength>::strassen_winograd_base_case_size = 3;
+const unsigned matrix_operations<ValueType, BlockSideLength>::strassen_winograd_base_case_size = 3;
 
 } // namespace matrix_local
 

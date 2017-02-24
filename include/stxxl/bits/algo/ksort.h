@@ -128,7 +128,7 @@ inline void write_out(
     TypeKey* end,
     BlockType*& cur_blk,
     const BlockType* end_blk,
-    int_type& out_block,
+    size_t& out_block,
     size_t& out_pos,
     RunType& run,
     write_completion_handler<BlockType, typename BlockType::bid_type>*& next_read,
@@ -207,18 +207,18 @@ create_runs(
 
     RunType* run;
     run = *runs;
-    int_type run_size = (*runs)->size();
+    size_t run_size = (*runs)->size();
     key_type offset = 0;
-    const int log_k1 = foxxll::ilog2_ceil(
+    const unsigned int log_k1 = foxxll::ilog2_ceil(
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
-    const int log_k2 = foxxll::ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
+    const unsigned int log_k2 = foxxll::ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
     STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
-    const int_type k1 = int_type(1) << log_k1;
-    const int_type k2 = int_type(1) << log_k2;
-    int_type* bucket1 = new int_type[k1];
-    int_type* bucket2 = new int_type[k2];
-    int_type i;
+    const size_t k1 = size_t(1) << log_k1;
+    const size_t k2 = size_t(1) << log_k2;
+    size_t* bucket1 = new size_t[k1];
+    size_t* bucket2 = new size_t[k2];
+    size_t i;
 
     foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
@@ -256,7 +256,7 @@ create_runs(
         classify(refs1, refs1 + run_size * Blocks1->size, refs2, bucket1,
                  offset, shift1);
 
-        int_type out_block = 0;
+        size_t out_block = 0;
         size_t out_pos = 0;
         size_t next_run_size = (k < nruns - 1) ? (runs[k + 1]->size()) : 0;
 
@@ -455,7 +455,7 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
     size_t i;
     RunType consume_seq(out_run->size());
 
-    int_type* prefetch_seq = new int_type[out_run->size()];
+    size_t* prefetch_seq = new size_t[out_run->size()];
 
     typename RunType::iterator copy_start = consume_seq.begin();
     for (i = 0; i < nruns; i++)
@@ -471,14 +471,14 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
     size_t disks_number = foxxll::config::get_instance()->disks_number();
 
 #ifdef PLAY_WITH_OPT_PREF
-    const int_type n_write_buffers = 4 * disks_number;
+    const size_t n_write_buffers = 4 * disks_number;
 #else
-    const int_type n_prefetch_buffers = std::max(int_type(2 * disks_number), (3 * (int_type(_m) - int_type(nruns)) / 4));
+    const size_t n_prefetch_buffers = std::max(2 * disks_number, (3 * (_m - nruns) / 4));
     STXXL_VERBOSE("Prefetch buffers " << n_prefetch_buffers);
-    const int_type n_write_buffers = std::max(int_type(2 * disks_number), int_type(_m) - int_type(nruns) - int_type(n_prefetch_buffers));
+    const size_t n_write_buffers = std::max(2 * disks_number, _m - nruns - n_prefetch_buffers);
     STXXL_VERBOSE("Write buffers " << n_write_buffers);
     // heuristic
-    const int_type n_opt_prefetch_buffers = 2 * int_type(disks_number) + (3 * (int_type(n_prefetch_buffers) - int_type(2 * disks_number))) / 10;
+    const size_t n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
     STXXL_VERBOSE("Prefetch buffers " << n_opt_prefetch_buffers);
 #endif
 
@@ -609,24 +609,24 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 
     foxxll::disk_queues::get_instance()->set_priority_op(foxxll::request_queue::WRITE);
 
-    const int_type merge_factor = optimal_merge_factor(nruns, _m);
+    const size_t merge_factor = optimal_merge_factor(nruns, _m);
     run_type** new_runs;
 
     while (nruns > 1)
     {
-        int_type new_nruns = foxxll::div_ceil(nruns, merge_factor);
+        size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
         STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                       " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 
         new_runs = new run_type*[new_nruns];
 
-        int_type runs_left = nruns;
-        int_type cur_out_run = 0;
-        int_type blocks_in_new_run = 0;
+        size_t runs_left = nruns;
+        size_t cur_out_run = 0;
+        size_t blocks_in_new_run = 0;
 
         while (runs_left > 0)
         {
-            int_type runs2merge = std::min(runs_left, merge_factor);
+            size_t runs2merge = std::min(runs_left, merge_factor);
             blocks_in_new_run = 0;
             for (size_t i = nruns - runs_left; i < (nruns - runs_left + runs2merge); i++)
                 blocks_in_new_run += runs[i]->size();
@@ -636,11 +636,11 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
             runs_left -= runs2merge;
         }
         // allocate blocks in the new runs
-        if (cur_out_run == 1 && blocks_in_new_run == int_type(_n) && !input_bids->is_managed())
+        if (cur_out_run == 1 && blocks_in_new_run == _n && !input_bids->is_managed())
         {
             // if we sort a file we can reuse the input bids for the output
             InputBidIterator cur = input_bids;
-            for (int_type i = 0; cur != (input_bids + _n); ++cur)
+            for (size_t i = 0; cur != (input_bids + _n); ++cur)
             {
                 (*new_runs[0])[i++].bid = *cur;
             }
@@ -672,7 +672,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
         cur_out_run = 0;
         while (runs_left > 0)
         {
-            int_type runs2merge = std::min(runs_left, merge_factor);
+            size_t runs2merge = std::min(runs_left, merge_factor);
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_ksorted_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left, runs2merge, m2, keyobj)));
 #endif

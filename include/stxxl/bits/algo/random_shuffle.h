@@ -70,7 +70,7 @@ void random_shuffle(ExtIterator first,
         STXXL_ERRMSG("random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)");
     }
 
-    int_type k = M / (3 * BlockSize); // number of buckets
+    size_t k = M / (3 * BlockSize); // number of buckets
 
     int64_t i, j, size = 0;
 
@@ -95,7 +95,7 @@ void random_shuffle(ExtIterator first,
     input_stream in = stream::streamify(first, last);
 
     // distribute input into random buckets
-    int_type random_bucket = 0;
+    size_t random_bucket = 0;
     for (i = 0; i < n; ++i) {
         random_bucket = rand(k);
         buckets[random_bucket]->push(*in); // reading the current input element
@@ -215,10 +215,10 @@ void random_shuffle(
         STXXL_ERRMSG("random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)");
     }
 
-    int64_t n = last - first;         // the number of input elements
-    int_type k = M / (3 * BlockSize); // number of buckets
+    uint64_t n = last - first;          // the number of input elements
+    size_t k = M / (3 * BlockSize);     // number of buckets
 
-    int64_t i, j, size = 0;
+    uint64_t i, j, size = 0;
 
     value_type* temp_array;
     using temp_vector_type = typename stxxl::vector<
@@ -259,9 +259,9 @@ void random_shuffle(
     ///// Reading input /////////////////////
 
     // distribute input into random buckets
-    int_type random_bucket = 0;
+    size_t random_bucket = 0;
     for (i = 0; i < n; ++i, ++_cur) {
-        random_bucket = rand((unsigned)k);
+        random_bucket = rand(k);
         typename ExtIterator::value_type tmp;
         in >> tmp;
         buckets[random_bucket]->push(tmp); // reading the current input element
