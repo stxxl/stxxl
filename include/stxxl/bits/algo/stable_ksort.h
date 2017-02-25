@@ -17,7 +17,6 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
-#include <foxxll/common/simple_vector.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/buf_istream.hpp>
@@ -25,6 +24,7 @@
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <tlx/math/integer_log2.hpp>
+#include <tlx/simple_vector.hpp>
 
 #include <algorithm>
 
@@ -87,24 +87,24 @@ public:
     using bid_type = BIDType;
     using reference = bid_type &;
     using alloc_strategy = AllocStrategy;
-    using size_type = typename foxxll::simple_vector<bid_type>::size_type;
-    using iterator = typename foxxll::simple_vector<bid_type>::iterator;
+    using size_type = typename tlx::simple_vector<bid_type>::size_type;
+    using iterator = typename tlx::simple_vector<bid_type>::iterator;
 
 protected:
-    foxxll::simple_vector<bid_type>* bids;
+    tlx::simple_vector<bid_type>* bids;
     alloc_strategy alloc_strategy_;
 
 public:
     bid_sequence() : bids(nullptr) { }
     explicit bid_sequence(size_type size_)
     {
-        bids = new foxxll::simple_vector<bid_type>(size_);
+        bids = new tlx::simple_vector<bid_type>(size_);
         foxxll::block_manager* mng = foxxll::block_manager::get_instance();
         mng->new_blocks(alloc_strategy_, bids->begin(), bids->end());
     }
     void init(size_type size_)
     {
-        bids = new foxxll::simple_vector<bid_type>(size_);
+        bids = new tlx::simple_vector<bid_type>(size_);
         foxxll::block_manager* mng = foxxll::block_manager::get_instance();
         mng->new_blocks(alloc_strategy_, bids->begin(), bids->end());
     }
@@ -115,7 +115,7 @@ public:
             return *(bids->begin() + i);
 
         foxxll::block_manager* mng = foxxll::block_manager::get_instance();
-        foxxll::simple_vector<bid_type>* larger_bids = new foxxll::simple_vector<bid_type>((i + 1) * 2);
+        tlx::simple_vector<bid_type>* larger_bids = new tlx::simple_vector<bid_type>((i + 1) * 2);
         std::copy(bids->begin(), bids->end(), larger_bids->begin());
         mng->new_blocks(alloc_strategy_, larger_bids->begin() + size_, larger_bids->end());
         delete bids;

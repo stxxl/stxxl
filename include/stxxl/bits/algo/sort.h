@@ -17,7 +17,6 @@
 #define STXXL_ALGO_SORT_HEADER
 
 #include <foxxll/common/error_handling.hpp>
-#include <foxxll/common/simple_vector.hpp>
 #include <foxxll/io/request_operations.hpp>
 #include <foxxll/mng/async_schedule.hpp>
 #include <foxxll/mng/block_alloc_strategy_interleaved.hpp>
@@ -36,6 +35,7 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/parallel.h>
+#include <tlx/simple_vector.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -517,7 +517,7 @@ template <typename BlockType,
           typename AllocStrategy,
           typename InputBidIterator,
           typename ValueCmp>
-foxxll::simple_vector<sort_helper::trigger_entry<BlockType> >*
+tlx::simple_vector<sort_helper::trigger_entry<BlockType> >*
 sort_blocks(InputBidIterator input_bids,
             size_t _n,
             size_t _m,
@@ -529,7 +529,7 @@ sort_blocks(InputBidIterator input_bids,
     using value_cmp = ValueCmp;
     using bid_type = typename block_type::bid_type;
     using trigger_entry_type = sort_helper::trigger_entry<block_type>;
-    using run_type = foxxll::simple_vector<trigger_entry_type>;
+    using run_type = tlx::simple_vector<trigger_entry_type>;
     using interleaved_alloc_strategy =
               typename foxxll::interleaved_alloc_traits<alloc_strategy>::strategy;
 
@@ -694,7 +694,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
     using alloc_strategy_type = typename ExtIterator::vector_type::alloc_strategy_type;
     using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
-    using run_type = foxxll::simple_vector<sort_helper::trigger_entry<block_type> >;
+    using run_type = tlx::simple_vector<sort_helper::trigger_entry<block_type> >;
 
     size_t n = 0;
 

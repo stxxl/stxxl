@@ -15,7 +15,6 @@
 #define STXXL_CONTAINERS_STACK_HEADER
 
 #include <foxxll/common/error_handling.hpp>
-#include <foxxll/common/simple_vector.hpp>
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/io/request_operations.hpp>
 #include <foxxll/mng/block_manager.hpp>
@@ -26,6 +25,7 @@
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
 #include <tlx/meta/if.hpp>
+#include <tlx/simple_vector.hpp>
 
 #include <algorithm>
 #include <stack>
@@ -83,9 +83,9 @@ private:
     size_type m_size;
     size_t cache_offset;
     value_type* current_element;
-    foxxll::simple_vector<block_type> cache;
-    typename foxxll::simple_vector<block_type>::iterator front_page;
-    typename foxxll::simple_vector<block_type>::iterator back_page;
+    tlx::simple_vector<block_type> cache;
+    typename tlx::simple_vector<block_type>::iterator front_page;
+    typename tlx::simple_vector<block_type>::iterator back_page;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
 
@@ -219,7 +219,7 @@ public:
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
             foxxll::block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
-            foxxll::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
+            tlx::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
@@ -259,7 +259,7 @@ public:
         {
             STXXL_VERBOSE2("shrinking, size: " << m_size);
 
-            foxxll::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
+            tlx::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
 
             {
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end();
@@ -329,10 +329,10 @@ private:
     size_type m_size;
     size_t cache_offset;
     value_type* current_element;
-    foxxll::simple_vector<block_type> cache;
-    typename foxxll::simple_vector<block_type>::iterator cache_buffers;
-    typename foxxll::simple_vector<block_type>::iterator overlap_buffers;
-    foxxll::simple_vector<foxxll::request_ptr> requests;
+    tlx::simple_vector<block_type> cache;
+    typename tlx::simple_vector<block_type>::iterator cache_buffers;
+    typename tlx::simple_vector<block_type>::iterator overlap_buffers;
+    tlx::simple_vector<foxxll::request_ptr> requests;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
 

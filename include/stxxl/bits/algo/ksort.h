@@ -16,7 +16,6 @@
 #define STXXL_ALGO_KSORT_HEADER
 
 #include <foxxll/common/onoff_switch.hpp>
-#include <foxxll/common/simple_vector.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/async_schedule.hpp>
 #include <foxxll/mng/block_alloc_strategy_interleaved.hpp>
@@ -32,6 +31,7 @@
 #include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/rand.h>
+#include <tlx/simple_vector.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -535,7 +535,7 @@ template <typename BlockType,
           typename AllocStrategy,
           typename InputBidIterator,
           typename KeyExtractor>
-foxxll::simple_vector<
+tlx::simple_vector<
     trigger_entry<typename BlockType::bid_type, typename KeyExtractor::key_type>
     >*
 ksort_blocks(InputBidIterator input_bids, size_t _n,
@@ -546,7 +546,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     using key_type = typename KeyExtractor::key_type;
     using bid_type = typename BlockType::bid_type;
     using trigger_entry_type = trigger_entry<bid_type, typename KeyExtractor::key_type>;
-    using run_type = foxxll::simple_vector<trigger_entry_type>;
+    using run_type = tlx::simple_vector<trigger_entry_type>;
     using interleaved_alloc_strategy = typename foxxll::interleaved_alloc_traits<AllocStrategy>::strategy;
 
     size_t m2 = foxxll::div_ceil(_m, 2);
@@ -730,7 +730,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 template <typename ExtIterator, typename KeyExtractor>
 void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
 {
-    using run_type = foxxll::simple_vector<
+    using run_type = tlx::simple_vector<
               ksort_local::trigger_entry<
                   typename ExtIterator::bid_type, typename KeyExtractor::key_type
                   >

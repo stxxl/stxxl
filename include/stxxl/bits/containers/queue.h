@@ -14,7 +14,6 @@
 #ifndef STXXL_CONTAINERS_QUEUE_HEADER
 #define STXXL_CONTAINERS_QUEUE_HEADER
 
-#include <foxxll/common/simple_vector.hpp>
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/prefetch_pool.hpp>

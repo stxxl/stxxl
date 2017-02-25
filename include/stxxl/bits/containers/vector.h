@@ -922,9 +922,9 @@ private:
     //! status of each page (valid_on_disk, uninitialized or dirty)
     mutable std::vector<page_status> m_page_status;
     mutable std::vector<ptrdiff_t> m_page_to_slot;
-    mutable foxxll::simple_vector<size_t> m_slot_to_page;
+    mutable tlx::simple_vector<size_t> m_slot_to_page;
     mutable std::queue<size_t> m_free_slots;
-    mutable foxxll::simple_vector<block_type>* m_cache;
+    mutable tlx::simple_vector<block_type>* m_cache;
 
     foxxll::file_ptr m_from;
     foxxll::block_manager* m_bm;
@@ -1009,7 +1009,7 @@ public:
     {
         //  numpages() might be zero
         if (!m_cache && numpages() > 0)
-            m_cache = new foxxll::simple_vector<block_type>(numpages() * page_size);
+            m_cache = new tlx::simple_vector<block_type>(numpages() * page_size);
     }
 
     //! allows to free the cache, but you may not access any element until call
@@ -1439,7 +1439,7 @@ public:
     //! Flushes the cache pages to the external memory.
     void flush() const
     {
-        foxxll::simple_vector<bool> non_free_slots(numpages());
+        tlx::simple_vector<bool> non_free_slots(numpages());
 
         for (size_t i = 0; i < numpages(); i++)
             non_free_slots[i] = true;
