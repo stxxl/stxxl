@@ -16,8 +16,8 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
-#include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/ksort>
 #include <stxxl/sort>

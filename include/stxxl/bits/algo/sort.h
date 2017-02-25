@@ -390,7 +390,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
 
         for (size_t i = 0; i < nruns; i++)                    // initialize sequences
         {
-            buffers[i] = prefetcher.pull_block();               // get first block of each run
+            buffers[i] = prefetcher.pull_block();             // get first block of each run
             seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());
             // this memory location stays the same, only the data is exchanged
         }
@@ -402,7 +402,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
 
         for (size_t j = 0; j < out_run_size; ++j)                     // for the whole output run, out_run_size is in blocks
         {
-            diff_type rest = block_type::size;                          // elements still to merge for this output block
+            diff_type rest = block_type::size;                        // elements still to merge for this output block
 
             STXXL_VERBOSE1("output block " << j);
             do {

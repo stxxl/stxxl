@@ -17,6 +17,7 @@
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/utils.hpp>
 #include <stxxl/bits/verbose.h>
+#include <tlx/math/integer_log2.hpp>
 
 #include <limits>
 #include <string>
@@ -91,7 +92,7 @@ public:
     {
         STXXL_ASSERT(num_players > 0 && num_players <= invalid_key);
 
-        m_num_slots = (1 << foxxll::ilog2_ceil(num_players));
+        m_num_slots = (1 << tlx::integer_log2_ceil(num_players));
         size_t treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, invalid_key);
     }
@@ -254,12 +255,12 @@ public:
 
         for (size_t i = old_tree_size; i > 0; --i) {
             size_t old_index = i - 1;
-            size_t old_level = foxxll::ilog2_floor(old_index + 1);
+            size_t old_level = tlx::integer_log2_floor(old_index + 1);
             size_t new_index = old_index + (1 << old_level);
             m_tree[new_index] = m_tree[old_index];
         }
 
-        size_t step_size = (1 << foxxll::ilog2_floor(old_tree_size));
+        size_t step_size = (1 << tlx::integer_log2_floor(old_tree_size));
         size_t index = tree_size - 1;
 
         while (step_size > 0) {
@@ -282,7 +283,7 @@ public:
 
     inline void resize(size_t num_players)
     {
-        m_num_slots = (1 << foxxll::ilog2_ceil(num_players));
+        m_num_slots = (1 << tlx::integer_log2_ceil(num_players));
         size_t treesize = (m_num_slots << 1) - 1;
         m_tree.resize(treesize, invalid_key);
     }

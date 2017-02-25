@@ -209,10 +209,10 @@ create_runs(
     run = *runs;
     size_t run_size = (*runs)->size();
     key_type offset = 0;
-    const unsigned int log_k1 = foxxll::ilog2_ceil(
+    const unsigned int log_k1 = tlx::integer_log2_ceil(
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
-    const unsigned int log_k2 = foxxll::ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
+    const unsigned int log_k2 = tlx::integer_log2_floor(m2 * Blocks1->size) - log_k1 - 1;
     STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
     const size_t k1 = size_t(1) << log_k1;
     const size_t k2 = size_t(1) << log_k2;

@@ -362,7 +362,6 @@ class struct_comparator
 public:
     explicit struct_comparator(const KeyExtract keys = KeyExtract()) : keys(keys) { }
 
-
     ValueType min_value() const
     {
         ValueType result;

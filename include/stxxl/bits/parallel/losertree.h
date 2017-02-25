@@ -19,6 +19,7 @@
 
 #include <foxxll/common/utils.hpp>
 #include <stxxl/bits/parallel/base.h>
+#include <tlx/math/round_to_power_of_two.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -75,7 +76,7 @@ public:
     explicit LoserTreeCopyBase(size_type _k,
                                Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(foxxll::round_up_to_power_of_two(ik)),
+          k(tlx::round_up_to_power_of_two(ik)),
           comp(_comp),
           first_insert(true)
     {
@@ -325,7 +326,7 @@ public:
     explicit LoserTreeReference(size_type _k, Comparator _comp = std::less<T>()) : comp(_comp)
     {
         ik = _k;
-        k = foxxll::round_up_to_power_of_two(ik);
+        k = tlx::round_up_to_power_of_two(ik);
         losers = new Loser[k * 2];
 #ifndef COPY
         keys = new T[ik];
@@ -528,7 +529,7 @@ public:
     explicit LoserTreePointerBase(size_type _k,
                                   Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(foxxll::round_up_to_power_of_two(ik)),
+          k(tlx::round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
@@ -754,7 +755,7 @@ public:
     LoserTreeCopyUnguardedBase(size_type _k, const ValueType& _sentinel,
                                Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(foxxll::round_up_to_power_of_two(ik)),
+          k(tlx::round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {
@@ -952,7 +953,7 @@ public:
     LoserTreePointerUnguardedBase(size_type _k, const ValueType& _sentinel,
                                   Comparator _comp = std::less<ValueType>())
         : ik(_k),
-          k(foxxll::round_up_to_power_of_two(ik)),
+          k(tlx::round_up_to_power_of_two(ik)),
           losers(new Loser[k * 2]),
           comp(_comp)
     {

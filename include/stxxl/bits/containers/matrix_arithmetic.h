@@ -15,6 +15,8 @@
 
 #include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/containers/matrix_low_level.h>
+#include <tlx/math/round_to_power_of_two.hpp>
+#include <tlx/math/integer_log2.hpp>
 
 #include <algorithm>
 
@@ -1428,7 +1430,7 @@ struct matrix_operations
                                                                  const swappable_block_matrix_type& B,
                                                                  swappable_block_matrix_type& C)
     {
-        size_t num_levels = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        size_t num_levels = tlx::integer_log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
         if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
         {
             if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS)
@@ -1518,7 +1520,7 @@ struct matrix_operations
                                                    const swappable_block_matrix_type& B,
                                                    swappable_block_matrix_type& C)
     {
-        size_t p = foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        size_t p = tlx::integer_log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
 
         swappable_block_matrix_type padded_a(
             A, foxxll::round_up_to_power_of_two(A.get_height(), p),
@@ -1536,7 +1538,7 @@ struct matrix_operations
                                              const swappable_block_matrix_type& B,
                                              swappable_block_matrix_type& C)
     {
-        switch (foxxll::ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
+        switch (tlx::integer_log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
         {
         default:
             /*

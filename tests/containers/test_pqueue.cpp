@@ -49,8 +49,8 @@ struct my_type
 
 struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 {
-    my_cmp() = delete;       // make sure that comparator does not
-    explicit my_cmp(int) {}  // get default constructed
+    my_cmp() = delete;                                       // make sure that comparator does not
+    explicit my_cmp(int) { }  // get default constructed
 
     bool operator () (const my_type& a, const my_type& b) const
     {
@@ -87,7 +87,7 @@ int main()
         (mem_for_pools / 2) / block_type::raw_size,
         (mem_for_pools / 2) / block_type::raw_size
         );
-    pq_type p(pool, my_cmp{1});
+    pq_type p(pool, my_cmp { 1 });
 
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 

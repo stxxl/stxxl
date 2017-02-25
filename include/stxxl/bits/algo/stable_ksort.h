@@ -24,6 +24,7 @@
 #include <foxxll/mng/buf_ostream.hpp>
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <tlx/math/integer_log2.hpp>
 
 #include <algorithm>
 
@@ -246,7 +247,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     const size_t ndisks = cfg->disks_number();
     const size_t min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const size_t nmaxbuckets = m - min_num_read_write_buffers;
-    const unsigned int lognbuckets = foxxll::ilog2_floor(nmaxbuckets);
+    const unsigned int lognbuckets = tlx::integer_log2_floor(nmaxbuckets);
     const size_t nbuckets = size_t(1) << lognbuckets;
     const size_t est_bucket_size = (size_t)foxxll::div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
@@ -288,9 +289,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     {
         // sort buckets
         size_t write_buffers_multiple_bs = 2;
-        size_t max_bucket_size_bl = (m - write_buffers_multiple_bs * ndisks) / 2;     // in number of blocks
+        size_t max_bucket_size_bl = (m - write_buffers_multiple_bs * ndisks) / 2;       // in number of blocks
         uint64_t max_bucket_size_rec = uint64_t(max_bucket_size_bl) * block_type::size; // in number of records
-        uint64_t max_bucket_size_act = 0;                                              // actual max bucket size
+        uint64_t max_bucket_size_act = 0;                                               // actual max bucket size
         // establish output stream
 
         for (i = 0; i < nbuckets; i++)
@@ -351,7 +352,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
 
         key_type offset = 0;
         const unsigned log_k1 = std::max<unsigned>(
-            foxxll::ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+            tlx::integer_log2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
         size_t k1 = size_t(1) << log_k1;
         size_t* bucket1 = new size_t[k1];
 
@@ -365,7 +366,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         {
             nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[k], block_type::size);
             const unsigned log_k1_k = std::max<unsigned>(
-                foxxll::ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+                tlx::integer_log2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
             k1 = (size_t)(1) << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
@@ -401,7 +402,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
                 type_key_* cEnd = refs2 + bucket1[i];
                 type_key_* dEnd = refs1 + bucket1[i];
 
-                const unsigned log_k2 = foxxll::ilog2_floor(bucket1[i]) - 1;        // adaptive bucket size
+                const unsigned log_k2 = tlx::integer_log2_floor(bucket1[i]) - 1;        // adaptive bucket size
                 const size_t k2 = size_t(1) << log_k2;
                 size_t* bucket2 = new size_t[k2];
                 const unsigned shift2 = shift1 - log_k2;
