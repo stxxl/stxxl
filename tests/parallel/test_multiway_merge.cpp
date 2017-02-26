@@ -39,16 +39,6 @@ struct Something
     }
 };
 
-template class stxxl::parallel::LoserTreeCopy<false, Something>;
-template class stxxl::parallel::LoserTreeCopy<true, Something>;
-template class stxxl::parallel::LoserTreeReference<Something>;
-template class stxxl::parallel::LoserTreePointer<false, Something>;
-template class stxxl::parallel::LoserTreePointer<true, Something>;
-template class stxxl::parallel::LoserTreeCopyUnguarded<false, Something>;
-template class stxxl::parallel::LoserTreeCopyUnguarded<true, Something>;
-template class stxxl::parallel::LoserTreePointerUnguarded<false, Something>;
-template class stxxl::parallel::LoserTreePointerUnguarded<true, Something>;
-
 template <typename ValueType, bool Stable, bool Sentinels>
 void test_vecs(unsigned int vecnum)
 {

@@ -20,13 +20,13 @@
 #include <foxxll/common/utils.hpp>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel/equally_split.h>
-#include <stxxl/bits/parallel/losertree.h>
 #include <stxxl/bits/parallel/merge.h>
 #include <stxxl/bits/parallel/multiseq_selection.h>
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/tags.h>
 #include <stxxl/bits/parallel/timing.h>
 #include <stxxl/bits/verbose.h>
+#include <tlx/loser_tree.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -959,8 +959,8 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 {
     STXXL_PARALLEL_PCALL(length);
 
-    using source_type = typename LoserTreeType::source_type;
-    using size_type = typename LoserTreeType::size_type;
+    using source_type = typename LoserTreeType::Source;
+    using size_type = typename LoserTreeType::Source;
     using RandomAccessIterator = typename std::iterator_traits<RandomAccessIteratorIterator>
                                  ::value_type::first_type;
     using value_type = typename std::iterator_traits<RandomAccessIterator>
@@ -988,9 +988,9 @@ RandomAccessIterator3 multiway_merge_loser_tree(
     for (source_type t = 0; t < k; ++t)
     {
         if (UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
-            lt.insert_start(*arbitrary_element, t, true);
+            lt.insert_start(arbitrary_element, t, true);
         else
-            lt.insert_start(*seqs_begin[t].first, t, false);
+            lt.insert_start(&*seqs_begin[t].first, t, false);
     }
 
     lt.init();
@@ -1000,7 +1000,7 @@ RandomAccessIterator3 multiway_merge_loser_tree(
     for (DiffType i = 0; i < total_length; ++i)
     {
         // take out
-        source_type source = lt.get_min_source();
+        source_type source = lt.min_source();
 
         *target = *seqs_begin[source].first;
         ++target;
@@ -1008,10 +1008,10 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 
         // feed
         if (seqs_begin[source].first == seqs_begin[source].second)
-            lt.delete_min_insert(*arbitrary_element, true);
+            lt.delete_min_insert(arbitrary_element, true);
         else
             // replace from same source
-            lt.delete_min_insert(*seqs_begin[source].first, false);
+            lt.delete_min_insert(&*seqs_begin[source].first, false);
     }
 
     return target;
@@ -1044,8 +1044,8 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
     difference_type length,
     Comparator comp)
 {
-    using source_type = typename LoserTreeType::source_type;
-    using size_type = typename LoserTreeType::size_type;
+    using source_type = typename LoserTreeType::Source;
+    using size_type = typename LoserTreeType::Source;
     using RandomAccessIteratorPair = typename std::iterator_traits<RandomAccessIteratorIterator>
                                      ::value_type;
     using RandomAccessIterator = typename RandomAccessIteratorPair
@@ -1066,7 +1066,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
     {
         assert(seqs_begin[t].first != seqs_begin[t].second);
 
-        lt.insert_start(*seqs_begin[t].first, t);
+        lt.insert_start(&*seqs_begin[t].first, t, false);
 
         total_length += iterpair_size(seqs_begin[t]);
     }
@@ -1086,7 +1086,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
     while (target < target_end)
     {
         // take out
-        source = lt.get_min_source();
+        source = lt.min_source();
 
 #if STXXL_DEBUG_ASSERTIONS
         assert(i == 0 || !comp(*(seqs_begin[source].first), *(target - 1)));
@@ -1102,7 +1102,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
 #endif
         // feed
         // replace from same source
-        lt.delete_min_insert(*seqs_begin[source].first);
+        lt.delete_min_insert(&*seqs_begin[source].first, false);
     }
 
     return target;
@@ -1112,14 +1112,14 @@ template <bool Stable, class ValueType, class Comparator>
 struct loser_tree_traits
 {
 public:
-    using LT = LoserTreePointer<Stable, ValueType, Comparator>;
+    using LT = tlx::LoserTreePointer<Stable, ValueType, Comparator>;
 };
 
-#define STXXL_NO_POINTER(T)                              \
-    template <bool Stable, class Comparator>             \
-    struct loser_tree_traits<Stable, T, Comparator>      \
-    {                                                    \
-        typedef LoserTreeCopy<Stable, T, Comparator> LT; \
+#define STXXL_NO_POINTER(T)                                   \
+    template <bool Stable, class Comparator>                  \
+    struct loser_tree_traits<Stable, T, Comparator>           \
+    {                                                         \
+        typedef tlx::LoserTreeCopy<Stable, T, Comparator> LT; \
     };
 
 STXXL_NO_POINTER(unsigned char)
@@ -1139,14 +1139,14 @@ template <bool Stable, class ValueType, class Comparator>
 class loser_tree_traits_unguarded
 {
 public:
-    using LT = LoserTreePointerUnguarded<Stable, ValueType, Comparator>;
+    using LT = tlx::LoserTreePointerUnguarded<Stable, ValueType, Comparator>;
 };
 
-#define STXXL_NO_POINTER_UNGUARDED(T)                             \
-    template <bool Stable, class Comparator>                      \
-    struct loser_tree_traits_unguarded<Stable, T, Comparator>     \
-    {                                                             \
-        typedef LoserTreeCopyUnguarded<Stable, T, Comparator> LT; \
+#define STXXL_NO_POINTER_UNGUARDED(T)                                  \
+    template <bool Stable, class Comparator>                           \
+    struct loser_tree_traits_unguarded<Stable, T, Comparator>          \
+    {                                                                  \
+        typedef tlx::LoserTreeCopyUnguarded<Stable, T, Comparator> LT; \
     };
 
 STXXL_NO_POINTER_UNGUARDED(unsigned char)
