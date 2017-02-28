@@ -24,11 +24,11 @@
 #include <stxxl/bits/containers/pq_helpers.h>
 #include <stxxl/bits/containers/pq_int_merger.h>
 #include <stxxl/bits/containers/pq_mergers.h>
-#include <tlx/meta/if.hpp>
 
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <type_traits>
 
 namespace stxxl {
 
@@ -838,8 +838,8 @@ struct find_B_m
                                          1, fits || candidate1::fits>::result;
 
     //! return a fitting configuration.
-    using result = typename tlx::If<
-              fits, self_type, typename tlx::If<
+    using result = typename std::conditional<
+              fits, self_type, typename std::conditional<
                   candidate1::fits, candidate1, candidate2>::type>::type;
 };
 
@@ -885,7 +885,7 @@ struct compute_N
     static const size_t AI = AI_;
     static const size_t N = X / (AI * AI);     // two stage internal
 
-    using result = typename tlx::If<
+    using result = typename std::conditional<
               (N >= CriticalSize), Self,
               typename compute_N<AI / 2, X, CriticalSize>::result>::type;
 };

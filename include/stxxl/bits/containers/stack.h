@@ -24,12 +24,12 @@
 #include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
-#include <tlx/meta/if.hpp>
 #include <tlx/simple_vector.hpp>
 
 #include <algorithm>
 #include <stack>
 #include <vector>
+#include <type_traits>
 
 namespace stxxl {
 
@@ -1037,18 +1037,18 @@ template <
 class STACK_GENERATOR
 {
     using cfg = stack_config_generator<ValueType, BlocksPerPage, BlockSize, AllocStr, SizeType>;
-    using GrShrTp = typename tlx::If<
+    using GrShrTp = typename std::conditional<
               Behaviour == grow_shrink,
               grow_shrink_stack<cfg>, grow_shrink_stack2<cfg> >::type;
-    using ExtStackType = typename tlx::If<
+    using ExtStackType = typename std::conditional<
               Behaviour == normal, normal_stack<cfg>, GrShrTp>::type;
-    using MigrOrNotStackType = typename tlx::If<
+    using MigrOrNotStackType = typename std::conditional<
               Externality == migrating,
               migrating_stack<MigrCritSize, ExtStackType, IntStackType>,
               ExtStackType>::type;
 
 public:
-    using result = typename tlx::If<
+    using result = typename std::conditional<
               Externality == internal, IntStackType, MigrOrNotStackType>::type;
 };
 

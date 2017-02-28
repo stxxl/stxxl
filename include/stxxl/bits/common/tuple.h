@@ -14,10 +14,10 @@
 #define STXXL_COMMON_TUPLE_HEADER
 
 #include <foxxll/common/tmeta.hpp>
-#include <tlx/meta/if.hpp>
 
 #include <limits>
 #include <ostream>
+#include <type_traits>
 
 namespace stxxl {
 
@@ -185,7 +185,8 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        using result = typename tlx::If<I == 1, first_type, void>::type;
+        using result = typename std::conditional<
+            I == 1, first_type, void>::type;
     };
 
     //! Empty constructor
