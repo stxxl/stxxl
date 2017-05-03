@@ -58,7 +58,7 @@ public:
             size_type bytes,
             request_type type);
 
-    virtual ~request();
+    virtual ~request() noexcept(false);
 
     file * get_file() const { return m_file; }
     void * get_buffer() const { return m_buffer; }

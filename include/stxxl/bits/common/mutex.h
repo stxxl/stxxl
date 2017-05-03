@@ -59,7 +59,7 @@ public:
         STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
     //! destroy mutex handle
-    ~mutex()
+    ~mutex() noexcept(false)
     {
         // try simple delete first
         int res = pthread_mutex_destroy(&m_mutex);

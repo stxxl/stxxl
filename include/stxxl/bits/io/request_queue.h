@@ -31,7 +31,7 @@ public:
 public:
     virtual void add_request(request_ptr& req) = 0;
     virtual bool cancel_request(request_ptr& req) = 0;
-    virtual ~request_queue() { }
+    virtual ~request_queue() noexcept(false) { }
     virtual void set_priority_op(priority_op p) { STXXL_UNUSED(p); }
 };
 

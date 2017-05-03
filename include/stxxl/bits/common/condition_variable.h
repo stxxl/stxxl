@@ -55,7 +55,7 @@ public:
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_init(&cond, NULL));
     }
     //! destroy condition variable
-    ~condition_variable()
+    ~condition_variable() noexcept(false)
     {
         STXXL_CHECK_PTHREAD_CALL(pthread_cond_destroy(&cond));
     }

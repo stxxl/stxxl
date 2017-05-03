@@ -151,7 +151,7 @@ public:
     //! close and remove file
     virtual void close_remove() { }
 
-    virtual ~file()
+    virtual ~file() noexcept(false)
     {
         unsigned_type nr = get_request_nref();
         if (nr != 0)

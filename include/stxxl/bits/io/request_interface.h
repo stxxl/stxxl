@@ -74,7 +74,7 @@ public:
     //! Dumps properties of a request.
     virtual std::ostream & print(std::ostream& out) const = 0;
 
-    virtual ~request_interface()
+    virtual ~request_interface() noexcept(false)
     { }
 };
 
