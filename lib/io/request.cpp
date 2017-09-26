@@ -36,7 +36,7 @@ request::request(
     m_file->add_request_ref();
 }
 
-request::~request()
+request::~request() noexcept(false)
 {
     STXXL_VERBOSE3_THIS("request::~request(), ref_cnt=" << get_reference_count());
 }
