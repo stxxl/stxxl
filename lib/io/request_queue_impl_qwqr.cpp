@@ -20,7 +20,7 @@
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/parallel.h>
 
-#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700 && STXXL_MSVC <= 1800
  #include <windows.h>
 #endif
 
@@ -215,7 +215,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
     pthis->m_thread_state.set_to(TERMINATED);
 
-#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700 && STXXL_MSVC <= 1800
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
     ExitThread(NULL);

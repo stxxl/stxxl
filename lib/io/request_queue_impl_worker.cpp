@@ -26,7 +26,7 @@
 #if STXXL_BOOST_THREADS
  #include <boost/bind.hpp>
 #endif
-#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700 && STXXL_MSVC <= 1800
  #include <windows.h>
 #endif
 
@@ -51,7 +51,7 @@ void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>&
     s.set_to(TERMINATING);
     sem++;
 #if STXXL_STD_THREADS
-#if STXXL_MSVC >= 1700
+#if STXXL_MSVC >= 1700 && STXXL_MSVC <= 1800
     // In the Visual C++ Runtime 2012 and 2013, there is a deadlock bug, which
     // occurs when threads are joined after main() exits. Apparently, Microsoft
     // thinks this is not a big issue. It has not been fixed in VC++RT 2013.
