@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 #include <vector>
 
 #if defined(_MSC_VER) && STXXL_DEBUG_ASSERTIONS
@@ -972,23 +973,13 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 
     LoserTreeType lt(static_cast<size_type>(k), comp);
 
-    DiffType total_length = 0;
-
-    const value_type* arbitrary_element = nullptr;
-
-    // find an arbitrary element to avoid default construction
-    for (source_type t = 0; t < k; ++t)
-    {
-        if (!arbitrary_element && iterpair_size(seqs_begin[t]) > 0)
-            arbitrary_element = &(*seqs_begin[t].first);
-
-        total_length += iterpair_size(seqs_begin[t]);
-    }
+    DiffType total_length = std::accumulate(seqs_begin, seqs_end, DiffType(0),
+        [] (DiffType sum, auto x) {return sum + iterpair_size(x);});
 
     for (source_type t = 0; t < k; ++t)
     {
         if (UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
-            lt.insert_start(arbitrary_element, t, true);
+            lt.insert_start(nullptr, t, true);
         else
             lt.insert_start(&*seqs_begin[t].first, t, false);
     }
@@ -1008,7 +999,7 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 
         // feed
         if (seqs_begin[source].first == seqs_begin[source].second)
-            lt.delete_min_insert(arbitrary_element, true);
+            lt.delete_min_insert(nullptr, true);
         else
             // replace from same source
             lt.delete_min_insert(&*seqs_begin[source].first, false);
