@@ -1,5 +1,6 @@
 language: cpp
 sudo: required
+dist: trusty
 
 env:
   global:
@@ -60,6 +61,9 @@ before_script:
   # run on ramdisk
   - echo "disk=/dev/shm/stxxl.###.tmp,2G,syscall unlink" > ~/.stxxl
   - df -h
+
+  # checkout foxxll and tlx
+  - git submodule update --init --recursive
 
   - mkdir build
   - cd build
