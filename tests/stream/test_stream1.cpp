@@ -96,7 +96,7 @@ int main()
         ++merger;
     }
     STXXL_MSG("CRC: " << crc);
-    STXXL_CHECK(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
+    STXXL_CHECK(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
     STXXL_CHECK(merger.empty());
 
     std::cout << *s;

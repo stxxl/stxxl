@@ -439,7 +439,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
             } while (rest > 0 && seqs.size() > 0);
 
  #if STXXL_CHECK_ORDER_IN_SORTS
-            if (!stxxl::is_sorted(out_buffer->begin(), out_buffer->end(), cmp))
+            if (!stxxl::is_sorted(out_buffer->cbegin(), out_buffer->cend(), cmp))
             {
                 for (value_type* i = out_buffer->begin() + 1; i != out_buffer->end(); i++)
                     if (cmp(*i, *(i - 1)))
@@ -483,10 +483,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
             (*out_run)[i].value = *(out_buffer->elem);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-            assert(stxxl::is_sorted(
-                       out_buffer->begin(),
-                       out_buffer->end(),
-                       cmp));
+            assert(stxxl::is_sorted(out_buffer->cbegin(), out_buffer->cend(), cmp));
 
             if (i)
                 assert(cmp(*(out_buffer->elem), last_elem) == false);

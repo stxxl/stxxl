@@ -13,6 +13,7 @@
 
 #include <iterator>
 #include <limits>
+
 #include <stxxl/priority_queue>
 
 using my_type = int;
@@ -79,7 +80,7 @@ int main()
     merger.append_merger(dummy, 1024 * 4);
     merger.append_merger(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
-    STXXL_CHECK(stxxl::is_sorted(output.begin(), output.end()));
+    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend()));
 
     int_merger<my_type, my_cmp, 8> loser;
     my_type* seq1 = make_sequence(dummy, 1024);

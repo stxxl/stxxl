@@ -68,13 +68,13 @@ int main()
         v[i].m_key = (rnd() / 2) * 2;
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(!stxxl::is_sorted(v.begin(), v.end()));
+    STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend()));
 
     STXXL_MSG("Sorting...");
     stxxl::stable_ksort(v.begin(), v.end(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend()));
 
     return 0;
 }

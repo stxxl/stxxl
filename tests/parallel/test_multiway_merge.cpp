@@ -102,7 +102,7 @@ void test_vecs(unsigned int vecnum)
     {
         sequences[i] = std::make_pair(vec[i].begin(), vec[i].end() - (Sentinels ? 1 : 0));
 
-        STXXL_CHECK(stxxl::is_sorted(vec[i].begin(), vec[i].end()));
+        STXXL_CHECK(stxxl::is_sorted(vec[i].cbegin(), vec[i].cend()));
     }
 
     if (!Sentinels) {

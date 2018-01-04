@@ -28,8 +28,8 @@
 
 #include <algorithm>
 #include <stack>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 namespace stxxl {
 

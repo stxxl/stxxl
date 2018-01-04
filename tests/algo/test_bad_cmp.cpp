@@ -99,13 +99,13 @@ int main(int argc, char* argv[])
     }
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     STXXL_MSG("Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...");
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {

@@ -54,7 +54,7 @@ void test_size(unsigned int size)
 
     stxxl::parallel::parallel_sort_mwms<Stable>(v.begin(), v.end(), cmp, 8);
 
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp));
 }
 
 int main()

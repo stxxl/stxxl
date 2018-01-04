@@ -60,7 +60,7 @@ void test(uint64_t data_mem, size_t memory_to_use)
     foxxll::stats_data after(*foxxll::stats::get_instance());
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend()));
 
     STXXL_MSG("Sorting: " << (after - before));
     STXXL_MSG("Total:   " << *foxxll::stats::get_instance());

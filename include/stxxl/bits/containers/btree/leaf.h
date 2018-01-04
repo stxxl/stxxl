@@ -231,7 +231,7 @@ public:
             assert(new_size >= min_nelements());
 
             std::copy(begin_,end_,m_block->begin());
-            assert(stxxl::is_sorted(m_block->begin(),m_block->begin() + new_size, m_vcmp));
+            assert(stxxl::is_sorted(m_block->cbegin(),m_block->cbegin() + new_size, m_vcmp));
             m_block->info.cur_size = new_size;
        }*/
 

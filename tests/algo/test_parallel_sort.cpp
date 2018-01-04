@@ -112,7 +112,7 @@ void linear_sort_normal(vector_type& input)
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
 
-    STXXL_CHECK(stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()));
+    STXXL_CHECK(stxxl::is_sorted(input.cbegin(), input.cend()));
 
     std::cout << "Linear sorting normal took " << (stop - start) << " seconds." << std::endl;
 }
@@ -147,7 +147,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     if (sum1 != sum2)
         STXXL_MSG("WRONG DATA");
 
-    STXXL_CHECK(stxxl::is_sorted<vector_type::const_iterator>(output.begin(), output.end(), comparator_type()));
+    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend(), comparator_type()));
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }
@@ -241,7 +241,7 @@ int main(int argc, const char** argv)
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 
-    STXXL_CHECK(!stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()));
+    STXXL_CHECK(!stxxl::is_sorted(input.cbegin(), input.cend()));
 
     {
         vector_type output(n_records);

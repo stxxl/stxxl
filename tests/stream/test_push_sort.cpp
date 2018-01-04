@@ -89,7 +89,7 @@ int main()
         ++merger;
     }
     STXXL_MSG("checksum after:  " << checksum_after);
-    STXXL_CHECK(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
+    STXXL_CHECK(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
     STXXL_CHECK(checksum_before == checksum_after);
     STXXL_CHECK(merger.empty());
 

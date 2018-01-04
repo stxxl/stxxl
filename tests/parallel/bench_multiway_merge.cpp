@@ -288,7 +288,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
             << std::endl;
     }
 
-    STXXL_CHECK(stxxl::is_sorted(out.begin(), out.end(), cmp));
+    STXXL_CHECK(stxxl::is_sorted(out.cbegin(), out.cend(), cmp));
 }
 
 template <typename ValueType, benchmark_type Method>

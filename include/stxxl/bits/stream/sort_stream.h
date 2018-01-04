@@ -1089,7 +1089,7 @@ private:
             } while (rest > 0 && (*seqs).size() > 0);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-            if (!stxxl::is_sorted(m_buffer_block->begin(), m_buffer_block->end(), cmp))
+            if (!stxxl::is_sorted(m_buffer_block->cbegin(), m_buffer_block->cend(), cmp))
             {
                 for (value_type* i = m_buffer_block->begin() + 1; i != m_buffer_block->end(); ++i)
                     if (cmp(*i, *(i - 1)))
@@ -1344,7 +1344,7 @@ public:
             fill_buffer_block();
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-            assert(stxxl::is_sorted(m_buffer_block->elem, m_buffer_block->elem + std::min<size_type>(m_elements_remaining, m_buffer_block->size), m_cmp));
+            assert(stxxl::is_sorted(m_buffer_block->cbegin(), m_buffer_block->cbegin() + std::min<size_type>(m_elements_remaining, m_buffer_block->size), m_cmp));
 #endif //STXXL_CHECK_ORDER_IN_SORTS
         }
 

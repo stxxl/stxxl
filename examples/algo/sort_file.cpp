@@ -128,7 +128,7 @@ int main(int argc, char** argv)
          */
 
         STXXL_MSG("Checking order...");
-        STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
+        STXXL_MSG((stxxl::is_sorted(v.cbegin(), v.cend()) ? "OK" : "WRONG"));
 
         STXXL_MSG("Sorting...");
         if (strcmp(argv[1], "sort") == 0) {
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
         }
 
         STXXL_MSG("Checking order...");
-        STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
+        STXXL_MSG((stxxl::is_sorted(v.cbegin(), v.cend()) ? "OK" : "WRONG"));
     }
 
     return 0;

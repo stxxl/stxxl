@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
     if (1) {
         STXXL_MSG("Checking order...");
-        STXXL_MSG((stxxl::is_sorted(output.begin(), output.end(), comparator_type()) ? "OK" : "WRONG"));
+        STXXL_MSG((stxxl::is_sorted(output.cbegin(), output.cend(), comparator_type()) ? "OK" : "WRONG"));
     }
 
     return 0;

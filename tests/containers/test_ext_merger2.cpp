@@ -123,7 +123,7 @@ int main()
                     );
 
             merger.multi_merge(output.begin(), output.begin() + l);
-            STXXL_CHECK(stxxl::is_sorted(output.begin(), output.begin() + l));
+            STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cbegin() + l));
             STXXL_MSG("merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")");
         }
 

@@ -106,7 +106,7 @@ int main()
         //stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
         stxxl::stl_in_memory_sort(v.begin(), v.end(), cmp());
         STXXL_MSG("small vector sorted   " << v[0] << " " << v[1] << " " << v[2]);
-        STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
+        STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
     }
 
     const uint64_t n_records = uint64_t(192) * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(my_type)) / sizeof(my_type);
@@ -118,13 +118,13 @@ int main()
         v[i].m_key = 1 + (rnd() % 0xfffffff);
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(!stxxl::is_sorted(v.begin(), v.end(), cmp()));
+    STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     STXXL_MSG("Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...");
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     STXXL_MSG("Done, output size=" << v.size());
 
