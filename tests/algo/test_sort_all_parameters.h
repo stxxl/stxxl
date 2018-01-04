@@ -12,36 +12,19 @@
  **************************************************************************/
 
 #include <foxxll/common/types.hpp>
+#include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/config.h>
 
 #include <functional>
 #include <limits>
 #include <ostream>
 
-template <unsigned kSize>
-struct bulk
-{
-    char m_data[kSize];
-
-    bulk()
-    {
-#if STXXL_WITH_VALGRIND
-        memset(m_data, 0, kSize);
-#endif
-    }
-};
-
-template <>
-struct bulk<0>
-{ };
-
 template <typename KEY, unsigned SIZE>
-struct my_type
+struct my_type : stxxl::padding<SIZE - sizeof(key_type)>
 {
     using key_type = KEY;
 
     key_type m_key;
-    bulk<SIZE - sizeof(key_type)> m_data;
 
     my_type() { }
     //! implicit conversion

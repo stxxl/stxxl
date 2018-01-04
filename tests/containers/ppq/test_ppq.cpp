@@ -14,6 +14,7 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 #include <limits>
+#include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/random>
 #include <stxxl/timer>
@@ -22,18 +23,14 @@ using foxxll::scoped_print_timer;
 
 #define RECORD_SIZE 128
 
-struct my_type
+using KEY_TYPE = int;
+struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
 {
-    using key_type = int;
+    using key_type = KEY_TYPE;
+
     key_type key;
-    char data[RECORD_SIZE - sizeof(key_type)];
     my_type() { }
-    explicit my_type(key_type k) : key(k)
-    {
-#if STXXL_WITH_VALGRIND
-        memset(data, 0, sizeof(data));
-#endif
-    }
+    explicit my_type(key_type k) : key(k) {}
 
     friend std::ostream& operator << (std::ostream& o, const my_type& obj)
     {

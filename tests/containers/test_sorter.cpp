@@ -16,15 +16,16 @@
 
 #include <limits>
 #include <stxxl/sorter>
+#include <stxxl/bits/common/padding.h>
 
 #define RECORD_SIZE 16
+using KEY_TYPE = unsigned;
 
-struct my_type
+struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
 {
-    using key_type = unsigned;
+    using key_type = KEY_TYPE;
 
     key_type m_key;
-    char m_data[RECORD_SIZE - sizeof(key_type)];
 
     key_type key() const
     {
@@ -32,13 +33,7 @@ struct my_type
     }
 
     my_type() { }
-    explicit my_type(key_type k)
-        : m_key(k)
-    {
-#if STXXL_WITH_VALGRIND
-        memset(m_data, 0, sizeof(m_data));
-#endif
-    }
+    explicit my_type(key_type k) : m_key(k) {}
 
     static my_type min_value()
     {

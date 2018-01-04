@@ -20,6 +20,7 @@ static const char* description =
 #include <foxxll/unused.hpp>
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/tuple.h>
+#include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/bits/verbose.h>
@@ -27,6 +28,7 @@ static const char* description =
 #include <stxxl/sorter>
 #include <stxxl/timer>
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
@@ -101,33 +103,26 @@ random_number32_r g_rand(g_seed);
  * The value type and corresponding benchmark functions.
  */
 
-template <typename KeyType, int ValueSize>
-struct my_type
+template <typename KeyType, size_t ValueSize>
+struct my_type : stxxl::padding<ValueSize - sizeof(KeyType)>
 {
-    enum { value_size = ValueSize };
+    constexpr static size_t value_size = ValueSize;
     using key_type = KeyType;
 
-    union {
-        key_type key;
-        char padding[value_size];
-    };
+    key_type key;
 
-    my_type()
-    { }
+    my_type() {}
 
     explicit my_type(const key_type& _key)
         : key(_key)
-    {
-#ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
-        memset(padding + sizeof(key_type), 0, sizeof(padding) - sizeof(key_type));
-#endif
-    }
+    {}
 
     friend std::ostream& operator << (std::ostream& o, const my_type& obj)
     {
         o << obj.key;
         return o;
     }
+
 };
 
 template <typename ValueType>
@@ -188,7 +183,9 @@ struct less_min_max : public std::binary_function<ValueType, ValueType, bool>
  */
 
 using my8_type = my_type<uint64_t, sizeof(uint64_t)>;
+static_assert(sizeof(my8_type) == 8, "my8 has invalid size");
 using my24_type = my_type<uint64_t, 24>;
+static_assert(sizeof(my24_type) == 24, "my24 has invalid size");
 
 /*
  * Progress messages

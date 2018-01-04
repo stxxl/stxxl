@@ -19,15 +19,18 @@
 #include <foxxll/mng.hpp>
 #include <stxxl/sort>
 #include <stxxl/vector>
+#include <stxxl/bits/common/padding.h>
 
 #define RECORD_SIZE 8
 
-struct my_type
+using KEY_TYPE = unsigned;
+
+struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
 {
-    using key_type = unsigned;
+    using key_type = KEY_TYPE;
 
     key_type m_key;
-    char m_data[RECORD_SIZE - sizeof(key_type)];
+
     key_type key() const
     {
         return m_key;
@@ -35,22 +38,17 @@ struct my_type
 
     my_type() { }
     explicit my_type(key_type k) : m_key(k)
-    {
-#if STXXL_WITH_VALGRIND
-        memset(m_data, 0, sizeof(m_data));
-#endif
-    }
+    {}
 
     static my_type min_value()
     {
         return my_type(std::numeric_limits<key_type>::min());
     }
+
     static my_type max_value()
     {
         return my_type(std::numeric_limits<key_type>::max());
     }
-
-    ~my_type() { }
 };
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)

@@ -22,6 +22,7 @@ static const char* description =
     "number of items set accordingly.";
 
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/priority_queue>
 #include <stxxl/random>
@@ -46,19 +47,16 @@ using uint64_pair_type = stxxl::tuple<uint64_t, uint64_t>;
 
 #define MY_TYPE_SIZE 24
 
-struct my_type : public uint32_pair_type
+struct my_type
+    : stxxl::padding<MY_TYPE_SIZE - sizeof(uint32_pair_type)>
+    , public uint32_pair_type
 {
     using key_type = uint32_t;
 
-    char data[MY_TYPE_SIZE - sizeof(uint32_pair_type)];
     my_type() { }
     my_type(const key_type& k1, const key_type& k2)
         : uint32_pair_type(k1, k2)
-    {
-#if STXXL_WITH_VALGRIND
-        memset(data, 0, sizeof(data));
-#endif
-    }
+    {}
 
     static my_type max_value()
     {
