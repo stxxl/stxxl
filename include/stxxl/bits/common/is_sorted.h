@@ -19,6 +19,18 @@
 
 namespace stxxl {
 
+
+/*!
+ * This function checks whether the items between the iterators are sorted
+ * in non decreasingly (assuming comp is less). It is functionally identical
+ * to std::is_sorted, however avoids needlessly copying iterators which can
+ * be prohibitively expensive with complex EM iterators.
+ *
+ * \node
+ * You should prefer using stxxl::is_sorted over std::is_sorted for STXXL
+ * containers as stxxl::is_sorted may have datastructure-specific
+ * overrides to increase performance.
+ */
 template <class ForwardIterator, class StrictWeakOrdering>
 bool is_sorted(ForwardIterator first, ForwardIterator last,
                StrictWeakOrdering comp)
@@ -35,6 +47,9 @@ bool is_sorted(ForwardIterator first, ForwardIterator last,
     return true;
 }
 
+/*!
+ * \see stxxl::is_sorted
+ */
 template <class ForwardIterator>
 bool is_sorted(ForwardIterator first, ForwardIterator last)
 {
