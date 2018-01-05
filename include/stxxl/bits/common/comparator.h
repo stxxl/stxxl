@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.org
  *
- *  Copyright (C) 2017 Manuel Penschuck
+ *  Copyright (C) 2017 Manuel Penschuck <manuel@ae.cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -413,5 +413,40 @@ auto make_struct_comparator(const KeyExtract extract)
 }
 
 } // namespace stxxl
+
+
+/*!
+ * Helper class to easily construct key-extractors and manual comparators
+ * that can determine their min and max elements based on std::numeric_limits.
+ *
+ * \code
+ * // example of an integer key-extractor
+ * struct my_keyextract : public stxxl::numeric_limits_sentinels<uint64_t> {
+ *     uint64_t operator() (const uint64_t x) {return x;}
+ * };
+ * \endcode
+ *
+ * \tparam ValueType    Type of comparator/key-extractor input
+ * \tparam Less         Less <=> (min_value() < max_value())
+ */
+template<typename ValueType, bool Less = false>
+struct numeric_limits_sentinels {
+    static_assert(std::numeric_limits<ValueType>::is_specialized,
+        "Only type with a std::numeric_limits specialization are supported");
+
+    using value_type = ValueType;
+
+    value_type max_value() const {
+        return Less
+               ? std::numeric_limits<value_type>::max()
+               : std::numeric_limits<value_type>::min();
+    }
+
+    value_type min_value() const {
+        return Less
+               ? std::numeric_limits<value_type>::min()
+               : std::numeric_limits<value_type>::max();
+    }
+};
 
 #endif // !STXXL_COMMON_COMPARATOR_HEADER
