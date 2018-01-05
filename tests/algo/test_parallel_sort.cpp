@@ -31,68 +31,29 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-const unsigned long long megabyte = 1024 * 1024;
+#include <key_with_padding.h>
 
-#define RECORD_SIZE 20
+const unsigned long long megabyte = 1024 * 1024;
 #define MAGIC 123
+
+using KeyType = uint64_t;
+constexpr size_t RecordSize = 2*sizeof(KeyType) + 0;
+using my_type = key_with_padding<KeyType, RecordSize, false>;
+using cmp_less_key = my_type::compare_less;
 
 size_t run_size;
 size_t buffer_size;
-
-struct my_type
-{
-    using key_type = unsigned long long;
-
-    key_type m_key;
-    key_type m_load;
-    char m_data[RECORD_SIZE - 2 * sizeof(key_type)];
-    key_type key() const { return m_key; }
-
-    my_type() { }
-    explicit my_type(key_type k) : m_key(k) { }
-    my_type(key_type k, key_type l) : m_key(k), m_load(l) { }
-
-    void operator = (const key_type& k) { m_key = k; }
-    void operator = (const my_type& mt)
-    {
-        m_key = mt.m_key;
-        m_load = mt.m_load;
-    }
-};
-
-const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
-
-bool operator < (const my_type& a, const my_type& b);
-
-inline bool operator < (const my_type& a, const my_type& b)
-{
-    return a.key() < b.key();
-}
-
-inline bool operator == (const my_type& a, const my_type& b)
-{
-    return a.key() == b.key();
-}
-
-inline std::ostream& operator << (std::ostream& o, const my_type& obj)
-{
-    o << obj.m_key << "/" << obj.m_load;
-    return o;
-}
-
-struct cmp_less_key : public std::less<my_type>
-{
-    my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::min(), MAGIC); }
-    my_type max_value() const { return my_type(std::numeric_limits<my_type::key_type>::max(), MAGIC); }
-};
+constexpr int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 
 using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY>;
 
 my_type::key_type checksum(vector_type& input)
 {
     my_type::key_type sum = 0;
-    for (vector_type::const_iterator i = input.begin(); i != input.end(); ++i)
-        sum += (my_type::key_type)((*i).m_key);
+
+    for(const auto& v : input)
+        sum += v.key;
+
     return sum;
 }
 
@@ -128,12 +89,9 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
-    using comparator_type = cmp_less_key;
-    comparator_type cl;
+    using sort_stream_type = stxxl::stream::sort<input_stream_type, cmp_less_key, block_size>;
 
-    using sort_stream_type = stxxl::stream::sort<input_stream_type, comparator_type, block_size>;
-
-    sort_stream_type sort_stream(input_stream, cl, run_size);
+    sort_stream_type sort_stream(input_stream, cmp_less_key(), run_size);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
     STXXL_CHECK(o == output.end());
@@ -147,7 +105,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     if (sum1 != sum2)
         STXXL_MSG("WRONG DATA");
 
-    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend(), comparator_type()));
+    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend(), cmp_less_key()));
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }

@@ -19,54 +19,12 @@
 #include <stxxl/ksort>
 #include <stxxl/vector>
 
-struct my_type
-{
-    using key_type1 = uint64_t;
+#include <key_with_padding.h>
 
-    key_type1 m_key;
-    key_type1 m_key_copy;
-    char m_data[32 - 2 * sizeof(key_type1)];
-
-    key_type1 key() const
-    {
-        return m_key;
-    }
-
-    my_type() : m_key(0), m_key_copy(0) { }
-    explicit my_type(key_type1 k) : m_key(k), m_key_copy(k) { }
-
-    my_type min_value() const { return my_type(std::numeric_limits<key_type1>::min()); }
-    my_type max_value() const { return my_type(std::numeric_limits<key_type1>::max()); }
-};
-
-std::ostream& operator << (std::ostream& o, const my_type& obj)
-{
-    o << obj.m_key << " " << obj.m_key_copy;
-    return o;
-}
-
-struct get_key
-{
-    using key_type = my_type::key_type1;
-    my_type dummy;
-    key_type operator () (const my_type& obj) const
-    {
-        return obj.m_key;
-    }
-    my_type min_value() const
-    {
-        return my_type((dummy.min_value)());
-    }
-    my_type max_value() const
-    {
-        return my_type((dummy.max_value)());
-    }
-};
-
-bool operator < (const my_type& a, const my_type& b)
-{
-    return a.key() < b.key();
-}
+using KeyType = uint64_t;
+constexpr size_t RecordSize = 2*sizeof(KeyType) + 0;
+using my_type = key_with_padding<KeyType, RecordSize, true>;
+using get_key = my_type::key_extract;
 
 int main()
 {
@@ -91,8 +49,8 @@ int main()
     STXXL_MSG("Filling vector... ");
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
-        v[i].m_key = rnd() + 1;
-        v[i].m_key_copy = v[i].m_key;
+        v[i].key = rnd() + 1;
+        v[i].key_copy = v[i].key;
     }
 
     STXXL_MSG("Checking order...");
@@ -100,7 +58,6 @@ int main()
 
     STXXL_MSG("Sorting...");
     stxxl::ksort(v.begin(), v.end(), get_key(), memory_to_use);
-    //stxxl::ksort(v.begin(),v.end(),memory_to_use);
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend()));
@@ -108,14 +65,14 @@ int main()
     my_type prev;
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
-        if (v[i].m_key != v[i].m_key_copy)
+        if (v[i].key != v[i].key_copy)
         {
             STXXL_MSG("Bug at position " << i);
             abort();
         }
-        if (i > 0 && prev.m_key == v[i].m_key)
+        if (i > 0 && prev.key == v[i].key)
         {
-            STXXL_MSG("Duplicate at position " << i << " key=" << v[i].m_key);
+            STXXL_MSG("Duplicate at position " << i << " key=" << v[i].key);
             //abort();
         }
         prev = v[i];

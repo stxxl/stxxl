@@ -19,13 +19,13 @@
 #include <stxxl/sort>
 #include <stxxl/vector>
 
-#include "test_sort_all_parameters.h"
+#include <key_with_padding.h>
 
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 4
 #endif
 
-#define MB (1024 * 1024)
+constexpr size_t MB = 1024 * 1024;
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
 void test(uint64_t data_mem, size_t memory_to_use)
@@ -33,6 +33,8 @@ void test(uint64_t data_mem, size_t memory_to_use)
     uint64_t records_to_sort = data_mem / sizeof(T);
     using vector_type = stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type>;
     vector_type v(records_to_sort);
+
+    using cmp = typename T::compare_less;
 
     size_t ndisks = foxxll::config::get_instance()->disks_number();
     STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
@@ -49,12 +51,12 @@ void test(uint64_t data_mem, size_t memory_to_use)
 
     foxxll::stats_data before(*foxxll::stats::get_instance());
 
-    stxxl::sort(v.begin(), v.end(), Cmp<T>(), memory_to_use);
+    stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     foxxll::stats_data after(*foxxll::stats::get_instance());
 
     STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), Cmp<T>()));
+    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     STXXL_MSG("Sorting: " << (after - before));
     STXXL_MSG("Total:   " << *foxxll::stats::get_instance());
@@ -106,7 +108,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 
-    using my_default_type = my_type<unsigned, RECORD_SIZE>;
+    using my_default_type = key_with_padding<unsigned, RECORD_SIZE>;
 
     switch (block_size_switch)
     {
@@ -144,16 +146,16 @@ int main(int argc, char* argv[])
         test_all_strategies<my_default_type, 896* 1024>(data_mem, sort_mem, strategy);
         break;
     case 11:
-        test_all_strategies<my_type<unsigned, 12>, 2* MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 12>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     case 12:
-        test_all_strategies<my_type<unsigned, 12>, 2* MB + 4096>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 12>, 2* MB + 4096>(data_mem, sort_mem, strategy);
         break;
     case 13:
-        test_all_strategies<my_type<unsigned, 20>, 2* MB + 4096>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 20>, 2* MB + 4096>(data_mem, sort_mem, strategy);
         break;
     case 14:
-        test_all_strategies<my_type<unsigned, 128>, 2* MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 128>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size_switch << ", aborting");

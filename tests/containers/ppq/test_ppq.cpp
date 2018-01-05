@@ -14,51 +14,19 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 #include <limits>
-#include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/random>
 #include <stxxl/timer>
 
+#include <key_with_padding.h>
+
 using foxxll::scoped_print_timer;
 
-#define RECORD_SIZE 128
+using KeyType = int32_t;
+constexpr size_t RecordSize = 128;
+using my_type = key_with_padding<KeyType, RecordSize>;
+using my_cmp = my_type::compare_greater;
 
-using KEY_TYPE = int;
-struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
-{
-    using key_type = KEY_TYPE;
-
-    key_type key;
-    my_type() { }
-    explicit my_type(key_type k) : key(k) {}
-
-    friend std::ostream& operator << (std::ostream& o, const my_type& obj)
-    {
-        return o << obj.key;
-    }
-};
-
-struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
-{
-    bool operator () (const my_type& a, const my_type& b) const
-    {
-        return a.key > b.key;
-    }
-
-    my_type min_value() const
-    {
-        return my_type(std::numeric_limits<my_type::key_type>::max());
-    }
-};
-
-// forced instantiation
-template class stxxl::parallel_priority_queue<
-        my_type, my_cmp,
-        STXXL_DEFAULT_ALLOC_STRATEGY,
-        STXXL_DEFAULT_BLOCK_SIZE(my_type),   /* BlockSize */
-        1* 64L* 1024L* 1024L,                /* RamSize */
-        0                                    /* MaxItems */
-        >;
 using ppq_type = stxxl::parallel_priority_queue<
           my_type, my_cmp,
           STXXL_DEFAULT_ALLOC_STRATEGY,

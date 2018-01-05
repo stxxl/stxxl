@@ -10,6 +10,7 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
+include_directories(include)
 add_subdirectory(algo)
 add_subdirectory(common)
 add_subdirectory(containers)

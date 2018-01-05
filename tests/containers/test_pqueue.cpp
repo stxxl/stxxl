@@ -21,55 +21,35 @@
 #include <limits>
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
-#include <stxxl/bits/common/padding.h>
+
+#include <key_with_padding.h>
 
 using foxxll::scoped_print_timer;
 
-#define RECORD_SIZE 128
 
-const size_t volume = 128 * 1024; // in KiB
+constexpr size_t volume = 128 * 1024; // in KiB
 
-using KEY_TYPE = int;
+using KeyType = int;
+constexpr size_t RecordSize = 128;
+using my_type = key_with_padding<KeyType, RecordSize>;
 
-struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
-{
-    using key_type = KEY_TYPE;
-    key_type key;
-
-    my_type() { }
-    explicit my_type(key_type k) : key(k) {}
-
-    friend std::ostream& operator << (std::ostream& o, const my_type& obj)
-    {
-        return o << obj.key;
-    }
+// Here we test that the PQ can deal with not default constructable comparators;
+// the function is provided by our default comparator infrastructure
+struct comp_without_def_construct : public my_type::compare_greater {
+    comp_without_def_construct() = delete;
+    explicit comp_without_def_construct(int) {}
 };
 
-struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
-{
-    my_cmp() = delete;                                       // make sure that comparator does not
-    explicit my_cmp(int) { }  // get default constructed
-
-    bool operator () (const my_type& a, const my_type& b) const
-    {
-        return a.key > b.key;
-    }
-
-    my_type min_value() const
-    {
-        return my_type(std::numeric_limits<my_type::key_type>::max());
-    }
-};
 
 // forced instantiation
 template class stxxl::PRIORITY_QUEUE_GENERATOR<
-        my_type, my_cmp, 32* 1024* 1024, volume / sizeof(my_type)
+        my_type, comp_without_def_construct, 32* 1024* 1024, volume / sizeof(my_type)
         >;
 
 int main()
 {
     using gen = stxxl::PRIORITY_QUEUE_GENERATOR<
-              my_type, my_cmp, 700* 1024, volume / sizeof(my_type)
+              my_type, comp_without_def_construct, 700* 1024, volume / sizeof(my_type)
               >;
     using pq_type = gen::result;
     using block_type = pq_type::block_type;
@@ -85,7 +65,7 @@ int main()
         (mem_for_pools / 2) / block_type::raw_size,
         (mem_for_pools / 2) / block_type::raw_size
         );
-    pq_type p(pool, my_cmp { 1 });
+    pq_type p(pool, comp_without_def_construct { 1 });
 
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 

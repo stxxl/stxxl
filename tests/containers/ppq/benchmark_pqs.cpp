@@ -36,6 +36,8 @@ static const char* description =
 #include <queue>
 #include <utility>
 
+#include <key_with_padding.h>
+
 #if STXXL_PARALLEL
   #include <omp.h>
 #endif
@@ -99,92 +101,10 @@ unsigned int g_seed = 12345;
 
 random_number32_r g_rand(g_seed);
 
-/*
- * The value type and corresponding benchmark functions.
- */
-
-template <typename KeyType, size_t ValueSize>
-struct my_type : stxxl::padding<ValueSize - sizeof(KeyType)>
-{
-    constexpr static size_t value_size = ValueSize;
-    using key_type = KeyType;
-
-    key_type key;
-
-    my_type() {}
-
-    explicit my_type(const key_type& _key)
-        : key(_key)
-    {}
-
-    friend std::ostream& operator << (std::ostream& o, const my_type& obj)
-    {
-        o << obj.key;
-        return o;
-    }
-
-};
-
-template <typename ValueType>
-struct my_type_cmp_smaller
-    : public std::binary_function<ValueType, ValueType, bool>
-{
-    using value_type = ValueType;
-    using key_type = typename value_type::key_type;
-    bool operator () (const value_type& a, const value_type& b) const
-    {
-        return a.key < b.key;
-    }
-    value_type min_value() const
-    {
-        return value_type(std::numeric_limits<key_type>::min());
-    }
-    value_type max_value() const
-    {
-        return value_type(std::numeric_limits<key_type>::max());
-    }
-};
-
-template <typename ValueType>
-struct my_type_cmp_greater
-    : public std::binary_function<ValueType, ValueType, bool>
-{
-    using value_type = ValueType;
-    using key_type = typename value_type::key_type;
-    bool operator () (const value_type& a, const value_type& b) const
-    {
-        return a.key > b.key;
-    }
-    value_type min_value() const
-    {
-        return value_type(std::numeric_limits<key_type>::max());
-    }
-};
-
-template <typename ValueType>
-struct less_min_max : public std::binary_function<ValueType, ValueType, bool>
-{
-    bool operator () (const ValueType& a, const ValueType& b) const
-    {
-        return a < b;
-    }
-    ValueType min_value() const
-    {
-        return std::numeric_limits<ValueType>::min();
-    }
-    ValueType max_value() const
-    {
-        return std::numeric_limits<ValueType>::max();
-    }
-};
-
-/*
- * my_type specializations used in benchmarks
- */
-
-using my8_type = my_type<uint64_t, sizeof(uint64_t)>;
+// Types used for benchmarking
+using my8_type = key_with_padding<uint64_t, sizeof(uint64_t)>;
 static_assert(sizeof(my8_type) == 8, "my8 has invalid size");
-using my24_type = my_type<uint64_t, 24>;
+using my24_type = key_with_padding<uint64_t, 24>;
 static_assert(sizeof(my24_type) == 24, "my24 has invalid size");
 
 /*
@@ -289,7 +209,7 @@ class CStxxlPQ
     : public PQBaseDefaults,
       public stxxl::PRIORITY_QUEUE_GENERATOR<
           ValueType,
-          my_type_cmp_greater<ValueType>,
+          typename ValueType::compare_greater,
           _mem_for_queue,
           _num_elements / 1024>::result
 {
@@ -297,7 +217,7 @@ public:
     using value_type = ValueType;
     using pq_type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
               value_type,
-              my_type_cmp_greater<value_type>,
+              typename ValueType::compare_greater,
               _mem_for_queue,
               _num_elements / 1024>::result;
 
@@ -360,16 +280,16 @@ public:
 template <typename ValueType>
 class CStxxlParallePQ
     : public PQBase,
-      public stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> >
+      public stxxl::parallel_priority_queue<ValueType, typename ValueType::compare_greater>
 {
 public:
     using value_type = ValueType;
 
-    using pq_type = stxxl::parallel_priority_queue<ValueType, my_type_cmp_greater<ValueType> >;
+    using pq_type = stxxl::parallel_priority_queue<ValueType, typename ValueType::compare_greater >;
 
     CStxxlParallePQ()
         : PQBase("Parallel PQ", "ppq"),
-          pq_type(my_type_cmp_greater<ValueType>(),
+          pq_type(typename ValueType::compare_greater(),
                   RAM, (float)num_prefetchers, num_write_buffers,
                   g_max_threads, single_heap_ram, extract_buffer_ram)
     { }
@@ -402,14 +322,14 @@ class CStdPriorityQueue
     : public PQBaseDefaults,
       public std::priority_queue<
           ValueType, std::vector<ValueType>,
-          my_type_cmp_greater<ValueType>
+          typename ValueType::compare_greater
           >
 {
 public:
     using value_type = ValueType;
     using pq_type = std::priority_queue<
               ValueType, std::vector<ValueType>,
-              my_type_cmp_greater<ValueType>
+              typename ValueType::compare_greater
               >;
 
     CStdPriorityQueue()
@@ -461,17 +381,17 @@ public:
 template <typename ValueType>
 class CStxxlSorter
     : public PQBaseDefaults,
-      public stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> >
+      public stxxl::sorter<ValueType, typename ValueType::compare_less >
 {
 public:
     using value_type = ValueType;
 
     // note that we use SMALLER here:
-    using pq_type = stxxl::sorter<ValueType, my_type_cmp_smaller<ValueType> >;
+    using pq_type = stxxl::sorter<ValueType, typename ValueType::compare_less >;
 
     CStxxlSorter()
         : PQBaseDefaults("STXXL Sorter", "sorter"),
-          pq_type(my_type_cmp_smaller<ValueType>(), RAM)
+          pq_type(typename ValueType::compare_less(), RAM)
     { }
 
     void fill_end()
@@ -555,11 +475,11 @@ public:
                  unsigned int rwcycles = 1)
         : foxxll::scoped_print_timer(message,
                                      rwcycles * num_elements *
-                                     ContainerType::value_type::value_size),
+                                     sizeof(typename ContainerType::value_type)),
           m_shortname(c.shortname()),
           m_op(op),
           m_stxxl_stats(*foxxll::stats::get_instance()),
-          m_value_size(ContainerType::value_type::value_size)
+          m_value_size(sizeof(typename ContainerType::value_type))
     { }
 
     ~scoped_stats()
@@ -693,9 +613,9 @@ template <typename ContainerType>
 void do_pop_rand_check(ContainerType& c, unsigned int seed)
 {
     using value_type = typename ContainerType::value_type;
+    using comp = stxxl::comparator<uint64_t, stxxl::direction::Less>;
 
-    stxxl::sorter<uint64_t, less_min_max<uint64_t> >
-    sorted_vals(less_min_max<uint64_t>(), RAM / 2);
+    stxxl::sorter<uint64_t, comp> sorted_vals(comp(), RAM / 2);
 
     {
         scoped_print_timer timer("Filling sorter for comparison");
@@ -938,12 +858,12 @@ void do_bulk_pop_check_rand(ContainerType& c,
 
     std::string parallel_str = do_parallel ? " in parallel" : " sequentially";
 
-    stxxl::sorter<uint64_t, less_min_max<uint64_t> >
-    sorted_vals(less_min_max<uint64_t>(), RAM / 2);
+    using comp = stxxl::comparator<uint64_t, stxxl::direction::Less>;
+    stxxl::sorter<uint64_t, comp> sorted_vals(comp(), RAM / 2);
 
     {
         scoped_print_timer timer("Filling sorter for comparison",
-                                 num_elements * value_type::value_size);
+                                 num_elements * sizeof(value_type));
 
         // independent random generator (also: in different cache lines)
         std::vector<random_number32_r_bigger> datarng(g_max_threads);

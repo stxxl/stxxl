@@ -17,72 +17,17 @@
 //! This is an example of how to use \c stxxl::sort() algorithm
 
 #include <foxxll/mng.hpp>
+
 #include <stxxl/sort>
 #include <stxxl/vector>
 #include <stxxl/bits/common/padding.h>
 
-#define RECORD_SIZE 8
+#include <key_with_padding.h>
 
-using KEY_TYPE = unsigned;
-
-struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
-{
-    using key_type = KEY_TYPE;
-
-    key_type m_key;
-
-    key_type key() const
-    {
-        return m_key;
-    }
-
-    my_type() { }
-    explicit my_type(key_type k) : m_key(k)
-    {}
-
-    static my_type min_value()
-    {
-        return my_type(std::numeric_limits<key_type>::min());
-    }
-
-    static my_type max_value()
-    {
-        return my_type(std::numeric_limits<key_type>::max());
-    }
-};
-
-std::ostream& operator << (std::ostream& o, const my_type& obj)
-{
-    o << obj.m_key;
-    return o;
-}
-
-bool operator < (const my_type& a, const my_type& b)
-{
-    return a.key() < b.key();
-}
-
-bool operator == (const my_type& a, const my_type& b)
-{
-    return a.key() == b.key();
-}
-
-bool operator != (const my_type& a, const my_type& b)
-{
-    return a.key() != b.key();
-}
-
-struct cmp : public std::less<my_type>
-{
-    my_type min_value() const
-    {
-        return my_type::min_value();
-    }
-    my_type max_value() const
-    {
-        return my_type::max_value();
-    }
-};
+constexpr size_t RECORD_SIZE = 8;
+using KeyType = unsigned;
+using my_type = key_with_padding<KeyType, RECORD_SIZE>;
+using cmp = my_type::compare_less;
 
 int main()
 {
@@ -113,7 +58,7 @@ int main()
     stxxl::random_number32 rnd;
     STXXL_MSG("Filling vector..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i].m_key = 1 + (rnd() % 0xfffffff);
+        v[i].key = 1 + (rnd() % 0xfffffff);
 
     STXXL_MSG("Checking order...");
     STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));

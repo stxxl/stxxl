@@ -16,68 +16,13 @@
 
 #include <limits>
 #include <stxxl/sorter>
-#include <stxxl/bits/common/padding.h>
 
-#define RECORD_SIZE 16
-using KEY_TYPE = unsigned;
+#include <key_with_padding.h>
 
-struct my_type : stxxl::padding<RECORD_SIZE - sizeof(KEY_TYPE)>
-{
-    using key_type = KEY_TYPE;
-
-    key_type m_key;
-
-    key_type key() const
-    {
-        return m_key;
-    }
-
-    my_type() { }
-    explicit my_type(key_type k) : m_key(k) {}
-
-    static my_type min_value()
-    {
-        return my_type(std::numeric_limits<key_type>::min());
-    }
-    static my_type max_value()
-    {
-        return my_type(std::numeric_limits<key_type>::max());
-    }
-
-    ~my_type() { }
-};
-
-std::ostream& operator << (std::ostream& o, const my_type& obj)
-{
-    o << obj.m_key;
-    return o;
-}
-
-bool operator == (const my_type& a, const my_type& b)
-{
-    return a.key() == b.key();
-}
-
-bool operator <= (const my_type& a, const my_type& b)
-{
-    return a.key() <= b.key();
-}
-
-struct Comparator : public std::less<my_type>
-{
-    inline bool operator () (const my_type& a, const my_type& b) const
-    {
-        return a.key() < b.key();
-    }
-    my_type min_value() const
-    {
-        return my_type::min_value();
-    }
-    my_type max_value() const
-    {
-        return my_type::max_value();
-    }
-};
+using KeyType = unsigned;
+constexpr size_t RecordSize = 16;
+using my_type = key_with_padding<KeyType, RecordSize>;
+using Comparator = my_type::compare_less;
 
 // forced instantiation
 template class stxxl::sorter<my_type, Comparator>;
