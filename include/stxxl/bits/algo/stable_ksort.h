@@ -41,15 +41,15 @@ namespace stxxl {
  */
 namespace stable_ksort_local {
 
-template <class Type, class TypeKey>
+template <typename Type, typename TypeKey, typename KeyExtract>
 void classify_block(Type* begin, Type* end, TypeKey*& out,
                     size_t* bucket, typename Type::key_type offset,
-                    unsigned shift)
+                    unsigned shift, KeyExtract key_extract)
 {
     for (Type* p = begin; p < end; p++, out++)      // count & create references
     {
         out->ptr = p;
-        typename Type::key_type key = p->key();
+        const auto key = key_extract(*p);
         size_t ibucket = (key - offset) >> shift;
         out->key = key;
         bucket[ibucket]++;
@@ -131,7 +131,7 @@ public:
     }
 };
 
-template <typename ExtIterator>
+template <typename ExtIterator, typename KeyExtract>
 void distribute(
     bid_sequence<typename ExtIterator::vector_type::block_type::bid_type,
                  typename ExtIterator::vector_type::alloc_strategy_type>* bucket_bids,
@@ -141,10 +141,10 @@ void distribute(
     ExtIterator first,
     ExtIterator last,
     const size_t nread_buffers,
-    const size_t nwrite_buffers)
+    const size_t nwrite_buffers,
+    KeyExtract key_extract)
 {
-    using value_type = typename ExtIterator::vector_type::value_type;
-    using key_type = typename value_type::key_type;
+    using key_type = decltype(key_extract(*first));
     using block_type = typename ExtIterator::block_type;
     using bids_container_iterator = typename ExtIterator::bids_container_iterator;
 
@@ -181,7 +181,7 @@ void distribute(
     STXXL_VERBOSE_STABLE_KSORT("Shift by: " << shift << " bits, lognbuckets: " << lognbuckets);
     for ( ; cur != last; cur++)
     {
-        key_type cur_key = in.current().key();
+        key_type cur_key = key_extract(in.current());
         size_t ibucket = cur_key >> shift;
 
         size_t block_offset = bucket_block_offsets[ibucket];
@@ -216,12 +216,12 @@ void distribute(
 //! Sort records with integer keys
 //! \param first object of model of \c ext_random_access_iterator concept
 //! \param last object of model of \c ext_random_access_iterator concept
+//! \param key_extract must provide a key_type operator(const value_type&) to extract the key from value_type
 //! \param M amount of memory for internal use (in bytes)
-//! \remark Elements must provide a method key() which returns the integer key.
 //! \remark Not yet fully implemented, it assumes that the keys are uniformly
 //! distributed between [0,std::numeric_limits<key_type>::max().
-template <typename ExtIterator>
-void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
+template <typename ExtIterator, typename KeyExtract>
+void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, size_t M)
 {
     STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
     using value_type = typename ExtIterator::vector_type::value_type;
@@ -281,7 +281,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
         first,
         last,
         nread_buffers,
-        nwrite_buffers);
+        nwrite_buffers,
+        key_extract
+    );
 
     double dist_end = foxxll::timestamp(), end;
     double io_wait_after_d = foxxll::stats::get_instance()->get_io_wait_time();
@@ -379,8 +381,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
             for (i = 0; i < nbucket_blocks - 1; i++)
             {
                 reqs1[i]->wait();
-                stable_ksort_local::classify_block(blocks1[i].begin(), blocks1[i].end(),
-                                                   ref_ptr, bucket1, offset1, shift1 /*,k1*/);
+                stable_ksort_local::classify_block(
+                    blocks1[i].begin(), blocks1[i].end(), ref_ptr,
+                    bucket1, offset1, shift1, key_extract);
             }
             // last block might be non-full
             const size_t last_block_size =
@@ -389,8 +392,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
 
             //STXXL_MSG("block_type::size: "<<block_type::size<<" last_block_size:"<<last_block_size);
 
-            classify_block(blocks1[i].begin(), blocks1[i].begin() + last_block_size,
-                           ref_ptr, bucket1, offset1, shift1);
+            stable_ksort_local::classify_block(
+                blocks1[i].begin(), blocks1[i].begin() + last_block_size, ref_ptr,
+                bucket1, offset1, shift1, key_extract);
 
             exclusive_prefix_sum(bucket1, k1);
             classify(refs1, refs1 + bucket_sizes[k], refs2, bucket1, offset1, shift1);
@@ -465,6 +469,20 @@ void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
     STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
     STXXL_VERBOSE(*foxxll::stats::get_instance());
 }
+
+//! Sort records with integer keys providing a key() method
+//! \param first object of model of \c ext_random_access_iterator concept
+//! \param last object of model of \c ext_random_access_iterator concept
+//! \param M amount of memory for internal use (in bytes)
+//! \remark Elements must provide a method key() which returns the integer key.
+//! \remark Not yet fully implemented, it assumes that the keys are uniformly
+//! distributed between [0,std::numeric_limits<key_type>::max().
+template <typename ExtIterator>
+void stable_ksort(ExtIterator first, ExtIterator last, size_t M) {
+    using value_type = typename ExtIterator::vector_type::value_type;
+    stable_ksort(first, last, [] (const value_type& v){return v.key();}, M);
+}
+
 
 //! \}
 
