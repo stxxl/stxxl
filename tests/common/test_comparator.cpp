@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/comparator.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 
 #include <algorithm>
 #include <cstdint>

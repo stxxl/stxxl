@@ -17,7 +17,11 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
+#include <tlx/loser_tree.hpp>
+
 #include <foxxll/common/utils.hpp>
+#include <foxxll/verbose.hpp>
+
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel/equally_split.h>
 #include <stxxl/bits/parallel/merge.h>
@@ -25,8 +29,6 @@
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/tags.h>
 #include <stxxl/bits/parallel/timing.h>
-#include <stxxl/bits/verbose.h>
-#include <tlx/loser_tree.hpp>
 
 #include <algorithm>
 #include <iterator>

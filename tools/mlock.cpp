@@ -14,9 +14,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/verbose.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/verbose.h>
 
 #if STXXL_HAVE_MLOCK_PROTO
 

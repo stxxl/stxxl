@@ -23,8 +23,9 @@
  #include <omp.h>
 #endif
 
+#include <foxxll/verbose.hpp>
+
 #include <stxxl/bits/common/settings.h>
-#include <stxxl/bits/verbose.h>
 
 #if defined(_GLIBCXX_PARALLEL)
 //use _STXXL_FORCE_SEQUENTIAL to tag calls which are not worthwhile parallelizing

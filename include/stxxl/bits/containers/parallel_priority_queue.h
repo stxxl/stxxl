@@ -40,7 +40,7 @@
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 #include <stxxl/types>
 
 #include <algorithm>

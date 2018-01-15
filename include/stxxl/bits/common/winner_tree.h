@@ -16,7 +16,7 @@
 
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/utils.hpp>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 #include <tlx/math/integer_log2.hpp>
 
 #include <limits>

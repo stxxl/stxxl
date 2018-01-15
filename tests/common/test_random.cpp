@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <iostream>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 #include <stxxl/random>
 
 int main()

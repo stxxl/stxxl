@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 #include <stxxl/random>
 
 struct Something

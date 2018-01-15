@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/binary_buffer.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 
 void test1()
 {

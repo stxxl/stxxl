@@ -17,7 +17,6 @@ set(LIBSTXXL_SOURCES
   common/log.cpp
   common/rand.cpp
   common/seed.cpp
-  common/verbose.cpp
   common/version.cpp
 
   )

@@ -14,8 +14,9 @@
 #ifndef STXXL_ALGO_SORT_HELPER_HEADER
 #define STXXL_ALGO_SORT_HELPER_HEADER
 
+#include <foxxll/verbose.hpp>
+
 #include <stxxl/bits/algo/run_cursor.h>
-#include <stxxl/bits/verbose.h>
 
 #include <algorithm>
 #include <functional>

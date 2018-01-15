@@ -17,7 +17,7 @@
 #include <foxxll/mng/block_manager.hpp>
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 #include <stxxl/timer>
 
 #include <cstddef>

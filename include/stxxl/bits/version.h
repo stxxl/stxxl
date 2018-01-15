@@ -15,7 +15,7 @@
 #define STXXL_VERSION_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 
 namespace stxxl {
 

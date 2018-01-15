@@ -12,7 +12,7 @@
 
 #include <foxxll/common/uint_types.hpp>
 #include <stxxl/bits/common/tuple.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 
 #include <sstream>
 

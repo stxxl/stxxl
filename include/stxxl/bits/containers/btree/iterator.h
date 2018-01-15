@@ -14,7 +14,7 @@
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
 #include <foxxll/common/types.hpp>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 
 #include <cassert>
 #include <iterator>

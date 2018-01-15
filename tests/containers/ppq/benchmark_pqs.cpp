@@ -23,7 +23,7 @@ static const char* description =
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
-#include <stxxl/bits/verbose.h>
+#include <foxxll/verbose.hpp>
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
