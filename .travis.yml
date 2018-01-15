@@ -1,66 +1,82 @@
 language: cpp
-sudo: required
 dist: trusty
+sudo: false
 
 env:
   global:
     # limit parallel threads (default is 32!)
     - OMP_NUM_THREADS=4
-    - STXXL_TMPDIR=/dev/shm
+    - TMPDIR=/tmp
+    - STXXL_TMPDIR=/tmp
 
 matrix:
-  # gcc-5 builds
   include:
-    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
+  # gcc-5 builds
+    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
       addons: &gcc5
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
           packages:
             - g++-5
-            - cmake
-            - cmake-data
-    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
+    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
       addons: *gcc5
-    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
-      addons: *gcc5
-    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
-      addons: *gcc5
-      # one 32-bit build
+
+  # gcc-7 builds
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=OFF"
+      addons: &gcc7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=ON"
+      addons: *gcc7
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=OFF"
+      addons: *gcc7
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=ON"
+      addons: *gcc7
+
+  # one 32-bit build
     - env: CMAKE_CC="gcc-5"     CMAKE_CXX="g++-5"     CMAKE_FLAGS="-m32" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert   -DUSE_GNU_PARALLEL=OFF"
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
           packages:
             - g++-5-multilib
             - linux-libc-dev:i386
-            - cmake
-            - cmake-data
-      # clang build
+
+  # clang build
     - env: CMAKE_CC="clang-3.9"   CMAKE_CXX="clang++-3.9" CMAKE_FLAGS="" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_GNU_PARALLEL=OFF"
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.9
-            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
+            - llvm-toolchain-trusty-3.9
           packages:
             - clang-3.9
-            - cmake
-            - cmake-data
+            - g++-5
+            - libiomp-dev
+    - env: CMAKE_CC="clang-5.0"   CMAKE_CXX="clang++-5.0" CMAKE_FLAGS="" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_GNU_PARALLEL=OFF"
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - g++-5
+            - libiomp-dev
 
 before_script:
-
   # print out some version numbers
   - $CMAKE_CXX --version
   - cmake --version
 
-  # run on ramdisk
-  - echo "disk=/dev/shm/stxxl.###.tmp,2G,syscall unlink" > ~/.stxxl
   - df -h
+  # checkout foxxll and tlx
+  - git submodule update --init --recursive
 
   # checkout foxxll and tlx
   - git submodule update --init --recursive
@@ -71,7 +87,10 @@ before_script:
     -DSTXXL_BUILD_TESTS=ON -DSTXXL_TRY_COMPILE_HEADERS=ON
     $CMAKE_ARGS ../
     -DCMAKE_C_FLAGS="$CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="$CMAKE_FLAGS"
-    #-DCMAKE_C_FLAGS="-Wconversion $CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="-Wconversion $CMAKE_FLAGS"
 
 script:
-  - make -j2 && ./tools/stxxl_tool info && ctest
+# Build the library and run tests on three IO subsystems
+- make -j2 &&
+   echo "disk=/tmp/stxxl.###.tmp,256Mi,syscall unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
+   echo "disk=/tmp/stxxl.###.tmp,256Mi,linuxaio unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
+   echo "disk=/tmp/stxxl.###.tmp,256Mi,memory" > ~/.stxxl && ./tools/stxxl_tool info && ctest
