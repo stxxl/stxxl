@@ -13,6 +13,8 @@
 #ifndef STXXL_COMMON_PADDING_HEADER
 #define STXXL_COMMON_PADDING_HEADER
 
+#include <cstddef>
+
 #include <iostream>
 #include <algorithm>
 
