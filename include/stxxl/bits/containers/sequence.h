@@ -300,7 +300,7 @@ public:
 
                 m_bm->new_block(m_alloc_strategy, newbid, m_alloc_count++);
 
-                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: push_front block " << m_front_block << " @ " << FMT_BID(newbid));
+                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: push_front block " << m_front_block << " @ " << newbid);
                 m_bids.push_front(newbid);
                 m_pool->write(m_front_block, newbid);
                 if (m_bids.size() <= m_blocks2prefetch) {
@@ -361,7 +361,7 @@ public:
 
                 m_bm->new_block(m_alloc_strategy, newbid, m_alloc_count++);
 
-                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: push_back block " << m_back_block << " @ " << FMT_BID(newbid));
+                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: push_back block " << m_back_block << " @ " << newbid);
                 m_bids.push_back(newbid);
                 m_pool->write(m_back_block, newbid);
                 if (m_bids.size() <= m_blocks2prefetch) {
@@ -419,7 +419,7 @@ public:
 
             assert(!m_bids.empty());
             foxxll::request_ptr req = m_pool->read(m_front_block, m_bids.front());
-            STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_front block  " << m_front_block << " @ " << FMT_BID(m_bids.front()));
+            STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_front block  " << m_front_block << " @ " << m_bids.front());
 
             // give prefetching hints
             for (size_t i = 0; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
@@ -478,7 +478,7 @@ public:
 
             assert(!m_bids.empty());
             foxxll::request_ptr req = m_pool->read(m_back_block, m_bids.back());
-            STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_back block  " << m_back_block << " @ " << FMT_BID(m_bids.back()));
+            STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]: pop_back block  " << m_back_block << " @ " << m_bids.back());
 
             // give prefetching hints
             for (size_t i = 1; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
@@ -667,7 +667,7 @@ public:
 
                 assert(m_next_bid != m_sequence.m_bids.end());
                 foxxll::request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
-                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::stream::operator++ read block " << m_current_block << " @ " << FMT_BID(*m_next_bid));
+                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::stream::operator++ read block " << m_current_block << " @ " << *m_next_bid);
 
                 // give prefetching hints
                 bid_iter_type bid = m_next_bid + 1;
@@ -798,7 +798,7 @@ public:
 
                 assert(m_next_bid != m_sequence.m_bids.rend());
                 foxxll::request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
-                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::reverse_stream::operator++ read block " << m_current_block << " @ " << FMT_BID(*m_next_bid));
+                STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::reverse_stream::operator++ read block " << m_current_block << " @ " << *m_next_bid);
 
                 // give prefetching hints
                 bid_iter_type bid = m_next_bid + 1;

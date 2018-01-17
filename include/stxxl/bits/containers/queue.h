@@ -254,7 +254,7 @@ public:
 
                 bm->new_block(alloc_strategy, newbid, alloc_count++);
 
-                STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << FMT_BID(newbid));
+                STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << newbid);
                 bids.push_back(newbid);
                 pool->write(back_block, newbid);
                 if (bids.size() <= blocks2prefetch) {
@@ -310,7 +310,7 @@ public:
 
             assert(!bids.empty());
             foxxll::request_ptr req = pool->read(front_block, bids.front());
-            STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << FMT_BID(bids.front()));
+            STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << bids.front());
 
             // give prefetching hints
             for (size_t i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
