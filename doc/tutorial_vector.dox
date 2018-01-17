@@ -23,7 +23,7 @@ This section introduces into the STXXL vector container (to learn more about the
 ### Creating a STXXL vector
 
 Before we can use a STXXL vector, we first have to define and then to instantiate a vector object.
-To manage the configuration of the vector type we use several template parameters. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only only stricly neccessary
+To manage the configuration of the vector type we use several template parameters. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only stricly necessary
 parameter. See \ref design_vector for additional configuration parameters and information.
 
 \code
