@@ -15,8 +15,8 @@
 
 #include <cstddef>
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 namespace stxxl {
 
@@ -41,24 +41,24 @@ namespace stxxl {
  */
 // We ptrdiff_t here despite accepting only non-negative value for more
 // verbose error messages in case, the computation of Size triggered an underflow
-template<ptrdiff_t Size>
+template <ptrdiff_t Size>
 struct padding {
-  static_assert(Size > 0, "Size has to be non-negative");
+    static_assert(Size > 0, "Size has to be non-negative");
 
-  uint8_t dummy[Size];
+    uint8_t dummy[Size];
 
-  padding() {
+    padding()
+    {
       #ifdef STXXL_WITH_VALGRIND
-      std::fill(dummy, dummy + Size, 0);
+        std::fill(dummy, dummy + Size, 0);
       #endif
-  }
+    }
 };
 
-template<>
-struct padding<0> {
-  padding() {}
+template <>
+struct padding<0>{
+    padding() { }
 };
-
 }
 
-#endif // STXXL_COMMON_PADDING_HEADER
+#endif // !STXXL_COMMON_PADDING_HEADER

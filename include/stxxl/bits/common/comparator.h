@@ -414,7 +414,6 @@ auto make_struct_comparator(const KeyExtract extract)
 
 } // namespace stxxl
 
-
 /*!
  * Helper class to easily construct key-extractors and manual comparators
  * that can determine their min and max elements based on std::numeric_limits.
@@ -429,20 +428,22 @@ auto make_struct_comparator(const KeyExtract extract)
  * \tparam ValueType    Type of comparator/key-extractor input
  * \tparam Less         Less <=> (min_value() < max_value())
  */
-template<typename ValueType, bool Less = false>
+template <typename ValueType, bool Less = false>
 struct numeric_limits_sentinels {
     static_assert(std::numeric_limits<ValueType>::is_specialized,
-        "Only type with a std::numeric_limits specialization are supported");
+                  "Only type with a std::numeric_limits specialization are supported");
 
     using value_type = ValueType;
 
-    value_type max_value() const {
+    value_type max_value() const
+    {
         return Less
                ? std::numeric_limits<value_type>::max()
                : std::numeric_limits<value_type>::min();
     }
 
-    value_type min_value() const {
+    value_type min_value() const
+    {
         return Less
                ? std::numeric_limits<value_type>::min()
                : std::numeric_limits<value_type>::max();

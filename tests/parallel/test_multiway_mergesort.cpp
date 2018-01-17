@@ -10,10 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_mergesort.h>
-#include <foxxll/verbose.hpp>
 #include <stxxl/random>
 
 #include <functional>

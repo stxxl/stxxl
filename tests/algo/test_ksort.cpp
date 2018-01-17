@@ -22,7 +22,7 @@
 #include <key_with_padding.h>
 
 using KeyType = uint64_t;
-constexpr size_t RecordSize = 2*sizeof(KeyType) + 0;
+constexpr size_t RecordSize = 2 * sizeof(KeyType) + 0;
 using my_type = key_with_padding<KeyType, RecordSize, true>;
 using get_key = my_type::key_extract;
 

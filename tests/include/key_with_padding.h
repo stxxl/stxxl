@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/algo/test_sort.cpp
+ *  tests/include/key_with_padding.h
  *
  *  Part of the STXXL. See http://stxxl.org
  *
@@ -25,22 +25,22 @@ struct key_with_padding_base {
 
     key_type key;
 
-    key_with_padding_base() {};
-    key_with_padding_base(KeyType key) : key(key) {}
+    key_with_padding_base() { }
+    key_with_padding_base(KeyType key) : key(key) { }
 
-    bool operator< (const key_with_padding_base& o) const {return key <  o.key;}
-    bool operator<=(const key_with_padding_base& o) const {return key <= o.key;}
-    bool operator==(const key_with_padding_base& o) const {return key == o.key;}
-    bool operator!=(const key_with_padding_base& o) const {return key != o.key;}
-    bool operator> (const key_with_padding_base& o) const {return key >  o.key;}
-    bool operator>=(const key_with_padding_base& o) const {return key >= o.key;}
+    bool operator < (const key_with_padding_base& o) const { return key < o.key; }
+    bool operator <= (const key_with_padding_base& o) const { return key <= o.key; }
+    bool operator == (const key_with_padding_base& o) const { return key == o.key; }
+    bool operator != (const key_with_padding_base& o) const { return key != o.key; }
+    bool operator > (const key_with_padding_base& o) const { return key > o.key; }
+    bool operator >= (const key_with_padding_base& o) const { return key >= o.key; }
 
     // Make sure we are printable
-    friend std::ostream& operator<<(std::ostream &os, const key_with_padding_base& k) {
+    friend std::ostream& operator << (std::ostream& os, const key_with_padding_base& k)
+    {
         return os << k.key;
     }
 };
-
 
 /*!
  * A struct exposing a single key value, a key-extract mechanism for STXXL's
@@ -60,73 +60,71 @@ struct key_with_padding;
 
 template <typename KeyType, size_t Size>
 struct key_with_padding<KeyType, Size, false>
-    : stxxl::padding<Size - sizeof(KeyType) >
-    , public key_with_padding_base<KeyType>
+    : stxxl::padding<Size - sizeof(KeyType)>,
+      public key_with_padding_base<KeyType>
 {
-    key_with_padding() {}
-    key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key) {}
+    key_with_padding() { }
+    key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key) { }
 
     // To be used with key-based algorithms
-    struct key_extract : public numeric_limits_sentinels<key_with_padding> {
+    struct key_extract : public numeric_limits_sentinels<key_with_padding>{
         using key_type = KeyType;
-        key_type operator()(const key_with_padding& k) const {return k.key;}
+        key_type operator () (const key_with_padding& k) const { return k.key; }
     };
 
     // To be used with comparison-based algorithms
-    using compare_less    = stxxl::comparator<key_with_padding, stxxl::direction::Less>;
+    using compare_less = stxxl::comparator<key_with_padding, stxxl::direction::Less>;
     using compare_greater = stxxl::comparator<key_with_padding, stxxl::direction::Greater>;
 };
 
 template <typename KeyType, size_t Size>
 struct key_with_padding<KeyType, Size, true>
-    : stxxl::padding<Size - 2*sizeof(KeyType) >
-    , public key_with_padding_base<KeyType>
+    : stxxl::padding<Size - 2* sizeof(KeyType)>,
+      public key_with_padding_base<KeyType>
 {
     KeyType key_copy;
 
-    key_with_padding() {}
-    key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key), key_copy(key) {}
-
+    key_with_padding() { }
+    key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key), key_copy(key) { }
 
     // To be used with key-based algorithms
-    struct key_extract : public numeric_limits_sentinels<key_with_padding> {
+    struct key_extract : public numeric_limits_sentinels<key_with_padding>{
         using key_type = KeyType;
-        key_type operator()(const key_with_padding& k) const {return k.key;}
+        key_type operator () (const key_with_padding& k) const { return k.key; }
     };
 
     // To be used with comparison-based algorithms
-    using compare_less    = stxxl::comparator<key_with_padding, stxxl::direction::Less>;
+    using compare_less = stxxl::comparator<key_with_padding, stxxl::direction::Less>;
     using compare_greater = stxxl::comparator<key_with_padding, stxxl::direction::Greater>;
 };
 
-
 namespace std {
-    template<typename KeyType>
-    struct numeric_limits<key_with_padding_base<KeyType> > {
-        using value_type = key_with_padding_base<KeyType>;
 
-        static constexpr bool is_specialized = numeric_limits<KeyType>::is_specialized;
+template <typename KeyType>
+struct numeric_limits<key_with_padding_base<KeyType> >{
+    using value_type = key_with_padding_base<KeyType>;
 
-        static constexpr value_type min() { return value_type{numeric_limits<KeyType>::min()}; }
-        static constexpr value_type max() { return value_type{numeric_limits<KeyType>::max()}; }
-    };
+    static constexpr bool is_specialized = numeric_limits<KeyType>::is_specialized;
 
-    template <typename KeyType, size_t Size, bool IncludeKeyCopy>
-    struct numeric_limits<key_with_padding<KeyType, Size, IncludeKeyCopy> > {
-        using value_type = key_with_padding<KeyType, Size, IncludeKeyCopy>;
+    static constexpr value_type min() { return value_type { numeric_limits<KeyType>::min() }; }
+    static constexpr value_type max() { return value_type { numeric_limits<KeyType>::max() }; }
+};
 
-        static constexpr bool is_specialized = numeric_limits<KeyType>::is_specialized;
+template <typename KeyType, size_t Size, bool IncludeKeyCopy>
+struct numeric_limits<key_with_padding<KeyType, Size, IncludeKeyCopy> >{
+    using value_type = key_with_padding<KeyType, Size, IncludeKeyCopy>;
 
-        static constexpr value_type min() { return value_type{numeric_limits<KeyType>::min()}; }
-        static constexpr value_type max() { return value_type{numeric_limits<KeyType>::max()}; }
-    };
+    static constexpr bool is_specialized = numeric_limits<KeyType>::is_specialized;
 
+    static constexpr value_type min() { return value_type { numeric_limits<KeyType>::min() }; }
+    static constexpr value_type max() { return value_type { numeric_limits<KeyType>::max() }; }
+};
 }
 
 static_assert(sizeof(key_with_padding<uint8_t, 1, false>) == 1, "size-mismatch in key_with_padding");
 static_assert(sizeof(key_with_padding<uint8_t, 2, false>) == 2, "size-mismatch in key_with_padding");
-static_assert(sizeof(key_with_padding<uint8_t, 2, true> ) == 2, "size-mismatch in key_with_padding");
+static_assert(sizeof(key_with_padding<uint8_t, 2, true>) == 2, "size-mismatch in key_with_padding");
 static_assert(sizeof(key_with_padding<uint8_t, 3, false>) == 3, "size-mismatch in key_with_padding");
-static_assert(sizeof(key_with_padding<uint8_t, 3, true> ) == 3, "size-mismatch in key_with_padding");
+static_assert(sizeof(key_with_padding<uint8_t, 3, true>) == 3, "size-mismatch in key_with_padding");
 
 #endif // STXXL_TESTS_KEYWITHPADDING_HEADER

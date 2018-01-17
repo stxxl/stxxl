@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/common/comparator.h>
 #include <foxxll/verbose.hpp>
+#include <stxxl/bits/common/comparator.h>
 
 #include <algorithm>
 #include <cstdint>

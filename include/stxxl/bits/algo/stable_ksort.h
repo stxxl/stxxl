@@ -283,7 +283,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         nread_buffers,
         nwrite_buffers,
         key_extract
-    );
+        );
 
     double dist_end = foxxll::timestamp(), end;
     double io_wait_after_d = foxxll::stats::get_instance()->get_io_wait_time();
@@ -478,11 +478,11 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
 //! \remark Not yet fully implemented, it assumes that the keys are uniformly
 //! distributed between [0,std::numeric_limits<key_type>::max().
 template <typename ExtIterator>
-void stable_ksort(ExtIterator first, ExtIterator last, size_t M) {
+void stable_ksort(ExtIterator first, ExtIterator last, size_t M)
+{
     using value_type = typename ExtIterator::vector_type::value_type;
-    stable_ksort(first, last, [] (const value_type& v){return v.key();}, M);
+    stable_ksort(first, last, [](const value_type& v) { return v.key(); }, M);
 }
-
 
 //! \}
 

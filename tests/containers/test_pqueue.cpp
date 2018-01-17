@@ -26,7 +26,6 @@
 
 using foxxll::scoped_print_timer;
 
-
 constexpr size_t volume = 128 * 1024; // in KiB
 
 using KeyType = int;
@@ -37,9 +36,8 @@ using my_type = key_with_padding<KeyType, RecordSize>;
 // the function is provided by our default comparator infrastructure
 struct comp_without_def_construct : public my_type::compare_greater {
     comp_without_def_construct() = delete;
-    explicit comp_without_def_construct(int) {}
+    explicit comp_without_def_construct(int) { }
 };
-
 
 // forced instantiation
 template class stxxl::PRIORITY_QUEUE_GENERATOR<

@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
 #include <foxxll/verbose.hpp>
+#include <iostream>
 #include <stxxl/random>
 
 int main()

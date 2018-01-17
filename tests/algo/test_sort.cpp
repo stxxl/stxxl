@@ -18,9 +18,9 @@
 
 #include <foxxll/mng.hpp>
 
+#include <stxxl/bits/common/padding.h>
 #include <stxxl/sort>
 #include <stxxl/vector>
-#include <stxxl/bits/common/padding.h>
 
 #include <key_with_padding.h>
 

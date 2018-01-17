@@ -23,7 +23,6 @@
 
 #include <key_with_padding.h>
 
-
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 128
 #endif

@@ -18,12 +18,12 @@ static const char* description =
     "cycle or fill/intermixed inserts/deletes.";
 
 #include <foxxll/unused.hpp>
+#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/cmdline.h>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/common/padding.h>
+#include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
-#include <foxxll/verbose.hpp>
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
@@ -285,7 +285,7 @@ class CStxxlParallePQ
 public:
     using value_type = ValueType;
 
-    using pq_type = stxxl::parallel_priority_queue<ValueType, typename ValueType::compare_greater >;
+    using pq_type = stxxl::parallel_priority_queue<ValueType, typename ValueType::compare_greater>;
 
     CStxxlParallePQ()
         : PQBase("Parallel PQ", "ppq"),
@@ -381,13 +381,13 @@ public:
 template <typename ValueType>
 class CStxxlSorter
     : public PQBaseDefaults,
-      public stxxl::sorter<ValueType, typename ValueType::compare_less >
+      public stxxl::sorter<ValueType, typename ValueType::compare_less>
 {
 public:
     using value_type = ValueType;
 
     // note that we use SMALLER here:
-    using pq_type = stxxl::sorter<ValueType, typename ValueType::compare_less >;
+    using pq_type = stxxl::sorter<ValueType, typename ValueType::compare_less>;
 
     CStxxlSorter()
         : PQBaseDefaults("STXXL Sorter", "sorter"),

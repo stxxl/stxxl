@@ -48,15 +48,15 @@ using uint64_pair_type = stxxl::tuple<uint64_t, uint64_t>;
 #define MY_TYPE_SIZE 24
 
 struct my_type
-    : stxxl::padding<MY_TYPE_SIZE - sizeof(uint32_pair_type)>
-    , public uint32_pair_type
+    : stxxl::padding<MY_TYPE_SIZE - sizeof(uint32_pair_type)>,
+      public uint32_pair_type
 {
     using key_type = uint32_t;
 
     my_type() { }
     my_type(const key_type& k1, const key_type& k2)
         : uint32_pair_type(k1, k2)
-    {}
+    { }
 
     static my_type max_value()
     {

@@ -33,6 +33,7 @@
 #include <foxxll/mng/prefetch_pool.hpp>
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
+#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/common/rand.h>
@@ -40,7 +41,6 @@
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel.h>
-#include <foxxll/verbose.hpp>
 #include <stxxl/types>
 
 #include <algorithm>

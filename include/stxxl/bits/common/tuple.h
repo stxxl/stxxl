@@ -186,7 +186,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     struct item_type
     {
         using result = typename std::conditional<
-            I == 1, first_type, void>::type;
+                  I == 1, first_type, void>::type;
     };
 
     //! Empty constructor

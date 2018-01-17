@@ -37,7 +37,7 @@ const unsigned long long megabyte = 1024 * 1024;
 #define MAGIC 123
 
 using KeyType = uint64_t;
-constexpr size_t RecordSize = 2*sizeof(KeyType) + 0;
+constexpr size_t RecordSize = 2 * sizeof(KeyType) + 0;
 using my_type = key_with_padding<KeyType, RecordSize, false>;
 using cmp_less_key = my_type::compare_less;
 
@@ -51,7 +51,7 @@ my_type::key_type checksum(vector_type& input)
 {
     my_type::key_type sum = 0;
 
-    for(const auto& v : input)
+    for (const auto& v : input)
         sum += v.key;
 
     return sum;

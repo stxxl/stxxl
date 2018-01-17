@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/common/binary_buffer.h>
 #include <foxxll/verbose.hpp>
+#include <stxxl/bits/common/binary_buffer.h>
 
 void test1()
 {

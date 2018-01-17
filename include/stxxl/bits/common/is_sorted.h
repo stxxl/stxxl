@@ -19,7 +19,6 @@
 
 namespace stxxl {
 
-
 /*!
  * This function checks whether the items between the iterators are sorted
  * in non decreasingly (assuming comp is less). It is functionally identical
