@@ -1258,7 +1258,7 @@ public:
             m_consume_seq,
             m_prefetch_seq,
             n_opt_prefetch_buffers,
-            foxxll::config::get_instance()->get_max_device_id());
+            foxxll::config::get_instance()->max_device_id());
 #else
         for (size_t i = 0; i < prefetch_seq_size; ++i)
             m_prefetch_seq[i] = i;

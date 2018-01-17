@@ -355,7 +355,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        foxxll::config::get_instance()->get_max_device_id());
+        foxxll::config::get_instance()->max_device_id());
 #else
     for (size_t i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;
