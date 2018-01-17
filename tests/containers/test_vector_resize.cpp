@@ -21,7 +21,7 @@ int main()
 {
     foxxll::config* config = foxxll::config::get_instance();
 
-    foxxll::disk_config disk1("/tmp/stxxl-###.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(int),
+    foxxll::disk_config disk1("/tmp/stxxl-$$.tmp", 16 * STXXL_DEFAULT_BLOCK_SIZE(int),
                               "syscall autogrow=no");
     disk1.unlink_on_open = true;
     disk1.direct = foxxll::disk_config::DIRECT_OFF;

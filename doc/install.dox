@@ -359,7 +359,7 @@ Description of the parameters:
 - <b><tt>\<path></tt></b> : full disk filename.
   - In order to access disks STXXL uses <i>file-based access methods</i> (see below). Each disk is represented as a file
   - If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name. \n
-  - If the string contains <tt>"###"</tt> (three '#'), then these symbols are replaced by the current process id.
+  - If the string contains <tt>"$$"</tt> (two '$' dollar signs), then these symbols are replaced by the current process id.
 
 - <b><tt>\<capacity></tt></b> : maximum capacity of the disk
 

@@ -91,6 +91,6 @@ before_script:
 script:
 # Build the library and run tests on three IO subsystems
 - make -j2 &&
-   echo "disk=/tmp/stxxl.###.tmp,256Mi,syscall unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
-   echo "disk=/tmp/stxxl.###.tmp,256Mi,linuxaio unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
-   echo "disk=/tmp/stxxl.###.tmp,256Mi,memory" > ~/.stxxl && ./tools/stxxl_tool info && ctest
+   echo "disk=/tmp/stxxl.$$.tmp,256Mi,syscall unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
+   echo "disk=/tmp/stxxl.$$.tmp,256Mi,linuxaio unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
+   echo "disk=/tmp/stxxl.$$.tmp,256Mi,memory" > ~/.stxxl && ./tools/stxxl_tool info && ctest
