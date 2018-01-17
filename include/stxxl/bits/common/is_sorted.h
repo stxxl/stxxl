@@ -26,7 +26,7 @@ namespace stxxl {
  * to std::is_sorted, however avoids needlessly copying iterators which can
  * be prohibitively expensive with complex EM iterators.
  *
- * \node
+ * \note
  * You should prefer using stxxl::is_sorted over std::is_sorted for STXXL
  * containers as stxxl::is_sorted may have datastructure-specific
  * overrides to increase performance.

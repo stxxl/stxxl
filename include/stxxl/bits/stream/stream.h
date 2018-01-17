@@ -82,8 +82,8 @@ public:
 };
 
 //! Input iterator range to stream converter.
-//! \param begin iterator, pointing to the first value
-//! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
+//! \param first iterator, pointing to the first value
+//! \param last iterator, pointing to the last + 1 position, i.e. beyond the range
 //! \return an instance of a stream object
 template <typename InputIterator>
 auto streamify(InputIterator first, InputIterator last)
@@ -194,8 +194,8 @@ public:
 
 //! Input external \c stxxl::vector iterator range to stream converter.
 //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
-//! \param begin iterator, pointing to the first value
-//! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
+//! \param first iterator, pointing to the first value
+//! \param last iterator, pointing to the last + 1 position, i.e. beyond the range
 //! \param nbuffers number of blocks used for overlapped reading (0 is default,
 //! which equals to (2 * number_of_disks)
 //! \return an instance of a stream object
@@ -220,8 +220,8 @@ struct streamify_traits<stxxl::vector_iterator<VectorConfig> >
 
 //! Input external \c stxxl::vector const iterator range to stream converter.
 //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
-//! \param begin const iterator, pointing to the first value
-//! \param end const iterator, pointing to the last + 1 position, i.e. beyond the range
+//! \param first const iterator, pointing to the first value
+//! \param last const iterator, pointing to the last + 1 position, i.e. beyond the range
 //! \param nbuffers number of blocks used for overlapped reading (0 is default,
 //! which equals to (2 * number_of_disks)
 //! \return an instance of a stream object
