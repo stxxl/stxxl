@@ -825,7 +825,7 @@ public:
         // more disks than threads?
         if (write_blocks < foxxll::config::get_instance()->disks_number())
             write_blocks = foxxll::config::get_instance()->disks_number();
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
         // required for re-reading the external array
         write_blocks = 2 * write_blocks;
 #endif
@@ -3653,7 +3653,7 @@ protected:
                     " needs_limit=" << needs_limit);
 
 // test correctness of external block min tree
-#ifdef STXXL_DEBUG_ASSERTIONS
+#ifdef STXXL_EXPENSIVE_ASSERTIONS
         m_stats.refill_minmax_time.start();
         {
             auto find_em = [&](size_t idx) {

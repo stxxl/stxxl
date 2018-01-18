@@ -21,5 +21,5 @@ if (MSVC)
  add_definitions(/bigobj)
 endif()
 
-add_define(test_ppq "STXXL_DEBUG_ASSERTIONS=1")
-add_define(test_ppq_arrays_and_iterator "STXXL_DEBUG_ASSERTIONS=1")
+add_define(test_ppq "STXXL_EXPENSIVE_ASSERTIONS=1")
+add_define(test_ppq_arrays_and_iterator "STXXL_EXPENSIVE_ASSERTIONS=1")
