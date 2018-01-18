@@ -17,6 +17,7 @@
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
+#include <tlx/string.hpp>
 
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
@@ -90,9 +91,9 @@ int run_external_array_test(size_t volume)
     const size_t N = volume / sizeof(value_type);
     const size_t num_blocks = foxxll::div_ceil(N, block_size);
 
-    LOG << "block_size = " << block_size;
-    LOG << "N = " << N;
-    LOG << "num_blocks = " << num_blocks;
+    LOG1 << "block_size = " << block_size;
+    LOG1 << "N = " << N;
+    LOG1 << "num_blocks = " << num_blocks;
 
     ea_type::pool_type rw_pool(6 * num_blocks, 4);
     ea_type ea(N, &rw_pool);
@@ -230,12 +231,10 @@ int run_multiway_merge(size_t volume)
     const size_t size = volume / sizeof(value_type);
     const size_t num_blocks = foxxll::div_ceil(size, block_size);
 
-    LOG1 << "--- Running run_multiway_merge() test with " <<
-        NumEAs << " external arrays";
-
-    LOG << "block_size = " << block_size;
-    LOG << "size = " << size;
-    LOG << "num_blocks = " << num_blocks;
+    LOG1 << "--- Running run_multiway_merge() test with " << NumEAs << " external arrays";
+    LOG1 << "block_size = " << block_size;
+    LOG1 << "size = " << size;
+    LOG1 << "num_blocks = " << num_blocks;
 
     std::vector<value_type> v(size);
 
@@ -368,7 +367,7 @@ int run_multiway_merge(size_t volume)
 int run_internal_array_test(size_t volume)
 {
     const size_t size = volume / sizeof(value_type);
-    LOG << "size = " << size;
+    LOG1 << "size = " << size;
     die_unless(size > 3);
 
     std::vector<value_type> v(size);
@@ -414,7 +413,7 @@ int run_upper_bound_test(size_t volume)
 {
     const size_t size = volume / sizeof(value_type);
     die_unless(volume > ea_type::block_size);
-    LOG << "size = " << size;
+    LOG1 << "size = " << size;
     die_unless(size > 2000);
 
     ea_type::pool_type rw_pool;
@@ -513,12 +512,12 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    STXXL_MEMDUMP(volume);
-    STXXL_MEMDUMP(mwmvolume);
-    STXXL_MEMDUMP(iavolume);
-    STXXL_MEMDUMP(sizeof(value_type));
-    LOG << "numpbs = " << numpbs;
-    LOG << "numwbs = " << numwbs;
+    LOG1 << "volume = " << tlx::format_iec_units(volume);
+    LOG1 << "mwmvolume = " << tlx::format_iec_units(mwmvolume);
+    LOG1 << "iavolume = " << tlx::format_iec_units(iavolume);
+    LOG1 << "sizeof(value_type) = " << tlx::format_iec_units(sizeof(value_type));
+    LOG1 << "numpbs = " << numpbs;
+    LOG1 << "numwbs = " << numwbs;
 
     bool succ = EXIT_SUCCESS;
 

@@ -26,6 +26,7 @@ static const char* description =
 #include <utility>
 
 #include <tlx/die.hpp>
+#include <tlx/string.hpp>
 #include <tlx/unused.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
@@ -1496,17 +1497,17 @@ void do_dijkstra(ContainerType& c)
 
 void print_params()
 {
-    STXXL_MEMDUMP(RAM);
-    STXXL_MEMDUMP(volume);
-    STXXL_MEMDUMP(block_size);
-    STXXL_MEMDUMP(single_heap_ram);
-    LOG << "bulk_size = " << bulk_size;
-    STXXL_MEMDUMP(extract_buffer_ram);
-    LOG << "num_elements = " << num_elements;
-    LOG << "g_max_threads = " << g_max_threads;
-    LOG << "num_write_buffers = " << num_write_buffers;
-    LOG << "num_prefetchers = " << num_prefetchers;
-    LOG << "num_read_blocks = " << num_read_blocks;
+    LOG1 << "RAM = " << tlx::format_iec_units(RAM);
+    LOG1 << "volume = " << tlx::format_iec_units(volume);
+    LOG1 << "block_size = " << tlx::format_iec_units(block_size);
+    LOG1 << "single_heap_ram = " << tlx::format_iec_units(single_heap_ram);
+    LOG1 << "bulk_size = " << bulk_size;
+    LOG1 << "extract_buffer_ram = " << tlx::format_iec_units(extract_buffer_ram);
+    LOG1 << "num_elements = " << num_elements;
+    LOG1 << "g_max_threads = " << g_max_threads;
+    LOG1 << "num_write_buffers = " << num_write_buffers;
+    LOG1 << "num_prefetchers = " << num_prefetchers;
+    LOG1 << "num_read_blocks = " << num_read_blocks;
 }
 
 /*

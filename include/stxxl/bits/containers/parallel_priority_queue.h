@@ -26,6 +26,7 @@
 
 #include <tlx/define.hpp>
 #include <tlx/die.hpp>
+#include <tlx/string.hpp>
 
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/types.hpp>
@@ -3600,19 +3601,19 @@ public:
 
         if (c_limit_extract_buffer) {
             LOG << "m_extract_buffer_limit = " << m_extract_buffer_limit;
-            STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(value_type));
+            LOG << "m_extract_buffer_limit * sizeof(value_type) = " << tlx::format_iec_units(m_extract_buffer_limit * sizeof(value_type));
         }
 
 #if STXXL_PARALLEL
         LOG << "omp_get_max_threads() = " << omp_get_max_threads();
 #endif
 
-        STXXL_MEMDUMP(m_mem_for_heaps);
-        STXXL_MEMDUMP(m_mem_left);
+        LOG << "m_mem_for_heaps = " << tlx::format_iec_units(m_mem_for_heaps);
+        LOG << "m_mem_left = " << tlx::format_iec_units(m_mem_left);
 
         //if (num_extract_buffer_refills > 0) {
         //    LOG << "total_extract_buffer_size / num_extract_buffer_refills = " << total_extract_buffer_size / num_extract_buffer_refills;
-        //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
+        //    LOG << "total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type) = " << tlx::format_iec_units(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
         //}
 
         LOG1 << m_stats;

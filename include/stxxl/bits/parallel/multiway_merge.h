@@ -17,8 +17,8 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
-#include <tlx/die.hpp>
 #include <tlx/define.hpp>
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 #include <tlx/loser_tree.hpp>
 
