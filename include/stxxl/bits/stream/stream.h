@@ -15,6 +15,8 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
+#include <tlx/meta/call_foreach_tuple.hpp>
+#include <tlx/meta/call_foreach_tuple_with_index.hpp>
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
@@ -1231,6 +1233,63 @@ public:
 };
 
 //! \}
+
+
+template <typename A, typename B, typename... TT>
+class tuplestream;
+
+template <typename A, typename B, typename... TT>
+class tuplestream{
+public:
+    using value_type = std::tuple<typename A::value_type, typename B::value_type, typename TT::value_type...>;
+    using tuple_type = std::tuple<A&, B&, TT&...>;
+
+private:
+    tuple_type in;
+    value_type current;
+
+public:
+    tuplestream(A& a, B& b, TT&... tt)
+        : in(a, b, (tt) ...)
+    {
+        if (!empty())
+            tlx::call_foreach_tuple_with_index([this](auto index, auto & t)
+                                               {
+                                                   std::get<decltype(index)::index>(current) = *t;
+                                               }, in);
+    }
+
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
+
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
+
+    //! Standard stream method.
+    tuplestream& operator ++ ()
+    {
+        tlx::call_foreach_tuple([&](auto & t) {  ++t; }, in);
+        if (!empty())
+            tlx::call_foreach_tuple_with_index([this](auto index, auto & t)
+                                               {
+                                                   std::get<decltype(index)::index>(current) = *t;
+                                               }, in);
+
+        return *this;
+    }
+
+    bool empty() const {
+        bool result = false;
+        tlx::call_foreach_tuple([&result](auto & t) { result = result || t.empty(); }, in);
+
+        return result;
+    }
+};
 
 } // namespace stream
 } // namespace stxxl
