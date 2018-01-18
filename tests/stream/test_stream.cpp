@@ -31,13 +31,13 @@
 
 #define block_size (8 * 1024)
 
-using tuple_type = stxxl::tuple<char, int>;
+using tuple_type = std::tuple<char, int>;
 
 namespace std {
 
 std::ostream& operator << (std::ostream& os, const tuple_type& t)
 {
-    os << "<" << t.first << "," << t.second << ">";
+    os << "<" << std::get<0>(t) << "," << std::get<1>(t) << ">";
     return os;
 }
 
@@ -53,8 +53,6 @@ using output_array_type = std::vector<tuple_type>;
 
 using stxxl::stream::streamify;
 using stxxl::stream::streamify_traits;
-using stxxl::stream::make_tuple;
-using stxxl::tuple;
 
 const char* phrase = "Hasta la vista, baby";
 
@@ -91,19 +89,19 @@ struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
     using value_type = tuple_type;
     bool operator () (const value_type& a, const value_type& b) const
     {
-        if (a.first == b.first)
-            return a.second < b.second;
+        if (std::get<0>(a) == std::get<0>(b))
+            return std::get<1>(a) < std::get<1>(b);
 
-        return a.first < b.first;
+        return std::get<0>(a) < std::get<0>(b);
     }
 
     value_type min_value() const
     {
-        return tuple_type::min_value();
+        return std::make_tuple(std::numeric_limits<char>::min(), std::numeric_limits<int>::min());
     }
     value_type max_value() const
     {
-        return tuple_type::max_value();
+        return  std::make_tuple(std::numeric_limits<char>::max(), std::numeric_limits<int>::max());
     }
 };
 
@@ -159,7 +157,7 @@ int main()
     counter_stream_type counter_stream = streamify(counter_type());
 
     // create tuple stream
-    using tuple_stream_type = make_tuple<input_stream_type, counter_stream_type>;
+    using tuple_stream_type = stxxl::stream::tuplestream<input_stream_type, counter_stream_type>;
     tuple_stream_type tuple_stream(input_stream, counter_stream);
 
     const uint64_t sorter_memory = 128 * 1024;
@@ -178,8 +176,8 @@ int main()
     sorted_stream_type sorted_stream(tuple_stream, cmp_type(), sorter_memory);
 #endif
 
-    using transformed_stream_type = stxxl::stream::transform<identity<stxxl::tuple<char, int> >, sorted_stream_type>;
-    identity<stxxl::tuple<char, int> > id;
+    using transformed_stream_type = stxxl::stream::transform<identity<std::tuple<char, int>>, sorted_stream_type>;
+    identity<std::tuple<char, int> > id;
     transformed_stream_type transformed_stream(id, sorted_stream);
 
     // HERE streaming part ends (materializing)
@@ -195,7 +193,7 @@ int main()
     STXXL_MSG("sorted tuples (character,position):");
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << output[i].first << "'," << output[i].second << ")");
+        STXXL_MSG("('" << std::get<0>(output[i]) << "'," << std::get<1>(output[i]) << ")");
     }
 
     STXXL_CHECK(output[0] == tuple_type(' ', 5));
