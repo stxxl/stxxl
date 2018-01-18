@@ -19,6 +19,8 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/error_handling.hpp>
+
 #include <stxxl.h>
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
@@ -26,7 +28,7 @@
 template <typename T>
 const char * _()
 {
-    const char* start = strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
+    const char* start = strchr(FOXXLL_PRETTY_FUNCTION_NAME, '[');
     if (start == nullptr)
         return "unknown";
     else
@@ -36,7 +38,7 @@ const char * _()
 template <typename I>
 void dump_iterator_info(I&)
 {
-    LOG1 << STXXL_PRETTY_FUNCTION_NAME;
+    LOG1 << FOXXLL_PRETTY_FUNCTION_NAME;
     LOG1 << "  category:        " << _<typename std::iterator_traits<I>::iterator_category>();
     LOG1 << "  value_type:      " << _<typename std::iterator_traits<I>::value_type>();
     LOG1 << "  difference_type: " << _<typename std::iterator_traits<I>::difference_type>();
@@ -47,7 +49,7 @@ void dump_iterator_info(I&)
 template <typename C>
 void dump_container_info(C&)
 {
-    LOG1 << STXXL_PRETTY_FUNCTION_NAME;
+    LOG1 << FOXXLL_PRETTY_FUNCTION_NAME;
     LOG1 << "  value_type:      " << _<typename C::value_type>();
     LOG1 << "  size_type:       " << _<typename C::size_type>();
     LOG1 << "  difference_type: " << _<typename C::difference_type>();
