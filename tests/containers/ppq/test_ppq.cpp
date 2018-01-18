@@ -80,7 +80,7 @@ void test_simple()
         }
     }
 
-    die_unequal(ppq.size(), 0);
+    die_unequal(ppq.size(), 0u);
     die_unless(ppq.empty());
 }
 
@@ -134,7 +134,7 @@ void test_bulk_pop()
         }
     }
 
-    die_unequal(ppq.size(), 0);
+    die_unequal(ppq.size(), 0u);
     die_unless(ppq.empty());
 }
 

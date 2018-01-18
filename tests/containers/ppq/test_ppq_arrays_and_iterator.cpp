@@ -139,9 +139,9 @@ int run_external_array_test(size_t volume)
 
         ea.remove_items(33);
 
-        die_unequal(ea[33].first, 34);
-        die_unequal(ea.begin().get_index(), 33);
-        die_unequal(ea.begin()->first, 34);
+        die_unequal(ea[33].first, 34u);
+        die_unequal(ea.begin().get_index(), 33u);
+        die_unequal(ea.begin()->first, 34u);
 
         // Testing get_next_block_min()...
 
@@ -149,15 +149,15 @@ int run_external_array_test(size_t volume)
 
         while (ea.get_next_block_min().first < 5 * block_size + 876) {
             switch (maxround) {
-            case 0: die_unequal(ea.get_next_block_min().first, 131073);
+            case 0: die_unequal(ea.get_next_block_min().first, 131073u);
                 break;
-            case 1: die_unequal(ea.get_next_block_min().first, 262145);
+            case 1: die_unequal(ea.get_next_block_min().first, 262145u);
                 break;
-            case 2: die_unequal(ea.get_next_block_min().first, 393217);
+            case 2: die_unequal(ea.get_next_block_min().first, 393217u);
                 break;
-            case 3: die_unequal(ea.get_next_block_min().first, 524289);
+            case 3: die_unequal(ea.get_next_block_min().first, 524289u);
                 break;
-            case 4: die_unequal(ea.get_next_block_min().first, 655361);
+            case 4: die_unequal(ea.get_next_block_min().first, 655361u);
                 break;
             }
 
@@ -303,7 +303,7 @@ int run_multiway_merge(size_t volume)
             die_unequal(it->first, index);
         }
 
-        die_unequal(index, 1);
+        die_unequal(index, 1u);
 
         // addition operator +
         for (ea_type::iterator it = begin; it != end; it = it + 1, ++index)
@@ -459,12 +459,12 @@ int run_upper_bound_test(size_t volume)
         ea_type::iterator uba = std::upper_bound(a.begin(), a.end(), minmax, value_comp());
         ea_type::iterator ubb = std::upper_bound(b.begin(), b.end(), minmax, value_comp());
 
-        die_unequal((uba - 1)->first, 2000);
-        die_unequal((ubb - 1)->first, 2000);
-        die_unequal(uba->first, 2001);
-        die_unequal(ubb->first, 2002);
-        die_unequal(uba.get_index(), 2000);
-        die_unequal(ubb.get_index(), 1001);
+        die_unequal((uba - 1)->first, 2000u);
+        die_unequal((ubb - 1)->first, 2000u);
+        die_unequal(uba->first, 2001u);
+        die_unequal(ubb->first, 2002u);
+        die_unequal(uba.get_index(), 2000u);
+        die_unequal(ubb.get_index(), 1001u);
     }
 
     return EXIT_SUCCESS;

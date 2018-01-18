@@ -100,7 +100,7 @@ int main()
 
     // Check the values.
     int expected_vals[10] = { -1, -1, 1, 2, 3, 5, 6, 7, 8, 9 };
-    die_unequal(vec.size(), 10);
+    die_unequal(vec.size(), 10u);
     for (unsigned i = 0; i < vec.size(); ++i) {
         die_unequal(vec[i].get_i(), expected_vals[i]);
     }
@@ -112,7 +112,7 @@ int main()
 
     // Check the values.
     int expected_vals2[10] = { 1, 2, 3, 5, 6, 7, 9 };
-    die_unequal(vec.size(), 7);
+    die_unequal(vec.size(), 7u);
     for (unsigned i = 0; i < vec.size(); ++i) {
         die_unequal(vec[i].get_i(), expected_vals2[i]);
     }
@@ -129,7 +129,7 @@ int main()
     std::swap(vec[19], t);
 
     // Check the values.
-    die_unequal(vec.size(), 20);
+    die_unequal(vec.size(), 20u);
     die_unequal(vec[19].get_i(), 11);
 
     return EXIT_SUCCESS;
