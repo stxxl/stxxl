@@ -21,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+#include <tlx/die.hpp>
+
 #include <stxxl/bits/containers/pq_mergers.h>
 
 namespace stxxl {
@@ -289,6 +291,8 @@ protected:
             return;
 
         assert(k > 0);
+
+        die_unless(MaxArity > logK || MaxArity >= 8);
 
         //This is the place to make statistics about internal multi_merge calls.
 
