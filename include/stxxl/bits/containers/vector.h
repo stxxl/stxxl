@@ -16,6 +16,8 @@
 #ifndef STXXL_CONTAINERS_VECTOR_HEADER
 #define STXXL_CONTAINERS_VECTOR_HEADER
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/common/types.hpp>
 #include <foxxll/io/request_operations.hpp>
@@ -103,11 +105,11 @@ public:
     {
         ++pos;
         ++offset;
-        if (UNLIKELY(offset == modulo1))
+        if (TLX_UNLIKELY(offset == modulo1))
         {
             offset = 0;
             ++block1;
-            if (UNLIKELY(block1 == modulo2))
+            if (TLX_UNLIKELY(block1 == modulo2))
             {
                 block1 = 0;
                 ++block2;
@@ -133,10 +135,10 @@ public:
     double_blocked_index& operator -- ()
     {
         --pos;
-        if (UNLIKELY(offset == 0))
+        if (TLX_UNLIKELY(offset == 0))
         {
             offset = modulo1;
-            if (UNLIKELY(block1 == 0))
+            if (TLX_UNLIKELY(block1 == 0))
             {
                 block1 = modulo2;
                 --block2;
@@ -1992,7 +1994,7 @@ public:
         ++m_iter;
         ++(*m_bufin);
 
-        if (UNLIKELY(empty())) {
+        if (TLX_UNLIKELY(empty())) {
             delete m_bufin;
             m_bufin = nullptr;
         }
@@ -2266,7 +2268,7 @@ public:
         --m_iter;
         ++(*m_bufin);
 
-        if (UNLIKELY(empty())) {
+        if (TLX_UNLIKELY(empty())) {
             delete m_bufin;
             m_bufin = nullptr;
         }
@@ -2410,7 +2412,7 @@ public:
     //! iterator.
     value_type& operator * ()
     {
-        if (UNLIKELY(m_iter == m_end))
+        if (TLX_UNLIKELY(m_iter == m_end))
         {
             // iterator points to end of vector -> double vector's size
 
@@ -2441,7 +2443,7 @@ public:
 
         assert(m_iter < m_end);
 
-        if (UNLIKELY(m_bufout == nullptr))
+        if (TLX_UNLIKELY(m_bufout == nullptr))
         {
             if (m_iter.block_offset() != 0)
             {
@@ -2466,7 +2468,7 @@ public:
 
         // if the pointer has finished a block, then we inform the vector that
         // this block has been updated.
-        if (UNLIKELY(m_iter.block_offset() == 0)) {
+        if (TLX_UNLIKELY(m_iter.block_offset() == 0)) {
             if (m_prevblk != m_iter) {
                 m_prevblk.block_externally_updated();
                 m_prevblk = m_iter;
@@ -2483,7 +2485,7 @@ public:
         ++m_iter;
 
         // if buf_ostream active, advance that too
-        if (LIKELY(m_bufout != nullptr)) m_bufout->operator ++ ();
+        if (TLX_LIKELY(m_bufout != nullptr)) m_bufout->operator ++ ();
 
         return *this;
     }

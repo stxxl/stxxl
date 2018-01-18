@@ -15,6 +15,8 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
@@ -174,7 +176,7 @@ public:
         assert(m_end != m_current);
         ++m_current;
         ++(*in);
-        if (UNLIKELY(empty()))
+        if (TLX_UNLIKELY(empty()))
             delete_stream();
 
         return *this;

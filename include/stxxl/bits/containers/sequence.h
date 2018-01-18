@@ -15,6 +15,8 @@
 #ifndef STXXL_CONTAINERS_SEQUENCE_HEADER
 #define STXXL_CONTAINERS_SEQUENCE_HEADER
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/prefetch_pool.hpp>
@@ -255,7 +257,7 @@ public:
     //! Adds an element to the front of the sequence
     void push_front(const value_type& val)
     {
-        if (UNLIKELY(m_front_element == m_front_block->begin()))
+        if (TLX_UNLIKELY(m_front_element == m_front_block->begin()))
         {
             if (m_size == 0)
             {
@@ -325,7 +327,7 @@ public:
     //! Adds an element to the end of the sequence
     void push_back(const value_type& val)
     {
-        if (UNLIKELY(m_back_element == m_back_block->begin() + (block_type::size - 1)))
+        if (TLX_UNLIKELY(m_back_element == m_back_block->begin() + (block_type::size - 1)))
         {
             // back block is completely  filled
             if (m_front_block == m_back_block)
@@ -388,7 +390,7 @@ public:
     {
         assert(!empty());
 
-        if (UNLIKELY(m_front_element == m_front_block->begin() + (block_type::size - 1)))
+        if (TLX_UNLIKELY(m_front_element == m_front_block->begin() + (block_type::size - 1)))
         {
             // if there is only one block, it implies ...
             if (m_back_block == m_front_block)
@@ -446,7 +448,7 @@ public:
     {
         assert(!empty());
 
-        if (UNLIKELY(m_back_element == m_back_block->begin()))
+        if (TLX_UNLIKELY(m_back_element == m_back_block->begin()))
         {
             // if there is only one block, it implies ...
             if (m_back_block == m_front_block)
@@ -632,7 +634,7 @@ public:
         {
             assert(!empty());
 
-            if (UNLIKELY(m_current_element == m_current_block->begin() + (block_type::size - 1)))
+            if (TLX_UNLIKELY(m_current_element == m_current_block->begin() + (block_type::size - 1)))
             {
                 // next item position is beyond end of current block, find next block
                 --m_size;
@@ -763,7 +765,7 @@ public:
         {
             assert(!empty());
 
-            if (UNLIKELY(m_current_element == m_current_block->begin()))
+            if (TLX_UNLIKELY(m_current_element == m_current_block->begin()))
             {
                 // next item position is beyond begin of current block, find next block
                 --m_size;

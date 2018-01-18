@@ -272,7 +272,7 @@ void test1(int rank)
         value_type v;
         v = w * x;
 
-        foxxll::STXXL_UNUSED(v);
+        tlx::unused(v);
     }
 
     delete a;

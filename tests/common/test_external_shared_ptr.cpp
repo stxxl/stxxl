@@ -85,7 +85,7 @@ void test_vector()
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
-    STXXL_UNUSED(c_it);
+    tlx::unused(c_it);
 
     test_const_iterator(v);
 

@@ -77,7 +77,7 @@ void test_vector1()
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
-    STXXL_UNUSED(c_it);
+    tlx::unused(c_it);
 
     unsigned int big_size = 2 * 32 * STXXL_DEFAULT_BLOCK_SIZE(double);
     using vec_big = stxxl::vector<double>;

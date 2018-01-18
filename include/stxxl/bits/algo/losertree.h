@@ -17,6 +17,8 @@
 
 #include <foxxll/common/types.hpp>
 #include <foxxll/common/utils.hpp>
+
+#include <tlx/define.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/types>
@@ -129,7 +131,7 @@ private:
         size_t* regEntry = entry;
         size_t winnerIndex = regEntry[0];
 
-        while (LIKELY(out_first != out_last))
+        while (TLX_LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
             *(out_first) = winnerE->current();
@@ -169,7 +171,7 @@ private:
 
     void multi_merge_unrolled_0(value_type* out_first, value_type* out_last)
     {
-        while (LIKELY(out_first != out_last))
+        while (TLX_LIKELY(out_first != out_last))
         {
             *out_first = current->current();
             ++out_first;
@@ -183,7 +185,7 @@ private:
         size_t kReg = k;
         size_t winnerIndex = entry[0];
 
-        while (LIKELY(out_first != out_last))
+        while (TLX_LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
             *(out_first) = winnerE->current();

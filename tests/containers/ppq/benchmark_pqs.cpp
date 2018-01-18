@@ -17,7 +17,8 @@ static const char* description =
     "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
-#include <foxxll/unused.hpp>
+#include <tlx/unused.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>

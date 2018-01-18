@@ -17,6 +17,7 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
+#include <tlx/define.hpp>
 #include <tlx/logger.hpp>
 #include <tlx/loser_tree.hpp>
 
@@ -981,7 +982,7 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 
     for (source_type t = 0; t < k; ++t)
     {
-        if (UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
+        if (TLX_UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
             lt.insert_start(nullptr, t, true);
         else
             lt.insert_start(&*seqs_begin[t].first, t, false);

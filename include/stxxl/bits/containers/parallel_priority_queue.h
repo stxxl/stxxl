@@ -24,6 +24,8 @@
 #define STXXL_MOVE(T) T
 #endif
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/types.hpp>
 #include <foxxll/io/request_operations.hpp>
@@ -159,7 +161,7 @@ public:
         ++m_index;
         ++m_current;
 
-        if (UNLIKELY(m_current == (*m_block_pointers)[m_block_index].second)) {
+        if (TLX_UNLIKELY(m_current == (*m_block_pointers)[m_block_index].second)) {
             if (m_block_index + 1 < m_block_pointers->size()) {
                 m_current = (*m_block_pointers)[++m_block_index].first;
             }
@@ -1455,7 +1457,7 @@ public:
         //! access the current item
         reference operator * ()
         {
-            if (UNLIKELY(!m_live))
+            if (TLX_UNLIKELY(!m_live))
                 make_live();
 
             return (*m_block)[m_current];
@@ -1471,11 +1473,11 @@ public:
         self_type& operator ++ ()
         {
             ++m_index;
-            if (UNLIKELY(!m_live)) return *this;
+            if (TLX_UNLIKELY(!m_live)) return *this;
 
             // if index stays in the same block, everything is fine
             ++m_current;
-            if (LIKELY(m_current != block_items)) return *this;
+            if (TLX_LIKELY(m_current != block_items)) return *this;
 
             // release current block
             m_writer->free_block_ref(m_block_index);
@@ -2671,7 +2673,7 @@ public:
         {
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items and keep heap invariant.
-            if (UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
+            if (TLX_UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2692,7 +2694,7 @@ public:
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items but DO NOT keep heap
             // invariant.
-            if (UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
+            if (TLX_UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2709,7 +2711,7 @@ public:
         }
         else // m_is_very_large_bulk
         {
-            if (UNLIKELY(insheap.size() >= 2 * 1024 * 1024)) {
+            if (TLX_UNLIKELY(insheap.size() >= 2 * 1024 * 1024)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif

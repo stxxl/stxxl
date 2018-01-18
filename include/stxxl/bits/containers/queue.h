@@ -14,6 +14,8 @@
 #ifndef STXXL_CONTAINERS_QUEUE_HEADER
 #define STXXL_CONTAINERS_QUEUE_HEADER
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/prefetch_pool.hpp>
@@ -219,7 +221,7 @@ public:
     //! Adds an element in the queue.
     void push(const value_type& val)
     {
-        if (UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
+        if (TLX_UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
         {
             // back block is filled
             if (front_block == back_block)
@@ -279,7 +281,7 @@ public:
     {
         assert(!empty());
 
-        if (UNLIKELY(front_element == front_block->begin() + (block_type::size - 1)))
+        if (TLX_UNLIKELY(front_element == front_block->begin() + (block_type::size - 1)))
         {
             // if there is only one block, it implies ...
             if (back_block == front_block)

@@ -14,6 +14,7 @@
 #ifndef STXXL_ALGO_SORT_HELPER_HEADER
 #define STXXL_ALGO_SORT_HELPER_HEADER
 
+#include <tlx/define.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/algo/run_cursor.h>
@@ -86,10 +87,10 @@ struct run_cursor2_cmp
     run_cursor2_cmp(const run_cursor2_cmp& a) : cmp(a.cmp) { }
     inline bool operator () (const cursor_type& a, const cursor_type& b) const
     {
-        if (UNLIKELY(b.empty()))
+        if (TLX_UNLIKELY(b.empty()))
             return true;
         // sentinel emulation
-        if (UNLIKELY(a.empty()))
+        if (TLX_UNLIKELY(a.empty()))
             return false;
         // sentinel emulation
 

@@ -14,6 +14,8 @@
 #ifndef STXXL_ALGO_RUN_CURSOR_HEADER
 #define STXXL_ALGO_RUN_CURSOR_HEADER
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/types.hpp>
 
 #include <cassert>
@@ -92,7 +94,7 @@ struct run_cursor2 : public run_cursor<BlockType>
     {
         assert(!empty());
         ++pos;
-        if (UNLIKELY(pos >= block_type::size))
+        if (TLX_UNLIKELY(pos >= block_type::size))
         {
             if (prefetcher()->block_consumed(buffer))
                 pos = 0;

@@ -18,6 +18,8 @@
 #ifndef STXXL_COMMON_BINARY_BUFFER_HEADER
 #define STXXL_COMMON_BINARY_BUFFER_HEADER
 
+#include <tlx/define.hpp>
+
 #include <foxxll/common/types.hpp>
 #include <foxxll/common/utils.hpp>
 
@@ -175,7 +177,7 @@ public:
     {
         if (len > m_capacity) alloc(len);
 
-        if (LIKELY(len > 0)) {
+        if (TLX_LIKELY(len > 0)) {
             memcpy(m_data, data, len);
         }
         m_size = len;

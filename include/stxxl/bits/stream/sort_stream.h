@@ -27,6 +27,7 @@
 #include <stxxl/bits/stream/sorted_runs.h>
 #include <stxxl/bits/stream/stream.h>
 
+#include <tlx/define.hpp>
 #include <tlx/counting_ptr.hpp>
 
 #include <algorithm>
@@ -642,7 +643,7 @@ public:
     void push(const value_type& val)
     {
         assert(m_result_computed == false);
-        if (LIKELY(m_cur_el < m_el_in_run))
+        if (TLX_LIKELY(m_cur_el < m_el_in_run))
         {
             m_blocks1[m_cur_el / block_type::size][m_cur_el % block_type::size] = val;
             ++m_cur_el;
@@ -1339,7 +1340,7 @@ public:
         --m_elements_remaining;
         ++m_current_ptr;
 
-        if (LIKELY(m_current_ptr == m_current_end && !empty()))
+        if (TLX_LIKELY(m_current_ptr == m_current_end && !empty()))
         {
             fill_buffer_block();
 
@@ -1689,7 +1690,7 @@ void sort(RandomAccessIterator begin,
           size_t MemSize,
           AllocStr AS)
 {
-    STXXL_UNUSED(AS);
+    tlx::unused(AS);
     using InputType = typename stream::streamify_traits<RandomAccessIterator>::stream_type;
     InputType Input(begin, end);
     using sorter_type = stream::sort<InputType, CmpType, BlockSize, AllocStr>;
