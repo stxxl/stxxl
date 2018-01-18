@@ -12,10 +12,13 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
-#include <stxxl/stream>
-
 #include <limits>
+
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/stream>
 
 struct Input
 {

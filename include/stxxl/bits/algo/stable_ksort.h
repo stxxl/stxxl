@@ -16,17 +16,20 @@
 
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
+#include <algorithm>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+#include <tlx/math/integer_log2.hpp>
+#include <tlx/simple_vector.hpp>
 
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
+
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
-#include <tlx/math/integer_log2.hpp>
-#include <tlx/simple_vector.hpp>
-
-#include <algorithm>
 
 #ifndef STXXL_VERBOSE_STABLE_KSORT
 #define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1

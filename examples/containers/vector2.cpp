@@ -10,9 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/vector>
-
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/vector>
 
 int main()
 {

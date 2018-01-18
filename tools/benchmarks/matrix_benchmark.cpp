@@ -13,6 +13,8 @@
 #include <iostream>
 #include <limits>
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
 #include <stxxl/stream>

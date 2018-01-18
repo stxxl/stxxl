@@ -13,17 +13,20 @@
 #ifndef STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 #define STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 
-#include <foxxll/common/error_handling.hpp>
-#include <foxxll/io/request.hpp>
-#include <foxxll/mng/block_manager.hpp>
-#include <foxxll/mng/typed_block.hpp>
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/containers/pager.h>
-
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/io/request.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/typed_block.hpp>
+
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/containers/pager.h>
 
 namespace stxxl {
 

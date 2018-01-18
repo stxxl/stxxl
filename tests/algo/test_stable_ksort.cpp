@@ -15,7 +15,10 @@
 //! \example algo/test_stable_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng.hpp>
+
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
 

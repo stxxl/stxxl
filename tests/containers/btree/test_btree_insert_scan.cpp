@@ -13,6 +13,10 @@
 #include <ctime>
 #include <iostream>
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/scan>
 #include <stxxl/sort>

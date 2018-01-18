@@ -17,6 +17,8 @@
 #include <iostream>
 #include <stxxl/vector>
 
+#include <tlx/logger.hpp>
+
 template <typename T>
 class matrix2d
 {

@@ -17,6 +17,15 @@ static const char* description =
     "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <limits>
+#include <queue>
+#include <utility>
+
+#include <tlx/die.hpp>
 #include <tlx/unused.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
@@ -28,14 +37,6 @@ static const char* description =
 #include <stxxl/sorter>
 #include <stxxl/timer>
 #include <tlx/logger.hpp>
-
-#include <algorithm>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
-#include <limits>
-#include <queue>
-#include <utility>
 
 #include <key_with_padding.h>
 

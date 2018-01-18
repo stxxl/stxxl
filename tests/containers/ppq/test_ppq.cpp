@@ -13,7 +13,11 @@
  **************************************************************************/
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/random>
 #include <stxxl/timer>

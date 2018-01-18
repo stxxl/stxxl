@@ -15,7 +15,10 @@
 //! content and then sorts it using \c stxxl::stream::sort while writing the
 //! sorted output to a different file.
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/io.hpp>
+
 #include <stxxl/stream>
 #include <stxxl/vector>
 

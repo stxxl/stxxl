@@ -20,6 +20,9 @@
 //! using \c stream::use_push specialization of \c stream::runs_creator class
 
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/stream>
 
 const unsigned long long megabyte = 1024 * 1024;

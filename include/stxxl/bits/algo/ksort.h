@@ -15,7 +15,12 @@
 #ifndef STXXL_ALGO_KSORT_HEADER
 #define STXXL_ALGO_KSORT_HEADER
 
+#include <algorithm>
+#include <functional>
+
 #include <tlx/define.hpp>
+#include <tlx/logger.hpp>
+#include <tlx/simple_vector.hpp>
 
 #include <foxxll/common/onoff_switch.hpp>
 #include <foxxll/common/utils.hpp>
@@ -33,10 +38,6 @@
 #include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/rand.h>
-#include <tlx/simple_vector.hpp>
-
-#include <algorithm>
-#include <functional>
 
 //#define INTERLEAVED_ALLOC
 

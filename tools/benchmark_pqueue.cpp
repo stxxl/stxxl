@@ -21,6 +21,8 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>

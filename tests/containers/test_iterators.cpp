@@ -14,8 +14,11 @@
 #include <cstring>
 #include <deque>
 #include <map>
-#include <stxxl.h>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl.h>
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
 

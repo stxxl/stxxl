@@ -16,7 +16,13 @@
 #ifndef STXXL_CONTAINERS_VECTOR_HEADER
 #define STXXL_CONTAINERS_VECTOR_HEADER
 
+#include <algorithm>
+#include <queue>
+#include <string>
+#include <vector>
+
 #include <tlx/define.hpp>
+#include <tlx/logger.hpp>
 
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/common/types.hpp>
@@ -30,11 +36,6 @@
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
-
-#include <algorithm>
-#include <queue>
-#include <string>
-#include <vector>
 
 namespace stxxl {
 

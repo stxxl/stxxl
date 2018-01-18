@@ -15,8 +15,11 @@
 //! This example imports a file into an \c stxxl::vector without copying its
 //! content and then sorts it using stxxl::sort / stxxl::ksort / ...
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/io.hpp>
 #include <foxxll/mng.hpp>
+
 #include <stxxl/ksort>
 #include <stxxl/sort>
 #include <stxxl/stable_ksort>

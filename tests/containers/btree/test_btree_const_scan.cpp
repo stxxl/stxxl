@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/timer>
 

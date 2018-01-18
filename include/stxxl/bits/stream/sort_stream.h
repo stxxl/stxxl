@@ -16,7 +16,17 @@
 #ifndef STXXL_STREAM_SORT_STREAM_HEADER
 #define STXXL_STREAM_SORT_STREAM_HEADER
 
+#include <algorithm>
+#include <functional>
+#include <utility>
+#include <vector>
+
+#include <tlx/counting_ptr.hpp>
+#include <tlx/define.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng/block_manager.hpp>
+
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/sort_base.h>
@@ -26,14 +36,6 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/stream/sorted_runs.h>
 #include <stxxl/bits/stream/stream.h>
-
-#include <tlx/define.hpp>
-#include <tlx/counting_ptr.hpp>
-
-#include <algorithm>
-#include <functional>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 namespace stream {

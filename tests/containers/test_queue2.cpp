@@ -17,6 +17,8 @@
 // stxxl::queue contains deprecated funtions
 #define STXXL_NO_DEPRECATED 1
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/queue>
 
 using my_type = uint64_t;

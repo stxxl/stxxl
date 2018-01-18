@@ -11,7 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/common/timer.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/rand.h>

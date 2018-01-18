@@ -10,11 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/scan>
-
 #include <ctime>
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/containers/btree/btree.h>
+#include <stxxl/scan>
 
 struct comp_type : public std::less<int>
 {

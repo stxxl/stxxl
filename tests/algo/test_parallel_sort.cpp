@@ -26,6 +26,8 @@
 #include <functional>
 #include <limits>
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/scan>
 #include <stxxl/sort>
 #include <stxxl/stream>

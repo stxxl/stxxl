@@ -16,6 +16,8 @@
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng.hpp>
 
 #include <stxxl/bits/common/padding.h>

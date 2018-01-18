@@ -10,10 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/queue>
 #include <stxxl/random>
-
-#include <iostream>
 
 int main()
 {

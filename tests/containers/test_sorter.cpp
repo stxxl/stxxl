@@ -15,6 +15,9 @@
 //! This is an example of how to use \c stxxl::sorter() container
 
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/sorter>
 
 #include <key_with_padding.h>

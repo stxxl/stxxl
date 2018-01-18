@@ -13,15 +13,17 @@
 #ifndef STXXL_CONTAINERS_MATRIX_HEADER
 #define STXXL_CONTAINERS_MATRIX_HEADER
 
-#include <stxxl/bits/containers/vector.h>
-#include <foxxll/mng/block_scheduler.hpp>
-#include <stxxl/bits/containers/matrix_arithmetic.h>
-
-#include <tlx/counting_ptr.hpp>
-
 #include <algorithm>
 #include <vector>
 #include <utility>
+
+#include <tlx/counting_ptr.hpp>
+#include <tlx/logger.hpp>
+
+#include <foxxll/mng/block_scheduler.hpp>
+
+#include <stxxl/bits/containers/vector.h>
+#include <stxxl/bits/containers/matrix_arithmetic.h>
 
 namespace stxxl {
 

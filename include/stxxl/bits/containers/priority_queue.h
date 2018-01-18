@@ -20,15 +20,17 @@
 #ifndef STXXL_CONTAINERS_PRIORITY_QUEUE_HEADER
 #define STXXL_CONTAINERS_PRIORITY_QUEUE_HEADER
 
-#include <stxxl/bits/containers/pq_ext_merger.h>
-#include <stxxl/bits/containers/pq_helpers.h>
-#include <stxxl/bits/containers/pq_int_merger.h>
-#include <stxxl/bits/containers/pq_mergers.h>
-
 #include <algorithm>
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/containers/pq_ext_merger.h>
+#include <stxxl/bits/containers/pq_helpers.h>
+#include <stxxl/bits/containers/pq_int_merger.h>
+#include <stxxl/bits/containers/pq_mergers.h>
 
 namespace stxxl {
 

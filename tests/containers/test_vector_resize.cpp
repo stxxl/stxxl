@@ -12,7 +12,10 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/io.hpp>
+
 #include <stxxl/vector>
 
 using vector_type = stxxl::vector<int, 4, stxxl::lru_pager<4> >;

@@ -10,11 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl.h>
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/containers/hash_map/util.h>
-
-#include <iostream>
 
 void reader_writer_test()
 {

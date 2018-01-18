@@ -14,6 +14,9 @@
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
 #include <iterator>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/deque>
 
 int main(int argc, char* argv[])

@@ -18,6 +18,8 @@
 
 #include <tlx/logger.hpp>
 
+#include <tlx/logger.hpp>
+
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER 1

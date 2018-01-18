@@ -19,6 +19,10 @@
 //! DOI: 10.1002/spe.844
 
 #include <limits>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 

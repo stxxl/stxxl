@@ -11,11 +11,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/seed.h>
-
-#include <iostream>
 
 struct rand_pairs
 {

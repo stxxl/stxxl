@@ -13,7 +13,11 @@
 
 //#define PLAY_WITH_OPT_PREF
 
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng.hpp>
+
 #include <stxxl/random>
 #include <stxxl/scan>
 #include <stxxl/sort>

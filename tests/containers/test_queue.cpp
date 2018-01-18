@@ -17,6 +17,9 @@
 #define STXXL_NO_DEPRECATED 1
 
 #include <queue>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/queue>
 #include <stxxl/random>
 

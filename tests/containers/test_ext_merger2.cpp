@@ -12,6 +12,9 @@
 
 #include <iterator>
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/priority_queue>
 
 using my_type = int;

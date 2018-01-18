@@ -15,7 +15,11 @@
 #ifndef STXXL_CONTAINERS_SEQUENCE_HEADER
 #define STXXL_CONTAINERS_SEQUENCE_HEADER
 
+#include <algorithm>
+#include <deque>
+
 #include <tlx/define.hpp>
+#include <tlx/logger.hpp>
 
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
@@ -23,11 +27,9 @@
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
 #include <foxxll/mng/write_pool.hpp>
+
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
-
-#include <algorithm>
-#include <deque>
 
 namespace stxxl {
 

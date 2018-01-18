@@ -14,7 +14,14 @@
 #ifndef STXXL_CONTAINERS_QUEUE_HEADER
 #define STXXL_CONTAINERS_QUEUE_HEADER
 
+#include <algorithm>
+#include <deque>
+#include <queue>
+#include <utility>
+#include <vector>
+
 #include <tlx/define.hpp>
+#include <tlx/logger.hpp>
 
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
@@ -24,12 +31,6 @@
 #include <foxxll/mng/write_pool.hpp>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
-
-#include <algorithm>
-#include <deque>
-#include <queue>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 

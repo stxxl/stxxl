@@ -25,6 +25,7 @@
 #endif
 
 #include <tlx/define.hpp>
+#include <tlx/die.hpp>
 
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/types.hpp>

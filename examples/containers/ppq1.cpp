@@ -11,7 +11,10 @@
  **************************************************************************/
 
 //! [example]
+#include <tlx/logger.hpp>
+
 #include <stxxl/parallel_priority_queue>
+
 #if STXXL_PARALLEL
 #include <omp.h>
 #endif

@@ -15,6 +15,9 @@
 
 #include <algorithm>
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/scan>
 #include <stxxl/vector>
 

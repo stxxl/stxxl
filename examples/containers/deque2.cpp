@@ -11,6 +11,9 @@
  **************************************************************************/
 
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/deque>
 
 int main()

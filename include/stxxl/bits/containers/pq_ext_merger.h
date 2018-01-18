@@ -16,13 +16,15 @@
 #ifndef STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 #define STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 
-#include <stxxl/bits/containers/pq_mergers.h>
-#include <stxxl/types>
-
 #include <algorithm>
 #include <deque>
 #include <utility>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/containers/pq_mergers.h>
+#include <stxxl/types>
 
 namespace stxxl {
 

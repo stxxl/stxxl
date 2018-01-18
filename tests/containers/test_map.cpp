@@ -11,10 +11,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/map>
-
 #include <algorithm>
 #include <cmath>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/map>
 
 using key_type = unsigned int;
 using data_type = unsigned int;

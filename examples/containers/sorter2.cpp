@@ -11,6 +11,9 @@
  **************************************************************************/
 
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>

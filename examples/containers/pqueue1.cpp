@@ -13,6 +13,9 @@
 //! [example]
 #include <iostream>
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/priority_queue>
 
 // comparison struct for priority queue where top() returns the smallest contained value:

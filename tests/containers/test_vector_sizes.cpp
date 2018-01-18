@@ -12,7 +12,10 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/io.hpp>
+
 #include <stxxl/vector>
 
 using my_type = int;

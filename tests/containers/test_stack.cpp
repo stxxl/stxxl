@@ -19,6 +19,8 @@
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
 //! block size \b STXXL_DEFAULT_BLOCK_SIZE(T) bytes
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/stack>
 
 // forced instantiation

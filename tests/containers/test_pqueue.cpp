@@ -19,6 +19,9 @@
 //! and \c stxxl::priority_queue
 
 #include <limits>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 

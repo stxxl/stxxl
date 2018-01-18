@@ -12,10 +12,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/timer>
-
-#include <iostream>
 
 struct comp_type : public std::less<int>
 {
