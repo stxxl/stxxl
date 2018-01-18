@@ -445,12 +445,12 @@ class external_array_writer;
  * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
  *
  * \tparam AllocStrategy Allocation strategy for the external memory. Default =
- * STXXL_DEFAULT_ALLOC_STRATEGY.
+ * foxxll::default_alloc_strategy.
  */
 template <
     class ValueType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
+    class AllocStrategy = foxxll::default_alloc_strategy
     >
 class external_array
 {
@@ -1878,12 +1878,12 @@ public:
  * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
  *
  * \tparam AllocStrategy Allocation strategy for the external memory. Default =
- * STXXL_DEFAULT_ALLOC_STRATEGY.
+ * foxxll::default_alloc_strategy.
  */
 template <
     class ValueType,
     class CompareType = std::less<ValueType>,
-    class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY,
+    class AllocStrategy = foxxll::default_alloc_strategy,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     size_t DefaultMemSize = 1* 1024L* 1024L* 1024L,
     external_size_type MaxItems = 0

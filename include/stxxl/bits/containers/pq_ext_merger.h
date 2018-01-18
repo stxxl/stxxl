@@ -41,7 +41,7 @@ namespace priority_queue_local {
  * \param Arity  maximum arity of merger, does not need to be a power of 2
  */
 template <class BlockType, class CompareType, unsigned Arity,
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStr = foxxll::default_alloc_strategy>
 class ext_merger
 {
 public:

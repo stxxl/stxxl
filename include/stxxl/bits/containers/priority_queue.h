@@ -45,7 +45,7 @@ template <
     size_t BlockSize_ = (2* 1024* 1024),         // external block size
     size_t ExtKMAX_ = 64,                        // maximal arity for external mergers
     size_t ExtLevels_ = 2,                       // number of external groups
-    class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
+    class AllocStr_ = foxxll::default_alloc_strategy
     >
 struct priority_queue_config
 {

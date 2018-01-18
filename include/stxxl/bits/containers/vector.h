@@ -33,9 +33,9 @@
 #include <foxxll/mng/buf_ostream.hpp>
 #include <foxxll/mng/typed_block.hpp>
 
-#include <stxxl/bits/defines.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/containers/pager.h>
+#include <stxxl/bits/defines.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
 
@@ -833,7 +833,7 @@ template <
     unsigned PageSize = 4,
     typename PagerType = lru_pager<8>,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+    typename AllocStr = foxxll::default_alloc_strategy>
 class vector
 {
 public:

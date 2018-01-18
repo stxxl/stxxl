@@ -33,7 +33,7 @@ using my_cmp = my_type::compare_greater;
 
 using ppq_type = stxxl::parallel_priority_queue<
           my_type, my_cmp,
-          STXXL_DEFAULT_ALLOC_STRATEGY,
+          foxxll::default_alloc_strategy,
           STXXL_DEFAULT_BLOCK_SIZE(my_type), /* BlockSize */
           512* 64L* 1024L                    /* RamSize */
           >;

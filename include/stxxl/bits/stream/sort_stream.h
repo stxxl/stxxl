@@ -57,7 +57,7 @@ template <
     class Input,
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+    class AllocStr = foxxll::default_alloc_strategy>
 class basic_runs_creator
 {
 public:
@@ -375,7 +375,7 @@ template <
     class Input,
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY
+    class AllocStr = foxxll::default_alloc_strategy
     >
 class runs_creator : public basic_runs_creator<Input, CompareType, BlockSize, AllocStr>
 {
@@ -959,7 +959,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 //! storing intermediate results if several merge passes are required
 template <class RunsType,
           class CompareType,
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStr = foxxll::default_alloc_strategy>
 class basic_runs_merger
 {
 public:
@@ -1526,7 +1526,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 //! storing intermediate results if several merge passes are required
 template <class RunsType,
           class CompareType = typename RunsType::element_type::cmp_type,
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStr = foxxll::default_alloc_strategy>
 class runs_merger : public basic_runs_merger<RunsType, CompareType, AllocStr>
 {
 protected:
@@ -1573,7 +1573,7 @@ template <
     class Input,
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+    class AllocStr = foxxll::default_alloc_strategy,
     class RunsCreatorType = runs_creator<Input, CompareType, BlockSize, AllocStr>
     >
 class sort

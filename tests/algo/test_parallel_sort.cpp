@@ -48,7 +48,7 @@ size_t run_size;
 size_t buffer_size;
 constexpr int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 
-using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY>;
+using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, foxxll::default_alloc_strategy>;
 
 my_type::key_type checksum(vector_type& input)
 {
