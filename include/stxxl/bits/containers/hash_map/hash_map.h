@@ -342,11 +342,10 @@ public:
         // search external memory ...
         else
         {
-            tuple<external_size_type, value_type> result
-                = _find_key_external(bucket, value.first);
+            external_size_type i_external;
+            value_type ext_value;
 
-            external_size_type i_external = result.first;
-            value_type ext_value = result.second;
+            std::tie(i_external, ext_value) = _find_key_external(bucket, value.first);
 
             // ... if found, return iterator pointing to external position ...
             if (i_external < bucket.n_external_ && _eq(ext_value.first, value.first))
@@ -480,11 +479,10 @@ public:
         // check external memory
         else
         {
-            tuple<external_size_type, value_type> result
-                = _find_key_external(bucket, key);
+            external_size_type i_external;
+            value_type ext_value;
 
-            external_size_type i_external = result.first;
-            value_type ext_value = result.second;
+            std::tie(i_external, ext_value) =  _find_key_external(bucket, key);
 
             // found in external memory; add delete-node
             if (i_external < bucket.n_external_ && _eq(ext_value.first, key))
@@ -647,11 +645,10 @@ public:
         }
         // search external elements
         else {
-            tuple<external_size_type, value_type> result
-                = _find_key_external(bucket, key);
+            external_size_type i_external;
+            value_type value;
 
-            external_size_type i_external = result.first;
-            value_type value = result.second;
+            std::tie(i_external, value) = _find_key_external(bucket, key);
 
             // found in external memory
             if (i_external < bucket.n_external_ && _eq(value.first, key)) {
@@ -701,11 +698,10 @@ public:
         }
         // search external elements
         else {
-            tuple<external_size_type, value_type> result
-                = _find_key_external(bucket, key);
+            external_size_type i_external;
+            value_type value;
 
-            external_size_type i_external = result.first;
-            value_type value = result.second;
+            std::tie(i_external, value) = _find_key_external(bucket, key);
 
             // found in external memory
             if (i_external < bucket.n_external_ && _eq(value.first, key)) {
@@ -769,11 +765,10 @@ public:
         }
         // search external elements
         else {
-            tuple<external_size_type, value_type> result
-                = _find_key_external(bucket, key);
+            external_size_type i_external;
+            value_type found_value;
 
-            external_size_type i_external = result.first;
-            value_type found_value = result.second;
+            std::tie(i_external, found_value) = _find_key_external(bucket, key);
 
             value_type buffer_value =
                 (i_external < bucket.n_external_ && _eq(found_value.first, key))
@@ -976,7 +971,7 @@ protected:
      * Search for key in external part of bucket. Return value is (i_external,
      * value), where i_ext = bucket._num_external if key could not be found.
      */
-    tuple<external_size_type, value_type>
+    std::tuple<external_size_type, value_type>
     _find_key_external(const bucket_type& bucket, const key_type& key) const
     {
         subblock_type* subblock;
@@ -1018,14 +1013,14 @@ protected:
             value_type value = (*subblock)[i_lower];
 
             if (_eq(value.first, key))
-                return tuple<external_size_type, value_type>
+                return std::tuple<external_size_type, value_type>
                            (i_subblock * subblock_size + i_lower, value);
             else
-                return tuple<external_size_type, value_type>
+                return std::tuple<external_size_type, value_type>
                            (bucket.n_external_, value_type());
         }
 
-        return tuple<external_size_type, value_type>(
+        return std::tuple<external_size_type, value_type>(
             bucket.n_external_, value_type());
     }
 
