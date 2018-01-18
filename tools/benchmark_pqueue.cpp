@@ -31,6 +31,8 @@ static const char* description =
 #include <cstdint>
 #include <iomanip>
 #include <limits>
+#include <tuple>
+#include <stxxl/bits/common/comparator.h>
 
 using stxxl::external_size_type;
 
@@ -39,9 +41,9 @@ using stxxl::external_size_type;
 
 // *** Integer Pair Types
 
-using uint32_pair_type = stxxl::tuple<uint32_t, uint32_t>;
+using uint32_pair_type = std::tuple<uint32_t, uint32_t>;
 
-using uint64_pair_type = stxxl::tuple<uint64_t, uint64_t>;
+using uint64_pair_type = std::tuple<uint64_t, uint64_t>;
 
 // *** Larger Structure Type
 
@@ -63,22 +65,23 @@ struct my_type
         return my_type(std::numeric_limits<key_type>::max(),
                        std::numeric_limits<key_type>::max());
     }
+
+    static my_type min_value()
+    {
+        return my_type(std::numeric_limits<key_type>::min(),
+                       std::numeric_limits<key_type>::min());
+    }
 };
 
-template <typename ValueType>
-struct my_cmp : public std::binary_function<ValueType, ValueType, bool>
+namespace std {
+
+template<>
+struct tuple_element<0, my_type>
 {
-    bool operator () (const ValueType& a, const ValueType& b) const
-    {
-        // PQ is a max priority queue, thus compare greater
-        return a.first > b.first;
-    }
-
-    ValueType min_value() const
-    {
-        return ValueType::max_value();
-    }
+    using type = my_type::key_type;
 };
+
+}
 
 static inline void progress(const char* text, external_size_type i, external_size_type nelements)
 {
@@ -92,7 +95,7 @@ template <typename PQType>
 void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools)
 {
     using ValueType = typename PQType::value_type;
-    using KeyType = typename ValueType::first_type;
+    using KeyType = typename std::tuple_element<0, ValueType>::type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -128,7 +131,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         for (external_size_type i = 0; i < nelements; ++i)
         {
             STXXL_CHECK(!pq.empty());
-            STXXL_CHECK(pq.top().first == i + 1);
+            STXXL_CHECK(std::get<0>(pq.top()) == i + 1);
 
             pq.pop();
 
@@ -144,7 +147,7 @@ template <typename PQType>
 void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_pools)
 {
     using ValueType = typename PQType::value_type;
-    using KeyType = typename ValueType::first_type;
+    using KeyType = typename std::tuple_element<0, ValueType>::type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -211,7 +214,7 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
     const size_t mem_for_queue = mib_for_queue * MiB;
     const size_t mem_for_pools = mib_for_pools * MiB;
     using gen = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-              ValueType, my_cmp<ValueType>,
+              ValueType, stxxl::comparator<ValueType, stxxl::direction::Greater>,
               mem_for_queue,
               maxvolume* MiB / sizeof(ValueType)>;
 
