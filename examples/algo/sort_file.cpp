@@ -100,7 +100,7 @@ int main(int argc, char** argv)
         const my_type::key_type num_elements = 1 * 1024 * 1024;
         const size_t records_in_block = block_size / sizeof(my_type);
         foxxll::syscall_file f(argv[2], foxxll::file::CREAT | foxxll::file::RDWR);
-        my_type* array = (my_type*)foxxll::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
+        my_type* array = (my_type*)foxxll::aligned_alloc<foxxll::BlockAlignment>(block_size);
         memset(array, 0, block_size);
 
         my_type::key_type cur_key = num_elements;
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
             foxxll::request_ptr req = f.awrite((void*)array, uint64_t(i) * block_size, block_size);
             req->wait();
         }
-        foxxll::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);
+        foxxll::aligned_dealloc<foxxll::BlockAlignment>(array);
     }
     else {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
