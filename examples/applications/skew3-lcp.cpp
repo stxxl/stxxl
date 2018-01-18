@@ -41,6 +41,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stxxl/bits/common/comparator.h>
 
 using foxxll::external_size_type;
 
@@ -73,8 +74,8 @@ template <typename InputT, typename InputSA>
 bool sacheck(InputT& inputT, InputSA& inputSA)
 {
     using offset_type = typename InputSA::value_type;
-    using pair_type = stxxl::tuple<offset_type, offset_type>;
-    using triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
+    using pair_type = std::tuple<offset_type, offset_type>;
+    using triple_type = std::tuple<offset_type, offset_type, offset_type>;
 
     /// Pipeline Declaration
 
@@ -82,17 +83,17 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     using index_counter_type = stxxl::stream::counter<offset_type>;
     index_counter_type index_counter;
 
-    using tuple_index_sa_type = stxxl::stream::make_tuple<index_counter_type, InputSA>;
+    using tuple_index_sa_type = stxxl::stream::tuplestream<index_counter_type, InputSA>;
     tuple_index_sa_type tuple_index_sa(index_counter, inputSA);
 
     // take (i, SA[i]) and sort to (ISA[i], i)
-    using pair_less_type = stxxl::tuple_less2nd<pair_type>;
+    using pair_less_type = stxxl::comparator<pair_type, stxxl::direction::DontCare, stxxl::direction::Less>;
     using build_isa_type = typename stxxl::stream::sort<tuple_index_sa_type, pair_less_type>;
 
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
     // build (ISA[i], T[i], ISA[i+1]) and sort to (i, T[SA[i]], ISA[SA[i]+1])
-    typedef stxxl::tuple_less1st<triple_type> triple_less_type;             // comparison relation
+    using triple_less_type = stxxl::comparator<triple_type, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>;             // comparison relation
 
     typedef typename stxxl::stream::use_push<triple_type> triple_push_type; // indicator use push()
     using triple_rc_type = typename stxxl::stream::runs_creator<triple_push_type, triple_less_type>;
@@ -106,10 +107,10 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     // simultaneously create runs of triples by iterating ISA and T.
     size_type totalSize;
     {
-        offset_type prev_isa = (*build_isa).first;
+        offset_type prev_isa = std::get<0>(*build_isa);
         offset_type counter = 0;
         while (!build_isa.empty()) {
-            if ((*build_isa).second != counter) {
+            if (std::get<1>(*build_isa) != counter) {
                 std::cout << "Error: suffix array is not a permutation of 0..n-1." << std::endl;
                 return false;
             }
@@ -118,8 +119,8 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
             ++build_isa; // ISA is one in front of T
 
             if (!build_isa.empty()) {
-                triple_rc.push(triple_type(prev_isa, *inputT, (*build_isa).first));
-                prev_isa = (*build_isa).first;
+                triple_rc.push(triple_type(prev_isa, *inputT, std::get<0>(*build_isa)));
+                prev_isa = std::get<0>(*build_isa);
             }
             ++inputT;
         }
@@ -141,22 +142,22 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
         while (!triple_rm.empty()) {
             const triple_type& this_triple = *triple_rm;
 
-            if (prev_triple.second > this_triple.second)
+            if (std::get<1>(prev_triple) > std::get<1>(this_triple))
             {
                 // simple check of first character of suffix
                 std::cout << "Error: suffix array position "
                           << counter << " ordered incorrectly." << std::endl;
                 return false;
             }
-            else if (prev_triple.second == this_triple.second) {
-                if (this_triple.third == (offset_type)totalSize) {
+            else if (std::get<1>(prev_triple) == std::get<1>(this_triple)) {
+                if (std::get<2>(this_triple) == (offset_type)totalSize) {
                     // last suffix of string must be first among those with same first character
                     std::cout << "Error: suffix array position "
                               << counter << " ordered incorrectly." << std::endl;
                     return false;
                 }
-                if (prev_triple.third != (offset_type)totalSize &&
-                    prev_triple.third > this_triple.third) {
+                if (std::get<2>(prev_triple) != (offset_type)totalSize &&
+                    std::get<2>(prev_triple) > std::get<2>(this_triple)) {
                     // positions SA[i] and SA[i-1] has same first character but their suffixes are ordered incorrectly:
                     // the suffix position of SA[i] is given by ISA[SA[i]]
                     std::cout << "Error: suffix array position "
@@ -201,7 +202,7 @@ template <typename InputStream>
 struct sa_index_stream_type
 {
     using offset_type = typename InputStream::value_type;
-    using value_type = stxxl::tuple<offset_type, offset_type, offset_type>;
+    using value_type = std::tuple<offset_type, offset_type, offset_type>;
 
 private:
     size_type m_counter;
@@ -226,7 +227,7 @@ public:
     {
         ++m_input;
         if (!m_input.empty())
-            m_curr = value_type(*m_input, offset_type(m_counter++), m_curr.first);
+            m_curr = value_type(*m_input, offset_type(m_counter++), std::get<0>(m_curr));
         return *this;
     }
 
@@ -260,8 +261,8 @@ void lcparray_stxxl_kasai(const StringContainer& string,
 
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    using offset_pair_type = stxxl::tuple<offset_type, offset_type>;
-    using offset_triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
+    using offset_pair_type = std::tuple<offset_type, offset_type>;
+    using offset_triple_type = std::tuple<offset_type, offset_type, offset_type>;
 
     // define stream iterating over a STXXL vector
     using sa_stream_type = stxxl::stream::iterator2stream<typename SAContainer::const_iterator>;
@@ -269,7 +270,7 @@ void lcparray_stxxl_kasai(const StringContainer& string,
     sa_index_stream_type<sa_stream_type> sa_index_stream(sa_stream);
 
     // comparator for ISA sort: 1st component ascending
-    using offset_triple_less1st_type = stxxl::tuple_less1st<offset_triple_type>;
+    using offset_triple_less1st_type = stxxl::comparator<offset_triple_type, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>;
     offset_triple_less1st_type offset_triple_less1st;
 
     // runs creator for ISA stream
@@ -278,7 +279,7 @@ void lcparray_stxxl_kasai(const StringContainer& string,
 
     /// Output sorter.
 
-    using offset_pair_less1st_type = stxxl::tuple_less1st_less2nd<offset_pair_type>;
+    using offset_pair_less1st_type = stxxl::comparator<offset_pair_type>;
     offset_pair_less1st_type offset_pair_less1st;
 
     using lcp_sorter_type = stxxl::sorter<offset_pair_type, offset_pair_less1st_type, block_size>;
@@ -295,10 +296,10 @@ void lcparray_stxxl_kasai(const StringContainer& string,
         std::vector<alphabet_type> stringRAM(string.begin(), string.end());
 
         while (!isa_sort.empty()) {
-            offset_type k = isa_sort->second;  // k = ISA[i]
+            offset_type k = std::get<1>(*isa_sort);  // k = ISA[i]
 
             if (k > offset_type(0)) {
-                size_type j = isa_sort->third; // j = SA[k-1];
+                size_type j = std::get<2>(*isa_sort); // j = SA[k-1];
 
                 while (i + h < stringRAM.size() && j + h < stringRAM.size() &&
                        stringRAM[i + h] == stringRAM[j + h])
@@ -314,7 +315,7 @@ void lcparray_stxxl_kasai(const StringContainer& string,
 
     /// Collect output.
 
-    stxxl::stream::choose<lcp_sorter_type, 2> pair_2nd_stream(lcp_sorter);
+    stxxl::stream::choose<lcp_sorter_type, 1> pair_2nd_stream(lcp_sorter);
 
     lcp.resize(string.size());
     lcp_sorter.sort();
@@ -578,10 +579,10 @@ public:
     };
 
     // 2-tuple, 3-tuple, 4-tuple (=quads), 5-tuple(=quints) definition
-    using skew_pair_type = stxxl::tuple<offset_type, offset_type>;
-    using skew_triple_type = stxxl::tuple<offset_type, offset_type, offset_type>;
-    using skew_quad_type = stxxl::tuple<offset_type, offset_type, offset_type, offset_type>;
-    using skew_quint_type = stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type>;
+    using skew_pair_type = std::tuple<offset_type, offset_type>;
+    using skew_triple_type = std::tuple<offset_type, offset_type, offset_type>;
+    using skew_quad_type = std::tuple<offset_type, offset_type, offset_type, offset_type>;
+    using skew_quint_type = std::tuple<offset_type, offset_type, offset_type, offset_type, offset_type>;
 
     static const std::size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
@@ -595,21 +596,7 @@ public:
     /**
      * Comparison function for the mod0 tuples.
      */
-    struct less_mod0
-    {
-        using value_type = skew_quint_type;
-
-        bool operator () (const value_type& a, const value_type& b) const
-        {
-            if (a.second == b.second)
-                return a.fourth < b.fourth;
-            else
-                return a.second < b.second;
-        }
-
-        static value_type min_value() { return value_type::min_value(); }
-        static value_type max_value() { return value_type::max_value(); }
-    };
+    using less_mod0 = stxxl::comparator<skew_quint_type, stxxl::direction::DontCare, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::Less, stxxl::direction::DontCare>;
 
     /**
      * Counter for creating tuple indexes for example.
@@ -643,76 +630,18 @@ public:
     /**
      * Compares quadruples with respect to the first component.
      */
-    struct less_quad_2nd
-    {
-        using value_type = skew_quad_type;
-
-        bool operator () (const skew_quad_type& a, const skew_quad_type& b) const
-        {
-            return a.second < b.second;
-        }
-
-        static value_type min_value() { return value_type::min_value(); }
-        static value_type max_value() { return value_type::max_value(); }
-    };
+    using less_quad_2nd = stxxl::comparator<skew_quad_type, stxxl::direction::DontCare, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>;
 
     /**
      * Compares five-tuples with respect to the second component.
      */
-    struct less_quint_2nd
-    {
-        using value_type = skew_quint_type;
-
-        bool operator () (const value_type& a, const value_type& b) const
-        {
-            return a.second < b.second;
-        }
-
-        static value_type min_value() { return value_type::min_value(); }
-        static value_type max_value() { return value_type::max_value(); }
-    };
-
-    /**
-     * Put the (0 mod 2) [which are the 1,2 mod 3 tuples] tuples at the begin.
-     */
-    struct less_skew
-    {
-        using value_type = skew_pair_type;
-
-        bool operator () (const value_type& a, const value_type& b) const
-        {
-            if ((a.first & 1) == (b.first & 1))
-                return a.first < b.first;
-            else
-                return (a.first & 1) < (b.first & 1);
-        }
-
-        static value_type min_value() { return value_type::min_value(); }
-        static value_type max_value() { return value_type::max_value(); }
-    };
+    using less_quint_2nd = stxxl::comparator<skew_quint_type, stxxl::direction::DontCare, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare, stxxl::direction::DontCare>;
 
     /**
      * Compare two pairs by their first component.
      */
-    struct mod12Comparator
-    {
-        using value_type = skew_pair_type;
 
-        bool operator () (const value_type& a, const value_type& b) const
-        {
-            return a.first < b.first;
-        }
-
-        value_type min_value() const
-        {
-            return value_type(std::numeric_limits<offset_type>::min(), std::numeric_limits<offset_type>::min());
-        }
-
-        value_type max_value() const
-        {
-            return value_type(std::numeric_limits<offset_type>::max(), std::numeric_limits<offset_type>::max());
-        }
-    };
+    using mod12Comparator = stxxl::comparator<skew_pair_type, stxxl::direction::Less, stxxl::direction::DontCare>;
 
     /**
      * Concatenates two streams as streamA '+' streamB containing pairs.
@@ -764,21 +693,22 @@ public:
     /**
      * Sort skew_quad datatype.
      */
+    using less_quad_offset_type = stxxl::comparator<std::tuple<offset_type,offset_type,offset_type,offset_type>, stxxl::direction::DontCare>;
     template <typename alphabet_type>
     struct less_quad
     {
-        using value_type = typename stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
+        using value_type = typename std::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
 
         bool operator () (const value_type& a, const value_type& b) const
         {
-            if (a.second == b.second) {
-                if (a.third == b.third)
-                    return a.fourth < b.fourth;
+            if (std::get<1>(a) == std::get<1>(b)) {
+                if (std::get<2>(a) == std::get<2>(b))
+                    return std::get<3>(a) < std::get<3>(b);
                 else
-                    return a.third < b.third;
+                    return std::get<2>(a) < std::get<2>(b);
             }
             else {
-                return a.second < b.second;
+                return std::get<1>(a) < std::get<1>(b);
             }
         }
 
@@ -794,7 +724,7 @@ public:
     template <class quad_type>
     static inline bool quad_eq(const quad_type& a, const quad_type& b)
     {
-        return (a.second == b.second) && (a.third == b.third) && (a.fourth == b.fourth);
+        return (std::get<1>(a) == std::get<1>(b)) && (std::get<2>(a) == std::get<2>(b)) && (std::get<3>(a) == std::get<3>(b));
     }
 
     /**
@@ -803,9 +733,9 @@ public:
     template <class quad_type>
     static inline char quad_neq(const quad_type& a, const quad_type& b)
     {
-        if ((a.second == b.second) && (a.third == b.third))
+        if ((std::get<1>(a) == std::get<1>(b)) && (std::get<2>(a) == std::get<2>(b)))
             return 2;
-        else if (a.second == b.second)
+        else if (std::get<1>(a) == std::get<1>(b))
             return 1;
         else
             return 0;
@@ -840,8 +770,8 @@ public:
             prev = *A;
             LCPn->push_back(0); // insert zero sentinel to hold LCPn[0] = 0
 
-            result.first = prev.first;
-            result.second = lexname;
+            std::get<0>(result) = std::get<0>(prev);
+            std::get<1>(result) = lexname;
         }
 
         const value_type& operator * () const
@@ -863,14 +793,14 @@ public:
                 LCPn->push_back(quad_neq(prev, curr));
             }
             else {
-                if (!A.empty() && curr.second != offset_type(0)) {
+                if (!A.empty() && std::get<1>(curr) != offset_type(0)) {
                     LCPn->push_back(3);
                     unique = false;
                 }
             }
 
-            result.first = curr.first;
-            result.second = lexname;
+            std::get<0>(result) = std::get<0>(curr);
+            std::get<1>(result) = lexname;
 
             prev = curr;
             return *this;
@@ -946,7 +876,7 @@ public:
     class make_quads
     {
     public:
-        using value_type = stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
+        using value_type = std::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type>;
 
     private:
         Input& A;
@@ -968,23 +898,23 @@ public:
         {
             assert(!A.empty());
 
-            current.first = counter;
-            current.second = (*A).second + add_alphabet;
+            std::get<0>(current) = counter;
+            std::get<1>(current) = std::get<1>(*A) + add_alphabet;
             ++A;
 
             if (!A.empty()) {
-                current.third = (*A).second + add_alphabet;
+                std::get<2>(current) = std::get<1>(*A) + add_alphabet;
                 ++A;
             }
             else {
-                current.third = 0;
-                current.fourth = 0;
+                std::get<2>(current) = 0;
+                std::get<3>(current) = 0;
             }
 
             if (!A.empty())
-                current.fourth = (*A).second + add_alphabet;
+                std::get<3>(current) = std::get<1>(*A) + add_alphabet;
             else
-                current.fourth = 0;
+                std::get<3>(current) = 0;
         }
 
         const value_type& operator * () const
@@ -996,24 +926,24 @@ public:
         {
             assert(!A.empty() || !finished);
 
-            if (current.second != offset_type(0))
-                backup.push_back(current.second);
+            if (std::get<1>(current) != offset_type(0))
+                backup.push_back(std::get<1>(current));
 
             if (++z3z == 3) z3z = 0;
 
-            current.first = ++counter;
-            current.second = current.third;
-            current.third = current.fourth;
+            std::get<0>(current) = ++counter;
+            std::get<1>(current) = std::get<2>(current);
+            std::get<2>(current) = std::get<3>(current);
 
             if (!A.empty())
                 ++A;
 
             if (!A.empty())
-                current.fourth = (*A).second + add_alphabet;
+                std::get<3>(current) = std::get<1>(*A) + add_alphabet;
             else
-                current.fourth = 0;
+                std::get<3>(current) = 0;
 
-            if ((current.second == offset_type(0)) && (z3z != 1))
+            if ((std::get<1>(current) == offset_type(0)) && (z3z != 1))
                 finished = true;
 
             return *this;
@@ -1048,7 +978,7 @@ public:
             ++A, ++counter; // skip 0 = mod0 offset
             if (!A.empty()) {
                 result = *A;
-                result.first = output_counter;
+                std::get<0>(result) = output_counter;
             }
         }
 
@@ -1068,7 +998,7 @@ public:
 
             if (!A.empty()) {
                 result = *A;
-                result.first = output_counter;
+                std::get<0>(result) = output_counter;
             }
 
             return *this;
@@ -1769,28 +1699,28 @@ public:
 
         bool cmp_mod12()
         {
-            return s1.second < s2.second;
+            return std::get<1>(s1) < std::get<1>(s2);
         }
 
         bool cmp_mod02()
         {
-            if (s0.second == s2.third) {
-                if (s0.third == s2.fourth)
-                    return s0.fifth < s2.fifth;
+            if (std::get<1>(s0) == std::get<2>(s2)) {
+                if (std::get<2>(s0) == std::get<3>(s2))
+                    return std::get<4>(s0) < std::get<4>(s2);
                 else
-                    return s0.third < s2.fourth;
+                    return std::get<2>(s0) < std::get<3>(s2);
             }
             else {
-                return s0.second < s2.third;
+                return std::get<1>(s0) < std::get<2>(s2);
             }
         }
 
         bool cmp_mod01()
         {
-            if (s0.second == s1.third)
-                return s0.fourth < s1.fourth;
+            if (std::get<1>(s0) == std::get<2>(s1))
+                return std::get<3>(s0) < std::get<3>(s1);
             else
-                return s0.second < s1.third;
+                return std::get<1>(s0) < std::get<2>(s1);
         }
 
         /// Comparison part of merge.
@@ -1800,8 +1730,8 @@ public:
             if (last_type == offset_type(0)) {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
-                        b_lcp->saveRMQ(last_s0.fifth, s0.fifth);
-                        b_lcp->preprocessL3(last_s0.fifth, s0.fifth);
+                        b_lcp->saveRMQ(std::get<4>(last_s0), std::get<4>(s0));
+                        b_lcp->preprocessL3(std::get<4>(last_s0), std::get<4>(s0));
                         return 2;
                     }
                     else {
@@ -1818,8 +1748,8 @@ public:
             }
             else if (last_type == offset_type(1)) {
                 if (last1_winner == c1) {
-                    b_lcp->saveRMQ(last_s1.fourth, s0.fourth);
-                    b_lcp->preprocessL3(last_s1.fourth, s0.fourth);
+                    b_lcp->saveRMQ(std::get<3>(last_s1), std::get<3>(s0));
+                    b_lcp->preprocessL3(std::get<3>(last_s1), std::get<3>(s0));
                     return 1;
                 }
                 else {
@@ -1831,8 +1761,8 @@ public:
             else {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
-                        b_lcp->saveRMQ(last_s2.fifth, s0.fifth);
-                        b_lcp->preprocessL3(last_s2.fifth, s0.fifth);
+                        b_lcp->saveRMQ(std::get<4>(last_s2), std::get<4>(s0));
+                        b_lcp->preprocessL3(std::get<4>(last_s2), std::get<4>(s0));
                         return 2;
                     }
                     else {
@@ -1853,8 +1783,8 @@ public:
         {
             if (last_type == offset_type(0)) {
                 if (last1_winner == c1) {
-                    b_lcp->saveRMQ(last_s0.fourth, s1.fourth);
-                    b_lcp->preprocessL3(last_s0.fourth, s1.fourth);
+                    b_lcp->saveRMQ(std::get<3>(last_s0), std::get<3>(s1));
+                    b_lcp->preprocessL3(std::get<3>(last_s0), std::get<3>(s1));
                     return 1;
                 }
                 else {
@@ -1865,12 +1795,12 @@ public:
             }
             else {   // i.e. S1-S1 or S2-S1
                 if (last_type == offset_type(1)) {
-                    b_lcp->saveRMQ(s1.second - 1, s1.second);
-                    b_lcp->preprocessL3(last_s1.second, s1.second);
+                    b_lcp->saveRMQ(std::get<1>(s1) - 1, std::get<1>(s1));
+                    b_lcp->preprocessL3(std::get<1>(last_s1), std::get<1>(s1));
                 }
                 else {
-                    b_lcp->saveRMQ(s1.second - 1, s1.second);
-                    b_lcp->preprocessL3(last_s2.second, s1.second);
+                    b_lcp->saveRMQ(std::get<1>(s1) - 1, std::get<1>(s1));
+                    b_lcp->preprocessL3(std::get<1>(last_s2), std::get<1>(s1));
                 }
                 return 0;
             }
@@ -1881,8 +1811,8 @@ public:
             if (last_type == offset_type(0)) {
                 if (last1_winner == c1) {
                     if (last2_winner == c2) {
-                        b_lcp->saveRMQ(last_s0.fifth, s2.fifth);
-                        b_lcp->preprocessL3(last_s0.fifth, s2.fifth);
+                        b_lcp->saveRMQ(std::get<4>(last_s0), std::get<4>(s2));
+                        b_lcp->preprocessL3(std::get<4>(last_s0), std::get<4>(s2));
                         return 2;
                     }
                     else {
@@ -1899,12 +1829,12 @@ public:
             }
             else {   // i.e. S1-S2 or S2-S2
                 if (last_type == offset_type(1)) {
-                    b_lcp->saveRMQ(s2.second - 1, s2.second);
-                    b_lcp->preprocessL3(last_s1.second, s2.second);
+                    b_lcp->saveRMQ(std::get<1>(s2) - 1, std::get<1>(s2));
+                    b_lcp->preprocessL3(std::get<1>(last_s1), std::get<1>(s2));
                 }
                 else {
-                    b_lcp->saveRMQ(s2.second - 1, s2.second);
-                    b_lcp->preprocessL3(last_s2.second, s2.second);
+                    b_lcp->saveRMQ(std::get<1>(s2) - 1, std::get<1>(s2));
+                    b_lcp->preprocessL3(std::get<1>(last_s2), std::get<1>(s2));
                 }
                 return 0;
             }
@@ -1915,22 +1845,22 @@ public:
             if (cmp_mod01()) {
                 if (cmp_mod02()) {
                     selected = 0;
-                    merge_result = s0.first;
+                    merge_result = std::get<0>(s0);
 
-                    b_lcp->saveL1(l12_construction0(s0.second, s0.third));
-                    last1_winner = s0.second;
-                    last2_winner = s0.third;
+                    b_lcp->saveL1(l12_construction0(std::get<1>(s0), std::get<2>(s0)));
+                    last1_winner = std::get<1>(s0);
+                    last2_winner = std::get<2>(s0);
 
                     last_type = 0;
                     last_s0 = s0;
                 }
                 else {
                     selected = 2;
-                    merge_result = s2.first;
+                    merge_result = std::get<0>(s2);
 
-                    b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
-                    last1_winner = s2.third;
-                    last2_winner = s2.fourth;
+                    b_lcp->saveL1(l12_construction2(std::get<2>(s2), std::get<3>(s2)));
+                    last1_winner = std::get<2>(s2);
+                    last2_winner = std::get<3>(s2);
 
                     last_type = 2;
                     last_s2 = s2;
@@ -1939,21 +1869,21 @@ public:
             else {
                 if (cmp_mod12()) {
                     selected = 1;
-                    merge_result = s1.first;
+                    merge_result = std::get<0>(s1);
 
-                    b_lcp->saveL1(l12_construction1(s1.third));
-                    last1_winner = s1.third;
+                    b_lcp->saveL1(l12_construction1(std::get<2>(s1)));
+                    last1_winner = std::get<2>(s1);
 
                     last_type = 1;
                     last_s1 = s1;
                 }
                 else {
                     selected = 2;
-                    merge_result = s2.first;
+                    merge_result = std::get<0>(s2);
 
-                    b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
-                    last1_winner = s2.third;
-                    last2_winner = s2.fourth;
+                    b_lcp->saveL1(l12_construction2(std::get<2>(s2), std::get<3>(s2)));
+                    last1_winner = std::get<2>(s2);
+                    last2_winner = std::get<3>(s2);
 
                     last_type = 2;
                     last_s2 = s2;
@@ -1965,21 +1895,21 @@ public:
         {
             if (cmp_mod01()) {
                 selected = 0;
-                merge_result = s0.first;
+                merge_result = std::get<0>(s0);
 
-                b_lcp->saveL1(l12_construction0(s0.second, s0.third));
-                last1_winner = s0.second;
-                last2_winner = s0.third;
+                b_lcp->saveL1(l12_construction0(std::get<1>(s0), std::get<2>(s0)));
+                last1_winner = std::get<1>(s0);
+                last2_winner = std::get<2>(s0);
 
                 last_type = 0;
                 last_s0 = s0;
             }
             else {
                 selected = 1;
-                merge_result = s1.first;
+                merge_result = std::get<0>(s1);
 
-                b_lcp->saveL1(l12_construction1(s1.third));
-                last1_winner = s1.third;
+                b_lcp->saveL1(l12_construction1(std::get<2>(s1)));
+                last1_winner = std::get<2>(s1);
 
                 last_type = 1;
                 last_s1 = s1;
@@ -1990,21 +1920,21 @@ public:
         {
             if (cmp_mod12()) {
                 selected = 1;
-                merge_result = s1.first;
+                merge_result = std::get<0>(s1);
 
-                b_lcp->saveL1(l12_construction1(s1.third));
-                last1_winner = s1.third;
+                b_lcp->saveL1(l12_construction1(std::get<2>(s1)));
+                last1_winner = std::get<2>(s1);
 
                 last_type = 1;
                 last_s1 = s1;
             }
             else {
                 selected = 2;
-                merge_result = s2.first;
+                merge_result = std::get<0>(s2);
 
-                b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
-                last1_winner = s2.third;
-                last2_winner = s2.fourth;
+                b_lcp->saveL1(l12_construction2(std::get<2>(s2), std::get<3>(s2)));
+                last1_winner = std::get<2>(s2);
+                last2_winner = std::get<3>(s2);
 
                 last_type = 2;
                 last_s2 = s2;
@@ -2015,22 +1945,22 @@ public:
         {
             if (cmp_mod02()) {
                 selected = 0;
-                merge_result = s0.first;
+                merge_result = std::get<0>(s0);
 
-                b_lcp->saveL1(l12_construction0(s0.second, s0.third));
-                last1_winner = s0.second;
-                last2_winner = s0.third;
+                b_lcp->saveL1(l12_construction0(std::get<1>(s0), std::get<2>(s0)));
+                last1_winner = std::get<1>(s0);
+                last2_winner = std::get<2>(s0);
 
                 last_type = 0;
                 last_s0 = s0;
             }
             else {
                 selected = 2;
-                merge_result = s2.first;
+                merge_result = std::get<0>(s2);
 
-                b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
-                last1_winner = s2.third;
-                last2_winner = s2.fourth;
+                b_lcp->saveL1(l12_construction2(std::get<2>(s2), std::get<3>(s2)));
+                last1_winner = std::get<2>(s2);
+                last2_winner = std::get<3>(s2);
 
                 last_type = 2;
                 last_s2 = s2;
@@ -2054,11 +1984,11 @@ public:
                     }
                     else {
                         selected = 0;
-                        merge_result = s0.first;
+                        merge_result = std::get<0>(s0);
 
-                        b_lcp->saveL1(l12_construction0(s0.second, s0.third));
-                        last1_winner = s0.second;
-                        last2_winner = s0.third;
+                        b_lcp->saveL1(l12_construction0(std::get<1>(s0), std::get<2>(s0)));
+                        last1_winner = std::get<1>(s0);
+                        last2_winner = std::get<2>(s0);
 
                         last_type = 0;
                         last_s0 = s0;
@@ -2072,10 +2002,10 @@ public:
                     }
                     else {
                         selected = 1;
-                        merge_result = s1.first;
+                        merge_result = std::get<0>(s1);
 
-                        b_lcp->saveL1(l12_construction1(s1.third));
-                        last1_winner = s1.third;
+                        b_lcp->saveL1(l12_construction1(std::get<2>(s1)));
+                        last1_winner = std::get<2>(s1);
 
                         last_type = 1;
                         last_s1 = s1;
@@ -2084,11 +2014,11 @@ public:
                 else {
                     if (exists[2]) {
                         selected = 2;
-                        merge_result = s2.first;
+                        merge_result = std::get<0>(s2);
 
-                        b_lcp->saveL1(l12_construction2(s2.third, s2.fourth));
-                        last1_winner = s2.third;
-                        last2_winner = s2.fourth;
+                        b_lcp->saveL1(l12_construction2(std::get<2>(s2), std::get<3>(s2)));
+                        last1_winner = std::get<2>(s2);
+                        last2_winner = std::get<3>(s2);
 
                         last_type = 2;
                         last_s2 = s2;
@@ -2440,9 +2370,9 @@ public:
         unsigned int rec_depth; // current recusion depth of the algorithm
 
         using mod12cmp = mod12Comparator;
-        using mod12_sorter_type = stxxl::sorter<stxxl::tuple<offset_type, offset_type>, mod12cmp, block_size>;
+        using mod12_sorter_type = stxxl::sorter<std::tuple<offset_type, offset_type>, mod12cmp, block_size>;
 
-        using isa_second_type = stxxl::stream::choose<mod12_sorter_type, 2>;
+        using isa_second_type = stxxl::stream::choose<mod12_sorter_type, 1>;
         using buildSA_type = build_sa<offset_array_it_rg, isa_second_type, isa_second_type>;
         using precompute_isa_type = make_pairs<buildSA_type, counter_stream_type>;
 
@@ -2461,7 +2391,7 @@ public:
             using mod12_quads_input_type = extract_mod12<make_quads_input_type>;
 
             // sort (i,t_i,t_{i+1},t_{i+2}) by (t_i,t_{i+1},t_{i+2})
-            using sort_mod12_input_type = typename stxxl::stream::sort<mod12_quads_input_type, less_quad<offset_type>, block_size>;
+            using sort_mod12_input_type = typename stxxl::stream::sort<mod12_quads_input_type, less_quad_offset_type, block_size>;
 
             // name (i,t_i,t_{i+1},t_{i+2}) -> (i,n_i)
             using naming_input_type = naming<sort_mod12_input_type>;
@@ -2473,7 +2403,7 @@ public:
             mod12_sorter_type m2_sorter(mod12cmp(), ram_use / 6);
 
             // sorted mod1 runs -concat- sorted mod2 runs
-            using concatenation = concat<stxxl::tuple<offset_type, offset_type>, mod12_sorter_type, mod12_sorter_type>;
+            using concatenation = concat<std::tuple<offset_type, offset_type>, mod12_sorter_type, mod12_sorter_type>;
 
             offset_array_type text;
 
@@ -2484,7 +2414,7 @@ public:
             mod12_quads_input_type mod12_quads_input(quads_input);
 
             // sort (i,t_i,t_{i+1},t_{i+2}) by (t_i,t_i+1},t_{i+2})
-            sort_mod12_input_type sort_mod12_input(mod12_quads_input, less_quad<offset_type>(), ram_use / 6);
+            sort_mod12_input_type sort_mod12_input(mod12_quads_input, less_quad_offset_type(), ram_use / 6);
 
             // lcpn sequence
             simpleDeq* lcp_names = new simpleDeq;
@@ -2495,7 +2425,7 @@ public:
             // create (i, s^12[i])
             while (!names_input.empty()) {
                 const skew_pair_type& tmp = *names_input;
-                if (tmp.first & 1)
+                if (std::get<0>(tmp) & 1)
                     m2_sorter.push(tmp);
                 else
                     m1_sorter.push(tmp);
@@ -2537,9 +2467,9 @@ public:
                 simpleDeq* SA12 = new simpleDeq;
 
                 while (!sa_pairs.empty()) {
-                    const skew_pair_type& tmp = *sa_pairs; // tmp.first is exactly the SA12 array
-                    SA12->push_back(tmp.first);            // save current SA^12 vector
-                    if (tmp.first < mod2_pos)
+                    const skew_pair_type& tmp = *sa_pairs; // std::get<0>(tmp) is exactly the SA12 array
+                    SA12->push_back(std::get<0>(tmp));            // save current SA^12 vector
+                    if (std::get<0>(tmp) < mod2_pos)
                         isa1_type.push(tmp);
                     else
                         isa2_type.push(tmp);

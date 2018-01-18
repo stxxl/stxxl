@@ -14,6 +14,8 @@
 #ifndef STXXL_STREAM_CHOOSE_HEADER
 #define STXXL_STREAM_CHOOSE_HEADER
 
+#include <tuple>
+
 namespace stxxl {
 
 //! Stream package subnamespace.
@@ -23,17 +25,13 @@ namespace stream {
 //     CHOOSE                                                         //
 ////////////////////////////////////////////////////////////////////////
 
-template <class Input, int Which>
+//! Creates stream from a tuple stream taking the which component of each tuple.
+//!
+//! \tparam Input type of the input tuple stream
+//!
+//! \remark Tuple stream is a stream which \c value_type is \c std::tuple .
+template<class Input, int Which>
 class choose
-{ };
-
-//! Creates stream from a tuple stream taking the first component of each tuple.
-//!
-//! \tparam Input type of the input tuple stream
-//!
-//! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input>
-class choose<Input, 1>
 {
     Input& in;
 
@@ -41,25 +39,25 @@ class choose<Input, 1>
 
 public:
     //! Standard stream typedef.
-    using value_type = typename tuple_type::first_type;
+    using value_type = typename std::tuple_element<Which, tuple_type>::type;
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
-    { }
+    {}
 
     //! Standard stream method.
-    const value_type& operator * () const
+    const value_type& operator*() const
     {
-        return (*in).first;
+        return std::get<Which>(*in);
     }
 
-    const value_type* operator -> () const
+    const value_type* operator->() const
     {
-        return &(*in).first;
+        return &std::get<Which>(*in);
     }
 
     //! Standard stream method.
-    choose& operator ++ ()
+    choose& operator++()
     {
         ++in;
         return *this;
@@ -72,237 +70,8 @@ public:
     }
 };
 
-//! Creates stream from a tuple stream taking the second component of each tuple.
-//!
-//! \tparam Input type of the input tuple stream
-//!
-//! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input>
-class choose<Input, 2>
-{
-    Input& in;
+}  // namespace stream
 
-    using tuple_type = typename Input::value_type;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename tuple_type::second_type;
-
-    //! Construction.
-    explicit choose(Input& in_) : in(in_)
-    { }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return (*in).second;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &(*in).second;
-    }
-
-    //! Standard stream method.
-    choose& operator ++ ()
-    {
-        ++in;
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return in.empty();
-    }
-};
-
-//! Creates stream from a tuple stream taking the third component of each tuple.
-//!
-//! \tparam Input type of the input tuple stream
-//!
-//! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input>
-class choose<Input, 3>
-{
-    Input& in;
-
-    using tuple_type = typename Input::value_type;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename tuple_type::third_type;
-
-    //! Construction.
-    explicit choose(Input& in_) : in(in_)
-    { }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return (*in).third;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &(*in).third;
-    }
-
-    //! Standard stream method.
-    choose& operator ++ ()
-    {
-        ++in;
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return in.empty();
-    }
-};
-
-//! Creates stream from a tuple stream taking the fourth component of each tuple.
-//!
-//! \tparam Input type of the input tuple stream
-//!
-//! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input>
-class choose<Input, 4>
-{
-    Input& in;
-
-    using tuple_type = typename Input::value_type;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename tuple_type::fourth_type;
-
-    //! Construction.
-    explicit choose(Input& in_) : in(in_)
-    { }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return (*in).fourth;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &(*in).fourth;
-    }
-
-    //! Standard stream method.
-    choose& operator ++ ()
-    {
-        ++in;
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return in.empty();
-    }
-};
-
-//! Creates stream from a tuple stream taking the fifth component of each tuple.
-//!
-//! \tparam Input type of the input tuple stream
-//!
-//! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input>
-class choose<Input, 5>
-{
-    Input& in;
-
-    using tuple_type = typename Input::value_type;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename tuple_type::fifth_type;
-
-    //! Construction.
-    explicit choose(Input& in_) : in(in_)
-    { }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return (*in).fifth;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &(*in).fifth;
-    }
-
-    //! Standard stream method.
-    choose& operator ++ ()
-    {
-        ++in;
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return in.empty();
-    }
-};
-
-//! Creates stream from a tuple stream taking the sixth component of each tuple.
-//!
-//! \tparam Input type of the input tuple stream
-//!
-//! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-template <class Input>
-class choose<Input, 6>
-{
-    Input& in;
-
-    using tuple_type = typename Input::value_type;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename tuple_type::sixth_type;
-
-    //! Construction.
-    explicit choose(Input& in_) : in(in_)
-    { }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return (*in).sixth;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &(*in).sixth;
-    }
-
-    //! Standard stream method.
-    choose& operator ++ ()
-    {
-        ++in;
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return in.empty();
-    }
-};
-
-//! \}
-
-} // namespace stream
-} // namespace stxxl
-
-#include <stxxl/bits/stream/unique.h>
+}  // namespace stxxl
 
 #endif // !STXXL_STREAM_CHOOSE_HEADER
-// vim: et:ts=4:sw=4
