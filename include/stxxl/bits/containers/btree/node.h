@@ -639,11 +639,13 @@ public:
     {
         const unsigned total_size = left.size() + size();
         unsigned new_left_size = total_size / 2;
-        STXXL_ASSERT(!check_constraints || new_left_size <= left.max_nelements());
-        STXXL_ASSERT(!check_constraints || new_left_size >= left.min_nelements());
         unsigned new_right_size = total_size - new_left_size;
-        STXXL_ASSERT(!check_constraints || new_right_size <= max_nelements());
-        STXXL_ASSERT(!check_constraints || new_right_size >= min_nelements());
+
+        assert(!check_constraints || new_left_size <= left.max_nelements());
+        assert(!check_constraints || new_left_size >= left.min_nelements());
+        assert(!check_constraints || new_right_size <= max_nelements());
+        assert(!check_constraints || new_right_size >= min_nelements());
+        tlx::unused(check_constraints);
 
         assert(m_vcmp(left.back(), front()) || size() == 0);
 

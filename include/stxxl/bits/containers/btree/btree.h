@@ -109,9 +109,9 @@ private:
 
     void insert_into_root(const std::pair<key_type, node_bid_type>& splitter)
     {
-        std::pair<root_node_iterator_type, bool> result =
-            m_root_node.insert(splitter);
-        STXXL_ASSERT(result.second == true);
+        std::pair<root_node_iterator_type, bool> result = m_root_node.insert(splitter);
+        assert(result.second);
+        tlx::unused(result);
 
         if (m_root_node.size() > max_node_size) // root overflow
         {

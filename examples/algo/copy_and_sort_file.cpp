@@ -111,7 +111,8 @@ int main(int argc, char** argv)
     sort_stream_type sort_stream(input_stream, comparator_type(), memory_to_use);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
-    STXXL_ASSERT(o == output.end());
+    assert(o == output.end());
+    tlx::unused(o);
 
     if (1) {
         LOG1 << "Checking order...";

@@ -14,10 +14,12 @@
 //! This is an example of how to represent a 2D matrix by using an \c stxxl::vector.
 //! DISCLAIMER: The approach is very basic and the matrix multiplication is NOT I/O-EFFICIENT.
 
+#include <cassert>
 #include <iostream>
-#include <stxxl/vector>
 
 #include <tlx/logger.hpp>
+
+#include <stxxl/vector>
 
 template <typename T>
 class matrix2d

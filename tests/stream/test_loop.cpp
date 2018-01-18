@@ -21,12 +21,13 @@
 //! next pass. The loop will terminate if at most one element remains.
 //! A split sorter is used to cut the data flow (and type dependency) cycle.
 
+#include <cassert>
+#include <iostream>
+#include <limits>
+
 #include <foxxll/mng.hpp>
 #include <stxxl/stream>
 #include <stxxl/vector>
-
-#include <iostream>
-#include <limits>
 
 using std::cout;
 using std::endl;

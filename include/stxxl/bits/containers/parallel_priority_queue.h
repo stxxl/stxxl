@@ -316,7 +316,7 @@ public:
           m_block_pointers(1)
     {
         std::swap(m_values, values);
-        STXXL_ASSERT(m_values.size() > 0);
+        assert(m_values.size() > 0);
         m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.begin()) + m_values.size());
     }
 
@@ -1574,7 +1574,7 @@ public:
     {
         m_live_boundary.clear(); // release block boundaries
 #ifndef NDEBUG
-        STXXL_ASSERT(m_ref_total == 0);
+        assert(m_ref_total == 0);
 #endif
         m_ea.finish_write();
     }
@@ -2922,7 +2922,8 @@ public:
             wait_next_ea_blocks(limiting_ea_index);
             // consider next limiting EA
             limiting_ea_index = m_external_min_tree.top();
-            STXXL_ASSERT(limiting_ea_index < eas);
+            assert(limiting_ea_index < eas);
+            tlx::unused(limiting_ea_index);
         }
 
         // build sequences
@@ -3446,7 +3447,7 @@ public:
 
             // -tb: this may recursively call this function!
             //flush_ia_ea_until_memory_free(mem_needed);
-            STXXL_ASSERT(m_mem_left >= mem_needed);
+            assert(m_mem_left >= mem_needed);
 
             while (new_num_read_blocks > m_num_read_blocks) {
                 block_type* new_block = new block_type();
@@ -3690,10 +3691,12 @@ protected:
                     }
                 }
 
-                STXXL_ASSERT(gmin_index == test_gmin_index);
+                assert(gmin_index == test_gmin_index);
+                tlx::unused(gmin_index);
             }
             else {
-                STXXL_ASSERT(!needs_limit);
+                assert(!needs_limit);
+                tlx::unused(needs_limit);
             }
         }
         m_stats.refill_minmax_time.stop();
@@ -4245,7 +4248,7 @@ protected:
             return;
         m_mem_left -= external_array_type::int_memory(level_size);
 
-        STXXL_ASSERT(force_merge_all || c_max_external_level_size == ea_index.size());
+        assert(force_merge_all || c_max_external_level_size == ea_index.size());
         const size_t num_arrays_to_merge = ea_index.size();
 
         STXXL_DEBUG("merging external arrays" <<
@@ -4462,8 +4465,8 @@ protected:
         assert(size > used); // at least one element
 
         internal_array_type new_array(values, used, level);
-        STXXL_ASSERT(new_array.int_memory() ==
-                     internal_array_type::int_memory(capacity));
+        assert(new_array.int_memory() ==
+               internal_array_type::int_memory(capacity));
         m_internal_arrays.swap_back(new_array);
 
         if (!extract_buffer_empty()) {
@@ -4509,7 +4512,7 @@ protected:
         if (m_mem_left < internal_array_type::int_memory(level_size)) return;
 
         // must free up more memory than the new array needs.
-        STXXL_ASSERT(int_memory >= internal_array_type::int_memory(level_size));
+        assert(int_memory >= internal_array_type::int_memory(level_size));
 
         STXXL_DEBUG("merging internal arrays" <<
                     " level=" << level <<

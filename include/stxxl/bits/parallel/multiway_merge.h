@@ -396,7 +396,8 @@ RandomAccessIterator3 multiway_merge_3_variant(
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 3);
+    assert(seqs_end - seqs_begin == 3);
+    tlx::unused(seqs_end);
     using RandomAccessIterator = typename std::iterator_traits<RandomAccessIteratorIterator>
                                  ::value_type::first_type;
 
@@ -488,7 +489,7 @@ RandomAccessIterator3 multiway_merge_3_combined(
                      ::difference_type;
 
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 3);
+    assert(seqs_end - seqs_begin == 3);
 
     int min_seq;
     RandomAccessIterator3 target_end;
@@ -584,7 +585,8 @@ RandomAccessIterator3 multiway_merge_4_variant(
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 4);
+    assert(seqs_end - seqs_begin == 4);
+    tlx::unused(seqs_end);
     using RandomAccessIterator = typename std::iterator_traits<RandomAccessIteratorIterator>
                                  ::value_type::first_type;
 
@@ -702,7 +704,7 @@ RandomAccessIterator3 multiway_merge_4_combined(
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 4);
+    assert(seqs_end - seqs_begin == 4);
     using RandomAccessIteratorPair = typename std::iterator_traits<RandomAccessIteratorIterator>
                                      ::value_type;
     using DiffType = typename std::iterator_traits<RandomAccessIteratorIterator>

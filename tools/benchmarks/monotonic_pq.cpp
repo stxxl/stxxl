@@ -12,11 +12,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cassert>
 #include <limits>
 #include <queue>
-#include <cassert>
-
-#include <tlx/logger.hpp>
 
 #include <tlx/logger.hpp>
 

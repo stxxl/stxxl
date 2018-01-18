@@ -13,6 +13,7 @@
 #ifndef STXXL_TESTS_KEYWITHPADDING_HEADER
 #define STXXL_TESTS_KEYWITHPADDING_HEADER
 
+#include <cassert>
 #include <iostream>
 #include <limits>
 
