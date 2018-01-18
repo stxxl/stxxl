@@ -3595,24 +3595,24 @@ public:
     //! Print statistics.
     void print_stats() const
     {
-        STXXL_VARDUMP(c_merge_sorted_heaps);
-        STXXL_VARDUMP(c_limit_extract_buffer);
-        STXXL_VARDUMP(c_single_insert_limit);
+        LOG << "c_merge_sorted_heaps = " << c_merge_sorted_heaps;
+        LOG << "c_limit_extract_buffer = " << c_limit_extract_buffer;
+        LOG << "c_single_insert_limit = " << c_single_insert_limit;
 
         if (c_limit_extract_buffer) {
-            STXXL_VARDUMP(m_extract_buffer_limit);
+            LOG << "m_extract_buffer_limit = " << m_extract_buffer_limit;
             STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(value_type));
         }
 
 #if STXXL_PARALLEL
-        STXXL_VARDUMP(omp_get_max_threads());
+        LOG << "omp_get_max_threads() = " << omp_get_max_threads();
 #endif
 
         STXXL_MEMDUMP(m_mem_for_heaps);
         STXXL_MEMDUMP(m_mem_left);
 
         //if (num_extract_buffer_refills > 0) {
-        //    STXXL_VARDUMP(total_extract_buffer_size / num_extract_buffer_refills);
+        //    LOG << "total_extract_buffer_size / num_extract_buffer_refills = " << total_extract_buffer_size / num_extract_buffer_refills;
         //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
         //}
 

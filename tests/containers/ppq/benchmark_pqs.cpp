@@ -1500,13 +1500,13 @@ void print_params()
     STXXL_MEMDUMP(volume);
     STXXL_MEMDUMP(block_size);
     STXXL_MEMDUMP(single_heap_ram);
-    STXXL_VARDUMP(bulk_size);
+    LOG << "bulk_size = " << bulk_size;
     STXXL_MEMDUMP(extract_buffer_ram);
-    STXXL_VARDUMP(num_elements);
-    STXXL_VARDUMP(g_max_threads);
-    STXXL_VARDUMP(num_write_buffers);
-    STXXL_VARDUMP(num_prefetchers);
-    STXXL_VARDUMP(num_read_blocks);
+    LOG << "num_elements = " << num_elements;
+    LOG << "g_max_threads = " << g_max_threads;
+    LOG << "num_write_buffers = " << num_write_buffers;
+    LOG << "num_prefetchers = " << num_prefetchers;
+    LOG << "num_read_blocks = " << num_read_blocks;
 }
 
 /*

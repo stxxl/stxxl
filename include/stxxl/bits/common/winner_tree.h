@@ -360,7 +360,7 @@ public:
     //! Print statistical data.
     void print_stats() const
     {
-        STXXL_VARDUMP(m_num_slots);
+        LOG << "m_num_slots = " << m_num_slots;
         LOG1 << m_stats;
     }
 };

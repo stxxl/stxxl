@@ -90,9 +90,9 @@ int run_external_array_test(size_t volume)
     const size_t N = volume / sizeof(value_type);
     const size_t num_blocks = foxxll::div_ceil(N, block_size);
 
-    STXXL_VARDUMP(block_size);
-    STXXL_VARDUMP(N);
-    STXXL_VARDUMP(num_blocks);
+    LOG << "block_size = " << block_size;
+    LOG << "N = " << N;
+    LOG << "num_blocks = " << num_blocks;
 
     ea_type::pool_type rw_pool(6 * num_blocks, 4);
     ea_type ea(N, &rw_pool);
@@ -233,9 +233,9 @@ int run_multiway_merge(size_t volume)
     LOG1 << "--- Running run_multiway_merge() test with " <<
         NumEAs << " external arrays";
 
-    STXXL_VARDUMP(block_size);
-    STXXL_VARDUMP(size);
-    STXXL_VARDUMP(num_blocks);
+    LOG << "block_size = " << block_size;
+    LOG << "size = " << size;
+    LOG << "num_blocks = " << num_blocks;
 
     std::vector<value_type> v(size);
 
@@ -368,7 +368,7 @@ int run_multiway_merge(size_t volume)
 int run_internal_array_test(size_t volume)
 {
     const size_t size = volume / sizeof(value_type);
-    STXXL_VARDUMP(size);
+    LOG << "size = " << size;
     die_unless(size > 3);
 
     std::vector<value_type> v(size);
@@ -414,7 +414,7 @@ int run_upper_bound_test(size_t volume)
 {
     const size_t size = volume / sizeof(value_type);
     die_unless(volume > ea_type::block_size);
-    STXXL_VARDUMP(size);
+    LOG << "size = " << size;
     die_unless(size > 2000);
 
     ea_type::pool_type rw_pool;
@@ -517,8 +517,8 @@ int main(int argc, char** argv)
     STXXL_MEMDUMP(mwmvolume);
     STXXL_MEMDUMP(iavolume);
     STXXL_MEMDUMP(sizeof(value_type));
-    STXXL_VARDUMP(numpbs);
-    STXXL_VARDUMP(numwbs);
+    LOG << "numpbs = " << numpbs;
+    LOG << "numwbs = " << numwbs;
 
     bool succ = EXIT_SUCCESS;
 
