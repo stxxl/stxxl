@@ -15,6 +15,8 @@
  **************************************************************************/
 
 #include <foxxll/io.hpp>
+#include <iostream>
+
 #include <stxxl/stream>
 #include <stxxl/vector>
 

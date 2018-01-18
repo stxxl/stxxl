@@ -20,6 +20,8 @@
 //! \example algo/test_random_shuffle.cpp
 //! Test \c stxxl::random_shuffle()
 
+#include <iostream>
+
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/defines.h>

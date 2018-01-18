@@ -14,6 +14,7 @@
 //! This is an example of how to use \c stxxl::external_array
 
 #include <cstddef>
+#include <iostream>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>

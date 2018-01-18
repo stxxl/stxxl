@@ -11,6 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <algorithm>
+#include <iostream>
+
 #include <tlx/logger.hpp>
 
 #include <foxxll/common/utils.hpp>
@@ -20,8 +23,6 @@
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/version.h>
-
-#include <algorithm>
 
 int stxxl_info(int, char**)
 {

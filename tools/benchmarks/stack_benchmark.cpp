@@ -18,6 +18,8 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
+#include <iostream>
+
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 

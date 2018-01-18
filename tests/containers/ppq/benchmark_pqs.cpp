@@ -21,6 +21,7 @@ static const char* description =
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
+#include <iostream>
 #include <limits>
 #include <queue>
 #include <utility>

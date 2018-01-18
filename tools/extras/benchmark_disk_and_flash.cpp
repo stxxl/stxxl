@@ -10,12 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iomanip>
+#include <iostream>
+#include <vector>
+
 #include <tlx/logger.hpp>
 
 #include <foxxll/io.hpp>
-
-#include <iomanip>
-#include <vector>
 
 using foxxll::request_ptr;
 using foxxll::file;

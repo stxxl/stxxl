@@ -13,6 +13,7 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <iostream>
 #include <iterator>
 
 #include <tlx/die.hpp>

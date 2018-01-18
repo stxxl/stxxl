@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 #include <tlx/die.hpp>

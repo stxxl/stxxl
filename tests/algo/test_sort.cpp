@@ -16,6 +16,8 @@
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
+#include <iostream>
+
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 

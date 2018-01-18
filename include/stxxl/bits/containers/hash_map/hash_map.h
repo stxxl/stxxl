@@ -14,7 +14,17 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include <foxxll/mng/block_manager.hpp>
+
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/sort_stream.h>
 #include <stxxl/bits/stream/stream.h>
@@ -23,14 +33,6 @@
 #include <stxxl/bits/containers/hash_map/iterator.h>
 #include <stxxl/bits/containers/hash_map/iterator_map.h>
 #include <stxxl/bits/containers/hash_map/util.h>
-
-#include <algorithm>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <tuple>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 

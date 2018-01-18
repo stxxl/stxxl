@@ -10,16 +10,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <tlx/logger.hpp>
-
-#include <foxxll/io.hpp>
-#include <stxxl/timer>
-
 #include <algorithm>
 #include <cinttypes>
 #include <cstdio>
 #include <iomanip>
+#include <iostream>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <foxxll/io.hpp>
+#include <stxxl/timer>
 
 using foxxll::request_ptr;
 using foxxll::file;

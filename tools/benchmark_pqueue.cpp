@@ -21,6 +21,11 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
@@ -30,10 +35,6 @@ static const char* description =
 #include <stxxl/priority_queue>
 #include <stxxl/random>
 #include <stxxl/timer>
-
-#include <cstdint>
-#include <iomanip>
-#include <limits>
 
 using stxxl::external_size_type;
 

@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 #include <tlx/die.hpp>

@@ -18,6 +18,7 @@
 //! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
 //! and \c stxxl::priority_queue
 
+#include <iostream>
 #include <limits>
 
 #include <tlx/die.hpp>

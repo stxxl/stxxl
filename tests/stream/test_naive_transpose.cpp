@@ -22,6 +22,7 @@
 //! memory matrix transpostion than sorting, see e.g. J.S. Vitter: Algorithms
 //! and Data Structures for External Memory, Chapter 7.2.
 
+#include <iostream>
 #include <limits>
 #include <vector>
 

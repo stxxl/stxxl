@@ -19,6 +19,7 @@
 //! DOI: 10.1002/spe.844
 
 #include <cassert>
+#include <iostream>
 #include <limits>
 
 #include <tlx/die.hpp>

@@ -13,11 +13,13 @@
 #define USE_STXXL
 
 //! [prolog]
-#include <algorithm>    // for STL std::sort
-#include <ctime>        // for time_t type
-#include <fstream>      // for std::fstream
+#include <algorithm>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
 #include <stxxl.h>      // STXXL header
-#include <vector>       // for STL std::vector
 
 #define CT_PER_MIN 2    // subscribers pay 2 cent per minute
 

@@ -14,13 +14,14 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_ITERATOR_MAP_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_ITERATOR_MAP_HEADER
 
-#include <stxxl/bits/containers/hash_map/iterator.h>
-
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include <stxxl/bits/containers/hash_map/iterator.h>
 
 namespace stxxl {
 namespace hash_map {

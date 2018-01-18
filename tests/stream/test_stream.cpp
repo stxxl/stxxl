@@ -17,6 +17,7 @@
 //! stream package. The example sorts characters of a string producing an
 //! array of sorted tuples (character, index position).
 
+#include <iostream>
 #include <limits>
 #include <vector>
 

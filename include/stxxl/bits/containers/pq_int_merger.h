@@ -16,11 +16,12 @@
 #ifndef STXXL_CONTAINERS_PQ_INT_MERGER_HEADER
 #define STXXL_CONTAINERS_PQ_INT_MERGER_HEADER
 
-#include <stxxl/bits/containers/pq_mergers.h>
-
 #include <algorithm>
+#include <iostream>
 #include <utility>
 #include <vector>
+
+#include <stxxl/bits/containers/pq_mergers.h>
 
 namespace stxxl {
 

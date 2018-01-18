@@ -16,10 +16,12 @@
 #ifndef STXXL_CONTAINERS_PQ_MERGERS_HEADER
 #define STXXL_CONTAINERS_PQ_MERGERS_HEADER
 
-#include <stxxl/bits/containers/pq_helpers.h>
+#include <algorithm>
+#include <iostream>
+
 #include <tlx/meta/log2.hpp>
 
-#include <algorithm>
+#include <stxxl/bits/containers/pq_helpers.h>
 
 namespace stxxl {
 

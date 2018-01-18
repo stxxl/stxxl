@@ -21,6 +21,7 @@
 #define STXXL_CONTAINERS_PRIORITY_QUEUE_HEADER
 
 #include <algorithm>
+#include <iostream>
 #include <type_traits>
 #include <utility>
 #include <vector>
