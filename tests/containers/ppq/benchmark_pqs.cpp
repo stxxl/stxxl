@@ -1721,16 +1721,16 @@ int main(int argc, char* argv[])
         using spq_type = CStxxlPQ<my8_type>;
         spq_type* spq = new spq_type();
 
-        STXXL_DEBUG1("PQ parameters:" <<
-                     " total_memory=" << spq->mem_cons() <<
-                     " kDeleteBufferSize=" << spq->kDeleteBufferSize <<
-                     " N=" << spq->N <<
-                     " IntKMAX=" << spq->IntKMAX <<
-                     " kNumIntGroups=" << spq->kNumIntGroups <<
-                     " kNumExtGroups=" << spq->kNumExtGroups <<
-                     " kTotalNumGroups=" << spq->kTotalNumGroups <<
-                     " BlockSize=" << spq->BlockSize <<
-                     " ExtKMAX=" << spq->ExtKMAX);
+        LOG1 << "PQ parameters:" <<
+            " total_memory=" << spq->mem_cons() <<
+            " kDeleteBufferSize=" << spq->kDeleteBufferSize <<
+            " N=" << spq->N <<
+            " IntKMAX=" << spq->IntKMAX <<
+            " kNumIntGroups=" << spq->kNumIntGroups <<
+            " kNumExtGroups=" << spq->kNumExtGroups <<
+            " kTotalNumGroups=" << spq->kTotalNumGroups <<
+            " BlockSize=" << spq->BlockSize <<
+            " ExtKMAX=" << spq->ExtKMAX;
 
         run_benchmark(*spq, opt_benchmark);
         delete spq;
