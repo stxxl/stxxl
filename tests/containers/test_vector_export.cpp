@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <iostream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/scan>
@@ -39,7 +40,7 @@ int main()
     for (i = 0; i < v.size(); ++i)
     {
         v[i] = i + offset;
-        STXXL_CHECK(v[i] == int64_t(i + offset));
+        die_unless(v[i] == int64_t(i + offset));
     }
 
     v.flush();

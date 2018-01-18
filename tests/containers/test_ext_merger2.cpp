@@ -13,6 +13,7 @@
 #include <iterator>
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/priority_queue>
@@ -75,7 +76,7 @@ int main()
         using pq_type = stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result;
         pq_type pq(mem_for_queue, mem_for_queue);
         pq.push(42);
-        STXXL_CHECK(pq.top() == 42);
+        die_unless(pq.top() == 42);
         pq.pop();
         pq.push(2);
         pq.push(0);
@@ -91,10 +92,10 @@ int main()
         x3 = pq.top();
         pq.pop();
         LOG1 << "Order: " << x0 << " " << x1 << " " << x2 << " " << x3;
-        STXXL_CHECK(x0 <= x1);
-        STXXL_CHECK(x1 <= x2);
-        STXXL_CHECK(x2 <= x3);
-        STXXL_CHECK(pq.empty());
+        die_unless(x0 <= x1);
+        die_unless(x1 <= x2);
+        die_unless(x2 <= x3);
+        die_unless(pq.empty());
     }
 
     if (1) { // ext_merger test
@@ -126,7 +127,7 @@ int main()
                     );
 
             merger.multi_merge(output.begin(), output.begin() + l);
-            STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cbegin() + l));
+            die_unless(stxxl::is_sorted(output.cbegin(), output.cbegin() + l));
             LOG1 << "merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")";
         }
 
@@ -181,7 +182,7 @@ int main()
         while (merger.size() > 0) {
             size_t l = std::min<size_t>(merger.size(), B + B / 2 + 1);
             merger.multi_merge(out, out + l);
-            STXXL_CHECK(stxxl::is_sorted(out, out + l));
+            die_unless(stxxl::is_sorted(out, out + l));
             LOG1 << "merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")";
         }
 

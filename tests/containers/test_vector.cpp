@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <iostream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/scan>
@@ -103,7 +104,7 @@ void test_vector1()
     for (i = 0; i < v.size(); ++i)
     {
         v[i].key = i + offset;
-        STXXL_CHECK(v[i].key == uint64_t(i + offset));
+        die_unless(v[i].key == uint64_t(i + offset));
     }
 
     // fill the vector with random numbers
@@ -120,7 +121,7 @@ void test_vector1()
     std::swap(v, a);
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].key == rnd());
+        die_unless(v[i].key == rnd());
 
     // check again
     LOG1 << "clear";
@@ -139,16 +140,16 @@ void test_vector1()
     LOG1 << "seq read of " << v.size() << " elements";
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].key == rnd());
+        die_unless(v[i].key == rnd());
 
     LOG1 << "copy vector of " << v.size() << " elements";
 
     vector_type v_copy0(v);
-    STXXL_CHECK(v == v_copy0);
+    die_unless(v == v_copy0);
 
     vector_type v_copy1;
     v_copy1 = v;
-    STXXL_CHECK(v == v_copy1);
+    die_unless(v == v_copy1);
 }
 
 //! check vector::resize(n,true)

@@ -16,6 +16,7 @@
 
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/parallel_priority_queue.h>
@@ -60,7 +61,7 @@ void test_simple()
         LOG1 << "Max elements: " << nelements;
     }
 
-    STXXL_CHECK(ppq.size() == nelements);
+    die_unless(ppq.size() == nelements);
 
     {
         scoped_print_timer timer("Emptying PPQ",
@@ -68,9 +69,9 @@ void test_simple()
 
         for (uint64_t i = 0; i < nelements; ++i)
         {
-            STXXL_CHECK(!ppq.empty());
+            die_unless(!ppq.empty());
             //LOG1 <<  ppq.top() ;
-            STXXL_CHECK_EQUAL(ppq.top().key, int(i + 1));
+            die_unequal(ppq.top().key, int(i + 1));
 
             ppq.pop();
             if ((i % (128 * 1024)) == 0)
@@ -78,8 +79,8 @@ void test_simple()
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), 0);
-    STXXL_CHECK(ppq.empty());
+    die_unequal(ppq.size(), 0);
+    die_unless(ppq.empty());
 }
 
 void test_bulk_pop()
@@ -107,7 +108,7 @@ void test_bulk_pop()
         LOG1 << "Max elements: " << nelements;
     }
 
-    STXXL_CHECK(ppq.size() == nelements);
+    die_unless(ppq.size() == nelements);
 
     {
         scoped_print_timer timer("Emptying PPQ",
@@ -115,25 +116,25 @@ void test_bulk_pop()
 
         for (uint64_t i = 0; i < nelements; )
         {
-            STXXL_CHECK(!ppq.empty());
+            die_unless(!ppq.empty());
 
             std::vector<my_type> out;
             ppq.bulk_pop(out, bulk_size);
 
-            STXXL_CHECK(!out.empty());
+            die_unless(!out.empty());
 
             for (size_t j = 0; j < out.size(); ++j) {
                 //LOG1 <<  ppq.top() ;
                 if ((i % (128 * 1024)) == 0)
                     LOG1 << "Element " << i << " popped";
                 ++i;
-                STXXL_CHECK_EQUAL(out[j].key, int(i));
+                die_unequal(out[j].key, int(i));
             }
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), 0);
-    STXXL_CHECK(ppq.empty());
+    die_unequal(ppq.size(), 0);
+    die_unless(ppq.empty());
 }
 
 void test_bulk_limit(const size_t bulk_size)
@@ -167,7 +168,7 @@ void test_bulk_limit(const size_t bulk_size)
             {
                 my_type top = ppq.top();
                 ppq.pop();
-                STXXL_CHECK_EQUAL(top.key, rindex);
+                die_unequal(top.key, rindex);
                 ++rindex;
 
                 ppq.push(my_type(windex++));
@@ -181,7 +182,7 @@ void test_bulk_limit(const size_t bulk_size)
             {
                 my_type top = ppq.limit_top();
                 ppq.limit_pop();
-                STXXL_CHECK_EQUAL(top.key, rindex);
+                die_unequal(top.key, rindex);
                 ++rindex;
 
                 ppq.limit_push(my_type(windex++));
@@ -199,7 +200,7 @@ void test_bulk_limit(const size_t bulk_size)
             // not parallel!
             for (size_t i = 0; i < work.size(); ++i)
             {
-                STXXL_CHECK_EQUAL(work[i].key, rindex);
+                die_unequal(work[i].key, rindex);
                 ++rindex;
                 ppq.bulk_push(my_type(windex++));
             }
@@ -208,18 +209,18 @@ void test_bulk_limit(const size_t bulk_size)
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), static_cast<size_t>(windex - rindex));
+    die_unequal(ppq.size(), static_cast<size_t>(windex - rindex));
 
     // extract last items
     for (size_t i = 0; i < 4L * bulk_size; ++i)
     {
         my_type top = ppq.top();
         ppq.pop();
-        STXXL_CHECK_EQUAL(top.key, rindex);
+        die_unequal(top.key, rindex);
         ++rindex;
     }
 
-    STXXL_CHECK(ppq.empty());
+    die_unless(ppq.empty());
 }
 
 int main()

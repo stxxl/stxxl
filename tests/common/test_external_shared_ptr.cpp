@@ -23,6 +23,7 @@
 #include <map>
 #include <memory>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/external_shared_ptr.h>
@@ -109,7 +110,7 @@ void test_vector()
 
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == int64_t(i + offset));
+        die_unless(v[i].get()->key == int64_t(i + offset));
     }
 
     // fill the vector with random numbers
@@ -122,7 +123,7 @@ void test_vector()
         v[i].unwrap();
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == aep->key);
+        die_unless(v[i].get()->key == aep->key);
     }
     v.flush();
 
@@ -136,7 +137,7 @@ void test_vector()
     std::swap(v, a);
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].get()->key == rnd());
+        die_unless(v[i].get()->key == rnd());
 
     // check again
     LOG1 << "clear";
@@ -159,7 +160,7 @@ void test_vector()
 
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == aep->key);
+        die_unless(v[i].get()->key == aep->key);
     }
 
     stxxl::ran32State = 0xdeadbeef + 10;
@@ -167,16 +168,16 @@ void test_vector()
     LOG1 << "seq read of " << v.size() << " elements";
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].get()->key == rnd());
+        die_unless(v[i].get()->key == rnd());
 
     LOG1 << "copy vector of " << v.size() << " elements";
 
     vector_type v_copy0(v);
-    STXXL_CHECK(v == v_copy0);
+    die_unless(v == v_copy0);
 
     vector_type v_copy1;
     v_copy1 = v;
-    STXXL_CHECK(v == v_copy1);
+    die_unless(v == v_copy1);
 
     while (v.size() != 0) {
         element e = v.back();
@@ -265,10 +266,10 @@ void test_map()
             data_type data = (*result).second;
             test_data_ptr tmp = data.get();
 
-            STXXL_CHECK(tmp->a == (unsigned char)(key + 1));
+            die_unless(tmp->a == (unsigned char)(key + 1));
             for (unsigned j = 0; j < 3; ++j)
-                STXXL_CHECK(tmp->b[j] == (unsigned long)(key + 2));
-            STXXL_CHECK(tmp->c == (unsigned int)(key + 3));
+                die_unless(tmp->b[j] == (unsigned long)(key + 2));
+            die_unless(tmp->c == (unsigned int)(key + 3));
         }
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;

@@ -11,6 +11,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <algorithm>
+#include <cstdlib>
+#include <functional>
+#include <limits>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <foxxll/common/timer.hpp>
@@ -20,14 +29,6 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
-
-#include <algorithm>
-#include <cstdlib>
-#include <functional>
-#include <limits>
-#include <string>
-#include <utility>
-#include <vector>
 
 // number of repetitions of each benchmark
 unsigned int g_outer_repeat = 3;
@@ -291,7 +292,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
             << std::endl;
     }
 
-    STXXL_CHECK(stxxl::is_sorted(out.cbegin(), out.cend(), cmp));
+    die_unless(stxxl::is_sorted(out.cbegin(), out.cend(), cmp));
 }
 
 template <typename ValueType, benchmark_type Method>

@@ -11,8 +11,11 @@
  **************************************************************************/
 
 #include <iostream>
-#include <stxxl/random>
+
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
+
+#include <stxxl/random>
 
 int main()
 {
@@ -41,6 +44,6 @@ int main()
     }
 
     stxxl::set_seed(42);
-    STXXL_CHECK(stxxl::get_next_seed() == 42);
-    STXXL_CHECK(stxxl::get_next_seed() != 42);
+    die_unless(stxxl::get_next_seed() == 42);
+    die_unless(stxxl::get_next_seed() != 42);
 }

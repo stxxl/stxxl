@@ -16,6 +16,7 @@
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <foxxll/mng.hpp>
@@ -52,7 +53,7 @@ int main()
         //stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
         stxxl::stl_in_memory_sort(v.begin(), v.end(), cmp());
         LOG1 << "small vector sorted   " << v[0] << " " << v[1] << " " << v[2];
-        STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+        die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
     }
 
     const uint64_t n_records = uint64_t(192) * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(my_type)) / sizeof(my_type);
@@ -64,13 +65,13 @@ int main()
         v[i].key = 1 + (rnd() % 0xfffffff);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    die_unless(!stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     LOG1 << "Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...";
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     LOG1 << "Done, output size=" << v.size();
 

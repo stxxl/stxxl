@@ -14,7 +14,10 @@
 #include <iostream>
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
+
+#include <foxxll/common/die_with_message.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
@@ -197,8 +200,8 @@ void test1(int rank)
         size_t num_err = 0;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit)
             num_err += (*mit != rank);
-        STXXL_CHECK2(num_err == 0,
-                     "c had " << num_err << " errors");
+        die_with_message_unless(num_err == 0,
+                                "c had " << num_err << " errors");
     }
 
     // ------ second run
@@ -240,8 +243,8 @@ void test1(int rank)
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit, ++i)
             num_err += (*mit != (i * 4));
 
-        STXXL_CHECK2(num_err == 0,
-                     "c had " << num_err << " errors");
+        die_with_message_unless(num_err == 0,
+                                "c had " << num_err << " errors");
     }
 
     {
@@ -334,7 +337,7 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
         size_t num_err = 0;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit)
             num_err += (*mit != rank);
-        STXXL_CHECK2(num_err == 0, "c had " << num_err << " errors");
+        die_with_message_unless(num_err == 0, "c had " << num_err << " errors");
     }
 
     delete a;

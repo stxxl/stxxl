@@ -20,6 +20,7 @@
 
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/priority_queue>
@@ -86,7 +87,7 @@ int main()
         }
     }
 
-    STXXL_CHECK(p.size() == (size_t)nelements);
+    die_unless(p.size() == (size_t)nelements);
 
 #if 0
     // test swap
@@ -103,17 +104,17 @@ int main()
 
         for (size_t i = 0; i < nelements; ++i)
         {
-            STXXL_CHECK(!p.empty());
+            die_unless(!p.empty());
             //LOG1 <<  p.top() ;
-            STXXL_CHECK(p.top().key == int(i + 1));
+            die_unless(p.top().key == int(i + 1));
             p.pop();
             if ((i % (1024 * 1024)) == 0)
                 LOG1 << "Element " << i << " popped";
         }
     }
 
-    STXXL_CHECK(p.size() == 0);
-    STXXL_CHECK(p.empty());
+    die_unless(p.size() == 0);
+    die_unless(p.empty());
 
     LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
 

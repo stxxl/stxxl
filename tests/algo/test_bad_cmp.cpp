@@ -17,6 +17,7 @@
 //! This is an example of how NOT to use \c stxxl::sort() algorithm.
 //! Here min_value and max_value are used as keys which is forbidden.
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <foxxll/mng.hpp>
@@ -103,13 +104,13 @@ int main(int argc, char* argv[])
     }
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     LOG1 << "Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...";
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -126,7 +127,7 @@ int main(int argc, char* argv[])
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -149,7 +150,7 @@ int main(int argc, char* argv[])
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {

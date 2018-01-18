@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <foxxll/mng.hpp>
@@ -45,13 +46,13 @@ int main()
         v[i].key = (rnd() / 2) * 2;
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend()));
+    die_unless(!stxxl::is_sorted(v.cbegin(), v.cend()));
 
     LOG1 << "Sorting...";
     stxxl::stable_ksort(v.begin(), v.end(), my_type::key_extract(), memory_to_use);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend()));
 
     return 0;
 }

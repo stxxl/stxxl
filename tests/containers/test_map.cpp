@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/map>
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
         {
             Map[i] = i + 1;
         }
-        STXXL_CHECK(Map.size() == el);
+        die_unless(Map.size() == el);
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double writes = double(stats_elapsed.get_write_count()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
@@ -86,8 +87,8 @@ int main(int argc, char** argv)
         {
             key_type key = (key_type)(myrandom() % el);
             map_type::const_iterator result = ConstMap.find(key);
-            STXXL_CHECK((*result).second == key + 1);
-            STXXL_CHECK(result->second == key + 1);
+            die_unless((*result).second == key + 1);
+            die_unless(result->second == key + 1);
         }
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;

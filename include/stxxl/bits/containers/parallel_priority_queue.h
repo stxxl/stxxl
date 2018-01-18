@@ -2396,9 +2396,8 @@ public:
         if (!omp_get_nested()) {
             omp_set_nested(1);
             if (!omp_get_nested()) {
-                STXXL_ERRMSG("Could not enable OpenMP's nested parallelism, "
-                             "however, the PPQ requires this OpenMP feature.");
-                abort();
+                die("Could not enable OpenMP's nested parallelism, "
+                    "however, the PPQ requires this OpenMP feature.");
             }
         }
 #else
@@ -2408,9 +2407,8 @@ public:
             "compilation settings.";
 #endif
         if (m_num_read_blocks_per_ea < 1.0) {
-            STXXL_ERRMSG("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
-                         " it is " << m_num_read_blocks_per_ea);
-            abort();
+            die("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
+                " it is " << m_num_read_blocks_per_ea);
         }
 
         if (c_limit_extract_buffer) {
@@ -2515,13 +2513,13 @@ protected:
             num_used_read += m_external_arrays[i].num_used_blocks();
         }
 
-        STXXL_CHECK(num_hinted == m_num_hinted_blocks);
-        STXXL_CHECK(num_used_read == m_num_used_read_blocks);
+        die_unless(num_hinted == m_num_hinted_blocks);
+        die_unless(num_used_read == m_num_used_read_blocks);
 
-        STXXL_CHECK_EQUAL(m_num_used_read_blocks,
-                          m_num_read_blocks
-                          - m_pool.free_size_prefetch()
-                          - m_num_hinted_blocks);
+        die_unequal(m_num_used_read_blocks,
+                    m_num_read_blocks
+                    - m_pool.free_size_prefetch()
+                    - m_num_hinted_blocks);
 
         // test the processor local data structures
 
@@ -2532,18 +2530,18 @@ protected:
             // check that each insertion heap is a heap
 
             // TODO: remove soon, because this is very expensive
-            STXXL_CHECK(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
-                                            m_proc[p]->insertion_heap.end(),
-                                            m_compare));
+            die_unless(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
+                                           m_proc[p]->insertion_heap.end(),
+                                           m_compare));
 
-            STXXL_CHECK(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
+            die_unless(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
 
             heaps_size += m_proc[p]->insertion_heap.size();
             mem_used += m_proc[p]->insertion_heap.capacity() * sizeof(value_type);
         }
 
         if (!m_in_bulk_push)
-            STXXL_CHECK_EQUAL(m_heaps_size, heaps_size);
+            die_unequal(m_heaps_size, heaps_size);
 
         // count number of items and memory size of internal arrays
 
@@ -2559,11 +2557,11 @@ protected:
             ++ia_levels[ia->level()];
         }
 
-        STXXL_CHECK_EQUAL(m_internal_size, ia_size);
+        die_unequal(m_internal_size, ia_size);
         mem_used += ia_memory;
 
         for (size_t i = 0; i < kMaxInternalLevels; ++i)
-            STXXL_CHECK_EQUAL(m_internal_levels[i], ia_levels[i]);
+            die_unequal(m_internal_levels[i], ia_levels[i]);
 
         // count number of items in external arrays
 
@@ -2579,15 +2577,15 @@ protected:
             ++ea_levels[ea->level()];
         }
 
-        STXXL_CHECK_EQUAL(m_external_size, ea_size);
+        die_unequal(m_external_size, ea_size);
         mem_used += ea_memory;
 
         for (size_t i = 0; i < kMaxExternalLevels; ++i)
-            STXXL_CHECK_EQUAL(m_external_levels[i], ea_levels[i]);
+            die_unequal(m_external_levels[i], ea_levels[i]);
 
         // calculate mem_used so that == mem_total - mem_left
 
-        STXXL_CHECK_EQUAL(memory_consumption(), mem_used);
+        die_unequal(memory_consumption(), mem_used);
     }
 
     //! \}
@@ -4480,9 +4478,9 @@ protected:
         m_internal_size += size - used;
         m_mem_left -= internal_array_type::int_memory(capacity);
 
-        STXXL_CHECK(level < kMaxInternalLevels &&
-                    "Internal array level is larger than anything possible "
-                    "in this universe. Increase the size of m_internal_levels");
+        die_unless(level < kMaxInternalLevels &&
+                   "Internal array level is larger than anything possible "
+                   "in this universe. Increase the size of m_internal_levels");
 
         ++m_internal_levels[level];
 

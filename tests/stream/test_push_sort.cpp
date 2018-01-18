@@ -21,6 +21,7 @@
 
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/defines.h>
@@ -78,7 +79,7 @@ int main()
     }
 
     SortedRunsType Runs = SortedRuns.result();  // get sorted_runs data structure
-    STXXL_CHECK(stxxl::stream::check_sorted_runs(Runs, Cmp()));
+    die_unless(stxxl::stream::check_sorted_runs(Runs, Cmp()));
 
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 10 * megabyte);
@@ -93,9 +94,9 @@ int main()
         ++merger;
     }
     LOG1 << "checksum after:  " << checksum_after;
-    STXXL_CHECK(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
-    STXXL_CHECK(checksum_before == checksum_after);
-    STXXL_CHECK(merger.empty());
+    die_unless(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
+    die_unless(checksum_before == checksum_after);
+    die_unless(merger.empty());
 
     return 0;
 }

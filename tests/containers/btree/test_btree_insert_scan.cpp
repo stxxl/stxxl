@@ -15,6 +15,7 @@
 
 #include <iostream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/btree/btree.h>
@@ -92,7 +93,7 @@ int main(int argc, char* argv[])
     stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
     Values.resize(NewEnd - Values.begin());
 
-    STXXL_CHECK(BTree.size() == Values.size());
+    die_unless(BTree.size() == Values.size());
     LOG1 << "Size without duplicates: " << Values.size();
 
     LOG1 << "Comparing content";
@@ -102,12 +103,12 @@ int main(int argc, char* argv[])
 
     for ( ; vIt != Values.end(); ++vIt, ++bIt)
     {
-        STXXL_CHECK(*vIt == bIt->first);
-        STXXL_CHECK(double(bIt->first) + 1.0 == bIt->second);
-        STXXL_CHECK(bIt != BTree.end());
+        die_unless(*vIt == bIt->first);
+        die_unless(double(bIt->first) + 1.0 == bIt->second);
+        die_unless(bIt != BTree.end());
     }
 
-    STXXL_CHECK(bIt == BTree.end());
+    die_unless(bIt == BTree.end());
 
     LOG1 << "Test passed.";
 

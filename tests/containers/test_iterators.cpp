@@ -16,6 +16,7 @@
 #include <map>
 #include <vector>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl.h>
@@ -77,7 +78,7 @@ bool test_inc_dec(Iterator it)
     --i;
     i--;
 
-    STXXL_CHECK(it == i);
+    die_unless(it == i);
     return it == i;
 }
 
@@ -95,7 +96,7 @@ bool test_inc_dec_random(Iterator it)
     i--;
     i -= 2;
 
-    STXXL_CHECK(it == i);
+    die_unless(it == i);
     return it == i;
 }
 
@@ -113,26 +114,26 @@ struct test_comparison_lt_gt<IteratorA, IteratorB, std::random_access_iterator_t
 {
     void operator () (IteratorA a, IteratorB b)
     {
-        STXXL_CHECK(! (a < b));
-        STXXL_CHECK((a <= b));
-        STXXL_CHECK(! (a > b));
-        STXXL_CHECK((a >= b));
+        die_unless(! (a < b));
+        die_unless((a <= b));
+        die_unless(! (a > b));
+        die_unless((a >= b));
 
-        STXXL_CHECK(! (b < a));
-        STXXL_CHECK((b <= a));
-        STXXL_CHECK(! (b > a));
-        STXXL_CHECK((b >= a));
+        die_unless(! (b < a));
+        die_unless((b <= a));
+        die_unless(! (b > a));
+        die_unless((b >= a));
     }
 };
 
 template <typename IteratorA, typename IteratorB>
 void test_comparison(IteratorA a, IteratorB b)
 {
-    STXXL_CHECK((a == b));
-    STXXL_CHECK(! (a != b));
+    die_unless((a == b));
+    die_unless(! (a != b));
 
-    STXXL_CHECK((b == a));
-    STXXL_CHECK(! (b != a));
+    die_unless((b == a));
+    die_unless(! (b != a));
 
     test_comparison_lt_gt<IteratorA, IteratorB, typename std::iterator_traits<IteratorA>::iterator_category>()(a, b);
 }

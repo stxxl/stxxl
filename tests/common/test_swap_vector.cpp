@@ -100,9 +100,9 @@ int main()
 
     // Check the values.
     int expected_vals[10] = { -1, -1, 1, 2, 3, 5, 6, 7, 8, 9 };
-    STXXL_CHECK_EQUAL(vec.size(), 10);
+    die_unequal(vec.size(), 10);
     for (unsigned i = 0; i < vec.size(); ++i) {
-        STXXL_CHECK_EQUAL(vec[i].get_i(), expected_vals[i]);
+        die_unequal(vec[i].get_i(), expected_vals[i]);
     }
 
     // std::remove_if would fail because it makes use of copy assignment.
@@ -112,14 +112,14 @@ int main()
 
     // Check the values.
     int expected_vals2[10] = { 1, 2, 3, 5, 6, 7, 9 };
-    STXXL_CHECK_EQUAL(vec.size(), 7);
+    die_unequal(vec.size(), 7);
     for (unsigned i = 0; i < vec.size(); ++i) {
-        STXXL_CHECK_EQUAL(vec[i].get_i(), expected_vals2[i]);
+        die_unequal(vec[i].get_i(), expected_vals2[i]);
     }
 
     // Clear the vector.
     vec.clear();
-    STXXL_CHECK(vec.empty());
+    die_unless(vec.empty());
 
     // Resize to 100 and overwrite the last value.
     // Content after resize and overwrite: {...,-1,100}
@@ -129,8 +129,8 @@ int main()
     std::swap(vec[19], t);
 
     // Check the values.
-    STXXL_CHECK_EQUAL(vec.size(), 20);
-    STXXL_CHECK_EQUAL(vec[19].get_i(), 11);
+    die_unequal(vec.size(), 20);
+    die_unequal(vec[19].get_i(), 11);
 
     return EXIT_SUCCESS;
 }

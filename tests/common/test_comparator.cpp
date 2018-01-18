@@ -10,12 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/common/comparator.h>
-#include <tlx/logger.hpp>
-
 #include <algorithm>
 #include <cstdint>
 #include <vector>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/common/comparator.h>
 
 using stxxl::direction;
 
@@ -24,15 +26,15 @@ void test_singletons(CompareT cmp, std::vector<T> values, direction M)
 {
     std::cout << "Test singletons" << std::endl;
 
-    STXXL_CHECK(cmp(cmp.min_value(), cmp.max_value()));
+    die_unless(cmp(cmp.min_value(), cmp.max_value()));
 
     size_t pos_compares = 0;
     size_t neg_compares = 0;
 
     for (auto i1 = values.cbegin(); i1 != values.cend(); ++i1) {
-        STXXL_CHECK(!cmp(*i1, *i1));
-        STXXL_CHECK(cmp(*i1, cmp.max_value()));
-        STXXL_CHECK(cmp(cmp.min_value(), *i1));
+        die_unless(!cmp(*i1, *i1));
+        die_unless(cmp(*i1, cmp.max_value()));
+        die_unless(cmp(cmp.min_value(), *i1));
 
         for (auto i2 = values.cbegin(); i2 != values.cend(); ++i2) {
             const bool expected = (M == direction::Less) ? (*i1 < *i2) : (*i1 > *i2);
@@ -41,11 +43,11 @@ void test_singletons(CompareT cmp, std::vector<T> values, direction M)
             pos_compares += compared;
             neg_compares += !compared;
 
-            STXXL_CHECK(expected == compared);
+            die_unless(expected == compared);
         }
     }
 
-    STXXL_CHECK(pos_compares + values.size() == neg_compares);
+    die_unless(pos_compares + values.size() == neg_compares);
 }
 
 template <
@@ -58,7 +60,7 @@ void test_two_int(const std::vector<T1>& aval, const std::vector<T2>& bval)
 {
     stxxl::comparator<AggrT, M1, M2> cmp;
 
-    STXXL_CHECK(cmp(cmp.min_value(), cmp.max_value()));
+    die_unless(cmp(cmp.min_value(), cmp.max_value()));
 
     auto reference_compare = [](const AggrT& a, const AggrT& b) {
                                  if (M1 != direction::DontCare) {
@@ -88,8 +90,8 @@ void test_two_int(const std::vector<T1>& aval, const std::vector<T2>& bval)
         for (auto b1 = bval.cbegin(); b1 != bval.cend(); ++b1) {
             const AggrT aggr1(*a1, *b1);
 
-            STXXL_CHECK(cmp(aggr1, cmp.max_value()));
-            STXXL_CHECK(cmp(cmp.min_value(), aggr1));
+            die_unless(cmp(aggr1, cmp.max_value()));
+            die_unless(cmp(cmp.min_value(), aggr1));
 
             for (auto a2 = aval.cbegin(); a2 != aval.cend(); ++a2) {
                 for (auto b2 = bval.cbegin(); b2 != bval.cend(); ++b2) {
@@ -108,14 +110,14 @@ void test_two_int(const std::vector<T1>& aval, const std::vector<T2>& bval)
                                   << " Got: " << compared
                                   << std::endl;
 
-                    STXXL_CHECK(expected == compared);
+                    die_unless(expected == compared);
                 }
             }
         }
     }
 
-    STXXL_CHECK(pos_compares > 0);
-    STXXL_CHECK(neg_compares > 0);
+    die_unless(pos_compares > 0);
+    die_unless(neg_compares > 0);
 }
 
 template <
@@ -157,22 +159,22 @@ void test_own_implementation()
 
     {
         stxxl::comparator<my_type> cmp;
-        STXXL_CHECK(cmp.min_value().a == -1000);
-        STXXL_CHECK(cmp.max_value().a == 1000);
+        die_unless(cmp.min_value().a == -1000);
+        die_unless(cmp.max_value().a == 1000);
 
         // compare is inverted due to own less implementation
-        STXXL_CHECK(cmp(cmp.max_value(), cmp.min_value()));
-        STXXL_CHECK(!cmp(cmp.min_value(), cmp.max_value()));
+        die_unless(cmp(cmp.max_value(), cmp.min_value()));
+        die_unless(!cmp(cmp.min_value(), cmp.max_value()));
     }
 
     {
         stxxl::comparator<my_type, direction::Greater> cmp;
-        STXXL_CHECK(cmp.min_value().a == 1000);
-        STXXL_CHECK(cmp.max_value().a == -1000);
+        die_unless(cmp.min_value().a == 1000);
+        die_unless(cmp.max_value().a == -1000);
 
         // compare is inverted due to own less implementation
-        STXXL_CHECK(cmp(cmp.max_value(), cmp.min_value()));
-        STXXL_CHECK(!cmp(cmp.min_value(), cmp.max_value()));
+        die_unless(cmp(cmp.max_value(), cmp.min_value()));
+        die_unless(!cmp(cmp.min_value(), cmp.max_value()));
     }
 }
 
@@ -214,13 +216,13 @@ void test_comparator_extract()
                                 });
 
     for (auto i1 = values.cbegin(); i1 != values.cend(); ++i1) {
-        STXXL_CHECK(!cmp(*i1, *i1));
-        STXXL_CHECK(cmp(*i1, cmp.max_value()));
-        STXXL_CHECK(cmp(cmp.min_value(), *i1));
+        die_unless(!cmp(*i1, *i1));
+        die_unless(cmp(*i1, cmp.max_value()));
+        die_unless(cmp(cmp.min_value(), *i1));
 
         for (auto i2 = i1 + 1; i2 != values.cend(); ++i2) {
-            STXXL_CHECK(cmp(*i1, *i2));
-            STXXL_CHECK(!cmp(*i2, *i1));
+            die_unless(cmp(*i1, *i2));
+            die_unless(!cmp(*i2, *i1));
         }
     }
 }

@@ -12,6 +12,7 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/queue>
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
 
         q.push(in++);
 
-        STXXL_CHECK(q.front() == out);
+        die_unless(q.front() == out);
         q.pop();
         ++out;
 
@@ -57,18 +58,18 @@ int main(int argc, char** argv)
         if ((i % mega) == 0)
             LOG1 << "Remove " << i;
 
-        STXXL_CHECK(q.front() == out);
+        die_unless(q.front() == out);
         q.pop();
         ++out;
 
         q.push(in++);
 
-        STXXL_CHECK(q.front() == out);
+        die_unless(q.front() == out);
         q.pop();
         ++out;
     }
-    STXXL_CHECK(q.empty());
-    STXXL_CHECK(in == out);
+    die_unless(q.empty());
+    die_unless(in == out);
 
     std::cout << *foxxll::stats::get_instance();
 

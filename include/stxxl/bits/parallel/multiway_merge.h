@@ -17,6 +17,7 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
+#include <tlx/die.hpp>
 #include <tlx/define.hpp>
 #include <tlx/logger.hpp>
 #include <tlx/loser_tree.hpp>
@@ -457,10 +458,10 @@ RandomAccessIterator3 multiway_merge_3_variant(
 
 finish:
 #if STXXL_EXPENSIVE_ASSERTIONS
-    STXXL_CHECK_EQUAL((seq0.iterator() - seqs_begin[0].first) +
-                      (seq1.iterator() - seqs_begin[1].first) +
-                      (seq2.iterator() - seqs_begin[2].first),
-                      orig_length);
+    die_unequal((seq0.iterator() - seqs_begin[0].first) +
+                (seq1.iterator() - seqs_begin[1].first) +
+                (seq2.iterator() - seqs_begin[2].first),
+                orig_length);
 #endif
 
     seqs_begin[0].first = seq0.iterator();
@@ -675,11 +676,11 @@ RandomAccessIterator3 multiway_merge_4_variant(
 
 finish:
 #if STXXL_EXPENSIVE_ASSERTIONS
-    STXXL_CHECK_EQUAL((seq0.iterator() - seqs_begin[0].first) +
-                      (seq1.iterator() - seqs_begin[1].first) +
-                      (seq2.iterator() - seqs_begin[2].first) +
-                      (seq3.iterator() - seqs_begin[3].first),
-                      orig_length);
+    die_unequal((seq0.iterator() - seqs_begin[0].first) +
+                (seq1.iterator() - seqs_begin[1].first) +
+                (seq2.iterator() - seqs_begin[2].first) +
+                (seq3.iterator() - seqs_begin[3].first),
+                orig_length);
 #endif
 
     seqs_begin[0].first = seq0.iterator();

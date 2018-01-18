@@ -12,6 +12,7 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <foxxll/io.hpp>
@@ -43,9 +44,9 @@ void test_rdwr(const char* fn, const char* ft, size_t sz, my_type ofs)
     {
         Vector v(f);
         LOG1 << "reading " << v.size() << " elements (RDWR)";
-        STXXL_CHECK(v.size() == sz);
+        die_unless(v.size() == sz);
         for (size_t i = 0; i < v.size(); ++i)
-            STXXL_CHECK(v[i] == ofs + my_type(i));
+            die_unless(v[i] == ofs + my_type(i));
     }
 }
 
@@ -57,9 +58,9 @@ void test_rdonly(const char* fn, const char* ft, size_t sz, my_type ofs)
     {
         Vector v(f);
         LOG1 << "reading " << v.size() << " elements (RDONLY)";
-        STXXL_CHECK(v.size() == sz);
+        die_unless(v.size() == sz);
         for (size_t i = 0; i < v.size(); ++i)
-            STXXL_CHECK(v[i] == ofs + my_type(i));
+            die_unless(v[i] == ofs + my_type(i));
     }
 }
 
@@ -137,7 +138,7 @@ int main(int argc, char** argv)
     {
         foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
         LOG1 << "file size is " << f.size() << " bytes";
-        STXXL_CHECK(f.size() == (start_elements + 4096 + 23 - 1) * sizeof(my_type) - 1);
+        die_unless(f.size() == (start_elements + 4096 + 23 - 1) * sizeof(my_type) - 1);
     }
 
     {

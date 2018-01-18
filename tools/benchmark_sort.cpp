@@ -16,11 +16,10 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
+#include <cassert>
 #include <cstdint>
 #include <limits>
 #include <random>
-#include <cassert>
-
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/comparator.h>

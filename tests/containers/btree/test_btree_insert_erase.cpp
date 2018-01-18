@@ -13,6 +13,7 @@
 #include <ctime>
 #include <iostream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/btree/btree.h>
@@ -102,18 +103,18 @@ int main(int argc, char* argv[])
     for ( ; vIt != Values.end(); ++vIt)
     {
         btree_type::iterator bIt = BTree.find(*vIt);
-        STXXL_CHECK(bIt != BTree.end());
+        die_unless(bIt != BTree.end());
         // erasing non-existent element
-        STXXL_CHECK(BTree.erase((*vIt) + 1) == 0);
+        die_unless(BTree.erase((*vIt) + 1) == 0);
         // erasing existing element
-        STXXL_CHECK(BTree.erase(*vIt) == 1);
+        die_unless(BTree.erase(*vIt) == 1);
         // checking it is not there
-        STXXL_CHECK(BTree.find(*vIt) == BTree.end());
+        die_unless(BTree.find(*vIt) == BTree.end());
         // trying to erase it again
-        STXXL_CHECK(BTree.erase(*vIt) == 0);
+        die_unless(BTree.erase(*vIt) == 0);
     }
 
-    STXXL_CHECK(BTree.empty());
+    die_unless(BTree.empty());
 
     LOG1 << "Test passed.";
 

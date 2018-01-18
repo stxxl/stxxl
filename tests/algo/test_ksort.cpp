@@ -57,13 +57,13 @@ int main()
     }
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend()));
+    die_unless(!stxxl::is_sorted(v.cbegin(), v.cend()));
 
     LOG1 << "Sorting...";
     stxxl::ksort(v.begin(), v.end(), get_key(), memory_to_use);
 
     LOG1 << "Checking order...";
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend()));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend()));
     LOG1 << "Checking content...";
     my_type prev;
     for (vector_type::size_type i = 0; i < v.size(); i++)

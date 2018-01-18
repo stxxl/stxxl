@@ -13,6 +13,7 @@
 #include <ctime>
 #include <iostream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/btree/btree.h>
@@ -90,8 +91,8 @@ int main(int argc, char* argv[])
     for ( ; vIt != Values.end(); ++vIt)
     {
         btree_type::iterator bIt = BTree.find(*vIt);
-        STXXL_CHECK(bIt != BTree.end());
-        STXXL_CHECK(bIt->first == *vIt);
+        die_unless(bIt != BTree.end());
+        die_unless(bIt->first == *vIt);
     }
 
     LOG1 << "Searching " << nins << " non-existing elements";
@@ -100,7 +101,7 @@ int main(int argc, char* argv[])
     for ( ; vIt1 != Values.end(); ++vIt1)
     {
         btree_type::iterator bIt = BTree.find((*vIt1) + 1);
-        STXXL_CHECK(bIt == BTree.end());
+        die_unless(bIt == BTree.end());
     }
 
     LOG1 << "Test passed.";

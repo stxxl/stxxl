@@ -16,6 +16,7 @@
 
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/sorter>
@@ -57,13 +58,13 @@ int main()
         // finish input, switch to sorting stage.
         s.sort();
 
-        STXXL_CHECK(*s == my_type(0));
+        die_unless(*s == my_type(0));
         ++s;
-        STXXL_CHECK(*s == my_type(23));
+        die_unless(*s == my_type(23));
         ++s;
-        STXXL_CHECK(*s == my_type(42));
+        die_unless(*s == my_type(42));
         ++s;
-        STXXL_CHECK(s.empty());
+        die_unless(s.empty());
     }
 
     {
@@ -79,7 +80,7 @@ int main()
 
         for (uint64_t i = 0; i < n_records; i++)
         {
-            STXXL_CHECK(s.size() == i);
+            die_unless(s.size() == i);
 
             s.push(my_type(1 + (rnd() % 0xfffffff)));
         }
@@ -89,8 +90,8 @@ int main()
 
         LOG1 << "Checking order...";
 
-        STXXL_CHECK(!s.empty());
-        STXXL_CHECK(s.size() == n_records);
+        die_unless(!s.empty());
+        die_unless(s.size() == n_records);
 
         my_type prev = *s;      // get first item
         ++s;
@@ -99,10 +100,10 @@ int main()
 
         while (!s.empty())
         {
-            STXXL_CHECK(s.size() == count);
+            die_unless(s.size() == count);
 
             if (!(prev <= *s)) LOG1 << "WRONG";
-            STXXL_CHECK(prev <= *s);
+            die_unless(prev <= *s);
 
             ++s;
             --count;
@@ -114,8 +115,8 @@ int main()
 
         LOG1 << "Checking order again...";
 
-        STXXL_CHECK(!s.empty());
-        STXXL_CHECK(s.size() == n_records);
+        die_unless(!s.empty());
+        die_unless(s.size() == n_records);
 
         prev = *s;      // get first item
         ++s;
@@ -123,13 +124,13 @@ int main()
         while (!s.empty())
         {
             if (!(prev <= *s)) LOG1 << "WRONG";
-            STXXL_CHECK(prev <= *s);
+            die_unless(prev <= *s);
 
             ++s;
         }
         LOG1 << "OK";
 
-        STXXL_CHECK(s.size() == 0);
+        die_unless(s.size() == 0);
 
         LOG1 << "Done";
     }

@@ -26,6 +26,7 @@
 #include <functional>
 #include <limits>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/defines.h>
@@ -76,7 +77,7 @@ void linear_sort_normal(vector_type& input)
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
 
-    STXXL_CHECK(stxxl::is_sorted(input.cbegin(), input.cend()));
+    die_unless(stxxl::is_sorted(input.cbegin(), input.cend()));
 
     std::cout << "Linear sorting normal took " << (stop - start) << " seconds." << std::endl;
 }
@@ -97,7 +98,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     sort_stream_type sort_stream(input_stream, cmp_less_key(), run_size);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
-    STXXL_CHECK(o == output.end());
+    die_unless(o == output.end());
 
     double stop = foxxll::timestamp();
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
@@ -108,7 +109,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     if (sum1 != sum2)
         LOG1 << "WRONG DATA";
 
-    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend(), cmp_less_key()));
+    die_unless(stxxl::is_sorted(output.cbegin(), output.cend(), cmp_less_key()));
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }
@@ -171,7 +172,7 @@ int main(int argc, const char** argv)
     parallel_settings.multiway_merge_minimal_k = 2;
 
     __gnu_parallel::_Settings::set(parallel_settings);
-    STXXL_CHECK(&__gnu_parallel::_Settings::get() != &parallel_settings);
+    die_unless(&__gnu_parallel::_Settings::get() != &parallel_settings);
 
     if (0)
         printf("%d %p: mwms %d, q %d, qb %d",
@@ -202,7 +203,7 @@ int main(int argc, const char** argv)
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 
-    STXXL_CHECK(!stxxl::is_sorted(input.cbegin(), input.cend()));
+    die_unless(!stxxl::is_sorted(input.cbegin(), input.cend()));
 
     {
         vector_type output(n_records);

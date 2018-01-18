@@ -529,7 +529,7 @@ private:
             break;
         default:
             FOXXLL_THROW2(std::runtime_error, "priority_queue<...>::refill_delete_buffer()",
-                         "Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4");
+                          "Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4");
         }
 
 #if STXXL_CHECK_ORDER_IN_SORTS

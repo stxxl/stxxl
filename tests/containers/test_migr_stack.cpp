@@ -17,6 +17,7 @@
 //! block size \b 4096 bytes, and internal implementation
 //! \c std::stack<int>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/stack>
@@ -39,9 +40,9 @@ int main()
     for (size_t i = 0; i < test_size; i++)
     {
         my_stack.push(i);
-        STXXL_CHECK(my_stack.top() == i);
-        STXXL_CHECK(my_stack.size() == i + 1);
-        STXXL_CHECK((my_stack.size() >= critical_size) == my_stack.external());
+        die_unless(my_stack.top() == i);
+        die_unless(my_stack.size() == i + 1);
+        die_unless((my_stack.size() >= critical_size) == my_stack.external());
     }
 
     LOG1 << "Testing swap.";
@@ -55,11 +56,11 @@ int main()
     for (size_t i = test_size; i > 0; )
     {
         --i;
-        STXXL_CHECK(my_stack.top() == i);
-        STXXL_CHECK(my_stack.size() == i + 1);
+        die_unless(my_stack.top() == i);
+        die_unless(my_stack.size() == i + 1);
         my_stack.pop();
-        STXXL_CHECK(my_stack.size() == i);
-        STXXL_CHECK(my_stack.external() == (test_size >= int(critical_size)));
+        die_unless(my_stack.size() == i);
+        die_unless(my_stack.external() == (test_size >= int(critical_size)));
     }
 
     LOG1 << "Test passed.";

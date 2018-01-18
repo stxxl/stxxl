@@ -12,6 +12,7 @@
 
 #include <iostream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/btree/btree.h>
@@ -69,7 +70,7 @@ void NC(btree_type& BTree)
 
     Timer1.stop();
     LOG1 << "Scanning with non const iterator: " << Timer1.mseconds() << " msec";
-    STXXL_CHECK(sum == checksum);
+    die_unless(sum == checksum);
 }
 
 void C(btree_type& BTree)
@@ -83,7 +84,7 @@ void C(btree_type& BTree)
 
     Timer1.stop();
     LOG1 << "Scanning with const iterator: " << Timer1.mseconds() << " msec";
-    STXXL_CHECK(sum == checksum);
+    die_unless(sum == checksum);
 }
 
 int main(int argc, char* argv[])

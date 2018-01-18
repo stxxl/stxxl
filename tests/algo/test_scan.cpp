@@ -15,7 +15,10 @@
 //! \example algo/test_scan.cpp
 //! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
+
+#include <foxxll/common/die_with_message.hpp>
 
 #include <stxxl/scan>
 #include <stxxl/vector>
@@ -80,7 +83,7 @@ int main()
     LOG1 << "check";
     for (i = 0; i < v.size(); ++i)
     {
-        STXXL_CHECK2(v[i] == int64_t(i * i), "Error at position " << i);
+        die_with_message_unless(v[i] == int64_t(i * i), "Error at position " << i);
     }
 
     LOG1 << "Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin());
@@ -95,14 +98,14 @@ int main()
     LOG1 << "generate: " << (e - b);
 
     LOG1 << "check";
-    STXXL_CHECK2(v[0] == 0, "Error at position " << 0);
+    die_with_message_unless(v[0] == 0, "Error at position " << 0);
 
-    STXXL_CHECK2(v[v.size() - 1] == int64_t((v.size() - 1) * (v.size() - 1)),
-                 "Error at position " << v.size() - 1);
+    die_with_message_unless(v[v.size() - 1] == int64_t((v.size() - 1) * (v.size() - 1)),
+                            "Error at position " << v.size() - 1);
 
     for (i = 1; i < v.size() - 1; ++i)
     {
-        STXXL_CHECK2(v[i] == 555, "Error at position " << i);
+        die_with_message_unless(v[i] == 555, "Error at position " << i);
     }
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;

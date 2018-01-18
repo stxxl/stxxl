@@ -21,6 +21,7 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
@@ -115,7 +116,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         }
     }
 
-    STXXL_CHECK(pq.size() == nelements);
+    die_unless(pq.size() == nelements);
 
     LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
 
@@ -129,8 +130,8 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
 
         for (external_size_type i = 0; i < nelements; ++i)
         {
-            STXXL_CHECK(!pq.empty());
-            STXXL_CHECK(pq.top().first == i + 1);
+            die_unless(!pq.empty());
+            die_unless(pq.top().first == i + 1);
 
             pq.pop();
 
@@ -167,7 +168,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
         }
     }
 
-    STXXL_CHECK(pq.size() == nelements);
+    die_unless(pq.size() == nelements);
 
     LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
 
@@ -190,7 +191,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
             }
             else
             {
-                STXXL_CHECK(!pq.empty());
+                die_unless(!pq.empty());
                 pq.pop();
             }
 

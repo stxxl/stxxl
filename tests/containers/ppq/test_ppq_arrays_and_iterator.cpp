@@ -13,14 +13,17 @@
 //! \example containers/external_array.cpp
 //! This is an example of how to use \c stxxl::external_array
 
+#include <cstddef>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/timer>
-#include <tlx/logger.hpp>
-
-#include <cstddef>
 
 using value_type = std::pair<uint64_t, uint64_t>;
 using ea_type = stxxl::ppq_local::external_array<value_type>;
@@ -48,24 +51,24 @@ static inline void progress(const char* text, size_t i, size_t nelements)
 //! Fills an external array with increasing numbers
 void fill(ea_type& ea, size_t index, size_t n)
 {
-    STXXL_CHECK(n > 0);
+    die_unless(n > 0);
 
     ea_type::writer_type ea_writer(ea);
 
     size_t i = index;
 
-    STXXL_CHECK_EQUAL(ea_writer.end() - ea_writer.begin(), (ssize_t)n);
+    die_unequal(ea_writer.end() - ea_writer.begin(), (ssize_t)n);
 
     for (ea_type::writer_type::iterator it = ea_writer.begin();
          it != ea_writer.end(); ++it)
     {
-        STXXL_CHECK(i < index + n);
+        die_unless(i < index + n);
         progress("Inserting element", i, n);
         *it = std::make_pair(i + 1, i + 1);
         ++i;
     }
 
-    STXXL_CHECK(i == index + n);
+    die_unless(i == index + n);
 }
 
 //! Run external array test.
@@ -97,7 +100,7 @@ int run_external_array_test(size_t volume)
     {
         foxxll::scoped_print_timer timer("filling", volume);
 
-        STXXL_CHECK(N >= 10 + 355 + 2 * block_size);
+        die_unless(N >= 10 + 355 + 2 * block_size);
 
         fill(ea, 0, N);
     }
@@ -105,38 +108,38 @@ int run_external_array_test(size_t volume)
     {
         foxxll::scoped_print_timer timer("reading and checking", volume);
 
-        STXXL_CHECK(N > 5 * block_size + 876);
-        STXXL_CHECK(block_size > 34);
+        die_unless(N > 5 * block_size + 876);
+        die_unless(block_size > 34);
 
-        STXXL_CHECK_EQUAL(ea.size(), N);
+        die_unequal(ea.size(), N);
 
         // fetch first block
         ea.hint_next_block();
         ea.wait_next_blocks();
 
-        STXXL_CHECK(ea.buffer_size() > 7);
+        die_unless(ea.buffer_size() > 7);
 
         // Testing iterator...
 
         for (unsigned i = 0; i < 7; ++i) {
-            STXXL_CHECK_EQUAL((ea.begin() + i)->first, i + 1);
+            die_unequal((ea.begin() + i)->first, i + 1);
         }
 
-        STXXL_CHECK(ea.buffer_size() > 12);
+        die_unless(ea.buffer_size() > 12);
 
         // Testing random access...
 
         for (unsigned i = 7; i < 12; ++i) {
-            STXXL_CHECK_EQUAL(ea[i].first, i + 1);
+            die_unequal(ea[i].first, i + 1);
         }
 
         // Testing remove...
 
         ea.remove_items(33);
 
-        STXXL_CHECK_EQUAL(ea[33].first, 34);
-        STXXL_CHECK_EQUAL(ea.begin().get_index(), 33);
-        STXXL_CHECK_EQUAL(ea.begin()->first, 34);
+        die_unequal(ea[33].first, 34);
+        die_unequal(ea.begin().get_index(), 33);
+        die_unequal(ea.begin()->first, 34);
 
         // Testing get_next_block_min()...
 
@@ -144,15 +147,15 @@ int run_external_array_test(size_t volume)
 
         while (ea.get_next_block_min().first < 5 * block_size + 876) {
             switch (maxround) {
-            case 0: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 131073);
+            case 0: die_unequal(ea.get_next_block_min().first, 131073);
                 break;
-            case 1: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 262145);
+            case 1: die_unequal(ea.get_next_block_min().first, 262145);
                 break;
-            case 2: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 393217);
+            case 2: die_unequal(ea.get_next_block_min().first, 393217);
                 break;
-            case 3: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 524289);
+            case 3: die_unequal(ea.get_next_block_min().first, 524289);
                 break;
-            case 4: STXXL_CHECK_EQUAL(ea.get_next_block_min().first, 655361);
+            case 4: die_unequal(ea.get_next_block_min().first, 655361);
                 break;
             }
 
@@ -163,19 +166,19 @@ int run_external_array_test(size_t volume)
 
         // Testing request_further_block() (called above)...
 
-        STXXL_CHECK((ea.end() - 1)->first >= 5 * block_size + 876);
+        die_unless((ea.end() - 1)->first >= 5 * block_size + 876);
 
         size_t index = 33;
 
         for (ea_type::iterator it = ea.begin(); it != ea.end(); ++it) {
             progress("Extracting element", index, N);
-            STXXL_CHECK_EQUAL(it.get_index(), index);
-            STXXL_CHECK_EQUAL(it->first, index + 1);
+            die_unequal(it.get_index(), index);
+            die_unequal(it->first, index + 1);
             ++index;
         }
 
         ea.remove_items(ea.buffer_size());
-        STXXL_CHECK(ea.buffer_size() == 0);
+        die_unless(ea.buffer_size() == 0);
 
         // Extracting the rest...
 
@@ -187,12 +190,12 @@ int run_external_array_test(size_t volume)
                 ea.wait_next_blocks();
             }
 
-            STXXL_CHECK((size_t)(ea.end() - ea.begin()) == ea.buffer_size());
+            die_unless((size_t)(ea.end() - ea.begin()) == ea.buffer_size());
 
             for (ea_type::iterator it = ea.begin(); it != ea.end(); ++it) {
                 progress("Extracting element", index, N);
-                STXXL_CHECK_EQUAL(it.get_index(), index);
-                STXXL_CHECK_EQUAL(it->first, index + 1);
+                die_unequal(it.get_index(), index);
+                die_unequal(it->first, index + 1);
                 ++index;
             }
 
@@ -279,7 +282,7 @@ int run_multiway_merge(size_t volume)
         }
 
         for (ea_iterator ea = ealist.begin(); ea != ealist.end(); ++ea)
-            STXXL_CHECK_EQUAL((*ea)->buffer_size(), size);
+            die_unequal((*ea)->buffer_size(), size);
     }
 
     if (NumEAs > 0) // test ea ppq_iterators
@@ -291,26 +294,26 @@ int run_multiway_merge(size_t volume)
 
         // prefix operator ++
         for (ea_type::iterator it = begin; it != end; ++it, ++index)
-            STXXL_CHECK_EQUAL(it->first, index);
+            die_unequal(it->first, index);
 
         // prefix operator --
         for (ea_type::iterator it = end; it != begin; )
         {
             --it, --index;
-            STXXL_CHECK_EQUAL(it->first, index);
+            die_unequal(it->first, index);
         }
 
-        STXXL_CHECK_EQUAL(index, 1);
+        die_unequal(index, 1);
 
         // addition operator +
         for (ea_type::iterator it = begin; it != end; it = it + 1, ++index)
-            STXXL_CHECK_EQUAL(it->first, index);
+            die_unequal(it->first, index);
 
         // subtraction operator -
         for (ea_type::iterator it = end; it != begin; )
         {
             it = it - 1, --index;
-            STXXL_CHECK_EQUAL(it->first, index);
+            die_unequal(it->first, index);
         }
     }
 
@@ -348,7 +351,7 @@ int run_multiway_merge(size_t volume)
             for (ea_type::iterator it = out.begin(); it != out.end(); ++it)
             {
                 progress("Extracting element", index, (NumEAs + 1) * size);
-                STXXL_CHECK_EQUAL(it->first, index / (NumEAs + 1));
+                die_unequal(it->first, index / (NumEAs + 1));
 
                 ++index;
             }
@@ -366,7 +369,7 @@ int run_internal_array_test(size_t volume)
 {
     const size_t size = volume / sizeof(value_type);
     STXXL_VARDUMP(size);
-    STXXL_CHECK(size > 3);
+    die_unless(size > 3);
 
     std::vector<value_type> v(size);
 
@@ -390,16 +393,16 @@ int run_internal_array_test(size_t volume)
 
         // test iterator
         for (iterator it = ia.begin(); it != ia.end(); ++it) {
-            STXXL_CHECK_EQUAL(it->first, index++);
+            die_unequal(it->first, index++);
         }
 
         for (size_t i = 3; i < size; ++i) {
-            STXXL_CHECK_EQUAL(ia.begin()[i - 3].first, i + 1);
-            STXXL_CHECK_EQUAL(ia[i].first, i + 1);
+            die_unequal(ia.begin()[i - 3].first, i + 1);
+            die_unequal(ia[i].first, i + 1);
         }
 
-        STXXL_CHECK_EQUAL(index, size + 1);
-        STXXL_CHECK_EQUAL(ia.size(), size - 3);
+        die_unequal(index, size + 1);
+        die_unequal(ia.size(), size - 3);
     }
 
     return EXIT_SUCCESS;
@@ -410,9 +413,9 @@ int run_internal_array_test(size_t volume)
 int run_upper_bound_test(size_t volume)
 {
     const size_t size = volume / sizeof(value_type);
-    STXXL_CHECK(volume > ea_type::block_size);
+    die_unless(volume > ea_type::block_size);
     STXXL_VARDUMP(size);
-    STXXL_CHECK(size > 2000);
+    die_unless(size > 2000);
 
     ea_type::pool_type rw_pool;
 
@@ -441,7 +444,7 @@ int run_upper_bound_test(size_t volume)
 
         it = ea_writer.begin();
         for (size_t i = 0; i < size - 10; ++i, ++it) {
-            STXXL_CHECK_EQUAL(it->first, 2 * i);
+            die_unequal(it->first, 2 * i);
         }
     }
 
@@ -456,12 +459,12 @@ int run_upper_bound_test(size_t volume)
         ea_type::iterator uba = std::upper_bound(a.begin(), a.end(), minmax, value_comp());
         ea_type::iterator ubb = std::upper_bound(b.begin(), b.end(), minmax, value_comp());
 
-        STXXL_CHECK_EQUAL((uba - 1)->first, 2000);
-        STXXL_CHECK_EQUAL((ubb - 1)->first, 2000);
-        STXXL_CHECK_EQUAL(uba->first, 2001);
-        STXXL_CHECK_EQUAL(ubb->first, 2002);
-        STXXL_CHECK_EQUAL(uba.get_index(), 2000);
-        STXXL_CHECK_EQUAL(ubb.get_index(), 1001);
+        die_unequal((uba - 1)->first, 2000);
+        die_unequal((ubb - 1)->first, 2000);
+        die_unequal(uba->first, 2001);
+        die_unequal(ubb->first, 2002);
+        die_unequal(uba.get_index(), 2000);
+        die_unequal(ubb.get_index(), 1001);
     }
 
     return EXIT_SUCCESS;
