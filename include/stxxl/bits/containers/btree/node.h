@@ -13,12 +13,12 @@
 #ifndef STXXL_CONTAINERS_BTREE_NODE_HEADER
 #define STXXL_CONTAINERS_BTREE_NODE_HEADER
 
-#include <stxxl/bits/containers/btree/iterator.h>
-#include <stxxl/bits/containers/btree/node_cache.h>
-
 #include <algorithm>
 #include <functional>
 #include <utility>
+
+#include <stxxl/bits/containers/btree/iterator.h>
+#include <stxxl/bits/containers/btree/node_cache.h>
 
 namespace stxxl {
 namespace btree {

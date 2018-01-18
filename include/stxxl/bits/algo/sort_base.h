@@ -13,9 +13,9 @@
 #ifndef STXXL_ALGO_SORT_BASE_HEADER
 #define STXXL_ALGO_SORT_BASE_HEADER
 
-#include <foxxll/common/types.hpp>
-
 #include <cmath>
+
+#include <foxxll/common/types.hpp>
 
 #ifndef STXXL_SORT_OPTIMAL_PREFETCHING
 #define STXXL_SORT_OPTIMAL_PREFETCHING 1

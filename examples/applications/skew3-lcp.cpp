@@ -17,6 +17,20 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cassert>
+#include <cmath>
+
+#include <algorithm>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <foxxll/common/uint_types.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/io.hpp>
@@ -29,18 +43,6 @@
 #include <stxxl/timer>
 #include <stxxl/vector>
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <iterator>
-#include <limits>
-#include <numeric>
-#include <sstream>
-#include <string>
-#include <vector>
 
 using foxxll::external_size_type;
 

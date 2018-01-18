@@ -19,11 +19,11 @@
 #define STXXL_PARALLEL_SETTINGS_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/parallel/types.h>
-
 #if STXXL_PARALLEL
-  #include <omp.h>
+    #include <omp.h>
 #endif
+
+#include <stxxl/bits/parallel/types.h>
 
 namespace stxxl {
 namespace parallel {

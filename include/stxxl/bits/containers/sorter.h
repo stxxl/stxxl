@@ -13,10 +13,10 @@
 #ifndef STXXL_CONTAINERS_SORTER_HEADER
 #define STXXL_CONTAINERS_SORTER_HEADER
 
+#include <algorithm>
+
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/stream/sort_stream.h>
-
-#include <algorithm>
 
 namespace stxxl {
 

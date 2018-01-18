@@ -19,10 +19,9 @@
 #include <random>
 
 #include <foxxll/common/types.hpp>
+
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/config.h>
-
-
 
 // Recommended seeding procedure:
 // by default, the global seed is initialized from a high resolution timer and the process id

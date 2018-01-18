@@ -15,6 +15,8 @@
 #ifndef STXXL_ALGO_LOSERTREE_HEADER
 #define STXXL_ALGO_LOSERTREE_HEADER
 
+#include <algorithm>
+
 #include <foxxll/common/types.hpp>
 #include <foxxll/common/utils.hpp>
 
@@ -23,8 +25,6 @@
 
 #include <stxxl/types>
 #include <tlx/math/integer_log2.hpp>
-
-#include <algorithm>
 
 namespace stxxl {
 

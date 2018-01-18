@@ -12,6 +12,7 @@
 
 //! [example]
 #include <iostream>
+
 #include <stxxl/vector>
 
 int main()

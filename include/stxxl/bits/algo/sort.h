@@ -31,6 +31,7 @@
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/block_prefetcher.hpp>
 #include <foxxll/mng/buf_writer.hpp>
+
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/intksort.h>

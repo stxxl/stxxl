@@ -14,12 +14,12 @@
 #ifndef STXXL_ALGO_RUN_CURSOR_HEADER
 #define STXXL_ALGO_RUN_CURSOR_HEADER
 
+#include <cassert>
+#include <cstdlib>
+
 #include <tlx/define.hpp>
 
 #include <foxxll/common/types.hpp>
-
-#include <cassert>
-#include <cstdlib>
 
 namespace stxxl {
 

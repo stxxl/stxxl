@@ -17,16 +17,16 @@
 #ifndef STXXL_PARALLEL_TIMING_HEADER
 #define STXXL_PARALLEL_TIMING_HEADER
 
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/parallel/tags.h>
-
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 
+#include <stxxl/bits/config.h>
 #if STXXL_PARALLEL
-  #include <omp.h>
+    #include <omp.h>
 #endif
+
+#include <stxxl/bits/parallel/tags.h>
 
 namespace stxxl {
 namespace parallel {

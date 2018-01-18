@@ -17,6 +17,12 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <numeric>
+#include <vector>
+
 #include <tlx/define.hpp>
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -32,12 +38,6 @@
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/tags.h>
 #include <stxxl/bits/parallel/timing.h>
-
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <numeric>
-#include <vector>
 
 #if defined(_MSC_VER) && STXXL_EXPENSIVE_ASSERTIONS
 #include <BaseTsd.h>

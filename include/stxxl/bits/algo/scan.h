@@ -18,6 +18,7 @@
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
 #include <foxxll/mng/config.hpp>
+
 #include <stxxl/types>
 
 namespace stxxl {

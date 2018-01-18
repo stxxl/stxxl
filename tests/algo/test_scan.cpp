@@ -15,6 +15,9 @@
 //! \example algo/test_scan.cpp
 //! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
 
+#include <algorithm>
+#include <iostream>
+
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
@@ -22,9 +25,6 @@
 
 #include <stxxl/scan>
 #include <stxxl/vector>
-
-#include <algorithm>
-#include <iostream>
 
 using foxxll::timestamp;
 

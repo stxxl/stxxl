@@ -17,12 +17,12 @@
 #ifndef STXXL_PARALLEL_MERGE_HEADER
 #define STXXL_PARALLEL_MERGE_HEADER
 
-#include <stxxl/bits/parallel/compiletime_settings.h>
-
 #include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <utility>
+
+#include <stxxl/bits/parallel/compiletime_settings.h>
 
 namespace stxxl {
 namespace parallel {

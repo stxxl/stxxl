@@ -17,6 +17,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cassert>
+#include <cctype>
+#include <cstddef>
+#include <cstdlib>
+
+#include <algorithm>
+#include <iostream>
+#include <limits>
+#include <string>
+#include <vector>
+
 #include <foxxll/common/uint_types.hpp>
 #include <foxxll/io.hpp>
 #include <stxxl/algorithm>
@@ -25,16 +36,6 @@
 #include <stxxl/sorter>
 #include <stxxl/stream>
 #include <stxxl/vector>
-
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <limits>
-#include <string>
-#include <vector>
 
 using foxxll::external_size_type;
 namespace stream = stxxl::stream;

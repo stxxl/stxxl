@@ -35,8 +35,6 @@
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
 
-
-
 namespace stxxl {
 
 //! \defgroup stlcont_stack stack

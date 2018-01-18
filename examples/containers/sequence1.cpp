@@ -12,6 +12,7 @@
 
 //! [example]
 #include <iostream>
+
 #include <stxxl/sequence>
 
 int main()

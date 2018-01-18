@@ -13,11 +13,12 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
-#include <foxxll/common/types.hpp>
-#include <tlx/logger.hpp>
-
 #include <cassert>
 #include <iterator>
+
+#include <tlx/logger.hpp>
+
+#include <foxxll/common/types.hpp>
 
 namespace stxxl {
 namespace btree {

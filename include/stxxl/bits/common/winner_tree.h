@@ -14,15 +14,15 @@
 #ifndef STXXL_COMMON_WINNER_TREE_HEADER
 #define STXXL_COMMON_WINNER_TREE_HEADER
 
-#include <foxxll/common/timer.hpp>
-#include <foxxll/common/utils.hpp>
-#include <tlx/logger.hpp>
-#include <tlx/math/integer_log2.hpp>
-
 #include <cassert>
 #include <limits>
 #include <string>
 #include <vector>
+
+#include <foxxll/common/timer.hpp>
+#include <foxxll/common/utils.hpp>
+#include <tlx/logger.hpp>
+#include <tlx/math/integer_log2.hpp>
 
 namespace stxxl {
 

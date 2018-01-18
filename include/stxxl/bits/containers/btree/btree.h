@@ -13,6 +13,11 @@
 #ifndef STXXL_CONTAINERS_BTREE_BTREE_HEADER
 #define STXXL_CONTAINERS_BTREE_BTREE_HEADER
 
+#include <algorithm>
+#include <limits>
+#include <map>
+#include <utility>
+
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/iterator_map.h>
 #include <stxxl/bits/containers/btree/leaf.h>
@@ -20,11 +25,6 @@
 #include <stxxl/bits/containers/btree/node_cache.h>
 #include <stxxl/bits/containers/btree/root_node.h>
 #include <stxxl/vector>
-
-#include <algorithm>
-#include <limits>
-#include <map>
-#include <utility>
 
 namespace stxxl {
 namespace btree {

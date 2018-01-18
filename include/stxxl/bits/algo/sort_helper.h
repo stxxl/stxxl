@@ -14,13 +14,13 @@
 #ifndef STXXL_ALGO_SORT_HELPER_HEADER
 #define STXXL_ALGO_SORT_HELPER_HEADER
 
+#include <algorithm>
+#include <functional>
+
 #include <tlx/define.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/algo/run_cursor.h>
-
-#include <algorithm>
-#include <functional>
 
 namespace stxxl {
 

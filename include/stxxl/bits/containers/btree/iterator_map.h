@@ -13,12 +13,13 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 
-#include <foxxll/common/error_handling.hpp>
-#include <stxxl/bits/containers/btree/iterator.h>
-
 #include <algorithm>
 #include <map>
 #include <utility>
+
+#include <foxxll/common/error_handling.hpp>
+
+#include <stxxl/bits/containers/btree/iterator.h>
 
 namespace stxxl {
 namespace btree {

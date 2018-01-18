@@ -14,9 +14,9 @@
 #ifndef STXXL_COMMON_LOG_HEADER
 #define STXXL_COMMON_LOG_HEADER
 
-#include <foxxll/singleton.hpp>
-
 #include <fstream>
+
+#include <foxxll/singleton.hpp>
 
 namespace stxxl {
 
