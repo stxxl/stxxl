@@ -350,11 +350,11 @@ public:
     }
 };
 
-template <typename BlockType, typename RunType, typename KeyExtractor>
+template <typename BlockType, typename RunType, typename KeyExtractorWithMin>
 bool check_ksorted_runs(RunType** runs,
                         size_t nruns,
                         size_t m,
-                        KeyExtractor keyext)
+                        KeyExtractorWithMin keyext)
 {
     using block_type = BlockType;
     using value_type = typename BlockType::value_type;
@@ -420,7 +420,7 @@ bool check_ksorted_runs(RunType** runs,
             }
             if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
                                   make_element_iterator(blocks, nelements),
-                                  key_comparison<value_type, KeyExtractor>()))
+                                  key_comparison<value_type, KeyExtractorWithMin>()))
             {
                 LOG1 << "check_sorted_runs  wrong order in the run " << irun;
                 LOG1 << "Data in blocks:";
@@ -732,12 +732,12 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
  * \param keyobj \link design_algo_ksort_key_extractor key extractor \endlink object
  * \param M amount of memory for internal use (in bytes)
  */
-template <typename ExtIterator, typename KeyExtractor>
-void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
+template <typename ExtIterator, typename KeyExtractorWithMinMax>
+void ksort(ExtIterator first, ExtIterator last, KeyExtractorWithMinMax keyobj, size_t M)
 {
     using run_type = tlx::simple_vector<
               ksort_local::trigger_entry<
-                  typename ExtIterator::bid_type, typename KeyExtractor::key_type
+                  typename ExtIterator::bid_type, typename KeyExtractorWithMinMax::key_type
                   >
               >;
     using value_type = typename ExtIterator::vector_type::value_type;
@@ -755,7 +755,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
     if ((last - first) * sizeof(value_type) < M)
     {
         stl_in_memory_sort(first, last,
-                           ksort_local::key_comparison<value_type, KeyExtractor>(keyobj));
+                           ksort_local::key_comparison<value_type, KeyExtractorWithMinMax>(keyobj));
     }
     else
     {
@@ -809,7 +809,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 run_type* out =
                     ksort_local::ksort_blocks<
                         block_type, alloc_strategy_type,
-                        bids_container_iterator, KeyExtractor
+                        bids_container_iterator, KeyExtractorWithMinMax
                         >(first.bid(), n, M / block_type::raw_size, keyobj);
 
                 first_block = new block_type;
@@ -900,7 +900,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 run_type* out =
                     ksort_local::ksort_blocks<
                         block_type, alloc_strategy_type,
-                        bids_container_iterator, KeyExtractor
+                        bids_container_iterator, KeyExtractorWithMinMax
                         >(first.bid(), n, M / block_type::raw_size, keyobj);
 
                 first_block = new block_type;
@@ -977,7 +977,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 run_type* out =
                     ksort_local::ksort_blocks<
                         block_type, alloc_strategy_type,
-                        bids_container_iterator, KeyExtractor
+                        bids_container_iterator, KeyExtractorWithMinMax
                         >(first.bid(), n, M / block_type::raw_size, keyobj);
 
                 last_block = new block_type;
@@ -1023,7 +1023,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
                 run_type* out =
                     ksort_local::ksort_blocks<
                         block_type, alloc_strategy_type,
-                        bids_container_iterator, KeyExtractor
+                        bids_container_iterator, KeyExtractorWithMinMax
                         >(first.bid(), n, M / block_type::raw_size, keyobj);
 
                 typename run_type::iterator it = out->begin();
@@ -1042,7 +1042,7 @@ void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, size_t M)
 #if STXXL_CHECK_ORDER_IN_SORTS
     using const_iterator = typename ExtIterator::const_iterator;
     assert(stxxl::is_sorted(const_iterator(first), const_iterator(last),
-                            ksort_local::key_comparison<value_type, KeyExtractor>()));
+                            ksort_local::key_comparison<value_type, KeyExtractorWithMinMax>()));
 #endif
 }
 

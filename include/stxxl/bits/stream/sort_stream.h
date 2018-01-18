@@ -51,19 +51,19 @@ namespace stream {
 //! Forms sorted runs of data from a stream.
 //!
 //! \tparam Input type of the input stream
-//! \tparam CompareType type of comparison object used for sorting the runs
+//! \tparam CompareWithMax type of comparison object used for sorting the runs
 //! \tparam BlockSize size of blocks used to store the runs (in bytes)
 //! \tparam AllocStr functor that defines allocation strategy for the runs
 template <
     class Input,
-    class CompareType,
+    class CompareWithMax,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
     class AllocStr = foxxll::default_alloc_strategy>
 class basic_runs_creator
 {
 public:
     using input_type = Input;
-    using cmp_type = CompareType;
+    using cmp_type = CompareWithMax;
     static const size_t block_size = BlockSize;
     using allocation_strategy_type = AllocStr;
 
@@ -81,7 +81,7 @@ protected:
     //! reference to the input stream
     Input& m_input;
     //! comparator used to sort block groups
-    CompareType m_cmp;
+    CompareWithMax m_cmp;
 
 private:
     //! stores the result (sorted runs) as smart pointer
@@ -138,7 +138,7 @@ public:
     //! \param cmp comparator object
     //! \param memory_to_use memory amount that is allowed to used by the
     //! sorter in bytes
-    basic_runs_creator(Input& input, CompareType cmp,
+    basic_runs_creator(Input& input, CompareWithMax cmp,
                        size_t memory_to_use)
         : m_input(input),
           m_cmp(cmp),
@@ -960,11 +960,11 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 //! Merges sorted runs.
 //!
 //! \tparam RunsType type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
-//! \tparam CompareType type of comparison object used for merging
+//! \tparam CompareWithMinMax type of comparison object used for merging
 //! \tparam AllocStr allocation strategy used to allocate the blocks for
 //! storing intermediate results if several merge passes are required
 template <class RunsType,
-          class CompareType,
+          class CompareWithMinMax,
           class AllocStr = foxxll::default_alloc_strategy>
 class basic_runs_merger
 {
@@ -972,7 +972,7 @@ class basic_runs_merger
 
 public:
     using sorted_runs_type = RunsType;
-    using value_cmp = CompareType;
+    using value_cmp = CompareWithMinMax;
     using alloc_strategy = AllocStr;
 
     using sorted_runs_data_type = typename sorted_runs_type::element_type;

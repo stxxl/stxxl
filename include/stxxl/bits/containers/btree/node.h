@@ -26,18 +26,18 @@ namespace btree {
 template <class NodeType, class BTreeType>
 class node_cache;
 
-template <class KeyType, class KeyCmp, unsigned RawSize, class BTreeType>
+template <class KeyType, class KeyCompareWithMax, unsigned RawSize, class BTreeType>
 class normal_node
 {
     static constexpr bool debug = false;
 
 public:
-    using self_type = normal_node<KeyType, KeyCmp, RawSize, BTreeType>;
+    using self_type = normal_node<KeyType, KeyCompareWithMax, RawSize, BTreeType>;
 
     friend class node_cache<self_type, BTreeType>;
 
     using key_type = KeyType;
-    using key_compare = KeyCmp;
+    using key_compare = KeyCompareWithMax;
 
     enum {
         raw_size = RawSize

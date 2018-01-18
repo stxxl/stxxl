@@ -253,7 +253,7 @@ void merge4_iterator(
  * Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
  * \tparam Arity  maximum arity of merger, does not need to be a power of 2
  */
-template <class ArraysType, class CompareType, unsigned Arity>
+template <class ArraysType, class CompareWithMin, unsigned Arity>
 class loser_tree
 {
     static constexpr bool debug = false;
@@ -262,7 +262,7 @@ public:
     //! type of arrays container linked with loser tree
     using arrays_type = ArraysType;
     //! comparator object type
-    using compare_type = CompareType;
+    using compare_type = CompareWithMin;
 
     // arity_bound / 2  <  arity  <=  arity_bound
     enum { arity = Arity, max_arity = 1UL << (tlx::Log2<Arity>::ceil) };

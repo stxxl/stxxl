@@ -27,19 +27,19 @@ namespace btree {
 template <class NodeType, class BTreeType>
 class node_cache;
 
-template <class KeyType, class DataType, class KeyCmp, unsigned RawSize, class BTreeType>
+template <class KeyType, class DataType, class KeyCompareWithMax, unsigned RawSize, class BTreeType>
 class normal_leaf
 {
     static constexpr bool debug = false;
 
 public:
-    using self_type = normal_leaf<KeyType, DataType, KeyCmp, RawSize, BTreeType>;
+    using self_type = normal_leaf<KeyType, DataType, KeyCompareWithMax, RawSize, BTreeType>;
 
     friend class node_cache<self_type, BTreeType>;
 
     using key_type = KeyType;
     using data_type = DataType;
-    using key_compare = KeyCmp;
+    using key_compare = KeyCompareWithMax;
     using value_type = std::pair<key_type, data_type>;
     using reference = value_type &;
     using const_reference = const value_type &;
