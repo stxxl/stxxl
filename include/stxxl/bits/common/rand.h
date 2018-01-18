@@ -15,17 +15,14 @@
 #ifndef STXXL_COMMON_RAND_HEADER
 #define STXXL_COMMON_RAND_HEADER
 
+#include <cmath>
+#include <random>
+
 #include <foxxll/common/types.hpp>
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/config.h>
 
-#include <cmath>
 
-#if STXXL_STD_RANDOM
- #include <random>
-#elif STXXL_BOOST_RANDOM
- #include <boost/random.hpp>
-#endif
 
 // Recommended seeding procedure:
 // by default, the global seed is initialized from a high resolution timer and the process id
@@ -148,7 +145,7 @@ struct random_uniform_fast
 struct random_uniform_slow
 {
     using value_type = double;
-#if STXXL_STD_RANDOM
+
     using gen_type = std::default_random_engine;
     mutable gen_type gen;
     using uni_type = std::uniform_real_distribution<>;
@@ -157,85 +154,12 @@ struct random_uniform_slow
     explicit random_uniform_slow(unsigned seed = get_next_seed())
         : gen(seed), uni(0.0, 1.0)
     { }
-#elif STXXL_BOOST_RANDOM
-    using base_generator_type = boost::minstd_rand;
-    base_generator_type generator;
-    boost::uniform_real<> uni_dist;
-    mutable boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
 
-    explicit random_uniform_slow(unsigned seed = get_next_seed())
-        : uni(generator, uni_dist)
-    {
-        uni.engine().seed(seed);
-    }
-#else
-    mutable unsigned short state48[3];
-/*
- * embedded erand48.c
- *
- * Copyright (c) 1993 Martin Birgmeier
- * All rights reserved.
- *
- * You may redistribute unmodified or modified versions of this source
- * code provided that the above copyright notice and this and the
- * following conditions are retained.
- *
- * This software is provided ``as is'', and comes with no warranties
- * of any kind. I shall in no event be liable for anything that happens
- * to anyone/anything when using this software.
- */
-    static void
-    _dorand48(unsigned short xseed[3])
-    {
-        unsigned long accu;
-        unsigned short temp[2];
-
-        static const unsigned short _mult[3] = { 0xe66d, 0xdeec, 0x0005 };
-        static const unsigned short _add = 0x000b;
-
-        accu = (unsigned long)_mult[0] * (unsigned long)xseed[0]
-               + (unsigned long)_add;
-        temp[0] = (unsigned short)accu;         /* lower 16 bits */
-        accu >>= sizeof(unsigned short) * 8;
-        accu += (unsigned long)_mult[0] * (unsigned long)xseed[1]
-                + (unsigned long)_mult[1] * (unsigned long)xseed[0];
-        temp[1] = (unsigned short)accu;         /* middle 16 bits */
-        accu >>= sizeof(unsigned short) * 8;
-        accu += _mult[0] * xseed[2] + _mult[1] * xseed[1] + _mult[2] * xseed[0];
-        xseed[0] = temp[0];
-        xseed[1] = temp[1];
-        xseed[2] = (unsigned short)accu;
-    }
-
-    static double
-    _erand48(unsigned short xseed[3])
-    {
-        _dorand48(xseed);
-        return ldexp((double)xseed[0], -48)
-               + ldexp((double)xseed[1], -32)
-               + ldexp((double)xseed[2], -16);
-    }
-/* end erand48.c */
-
-    explicit random_uniform_slow(unsigned seed = get_next_seed())
-    {
-        state48[0] = (unsigned short)(seed & 0xffff);
-        state48[1] = (unsigned short)(seed >> 16);
-        state48[2] = 42;
-        _dorand48(state48);
-    }
-#endif
 
     //! Returns a random number from [0.0, 1.0)
     inline value_type operator () () const
     {
-#if STXXL_STD_RANDOM
         return uni(gen);
-#elif STXXL_BOOST_RANDOM
-        return uni();
-#else
-        return _erand48(state48);
-#endif
     }
 };
 
