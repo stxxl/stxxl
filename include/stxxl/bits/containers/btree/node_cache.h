@@ -116,7 +116,7 @@ public:
         LOG << "btree::node_cache constructor nodes=" << nnodes;
         if (nnodes < 3)
         {
-            STXXL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
+            FOXXLL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
         }
         m_nodes.reserve(nnodes);
         m_reqs.resize(nnodes);

@@ -164,7 +164,7 @@ private:
             LOG << "btree Increasing height to " << m_height;
             if (m_node_cache.size() < (m_height - 1))
             {
-                STXXL_THROW2(std::runtime_error, "btree::bulk_construction",
+                FOXXLL_THROW2(std::runtime_error, "btree::bulk_construction",
                              "The height of the tree (" << m_height << ") has exceeded the required capacity (" << (m_node_cache.size() + 1) << ") of the node cache. Increase the node cache size.");
             }
         }
@@ -423,7 +423,7 @@ private:
             LOG << "Increasing height to " << m_height;
             if (m_node_cache.size() < (m_height - 1))
             {
-                STXXL_THROW2(std::runtime_error, "btree::bulk_construction",
+                FOXXLL_THROW2(std::runtime_error, "btree::bulk_construction",
                              "The height of the tree (" << m_height << ") has exceeded the required capacity (" << (m_node_cache.size() + 1) << ") of the node cache. Increase the node cache size.");
             }
         }

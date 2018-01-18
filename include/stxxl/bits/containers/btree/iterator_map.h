@@ -119,7 +119,7 @@ public:
             }
         }
 
-        STXXL_THROW2(std::runtime_error, "btree::iterator_map::unregister_iterator", "Panic in btree::iterator_map, can not find and unregister iterator");
+        FOXXLL_THROW2(std::runtime_error, "btree::iterator_map::unregister_iterator", "Panic in btree::iterator_map, can not find and unregister iterator");
     }
     template <class OutputContainer>
     void find(const bid_type& bid,
