@@ -28,6 +28,7 @@
 
 #include <tlx/logger.hpp>
 
+#include <stxxl/bits/defines.h>
 #include <stxxl/scan>
 #include <stxxl/sort>
 #include <stxxl/stream>

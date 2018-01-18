@@ -14,6 +14,7 @@
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
 #include <stxxl/algorithm>
+#include <stxxl/bits/defines.h>
 #include <stxxl/stream>
 #include <stxxl/vector>
 

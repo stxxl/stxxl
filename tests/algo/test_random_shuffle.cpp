@@ -22,6 +22,7 @@
 
 #include <tlx/logger.hpp>
 
+#include <stxxl/bits/defines.h>
 #include <stxxl/random_shuffle>
 #include <stxxl/vector>
 

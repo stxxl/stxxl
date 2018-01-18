@@ -23,6 +23,7 @@
 
 #include <tlx/logger.hpp>
 
+#include <stxxl/bits/defines.h>
 #include <stxxl/stream>
 
 const unsigned long long megabyte = 1024 * 1024;

@@ -29,6 +29,8 @@
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
 #include <foxxll/mng/write_pool.hpp>
+
+#include <stxxl/bits/defines.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
 

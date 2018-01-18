@@ -21,6 +21,7 @@
 #include <foxxll/mng.hpp>
 
 #include <stxxl/bits/common/padding.h>
+#include <stxxl/bits/defines.h>
 #include <stxxl/sort>
 #include <stxxl/vector>
 

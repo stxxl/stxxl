@@ -18,6 +18,7 @@
 
 #include <tlx/logger.hpp>
 
+#include <stxxl/bits/defines.h>
 #include <stxxl/stream>
 
 struct Input

@@ -15,14 +15,15 @@
 //! \example algo/test_stable_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
+#include <vector>
+
 #include <tlx/logger.hpp>
 
 #include <foxxll/mng.hpp>
 
+#include <stxxl/bits/defines.h>
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
-
-#include <vector>
 
 #include <key_with_padding.h>
 

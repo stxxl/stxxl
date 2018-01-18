@@ -32,6 +32,8 @@
 #include <foxxll/mng/buf_istream_reverse.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
 #include <foxxll/mng/typed_block.hpp>
+
+#include <stxxl/bits/defines.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/deprecated.h>

@@ -85,4 +85,8 @@
 // used in deprecated.h
 // turns off deprecated warnings for some forced template instantiations
 
+#ifndef STXXL_DEFAULT_BLOCK_SIZE
+#define STXXL_DEFAULT_BLOCK_SIZE(type) (2 * 1024 * 1024)
+#endif
+
 #endif // !STXXL_DEFINES_HEADER
