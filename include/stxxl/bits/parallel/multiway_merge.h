@@ -34,6 +34,7 @@
 #include <stxxl/bits/parallel/timing.h>
 
 #include <algorithm>
+#include <cassert>
 #include <iterator>
 #include <numeric>
 #include <vector>

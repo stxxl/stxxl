@@ -20,6 +20,7 @@
 //! \example algo/test_random_shuffle.cpp
 //! Test \c stxxl::random_shuffle()
 
+#include <cassert>
 #include <iostream>
 
 #include <tlx/logger.hpp>

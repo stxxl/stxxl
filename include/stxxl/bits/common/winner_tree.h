@@ -19,6 +19,7 @@
 #include <tlx/logger.hpp>
 #include <tlx/math/integer_log2.hpp>
 
+#include <cassert>
 #include <limits>
 #include <string>
 #include <vector>

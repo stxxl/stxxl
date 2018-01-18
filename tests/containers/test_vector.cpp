@@ -18,6 +18,7 @@
 //! to store 64-bit integers and have 2 pages each of 1 block
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 
 #include <tlx/die.hpp>

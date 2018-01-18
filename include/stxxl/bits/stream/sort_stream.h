@@ -17,6 +17,7 @@
 #define STXXL_STREAM_SORT_STREAM_HEADER
 
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <utility>
 #include <vector>

@@ -15,15 +15,17 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
+#include <cassert>
+#include <memory>
+
 #include <tlx/define.hpp>
 
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
+
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/vector>
-
-#include <memory>
 
 namespace stxxl {
 

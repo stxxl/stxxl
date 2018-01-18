@@ -15,6 +15,8 @@
 #ifndef STXXL_STREAM_MATERIALIZE_HEADER
 #define STXXL_STREAM_MATERIALIZE_HEADER
 
+#include <cassert>
+
 #include <stxxl/vector>
 
 namespace stxxl {
