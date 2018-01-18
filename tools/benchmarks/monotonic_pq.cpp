@@ -12,8 +12,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cassert>
+#include <iostream>
 #include <limits>
 #include <queue>
+
+#include <tlx/logger.hpp>
 
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
@@ -28,6 +32,7 @@
 #include <stxxl/timer>
 
 const size_t mega = 1024 * 1024;
+constexpr bool debug = false;
 
 #define RECORD_SIZE 16
 #define LOAD 0
@@ -120,7 +125,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    STXXL_MSG("----------------------------------------");
+    LOG1 << "----------------------------------------";
 
     foxxll::config::get_instance();
     std::string Flags = std::string("")
@@ -149,12 +154,12 @@ int main(int argc, char* argv[])
                         + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER"
 #endif
     ;
-    STXXL_MSG("Flags:" << Flags);
+    LOG1 << "Flags:" << Flags;
 
     unsigned long megabytes = atoi(argv[1]);
 #if defined(STXXL_PARALLEL_MODE)
     int num_threads = atoi(argv[2]);
-    STXXL_MSG("Threads: " << num_threads);
+    LOG1 << "Threads: " << num_threads;
 
     omp_set_num_threads(num_threads);
     __gnu_parallel::_Settings parallel_settings(__gnu_parallel::_Settings::get());
@@ -179,7 +184,7 @@ int main(int argc, char* argv[])
     const size_t mem_for_pools = 512 * mega;
 
 #if TINY_PQ
-    stxxl::STXXL_UNUSED(mem_for_queue);
+    tlx::unused(mem_for_queue);
     const unsigned BufferSize1 = 32;               // equalize procedure call overheads etc.
     const unsigned N = (1 << 9) / sizeof(my_type); // minimal sequence length
     const unsigned IntKMAX = 8;                    // maximal arity for internal mergersq
@@ -201,7 +206,7 @@ int main(int argc, char* argv[])
                   >
               >;
 #elif MANUAL_PQ
-    stxxl::STXXL_UNUSED(mem_for_queue);
+    tlx::unused(mem_for_queue);
     const unsigned BufferSize1 = 32;                    // equalize procedure call overheads etc.
     const unsigned N = (1 << 20) / sizeof(my_type);     // minimal sequence length
     const unsigned IntKMAX = 16;                        // maximal arity for internal mergersq
@@ -226,27 +231,16 @@ int main(int argc, char* argv[])
     const uint64_t volume = uint64_t(200000) * mega;     // in bytes
     using gen = stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1>;
     using pq_type = gen::result;
-//         BufferSize1 = Config::BufferSize1,
-//         N = Config::N,
-//         IntKMAX = Config::IntKMAX,
-//         IntLevels = Config::IntLevels,
-//         ExtLevels = Config::ExtLevels,
-//         Levels = Config::IntLevels + Config::ExtLevels,
-//         BlockSize = Config::BlockSize,
-//         ExtKMAX = Config::ExtKMAX
-
-/*  STXXL_MSG ( "Blocks fitting into internal memory m: "<<gen::m );
-  STXXL_MSG ( "X : "<<gen::X );  //maximum number of internal elements //X = B * (settings::k - m) / settings::E,
-  STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MiB");*/
 #endif
-    STXXL_MSG("Internal arity: " << pq_type::IntKMAX);
-    STXXL_MSG("N : " << pq_type::N); //X / (AI * AI)
-    STXXL_MSG("External arity: " << pq_type::ExtKMAX);
-    STXXL_MSG("Block size B: " << pq_type::BlockSize);
+
+    LOG1 << "Internal arity: " << pq_type::IntKMAX;
+    LOG1 << "N : " << pq_type::N; //X / (AI * AI)
+    LOG1 << "External arity: " << pq_type::ExtKMAX;
+    LOG1 << "Block size B: " << pq_type::BlockSize;
     //EConsumption = X * settings::E + settings::B * AE + ((MaxS_ / X) / AE) * settings::B * 1024
 
-    STXXL_MSG("Data type size: " << sizeof(my_type));
-    STXXL_MSG("");
+    LOG1 << "Data type size: " << sizeof(my_type);
+    LOG1 << "";
 
     foxxll::stats_data sd_start(*foxxll::stats::get_instance());
     foxxll::timer Timer;
@@ -255,9 +249,9 @@ int main(int argc, char* argv[])
     pq_type p(mem_for_pools / 2, mem_for_pools / 2);
     uint64_t nelements = uint64_t(megabytes) * mega / sizeof(my_type);
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-    STXXL_MSG("Peak number of elements (n): " << nelements);
-    STXXL_MSG("Max number of elements to contain: " << (uint64_t(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
+    LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
+    LOG1 << "Peak number of elements (n): " << nelements;
+    LOG1 << "Max number of elements to contain: " << (uint64_t(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX);
     srand(5);
     my_cmp cmp;
     my_key_type r, sum_input = 0, sum_output = 0;
@@ -271,16 +265,15 @@ int main(int argc, char* argv[])
 
     my_type side_pq_least;
 
-    STXXL_MSG("op-sequence(monotonic pq): ( push, pop, push ) * n");
+    LOG1 << "op-sequence(monotonic pq): ( push, pop, push ) * n";
     for (uint64_t i = 0; i < nelements; ++i)
     {
         if ((i % mega) == 0)
-            STXXL_MSG(
-                std::fixed << std::setprecision(2) << std::setw(5)
-                           << (100.0 * (double)i / (double)nelements) << "% "
-                           << "Inserting element " << i << " top() == " << least.key << " @ "
-                           << std::setprecision(3) << Timer.seconds() << " s"
-                           << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
+            LOG1 << std::fixed << std::setprecision(2) << std::setw(5)
+                 << (100.0 * (double)i / (double)nelements) << "% "
+                 << "Inserting element " << i << " top() == " << least.key << " @ "
+                 << std::setprecision(3) << Timer.seconds() << " s"
+                 << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield);
 
         //monotone priority queue
         r = least.key + rand() % modulo;
@@ -297,12 +290,12 @@ int main(int argc, char* argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
-            STXXL_MSG("Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key);
+            LOG1 << "Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key;
 #endif
 
         if (cmp(last_least, least))
         {
-            STXXL_MSG("Wrong order at  " << i << "  " << last_least.key << " > " << least.key);
+            LOG1 << "Wrong order at  " << i << "  " << last_least.key << " > " << least.key;
         }
         else
             last_least = least;
@@ -315,15 +308,15 @@ int main(int argc, char* argv[])
 #endif
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
+    LOG1 << "Time spent for filling: " << Timer.seconds() << " s";
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
     foxxll::stats_data sd_middle(*foxxll::stats::get_instance());
     std::cout << sd_middle - sd_start;
     Timer.reset();
     Timer.start();
 
-    STXXL_MSG("op-sequence(monotonic pq): ( pop, push, pop ) * n");
+    LOG1 << "op-sequence(monotonic pq): ( pop, push, pop ) * n";
     for (uint64_t i = 0; i < nelements; ++i)
     {
         assert(!p.empty());
@@ -336,12 +329,12 @@ int main(int argc, char* argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
+            LOG << "" << side_pq_least << " != " << least;
         }
 #endif
         if (cmp(last_least, least))
         {
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
+            LOG1 << "Wrong result at " << i << "  " << last_least.key << " > " << least.key;
         }
         else
             last_least = least;
@@ -361,32 +354,31 @@ int main(int argc, char* argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
+            LOG << "" << side_pq_least << " != " << least;
         }
 #endif
         if (cmp(last_least, least))
         {
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
+            LOG1 << "Wrong result at " << i << "  " << last_least.key << " > " << least.key;
         }
         else
             last_least = least;
 
         if ((i % mega) == 0)
-            STXXL_MSG(
-                std::fixed << std::setprecision(2) << std::setw(5)
-                           << (100.0 * (double)i / (double)nelements) << "% "
-                           << "Popped element " << i << " == " << least.key << " @ "
-                           << std::setprecision(3) << Timer.seconds() << " s"
-                           << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
+            LOG1 << std::fixed << std::setprecision(2) << std::setw(5)
+                 << (100.0 * (double)i / (double)nelements) << "% "
+                 << "Popped element " << i << " == " << least.key << " @ "
+                 << std::setprecision(3) << Timer.seconds() << " s"
+                 << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield);
     }
-    STXXL_MSG("Last element " << nelements << " popped");
+    LOG1 << "Last element " << nelements << " popped";
     Timer.stop();
 
     if (sum_input != sum_output)
-        STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
+        LOG1 << "WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output);
 
-    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    LOG1 << "Time spent for removing elements: " << Timer.seconds() << " s";
+    LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - sd_middle;
     std::cout << *foxxll::stats::get_instance();
 

@@ -17,12 +17,21 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGE_HEADER
 
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <numeric>
+#include <vector>
+
+#include <tlx/define.hpp>
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
 #include <tlx/loser_tree.hpp>
 
 #include <foxxll/common/utils.hpp>
-#include <foxxll/verbose.hpp>
 
 #include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/expensive_assert.h>
 #include <stxxl/bits/parallel/equally_split.h>
 #include <stxxl/bits/parallel/merge.h>
 #include <stxxl/bits/parallel/multiseq_selection.h>
@@ -30,12 +39,7 @@
 #include <stxxl/bits/parallel/tags.h>
 #include <stxxl/bits/parallel/timing.h>
 
-#include <algorithm>
-#include <iterator>
-#include <numeric>
-#include <vector>
-
-#if defined(_MSC_VER) && STXXL_DEBUG_ASSERTIONS
+#if defined(_MSC_VER) && STXXL_EXPENSIVE_ASSERTIONS
 #include <BaseTsd.h>
 using ssize_t = SSIZE_T;
 #endif
@@ -394,14 +398,15 @@ RandomAccessIterator3 multiway_merge_3_variant(
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 3);
+    assert(seqs_end - seqs_begin == 3);
+    tlx::unused(seqs_end);
     using RandomAccessIterator = typename std::iterator_traits<RandomAccessIteratorIterator>
                                  ::value_type::first_type;
 
     if (length == 0)
         return target;
 
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
     ssize_t orig_length = length;
 #endif
 
@@ -453,11 +458,11 @@ RandomAccessIterator3 multiway_merge_3_variant(
 #undef STXXL_MERGE3CASE
 
 finish:
-#if STXXL_DEBUG_ASSERTIONS
-    STXXL_CHECK_EQUAL((seq0.iterator() - seqs_begin[0].first) +
-                      (seq1.iterator() - seqs_begin[1].first) +
-                      (seq2.iterator() - seqs_begin[2].first),
-                      orig_length);
+#if STXXL_EXPENSIVE_ASSERTIONS
+    die_unequal((seq0.iterator() - seqs_begin[0].first) +
+                (seq1.iterator() - seqs_begin[1].first) +
+                (seq2.iterator() - seqs_begin[2].first),
+                orig_length);
 #endif
 
     seqs_begin[0].first = seq0.iterator();
@@ -486,7 +491,7 @@ RandomAccessIterator3 multiway_merge_3_combined(
                      ::difference_type;
 
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 3);
+    assert(seqs_end - seqs_begin == 3);
 
     int min_seq;
     RandomAccessIterator3 target_end;
@@ -510,8 +515,8 @@ RandomAccessIterator3 multiway_merge_3_combined(
         target_end = target;
     }
 
-    STXXL_DEBUG_ASSERT(target_end == target + length - overhang);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length - overhang);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     switch (min_seq)
     {
@@ -538,8 +543,8 @@ RandomAccessIterator3 multiway_merge_3_combined(
         assert(false);
     }
 
-    STXXL_DEBUG_ASSERT(target_end == target + length);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     return target_end;
 }
@@ -582,14 +587,15 @@ RandomAccessIterator3 multiway_merge_4_variant(
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 4);
+    assert(seqs_end - seqs_begin == 4);
+    tlx::unused(seqs_end);
     using RandomAccessIterator = typename std::iterator_traits<RandomAccessIteratorIterator>
                                  ::value_type::first_type;
 
     if (length == 0)
         return target;
 
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
     ssize_t orig_length = length;
 #endif
 
@@ -670,12 +676,12 @@ RandomAccessIterator3 multiway_merge_4_variant(
 #undef STXXL_DECISION
 
 finish:
-#if STXXL_DEBUG_ASSERTIONS
-    STXXL_CHECK_EQUAL((seq0.iterator() - seqs_begin[0].first) +
-                      (seq1.iterator() - seqs_begin[1].first) +
-                      (seq2.iterator() - seqs_begin[2].first) +
-                      (seq3.iterator() - seqs_begin[3].first),
-                      orig_length);
+#if STXXL_EXPENSIVE_ASSERTIONS
+    die_unequal((seq0.iterator() - seqs_begin[0].first) +
+                (seq1.iterator() - seqs_begin[1].first) +
+                (seq2.iterator() - seqs_begin[2].first) +
+                (seq3.iterator() - seqs_begin[3].first),
+                orig_length);
 #endif
 
     seqs_begin[0].first = seq0.iterator();
@@ -700,7 +706,7 @@ RandomAccessIterator3 multiway_merge_4_combined(
     Comparator comp)
 {
     STXXL_PARALLEL_PCALL(length);
-    STXXL_ASSERT(seqs_end - seqs_begin == 4);
+    assert(seqs_end - seqs_begin == 4);
     using RandomAccessIteratorPair = typename std::iterator_traits<RandomAccessIteratorIterator>
                                      ::value_type;
     using DiffType = typename std::iterator_traits<RandomAccessIteratorIterator>
@@ -728,8 +734,8 @@ RandomAccessIterator3 multiway_merge_4_combined(
         target_end = target;
     }
 
-    STXXL_DEBUG_ASSERT(target_end == target + length - overhang);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length - overhang);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     std::vector<RandomAccessIteratorPair> one_missing(seqs_begin, seqs_end);
     one_missing.erase(one_missing.begin() + min_seq);                                               //remove
@@ -739,8 +745,8 @@ RandomAccessIterator3 multiway_merge_4_combined(
     one_missing.insert(one_missing.begin() + min_seq, seqs_begin[min_seq]);                         //insert back again
     std::copy(one_missing.begin(), one_missing.end(), seqs_begin);                                  //write back modified iterators
 
-    STXXL_DEBUG_ASSERT(target_end == target + length);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     return target_end;
 }
@@ -980,7 +986,7 @@ RandomAccessIterator3 multiway_merge_loser_tree(
 
     for (source_type t = 0; t < k; ++t)
     {
-        if (UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
+        if (TLX_UNLIKELY(seqs_begin[t].first == seqs_begin[t].second))
             lt.insert_start(nullptr, t, true);
         else
             lt.insert_start(&*seqs_begin[t].first, t, false);
@@ -1069,7 +1075,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
 
     int source;
 
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
     DiffType i = 0;
 #endif
 
@@ -1079,7 +1085,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
         // take out
         source = lt.min_source();
 
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
         assert(i == 0 || !comp(*(seqs_begin[source].first), *(target - 1)));
 #endif
 
@@ -1087,7 +1093,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_unguarded(
         ++seqs_begin[source].first;
         ++target;
 
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
         assert((seqs_begin[source].first != seqs_begin[source].second) || (i == length - 1));
         ++i;
 #endif
@@ -1198,15 +1204,15 @@ RandomAccessIterator3 multiway_merge_loser_tree_combined(
         target_end = target;
     }
 
-    STXXL_DEBUG_ASSERT(target_end == target + length - overhang);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length - overhang);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     target_end = multiway_merge_loser_tree
                  <typename loser_tree_traits<Stable, value_type, Comparator>::LT>
                      (seqs_begin, seqs_end, target_end, overhang, comp);
 
-    STXXL_DEBUG_ASSERT(target_end == target + length);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     return target_end;
 }
@@ -1240,8 +1246,8 @@ RandomAccessIterator3 multiway_merge_loser_tree_sentinel(
           <typename loser_tree_traits_unguarded<Stable, value_type, Comparator>::LT>
               (seqs_begin, seqs_end, target, length, comp);
 
-    STXXL_DEBUG_ASSERT(target_end == target + length);
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target_end, comp));
+    STXXL_EXPENSIVE_ASSERT(target_end == target + length);
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target_end, comp));
 
     // restore end of sequences
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
@@ -1286,7 +1292,7 @@ RandomAccessIterator3 sequential_multiway_merge(
                        ::value_type;
 
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
-        STXXL_DEBUG_ASSERT(stxxl::is_sorted((*s).first, (*s).second, comp));
+        STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted((*s).first, (*s).second, comp));
 
     RandomAccessIterator3 return_target = target;
     int k = static_cast<int>(seqs_end - seqs_begin);
@@ -1374,7 +1380,7 @@ RandomAccessIterator3 sequential_multiway_merge(
     }
     }
 
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target + length, comp));
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target + length, comp));
 
     return return_target;
 }
@@ -1593,7 +1599,7 @@ RandomAccessIterator3 parallel_multiway_merge(
                      ::difference_type;
 
     for (RandomAccessIteratorIterator rii = seqs_begin; rii != seqs_end; ++rii)
-        STXXL_DEBUG_ASSERT(stxxl::is_sorted((*rii).first, (*rii).second, comp));
+        STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted((*rii).first, (*rii).second, comp));
 
     // leave only non-empty sequences
     std::vector<RandomAccessIteratorPair> seqs_ne;
@@ -1675,7 +1681,7 @@ RandomAccessIterator3 parallel_multiway_merge(
     for (int pr = 0; pr < num_threads; ++pr)
         t[pr].tic();
 
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(target, target + length, comp));
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(target, target + length, comp));
 
     //update ends of sequences
     size_t count_seqs = 0;
@@ -1685,7 +1691,7 @@ RandomAccessIterator3 parallel_multiway_merge(
         if (length > 0)
             raii->first = chunks[num_threads - 1][count_seqs++].second;
     }
-    STXXL_DEBUG_ASSERT(count_seqs == num_seqs);
+    STXXL_EXPENSIVE_ASSERT(count_seqs == num_seqs);
 
     delete[] chunks;
 

@@ -16,6 +16,8 @@
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
 //! block size \b 4096 bytes
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/stack>
 
 // forced instantiation
@@ -27,7 +29,7 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " number_of_stacks");
+        LOG1 << "Usage: " << argv[0] << " number_of_stacks";
         return -1;
     }
 

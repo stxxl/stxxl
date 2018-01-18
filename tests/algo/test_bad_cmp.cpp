@@ -17,7 +17,12 @@
 //! This is an example of how NOT to use \c stxxl::sort() algorithm.
 //! Here min_value and max_value are used as keys which is forbidden.
 
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng.hpp>
+
+#include <stxxl/bits/defines.h>
 #include <stxxl/sort>
 #include <stxxl/vector>
 
@@ -81,7 +86,7 @@ int main(int argc, char* argv[])
     const size_t SIZE = (argc >= 2) ? strtoul(argv[1], nullptr, 0) : 16;
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     size_t memory_to_use = SIZE * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     using vector_type = stxxl::vector<my_type>;
@@ -92,20 +97,20 @@ int main(int argc, char* argv[])
     uint64_t aliens, not_stable;
     size_t bs = vector_type::block_type::size;
 
-    STXXL_MSG("Filling vector with min_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
+    LOG1 << "Filling vector with min_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)";
     for (vector_type::size_type i = 0; i < v.size(); i++) {
         v[i].m_key = 0;
         v[i].m_data = (int)(i + 1);
     }
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
-    STXXL_MSG("Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...");
+    LOG1 << "Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...";
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -115,14 +120,14 @@ int main(int argc, char* argv[])
             ++not_stable;
         v[i].m_data = (int)(i + 1);
     }
-    STXXL_MSG("elements that were not in the input:     " << aliens);
-    STXXL_MSG("elements not on their expected location: " << not_stable);
+    LOG1 << "elements that were not in the input:     " << aliens;
+    LOG1 << "elements not on their expected location: " << not_stable;
 
-    STXXL_MSG("Sorting subset (using " << (memory_to_use >> 20) << " MiB of memory)...");
+    LOG1 << "Sorting subset (using " << (memory_to_use >> 20) << " MiB of memory)...";
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -132,20 +137,20 @@ int main(int argc, char* argv[])
             ++not_stable;
         v[i].m_data = (int)(i + 1);
     }
-    STXXL_MSG("elements that were not in the input:     " << aliens);
-    STXXL_MSG("elements not on their expected location: " << not_stable);
+    LOG1 << "elements that were not in the input:     " << aliens;
+    LOG1 << "elements not on their expected location: " << not_stable;
 
-    STXXL_MSG("Filling vector with max_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
+    LOG1 << "Filling vector with max_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)";
     for (vector_type::size_type i = 0; i < v.size(); i++) {
         v[i].m_key = unsigned(-1);
         v[i].m_data = int(i + 1);
     }
 
-    STXXL_MSG("Sorting subset (using " << (memory_to_use >> 20) << " MiB of memory)...");
+    LOG1 << "Sorting subset (using " << (memory_to_use >> 20) << " MiB of memory)...";
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -155,10 +160,10 @@ int main(int argc, char* argv[])
             ++not_stable;
         v[i].m_data = int(i + 1);
     }
-    STXXL_MSG("elements that were not in the input:     " << aliens);
-    STXXL_MSG("elements not on their expected location: " << not_stable);
+    LOG1 << "elements that were not in the input:     " << aliens;
+    LOG1 << "elements not on their expected location: " << not_stable;
 
-    STXXL_MSG("Done, output size=" << v.size() << " block size=" << bs);
+    LOG1 << "Done, output size=" << v.size() << " block size=" << bs;
 
     return 0;
 }

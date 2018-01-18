@@ -18,6 +18,7 @@
 #define STXXL_ALGO_TRIGGER_ENTRY_HEADER
 
 #include <foxxll/mng/bid.hpp>
+
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/types>
 

@@ -11,6 +11,9 @@
  **************************************************************************/
 
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/deque>
 
 int main()
@@ -59,7 +62,7 @@ int main()
         ++deque_iterator;
     }
 
-    STXXL_MSG("smaller left: " << smaller_left << ", smaller right: " << smaller_right);
+    LOG1 << "smaller left: " << smaller_left << ", smaller right: " << smaller_right;
 
     return 0;
 }

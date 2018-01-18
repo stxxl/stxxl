@@ -17,7 +17,8 @@
 #ifndef STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 #define STXXL_PARALLEL_COMPILETIME_SETTINGS_HEADER
 
-#include <cstdio>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/settings.h>
 
@@ -27,25 +28,22 @@ namespace parallel {
 /** STXXL_PARALLEL_PCALL Macro to produce log message when entering a
  *  function.
  *  \param n Input size.
- *  \see STXXL_VERBOSE_LEVEL */
-#if (STXXL_VERBOSE_LEVEL <= 0)
-#define STXXL_PARALLEL_PCALL(n)
-#endif
+ */
 
-#if (STXXL_VERBOSE_LEVEL >= 1)
+constexpr bool debug_pcalls = false;
+
 #if STXXL_PARALLEL
-#define STXXL_PARALLEL_PCALL(n)                        \
-    STXXL_MSG("   " << __FUNCTION__ << ":\n"           \
-              "iam = " << omp_get_thread_num() << ", " \
-              "n = " << (n) << ", "                    \
-              "num_threads = " << SETTINGS::num_threads);
+#define STXXL_PARALLEL_PCALL(n)                          \
+    LOGC(debug_pcalls) << "   " << __FUNCTION__ << ":\n" \
+        "iam = " << omp_get_thread_num() << ", "         \
+        "n = " << (n) << ", "                            \
+        "num_threads = " << int(SETTINGS::num_threads);
 #else
-#define STXXL_PARALLEL_PCALL(n)              \
-    STXXL_MSG("   " << __FUNCTION__ << ":\n" \
-              "iam = single-threaded, "      \
-              "n = " << (n) << ", "          \
-              "num_threads = " << SETTINGS::num_threads);
-#endif
+#define STXXL_PARALLEL_PCALL(n)                          \
+    LOGC(debug_pcalls) << "   " << __FUNCTION__ << ":\n" \
+        "iam = single-threaded, "                        \
+        "n = " << (n) << ", "                            \
+        "num_threads = " << int(SETTINGS::num_threads);
 #endif
 
 /** First copy the data, sort it locally, and merge it back (0); or copy it

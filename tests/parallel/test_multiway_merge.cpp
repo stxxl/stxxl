@@ -10,8 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
 #include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/parallel.h>
 #include <stxxl/random>
 
@@ -102,7 +105,7 @@ void test_vecs(unsigned int vecnum)
     {
         sequences[i] = std::make_pair(vec[i].begin(), vec[i].end() - (Sentinels ? 1 : 0));
 
-        STXXL_CHECK(stxxl::is_sorted(vec[i].cbegin(), vec[i].cend()));
+        die_unless(stxxl::is_sorted(vec[i].cbegin(), vec[i].cend()));
     }
 
     if (!Sentinels) {
@@ -147,7 +150,7 @@ void test_vecs(unsigned int vecnum)
             std::cout << output[i] << " ";
     }
 
-    STXXL_CHECK(output == correct);
+    die_unless(output == correct);
 }
 
 void test_all()

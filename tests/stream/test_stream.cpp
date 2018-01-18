@@ -17,10 +17,15 @@
 //! stream package. The example sorts characters of a string producing an
 //! array of sorted tuples (character, index position).
 
+#include <iostream>
 #include <limits>
+#include <vector>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/stream>
 #include <stxxl/vector>
-#include <vector>
 
 // comment if you want to use one 'sort' algorithm without producing
 // intermediate sorted runs.
@@ -185,40 +190,40 @@ int main()
     // HERE streaming part ends (materializing)
     output_array_type::iterator o = stxxl::stream::materialize(transformed_stream, output.begin(), output.end());
     // or materialize(sorted_stream,output.begin());
-    STXXL_CHECK(o == output.end());
+    die_unless(o == output.end());
 
-    STXXL_MSG("input string (character,position) :");
+    LOG1 << "input string (character,position) :";
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << input[i] << "'," << i << ")");
+        LOG1 << "('" << input[i] << "'," << i << ")";
     }
-    STXXL_MSG("sorted tuples (character,position):");
+    LOG1 << "sorted tuples (character,position):";
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << output[i].first << "'," << output[i].second << ")");
+        LOG1 << "('" << output[i].first << "'," << output[i].second << ")";
     }
 
-    STXXL_CHECK(output[0] == tuple_type(' ', 5));
-    STXXL_CHECK(output[1] == tuple_type(' ', 8));
-    STXXL_CHECK(output[2] == tuple_type(' ', 15));
-    STXXL_CHECK(output[3] == tuple_type(',', 14));
-    STXXL_CHECK(output[4] == tuple_type('H', 0));
-    STXXL_CHECK(output[5] == tuple_type('a', 1));
-    STXXL_CHECK(output[6] == tuple_type('a', 4));
-    STXXL_CHECK(output[7] == tuple_type('a', 7));
-    STXXL_CHECK(output[8] == tuple_type('a', 13));
-    STXXL_CHECK(output[9] == tuple_type('a', 17));
-    STXXL_CHECK(output[10] == tuple_type('b', 16));
-    STXXL_CHECK(output[11] == tuple_type('b', 18));
-    STXXL_CHECK(output[12] == tuple_type('i', 10));
-    STXXL_CHECK(output[13] == tuple_type('l', 6));
-    STXXL_CHECK(output[14] == tuple_type('s', 2));
-    STXXL_CHECK(output[15] == tuple_type('s', 11));
-    STXXL_CHECK(output[16] == tuple_type('t', 3));
-    STXXL_CHECK(output[17] == tuple_type('t', 12));
-    STXXL_CHECK(output[18] == tuple_type('v', 9));
-    STXXL_CHECK(output[19] == tuple_type('y', 19));
-    STXXL_CHECK(output.size() == 20);
+    die_unless(output[0] == tuple_type(' ', 5));
+    die_unless(output[1] == tuple_type(' ', 8));
+    die_unless(output[2] == tuple_type(' ', 15));
+    die_unless(output[3] == tuple_type(',', 14));
+    die_unless(output[4] == tuple_type('H', 0));
+    die_unless(output[5] == tuple_type('a', 1));
+    die_unless(output[6] == tuple_type('a', 4));
+    die_unless(output[7] == tuple_type('a', 7));
+    die_unless(output[8] == tuple_type('a', 13));
+    die_unless(output[9] == tuple_type('a', 17));
+    die_unless(output[10] == tuple_type('b', 16));
+    die_unless(output[11] == tuple_type('b', 18));
+    die_unless(output[12] == tuple_type('i', 10));
+    die_unless(output[13] == tuple_type('l', 6));
+    die_unless(output[14] == tuple_type('s', 2));
+    die_unless(output[15] == tuple_type('s', 11));
+    die_unless(output[16] == tuple_type('t', 3));
+    die_unless(output[17] == tuple_type('t', 12));
+    die_unless(output[18] == tuple_type('v', 9));
+    die_unless(output[19] == tuple_type('y', 19));
+    die_unless(output.size() == 20);
 
     std::cout << *s;
 

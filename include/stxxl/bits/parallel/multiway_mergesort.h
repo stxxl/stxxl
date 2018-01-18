@@ -17,18 +17,19 @@
 #ifndef STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
 #define STXXL_PARALLEL_MULTIWAY_MERGESORT_HEADER
 
+#include <algorithm>
+#include <iterator>
+#include <utility>
+#include <vector>
+
 #include <stxxl/bits/config.h>
+#include <stxxl/bits/expensive_assert.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
 #include <stxxl/bits/parallel/equally_split.h>
 #include <stxxl/bits/parallel/multiseq_selection.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 #include <stxxl/bits/parallel/settings.h>
 #include <stxxl/bits/parallel/timing.h>
-
-#include <algorithm>
-#include <iterator>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 
@@ -165,7 +166,7 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     else
         std::sort(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp);
 
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(sd->sorting_places[iam], sd->sorting_places[iam] + length_local, comp));
 
     // invariant: locally sorted subsequence in sd->sorting_places[iam], sd->sorting_places[iam] + length_local
 
@@ -275,14 +276,14 @@ inline void parallel_sort_mwms_pu(PMWMSSorterPU<RandomAccessIterator>* d,
     {
         seqs[s] = std::make_pair(sd->sorting_places[s] + sd->pieces[iam][s].begin, sd->sorting_places[s] + sd->pieces[iam][s].end);
 
-        STXXL_DEBUG_ASSERT(stxxl::is_sorted(seqs[s].first, seqs[s].second, comp));
+        STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(seqs[s].first, seqs[s].second, comp));
     }
 
     sequential_multiway_merge<Stable, false>(seqs.begin(), seqs.end(), sd->merging_places[iam], length_am, comp);
 
     t.tic("merge");
 
-    STXXL_DEBUG_ASSERT(stxxl::is_sorted(sd->merging_places[iam], sd->merging_places[iam] + length_am, comp));
+    STXXL_EXPENSIVE_ASSERT(stxxl::is_sorted(sd->merging_places[iam], sd->merging_places[iam] + length_am, comp));
 
 #pragma omp barrier
 

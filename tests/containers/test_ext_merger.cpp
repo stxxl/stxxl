@@ -14,6 +14,8 @@
 #include <iterator>
 #include <limits>
 
+#include <tlx/die.hpp>
+
 #include <stxxl/priority_queue>
 
 using my_type = int;
@@ -80,7 +82,7 @@ int main()
     merger.append_merger(dummy, 1024 * 4);
     merger.append_merger(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
-    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend()));
+    die_unless(stxxl::is_sorted(output.cbegin(), output.cend()));
 
     int_merger<my_type, my_cmp, 8> loser;
     my_type* seq1 = make_sequence(dummy, 1024);
@@ -97,7 +99,7 @@ int main()
     loser.append_array(seq4, 1024);
 
     loser.multi_merge(out, out + 1024);
-    STXXL_CHECK(stxxl::is_sorted(out, out + 1024));
+    die_unless(stxxl::is_sorted(out, out + 1024));
 
     delete[] out;
 }

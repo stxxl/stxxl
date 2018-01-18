@@ -14,14 +14,15 @@
 #ifndef STXXL_COMMON_WINNER_TREE_HEADER
 #define STXXL_COMMON_WINNER_TREE_HEADER
 
-#include <foxxll/common/timer.hpp>
-#include <foxxll/common/utils.hpp>
-#include <foxxll/verbose.hpp>
-#include <tlx/math/integer_log2.hpp>
-
+#include <cassert>
 #include <limits>
 #include <string>
 #include <vector>
+
+#include <foxxll/common/timer.hpp>
+#include <foxxll/common/utils.hpp>
+#include <tlx/logger.hpp>
+#include <tlx/math/integer_log2.hpp>
 
 namespace stxxl {
 
@@ -43,6 +44,8 @@ namespace stxxl {
 template <typename Comparator>
 class winner_tree
 {
+    static constexpr bool debug = false;
+
 protected:
     //! the binary tree of size 2^(k+1)-1
     std::vector<size_t> m_tree;
@@ -90,7 +93,7 @@ public:
     winner_tree(size_t num_players, Comparator& less)
         : m_less(less), invalid_key(std::numeric_limits<size_t>::max())
     {
-        STXXL_ASSERT(num_players > 0 && num_players <= invalid_key);
+        assert(num_players > 0 && num_players <= invalid_key);
 
         m_num_slots = (1 << tlx::integer_log2_ceil(num_players));
         size_t treesize = (m_num_slots << 1) - 1;
@@ -100,7 +103,7 @@ public:
     //! activate one of the static players or add a new one and replay
     inline void activate_player(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
+        assert(index != invalid_key);
         while (index >= m_num_slots)
             double_num_slots();
         replay_on_change(index);
@@ -109,7 +112,7 @@ public:
     //! activate a player and resize if necessary
     inline void activate_without_replay(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
+        assert(index != invalid_key);
         while (index >= m_num_slots)
             double_num_slots();
         m_tree[((m_tree.size() / 2) + index)] = index;
@@ -118,16 +121,16 @@ public:
     //! deactivate a player
     inline void deactivate_without_replay(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
-        STXXL_ASSERT(index < m_num_slots);
+        assert(index != invalid_key);
+        assert(index < m_num_slots);
         m_tree[((m_tree.size() / 2) + index)] = invalid_key;
     }
 
     //! deactivate a player and replay.
     inline void deactivate_player(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
-        STXXL_ASSERT(index < m_num_slots);
+        assert(index != invalid_key);
+        assert(index < m_num_slots);
         replay_on_change(index, true);
     }
 
@@ -139,8 +142,8 @@ public:
      */
     inline void deactivate_player_step(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
-        STXXL_ASSERT(index < m_num_slots);
+        assert(index != invalid_key);
+        assert(index < m_num_slots);
 
         m_stats.remove_player_time.start();
         size_t p = (m_tree.size() / 2) + index;
@@ -161,15 +164,15 @@ public:
     //! Replay after the player at index has been deactivated.
     inline void replay_on_deactivations(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
-        STXXL_ASSERT(index < m_num_slots);
+        assert(index != invalid_key);
+        assert(index < m_num_slots);
         replay_on_change(index, true);
     }
 
     //! Notify that the value of the player at index has changed.
     inline void notify_change(size_t index)
     {
-        STXXL_ASSERT(index != invalid_key);
+        assert(index != invalid_key);
         replay_on_change(index);
     }
 
@@ -195,7 +198,7 @@ public:
     //! Replay after the value of the winning player has changed.
     inline void replay_on_pop()
     {
-        STXXL_ASSERT(!empty());
+        assert(!empty());
         replay_on_change(m_tree[0]);
     }
 
@@ -211,7 +214,7 @@ public:
      */
     inline void replay_on_change(size_t index, bool done = false)
     {
-        STXXL_ASSERT(index != invalid_key);
+        assert(index != invalid_key);
         m_stats.replay_time.start();
 
         size_t top;
@@ -298,7 +301,7 @@ public:
     inline void resize_and_rebuild(size_t num_players)
     {
         //resize(num_players);
-        STXXL_ASSERT(num_players > 0);
+        assert(num_players > 0);
         resize_and_clear(num_players);
         for (size_t i = 0; i < num_players; ++i)
             activate_without_replay(i);
@@ -358,8 +361,8 @@ public:
     //! Print statistical data.
     void print_stats() const
     {
-        STXXL_VARDUMP(m_num_slots);
-        STXXL_MSG(m_stats);
+        LOG << "m_num_slots = " << m_num_slots;
+        LOG1 << m_stats;
     }
 };
 

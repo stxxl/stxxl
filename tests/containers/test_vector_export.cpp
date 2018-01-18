@@ -15,6 +15,10 @@
 
 #include <algorithm>
 #include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/scan>
 #include <stxxl/vector>
 
@@ -27,7 +31,7 @@ int main()
     stxxl::random_number32 rnd;
     int offset = rnd();
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
     vector_type::size_type i;
@@ -36,12 +40,12 @@ int main()
     for (i = 0; i < v.size(); ++i)
     {
         v[i] = i + offset;
-        STXXL_CHECK(v[i] == int64_t(i + offset));
+        die_unless(v[i] == int64_t(i + offset));
     }
 
     v.flush();
 
-    STXXL_MSG("export files");
+    LOG1 << "export files";
     v.export_files("exported_");
 
     return 0;

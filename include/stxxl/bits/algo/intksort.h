@@ -13,8 +13,9 @@
 #ifndef STXXL_ALGO_INTKSORT_HEADER
 #define STXXL_ALGO_INTKSORT_HEADER
 
+#include <tlx/unused.hpp>
+
 #include <foxxll/common/types.hpp>
-#include <foxxll/unused.hpp>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/types>
 
@@ -361,7 +362,7 @@ void classify_block(Type* begin, Type* end, TypeKey*& out, size_t* bucket, typen
         out->key = key;
         bucket[ibucket]++;
     }
-    foxxll::STXXL_UNUSED(K);
+    tlx::unused(K);
 }
 
 } // namespace stxxl

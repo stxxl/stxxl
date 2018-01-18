@@ -14,7 +14,11 @@
 //! This is an example of how to represent a 2D matrix by using an \c stxxl::vector.
 //! DISCLAIMER: The approach is very basic and the matrix multiplication is NOT I/O-EFFICIENT.
 
+#include <cassert>
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/vector>
 
 template <typename T>
@@ -91,11 +95,11 @@ int main()
     }
     catch (const std::exception& ex)
     {
-        STXXL_MSG("Caught exception: " << ex.what());
+        LOG1 << "Caught exception: " << ex.what();
     }
     catch (...)
     {
-        STXXL_MSG("Caught unknown exception.");
+        LOG1 << "Caught unknown exception.";
     }
 
     return 0;

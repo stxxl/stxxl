@@ -14,12 +14,13 @@
 #ifndef STXXL_ALGO_SORT_HELPER_HEADER
 #define STXXL_ALGO_SORT_HELPER_HEADER
 
-#include <foxxll/verbose.hpp>
-
-#include <stxxl/bits/algo/run_cursor.h>
-
 #include <algorithm>
 #include <functional>
+
+#include <tlx/define.hpp>
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/algo/run_cursor.h>
 
 namespace stxxl {
 
@@ -29,10 +30,10 @@ namespace sort_helper {
 template <typename StrictWeakOrdering>
 inline void verify_sentinel_strict_weak_ordering(StrictWeakOrdering cmp)
 {
-    STXXL_ASSERT(!cmp(cmp.min_value(), cmp.min_value()));
-    STXXL_ASSERT(cmp(cmp.min_value(), cmp.max_value()));
-    STXXL_ASSERT(!cmp(cmp.max_value(), cmp.min_value()));
-    STXXL_ASSERT(!cmp(cmp.max_value(), cmp.max_value()));
+    assert(!cmp(cmp.min_value(), cmp.min_value()));
+    assert(cmp(cmp.min_value(), cmp.max_value()));
+    assert(!cmp(cmp.max_value(), cmp.min_value()));
+    assert(!cmp(cmp.max_value(), cmp.max_value()));
 }
 
 template <typename BlockType, typename ValueType = typename BlockType::value_type>
@@ -86,10 +87,10 @@ struct run_cursor2_cmp
     run_cursor2_cmp(const run_cursor2_cmp& a) : cmp(a.cmp) { }
     inline bool operator () (const cursor_type& a, const cursor_type& b) const
     {
-        if (UNLIKELY(b.empty()))
+        if (TLX_UNLIKELY(b.empty()))
             return true;
         // sentinel emulation
-        if (UNLIKELY(a.empty()))
+        if (TLX_UNLIKELY(a.empty()))
             return false;
         // sentinel emulation
 
@@ -110,10 +111,10 @@ count_elements_less_equal(const SequenceVector& seqs,
     for (seqs_size_type i = 0; i < seqs.size(); ++i)
     {
         iterator position = std::upper_bound(seqs[i].first, seqs[i].second, bound, cmp);
-        STXXL_VERBOSE1("less equal than " << position - seqs[i].first);
+        LOG0 << "less equal than " << position - seqs[i].first;
         count += position - seqs[i].first;
     }
-    STXXL_VERBOSE1("finished loop");
+    LOG0 << "finished loop";
     return count;
 }
 
@@ -134,13 +135,13 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
             {
                 seqs[i].first = buffers[i]->begin();            // reset iterator
                 seqs[i].second = buffers[i]->end();
-                STXXL_VERBOSE1("block ran empty " << i);
+                LOG0 << "block ran empty " << i;
             }
             else
             {
                 seqs.erase(seqs.begin() + i);                   // remove this sequence
                 buffers.erase(buffers.begin() + i);
-                STXXL_VERBOSE1("seq removed " << i);
+                LOG0 << "seq removed " << i;
                 --i;                                            // don't skip the next sequence
             }
         }

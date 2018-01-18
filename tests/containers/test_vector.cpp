@@ -18,7 +18,12 @@
 //! to store 64-bit integers and have 2 pages each of 1 block
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/scan>
 #include <stxxl/vector>
 
@@ -77,7 +82,7 @@ void test_vector1()
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
-    STXXL_UNUSED(c_it);
+    tlx::unused(c_it);
 
     unsigned int big_size = 2 * 32 * STXXL_DEFAULT_BLOCK_SIZE(double);
     using vec_big = stxxl::vector<double>;
@@ -91,7 +96,7 @@ void test_vector1()
     stxxl::random_number32 rnd;
     int offset = rnd();
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
     vector_type::size_type i;
@@ -100,14 +105,14 @@ void test_vector1()
     for (i = 0; i < v.size(); ++i)
     {
         v[i].key = i + offset;
-        STXXL_CHECK(v[i].key == uint64_t(i + offset));
+        die_unless(v[i].key == uint64_t(i + offset));
     }
 
     // fill the vector with random numbers
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
     v.flush();
 
-    STXXL_MSG("seq read of " << v.size() << " elements");
+    LOG1 << "seq read of " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
 
@@ -117,10 +122,10 @@ void test_vector1()
     std::swap(v, a);
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].key == rnd());
+        die_unless(v[i].key == rnd());
 
     // check again
-    STXXL_MSG("clear");
+    LOG1 << "clear";
 
     v.clear();
 
@@ -128,24 +133,24 @@ void test_vector1()
 
     v.resize(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
 
     stxxl::ran32State = 0xdeadbeef + 10;
 
-    STXXL_MSG("seq read of " << v.size() << " elements");
+    LOG1 << "seq read of " << v.size() << " elements";
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].key == rnd());
+        die_unless(v[i].key == rnd());
 
-    STXXL_MSG("copy vector of " << v.size() << " elements");
+    LOG1 << "copy vector of " << v.size() << " elements";
 
     vector_type v_copy0(v);
-    STXXL_CHECK(v == v_copy0);
+    die_unless(v == v_copy0);
 
     vector_type v_copy1;
     v_copy1 = v;
-    STXXL_CHECK(v == v_copy1);
+    die_unless(v == v_copy1);
 }
 
 //! check vector::resize(n,true)

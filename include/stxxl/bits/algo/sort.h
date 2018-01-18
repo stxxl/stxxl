@@ -16,6 +16,14 @@
 #ifndef STXXL_ALGO_SORT_HEADER
 #define STXXL_ALGO_SORT_HEADER
 
+#include <algorithm>
+#include <functional>
+#include <utility>
+#include <vector>
+
+#include <tlx/logger.hpp>
+#include <tlx/simple_vector.hpp>
+
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/io/request_operations.hpp>
 #include <foxxll/mng/async_schedule.hpp>
@@ -23,6 +31,7 @@
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/block_prefetcher.hpp>
 #include <foxxll/mng/buf_writer.hpp>
+
 #include <stxxl/bits/algo/bid_adapter.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/intksort.h>
@@ -35,12 +44,6 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/parallel.h>
-#include <tlx/simple_vector.hpp>
-
-#include <algorithm>
-#include <functional>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 
@@ -50,6 +53,8 @@ namespace stxxl {
 /*! \internal
  */
 namespace sort_local {
+
+constexpr bool debug = false;
 
 template <typename BlockType, typename BidType>
 struct read_next_after_write_completed
@@ -82,7 +87,7 @@ create_runs(
     using request_ptr = foxxll::request_ptr;
 
     using bid_type = typename block_type::bid_type;
-    STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
+    LOG << "stxxl::create_runs nruns=" << nruns << " m=" << _m;
 
     const size_t m2 = _m / 2;
     foxxll::block_manager* bm = foxxll::block_manager::get_instance();
@@ -108,7 +113,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting read " << Blocks1[i].elem);
+        LOG << "stxxl::create_runs posting read " << Blocks1[i].elem;
         bids1[i] = *(it++);
         read_reqs1[i] = Blocks1[i].read(bids1[i]);
     }
@@ -117,7 +122,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting read " << Blocks2[i].elem);
+        LOG << "stxxl::create_runs posting read " << Blocks2[i].elem;
         bids2[i] = *(it++);
         read_reqs2[i] = Blocks2[i].read(bids2[i]);
     }
@@ -127,12 +132,15 @@ create_runs(
         run_type* run = runs[k];
         run_size = run->size();
         assert(run_size == m2);
-        size_t next_run_size = runs[k + 1]->size();
-        STXXL_ASSERT((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
+        {
+            size_t next_run_size = runs[k + 1]->size();
+            assert((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
+            tlx::unused(next_run_size);
+        }
 
-        STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
+        LOG << "stxxl::create_runs start waiting read_reqs1";
         wait_all(read_reqs1, run_size);
-        STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
+        LOG << "stxxl::create_runs finish waiting read_reqs1";
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
@@ -142,15 +150,15 @@ create_runs(
              make_element_iterator(Blocks1, run_size * block_type::size),
              cmp);
 
-        STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
+        LOG << "stxxl::create_runs start waiting write_reqs";
         if (k > 0)
             wait_all(write_reqs, m2);
-        STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
+        LOG << "stxxl::create_runs finish waiting write_reqs";
 
         size_t runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
         for (i = 0; i < m2; ++i)
         {
-            STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
+            LOG << "stxxl::create_runs posting write " << Blocks1[i].elem;
             (*run)[i].value = Blocks1[i][0];
             if (i >= runplus2size) {
                 write_reqs[i] = Blocks1[i].write((*run)[i].bid);
@@ -170,9 +178,9 @@ create_runs(
 
     run_type* run = runs[nruns - 1];
     run_size = run->size();
-    STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
+    LOG << "stxxl::create_runs start waiting read_reqs1";
     wait_all(read_reqs1, run_size);
-    STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
+    LOG << "stxxl::create_runs finish waiting read_reqs1";
     for (i = 0; i < run_size; ++i)
         bm->delete_block(bids1[i]);
 
@@ -182,20 +190,20 @@ create_runs(
          make_element_iterator(Blocks1, run_size * block_type::size),
          cmp);
 
-    STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
+    LOG << "stxxl::create_runs start waiting write_reqs";
     wait_all(write_reqs, m2);
-    STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
+    LOG << "stxxl::create_runs finish waiting write_reqs";
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
+        LOG << "stxxl::create_runs posting write " << Blocks1[i].elem;
         (*run)[i].value = Blocks1[i][0];
         write_reqs[i] = Blocks1[i].write((*run)[i].bid);
     }
 
-    STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
+    LOG << "stxxl::create_runs start waiting write_reqs";
     wait_all(write_reqs, run_size);
-    STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
+    LOG << "stxxl::create_runs finish waiting write_reqs";
 
     delete[] Blocks1;
     delete[] Blocks2;
@@ -217,7 +225,7 @@ bool check_sorted_runs(RunType** runs,
     using value_type = typename block_type::value_type;
     using request_ptr = foxxll::request_ptr;
 
-    STXXL_MSG("check_sorted_runs  Runs: " << nruns);
+    LOG1 << "check_sorted_runs  Runs: " << nruns;
     size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
@@ -241,11 +249,11 @@ bool check_sorted_runs(RunType** runs,
 
             if (off && cmp(blocks[0][0], last))
             {
-                STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
-                STXXL_MSG(" first value: " << blocks[0][0]);
-                STXXL_MSG(" last  value: " << last);
+                LOG1 << "check_sorted_runs  wrong first value in the run " << irun;
+                LOG1 << " first value: " << blocks[0][0];
+                LOG1 << " last  value: " << last;
                 for (size_t k = 0; k < block_type::size; ++k)
-                    STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k]);
+                    LOG1 << "Element " << k << " in the block is :" << blocks[0][k];
 
                 delete[] reqs;
                 delete[] blocks;
@@ -256,18 +264,18 @@ bool check_sorted_runs(RunType** runs,
             {
                 if (!(blocks[j][0] == (*runs[irun])[j + off].value))
                 {
-                    STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off));
-                    STXXL_MSG("                   trigger value: " << (*runs[irun])[j + off].value);
-                    STXXL_MSG("Data in the block:");
+                    LOG1 << "check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off);
+                    LOG1 << "                   trigger value: " << (*runs[irun])[j + off].value;
+                    LOG1 << "Data in the block:";
                     for (size_t k = 0; k < block_type::size; ++k)
-                        STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k]);
+                        LOG1 << "Element " << k << " in the block is :" << blocks[j][k];
 
-                    STXXL_MSG("BIDS:");
+                    LOG1 << "BIDS:";
                     for (size_t k = 0; k < nblocks; ++k)
                     {
                         if (k == j)
-                            STXXL_MSG("Bad one comes next.");
-                        STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
+                            LOG1 << "Bad one comes next.";
+                        LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
                     }
 
                     delete[] reqs;
@@ -279,17 +287,17 @@ bool check_sorted_runs(RunType** runs,
                                   make_element_iterator(blocks, nelements),
                                   cmp))
             {
-                STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
-                STXXL_MSG("Data in blocks:");
+                LOG1 << "check_sorted_runs  wrong order in the run " << irun;
+                LOG1 << "Data in blocks:";
                 for (size_t j = 0; j < nblocks; ++j)
                 {
                     for (size_t k = 0; k < block_type::size; ++k)
-                        STXXL_MSG("     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k]);
+                        LOG1 << "     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k];
                 }
-                STXXL_MSG("BIDS:");
+                LOG1 << "BIDS:";
                 for (size_t k = 0; k < nblocks; ++k)
                 {
-                    STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
+                    LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
                 }
 
                 delete[] reqs;
@@ -404,7 +412,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
         {
             diff_type rest = block_type::size;                        // elements still to merge for this output block
 
-            STXXL_VERBOSE1("output block " << j);
+            LOG << "output block " << j;
             do {
                 if (num_currently_mergeable < rest)
                 {
@@ -423,7 +431,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
 
                 diff_type output_size = std::min(num_currently_mergeable, rest);       // at most rest elements
 
-                STXXL_VERBOSE1("before merge " << output_size);
+                LOG << "before merge " << output_size;
 
                 parallel::multiway_merge(
                     seqs.begin(), seqs.end(),
@@ -433,7 +441,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
                 rest -= output_size;
                 num_currently_mergeable -= output_size;
 
-                STXXL_VERBOSE1("after merge");
+                LOG << "after merge";
 
                 sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
             } while (rest > 0 && seqs.size() > 0);
@@ -444,7 +452,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
                 for (value_type* i = out_buffer->begin() + 1; i != out_buffer->end(); i++)
                     if (cmp(*i, *(i - 1)))
                     {
-                        STXXL_VERBOSE1("Error at position " << (i - out_buffer->begin()));
+                        LOG << "Error at position " << (i - out_buffer->begin());
                     }
                 assert(false);
             }
@@ -538,8 +546,6 @@ sort_blocks(InputBidIterator input_bids,
 
     foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
-    //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
-
     double begin = foxxll::timestamp(), after_runs_creation, end;
 
     run_type** runs = new run_type*[nruns];
@@ -572,8 +578,8 @@ sort_blocks(InputBidIterator input_bids,
     while (nruns > 1)
     {
         size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
-        STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                      " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
+        LOG1 << "Starting new merge phase: nruns: " << nruns <<
+            " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns;
 
         new_runs = new run_type*[new_nruns];
 
@@ -635,7 +641,7 @@ sort_blocks(InputBidIterator input_bids,
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_sorted_runs<block_type, run_type, value_cmp>(runs + nruns - runs_left, runs2merge, m2, cmp)));
 #endif
-            STXXL_VERBOSE("Merging " << runs2merge << " runs");
+            LOG1 << "Merging " << runs2merge << " runs";
             merge_runs<block_type, run_type>(runs + nruns - runs_left,
                                              runs2merge, *(new_runs + (cur_out_run++)), _m, cmp);
             runs_left -= runs2merge;
@@ -651,10 +657,9 @@ sort_blocks(InputBidIterator input_bids,
 
     end = foxxll::timestamp();
 
-    STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
-                  after_runs_creation - begin << " s");
-    STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-    STXXL_VERBOSE(*foxxll::stats::get_instance());
+    LOG1 << "Elapsed time        : " << end - begin << " s. Run creation time: " << (after_runs_creation - begin) << " s";
+    LOG1 << "Time in I/O wait(rf): " << io_wait_after_rf << " s";
+    LOG1 << *foxxll::stats::get_instance();
 
     return result;
 }

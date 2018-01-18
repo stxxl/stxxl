@@ -14,11 +14,12 @@
 #ifndef STXXL_CONTAINERS_UNORDERED_MAP_HEADER
 #define STXXL_CONTAINERS_UNORDERED_MAP_HEADER
 
-#include <stxxl/bits/containers/hash_map/hash_map.h>
-
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <utility>
+
+#include <stxxl/bits/containers/hash_map/hash_map.h>
 
 namespace stxxl {
 namespace hash_map {

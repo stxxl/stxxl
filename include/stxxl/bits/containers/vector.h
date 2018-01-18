@@ -16,6 +16,14 @@
 #ifndef STXXL_CONTAINERS_VECTOR_HEADER
 #define STXXL_CONTAINERS_VECTOR_HEADER
 
+#include <algorithm>
+#include <queue>
+#include <string>
+#include <vector>
+
+#include <tlx/define.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/common/types.hpp>
 #include <foxxll/io/request_operations.hpp>
@@ -24,19 +32,14 @@
 #include <foxxll/mng/buf_istream_reverse.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
 #include <foxxll/mng/typed_block.hpp>
+
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/containers/pager.h>
+#include <stxxl/bits/defines.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
 
-#include <algorithm>
-#include <queue>
-#include <string>
-#include <vector>
-
 namespace stxxl {
-
-#define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void*>(this) << "]::" << msg)
 
 //! \defgroup stlcont Containers
 //! \ingroup stllayer
@@ -103,11 +106,11 @@ public:
     {
         ++pos;
         ++offset;
-        if (UNLIKELY(offset == modulo1))
+        if (TLX_UNLIKELY(offset == modulo1))
         {
             offset = 0;
             ++block1;
-            if (UNLIKELY(block1 == modulo2))
+            if (TLX_UNLIKELY(block1 == modulo2))
             {
                 block1 = 0;
                 ++block2;
@@ -133,10 +136,10 @@ public:
     double_blocked_index& operator -- ()
     {
         --pos;
-        if (UNLIKELY(offset == 0))
+        if (TLX_UNLIKELY(offset == 0))
         {
             offset = modulo1;
-            if (UNLIKELY(block1 == 0))
+            if (TLX_UNLIKELY(block1 == 0))
             {
                 block1 = modulo2;
                 --block2;
@@ -828,9 +831,11 @@ template <
     unsigned PageSize = 4,
     typename PagerType = lru_pager<8>,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+    typename AllocStr = foxxll::default_alloc_strategy>
 class vector
 {
+    constexpr static bool debug = false;
+
 public:
     //! \name Standard Types
     //! \{
@@ -1085,8 +1090,7 @@ public:
                 (*it).storage = m_from.get();
                 (*it).offset = offset;
             }
-            STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " <<
-                                 m_from << " to " << offset);
+            LOG << "reserve(): Changing size of file " << m_from << " to " << offset;
             m_from->set_size(offset);
         }
     }
@@ -1145,10 +1149,10 @@ private:
         {
             const size_t new_pages_size = foxxll::div_ceil(new_bids_size, page_size);
 
-            STXXL_VERBOSE_VECTOR("shrinking from " << old_bids_size << " to " <<
-                                 new_bids_size << " blocks = from " <<
-                                 m_page_status.size() << " to " <<
-                                 new_pages_size << " pages");
+            LOG << "shrinking from " << old_bids_size << " to " <<
+                new_bids_size << " blocks = from " <<
+                m_page_status.size() << " to " <<
+                new_pages_size << " pages";
 
             // release blocks
             if (m_from)
@@ -1456,10 +1460,10 @@ public:
             const size_t& page_no = m_slot_to_page[i];
             if (non_free_slots[i])
             {
-                STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address " <<
-                                     (static_cast<uint64_t>(page_no)
-                                      * static_cast<uint64_t>(block_type::size)
-                                      * static_cast<uint64_t>(page_size)));
+                LOG << "flush(: flushing page " << i << " at address " <<
+                (static_cast<uint64_t>(page_no)
+                 * static_cast<uint64_t>(block_type::size)
+                 * static_cast<uint64_t>(page_size));
                 write_page(page_no, i);
 
                 m_page_to_slot[page_no] = on_disk;
@@ -1474,18 +1478,18 @@ public:
 
     ~vector()
     {
-        STXXL_VERBOSE_VECTOR("~vector()");
+        LOG << "~vector()";
         try
         {
             flush();
         }
         catch (foxxll::io_error e)
         {
-            STXXL_ERRMSG("io_error thrown in ~vector(): " << e.what());
+            LOG1 << "io_error thrown in ~vector(): " << e.what();
         }
         catch (...)
         {
-            STXXL_ERRMSG("Exception thrown in ~vector()");
+            LOG1 << "Exception thrown in ~vector()";
         }
 
         if (!m_exported)
@@ -1495,16 +1499,16 @@ public:
             }
             else // file must be truncated
             {
-                STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " <<
-                                     m_from << " to " << file_length());
-                STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
+                LOG << "~vector(: Changing size of file " <<
+                    m_from << " to " << file_length();
+                LOG << "~vector(): size of the vector is " << size();
                 try
                 {
                     m_from->set_size(file_length());
                 }
                 catch (...)
                 {
-                    STXXL_ERRMSG("Exception thrown in ~vector()...set_size()");
+                    LOG1 << "Exception thrown in ~vector()...set_size()";
                 }
             }
         }
@@ -1600,7 +1604,7 @@ private:
         if (m_page_status[page_no] == uninitialized)
             return;
 
-        STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
+        LOG << "read_page(): page_no=" << page_no << " cache_slot=" << cache_slot;
         std::vector<foxxll::request_ptr> reqs;
         reqs.reserve(page_size);
 
@@ -1621,7 +1625,7 @@ private:
         if (!(m_page_status[page_no] & dirty))
             return;
 
-        STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
+        LOG << "write_page(): page_no=" << page_no << " cache_slot=" << cache_slot;
 
         std::vector<foxxll::request_ptr> reqs;
         reqs.reserve(page_size);
@@ -1703,10 +1707,10 @@ private:
             // remove page from cache
             m_free_slots.push(m_page_to_slot[page_no]);
             m_page_to_slot[page_no] = on_disk;
-            STXXL_VERBOSE_VECTOR("page_externally_updated(): page_no=" << page_no << " flushed from cache.");
+            LOG << "page_externally_updated(): page_no=" << page_no << " flushed from cache.";
         }
         else {
-            STXXL_VERBOSE_VECTOR("page_externally_updated(): page_no=" << page_no << " no need to flush.");
+            LOG << "page_externally_updated(): page_no=" << page_no << " no need to flush.";
         }
         m_page_status[page_no] = valid_on_disk;
     }
@@ -1992,7 +1996,7 @@ public:
         ++m_iter;
         ++(*m_bufin);
 
-        if (UNLIKELY(empty())) {
+        if (TLX_UNLIKELY(empty())) {
             delete m_bufin;
             m_bufin = nullptr;
         }
@@ -2266,7 +2270,7 @@ public:
         --m_iter;
         ++(*m_bufin);
 
-        if (UNLIKELY(empty())) {
+        if (TLX_UNLIKELY(empty())) {
             delete m_bufin;
             m_bufin = nullptr;
         }
@@ -2410,7 +2414,7 @@ public:
     //! iterator.
     value_type& operator * ()
     {
-        if (UNLIKELY(m_iter == m_end))
+        if (TLX_UNLIKELY(m_iter == m_end))
         {
             // iterator points to end of vector -> double vector's size
 
@@ -2441,7 +2445,7 @@ public:
 
         assert(m_iter < m_end);
 
-        if (UNLIKELY(m_bufout == nullptr))
+        if (TLX_UNLIKELY(m_bufout == nullptr))
         {
             if (m_iter.block_offset() != 0)
             {
@@ -2466,7 +2470,7 @@ public:
 
         // if the pointer has finished a block, then we inform the vector that
         // this block has been updated.
-        if (UNLIKELY(m_iter.block_offset() == 0)) {
+        if (TLX_UNLIKELY(m_iter.block_offset() == 0)) {
             if (m_prevblk != m_iter) {
                 m_prevblk.block_externally_updated();
                 m_prevblk = m_iter;
@@ -2483,7 +2487,7 @@ public:
         ++m_iter;
 
         // if buf_ostream active, advance that too
-        if (LIKELY(m_bufout != nullptr)) m_bufout->operator ++ ();
+        if (TLX_LIKELY(m_bufout != nullptr)) m_bufout->operator ++ ();
 
         return *this;
     }

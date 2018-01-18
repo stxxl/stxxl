@@ -17,8 +17,20 @@ static const char* description =
     "The operation sequence is either a simple fill/delete "
     "cycle or fill/intermixed inserts/deletes.";
 
-#include <foxxll/unused.hpp>
-#include <foxxll/verbose.hpp>
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <queue>
+#include <utility>
+
+#include <tlx/die.hpp>
+#include <tlx/string.hpp>
+#include <tlx/unused.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>
@@ -27,14 +39,7 @@ static const char* description =
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
-
-#include <algorithm>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
-#include <limits>
-#include <queue>
-#include <utility>
+#include <tlx/logger.hpp>
 
 #include <key_with_padding.h>
 
@@ -116,8 +121,8 @@ static inline void progress(const char* text, size_t i, size_t nelements)
     if (!g_progress) return;
 
     if ((i % g_printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) <<
-                  (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
+        LOG1 << text << " " << i << " (" << std::setprecision(5) <<
+        (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)";
     }
 }
 
@@ -576,12 +581,12 @@ void do_pop(ContainerType& c)
     scoped_stats stats(c, g_testset + "|pop",
                        "Reading " + c.name());
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     for (size_t i = 0; i < num_elements; ++i)
     {
-        STXXL_CHECK(!c.empty());
-        STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+        die_unless(!c.empty());
+        die_unequal(c.size(), num_elements - i);
         c.pop();
         progress("Popped element", i, num_elements);
     }
@@ -595,16 +600,16 @@ void do_pop_asc_check(ContainerType& c)
     scoped_stats stats(c, g_testset + "|pop-check",
                        "Reading " + c.name() + " and checking order");
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     for (size_t i = 0; i < num_elements; ++i)
     {
-        STXXL_CHECK(!c.empty());
-        STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+        die_unless(!c.empty());
+        die_unequal(c.size(), num_elements - i);
 
         value_type top = c.top_pop();
 
-        STXXL_CHECK_EQUAL(top.key, i);
+        die_unequal(top.key, i);
         progress("Popped element", i, num_elements);
     }
 }
@@ -636,13 +641,13 @@ void do_pop_rand_check(ContainerType& c, unsigned int seed)
 
         for (size_t i = 0; i < num_elements; ++i)
         {
-            STXXL_CHECK(!c.empty());
-            STXXL_CHECK_EQUAL(c.size(), num_elements - i);
-            STXXL_CHECK_EQUAL(c.size(), sorted_vals.size());
+            die_unless(!c.empty());
+            die_unequal(c.size(), num_elements - i);
+            die_unequal(c.size(), sorted_vals.size());
 
             value_type top = c.top_pop();
 
-            STXXL_CHECK_EQUAL(top.key, *sorted_vals);
+            die_unequal(top.key, *sorted_vals);
             progress("Popped element", i, num_elements);
             ++sorted_vals;
         }
@@ -660,9 +665,7 @@ void do_bulk_push_asc(ContainerType& c, bool do_parallel)
                        "Filling " + c.name() + " with bulks" + parallel_str);
 
     if (do_parallel && !c.supports_threaded_bulks()) {
-        STXXL_ERRMSG("Container " + c.name() +
-                     " does not support parallel bulks operations");
-        abort();
+        die("Container " << c.name() << " does not support parallel bulks operations");
     }
 
     for (size_t i = 0; i < num_elements / bulk_size; ++i)
@@ -711,7 +714,7 @@ void do_bulk_push_asc(ContainerType& c, bool do_parallel)
 
     progress("Inserting element", num_elements, num_elements);
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     c.fill_end();
 }
@@ -728,9 +731,7 @@ void do_bulk_push_rand(ContainerType& c,
                        "Filling " + c.name() + " with bulks" + parallel_str);
 
     if (do_parallel && !c.supports_threaded_bulks()) {
-        STXXL_ERRMSG("Container " + c.name() +
-                     " does not support parallel bulks operations");
-        abort();
+        die("Container " << c.name() << " does not support parallel bulks operations");
     }
 
     // independent random generator (also: in different cache lines)
@@ -763,7 +764,7 @@ void do_bulk_push_rand(ContainerType& c,
         progress("Inserting element", i * bulk_size, num_elements);
     }
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements - (num_elements % bulk_size));
+    die_unequal(c.size(), num_elements - (num_elements % bulk_size));
 
     size_t bulk_remain = num_elements % bulk_size;
 
@@ -789,7 +790,7 @@ void do_bulk_push_rand(ContainerType& c,
 
     progress("Inserting element", num_elements, num_elements);
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     c.fill_end();
 }
@@ -802,22 +803,22 @@ void do_bulk_pop(ContainerType& c)
     scoped_stats stats(c, g_testset + "|bulk-pop",
                        "Reading " + c.name() + " in bulks");
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     std::vector<value_type> work;
 
     for (size_t i = 0; i < num_elements; i += work.size())
     {
-        STXXL_CHECK(!c.empty());
-        STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+        die_unless(!c.empty());
+        die_unequal(c.size(), num_elements - i);
 
         c.bulk_pop(work, bulk_size);
 
-        STXXL_CHECK(work.size() <= std::min(bulk_size, num_elements - i));
+        die_unless(work.size() <= std::min(bulk_size, num_elements - i));
         progress("Popped element", i, num_elements);
     }
 
-    STXXL_CHECK(c.empty());
+    die_unless(c.empty());
 }
 
 template <typename ContainerType>
@@ -828,26 +829,26 @@ void do_bulk_pop_check_asc(ContainerType& c)
     scoped_stats stats(c, g_testset + "|bulk-pop-check",
                        "Reading " + c.name() + " in bulks");
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     std::vector<value_type> work;
 
     for (size_t i = 0; i < num_elements; i += work.size())
     {
-        STXXL_CHECK(!c.empty());
-        STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+        die_unless(!c.empty());
+        die_unequal(c.size(), num_elements - i);
 
         c.bulk_pop(work, bulk_size);
 
-        STXXL_CHECK(work.size() <= std::min(bulk_size, num_elements - i));
+        die_unless(work.size() <= std::min(bulk_size, num_elements - i));
 
         for (size_t j = 0; j < work.size(); ++j)
-            STXXL_CHECK_EQUAL(work[j].key, i + j);
+            die_unequal(work[j].key, i + j);
 
         progress("Popped element", i, num_elements);
     }
 
-    STXXL_CHECK(c.empty());
+    die_unless(c.empty());
 }
 
 template <typename ContainerType>
@@ -894,8 +895,8 @@ void do_bulk_pop_check_rand(ContainerType& c,
             progress("Inserting element", i * bulk_size, num_elements);
         }
 
-        STXXL_CHECK_EQUAL(sorted_vals.size(),
-                          num_elements - (num_elements % bulk_size));
+        die_unequal(sorted_vals.size(),
+                    num_elements - (num_elements % bulk_size));
 
         size_t bulk_remain = num_elements % bulk_size;
 
@@ -922,28 +923,28 @@ void do_bulk_pop_check_rand(ContainerType& c,
     }
 
     sorted_vals.sort();
-    STXXL_CHECK_EQUAL(c.size(), sorted_vals.size());
+    die_unequal(c.size(), sorted_vals.size());
 
     {
         scoped_stats stats(c, g_testset + "|bulk-pop-check",
                            "Reading " + c.name() + " in bulks");
 
-        STXXL_CHECK_EQUAL(c.size(), num_elements);
+        die_unequal(c.size(), num_elements);
 
         std::vector<value_type> work;
 
         for (size_t i = 0; i < num_elements; i += bulk_size)
         {
-            STXXL_CHECK(!c.empty());
-            STXXL_CHECK_EQUAL(c.size(), num_elements - i);
+            die_unless(!c.empty());
+            die_unequal(c.size(), num_elements - i);
 
             c.bulk_pop(work, bulk_size);
 
-            STXXL_CHECK_EQUAL(work.size(), std::min(bulk_size, num_elements - i));
+            die_unequal(work.size(), std::min(bulk_size, num_elements - i));
 
             for (size_t j = 0; j < work.size(); ++j)
             {
-                STXXL_CHECK_EQUAL(work[j].key, *sorted_vals);
+                die_unequal(work[j].key, *sorted_vals);
                 ++sorted_vals;
             }
 
@@ -951,8 +952,8 @@ void do_bulk_pop_check_rand(ContainerType& c,
         }
     }
 
-    STXXL_CHECK(c.empty());
-    STXXL_CHECK(sorted_vals.empty());
+    die_unless(c.empty());
+    die_unless(sorted_vals.empty());
 }
 
 #if 0
@@ -976,13 +977,13 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
         if (num_deletes < num_inserts &&
             (r > 0 || num_inserts >= (filled ? 2 * num_elements : num_elements)))
         {
-            STXXL_CHECK(!c.empty());
+            die_unless(!c.empty());
 
             c.pop();
 
             progress("Deleting / inserting element", i, 2 * num_elements);
             ++num_deletes;
-            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+            die_unequal(c.size(), num_inserts - num_deletes);
         }
         else
         {
@@ -992,7 +993,7 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
             c.push(value_type(k));
 
             num_inserts++;
-            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+            die_unequal(c.size(), num_inserts - num_deletes);
         }
     }
 }
@@ -1024,13 +1025,13 @@ void do_bulk_rand_intermixed(ContainerType& c,
             num_deletes < (filled ? 2 : 1) * num_elements &&
             (r > 0 || num_inserts >= (filled ? 2 : 1) * num_elements))
         {
-            STXXL_CHECK(!c.empty());
+            die_unless(!c.empty());
 
             c.top_pop();
 
             progress("Deleting / inserting element", i, (filled ? 3 : 2) * num_elements);
             ++num_deletes;
-            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+            die_unequal(c.size(), num_inserts - num_deletes);
         }
         else {
             size_t this_bulk_size =
@@ -1068,7 +1069,7 @@ void do_bulk_rand_intermixed(ContainerType& c,
 
             num_inserts += this_bulk_size;
             i += this_bulk_size - 1;
-            STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+            die_unequal(c.size(), num_inserts - num_deletes);
         }
     }
 }
@@ -1094,7 +1095,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
             if (num_deletes < num_inserts && num_deletes < num_elements &&
                 (r > 0 || num_inserts >= num_elements))
             {
-                STXXL_CHECK(!c.empty());
+                die_unless(!c.empty());
 
                 value_type top = c.top_pop();
 
@@ -1112,7 +1113,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 
                 progress("Deleting / inserting element", i, 2 * num_elements);
                 ++num_deletes;
-                STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+                die_unequal(c.size(), num_inserts - num_deletes);
             }
             else
             {
@@ -1144,7 +1145,7 @@ void do_bulk_intermixed_check(ContainerType& c, bool parallel)
 
                 num_inserts += this_bulk_size;
                 i += this_bulk_size - 1;
-                STXXL_CHECK_EQUAL(c.size(), num_inserts - num_deletes);
+                die_unequal(c.size(), num_inserts - num_deletes);
             }
         }
     }
@@ -1194,7 +1195,7 @@ void do_bulk_prefill(ContainerType& c, bool do_parallel,
 
     windex += num_elements;
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 }
 
 template <typename ContainerType>
@@ -1208,7 +1209,7 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
     scoped_stats stats(c, g_testset + "|postempty",
                        c.name() + ": post empty", 1);
 
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), num_elements);
 
     std::vector<value_type> work;
     while (!c.empty())
@@ -1217,12 +1218,12 @@ void do_bulk_postempty(ContainerType& c, bool /* parallel */,
 
         for (size_t j = 0; j < work.size(); ++j)
         {
-            STXXL_CHECK_EQUAL(work[j].key, rindex);
+            die_unequal(work[j].key, rindex);
             ++rindex;
         }
     }
 
-    STXXL_CHECK(c.empty());
+    die_unless(c.empty());
 }
 
 template <bool RandomizeBulkSize, typename ContainerType>
@@ -1257,7 +1258,7 @@ void do_bulk_limit(ContainerType& c, bool do_parallel)
                 for (size_t i = 0; i < this_bulk_size; ++i)
                 {
                     value_type top = c.top_pop();
-                    STXXL_CHECK_EQUAL(top.key, rindex);
+                    die_unequal(top.key, rindex);
                     ++rindex;
 
                     c.push(value_type(windex++));
@@ -1273,25 +1274,25 @@ void do_bulk_limit(ContainerType& c, bool do_parallel)
                 while (c.limit_top().key < limit.key)
                 {
                     value_type top = c.limit_top_pop();
-                    STXXL_CHECK_EQUAL(top.key, rindex);
+                    die_unequal(top.key, rindex);
                     ++rindex;
 
                     c.limit_push(value_type(windex++), 0);
                     ++iterations;
                 }
 
-                STXXL_CHECK_EQUAL(c.limit_top().key, rindex);
+                die_unequal(c.limit_top().key, rindex);
 
                 c.limit_end();
-                STXXL_CHECK_EQUAL(iterations, this_bulk_size);
+                die_unequal(iterations, this_bulk_size);
             }
         }
 
         std::cout << "bulk-limit cycles: " << cycles << "\n";
     }
 
-    STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), (size_t)windex - rindex);
+    die_unequal(c.size(), num_elements);
 
     do_bulk_postempty(c, do_parallel, rindex);
 }
@@ -1331,7 +1332,7 @@ void do_bulk_pop_push(ContainerType& c, bool do_parallel)
             {
                 for (size_t i = 0; i < work.size(); ++i)
                 {
-                    STXXL_CHECK_EQUAL(work[i].key, rindex + i);
+                    die_unequal(work[i].key, rindex + i);
                     c.bulk_push(value_type(windex + i), 0);
                 }
             }
@@ -1347,7 +1348,7 @@ void do_bulk_pop_push(ContainerType& c, bool do_parallel)
 #endif
                     for (size_t i = 0; i < work.size(); ++i)
                     {
-                        STXXL_CHECK_EQUAL(work[i].key, rindex + i);
+                        die_unequal(work[i].key, rindex + i);
                         c.bulk_push(value_type(windex + i), thread_num);
                     }
                 }
@@ -1361,8 +1362,8 @@ void do_bulk_pop_push(ContainerType& c, bool do_parallel)
         std::cout << "bulk-pop-push cycles: " << cycles << "\n";
     }
 
-    STXXL_CHECK_EQUAL(c.size(), (size_t)windex - rindex);
-    STXXL_CHECK_EQUAL(c.size(), num_elements);
+    die_unequal(c.size(), (size_t)windex - rindex);
+    die_unequal(c.size(), num_elements);
 
     do_bulk_postempty(c, do_parallel, rindex);
 }
@@ -1480,8 +1481,7 @@ void do_dijkstra(ContainerType& c)
     size_t num_edges = 100 * num_nodes;
 
     if (c.name() == "sorter") {
-        STXXL_ERRMSG("Dijkstra benchmark does not work with the stxxl::sorter.");
-        abort();
+        die("Dijkstra benchmark does not work with the stxxl::sorter.");
     }
 
     std::cout << "Generating Graph" << std::endl;
@@ -1499,17 +1499,17 @@ void do_dijkstra(ContainerType& c)
 
 void print_params()
 {
-    STXXL_MEMDUMP(RAM);
-    STXXL_MEMDUMP(volume);
-    STXXL_MEMDUMP(block_size);
-    STXXL_MEMDUMP(single_heap_ram);
-    STXXL_VARDUMP(bulk_size);
-    STXXL_MEMDUMP(extract_buffer_ram);
-    STXXL_VARDUMP(num_elements);
-    STXXL_VARDUMP(g_max_threads);
-    STXXL_VARDUMP(num_write_buffers);
-    STXXL_VARDUMP(num_prefetchers);
-    STXXL_VARDUMP(num_read_blocks);
+    LOG1 << "RAM = " << tlx::format_iec_units(RAM);
+    LOG1 << "volume = " << tlx::format_iec_units(volume);
+    LOG1 << "block_size = " << tlx::format_iec_units(block_size);
+    LOG1 << "single_heap_ram = " << tlx::format_iec_units(single_heap_ram);
+    LOG1 << "bulk_size = " << bulk_size;
+    LOG1 << "extract_buffer_ram = " << tlx::format_iec_units(extract_buffer_ram);
+    LOG1 << "num_elements = " << num_elements;
+    LOG1 << "g_max_threads = " << g_max_threads;
+    LOG1 << "num_write_buffers = " << num_write_buffers;
+    LOG1 << "num_prefetchers = " << num_prefetchers;
+    LOG1 << "num_read_blocks = " << num_read_blocks;
 }
 
 /*
@@ -1623,7 +1623,7 @@ void run_benchmark(ContainerType& c, const std::string& testset)
         //do_dijkstra(c);
     }
     else {
-        STXXL_ERRMSG("Unknown benchmark test '" << testset << "'");
+        LOG1 << "Unknown benchmark test '" << testset << "'";
     }
 }
 
@@ -1690,17 +1690,16 @@ int main(int argc, char* argv[])
 
 #if !STXXL_PARALLEL
     if (opt_parallel) {
-        STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. "
-                  "Parallel processing cannot be used.");
+        LOG1 << "STXXL is compiled without STXXL_PARALLEL flag. "
+            "Parallel processing cannot be used.";
         return EXIT_FAILURE;
     }
 #else
     if (!omp_get_nested()) {
         omp_set_nested(1);
         if (!omp_get_nested()) {
-            STXXL_ERRMSG("Could not enable OpenMP's nested parallelism, "
-                         "however, the PPQ requires this OpenMP feature.");
-            abort();
+            die("Could not enable OpenMP's nested parallelism, "
+                "however, the PPQ requires this OpenMP feature.");
         }
     }
 
@@ -1725,16 +1724,16 @@ int main(int argc, char* argv[])
         using spq_type = CStxxlPQ<my8_type>;
         spq_type* spq = new spq_type();
 
-        STXXL_DEBUG1("PQ parameters:" <<
-                     " total_memory=" << spq->mem_cons() <<
-                     " kDeleteBufferSize=" << spq->kDeleteBufferSize <<
-                     " N=" << spq->N <<
-                     " IntKMAX=" << spq->IntKMAX <<
-                     " kNumIntGroups=" << spq->kNumIntGroups <<
-                     " kNumExtGroups=" << spq->kNumExtGroups <<
-                     " kTotalNumGroups=" << spq->kTotalNumGroups <<
-                     " BlockSize=" << spq->BlockSize <<
-                     " ExtKMAX=" << spq->ExtKMAX);
+        LOG1 << "PQ parameters:" <<
+            " total_memory=" << spq->mem_cons() <<
+            " kDeleteBufferSize=" << spq->kDeleteBufferSize <<
+            " N=" << spq->N <<
+            " IntKMAX=" << spq->IntKMAX <<
+            " kNumIntGroups=" << spq->kNumIntGroups <<
+            " kNumExtGroups=" << spq->kNumExtGroups <<
+            " kTotalNumGroups=" << spq->kTotalNumGroups <<
+            " BlockSize=" << spq->BlockSize <<
+            " ExtKMAX=" << spq->ExtKMAX;
 
         run_benchmark(*spq, opt_benchmark);
         delete spq;
@@ -1776,7 +1775,7 @@ int main(int argc, char* argv[])
     }
 #endif
     else {
-        STXXL_MSG("Please choose a queue container type. Use -h for help.");
+        LOG1 << "Please choose a queue container type. Use -h for help.";
         return EXIT_FAILURE;
     }
 

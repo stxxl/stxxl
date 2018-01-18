@@ -13,11 +13,12 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
-#include <foxxll/common/types.hpp>
-#include <foxxll/verbose.hpp>
-
 #include <cassert>
 #include <iterator>
+
+#include <tlx/logger.hpp>
+
+#include <foxxll/common/types.hpp>
 
 namespace stxxl {
 namespace btree {
@@ -35,6 +36,8 @@ class normal_leaf;
 template <class BTreeType>
 class btree_iterator_base
 {
+    static constexpr bool debug = false;
+
 public:
     using btree_type = BTreeType;
     using bid_type = typename btree_type::leaf_bid_type;
@@ -65,7 +68,7 @@ protected:
 
     btree_iterator_base()
     {
-        STXXL_VERBOSE3("btree_iterator_base def construct addr=" << this);
+        LOG << "btree_iterator_base def construct addr=" << this;
         make_invalid();
     }
 
@@ -74,7 +77,7 @@ protected:
                         const size_t _pos)
         : btree(_btree), bid(_bid), pos(_pos)
     {
-        STXXL_VERBOSE3("btree_iterator_base parameter construct addr=" << this);
+        LOG << "btree_iterator_base parameter construct addr=" << this;
         btree->m_iterator_map.register_iterator(*this);
     }
 
@@ -86,7 +89,7 @@ protected:
 
     btree_iterator_base(const btree_iterator_base& obj)
     {
-        STXXL_VERBOSE3("btree_iterator_base constr from" << (&obj) << " to " << this);
+        LOG << "btree_iterator_base constr from" << (&obj) << " to " << this;
         btree = obj.btree;
         bid = obj.bid;
         pos = obj.pos;
@@ -96,7 +99,7 @@ protected:
 
     btree_iterator_base& operator = (const btree_iterator_base& obj)
     {
-        STXXL_VERBOSE3("btree_iterator_base copy from" << (&obj) << " to " << this);
+        LOG << "btree_iterator_base copy from" << (&obj) << " to " << this;
         if (&obj != this)
         {
             if (btree)
@@ -162,7 +165,7 @@ protected:
 public:
     virtual ~btree_iterator_base()
     {
-        STXXL_VERBOSE3("btree_iterator_base deconst " << this);
+        LOG << "btree_iterator_base deconst " << this;
         if (btree)
             btree->m_iterator_map.unregister_iterator(*this);
     }

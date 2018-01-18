@@ -10,14 +10,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/io.hpp>
-#include <stxxl/timer>
-
 #include <algorithm>
 #include <cinttypes>
 #include <cstdio>
 #include <iomanip>
+#include <iostream>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <foxxll/io.hpp>
+#include <stxxl/timer>
 
 using foxxll::request_ptr;
 using foxxll::file;
@@ -145,7 +148,7 @@ int main(int argc, char* argv[])
     catch (const std::exception& ex)
     {
         std::cout << std::endl;
-        STXXL_ERRMSG(ex.what());
+        LOG1 << ex.what();
     }
     t_total.stop();
 

@@ -95,9 +95,9 @@ option(USE_MALLOC_COUNT "Compile all programs with included malloc_count heap pr
 
 option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
 
-option(STXXL_DEBUG_ASSERTIONS "Enable more costly assertions for internal debugging." OFF)
-if(STXXL_DEBUG_ASSERTIONS)
-  set(STXXL_DEBUG_ASSERTIONS "1") # change from ON/OFF to 1/0
+option(STXXL_EXPENSIVE_ASSERTIONS "Enable more costly assertions for internal debugging." OFF)
+if(STXXL_EXPENSIVE_ASSERTIONS)
+  set(STXXL_EXPENSIVE_ASSERTIONS "1") # change from ON/OFF to 1/0
 endif()
 
 ### building shared and/or static libraries

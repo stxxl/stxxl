@@ -12,7 +12,10 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <tlx/logger.hpp>
+
 #include <foxxll/io.hpp>
+
 #include <stxxl/vector>
 
 using vector_type = stxxl::vector<int, 4, stxxl::lru_pager<4> >;
@@ -34,11 +37,11 @@ int main()
             vector->push_back(0);
     }
     catch (std::exception& e) {
-        STXXL_ERRMSG("Caught exception: " << e.what());
+        LOG1 << "Caught exception: " << e.what();
         delete vector; // here it will crash in block_manager::delete_block(bid)
     }
 
-    STXXL_MSG("Delete done, all is well.");
+    LOG1 << "Delete done, all is well.";
 
     return 0;
 }

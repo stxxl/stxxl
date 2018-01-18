@@ -10,7 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/binary_buffer.h>
 
 void test1()
@@ -60,26 +64,26 @@ void test1()
     if (bbr != bb_verify)
         std::cout << bbr.str();
 
-    STXXL_CHECK(bbr == bb_verify);
+    die_unless(bbr == bb_verify);
 
 //! [deserialize]
     // read binary block using binary_reader
 
     stxxl::binary_reader br(bb);
 
-    STXXL_CHECK(br.get<unsigned int>() == 1);
-    STXXL_CHECK(br.get_string() == "test");
-    STXXL_CHECK(br.get_varint() == 42);
-    STXXL_CHECK(br.get_varint() == 12345678);
+    die_unless(br.get<unsigned int>() == 1);
+    die_unless(br.get_string() == "test");
+    die_unless(br.get_varint() == 42);
+    die_unless(br.get_varint() == 12345678);
 
     {
         stxxl::binary_reader sub_br(br.get_binary_buffer_ref());
-        STXXL_CHECK(sub_br.get_string() == "sub block");
-        STXXL_CHECK(sub_br.get_varint() == 6 * 9);
-        STXXL_CHECK(sub_br.empty());
+        die_unless(sub_br.get_string() == "sub block");
+        die_unless(sub_br.get_varint() == 6 * 9);
+        die_unless(sub_br.empty());
     }
 
-    STXXL_CHECK(br.empty());
+    die_unless(br.empty());
 //! [deserialize]
 }
 

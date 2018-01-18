@@ -20,15 +20,18 @@
 #ifndef STXXL_CONTAINERS_PRIORITY_QUEUE_HEADER
 #define STXXL_CONTAINERS_PRIORITY_QUEUE_HEADER
 
+#include <algorithm>
+#include <iostream>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/pq_ext_merger.h>
 #include <stxxl/bits/containers/pq_helpers.h>
 #include <stxxl/bits/containers/pq_int_merger.h>
 #include <stxxl/bits/containers/pq_mergers.h>
-
-#include <algorithm>
-#include <type_traits>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 
@@ -43,7 +46,7 @@ template <
     size_t BlockSize_ = (2* 1024* 1024),         // external block size
     size_t ExtKMAX_ = 64,                        // maximal arity for external mergers
     size_t ExtLevels_ = 2,                       // number of external groups
-    class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
+    class AllocStr_ = foxxll::default_alloc_strategy
     >
 struct priority_queue_config
 {
@@ -73,6 +76,8 @@ namespace stxxl {
 template <class ConfigType>
 class priority_queue
 {
+    static constexpr bool debug = false;
+
 public:
     using Config = ConfigType;
     enum
@@ -114,7 +119,7 @@ public:
           insert_heap(N + 2, comp_),
           num_active_groups(0), size_(0)
     {
-        STXXL_VERBOSE_PQ("priority_queue(pool)");
+        LOG << "priority_queue(pool)";
         init();
     }
 
@@ -136,7 +141,7 @@ public:
           insert_heap(N + 2, comp_),
           num_active_groups(0), size_(0)
     {
-        STXXL_VERBOSE_PQ("priority_queue(pool sizes)");
+        LOG << "priority_queue(pool sizes)";
         init();
     }
 
@@ -147,7 +152,7 @@ public:
 
     virtual ~priority_queue()
     {
-        STXXL_VERBOSE_PQ("~priority_queue()");
+        LOG << "~priority_queue()";
         if (pool_owned)
             delete pool;
 
@@ -244,7 +249,7 @@ public:
     //! \b false. Postcondition: \c size() will be decremented by 1.
     void pop()
     {
-        //STXXL_VERBOSE1("priority_queue::pop()");
+        //LOG << "priority_queue::pop()";
         assert(!insert_heap.empty());
 
         if (/*(!insert_heap.empty()) && */ cmp(*delete_buffer_current_min, insert_heap.top()))
@@ -299,31 +304,31 @@ public:
     void dump_sizes() const
     {
         size_t capacity = N;
-        STXXL_MSG("pq::size()\t= " << size());
-        STXXL_MSG("  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity);
-        STXXL_MSG("  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize);
+        LOG1 << "pq::size()\t= " << size();
+        LOG1 << "  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity;
+        LOG1 << "  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize;
         for (int i = 0; i < kNumIntGroups; ++i) {
             capacity *= IntKMAX;
-            STXXL_MSG("  grp " << i << " int" <<
-                      " grpbuf=" << current_group_buffer_size(i) <<
-                      " size=" << int_mergers[i].size() << "/" << capacity <<
-                      " (" << (int)((double)int_mergers[i].size() * 100.0 / (double)capacity) << "%)" <<
-                      " space=" << int_mergers[i].is_space_available());
+            LOG1 << "  grp " << i << " int" <<
+                " grpbuf=" << current_group_buffer_size(i) <<
+                " size=" << int_mergers[i].size() << "/" << capacity <<
+                " (" << (int)((double)int_mergers[i].size() * 100.0 / (double)capacity) << "%)" <<
+                " space=" << int_mergers[i].is_space_available();
         }
         for (int i = 0; i < kNumExtGroups; ++i) {
             capacity *= ExtKMAX;
-            STXXL_MSG("  grp " << i + kNumIntGroups << " ext" <<
-                      " grpbuf=" << current_group_buffer_size(i + kNumIntGroups) <<
-                      " size=" << ext_mergers[i]->size() << "/" << capacity <<
-                      " (" << (int)((double)ext_mergers[i]->size() * 100.0 / (double)capacity) << "%)" <<
-                      " space=" << ext_mergers[i]->is_space_available());
+            LOG1 << "  grp " << i + kNumIntGroups << " ext" <<
+                " grpbuf=" << current_group_buffer_size(i + kNumIntGroups) <<
+                " size=" << ext_mergers[i]->size() << "/" << capacity <<
+                " (" << (int)((double)ext_mergers[i]->size() * 100.0 / (double)capacity) << "%)" <<
+                " space=" << ext_mergers[i]->is_space_available();
         }
         dump_params();
     }
 
     void dump_params() const
     {
-        STXXL_MSG("params: kDeleteBufferSize=" << kDeleteBufferSize << " N=" << N << " IntKMAX=" << IntKMAX << " kNumIntGroups=" << kNumIntGroups << " ExtKMAX=" << ExtKMAX << " kNumExtGroups=" << kNumExtGroups << " BlockSize=" << BlockSize);
+        LOG1 << "params: kDeleteBufferSize=" << kDeleteBufferSize << " N=" << N << " IntKMAX=" << IntKMAX << " kNumIntGroups=" << kNumIntGroups << " ExtKMAX=" << ExtKMAX << " kNumExtGroups=" << kNumExtGroups << " BlockSize=" << BlockSize;
     }
 
     //! \}
@@ -397,7 +402,7 @@ private:
 
     void refill_delete_buffer()
     {
-        STXXL_VERBOSE_PQ("refill_delete_buffer()");
+        LOG << "refill_delete_buffer()";
 
         size_type total_group_size = 0;
         //num_active_groups is <= 4
@@ -436,7 +441,7 @@ private:
         // which can make the assumption that
         // they find all they are asked in the buffers
         delete_buffer_current_min = delete_buffer_end - length;
-        STXXL_VERBOSE_PQ("refill_del... Active groups = " << num_active_groups);
+        LOG << "refill_del... Active groups = " << num_active_groups;
         switch (num_active_groups)
         {
         case 0:
@@ -524,8 +529,8 @@ private:
 #endif
             break;
         default:
-            STXXL_THROW2(std::runtime_error, "priority_queue<...>::refill_delete_buffer()",
-                         "Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4");
+            FOXXLL_THROW2(std::runtime_error, "priority_queue<...>::refill_delete_buffer()",
+                          "Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4");
         }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -535,7 +540,7 @@ private:
             {
                 if (inv_cmp(*v, *(v - 1)))
                 {
-                    STXXL_MSG("Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v);
+                    LOG1 << "Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v;
                 }
             }
             assert(false);
@@ -546,7 +551,7 @@ private:
 
     size_type refill_group_buffer(const size_t group)
     {
-        STXXL_VERBOSE_PQ("refill_group_buffer(" << group << ")");
+        LOG << "refill_group_buffer(" << group << ")";
 
         value_type* target;
         size_type length;
@@ -587,12 +592,12 @@ private:
         priority_queue_local::invert_order<typename Config::comparator_type, value_type, value_type> inv_cmp(cmp);
         if (!stxxl::is_sorted(group_buffer_current_mins[group], group_buffers[group] + N, inv_cmp))
         {
-            STXXL_VERBOSE_PQ("refill_grp... length: " << length << " left_elements: " << left_elements);
+            LOG << "refill_grp... length: " << length << " left_elements: " << left_elements;
             for (value_type* v = group_buffer_current_mins[group] + 1; v < group_buffer_current_mins[group] + left_elements; ++v)
             {
                 if (inv_cmp(*v, *(v - 1)))
                 {
-                    STXXL_MSG("Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1));
+                    LOG1 << "Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1);
                 }
             }
             assert(false);
@@ -604,7 +609,7 @@ private:
 
     size_t make_space_available(const size_t level)
     {
-        STXXL_VERBOSE_PQ("make_space_available(" << level << ")");
+        LOG << "make_space_available(" << level << ")";
 
         size_t finalLevel;
         assert(level < kTotalNumGroups);
@@ -629,13 +634,13 @@ private:
                 capacity *= IntKMAX;
             for (int i = 0; i < kNumExtGroups; ++i)
                 capacity *= ExtKMAX;
-            STXXL_ERRMSG("priority_queue OVERFLOW - all groups full, size=" << size() <<
-                         ", capacity(last externel group (" << kNumIntGroups + kNumExtGroups - 1 << "))=" << capacity);
+            LOG1 << "priority_queue OVERFLOW - all groups full, size=" << size() <<
+                ", capacity(last externel group (" << kNumIntGroups + kNumExtGroups - 1 << "))=" << capacity;
             dump_sizes();
 
             const size_t extLevel = level - kNumIntGroups;
             const size_type segmentSize = ext_mergers[extLevel]->size();
-            STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
+            LOG << "Inserting segment into last level external: " << level << " " << segmentSize;
             ext_merger_type* overflow_merger = new ext_merger_type(cmp);
             overflow_merger->set_pool(pool);
             overflow_merger->append_merger(*ext_mergers[extLevel], segmentSize);
@@ -664,13 +669,13 @@ private:
                 if (level == kNumIntGroups - 1) // from internal to external tree
                 {
                     const size_t segmentSize = int_mergers[kNumIntGroups - 1].size();
-                    STXXL_VERBOSE_PQ("make_space... Inserting segment into first level external: " << level << " " << segmentSize);
+                    LOG << "make_space... Inserting segment into first level external: " << level << " " << segmentSize;
                     ext_mergers[0]->append_merger(int_mergers[kNumIntGroups - 1], segmentSize);
                 }
                 else // from external to external tree
                 {
                     const size_type segmentSize = ext_mergers[level - kNumIntGroups]->size();
-                    STXXL_VERBOSE_PQ("make_space... Inserting segment into second level external: " << level << " " << segmentSize);
+                    LOG << "make_space... Inserting segment into second level external: " << level << " " << segmentSize;
                     ext_mergers[level - kNumIntGroups + 1]->append_merger(*ext_mergers[level - kNumIntGroups], segmentSize);
                 }
             }
@@ -680,7 +685,7 @@ private:
 
     void empty_insert_heap()
     {
-        STXXL_VERBOSE_PQ("empty_insert_heap()");
+        LOG << "empty_insert_heap()";
         assert(insert_heap.size() == (N + 1));
 
         const value_type sup = get_supremum();

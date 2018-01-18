@@ -24,8 +24,13 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <limits>
 
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/defines.h>
 #include <stxxl/scan>
 #include <stxxl/sort>
 #include <stxxl/stream>
@@ -45,7 +50,7 @@ size_t run_size;
 size_t buffer_size;
 constexpr int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 
-using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY>;
+using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, foxxll::default_alloc_strategy>;
 
 my_type::key_type checksum(vector_type& input)
 {
@@ -73,7 +78,7 @@ void linear_sort_normal(vector_type& input)
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
 
-    STXXL_CHECK(stxxl::is_sorted(input.cbegin(), input.cend()));
+    die_unless(stxxl::is_sorted(input.cbegin(), input.cend()));
 
     std::cout << "Linear sorting normal took " << (stop - start) << " seconds." << std::endl;
 }
@@ -94,7 +99,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
     sort_stream_type sort_stream(input_stream, cmp_less_key(), run_size);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
-    STXXL_CHECK(o == output.end());
+    die_unless(o == output.end());
 
     double stop = foxxll::timestamp();
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
@@ -103,9 +108,9 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
     if (sum1 != sum2)
-        STXXL_MSG("WRONG DATA");
+        LOG1 << "WRONG DATA";
 
-    STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend(), cmp_less_key()));
+    die_unless(stxxl::is_sorted(output.cbegin(), output.cend(), cmp_less_key()));
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }
@@ -120,7 +125,7 @@ int main(int argc, const char** argv)
     foxxll::config::get_instance();
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     unsigned long megabytes_to_process = atoi(argv[1]);
     int p = atoi(argv[2]);
@@ -168,7 +173,7 @@ int main(int argc, const char** argv)
     parallel_settings.multiway_merge_minimal_k = 2;
 
     __gnu_parallel::_Settings::set(parallel_settings);
-    STXXL_CHECK(&__gnu_parallel::_Settings::get() != &parallel_settings);
+    die_unless(&__gnu_parallel::_Settings::get() != &parallel_settings);
 
     if (0)
         printf("%d %p: mwms %d, q %d, qb %d",
@@ -199,7 +204,7 @@ int main(int argc, const char** argv)
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 
-    STXXL_CHECK(!stxxl::is_sorted(input.cbegin(), input.cend()));
+    die_unless(!stxxl::is_sorted(input.cbegin(), input.cend()));
 
     {
         vector_type output(n_records);

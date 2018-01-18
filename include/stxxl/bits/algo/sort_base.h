@@ -13,15 +13,9 @@
 #ifndef STXXL_ALGO_SORT_BASE_HEADER
 #define STXXL_ALGO_SORT_BASE_HEADER
 
-#include <foxxll/common/types.hpp>
-
 #include <cmath>
 
-#ifndef STXXL_NO_WARN_RECURSIVE_SORT
-#define STXXL_WARNMSG_RECURSIVE_SORT STXXL_ERRMSG
-#else
-#define STXXL_WARNMSG_RECURSIVE_SORT STXXL_VERBOSE
-#endif
+#include <foxxll/common/types.hpp>
 
 #ifndef STXXL_SORT_OPTIMAL_PREFETCHING
 #define STXXL_SORT_OPTIMAL_PREFETCHING 1

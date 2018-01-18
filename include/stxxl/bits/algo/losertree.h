@@ -15,14 +15,16 @@
 #ifndef STXXL_ALGO_LOSERTREE_HEADER
 #define STXXL_ALGO_LOSERTREE_HEADER
 
+#include <algorithm>
+
 #include <foxxll/common/types.hpp>
 #include <foxxll/common/utils.hpp>
-#include <foxxll/verbose.hpp>
+
+#include <tlx/define.hpp>
+#include <tlx/logger.hpp>
 
 #include <stxxl/types>
 #include <tlx/math/integer_log2.hpp>
-
-#include <algorithm>
 
 namespace stxxl {
 
@@ -30,6 +32,7 @@ template <typename RunCursorType,
           typename RunCursorCmpType>
 class loser_tree
 {
+    static constexpr bool debug = false;
     int logK;
     size_t k;
     size_t* entry;
@@ -73,7 +76,7 @@ public:
         logK = tlx::integer_log2_ceil(nruns);
         size_t kReg = k = size_t(1) << logK;
 
-        STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
+        LOG << "loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg;
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
         current = new RunCursorType[kReg];
@@ -129,7 +132,7 @@ private:
         size_t* regEntry = entry;
         size_t winnerIndex = regEntry[0];
 
-        while (LIKELY(out_first != out_last))
+        while (TLX_LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
             *(out_first) = winnerE->current();
@@ -169,7 +172,7 @@ private:
 
     void multi_merge_unrolled_0(value_type* out_first, value_type* out_last)
     {
-        while (LIKELY(out_first != out_last))
+        while (TLX_LIKELY(out_first != out_last))
         {
             *out_first = current->current();
             ++out_first;
@@ -183,7 +186,7 @@ private:
         size_t kReg = k;
         size_t winnerIndex = entry[0];
 
-        while (LIKELY(out_first != out_last))
+        while (TLX_LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
             *(out_first) = winnerE->current();

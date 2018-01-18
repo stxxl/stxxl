@@ -16,7 +16,18 @@
 #ifndef STXXL_STREAM_SORT_STREAM_HEADER
 #define STXXL_STREAM_SORT_STREAM_HEADER
 
+#include <algorithm>
+#include <cassert>
+#include <functional>
+#include <utility>
+#include <vector>
+
+#include <tlx/counting_ptr.hpp>
+#include <tlx/define.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng/block_manager.hpp>
+
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/sort_base.h>
@@ -26,13 +37,6 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/stream/sorted_runs.h>
 #include <stxxl/bits/stream/stream.h>
-
-#include <tlx/counting_ptr.hpp>
-
-#include <algorithm>
-#include <functional>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 namespace stream {
@@ -54,7 +58,7 @@ template <
     class Input,
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+    class AllocStr = foxxll::default_alloc_strategy>
 class basic_runs_creator
 {
 public:
@@ -167,7 +171,7 @@ public:
             compute_result();
             m_result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-            STXXL_MSG(*stats::get_instance());
+            LOG1 << *stats::get_instance();
 #endif //STXXL_PRINT_STAT_AFTER_RF
         }
         return m_result;
@@ -180,12 +184,13 @@ public:
 template <class Input, class CompareType, size_t BlockSize, class AllocStr>
 void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result()
 {
+    constexpr bool debug = false;
     using request_ptr = foxxll::request_ptr;
 
     size_t i = 0;
     size_t m2 = m_memsize / 2;
     const size_t el_in_run = m2 * block_type::size;     // # el in a run
-    STXXL_VERBOSE1("basic_runs_creator::compute_result m2=" << m2);
+    LOG << "basic_runs_creator::compute_result m2=" << m2;
     size_t blocks1_length = 0, blocks2_length = 0;
     block_type* Blocks1 = nullptr;
 
@@ -209,7 +214,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     }
     else
     {
-        STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
+        LOG << "basic_runs_creator: Small input optimization, input length: " << blocks1_length;
         m_result->elements = blocks1_length;
         check_sort_settings();
         potentially_parallel::sort(m_result->small_run.begin(), m_result->small_run.end(), cmp);
@@ -226,7 +231,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     if (blocks1_length <= block_type::size && m_input.empty())
     {
         // small input, do not flush it on the disk(s)
-        STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
+        LOG << "basic_runs_creator: Small input optimization, input length: " << blocks1_length;
         assert(m_result->small_run.empty());
         m_result->small_run.assign(Blocks1[0].begin(), Blocks1[0].begin() + blocks1_length);
         m_result->elements = blocks1_length;
@@ -266,7 +271,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
         return;
     }
 
-    STXXL_VERBOSE1("Filling the second part of the allocated blocks");
+    LOG << "Filling the second part of the allocated blocks";
     blocks2_length = fetch(Blocks2, 0, el_in_run);
 
     if (m_input.empty())
@@ -372,7 +377,7 @@ template <
     class Input,
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY
+    class AllocStr = foxxll::default_alloc_strategy
     >
 class runs_creator : public basic_runs_creator<Input, CompareType, BlockSize, AllocStr>
 {
@@ -433,6 +438,8 @@ class runs_creator<
         AllocStr
         >
 {
+    static constexpr bool debug = false;
+
 public:
     using cmp_type = CompareType;
     using value_type = ValueType;
@@ -520,7 +527,7 @@ protected:
         if (m_cur_el <= block_type::size && m_result->elements == 0)
         {
             // small input, do not flush it on the disk(s)
-            STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: " << m_cur_el);
+            LOG << "runs_creator(use_push): Small input optimization, input length: " << m_cur_el;
             m_result->small_run.assign(m_blocks1[0].begin(), m_blocks1[0].begin() + m_cur_el);
             m_result->elements = m_cur_el;
             return;
@@ -642,7 +649,7 @@ public:
     void push(const value_type& val)
     {
         assert(m_result_computed == false);
-        if (LIKELY(m_cur_el < m_el_in_run))
+        if (TLX_LIKELY(m_cur_el < m_el_in_run))
         {
             m_blocks1[m_cur_el / block_type::size][m_cur_el % block_type::size] = val;
             ++m_cur_el;
@@ -688,7 +695,7 @@ public:
             compute_result();
             m_result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-            STXXL_MSG(*stats::get_instance());
+            LOG1 << *stats::get_instance();
 #endif //STXXL_PRINT_STAT_AFTER_RF
         }
         return m_result;
@@ -898,11 +905,13 @@ public:
 template <class RunsType, class CompareType>
 bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 {
+    constexpr bool debug = false;
+
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
     using block_type = typename RunsType::element_type::block_type;
-    STXXL_VERBOSE2("Elements: " << sruns->elements);
+    LOG << "Elements: " << sruns->elements;
     size_t nruns = sruns->runs.size();
-    STXXL_VERBOSE2("Runs: " << nruns);
+    LOG << "Runs: " << nruns;
     size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
@@ -921,7 +930,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
             if (cmp(blocks[j][0], sruns->runs[irun][j].value) ||
                 cmp(sruns->runs[irun][j].value, blocks[j][0]))     //!=
             {
-                STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run");
+                LOG1 << "check_sorted_runs  wrong trigger in the run";
                 delete[] blocks;
                 return false;
             }
@@ -931,7 +940,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
                 make_element_iterator(blocks, sruns->runs_sizes[irun]),
                 cmp))
         {
-            STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
+            LOG1 << "check_sorted_runs  wrong order in the run";
             delete[] blocks;
             return false;
         }
@@ -939,7 +948,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
         delete[] blocks;
     }
 
-    STXXL_MSG("Checking runs finished successfully");
+    LOG1 << "Checking runs finished successfully";
 
     return true;
 }
@@ -956,9 +965,11 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
 //! storing intermediate results if several merge passes are required
 template <class RunsType,
           class CompareType,
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStr = foxxll::default_alloc_strategy>
 class basic_runs_merger
 {
+    static constexpr bool debug = false;
+
 public:
     using sorted_runs_type = RunsType;
     using value_cmp = CompareType;
@@ -1048,7 +1059,7 @@ private:
 
     void fill_buffer_block()
     {
-        STXXL_VERBOSE1("fill_buffer_block");
+        LOG << "fill_buffer_block";
         if (do_parallel_merge())
         {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
@@ -1073,7 +1084,7 @@ private:
 
                 diff_type output_size = std::min(num_currently_mergeable, rest);         // at most rest elements
 
-                STXXL_VERBOSE1("before merge " << output_size);
+                LOG << "before merge " << output_size;
 
                 potentially_parallel::multiway_merge(
                     (*seqs).begin(), (*seqs).end(),
@@ -1083,7 +1094,7 @@ private:
                 rest -= output_size;
                 num_currently_mergeable -= output_size;
 
-                STXXL_VERBOSE1("after merge");
+                LOG << "after merge";
 
                 sort_helper::refill_or_remove_empty_sequences(*seqs, *buffers, *m_prefetcher);
             } while (rest > 0 && (*seqs).size() > 0);
@@ -1094,7 +1105,7 @@ private:
                 for (value_type* i = m_buffer_block->begin() + 1; i != m_buffer_block->end(); ++i)
                     if (cmp(*i, *(i - 1)))
                     {
-                        STXXL_VERBOSE1("Error at position " << (i - m_buffer_block->begin()));
+                        LOG << "Error at position " << (i - m_buffer_block->begin());
                     }
                 assert(false);
             }
@@ -1115,7 +1126,7 @@ private:
                                       m_elements_remaining));
 // end of native merging procedure
         }
-        STXXL_VERBOSE1("current block filled");
+        LOG << "current block filled";
 
         m_current_ptr = m_buffer_block->elem;
         m_current_end = m_buffer_block->elem + std::min<size_type>(
@@ -1171,7 +1182,7 @@ public:
         if (!m_sruns->small_run.empty())
         {
             // we have a small input <= B, that is kept in the main memory
-            STXXL_VERBOSE1("basic_runs_merger: small input optimization, input length: " << m_elements_remaining);
+            LOG << "basic_runs_merger: small input optimization, input length: " << m_elements_remaining;
             assert(m_elements_remaining == size_type(m_sruns->small_run.size()));
 
             m_current_ptr = &m_sruns->small_run[0];
@@ -1199,20 +1210,21 @@ public:
         if (input_buffers < nruns + min_prefetch_buffers)
         {
             // can not merge runs in one pass. merge recursively:
-            STXXL_WARNMSG_RECURSIVE_SORT("The implementation of sort requires more than one merge pass, therefore for a better");
-            STXXL_WARNMSG_RECURSIVE_SORT("efficiency decrease block size of run storage (a parameter of the run_creator)");
-            STXXL_WARNMSG_RECURSIVE_SORT("or increase the amount memory dedicated to the merger.");
-            STXXL_WARNMSG_RECURSIVE_SORT("m=" << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers);
-            STXXL_WARNMSG_RECURSIVE_SORT("memory_to_use=" << m_memory_to_use << " bytes  block_type::raw_size=" << block_type::raw_size << " bytes");
+            LOG1 <<
+                "The implementation of sort requires more than one merge pass, therefore for a better\n"
+                "efficiency decrease block size of run storage (a parameter of the run_creator)\n"
+                "or increase the amount memory dedicated to the merger.\n"
+                "m=" << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers << "\n"
+                "memory_to_use=" << m_memory_to_use << " bytes  block_type::raw_size=" << block_type::raw_size << " bytes";
 
             // check whether we have enough memory to merge recursively
             size_t recursive_merge_buffers = m_memory_to_use / block_type::raw_size;
             if (recursive_merge_buffers < 2 * min_prefetch_buffers + 1 + 2) {
                 // recursive merge uses min_prefetch_buffers for input buffering and min_prefetch_buffers output buffering
                 // as well as 1 current output block and at least 2 input blocks
-                STXXL_ERRMSG("There are only m=" << recursive_merge_buffers << " blocks available for recursive merging, but "
-                                                 << min_prefetch_buffers << "+" << min_prefetch_buffers << "+1 are needed read-ahead/write-back/output, and");
-                STXXL_ERRMSG("the merger requires memory to store at least two input blocks internally. Aborting.");
+                LOG1 << "There are only m=" << recursive_merge_buffers << " blocks available for recursive merging, but "
+                     << min_prefetch_buffers << "+" << min_prefetch_buffers << "+1 are needed read-ahead/write-back/output, and";
+                LOG1 << "the merger requires memory to store at least two input blocks internally. Aborting.";
                 throw foxxll::bad_parameter(
                           "basic_runs_merger::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
@@ -1339,7 +1351,7 @@ public:
         --m_elements_remaining;
         ++m_current_ptr;
 
-        if (LIKELY(m_current_ptr == m_current_end && !empty()))
+        if (TLX_LIKELY(m_current_ptr == m_current_end && !empty()))
         {
             fill_buffer_block();
 
@@ -1395,9 +1407,9 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
     while (nruns > max_arity)
     {
         size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
-        STXXL_MSG("Starting new merge phase: nruns: " << nruns <<
-                  " opt_merge_factor: " << merge_factor <<
-                  " max_arity: " << max_arity << " new_nruns: " << new_nruns);
+        LOG1 << "Starting new merge phase: nruns: " << nruns <<
+            " opt_merge_factor: " << merge_factor <<
+            " max_arity: " << max_arity << " new_nruns: " << new_nruns;
 
         // construct new sorted_runs data object which will be swapped into
         // m_sruns
@@ -1416,7 +1428,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
         while (runs_left > 0)
         {
             size_t runs2merge = std::min(runs_left, merge_factor);
-            STXXL_MSG("Merging " << runs2merge << " runs");
+            LOG1 << "Merging " << runs2merge << " runs";
 
             if (runs2merge > 1)     // non-trivial merge
             {
@@ -1523,7 +1535,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 //! storing intermediate results if several merge passes are required
 template <class RunsType,
           class CompareType = typename RunsType::element_type::cmp_type,
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStr = foxxll::default_alloc_strategy>
 class runs_merger : public basic_runs_merger<RunsType, CompareType, AllocStr>
 {
 protected:
@@ -1570,7 +1582,7 @@ template <
     class Input,
     class CompareType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(typename Input::value_type),
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+    class AllocStr = foxxll::default_alloc_strategy,
     class RunsCreatorType = runs_creator<Input, CompareType, BlockSize, AllocStr>
     >
 class sort
@@ -1689,7 +1701,7 @@ void sort(RandomAccessIterator begin,
           size_t MemSize,
           AllocStr AS)
 {
-    STXXL_UNUSED(AS);
+    tlx::unused(AS);
     using InputType = typename stream::streamify_traits<RandomAccessIterator>::stream_type;
     InputType Input(begin, end);
     using sorter_type = stream::sort<InputType, CmpType, BlockSize, AllocStr>;

@@ -10,9 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/vector>
-
 #include <iostream>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/vector>
 
 int main()
 {
@@ -47,6 +49,6 @@ int main()
         iter++;
     }
 
-    STXXL_MSG("found " << counter << " even numbers in V");
+    LOG1 << "found " << counter << " even numbers in V";
     return 0;
 }

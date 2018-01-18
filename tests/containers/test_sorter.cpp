@@ -15,6 +15,10 @@
 //! This is an example of how to use \c stxxl::sorter() container
 
 #include <limits>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/sorter>
 
 #include <key_with_padding.h>
@@ -30,7 +34,7 @@ template class stxxl::sorter<my_type, Comparator>;
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     enum { block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type) };
@@ -54,13 +58,13 @@ int main()
         // finish input, switch to sorting stage.
         s.sort();
 
-        STXXL_CHECK(*s == my_type(0));
+        die_unless(*s == my_type(0));
         ++s;
-        STXXL_CHECK(*s == my_type(23));
+        die_unless(*s == my_type(23));
         ++s;
-        STXXL_CHECK(*s == my_type(42));
+        die_unless(*s == my_type(42));
         ++s;
-        STXXL_CHECK(s.empty());
+        die_unless(s.empty());
     }
 
     {
@@ -72,11 +76,11 @@ int main()
 
         stxxl::random_number32 rnd;
 
-        STXXL_MSG("Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)");
+        LOG1 << "Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)";
 
         for (uint64_t i = 0; i < n_records; i++)
         {
-            STXXL_CHECK(s.size() == i);
+            die_unless(s.size() == i);
 
             s.push(my_type(1 + (rnd() % 0xfffffff)));
         }
@@ -84,10 +88,10 @@ int main()
         // finish input, switch to sorting stage.
         s.sort();
 
-        STXXL_MSG("Checking order...");
+        LOG1 << "Checking order...";
 
-        STXXL_CHECK(!s.empty());
-        STXXL_CHECK(s.size() == n_records);
+        die_unless(!s.empty());
+        die_unless(s.size() == n_records);
 
         my_type prev = *s;      // get first item
         ++s;
@@ -96,39 +100,39 @@ int main()
 
         while (!s.empty())
         {
-            STXXL_CHECK(s.size() == count);
+            die_unless(s.size() == count);
 
-            if (!(prev <= *s)) STXXL_MSG("WRONG");
-            STXXL_CHECK(prev <= *s);
+            if (!(prev <= *s)) LOG1 << "WRONG";
+            die_unless(prev <= *s);
 
             ++s;
             --count;
         }
-        STXXL_MSG("OK");
+        LOG1 << "OK";
 
         // rewind and read output again
         s.rewind();
 
-        STXXL_MSG("Checking order again...");
+        LOG1 << "Checking order again...";
 
-        STXXL_CHECK(!s.empty());
-        STXXL_CHECK(s.size() == n_records);
+        die_unless(!s.empty());
+        die_unless(s.size() == n_records);
 
         prev = *s;      // get first item
         ++s;
 
         while (!s.empty())
         {
-            if (!(prev <= *s)) STXXL_MSG("WRONG");
-            STXXL_CHECK(prev <= *s);
+            if (!(prev <= *s)) LOG1 << "WRONG";
+            die_unless(prev <= *s);
 
             ++s;
         }
-        STXXL_MSG("OK");
+        LOG1 << "OK";
 
-        STXXL_CHECK(s.size() == 0);
+        die_unless(s.size() == 0);
 
-        STXXL_MSG("Done");
+        LOG1 << "Done";
     }
 
     return 0;

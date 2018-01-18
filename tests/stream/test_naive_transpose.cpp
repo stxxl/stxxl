@@ -22,11 +22,15 @@
 //! memory matrix transpostion than sorting, see e.g. J.S. Vitter: Algorithms
 //! and Data Structures for External Memory, Chapter 7.2.
 
-#include <stxxl/stream>
-#include <stxxl/vector>
-
+#include <iostream>
 #include <limits>
 #include <vector>
+
+#include <tlx/die.hpp>
+
+#include <stxxl/bits/defines.h>
+#include <stxxl/stream>
+#include <stxxl/vector>
 
 class streamop_matrix_transpose
 {
@@ -149,8 +153,8 @@ int main()
 
     // HERE streaming part ends (materializing)
     array_type::iterator o = stxxl::stream::materialize(sorted_element_stream, output.begin(), output.end(), numbuffers);
-    STXXL_CHECK(o == output.end());
-    STXXL_CHECK(sorted_element_stream.empty());
+    die_unless(o == output.end());
+    die_unless(sorted_element_stream.empty());
 
     foxxll::stats_data stats_after(*foxxll::stats::get_instance());
 

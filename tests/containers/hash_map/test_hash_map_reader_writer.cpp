@@ -10,11 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl.h>
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/containers/hash_map/util.h>
-
-#include <iostream>
 
 void reader_writer_test()
 {
@@ -53,7 +56,7 @@ void reader_writer_test()
             writer.append(value_type(i, i));
         writer.flush();
 
-        STXXL_CHECK(bids.size() >= n_blocks);
+        die_unless(bids.size() >= n_blocks);
 
         block_type* block = new block_type;
         i = 0;
@@ -62,7 +65,7 @@ void reader_writer_test()
             req->wait();
 
             for (unsigned inner = 0; inner < block_size * subblock_size; ++inner) {
-                STXXL_CHECK((*block)[inner / subblock_size][inner % subblock_size].first == i);
+                die_unless((*block)[inner / subblock_size][inner % subblock_size].first == i);
                 i++;
             }
         }
@@ -74,14 +77,14 @@ void reader_writer_test()
         // last parameter disables prefetching
         reader_type reader(bids.begin(), bids.end(), cache, 0, false);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
-            STXXL_CHECK(reader.const_value().first == i);
+            die_unless(reader.const_value().first == i);
             ++reader;
         }
 
         // prefetching enabled by default
         reader_type reader2(bids.begin(), bids.end(), cache);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
-            STXXL_CHECK(reader2.const_value().first == i);
+            die_unless(reader2.const_value().first == i);
             ++reader2;
         }
     }
@@ -94,17 +97,17 @@ void reader_writer_test()
         // I: first subblock
         reader.skip_to(bids.begin() + 10, 0);
         unsigned expected = block_size * subblock_size * 10 + subblock_size * 0;
-        STXXL_CHECK(reader.const_value().first == expected);
+        die_unless(reader.const_value().first == expected);
 
         // II: subblock in the middle (same block)
         reader.skip_to(bids.begin() + 10, 2);
         expected = block_size * subblock_size * 10 + subblock_size * 2;
-        STXXL_CHECK(reader.const_value().first == expected);
+        die_unless(reader.const_value().first == expected);
 
         // III: subblock in the middle (another block)
         reader.skip_to(bids.begin() + 13, 1);
         expected = block_size * subblock_size * 13 + subblock_size * 1;
-        STXXL_CHECK(reader.const_value().first == expected);
+        die_unless(reader.const_value().first == expected);
     }
 
     // reading with modifying access
@@ -117,7 +120,7 @@ void reader_writer_test()
 
         reader_type reader2(bids.begin(), bids.end(), cache);
         for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i) {
-            STXXL_CHECK(reader2.const_value().second == reader2.const_value().first + 1);
+            die_unless(reader2.const_value().second == reader2.const_value().first + 1);
             ++reader2;
         }
 
@@ -129,8 +132,8 @@ void reader_writer_test()
             req->wait();
 
             for (unsigned inner = 0; inner < block_size * subblock_size; ++inner) {
-                STXXL_CHECK((*block)[inner / subblock_size][inner % subblock_size].first == i);
-                STXXL_CHECK((*block)[inner / subblock_size][inner % subblock_size].second == i + 1);
+                die_unless((*block)[inner / subblock_size][inner % subblock_size].first == i);
+                die_unless((*block)[inner / subblock_size][inner % subblock_size].second == i + 1);
                 i++;
             }
         }
@@ -158,7 +161,7 @@ void reader_writer_test()
         i = 0;
         for (unsigned outer = 0; outer < n_blocks * block_size; ++outer) {
             for (unsigned inner = 0; inner < subblock_size / 2; ++inner) {
-                STXXL_CHECK(reader.const_value().first == i);
+                die_unless(reader.const_value().first == i);
                 ++i;
                 ++reader;
             }
@@ -166,7 +169,7 @@ void reader_writer_test()
         }
     }
 
-    STXXL_MSG("Passed Reader-Writer Test");
+    LOG1 << "Passed Reader-Writer Test";
 }
 
 int main()

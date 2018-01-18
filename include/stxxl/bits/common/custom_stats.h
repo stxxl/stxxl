@@ -13,12 +13,14 @@
 #ifndef STXXL_COMMON_CUSTOM_STATS_HEADER
 #define STXXL_COMMON_CUSTOM_STATS_HEADER
 
-#include <foxxll/common/timer.hpp>
-#include <foxxll/common/utils.hpp>
-
 #include <algorithm>
 #include <string>
 #include <utility>
+
+#include <tlx/string.hpp>
+
+#include <foxxll/common/timer.hpp>
+#include <foxxll/common/utils.hpp>
 
 namespace stxxl {
 
@@ -92,7 +94,7 @@ public:
      */
     std::string as_memory_amount(const value_type& byte_per_element) const
     {
-        return format_IEC_size(m_value * byte_per_element) + "B";
+        return tlx::format_iec_units(m_value * byte_per_element) + "B";
     }
     /*!
      * Cast to counter_type: Returns the counter's value as a regular integer

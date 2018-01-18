@@ -11,12 +11,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/containers/hash_map/hash_map.h>
-
-#include <iostream>
 
 struct rand_pairs
 {
@@ -112,11 +115,11 @@ void cmp_with_internal_map()
 
     // --- scan and compare with internal memory hash-map
     std::cout << "Compare with internal-memory map...";
-    STXXL_CHECK(int_map.size() == map.size());
+    die_unless(int_map.size() == map.size());
     const_iterator cit = cmap.begin();
     for ( ; cit != cmap.end(); ++cit) {
         int key = (*cit).first;
-        STXXL_CHECK(int_map.find(key) != int_map.end());
+        die_unless(int_map.find(key) != int_map.end());
     }
     std::cout << "passed" << std::endl;
 
@@ -124,14 +127,14 @@ void cmp_with_internal_map()
     std::cout << "Compare with internal-memory map after another bulk-insert...";
     map.insert(values3.begin(), values3.end(), mem_to_sort);
     int_map.insert(values3.begin(), values3.end());
-    STXXL_CHECK(map.size() == map.size());
+    die_unless(map.size() == map.size());
     cit = cmap.begin();
     for ( ; cit != cmap.end(); ++cit) {
         int key = (*cit).first;
-        STXXL_CHECK(int_map.find(key) != int_map.end());
+        die_unless(int_map.find(key) != int_map.end());
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,13 +176,13 @@ void basic_iterator_test()
     // --- internally (values2) stored values
     std::cout << "Initial import...";
 
-    STXXL_CHECK(map.begin() == map.end());
+    die_unless(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
     for (std::vector<value_type>::iterator val_it = values2.begin();
          val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
-    STXXL_CHECK(map.begin() != map.end());
-    STXXL_CHECK(map.size() == 2 * n_values);
+    die_unless(map.begin() != map.end());
+    die_unless(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
 
     // --- actual testing begins: modfiy random values via iterator
@@ -189,8 +192,8 @@ void basic_iterator_test()
     for (size_t i = 0; i < n_tests; ++i) {
         iterator it1 = map.find(values1[i].first);
         iterator it2 = map.find(values2[i].first);
-        STXXL_CHECK(it1 != map.end());
-        STXXL_CHECK(it2 != map.end());
+        die_unless(it1 != map.end());
+        die_unless(it2 != map.end());
         (*it1).second++;
         (*it2).second++;
     }
@@ -198,12 +201,12 @@ void basic_iterator_test()
     for (size_t i = 0; i < n_tests; ++i) {
         const_iterator cit1 = cmap.find(values1[i].first);
         const_iterator cit2 = cmap.find(values2[i].first);
-        STXXL_CHECK(cit1 != map.end());
-        STXXL_CHECK(cit2 != map.end());
+        die_unless(cit1 != map.end());
+        die_unless(cit2 != map.end());
         value_type value1 = *cit1;
         value_type value2 = *cit2;
-        STXXL_CHECK(value1.second == value1.first + 1);
-        STXXL_CHECK(value2.second == value2.first + 1);
+        die_unless(value1.second == value1.first + 1);
+        die_unless(value2.second == value2.first + 1);
     }
     std::cout << "passed" << std::endl;
 
@@ -214,7 +217,7 @@ void basic_iterator_test()
             (*it).second = (*it).first + 1;
 
         for (const_iterator cit = cmap.begin(); cit != cmap.end(); ++cit) {
-            STXXL_CHECK((*cit).second == (*cit).first + 1);
+            die_unless((*cit).second == (*cit).first + 1);
         }
     }
     std::cout << "passed" << std::endl;
@@ -227,15 +230,15 @@ void basic_iterator_test()
         int key1 = values1[i].first;
         int key2 = values2[i].first;
         const_iterator cit1 = cmap.find(key1);
-        STXXL_CHECK(cit1 != cmap.end());
+        die_unless(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(key2);
-        STXXL_CHECK(cit2 != cmap.end());
+        die_unless(cit2 != cmap.end());
 
         map.insert_oblivious(value_type(key1, key1 + 3));
         map.insert_oblivious(value_type(key2, key2 + 3));
 
-        STXXL_CHECK((*cit1).second == key1 + 3);
-        STXXL_CHECK((*cit2).second == key2 + 3);
+        die_unless((*cit1).second == key1 + 3);
+        die_unless((*cit2).second == key2 + 3);
     }
     std::cout << "passed" << std::endl;
 
@@ -245,18 +248,18 @@ void basic_iterator_test()
     std::random_shuffle(values2.begin(), values2.end());
     for (size_t i = 0; i < n_tests; i++) {
         const_iterator cit1 = cmap.find(values1[i].first);
-        STXXL_CHECK(cit1 != cmap.end());
+        die_unless(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(values2[i].first);
-        STXXL_CHECK(cit2 != cmap.end());
+        die_unless(cit2 != cmap.end());
         iterator it1 = map.find(values1[i].first);
-        STXXL_CHECK(it1 != map.end());
+        die_unless(it1 != map.end());
         iterator it2 = map.find(values2[i].first);
-        STXXL_CHECK(it2 != map.end());
+        die_unless(it2 != map.end());
 
         (*it1).second = (*it1).first + 5;
         (*it2).second = (*it2).first + 5;
-        STXXL_CHECK((*cit1).second == (*cit1).first + 5);
-        STXXL_CHECK((*cit2).second == (*cit2).first + 5);
+        die_unless((*cit1).second == (*cit1).first + 5);
+        die_unless((*cit2).second == (*cit2).first + 5);
     }
     std::cout << "passed" << std::endl;
 
@@ -266,18 +269,18 @@ void basic_iterator_test()
     std::random_shuffle(values2.begin(), values2.end());
     for (size_t i = 0; i < n_tests; i++) {
         const_iterator cit1 = cmap.find(values1[i].first);
-        STXXL_CHECK(cit1 != cmap.end());
+        die_unless(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(values2[i].first);
-        STXXL_CHECK(cit2 != cmap.end());
+        die_unless(cit2 != cmap.end());
         iterator it1 = map.find(values1[i].first);
-        STXXL_CHECK(it1 != map.end());
+        die_unless(it1 != map.end());
         iterator it2 = map.find(values2[i].first);
-        STXXL_CHECK(it2 != map.end());
+        die_unless(it2 != map.end());
 
         map.erase(it1);
         map.erase(it2);
-        STXXL_CHECK(cit1 == cmap.end());
-        STXXL_CHECK(cit2 == cmap.end());
+        die_unless(cit1 == cmap.end());
+        die_unless(cit2 == cmap.end());
     }
     std::cout << "passed" << std::endl;
 
@@ -285,18 +288,18 @@ void basic_iterator_test()
     std::cout << "Erase by key...";
     for (size_t i = 0; i < n_tests; i++) {
         const_iterator cit1 = cmap.find(values1[i + n_tests].first);
-        STXXL_CHECK(cit1 != cmap.end());
+        die_unless(cit1 != cmap.end());
         const_iterator cit2 = cmap.find(values2[i + n_tests].first);
-        STXXL_CHECK(cit2 != cmap.end());
+        die_unless(cit2 != cmap.end());
 
         map.erase_oblivious(values1[i + n_tests].first);
         map.erase_oblivious(values2[i + n_tests].first);
-        STXXL_CHECK(cit1 == cmap.end());
-        STXXL_CHECK(cit2 == cmap.end());
+        die_unless(cit1 == cmap.end());
+        die_unless(cit2 == cmap.end());
     }
     std::cout << "passed" << std::endl;
 
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,9 +349,9 @@ void more_iterator_test()
         *cit1;
         *cit2;
         map.rehash();
-        STXXL_CHECK(map.size() == 2 * n_values);
-        STXXL_CHECK((*cit1).first == values1[17].first);
-        STXXL_CHECK((*cit2).first == values2[19].first);
+        die_unless(map.size() == 2 * n_values);
+        die_unless((*cit1).first == values1[17].first);
+        die_unless((*cit2).first == values2[19].first);
     }
     std::cout << "passed" << std::endl;
 
@@ -364,13 +367,13 @@ void more_iterator_test()
         map.erase_oblivious(key1);
         map.insert_oblivious(value_type(key2, key2 + 2));
 
-        STXXL_CHECK((*cit1).second == key2 + 2);
+        die_unless((*cit1).second == key2 + 2);
         ++cit2;
-        STXXL_CHECK(cit1 == cit2);
+        die_unless(cit1 == cit2);
     }
     std::cout << "passed" << std::endl;
 
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -18,6 +18,11 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/stack>
 #include <stxxl/timer>
 
@@ -53,7 +58,7 @@ void benchmark_insert(stack_type& Stack, uint64_t volume)
 {
     using value_type = typename stack_type::value_type;
 
-    STXXL_MSG("Record size: " << sizeof(value_type) << " bytes");
+    LOG1 << "Record size: " << sizeof(value_type) << " bytes";
 
     uint64_t ops = volume / sizeof(value_type);
 
@@ -76,16 +81,12 @@ void benchmark_insert(stack_type& Stack, uint64_t volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.size());
-    if (ops != uint64_t(Stack.size()))
-    {
-        STXXL_MSG("Size does not match");
-        abort();
-    }
+    LOG1 << "Records in Stack: " << Stack.size();
+    die_unequal(ops, uint64_t(Stack.size()));
 
-    STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MiB/s");
+    LOG1 << "Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
+        " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+        " MiB/s";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
@@ -111,16 +112,11 @@ void benchmark_delete(stack_type& Stack, uint64_t volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.size());
-    if (!Stack.empty())
-    {
-        STXXL_MSG("Stack must be empty");
-        abort();
-    }
+    die_unless(Stack.empty());
 
-    STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MiB/s");
+    LOG1 << "Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
+        " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+        " MiB/s";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
@@ -167,37 +163,37 @@ void run_stl_stack(uint64_t volume)
 
 int main(int argc, char* argv[])
 {
-    STXXL_MSG("stxxl::pq block size: " << BLOCK_SIZE << " bytes");
+    LOG1 << "stxxl::pq block size: " << BLOCK_SIZE << " bytes";
 
 #if STXXL_DIRECT_IO_OFF
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");
+    LOG1 << "STXXL_DIRECT_IO_OFF is defined";
 #else
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined");
+    LOG1 << "STXXL_DIRECT_IO_OFF is NOT defined";
 #endif
 
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " variant volume");
-        STXXL_MSG("\t variant = 1: grow-shrink-stack2 with 4 byte records");
-        STXXL_MSG("\t variant = 2: grow-shrink-stack2 with 32 byte records");
-        STXXL_MSG("\t variant = 3: normal-stack with 4 byte records");
-        STXXL_MSG("\t variant = 4: normal-stack with 32 byte records");
-        STXXL_MSG("\t variant = 5: std::stack with 4 byte records");
-        STXXL_MSG("\t variant = 6: std::stack with 32 byte records");
-        STXXL_MSG("\t volume:      in bytes");
+        LOG1 << "Usage: " << argv[0] << " variant volume";
+        LOG1 << "\t variant = 1: grow-shrink-stack2 with 4 byte records";
+        LOG1 << "\t variant = 2: grow-shrink-stack2 with 32 byte records";
+        LOG1 << "\t variant = 3: normal-stack with 4 byte records";
+        LOG1 << "\t variant = 4: normal-stack with 32 byte records";
+        LOG1 << "\t variant = 5: std::stack with 4 byte records";
+        LOG1 << "\t variant = 6: std::stack with 32 byte records";
+        LOG1 << "\t volume:      in bytes";
         return -1;
     }
 
     int variant = atoi(argv[1]);
     uint64_t volume = foxxll::atouint64(argv[2]);
 
-    STXXL_MSG("Allocating array with size " <<
-              MEM_2_RESERVE << " bytes to prevent file buffering.");
+    LOG1 << "Allocating array with size " <<
+        MEM_2_RESERVE << " bytes to prevent file buffering.";
     int* array = new int[MEM_2_RESERVE / sizeof(int)];
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 
-    STXXL_MSG("Running variant: " << variant);
-    STXXL_MSG("Data volume    : " << volume << " bytes");
+    LOG1 << "Running variant: " << variant;
+    LOG1 << "Data volume    : " << volume << " bytes";
 
     switch (variant)
     {
@@ -220,7 +216,7 @@ int main(int argc, char* argv[])
         run_stl_stack<my_record_<32> >(volume);
         break;
     default:
-        STXXL_MSG("Unsupported variant " << variant);
+        LOG1 << "Unsupported variant " << variant;
     }
 
     delete[] array;

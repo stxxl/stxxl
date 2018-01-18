@@ -20,6 +20,11 @@
 //! using \c stream::use_push specialization of \c stream::runs_creator class
 
 #include <limits>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/defines.h>
 #include <stxxl/stream>
 
 const unsigned long long megabyte = 1024 * 1024;
@@ -55,7 +60,7 @@ template class stxxl::stream::runs_merger<SortedRunsType, Cmp>;
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
 
     unsigned input_size = (10 * megabyte / sizeof(value_type));
@@ -74,13 +79,13 @@ int main()
     }
 
     SortedRunsType Runs = SortedRuns.result();  // get sorted_runs data structure
-    STXXL_CHECK(stxxl::stream::check_sorted_runs(Runs, Cmp()));
+    die_unless(stxxl::stream::check_sorted_runs(Runs, Cmp()));
 
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 10 * megabyte);
     stxxl::vector<value_type, 4, stxxl::lru_pager<8> > array;
-    STXXL_MSG(input_size << " " << Runs->elements);
-    STXXL_MSG("checksum before: " << checksum_before);
+    LOG1 << input_size << " " << Runs->elements;
+    LOG1 << "checksum before: " << checksum_before;
     value_type checksum_after(0);
     for (unsigned i = 0; i < input_size; ++i)
     {
@@ -88,10 +93,10 @@ int main()
         array.push_back(*merger);
         ++merger;
     }
-    STXXL_MSG("checksum after:  " << checksum_after);
-    STXXL_CHECK(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
-    STXXL_CHECK(checksum_before == checksum_after);
-    STXXL_CHECK(merger.empty());
+    LOG1 << "checksum after:  " << checksum_after;
+    die_unless(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
+    die_unless(checksum_before == checksum_after);
+    die_unless(merger.empty());
 
     return 0;
 }

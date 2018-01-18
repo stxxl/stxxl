@@ -16,6 +16,11 @@
 #ifndef STXXL_CONTAINERS_PQ_HELPERS_HEADER
 #define STXXL_CONTAINERS_PQ_HELPERS_HEADER
 
+#include <algorithm>
+#include <functional>
+#include <utility>
+#include <vector>
+
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_alloc_strategy.hpp>
@@ -24,15 +29,11 @@
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
 #include <foxxll/mng/write_pool.hpp>
+
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/parallel.h>
-
-#include <algorithm>
-#include <functional>
-#include <utility>
-#include <vector>
 
 #if STXXL_PARALLEL
 
@@ -69,8 +70,6 @@
 #else
 #define STXXL_PQ_INTERNAL_LOSER_TREE 1
 #endif
-
-#define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2_THIS("priority_queue::" << msg)
 
 namespace stxxl {
 

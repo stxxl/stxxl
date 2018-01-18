@@ -16,13 +16,15 @@
 #ifndef STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 #define STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 
-#include <stxxl/bits/containers/pq_mergers.h>
-#include <stxxl/types>
-
 #include <algorithm>
 #include <deque>
 #include <utility>
 #include <vector>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/containers/pq_mergers.h>
+#include <stxxl/types>
 
 namespace stxxl {
 
@@ -39,9 +41,11 @@ namespace priority_queue_local {
  * \param Arity  maximum arity of merger, does not need to be a power of 2
  */
 template <class BlockType, class CompareType, unsigned Arity,
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStr = foxxll::default_alloc_strategy>
 class ext_merger
 {
+    static constexpr bool debug = false;
+
 public:
     //! class is parameterized by the block of the external arrays
     using block_type = BlockType;
@@ -103,7 +107,7 @@ public:
 
         ~sequence_state()
         {
-            STXXL_VERBOSE2("ext_merger sequence_state::~sequence_state()");
+            LOG << "ext_merger sequence_state::~sequence_state()";
 
             foxxll::block_manager* bm = foxxll::block_manager::get_instance();
             bm->delete_blocks(bids.begin(), bids.end());
@@ -141,11 +145,11 @@ public:
 
             if (current == block->size)
             {
-                STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
+                LOG << "ext_merger sequence_state operator++ crossing block border ";
                 // go to the next block
                 if (bids.empty()) // if there is no next block
                 {
-                    STXXL_VERBOSE2("ext_merger sequence_state operator++ it was the last block in the sequence ");
+                    LOG << "ext_merger sequence_state operator++ it was the last block in the sequence ";
                     // swap memory area and delete other object.
                     bid_container_type to_delete;
                     std::swap(to_delete, bids);
@@ -153,17 +157,17 @@ public:
                 }
                 else
                 {
-                    STXXL_VERBOSE2("ext_merger sequence_state operator++ there is another block ");
+                    LOG << "ext_merger sequence_state operator++ there is another block ";
                     bid_type bid = bids.front();
                     bids.pop_front();
                     merger->pool->hint(bid);
                     if (!(bids.empty()))
                     {
-                        STXXL_VERBOSE2("ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next");
+                        LOG << "ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next";
                         merger->pool->hint(bids.front());
                     }
                     merger->pool->read(block, bid)->wait();
-                    //req-ostream STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
+                    //req-ostream LOG << "first element of read block " << bid << " " << *(block->begin()) << " cached in " << block;
                     if (!(bids.empty()))
                         merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
                     foxxll::block_manager::get_instance()->delete_block(bid);
@@ -225,7 +229,7 @@ public:
 
     virtual ~ext_merger()
     {
-        STXXL_VERBOSE1("ext_merger::~ext_merger()");
+        LOG << "ext_merger::~ext_merger()";
         for (size_t i = 0; i < arity; ++i)
         {
             delete states[i].block;
@@ -281,7 +285,7 @@ public:
     //! free an empty segment.
     void free_array(const size_t slot)
     {
-        STXXL_VERBOSE1("ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot)));
+        LOG << "ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot));
         assert(is_array_allocated(slot));
         states[slot].allocated = false;
         states[slot].make_inf();
@@ -306,7 +310,7 @@ public:
 protected:
     void init()
     {
-        STXXL_VERBOSE2("ext_merger::init()");
+        LOG << "ext_merger::init()";
 
         states = reinterpret_cast<sequence_state*>(new uint8_t[sizeof(sequence_state) * kMaxArity]);
         for (size_t i = 0; i < kMaxArity; ++i)
@@ -318,10 +322,9 @@ protected:
             sentinel_block = new block_type;
             for (size_t i = 0; i < block_type::size; ++i)
                 (*sentinel_block)[i] = tree.cmp.min_value();
-            if (arity + 1 == kMaxArity) {
-                // same memory consumption, but smaller merge width, better use arity = kMaxArity
-                STXXL_ERRMSG("inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity");
-            }
+
+            // same memory consumption, but smaller merge width, better use arity = kMaxArity
+            LOGC(arity + 1 == kMaxArity) << "inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity";
         }
 
         for (size_t i = 0; i < kMaxArity; ++i)
@@ -382,7 +385,7 @@ public:
     void insert_segment(bid_container_type& bidlist, block_type* first_block,
                         const size_t first_size, const size_t slot)
     {
-        STXXL_VERBOSE1("ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist.size() << " " << slot);
+        LOG << "ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist.size() << " " << slot;
         assert(!is_array_allocated(slot));
         assert(first_size > 0);
 
@@ -400,12 +403,12 @@ public:
     template <class Merger>
     void append_merger(Merger& another_merger, size_type segment_size)
     {
-        STXXL_VERBOSE1("ext_merger::append_merger(merger,...)" << this);
+        LOG << "ext_merger::append_merger(merger,...)" << this;
 
         if (segment_size == 0)
         {
             // deallocate memory ?
-            STXXL_VERBOSE1("Merged segment with zero size.");
+            LOG << "Merged segment with zero size.";
             return;
         }
 
@@ -416,12 +419,11 @@ public:
         assert(segment_size);
         size_t nblocks = static_cast<size_t>(segment_size / block_type::size);
         //assert(nblocks); // at least one block
-        STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks);
+        LOG << "ext_merger::insert_segment nblocks=" << nblocks;
         if (nblocks == 0)
         {
-            STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " <<
-                           nblocks << " blocks");
-            STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
+            LOG << "ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " << nblocks << " blocks";
+            LOG << "THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS";
         }
         size_t first_size = static_cast<size_t>(segment_size % block_type::size);
         if (first_size == 0)
@@ -440,7 +442,7 @@ public:
             first_block->begin() + (block_type::size - first_size),
             first_block->end());
 
-        //req-ostream STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
+        //req-ostream LOG << "last element of first block " << *(first_block->end() - 1);
         assert(!tree.cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
 
         assert(pool->size_write() > 0);
@@ -449,11 +451,11 @@ public:
         {
             block_type* b = pool->steal();
             another_merger.multi_merge(b->begin(), b->end());
-            //req-ostreamSTXXL_VERBOSE1("first element of following block " << curbid << " " << *(b->begin()));
-            //req-ostreamSTXXL_VERBOSE1("last element of following block " << curbid << " " << *(b->end() - 1));
+            //req-ostreamLOG << "first element of following block " << curbid << " " << *(b->begin());
+            //req-ostreamLOG << "last element of following block " << curbid << " " << *(b->end() - 1);
             assert(!tree.cmp(*(b->begin()), *(b->end() - 1)));
             pool->write(b, curbid);
-            STXXL_VERBOSE1("written to block " << curbid << " cached in " << b);
+            LOG << "written to block " << curbid << " cached in " << b;
         }
 
         insert_segment(bids, first_block, first_size, index);
@@ -516,16 +518,16 @@ protected:
 #if STXXL_CHECK_ORDER_IN_SORTS
             if (!is_sentinel(*seqs.back().first, cmp) && !stxxl::is_sorted(seqs.back().first, seqs.back().second, inv_cmp))
             {
-                STXXL_VERBOSE1("length " << i << " " << (seqs.back().second - seqs.back().first));
+                LOG << "length " << i << " " << (seqs.back().second - seqs.back().first);
                 for (value_type* v = seqs.back().first + 1; v < seqs.back().second; ++v)
                 {
                     if (inv_cmp(*v, *(v - 1)))
                     {
-                        STXXL_VERBOSE1("Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v);
+                        LOG << "Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v;
                     }
                     if (is_sentinel(*v, cmp))
                     {
-                        STXXL_VERBOSE1("Wrong sentinel at position " << (v - seqs.back().first));
+                        LOG << "Wrong sentinel at position " << (v - seqs.back().first);
                     }
                 }
                 assert(false);
@@ -562,19 +564,17 @@ protected:
                     if (inv_cmp(*(seqs[i].second - 1), min_last))
                         min_last = *(seqs[i].second - 1);
 
-                    STXXL_VERBOSE1("front block of seq " << i << ": len=" << seq_i_size);
+                    LOG << "front block of seq " << i << ": len=" << seq_i_size;
                 }
                 else {
-                    STXXL_VERBOSE1("front block of seq " << i << ": empty");
+                    LOG << "front block of seq " << i << ": empty";
                 }
             }
 
             assert(total_size > 0);
             assert(!is_sentinel(min_last));
 
-            STXXL_VERBOSE1(
-                //req-ostream "min_last " << min_last <<
-                " total size " << total_size << " num_seq " << seqs.size());
+            LOG << " total size " << total_size << " num_seq " << seqs.size();
 
             diff_type less_equal_than_min_last = 0;
             //locate this element in all sequences
@@ -587,7 +587,7 @@ protected:
 
                 //no element larger than min_last is merged
 
-                //req-ostream STXXL_VERBOSE1("seq " << i << ": " << (position - seqs[i].first) << " greater equal than " << min_last);
+                //req-ostream LOG << "seq " << i << ": " << (position - seqs[i].first) << " greater equal than " << min_last;
 
                 less_equal_than_min_last += (position - seqs[i].first);
             }
@@ -595,7 +595,7 @@ protected:
             // at most rest elements
             diff_type output_size = std::min(less_equal_than_min_last, rest);
 
-            STXXL_VERBOSE1("output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")");
+            LOG << "output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")";
 
             assert(output_size > 0);
 
@@ -624,7 +624,7 @@ protected:
                     if (state.bids.empty())
                     {
                         // if there is no next block
-                        STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
+                        LOG << "seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ";
                         state.make_inf();
                     }
                     else
@@ -632,19 +632,17 @@ protected:
 #if STXXL_CHECK_ORDER_IN_SORTS
                         last_elem = *(seqs[i].second - 1);
 #endif
-                        STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) there is another block ");
+                        LOG << "seq " << i << ": ext_merger::multi_merge(...) there is another block ";
                         bid_type bid = state.bids.front();
                         state.bids.pop_front();
                         pool->hint(bid);
                         if (!(state.bids.empty()))
                         {
-                            STXXL_VERBOSE2("seq " << i << ": ext_merger::multi_merge(...) more blocks exist, hinting the next");
+                            LOG << "seq " << i << ": ext_merger::multi_merge(...) more blocks exist, hinting the next";
                             pool->hint(state.bids.front());
                         }
                         pool->read(state.block, bid)->wait();
-                        STXXL_VERBOSE1("seq " << i << ": first element of read block " << bid <<
-                                                             //" " << *(state.block->begin()) <<
-                                       " cached in " << state.block);
+                        LOG << "seq " << i << ": first element of read block " << bid << " cached in " << state.block;
                         if (!(state.bids.empty()))
                             pool->hint(state.bids.front());  // re-hint, reading might have made a block free
                         state.current = 0;
@@ -652,19 +650,19 @@ protected:
                         foxxll::block_manager::get_instance()->delete_block(bid);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-                        STXXL_VERBOSE1("before " << last_elem << " after " << *seqs[i].first << " newly loaded block " << bid);
+                        LOG << "before " << last_elem << " after " << *seqs[i].first << " newly loaded block " << bid;
                         if (!stxxl::is_sorted(seqs[i].first, seqs[i].second, inv_cmp))
                         {
-                            STXXL_VERBOSE1("length " << i << " " << (seqs[i].second - seqs[i].first));
+                            LOG << "length " << i << " " << (seqs[i].second - seqs[i].first);
                             for (value_type* v = seqs[i].first + 1; v < seqs[i].second; ++v)
                             {
                                 if (inv_cmp(*v, *(v - 1)))
                                 {
-                                    STXXL_VERBOSE1("Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v);
+                                    LOG << "Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v;
                                 }
                                 if (is_sentinel(*v, cmp))
                                 {
-                                    STXXL_VERBOSE1("Wrong sentinel at position " << (v - seqs[i].first));
+                                    LOG << "Wrong sentinel at position " << (v - seqs[i].first);
                                 }
                             }
                             assert(false);
@@ -680,7 +678,7 @@ protected:
             size_t seg = orig_seq_index[i];
             if (is_array_empty(seg))
             {
-                STXXL_VERBOSE1("deallocated " << seg);
+                LOG << "deallocated " << seg;
                 free_array(seg);
             }
         }

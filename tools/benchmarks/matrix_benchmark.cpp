@@ -10,8 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cassert>
 #include <iostream>
 #include <limits>
+
+#include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
@@ -63,10 +66,10 @@ int main(int argc, char** argv)
     if (!cp.process(argc, argv))
         return -1;
 
-    STXXL_MSG("multiplying two full double matrices of rank " <<
-              rank << ", block order " << block_order <<
-              " using " << internal_memory / 1024 / 1024 << "MiB internal memory, multiplication-algo " <<
-              mult_algo_num << ", scheduling-algo " << sched_algo_num);
+    LOG1 << "multiplying two full double matrices of rank " <<
+        rank << ", block order " << block_order <<
+        " using " << internal_memory / 1024 / 1024 << "MiB internal memory, multiplication-algo " <<
+        mult_algo_num << ", scheduling-algo " << sched_algo_num;
 
     using value_type = double;
 
@@ -97,7 +100,7 @@ int main(int argc, char** argv)
                      value_type(0), false, C);
         stats_after = *foxxll::stats::get_instance();
         #else
-        STXXL_ERRMSG("internal multiplication is only available for testing with blas");
+        LOG1 << "internal multiplication is only available for testing with blas";
         #endif
         delete[] A;
         delete[] B;
@@ -116,14 +119,14 @@ int main(int argc, char** argv)
             * b = new mt(bs, rank, rank),
             * c = new mt(bs, rank, rank);
 
-        STXXL_MSG("writing input matrices");
+        LOG1 << "writing input matrices";
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
             *mit = 1;
         for (mitt mit = b->begin(); mit != b->end(); ++mit)
             *mit = 1;
 
         bs.flush();
-        STXXL_MSG("start of multiplication");
+        LOG1 << "start of multiplication";
         matrix_stats_before.set();
         stats_before = *foxxll::stats::get_instance();
         if (mult_algo_num >= 0)
@@ -133,18 +136,18 @@ int main(int argc, char** argv)
         bs.flush();
         stats_after = *foxxll::stats::get_instance();
         matrix_stats_after.set();
-        STXXL_MSG("end of multiplication");
+        LOG1 << "end of multiplication";
 
         matrix_stats_after = matrix_stats_after - matrix_stats_before;
-        STXXL_MSG(matrix_stats_after);
+        LOG1 << matrix_stats_after;
         stats_after = stats_after - stats_before;
-        STXXL_MSG(stats_after);
+        LOG1 << stats_after;
         {
             size_t num_err = 0;
             for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit)
                 num_err += (*mit != rank);
             if (num_err)
-                STXXL_ERRMSG("c had " << num_err << " errors");
+                LOG1 << "c had " << num_err << " errors";
         }
 
         delete a;
@@ -153,7 +156,7 @@ int main(int argc, char** argv)
         delete b_s;
     }
 
-    STXXL_MSG("end of test");
+    LOG1 << "end of test";
     std::cout << "@";
     std::cout << " ra " << rank << " bo " << block_order << " im " << internal_memory / 1024 / 1024
               << " ma " << mult_algo_num << " sa " << sched_algo_num;

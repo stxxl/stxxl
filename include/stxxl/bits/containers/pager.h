@@ -47,9 +47,10 @@ public:
         return rnd(size());
     }
 
-    void hit(size_type ipage)
+    void hit(size_type ipage) const
     {
-        STXXL_ASSERT(ipage < size());
+        assert(ipage < size());
+        tlx::unused(ipage);
     }
 
     size_type size() const

@@ -19,14 +19,14 @@
 #define _GNU_SOURCE
 #endif
 
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/utils/malloc_count.h>
-
 #include <clocale>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <dlfcn.h>
+
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/utils/malloc_count.h>
 
 /* user-defined options for output malloc()/free() operations to stderr */
 

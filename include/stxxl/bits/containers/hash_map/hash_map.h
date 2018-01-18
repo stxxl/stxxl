@@ -14,7 +14,17 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 #define STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include <foxxll/mng/block_manager.hpp>
+
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/sort_stream.h>
 #include <stxxl/bits/stream/stream.h>
@@ -24,18 +34,7 @@
 #include <stxxl/bits/containers/hash_map/iterator_map.h>
 #include <stxxl/bits/containers/hash_map/util.h>
 
-#include <algorithm>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <tuple>
-#include <utility>
-#include <vector>
-
 namespace stxxl {
-
-#define STXXL_VERBOSE_HASH_MAP(m) \
-    STXXL_VERBOSE1("hash_map[" << static_cast<const void*>(this) << "]::" << m)
 
 //! External memory hash-map
 namespace hash_map {
@@ -63,6 +62,8 @@ template <class KeyType,
           >
 class hash_map
 {
+    static constexpr bool debug = false;
+
 protected:
     using self_type = hash_map<KeyType, MappedType, HashType, KeyCompareType,
                                SubBlockSize, SubBlocksPerBlock>;
@@ -550,7 +551,7 @@ public:
     //! Reset hash-map: erase all values, invalidate all iterators
     void clear()
     {
-        STXXL_VERBOSE_HASH_MAP("clear()");
+        LOG << "clear()";
 
         iterator_map_.fix_iterators_all2end();
         block_cache_.flush();
@@ -1116,7 +1117,7 @@ protected:
     /*  Rebuild hash-map. The desired number of buckets may be supplied. */
     void _rebuild_buckets(internal_size_type n_desired = 0)
     {
-        STXXL_VERBOSE_HASH_MAP("_rebuild_buckets()");
+        LOG << "_rebuild_buckets()";
 
         using writer_type = buffered_writer<block_type, bid_container_type>;
         using values_stream_type = HashedValuesStream<self_type, reader_type>;
@@ -1327,7 +1328,7 @@ public:
         if (n_buckets_new > max_bucket_count())
             n_buckets_new = max_bucket_count();
 
-        STXXL_VERBOSE_HASH_MAP("insert() items=" << (l - f) << " buckets_new=" << n_buckets_new);
+        LOG << "insert() items=" << (l - f) << " buckets_new=" << n_buckets_new;
 
         // prepare new buckets and bids
         buckets_container_type old_buckets((internal_size_type)n_buckets_new);

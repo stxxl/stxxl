@@ -33,6 +33,8 @@ class block_cache;
 template <class HashMap>
 class hash_map_iterator_base
 {
+    static constexpr bool debug = false;
+
 public:
     friend class iterator_map<HashMap>;
     friend void HashMap::erase(hash_map_const_iterator<HashMap> it);
@@ -101,7 +103,7 @@ public:
           ext_valid_(ext_valid),
           end_(false)
     {
-        STXXL_VERBOSE3("hash_map_iterator_base parameter construct addr=" << this);
+        LOG << "hash_map_iterator_base parameter construct addr=" << this;
         map_->iterator_map_.register_iterator(*this);
     }
 
@@ -131,7 +133,7 @@ public:
           ext_valid_(obj.ext_valid_),
           end_(obj.end_)
     {
-        STXXL_VERBOSE3("hash_map_iterator_base constr from" << (&obj) << " to " << this);
+        LOG << "hash_map_iterator_base constr from" << (&obj) << " to " << this;
 
         if (!end_ && map_)
             map_->iterator_map_.register_iterator(*this);
@@ -140,7 +142,7 @@ public:
     //! Assignment operator
     hash_map_iterator_base& operator = (const hash_map_iterator_base& obj)
     {
-        STXXL_VERBOSE3("hash_map_iterator_base copy from" << (&obj) << " to " << this);
+        LOG << "hash_map_iterator_base copy from" << (&obj) << " to " << this;
 
         if (&obj != this)
         {
@@ -368,7 +370,7 @@ end_search:
 
     virtual ~hash_map_iterator_base()
     {
-        STXXL_VERBOSE3("hash_map_iterator_base deconst " << this);
+        LOG << "hash_map_iterator_base deconst " << this;
 
         if (map_ && !end_)
             map_->iterator_map_.unregister_iterator(*this);

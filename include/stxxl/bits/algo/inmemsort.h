@@ -29,7 +29,7 @@ void stl_in_memory_sort(ExtIterator first, ExtIterator last, StrictWeakOrdering 
 {
     using block_type = typename ExtIterator::block_type;
 
-    STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
+    LOG1 << "stl_in_memory_sort, range: " << (last - first);
     first.flush();
     size_t nblocks = last.bid() - first.bid() + (last.block_offset() ? 1 : 0);
     tlx::simple_vector<block_type> blocks(nblocks);

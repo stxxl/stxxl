@@ -24,6 +24,10 @@
 #define STXXL_MOVE(T) T
 #endif
 
+#include <tlx/define.hpp>
+#include <tlx/die.hpp>
+#include <tlx/string.hpp>
+
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/types.hpp>
 #include <foxxll/io/request_operations.hpp>
@@ -33,15 +37,18 @@
 #include <foxxll/mng/prefetch_pool.hpp>
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
-#include <foxxll/verbose.hpp>
+
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/swap_vector.h>
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/config.h>
+#include <stxxl/bits/defines.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/types>
+
+#include <tlx/logger.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -159,7 +166,7 @@ public:
         ++m_index;
         ++m_current;
 
-        if (UNLIKELY(m_current == (*m_block_pointers)[m_block_index].second)) {
+        if (TLX_UNLIKELY(m_current == (*m_block_pointers)[m_block_index].second)) {
             if (m_block_index + 1 < m_block_pointers->size()) {
                 m_current = (*m_block_pointers)[++m_block_index].first;
             }
@@ -310,7 +317,7 @@ public:
           m_block_pointers(1)
     {
         std::swap(m_values, values);
-        STXXL_ASSERT(m_values.size() > 0);
+        assert(m_values.size() > 0);
         m_block_pointers[0] = std::make_pair(&(*m_values.begin()), &(*m_values.begin()) + m_values.size());
     }
 
@@ -439,12 +446,12 @@ class external_array_writer;
  * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
  *
  * \tparam AllocStrategy Allocation strategy for the external memory. Default =
- * STXXL_DEFAULT_ALLOC_STRATEGY.
+ * foxxll::default_alloc_strategy.
  */
 template <
     class ValueType,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-    class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY
+    class AllocStrategy = foxxll::default_alloc_strategy
     >
 class external_array
 {
@@ -655,8 +662,7 @@ public:
 
         // cancel currently hinted blocks
         for (size_t i = end_block_index; i < m_unhinted_block; ++i) {
-            STXXL_DEBUG("ea[" << this << "]: discarding prefetch hint on"
-                        " block " << i);
+            LOG << "ea[" << this << "]: discarding prefetch hint on block " << i;
 
             m_requests[i]->cancel();
             m_requests[i]->wait();
@@ -825,14 +831,14 @@ public:
         // more disks than threads?
         if (write_blocks < foxxll::config::get_instance()->disks_number())
             write_blocks = foxxll::config::get_instance()->disks_number();
-#if STXXL_DEBUG_ASSERTIONS
+#if STXXL_EXPENSIVE_ASSERTIONS
         // required for re-reading the external array
         write_blocks = 2 * write_blocks;
 #endif
         if (pool.size_write() < write_blocks) {
-            STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
-                         write_blocks << " blocks = " <<
-                         write_blocks * block_size / 1024 / 1024 << " MiB");
+            LOG1 << "WARNING: enlarging PPQ write pool to " <<
+                write_blocks << " blocks = " <<
+                write_blocks * block_size / 1024 / 1024 << " MiB";
             pool.resize_write(write_blocks);
         }
     }
@@ -884,17 +890,17 @@ protected:
         else
         {
             // block was already written, have to read from EM.
-            STXXL_DEBUG("ea[" << this << "]: "
-                        "read_block needs to re-read block index=" << block_index);
+            LOG << "ea[" << this << "]: "
+                "read_block needs to re-read block index=" << block_index;
 
             static bool s_warned = false;
             if (!s_warned)
             {
                 s_warned = true;
-                STXXL_ERRMSG("ppq::external_array[" << this << "] "
-                             "writer requested to re-read block from EM.");
-                STXXL_ERRMSG("This should never occur in full-performance mode, "
-                             "verify that you run in debug mode.");
+                LOG1 << "ppq::external_array[" << this << "] "
+                    "writer requested to re-read block from EM.\n"
+                    "This should never occur in full-performance mode, "
+                    "verify that you run in debug mode.";
             }
 
             // this re-reading is not necessary for full performance builds, so
@@ -920,8 +926,8 @@ protected:
         const size_t this_block_items =
             std::min<size_t>(block_items, m_capacity - block_index * (external_size_type)block_items);
 
-        STXXL_DEBUG("ea[" << this << "]: write_block index=" << block_index <<
-                    " this_block_items=" << this_block_items);
+        LOG << "ea[" << this << "]: write_block index=" << block_index <<
+            " this_block_items=" << this_block_items;
 
         assert(this_block_items > 0);
         block_type& this_block = *m_blocks[block_index];
@@ -947,7 +953,7 @@ public:
         // will read (prefetch) block i
         size_t i = m_unhinted_block++;
 
-        STXXL_DEBUG("ea[" << this << "]: prefetching block_index=" << i);
+        LOG << "ea[" << this << "]: prefetching block_index=" << i;
 
         assert(m_pool->size_write() > 0);
         assert(m_blocks[i] == nullptr);
@@ -1000,8 +1006,8 @@ public:
 
         // will read (prefetch) block after cancellations.
 
-        STXXL_DEBUG("ea[" << this << "]: pre-hint of" <<
-                    " block_index=" << m_unhinted_block);
+        LOG << "ea[" << this << "]: pre-hint of" <<
+            " block_index=" << m_unhinted_block;
 
         ++m_unhinted_block;
     }
@@ -1011,8 +1017,8 @@ public:
     void rebuild_hints_cancel()
     {
         for (size_t i = m_unhinted_block; i < m_old_unhinted_block; ++i) {
-            STXXL_DEBUG("ea[" << this << "]: discarding prefetch hint on"
-                        " block " << i);
+            LOG << "ea[" << this << "]: discarding prefetch hint on"
+                " block " << i;
             m_requests[i]->cancel();
             m_requests[i]->wait();
             // put block back into pool
@@ -1029,8 +1035,8 @@ public:
     {
         for (size_t i = m_old_unhinted_block; i < m_unhinted_block; ++i)
         {
-            STXXL_DEBUG("ea[" << this << "]: perform real-hinting of"
-                        " block " << i);
+            LOG << "ea[" << this << "]: perform real-hinting of"
+                " block " << i;
 
             assert(m_pool->size_write() > 0);
             assert(m_blocks[i] == nullptr);
@@ -1052,9 +1058,9 @@ public:
     {
         size_t begin = get_end_block_index(), i = begin;
 
-        STXXL_DEBUG("ea[" << this << "]: waiting for" <<
-                    " block index=" << i <<
-                    " end_index=" << m_end_index);
+        LOG << "ea[" << this << "]: waiting for" <<
+            " block index=" << i <<
+            " end_index=" << m_end_index;
 
         assert(has_em_data());
 
@@ -1073,9 +1079,9 @@ public:
         // poll further hinted blocks if already done
         while (i < m_unhinted_block && m_requests[i]->poll())
         {
-            STXXL_DEBUG("ea[" << this << "]: poll-ok for" <<
-                        " block index=" << i <<
-                        " end_index=" << m_end_index);
+            LOG << "ea[" << this << "]: poll-ok for" <<
+                " block index=" << i <<
+                " end_index=" << m_end_index;
             m_requests[i]->wait();
             assert(m_requests[i]->poll());
             assert(m_blocks[i]);
@@ -1096,9 +1102,9 @@ public:
         size_t begin = get_end_block_index(), i = begin;
         while (i < m_unhinted_block)
         {
-            STXXL_DEBUG("wait_all_hinted_blocks(): ea[" << this << "]: waiting for" <<
-                        " block index=" << i <<
-                        " end_index=" << m_end_index);
+            LOG << "wait_all_hinted_blocks(): ea[" << this << "]: waiting for" <<
+                " block index=" << i <<
+                " end_index=" << m_end_index;
             m_requests[i]->wait();
             assert(m_requests[i]->poll());
             assert(m_blocks[i]);
@@ -1123,7 +1129,7 @@ public:
         assert(m_index + n <= m_end_index);
         assert(m_size >= n);
 
-        STXXL_DEBUG("ea[" << this << "]: remove " << n << " items");
+        LOG << "ea[" << this << "]: remove " << n << " items";
 
         if (n == 0)
             return 0;
@@ -1155,13 +1161,13 @@ public:
 
         size_t blocks_freed = block_index_after - block_index;
 
-        STXXL_DEBUG("ea[" << this << "]: after remove:" <<
-                    " index_after=" << index_after <<
-                    " block_index_after=" << block_index_after <<
-                    " local_index_after=" << local_index_after <<
-                    " blocks_freed=" << blocks_freed <<
-                    " num_blocks=" << m_num_blocks <<
-                    " capacity=" << m_capacity);
+        LOG << "ea[" << this << "]: after remove:" <<
+            " index_after=" << index_after <<
+            " block_index_after=" << block_index_after <<
+            " local_index_after=" << local_index_after <<
+            " blocks_freed=" << blocks_freed <<
+            " num_blocks=" << m_num_blocks <<
+            " capacity=" << m_capacity;
 
         assert(block_index_after <= m_num_blocks);
         // at most one block outside of the currently loaded range
@@ -1190,7 +1196,7 @@ protected:
     //! This is necessary for the iterators to work properly.
     inline void update_block_pointers(size_t block_index)
     {
-        STXXL_DEBUG("ea[" << this << "]: updating block pointers for " << block_index);
+        LOG << "ea[" << this << "]: updating block pointers for " << block_index;
 
         m_block_pointers[block_index].first = m_blocks[block_index]->begin();
         if (block_index + 1 != m_num_blocks)
@@ -1289,13 +1295,13 @@ protected:
 #endif
 
         if (ref == 0) {
-            STXXL_DEBUG("get_block_ref block_index=" << block_index <<
-                        " ref=" << ref << " reading.");
+            LOG << "get_block_ref block_index=" << block_index <<
+                " ref=" << ref << " reading.";
             m_ea.read_block(block_index);
         }
         else {
-            STXXL_DEBUG("get_block_ref block_index=" << block_index <<
-                        " ref=" << ref);
+            LOG << "get_block_ref block_index=" << block_index <<
+                " ref=" << ref;
         }
 
         return m_ea.m_blocks[block_index];
@@ -1315,13 +1321,13 @@ protected:
         unsigned int ref = --m_ref_count[block_index];
 
         if (ref == 0) {
-            STXXL_DEBUG("free_block_ref block_index=" << block_index <<
-                        " ref=" << ref << " written.");
+            LOG << "free_block_ref block_index=" << block_index <<
+                " ref=" << ref << " written.";
             m_ea.write_block(block_index);
         }
         else {
-            STXXL_DEBUG("free_block_ref block_index=" << block_index <<
-                        " ref=" << ref);
+            LOG << "free_block_ref block_index=" << block_index <<
+                " ref=" << ref;
         }
     }
 
@@ -1387,7 +1393,7 @@ public:
               m_live(false),
               m_index(index)
         {
-            STXXL_DEBUG("Construct iterator for index " << m_index);
+            LOG << "Construct iterator for index " << m_index;
         }
 
         //! copy an iterator, the new iterator is _not_ automatically live!
@@ -1396,7 +1402,7 @@ public:
               m_live(false),
               m_index(other.m_index)
         {
-            STXXL_DEBUG("Copy-Construct iterator for index " << m_index);
+            LOG << "Copy-Construct iterator for index " << m_index;
         }
 
         //! assign an iterator, the assigned iterator is not automatically live!
@@ -1404,7 +1410,7 @@ public:
         {
             if (&other != this)
             {
-                STXXL_DEBUG("Assign iterator to index " << other.m_index);
+                LOG << "Assign iterator to index " << other.m_index;
 
                 if (m_live)
                     m_writer->free_block_ref(m_block_index);
@@ -1423,8 +1429,8 @@ public:
 
             m_writer->free_block_ref(m_block_index);
 
-            STXXL_DEBUG("Destruction of iterator for index " << m_index <<
-                        " in block " << m_index / block_items);
+            LOG << "Destruction of iterator for index " << m_index <<
+                " in block " << m_index / block_items;
         }
 
         //! return the current absolute index inside the external array.
@@ -1443,9 +1449,9 @@ public:
             m_block_index = m_index / block_items;
             m_current = m_index % block_items;
 
-            STXXL_DEBUG("operator*() live request for index=" << m_index <<
-                        " block_index=" << m_block_index <<
-                        " m_current=" << m_current);
+            LOG << "operator*() live request for index=" << m_index <<
+                " block_index=" << m_block_index <<
+                " m_current=" << m_current;
 
             // get block reference
             m_block = m_writer->get_block_ref(m_block_index);
@@ -1455,7 +1461,7 @@ public:
         //! access the current item
         reference operator * ()
         {
-            if (UNLIKELY(!m_live))
+            if (TLX_UNLIKELY(!m_live))
                 make_live();
 
             return (*m_block)[m_current];
@@ -1471,11 +1477,11 @@ public:
         self_type& operator ++ ()
         {
             ++m_index;
-            if (UNLIKELY(!m_live)) return *this;
+            if (TLX_UNLIKELY(!m_live)) return *this;
 
             // if index stays in the same block, everything is fine
             ++m_current;
-            if (LIKELY(m_current != block_items)) return *this;
+            if (TLX_LIKELY(m_current != block_items)) return *this;
 
             // release current block
             m_writer->free_block_ref(m_block_index);
@@ -1552,8 +1558,8 @@ public:
         for (unsigned int i = 0; i < num_threads - 1; ++i)
         {
             external_size_type index = (external_size_type)((i + 1) * step);
-            STXXL_DEBUG("hold index " << index <<
-                        " in block " << index / ea_type::block_items);
+            LOG << "hold index " << index <<
+                " in block " << index / ea_type::block_items;
             m_live_boundary[i] = iterator(this, index);
             m_live_boundary[i].make_live();
         }
@@ -1568,7 +1574,7 @@ public:
     {
         m_live_boundary.clear(); // release block boundaries
 #ifndef NDEBUG
-        STXXL_ASSERT(m_ref_total == 0);
+        assert(m_ref_total == 0);
 #endif
         m_ea.finish_write();
     }
@@ -1841,11 +1847,11 @@ public:
     //! Prints statistical data.
     void print_stats() const
     {
-        STXXL_MSG("Head winner tree stats:");
+        LOG1 << "Head winner tree stats:";
         m_head.print_stats();
-        STXXL_MSG("Heaps winner tree stats:");
+        LOG1 << "Heaps winner tree stats:";
         m_heaps.print_stats();
-        STXXL_MSG("IA winner tree stats:");
+        LOG1 << "IA winner tree stats:";
         m_ia.print_stats();
     }
 };
@@ -1872,12 +1878,12 @@ public:
  * STXXL_DEFAULT_BLOCK_SIZE(ValueType).
  *
  * \tparam AllocStrategy Allocation strategy for the external memory. Default =
- * STXXL_DEFAULT_ALLOC_STRATEGY.
+ * foxxll::default_alloc_strategy.
  */
 template <
     class ValueType,
     class CompareType = std::less<ValueType>,
-    class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY,
+    class AllocStrategy = foxxll::default_alloc_strategy,
     size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
     size_t DefaultMemSize = 1* 1024L* 1024L* 1024L,
     external_size_type MaxItems = 0
@@ -2211,8 +2217,8 @@ protected:
         }
 
         if (swap_end != m_internal_arrays.end())
-            STXXL_DEBUG0("cleanup_internal_arrays" <<
-                         " cleaned=" << m_internal_arrays.end() - swap_end);
+            LOG0 << "cleanup_internal_arrays" <<
+                " cleaned=" << m_internal_arrays.end() - swap_end;
 
         m_internal_arrays.erase(swap_end, m_internal_arrays.end());
         m_minima.rebuild_internal_arrays();
@@ -2271,8 +2277,8 @@ protected:
             update_hint_tree(i);
         }
 
-        STXXL_DEBUG("Removed " << m_external_arrays.end() - swap_end <<
-                    " empty external arrays.");
+        LOG << "Removed " << m_external_arrays.end() - swap_end <<
+            " empty external arrays.";
 
         m_external_arrays.erase(swap_end, m_external_arrays.end());
 
@@ -2390,21 +2396,19 @@ public:
         if (!omp_get_nested()) {
             omp_set_nested(1);
             if (!omp_get_nested()) {
-                STXXL_ERRMSG("Could not enable OpenMP's nested parallelism, "
-                             "however, the PPQ requires this OpenMP feature.");
-                abort();
+                die("Could not enable OpenMP's nested parallelism, "
+                    "however, the PPQ requires this OpenMP feature.");
             }
         }
 #else
-        STXXL_ERRMSG("You are using stxxl::parallel_priority_queue without "
-                     "support for OpenMP parallelism.");
-        STXXL_ERRMSG("This is probably not what you want, so check the "
-                     "compilation settings.");
+        LOG1 << "You are using stxxl::parallel_priority_queue without "
+            "support for OpenMP parallelism.\n"
+            "This is probably not what you want, so check the "
+            "compilation settings.";
 #endif
         if (m_num_read_blocks_per_ea < 1.0) {
-            STXXL_ERRMSG("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
-                         " it is " << m_num_read_blocks_per_ea);
-            abort();
+            die("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
+                " it is " << m_num_read_blocks_per_ea);
         }
 
         if (c_limit_extract_buffer) {
@@ -2461,9 +2465,8 @@ public:
 
         if (m_mem_total < m_mem_left) // checks if unsigned type wrapped.
         {
-            STXXL_ERRMSG("Minimum memory requirement insufficient, "
-                         "increase PPQ's memory limit or decrease buffers.");
-            abort();
+            die("Minimum memory requirement insufficient, "
+                "increase PPQ's memory limit or decrease buffers.");
         }
 
         check_invariants();
@@ -2510,13 +2513,13 @@ protected:
             num_used_read += m_external_arrays[i].num_used_blocks();
         }
 
-        STXXL_CHECK(num_hinted == m_num_hinted_blocks);
-        STXXL_CHECK(num_used_read == m_num_used_read_blocks);
+        die_unless(num_hinted == m_num_hinted_blocks);
+        die_unless(num_used_read == m_num_used_read_blocks);
 
-        STXXL_CHECK_EQUAL(m_num_used_read_blocks,
-                          m_num_read_blocks
-                          - m_pool.free_size_prefetch()
-                          - m_num_hinted_blocks);
+        die_unequal(m_num_used_read_blocks,
+                    m_num_read_blocks
+                    - m_pool.free_size_prefetch()
+                    - m_num_hinted_blocks);
 
         // test the processor local data structures
 
@@ -2527,18 +2530,18 @@ protected:
             // check that each insertion heap is a heap
 
             // TODO: remove soon, because this is very expensive
-            STXXL_CHECK(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
-                                            m_proc[p]->insertion_heap.end(),
-                                            m_compare));
+            die_unless(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
+                                           m_proc[p]->insertion_heap.end(),
+                                           m_compare));
 
-            STXXL_CHECK(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
+            die_unless(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
 
             heaps_size += m_proc[p]->insertion_heap.size();
             mem_used += m_proc[p]->insertion_heap.capacity() * sizeof(value_type);
         }
 
         if (!m_in_bulk_push)
-            STXXL_CHECK_EQUAL(m_heaps_size, heaps_size);
+            die_unequal(m_heaps_size, heaps_size);
 
         // count number of items and memory size of internal arrays
 
@@ -2554,11 +2557,11 @@ protected:
             ++ia_levels[ia->level()];
         }
 
-        STXXL_CHECK_EQUAL(m_internal_size, ia_size);
+        die_unequal(m_internal_size, ia_size);
         mem_used += ia_memory;
 
         for (size_t i = 0; i < kMaxInternalLevels; ++i)
-            STXXL_CHECK_EQUAL(m_internal_levels[i], ia_levels[i]);
+            die_unequal(m_internal_levels[i], ia_levels[i]);
 
         // count number of items in external arrays
 
@@ -2574,15 +2577,15 @@ protected:
             ++ea_levels[ea->level()];
         }
 
-        STXXL_CHECK_EQUAL(m_external_size, ea_size);
+        die_unequal(m_external_size, ea_size);
         mem_used += ea_memory;
 
         for (size_t i = 0; i < kMaxExternalLevels; ++i)
-            STXXL_CHECK_EQUAL(m_external_levels[i], ea_levels[i]);
+            die_unequal(m_external_levels[i], ea_levels[i]);
 
         // calculate mem_used so that == mem_total - mem_left
 
-        STXXL_CHECK_EQUAL(memory_consumption(), mem_used);
+        die_unequal(memory_consumption(), mem_used);
     }
 
     //! \}
@@ -2672,7 +2675,7 @@ public:
         {
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items and keep heap invariant.
-            if (UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
+            if (TLX_UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2693,7 +2696,7 @@ public:
             // if small bulk: if heap is full -> sort locally and put into
             // internal array list. insert items but DO NOT keep heap
             // invariant.
-            if (UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
+            if (TLX_UNLIKELY(insheap.size() >= m_insertion_heap_capacity)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2710,7 +2713,7 @@ public:
         }
         else // m_is_very_large_bulk
         {
-            if (UNLIKELY(insheap.size() >= 2 * 1024 * 1024)) {
+            if (TLX_UNLIKELY(insheap.size() >= 2 * 1024 * 1024)) {
 #if STXXL_PARALLEL
 #pragma omp atomic
 #endif
@@ -2832,7 +2835,7 @@ public:
         }
 
         if (m_bulk_first_delayed_external_array != m_external_arrays.size()) {
-            STXXL_DEBUG("bulk_push_end: run delayed re-hinting of EAs");
+            LOG << "bulk_push_end: run delayed re-hinting of EAs";
             rebuild_hint_tree();
         }
 
@@ -2842,7 +2845,7 @@ public:
     //! Extract up to max_size values at once.
     void bulk_pop(std::vector<value_type>& out, size_t max_size)
     {
-        STXXL_DEBUG("bulk_pop() max_size=" << max_size);
+        LOG << "bulk_pop() max_size=" << max_size;
 
         const size_t n_elements = std::min<size_t>(max_size, size());
         assert(n_elements < m_extract_buffer_limit);
@@ -2873,7 +2876,7 @@ public:
     bool bulk_pop_limit(std::vector<value_type>& out, const value_type& limit,
                         size_t max_size = std::numeric_limits<size_t>::max())
     {
-        STXXL_DEBUG("bulk_pop_limit with limit=" << limit);
+        LOG << "bulk_pop_limit with limit=" << limit;
 
         convert_eb_into_ia();
 
@@ -2917,7 +2920,8 @@ public:
             wait_next_ea_blocks(limiting_ea_index);
             // consider next limiting EA
             limiting_ea_index = m_external_min_tree.top();
-            STXXL_ASSERT(limiting_ea_index < eas);
+            assert(limiting_ea_index < eas);
+            tlx::unused(limiting_ea_index);
         }
 
         // build sequences
@@ -2950,10 +2954,10 @@ public:
         }
         out.resize(output_size);
 
-        STXXL_DEBUG("bulk_pop_limit with" <<
-                    " sequences=" << sequences.size() <<
-                    " output_size=" << output_size <<
-                    " has_full_range=" << has_full_range);
+        LOG << "bulk_pop_limit with" <<
+            " sequences=" << sequences.size() <<
+            " output_size=" << output_size <<
+            " has_full_range=" << has_full_range;
 
         potentially_parallel::multiway_merge(
             sequences.begin(), sequences.end(),
@@ -3094,20 +3098,19 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
-            STXXL_DEBUG("heap " << index <<
-                        ": " << m_proc[index]->insertion_heap[0]);
+            LOG << "heap " << index <<
+                ": " << m_proc[index]->insertion_heap[0];
             return m_proc[index]->insertion_heap[0];
         case minima_type::IA:
-            STXXL_DEBUG("ia " << index <<
-                        ": " << m_internal_arrays[index].get_min());
+            LOG << "ia " << index <<
+                ": " << m_internal_arrays[index].get_min();
             return m_internal_arrays[index].get_min();
         case minima_type::EB:
-            STXXL_DEBUG("eb " << m_extract_buffer_index <<
-                        ": " << m_extract_buffer[m_extract_buffer_index]);
+            LOG << "eb " << m_extract_buffer_index <<
+                ": " << m_extract_buffer[m_extract_buffer_index];
             return m_extract_buffer[m_extract_buffer_index];
         default:
-            STXXL_ERRMSG("Unknown extract type: " << type);
-            abort();
+            die("Unknown extract type: " << type);
         }
     }
 
@@ -3177,8 +3180,7 @@ public:
             break;
         }
         default:
-            STXXL_ERRMSG("Unknown extract type: " << type);
-            abort();
+            die("Unknown extract type: " << type);
         }
 
         m_stats.extract_min_time.stop();
@@ -3348,7 +3350,7 @@ protected:
         const size_t back_sum = std::accumulate(
             back_size.begin(), back_size.end(), 0u);
 
-        STXXL_DEBUG("flush_insertion_heaps_with_limit(): back_sum = " << back_sum);
+        LOG << "flush_insertion_heaps_with_limit(): back_sum = " << back_sum;
 
         if (back_sum)
         {
@@ -3387,10 +3389,10 @@ public:
      */
     void merge_external_arrays()
     {
-        STXXL_ERRMSG("Merging external arrays. This should not happen."
-                     << " You should adjust memory assignment and/or external array level size.");
+        LOG1 << "Merging external arrays. This should not happen."
+             << " You should adjust memory assignment and/or external array level size.";
         check_external_level(0, true);
-        STXXL_DEBUG("Merging all external arrays done.");
+        LOG << "Merging all external arrays done.";
 
         resize_read_pool();
 
@@ -3426,14 +3428,14 @@ public:
         size_t new_num_read_blocks = static_cast<size_t>(
             (m_num_read_blocks_per_ea * static_cast<float>(m_external_arrays.size())));
 
-        STXXL_DEBUG("resize_read_pool:" <<
-                    " m_num_read_blocks=" << m_num_read_blocks <<
-                    " ea_size=" << m_external_arrays.size() <<
-                    " m_num_read_blocks_per_ea=" << m_num_read_blocks_per_ea <<
-                    " new_num_read_blocks=" << new_num_read_blocks <<
-                    " free_size_prefetch=" << m_pool.free_size_prefetch() <<
-                    " m_num_hinted_blocks=" << m_num_hinted_blocks <<
-                    " m_num_used_read_blocks=" << m_num_used_read_blocks);
+        LOG << "resize_read_pool:" <<
+            " m_num_read_blocks=" << m_num_read_blocks <<
+            " ea_size=" << m_external_arrays.size() <<
+            " m_num_read_blocks_per_ea=" << m_num_read_blocks_per_ea <<
+            " new_num_read_blocks=" << new_num_read_blocks <<
+            " free_size_prefetch=" << m_pool.free_size_prefetch() <<
+            " m_num_hinted_blocks=" << m_num_hinted_blocks <<
+            " m_num_used_read_blocks=" << m_num_used_read_blocks;
 
         // add new blocks
         if (new_num_read_blocks > m_num_read_blocks)
@@ -3443,7 +3445,7 @@ public:
 
             // -tb: this may recursively call this function!
             //flush_ia_ea_until_memory_free(mem_needed);
-            STXXL_ASSERT(m_mem_left >= mem_needed);
+            assert(m_mem_left >= mem_needed);
 
             while (new_num_read_blocks > m_num_read_blocks) {
                 block_type* new_block = new block_type();
@@ -3467,7 +3469,7 @@ public:
             }
 
             if (new_num_read_blocks < m_num_read_blocks)
-                STXXL_ERRMSG("WARNING: could not immediately reduce read/prefetch pool!");
+                LOG1 << "WARNING: could not immediately reduce read/prefetch pool!";
         }
     }
 
@@ -3504,8 +3506,8 @@ public:
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
-            STXXL_DEBUG("Give pre-hint in EA[" << gmin_index << "] min " <<
-                        m_external_arrays[gmin_index].get_next_hintable_min());
+            LOG << "Give pre-hint in EA[" << gmin_index << "] min " <<
+                m_external_arrays[gmin_index].get_next_hintable_min();
 
             m_external_arrays[gmin_index].rebuild_hints_prehint_next_block();
             --free_prefetch_blocks;
@@ -3566,8 +3568,8 @@ public:
     {
         m_stats.hint_time.start();
 
-        STXXL_DEBUG("hint_external_arrays()"
-                    " for free_size_prefetch=" << m_pool.free_size_prefetch());
+        LOG << "hint_external_arrays()"
+            " for free_size_prefetch=" << m_pool.free_size_prefetch();
 
         size_t gmin_index;
         while (m_pool.free_size_prefetch() > 0 &&
@@ -3575,7 +3577,7 @@ public:
         {
             assert((size_t)gmin_index < m_external_arrays.size());
 
-            STXXL_DEBUG("Give hint in EA[" << gmin_index << "]");
+            LOG << "Give hint in EA[" << gmin_index << "]";
             m_external_arrays[gmin_index].hint_next_block();
             ++m_num_hinted_blocks;
 
@@ -3593,28 +3595,28 @@ public:
     //! Print statistics.
     void print_stats() const
     {
-        STXXL_VARDUMP(c_merge_sorted_heaps);
-        STXXL_VARDUMP(c_limit_extract_buffer);
-        STXXL_VARDUMP(c_single_insert_limit);
+        LOG << "c_merge_sorted_heaps = " << c_merge_sorted_heaps;
+        LOG << "c_limit_extract_buffer = " << c_limit_extract_buffer;
+        LOG << "c_single_insert_limit = " << c_single_insert_limit;
 
         if (c_limit_extract_buffer) {
-            STXXL_VARDUMP(m_extract_buffer_limit);
-            STXXL_MEMDUMP(m_extract_buffer_limit * sizeof(value_type));
+            LOG << "m_extract_buffer_limit = " << m_extract_buffer_limit;
+            LOG << "m_extract_buffer_limit * sizeof(value_type) = " << tlx::format_iec_units(m_extract_buffer_limit * sizeof(value_type));
         }
 
 #if STXXL_PARALLEL
-        STXXL_VARDUMP(omp_get_max_threads());
+        LOG << "omp_get_max_threads() = " << omp_get_max_threads();
 #endif
 
-        STXXL_MEMDUMP(m_mem_for_heaps);
-        STXXL_MEMDUMP(m_mem_left);
+        LOG << "m_mem_for_heaps = " << tlx::format_iec_units(m_mem_for_heaps);
+        LOG << "m_mem_left = " << tlx::format_iec_units(m_mem_left);
 
         //if (num_extract_buffer_refills > 0) {
-        //    STXXL_VARDUMP(total_extract_buffer_size / num_extract_buffer_refills);
-        //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
+        //    LOG << "total_extract_buffer_size / num_extract_buffer_refills = " << total_extract_buffer_size / num_extract_buffer_refills;
+        //    LOG << "total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type) = " << tlx::format_iec_units(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
         //}
 
-        STXXL_MSG(m_stats);
+        LOG1 << m_stats;
         m_minima.print_stats();
     }
 
@@ -3633,9 +3635,9 @@ protected:
                                      std::vector<iterator_pair_type>& sequences,
                                      bool reuse_previous_lower_bounds = false)
     {
-        STXXL_DEBUG(
+        LOG <<
             "calculate_merge_sequences() " <<
-                "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds);
+            "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds;
 
         static const bool debug = false;
 
@@ -3652,11 +3654,11 @@ protected:
         const size_t gmin_index = m_external_min_tree.top();
         bool needs_limit = (gmin_index != m_external_min_tree.invalid_key);
 
-        STXXL_DEBUG("calculate_merge_sequences() gmin_index=" << gmin_index <<
-                    " needs_limit=" << needs_limit);
+        LOG << "calculate_merge_sequences() gmin_index=" << gmin_index <<
+            " needs_limit=" << needs_limit;
 
 // test correctness of external block min tree
-#ifdef STXXL_DEBUG_ASSERTIONS
+#ifdef STXXL_EXPENSIVE_ASSERTIONS
         m_stats.refill_minmax_time.start();
         {
             auto find_em = [&](size_t idx) {
@@ -3677,9 +3679,9 @@ protected:
                     const value_type& min_value =
                         m_external_arrays[i].get_next_block_min();
 
-                    STXXL_DEBUG("min[" << i << "]: " << min_value <<
-                                " test: " << test_gmin_value <<
-                                ": " << m_inv_compare(min_value, test_gmin_value));
+                    LOG << "min[" << i << "]: " << min_value <<
+                        " test: " << test_gmin_value <<
+                        ": " << m_inv_compare(min_value, test_gmin_value);
 
                     if (m_inv_compare(min_value, test_gmin_value)) {
                         test_gmin_value = min_value;
@@ -3687,10 +3689,12 @@ protected:
                     }
                 }
 
-                STXXL_ASSERT(gmin_index == test_gmin_index);
+                assert(gmin_index == test_gmin_index);
+                tlx::unused(gmin_index);
             }
             else {
-                STXXL_ASSERT(!needs_limit);
+                assert(!needs_limit);
+                tlx::unused(needs_limit);
             }
         }
         m_stats.refill_minmax_time.stop();
@@ -3731,8 +3735,8 @@ protected:
                 }
                 else
                 {
-                    STXXL_DEBUG("lower_bound [" << begin << "," << end << ")" <<
-                                " gmin_value " << gmin_value);
+                    LOG << "lower_bound [" << begin << "," << end << ")" <<
+                        " gmin_value " << gmin_value;
 
                     end = std::lower_bound(begin, end,
                                            gmin_value, m_inv_compare);
@@ -3743,18 +3747,18 @@ protected:
             sizes[i] = std::distance(begin, end);
             sequences[i] = std::make_pair(begin, end);
 
-            STXXL_DEBUG("sequence[" << i << "] " << (i < eas ? "ea " : "ia ") <<
-                        begin << " - " << end <<
-                        " size " << sizes[i] <<
-                        (needs_limit ? " with ub limit" : ""));
+            LOG << "sequence[" << i << "] " << (i < eas ? "ea " : "ia ") <<
+                begin << " - " << end <<
+                " size " << sizes[i] <<
+            (needs_limit ? " with ub limit" : "");
         }
 
         if (needs_limit) {
-            STXXL_DEBUG("return with needs_limit: gmin_index=" << gmin_index);
+            LOG << "return with needs_limit: gmin_index=" << gmin_index;
             return gmin_index;
         }
         else {
-            STXXL_DEBUG("return with needs_limit: eas=" << eas);
+            LOG << "return with needs_limit: eas=" << eas;
             return eas;
         }
     }
@@ -3765,7 +3769,7 @@ protected:
     {
         if (m_extract_buffer_size == 0) return;
 
-        STXXL_DEBUG("convert_eb_into_ia");
+        LOG << "convert_eb_into_ia";
 
         // tb: if in limit sequence and the EB gets flushed out to EM, then we
         // have to re-merge items into the EB instead of returning the
@@ -3798,9 +3802,9 @@ protected:
     inline void refill_extract_buffer(size_t minimum_size = 0,
                                       size_t maximum_size = 0)
     {
-        STXXL_DEBUG("refill_extract_buffer()" <<
-                    " ia_size=" << m_internal_arrays.size() <<
-                    " ea_size=" << m_external_arrays.size());
+        LOG << "refill_extract_buffer()" <<
+            " ia_size=" << m_internal_arrays.size() <<
+            " ea_size=" << m_external_arrays.size();
 
         if (maximum_size == 0)
             maximum_size = m_extract_buffer_limit;
@@ -3837,13 +3841,13 @@ protected:
             bool reuse_lower_bounds = false;
             while (output_size < minimum_size)
             {
-                STXXL_DEBUG("refill: request more data," <<
-                            " output_size=" << output_size <<
-                            " minimum_size=" << minimum_size <<
-                            " limiting_ea_index=" << limiting_ea_index);
+                LOG << "refill: request more data," <<
+                    " output_size=" << output_size <<
+                    " minimum_size=" << minimum_size <<
+                    " limiting_ea_index=" << limiting_ea_index;
 
                 if (limiting_ea_index < eas) {
-                    STXXL_DEBUG("refill: limiting_ea_index");
+                    LOG << "refill: limiting_ea_index";
 
                     if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0)
                         break;
@@ -3853,8 +3857,7 @@ protected:
                 }
                 else if (limiting_ea_index == eas) {
                     // no more unaccessible EM data
-                    STXXL_MSG("Warning: refill_extract_buffer(n): "
-                              "minimum_size > # mergeable elements!");
+                    LOG1 << "Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!";
                     break;
                 }
 
@@ -3904,7 +3907,7 @@ protected:
     //! the winner trees and hints accordingly.
     inline void wait_next_ea_blocks(const size_t ea_index)
     {
-        STXXL_DEBUG("wait_next_ea_blocks() ea_index=" << ea_index);
+        LOG << "wait_next_ea_blocks() ea_index=" << ea_index;
 
         size_t used_blocks =
             m_external_arrays[ea_index].wait_next_blocks();
@@ -3969,12 +3972,12 @@ protected:
         heap_type& insheap = m_proc[p]->insertion_heap;
         size_t size = insheap.size();
 
-        STXXL_DEBUG0(
+        LOG0 <<
             "Flushing insertion heap array p=" << p <<
-                " size=" << insheap.size() <<
-                " capacity=" << insheap.capacity() <<
-                " int_memory=" << internal_array_type::int_memory(insheap.size()) <<
-                " mem_left=" << m_mem_left);
+            " size=" << insheap.size() <<
+            " capacity=" << insheap.capacity() <<
+            " int_memory=" << internal_array_type::int_memory(insheap.size()) <<
+            " mem_left=" << m_mem_left;
 
         m_stats.num_insertion_heap_flushes++;
         stats_timer flush_time(true); // separate timer due to parallel sorting
@@ -4098,8 +4101,8 @@ protected:
     //! Flushes the internal arrays into an external array.
     void flush_internal_arrays()
     {
-        STXXL_DEBUG("Flushing internal arrays" <<
-                    " num_arrays=" << m_internal_arrays.size());
+        LOG << "Flushing internal arrays" <<
+            " num_arrays=" << m_internal_arrays.size();
 
         m_stats.num_internal_array_flushes++;
         m_stats.internal_array_flush_time.start();
@@ -4147,7 +4150,7 @@ protected:
                 external_array_writer.begin(), size, m_inv_compare);
         }
 
-        STXXL_DEBUG("Merge done of new ea " << &ea << " size " << size);
+        LOG << "Merge done of new ea " << &ea << " size " << size;
 
         m_external_arrays.swap_back(ea);
 
@@ -4216,7 +4219,7 @@ protected:
     void check_external_level(const size_t level, const bool force_merge_all = false)
     {
         if (!force_merge_all)
-            STXXL_DEBUG("Checking external level " << level);
+            LOG << "Checking external level " << level;
 
         // return if EA level is not full
         if (m_external_levels[level] < c_max_external_level_size && !force_merge_all)
@@ -4243,14 +4246,14 @@ protected:
             return;
         m_mem_left -= external_array_type::int_memory(level_size);
 
-        STXXL_ASSERT(force_merge_all || c_max_external_level_size == ea_index.size());
+        assert(force_merge_all || c_max_external_level_size == ea_index.size());
         const size_t num_arrays_to_merge = ea_index.size();
 
-        STXXL_DEBUG("merging external arrays" <<
-                    " level=" << level <<
-                    " level_size=" << level_size <<
-                    " sequences=" << num_arrays_to_merge <<
-                    " force_merge_all=" << force_merge_all);
+        LOG << "merging external arrays" <<
+            " level=" << level <<
+            " level_size=" << level_size <<
+            " sequences=" << num_arrays_to_merge <<
+            " force_merge_all=" << force_merge_all;
 
         // if force_merge_all: create array in highest level to avoid merging
         // of such a large EA.
@@ -4277,7 +4280,7 @@ protected:
 
             while (num_arrays_to_merge != num_arrays_done)
             {
-                STXXL_DEBUG("num_arrays_done = " << num_arrays_done);
+                LOG << "num_arrays_done = " << num_arrays_done;
 
                 // === build hints ===
 
@@ -4318,8 +4321,8 @@ protected:
                     const size_t gmin_index = ea_index[gmin_index_index];
                     assert(gmin_index < m_external_arrays.size());
 
-                    STXXL_DEBUG0("check_external_level():Give pre-hint in EA[" << gmin_index << "] min " <<
-                                 m_external_arrays[gmin_index].get_next_hintable_min());
+                    LOG0 << "check_external_level():Give pre-hint in EA[" << gmin_index << "] min " <<
+                        m_external_arrays[gmin_index].get_next_hintable_min();
 
                     m_external_arrays[gmin_index].rebuild_hints_prehint_next_block();
                     --free_prefetch_blocks;
@@ -4383,10 +4386,10 @@ protected:
                     sizes[i] = std::distance(begin, end);
                     sequences[i] = std::make_pair(begin, end);
 
-                    STXXL_DEBUG("sequence[" << i << "] ea " <<
-                                begin << " - " << end <<
-                                " size " << sizes[i] <<
-                                (needs_limit ? " with ub limit" : ""));
+                    LOG << "sequence[" << i << "] ea " <<
+                        begin << " - " << end <<
+                        " size " << sizes[i] <<
+                    (needs_limit ? " with ub limit" : "");
                 }
                 // ==========================================
 
@@ -4440,7 +4443,7 @@ protected:
             update_hint_tree(m_external_arrays.size() - 1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
-        STXXL_DEBUG("Merge done of new ea " << &ea);
+        LOG << "Merge done of new ea " << &ea;
 
         if (!force_merge_all)
             check_external_level(level + 1);
@@ -4460,8 +4463,8 @@ protected:
         assert(size > used); // at least one element
 
         internal_array_type new_array(values, used, level);
-        STXXL_ASSERT(new_array.int_memory() ==
-                     internal_array_type::int_memory(capacity));
+        assert(new_array.int_memory() ==
+               internal_array_type::int_memory(capacity));
         m_internal_arrays.swap_back(new_array);
 
         if (!extract_buffer_empty()) {
@@ -4475,9 +4478,9 @@ protected:
         m_internal_size += size - used;
         m_mem_left -= internal_array_type::int_memory(capacity);
 
-        STXXL_CHECK(level < kMaxInternalLevels &&
-                    "Internal array level is larger than anything possible "
-                    "in this universe. Increase the size of m_internal_levels");
+        die_unless(level < kMaxInternalLevels &&
+                   "Internal array level is larger than anything possible "
+                   "in this universe. Increase the size of m_internal_levels");
 
         ++m_internal_levels[level];
 
@@ -4507,12 +4510,12 @@ protected:
         if (m_mem_left < internal_array_type::int_memory(level_size)) return;
 
         // must free up more memory than the new array needs.
-        STXXL_ASSERT(int_memory >= internal_array_type::int_memory(level_size));
+        assert(int_memory >= internal_array_type::int_memory(level_size));
 
-        STXXL_DEBUG("merging internal arrays" <<
-                    " level=" << level <<
-                    " level_size=" << level_size <<
-                    " sequences=" << sequences.size());
+        LOG << "merging internal arrays" <<
+            " level=" << level <<
+            " level_size=" << level_size <<
+            " sequences=" << sequences.size();
 
         std::vector<value_type> merged_array(level_size);
 

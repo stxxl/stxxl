@@ -17,6 +17,10 @@
 #define STXXL_NO_DEPRECATED 1
 
 #include <queue>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/queue>
 #include <stxxl/random>
 
@@ -25,14 +29,14 @@ using my_type = unsigned;
 template <class q1type, class q2type>
 void check(const q1type& q1, const q2type& q2)
 {
-    STXXL_CHECK(q1.empty() == q2.empty());
-    STXXL_CHECK(q1.size() == q2.size());
+    die_unless(q1.empty() == q2.empty());
+    die_unless(q1.size() == q2.size());
     if (!q1.empty())
     {
         if (q1.front() != q2.front() || q1.back() != q2.back())
-            STXXL_MSG(q1.size() << ": (" << q1.front() << ", " << q1.back() << ") (" << q2.front() << ", " << q2.back() << ")" << (q1.front() == q2.front() ? "" : " FRONT"));
-        STXXL_CHECK(q1.front() == q2.front());
-        STXXL_CHECK(q1.back() == q2.back());
+            LOG1 << q1.size() << ": (" << q1.front() << ", " << q1.back() << ") (" << q2.front() << ", " << q2.back() << ")" << (q1.front() == q2.front() ? "" : " FRONT");
+        die_unless(q1.front() == q2.front());
+        die_unless(q1.back() == q2.back());
     }
 }
 
@@ -43,24 +47,24 @@ int main()
 {
 #if 1
     //stxxl::set_seed(424648671);  // works fine with a single disk, fails with two disks
-    STXXL_MSG("SEED=" << stxxl::get_next_seed());
+    LOG1 << "SEED=" << stxxl::get_next_seed();
     stxxl::srandom_number32(stxxl::get_next_seed());
     stxxl::random_number32_r rnd;
 #else
     //stxxl::ran32State = 1028675152; // fails with two disks
-    STXXL_MSG("ran32State=" << stxxl::ran32State);
+    LOG1 << "ran32State=" << stxxl::ran32State;
     stxxl::random_number32 rnd;
 #endif
 
     unsigned cnt;
-    STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size);
+    LOG1 << "Elements in a block: " << stxxl::queue<my_type>::block_type::size;
 
     // FIXME: can this be raised to recommended (3, 2) without breaking "Testing special case 4" or any other tests?
     stxxl::queue<my_type> xqueue(2, 2, -1);
     std::queue<my_type> squeue;
     check(xqueue, squeue);
 
-    STXXL_MSG("Testing special case 4");
+    LOG1 << "Testing special case 4";
     cnt = stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
@@ -76,12 +80,12 @@ int main()
         squeue.pop();
         check(xqueue, squeue);
     }
-    STXXL_MSG("Testing other cases ");
+    LOG1 << "Testing other cases ";
     cnt = 20 * stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
         if ((cnt % 1000) == 0)
-            STXXL_MSG("Operations left: " << cnt << " queue size " << squeue.size());
+            LOG1 << "Operations left: " << cnt << " queue size " << squeue.size();
 
         int rndtmp = rnd() % 3;
         if (rndtmp > 0 || squeue.empty())
@@ -101,7 +105,7 @@ int main()
     while (!squeue.empty())
     {
         if ((cnt++ % 1000) == 0)
-            STXXL_MSG("Operations: " << cnt << " queue size " << squeue.size());
+            LOG1 << "Operations: " << cnt << " queue size " << squeue.size();
 
         int rndtmp = rnd() % 4;
         if (rndtmp >= 3)
@@ -122,7 +126,7 @@ int main()
     while (cnt--)
     {
         if ((cnt % 1000) == 0)
-            STXXL_MSG("Operations left: " << cnt << " queue size " << squeue.size());
+            LOG1 << "Operations left: " << cnt << " queue size " << squeue.size();
 
         int rndtmp = rnd() % 3;
         if (rndtmp > 0 || squeue.empty())
@@ -148,7 +152,7 @@ int main()
     while (cnt--)
     {
         if ((cnt % 1000) == 0)
-            STXXL_MSG("Operations left: " << cnt << " queue size " << squeue1.size());
+            LOG1 << "Operations left: " << cnt << " queue size " << squeue1.size();
 
         int rndtmp = rnd() % 3;
         if (rndtmp > 0 || squeue1.empty())

@@ -15,14 +15,15 @@
 #ifndef STXXL_STREAM_SORTED_RUNS_HEADER
 #define STXXL_STREAM_SORTED_RUNS_HEADER
 
-#include <foxxll/mng/block_manager.hpp>
-#include <foxxll/mng/typed_block.hpp>
-#include <stxxl/bits/algo/trigger_entry.h>
+#include <algorithm>
+#include <vector>
 
 #include <tlx/counting_ptr.hpp>
 
-#include <algorithm>
-#include <vector>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/typed_block.hpp>
+
+#include <stxxl/bits/algo/trigger_entry.h>
 
 namespace stxxl {
 namespace stream {

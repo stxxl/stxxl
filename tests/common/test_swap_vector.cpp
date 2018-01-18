@@ -10,7 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/swap_vector.h>
 
 class Test
@@ -20,35 +22,33 @@ class Test
 public:
     Test() : m_i(-1)
     {
-        STXXL_MSG("Construct Test " << m_i);
+        LOG1 << "Construct Test " << m_i;
     }
     explicit Test(int i) : m_i(i)
     {
-        STXXL_MSG("Construct Test " << m_i);
+        LOG1 << "Construct Test " << m_i;
     }
     // Copy constructor
     Test(const Test& o)
     {
-        STXXL_ERRMSG("Copy Test " << o.m_i << " into Test " << m_i);
-        abort();
+        die("Copy Test " << o.m_i << " into Test " << m_i);
         m_i = o.m_i;
     }
     // Copy assignment
     Test& operator = (const Test& o)
     {
-        STXXL_ERRMSG("Copy-assign Test " << o.m_i << " to Test " << m_i);
-        abort();
+        die("Copy-assign Test " << o.m_i << " to Test " << m_i);
         m_i = o.m_i;
         return *this;
     }
     ~Test()
     {
-        STXXL_MSG("Destruct Test " << m_i);
+        LOG1 << "Destruct Test " << m_i;
     }
     //! swap vector with another one
     void swap(Test& obj)
     {
-        STXXL_MSG("Swap Test " << m_i << " with Test " << obj.m_i);
+        LOG1 << "Swap Test " << m_i << " with Test " << obj.m_i;
         std::swap(m_i, obj.m_i);
     }
     int get_i() const
@@ -100,9 +100,9 @@ int main()
 
     // Check the values.
     int expected_vals[10] = { -1, -1, 1, 2, 3, 5, 6, 7, 8, 9 };
-    STXXL_CHECK_EQUAL(vec.size(), 10);
+    die_unequal(vec.size(), 10u);
     for (unsigned i = 0; i < vec.size(); ++i) {
-        STXXL_CHECK_EQUAL(vec[i].get_i(), expected_vals[i]);
+        die_unequal(vec[i].get_i(), expected_vals[i]);
     }
 
     // std::remove_if would fail because it makes use of copy assignment.
@@ -112,14 +112,14 @@ int main()
 
     // Check the values.
     int expected_vals2[10] = { 1, 2, 3, 5, 6, 7, 9 };
-    STXXL_CHECK_EQUAL(vec.size(), 7);
+    die_unequal(vec.size(), 7u);
     for (unsigned i = 0; i < vec.size(); ++i) {
-        STXXL_CHECK_EQUAL(vec[i].get_i(), expected_vals2[i]);
+        die_unequal(vec[i].get_i(), expected_vals2[i]);
     }
 
     // Clear the vector.
     vec.clear();
-    STXXL_CHECK(vec.empty());
+    die_unless(vec.empty());
 
     // Resize to 100 and overwrite the last value.
     // Content after resize and overwrite: {...,-1,100}
@@ -129,8 +129,8 @@ int main()
     std::swap(vec[19], t);
 
     // Check the values.
-    STXXL_CHECK_EQUAL(vec.size(), 20);
-    STXXL_CHECK_EQUAL(vec[19].get_i(), 11);
+    die_unequal(vec.size(), 20u);
+    die_unequal(vec[19].get_i(), 11);
 
     return EXIT_SUCCESS;
 }

@@ -13,6 +13,7 @@
 
 //! [example]
 #include <iostream>
+
 #include <stxxl/unordered_map>
 
 //! [hash]

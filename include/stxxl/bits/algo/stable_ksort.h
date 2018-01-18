@@ -16,23 +16,24 @@
 
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
+#include <algorithm>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+#include <tlx/math/integer_log2.hpp>
+#include <tlx/simple_vector.hpp>
 
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
+
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
-#include <tlx/math/integer_log2.hpp>
-#include <tlx/simple_vector.hpp>
-
-#include <algorithm>
-
-#ifndef STXXL_VERBOSE_STABLE_KSORT
-#define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1
-#endif
 
 namespace stxxl {
+
+constexpr bool debug_stable_ksort = false;
 
 //! \addtogroup stlalgo
 //! \{
@@ -178,7 +179,7 @@ void distribute(
 
     const size_t shift = sizeof(key_type) * 8 - lognbuckets;
     // search in the the range [_begin,_end)
-    STXXL_VERBOSE_STABLE_KSORT("Shift by: " << shift << " bits, lognbuckets: " << lognbuckets);
+    LOGC(debug_stable_ksort) << "Shift by: " << shift << " bits, lognbuckets: " << lognbuckets;
     for ( ; cur != last; cur++)
     {
         key_type cur_key = key_extract(in.current());
@@ -202,8 +203,8 @@ void distribute(
         }
         bucket_sizes[i] = uint64_t(block_type::size) * bucket_iblock[i] +
                           bucket_block_offsets[i];
-        STXXL_VERBOSE_STABLE_KSORT("Bucket " << i << " has size " << bucket_sizes[i] <<
-                                   ", estimated size: " << ((last - first) / int64_t(nbuckets)));
+        LOGC(debug_stable_ksort) << "Bucket " << i << " has size " << bucket_sizes[i] <<
+            ", estimated size: " << ((last - first) / int64_t(nbuckets));
     }
 
     delete[] bucket_blocks;
@@ -223,7 +224,7 @@ void distribute(
 template <typename ExtIterator, typename KeyExtract>
 void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, size_t M)
 {
-    STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
+    LOG1 << "Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]";
     using value_type = typename ExtIterator::vector_type::value_type;
     using key_type = typename value_type::key_type;
     using block_type = typename ExtIterator::block_type;
@@ -252,18 +253,18 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
     const size_t est_bucket_size = (size_t)foxxll::div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
-        STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
-                     ", required for r/w buffers: " << min_num_read_write_buffers <<
-                     ", required for buckets: 2, nbuckets: " << nbuckets);
+        LOG1 << "stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
+            ", required for r/w buffers: " << min_num_read_write_buffers <<
+            ", required for buckets: 2, nbuckets: " << nbuckets;
         throw foxxll::bad_parameter("stxxl::stable_ksort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
     }
-    STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
-    STXXL_VERBOSE_STABLE_KSORT("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
+    LOGC(debug_stable_ksort) << "Elements to sort: " << (last - first);
+    LOGC(debug_stable_ksort) << "Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets;
     const size_t nread_buffers = (m - nbuckets) * read_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
     const size_t nwrite_buffers = (m - nbuckets) * write_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
 
-    STXXL_VERBOSE_STABLE_KSORT("Read buffers in distribution phase: " << nread_buffers);
-    STXXL_VERBOSE_STABLE_KSORT("Write buffers in distribution phase: " << nwrite_buffers);
+    LOGC(debug_stable_ksort) << "Read buffers in distribution phase: " << nread_buffers;
+    LOGC(debug_stable_ksort) << "Write buffers in distribution phase: " << nwrite_buffers;
 
     bucket_bids_type* bucket_bids = new bucket_bids_type[nbuckets];
     for (i = 0; i < nbuckets; ++i)
@@ -301,21 +302,20 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
             max_bucket_size_act = std::max(bucket_sizes[i], max_bucket_size_act);
             if (bucket_sizes[i] > max_bucket_size_rec)
             {
-                STXXL_ERRMSG("Bucket " << i << " is too large: " << bucket_sizes[i] <<
-                             " records, maximum: " << max_bucket_size_rec);
-                STXXL_ERRMSG("Recursion on buckets is not yet implemented, aborting.");
-                abort();
+                die("Bucket " << i << " is too large: " << bucket_sizes[i] <<
+                    " records, maximum: " << max_bucket_size_rec << "\n"
+                    "Recursion on buckets is not yet implemented, aborting.");
             }
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
         const size_t max_bucket_size_act_bl = (size_t)foxxll::div_ceil(max_bucket_size_act, block_type::size);
-        STXXL_VERBOSE_STABLE_KSORT("Reducing required number of required blocks per bucket from " <<
-                                   max_bucket_size_bl << " to " << max_bucket_size_act_bl);
+        LOGC(debug_stable_ksort) << "Reducing required number of required blocks per bucket from " <<
+            max_bucket_size_bl << " to " << max_bucket_size_act_bl;
         max_bucket_size_rec = max_bucket_size_act;
         max_bucket_size_bl = max_bucket_size_act_bl;
         const size_t nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
-        STXXL_VERBOSE_STABLE_KSORT("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
+        LOGC(debug_stable_ksort) << "Write buffers in bucket sorting phase: " << nwrite_buffers_bs;
 
         using buf_ostream_type = foxxll::buf_ostream<block_type, bids_container_iterator>;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
@@ -361,8 +361,8 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         const unsigned int shift = (unsigned int)(sizeof(key_type) * 8 - lognbuckets);
         const unsigned int shift1 = shift - log_k1;
 
-        STXXL_VERBOSE_STABLE_KSORT("Classifying " << nbuckets << " buckets, max size:" << max_bucket_size_rec <<
-                                   " block size:" << block_type::size << " log_k1:" << log_k1);
+        LOGC(debug_stable_ksort) << "Classifying " << nbuckets << " buckets, max size:" << max_bucket_size_rec <<
+            " block size:" << block_type::size << " log_k1:" << log_k1;
 
         for (size_t k = 0; k < nbuckets; k++)
         {
@@ -373,8 +373,8 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
             k1 = (size_t)(1) << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
 
-            STXXL_VERBOSE_STABLE_KSORT("Classifying bucket " << k << " size:" << bucket_sizes[k] <<
-                                       " blocks:" << nbucket_blocks << " log_k1:" << log_k1_k);
+            LOGC(debug_stable_ksort) << "Classifying bucket " << k << " size:" << bucket_sizes[k] <<
+                " blocks:" << nbucket_blocks << " log_k1:" << log_k1_k;
             // classify first nbucket_blocks-1 blocks, they are full
             type_key_* ref_ptr = refs1;
             key_type offset1 = offset + (key_type(1) << key_type(shift)) * key_type(k);
@@ -464,10 +464,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         end = foxxll::timestamp();
     }
 
-    STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Distribution time: " <<
-                  dist_end - begin << " s");
-    STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
-    STXXL_VERBOSE(*foxxll::stats::get_instance());
+    LOG1 << "Elapsed time        : " << end - begin << " s. Distribution time: " << (dist_end - begin) << " s";
+    LOG1 << "Time in I/O wait(ds): " << io_wait_after_d << " s";
+    LOG1 << *foxxll::stats::get_instance();
 }
 
 //! Sort records with integer keys providing a key() method

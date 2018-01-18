@@ -13,11 +13,14 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <vector>
+
+#include <tlx/die.hpp>
+
 #include <stxxl/algorithm>
+#include <stxxl/bits/defines.h>
 #include <stxxl/stream>
 #include <stxxl/vector>
-
-#include <vector>
 
 struct forty_two
 {
@@ -33,13 +36,13 @@ struct forty_two
 
     value_type operator * ()
     {
-        STXXL_CHECK(!empty());
+        die_unless(!empty());
         return counter;
     }
 
     forty_two& operator ++ ()
     {
-        STXXL_CHECK(!empty());
+        die_unless(!empty());
         ++counter;
         return *this;
     }
@@ -89,13 +92,13 @@ void check_42_fill(VectorType& v, typename VectorType::size_type length)
 
     for (size_type i = 0; i < length; ++i)
     {
-        STXXL_CHECK(*ci == value_type(i));
+        die_unless(*ci == value_type(i));
         ++ci;
     }
 
     for (size_type i = length; i < v.size(); ++i)
     {
-        STXXL_CHECK(*ci == value_type(0));
+        die_unless(*ci == value_type(0));
         ++ci;
     }
 

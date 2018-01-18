@@ -15,8 +15,13 @@
 //! This example imports a file into an \c stxxl::vector without copying its
 //! content and then sorts it using stxxl::sort / stxxl::ksort / ...
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <foxxll/io.hpp>
 #include <foxxll/mng.hpp>
+
 #include <stxxl/ksort>
 #include <stxxl/sort>
 #include <stxxl/stable_ksort>
@@ -97,7 +102,7 @@ int main(int argc, char** argv)
         const my_type::key_type num_elements = 1 * 1024 * 1024;
         const size_t records_in_block = block_size / sizeof(my_type);
         foxxll::syscall_file f(argv[2], foxxll::file::CREAT | foxxll::file::RDWR);
-        my_type* array = (my_type*)foxxll::aligned_alloc<STXXL_BLOCK_ALIGN>(block_size);
+        my_type* array = (my_type*)foxxll::aligned_alloc<foxxll::BlockAlignment>(block_size);
         memset(array, 0, block_size);
 
         my_type::key_type cur_key = num_elements;
@@ -109,11 +114,11 @@ int main(int argc, char** argv)
             foxxll::request_ptr req = f.awrite((void*)array, uint64_t(i) * block_size, block_size);
             req->wait();
         }
-        foxxll::aligned_dealloc<STXXL_BLOCK_ALIGN>(array);
+        foxxll::aligned_dealloc<foxxll::BlockAlignment>(array);
     }
     else {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-        STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+        LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
         foxxll::file_ptr f = tlx::make_counting<foxxll::syscall_file>(
             argv[2], foxxll::file::DIRECT | foxxll::file::RDWR);
@@ -122,15 +127,15 @@ int main(int argc, char** argv)
         vector_type v(f);
 
         /*
-        STXXL_MSG("Printing...");
+        LOG1 << "Printing...";
         for(uint64_t i=0; i < v.size(); i++)
-            STXXL_MSG(v[i].key());
+            LOG1 << v[i].key();
          */
 
-        STXXL_MSG("Checking order...");
-        STXXL_MSG((stxxl::is_sorted(v.cbegin(), v.cend()) ? "OK" : "WRONG"));
+        LOG1 << "Checking order...";
+        LOG1 << (stxxl::is_sorted(v.cbegin(), v.cend()) ? "OK" : "WRONG");
 
-        STXXL_MSG("Sorting...");
+        LOG1 << "Sorting...";
         if (strcmp(argv[1], "sort") == 0) {
             stxxl::sort(v.begin(), v.end(), Cmp(), memory_to_use);
 #if 0       // stable_sort is not yet implemented
@@ -146,11 +151,11 @@ int main(int argc, char** argv)
             stxxl::stable_ksort(v.begin(), v.end(), memory_to_use);
         }
         else {
-            STXXL_MSG("Not implemented: " << argv[1]);
+            LOG1 << "Not implemented: " << argv[1];
         }
 
-        STXXL_MSG("Checking order...");
-        STXXL_MSG((stxxl::is_sorted(v.cbegin(), v.cend()) ? "OK" : "WRONG"));
+        LOG1 << "Checking order...";
+        LOG1 << (stxxl::is_sorted(v.cbegin(), v.cend()) ? "OK" : "WRONG");
     }
 
     return 0;

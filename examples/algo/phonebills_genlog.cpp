@@ -10,10 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl.h>
-
 #include <ctime>
 #include <fstream>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl.h>
 
 struct LogEntry
 {
@@ -59,11 +61,11 @@ int main(int argc, char* argv[])
 {
     if (argc < 5)
     {
-        STXXL_MSG("Usage: " << argv[0] << " ncalls avcalls main logfile");
-        STXXL_MSG(" ncalls  - number of calls");
-        STXXL_MSG(" avcalls - average number of calls per client");
-        STXXL_MSG(" main    - memory to use (in MiB)");
-        STXXL_MSG(" logfile - file name of the output");
+        LOG1 << "Usage: " << argv[0] << " ncalls avcalls main logfile";
+        LOG1 << " ncalls  - number of calls";
+        LOG1 << " avcalls - average number of calls per client";
+        LOG1 << " main    - memory to use (in MiB)";
+        LOG1 << " logfile - file name of the output";
 
         return 0;
     }
@@ -116,8 +118,8 @@ int main(int argc, char* argv[])
 
     std::copy(log.begin(), log.end(), std::ostream_iterator<LogEntry>(out));
 
-    STXXL_MSG("\n" << calls_made << " calls made.");
-    STXXL_MSG("The log is written to '" << argv[4] << "'.");
+    LOG1 << "\n" << calls_made << " calls made.";
+    LOG1 << "The log is written to '" << argv[4] << "'.";
 
     return 0;
 }

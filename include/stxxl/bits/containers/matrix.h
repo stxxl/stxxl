@@ -13,15 +13,17 @@
 #ifndef STXXL_CONTAINERS_MATRIX_HEADER
 #define STXXL_CONTAINERS_MATRIX_HEADER
 
-#include <stxxl/bits/containers/vector.h>
-#include <foxxll/mng/block_scheduler.hpp>
-#include <stxxl/bits/containers/matrix_arithmetic.h>
-
-#include <tlx/counting_ptr.hpp>
-
 #include <algorithm>
 #include <vector>
 #include <utility>
+
+#include <tlx/counting_ptr.hpp>
+#include <tlx/logger.hpp>
+
+#include <foxxll/mng/block_scheduler.hpp>
+
+#include <stxxl/bits/containers/vector.h>
+#include <stxxl/bits/containers/matrix_arithmetic.h>
 
 namespace stxxl {
 
@@ -1290,7 +1292,7 @@ public:
                 Ops::multi_level_strassen_winograd_multiply_and_add_block_grained(*data, *right.data, *res.data);
                 break;
             default:
-                STXXL_ERRMSG("invalid multiplication-algorithm number");
+                LOG1 << "invalid multiplication-algorithm number";
                 break;
             }
         }
@@ -1309,7 +1311,7 @@ public:
                 new foxxll::block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
             break;
         default:
-            STXXL_ERRMSG("invalid scheduling-algorithm number");
+            LOG1 << "invalid scheduling-algorithm number";
         }
         switch (multiplication_algorithm)
         {
@@ -1335,7 +1337,7 @@ public:
             Ops::multi_level_strassen_winograd_multiply_and_add_block_grained(*data, *right.data, *res.data);
             break;
         default:
-            STXXL_ERRMSG("invalid multiplication-algorithm number");
+            LOG1 << "invalid multiplication-algorithm number";
             break;
         }
         delete data->bs.switch_algorithm_to(
@@ -1372,7 +1374,7 @@ public:
                 new foxxll::block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
             break;
         default:
-            STXXL_ERRMSG("invalid scheduling-algorithm number");
+            LOG1 << "invalid scheduling-algorithm number";
         }
         multiply_internal(right, res);
         delete data->bs.switch_algorithm_to(

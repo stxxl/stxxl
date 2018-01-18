@@ -11,14 +11,18 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <algorithm>
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <foxxll/common/utils.hpp>
 #include <foxxll/io.hpp>
 #include <foxxll/mng.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/version.h>
-
-#include <algorithm>
 
 int stxxl_info(int, char**)
 {
@@ -28,17 +32,17 @@ int stxxl_info(int, char**)
     foxxll::disk_queues::get_instance();
 
 #if STXXL_PARALLEL
-    STXXL_MSG("STXXL_PARALLEL, max threads = " << omp_get_max_threads());
+    LOG1 << "STXXL_PARALLEL, max threads = " << omp_get_max_threads();
 #endif
-    STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));
-    STXXL_MSG("sizeof(uint64_t)       = " << sizeof(uint64_t));
-    STXXL_MSG("sizeof(long)           = " << sizeof(long));
-    STXXL_MSG("sizeof(size_t)         = " << sizeof(size_t));
-    STXXL_MSG("sizeof(off_t)          = " << sizeof(off_t));
-    STXXL_MSG("sizeof(void*)          = " << sizeof(void*));
+    LOG1 << "sizeof(unsigned int)   = " << sizeof(unsigned int);
+    LOG1 << "sizeof(uint64_t)       = " << sizeof(uint64_t);
+    LOG1 << "sizeof(long)           = " << sizeof(long);
+    LOG1 << "sizeof(size_t)         = " << sizeof(size_t);
+    LOG1 << "sizeof(off_t)          = " << sizeof(off_t);
+    LOG1 << "sizeof(void*)          = " << sizeof(void*);
 
 #if defined(STXXL_HAVE_LINUXAIO_FILE)
-    STXXL_MSG("STXXL_HAVE_LINUXAIO_FILE = " << STXXL_HAVE_LINUXAIO_FILE);
+    LOG1 << "STXXL_HAVE_LINUXAIO_FILE = " << STXXL_HAVE_LINUXAIO_FILE;
 #endif
 
     return 0;
@@ -84,7 +88,7 @@ struct SubTool subtools[] = {
 
 int main_usage(const char* arg0)
 {
-    STXXL_MSG(stxxl::get_version_string_long());
+    LOG1 << stxxl::get_version_string_long();
 
     std::cout << "Usage: " << arg0 << " <subtool> ..." << std::endl
               << "Available subtools: " << std::endl;
@@ -122,7 +126,7 @@ int main(int argc, char** argv)
     char progsub[256];
 
     if (stxxl::check_library_version() != 0)
-        STXXL_ERRMSG("version mismatch between headers and library");
+        LOG1 << "version mismatch between headers and library";
 
     if (argc > 1)
     {

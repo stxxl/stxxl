@@ -11,11 +11,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/seed.h>
-
-#include <iostream>
 
 struct rand_pairs
 {
@@ -137,13 +140,13 @@ void basic_test()
     std::cout << "Initial import...";
     stats_begin = *foxxll::stats::get_instance();
 
-    STXXL_CHECK(map.begin() == map.end());
+    die_unless(map.begin() == map.end());
     map.insert(values1.begin(), values1.end(), mem_to_sort);
-    STXXL_CHECK(map.begin() != map.end());
-    STXXL_CHECK(map.size() == n_values);
+    die_unless(map.begin() != map.end());
+    die_unless(map.size() == n_values);
 
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // (*) all these values are stored in external memory; the remaining
     // changes will be buffered in internal memory
@@ -158,17 +161,17 @@ void basic_test()
         map.insert_oblivious(values2[2 * i]);
         // new with checking
         std::pair<iterator, bool> res = map.insert(values2[2 * i + 1]);
-        STXXL_CHECK(res.second && (*(res.first)).first == values2[2 * i + 1].first);
+        die_unless(res.second && (*(res.first)).first == values2[2 * i + 1].first);
         // existing without checking
         map.insert_oblivious(values1[2 * i]);
         // exiting with checking
         res = map.insert(values1[2 * i + 1]);
-        STXXL_CHECK(!res.second && (*(res.first)).first == values1[2 * i + 1].first);
+        die_unless(!res.second && (*(res.first)).first == values1[2 * i + 1].first);
     }
 
-    STXXL_CHECK(map.size() == 2 * n_values);
+    die_unless(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // "old" values are stored in external memory, "new" values are stored in
     // internal memory
@@ -181,12 +184,12 @@ void basic_test()
     std::random_shuffle(values1.begin(), values1.end());
     std::random_shuffle(values2.begin(), values2.end());
     for (size_t i = 0; i < n_tests; i++) {
-        STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
-        STXXL_CHECK(cmap.find(values2[i].first) != cmap.end());
-        STXXL_CHECK(cmap.find(values3[i].first) == cmap.end());
+        die_unless(cmap.find(values1[i].first) != cmap.end());
+        die_unless(cmap.find(values2[i].first) != cmap.end());
+        die_unless(cmap.find(values3[i].first) == cmap.end());
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // --- insert with overwriting
     std::cout << "Insert with overwriting...";
@@ -204,16 +207,16 @@ void basic_test()
         map.insert_oblivious(value2);
     }
     // now check
-    STXXL_CHECK(map.size() == 2 * n_values);         // nothing added, nothing removed
+    die_unless(map.size() == 2 * n_values);         // nothing added, nothing removed
     for (size_t i = 0; i < n_tests; i++) {
         const_iterator it1 = cmap.find(values1[i].first);
         const_iterator it2 = cmap.find(values2[i].first);
 
-        STXXL_CHECK((*it1).second == values1[i].second + 1);
-        STXXL_CHECK((*it2).second == values2[i].second + 1);
+        die_unless((*it1).second == values1[i].second + 1);
+        die_unless((*it2).second == values2[i].second + 1);
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // --- erase: existing and non-existing values, with and without checking
     std::cout << "Erase...";
@@ -226,23 +229,23 @@ void basic_test()
         // existing without checking
         map.erase_oblivious(values1[2 * i].first);
         // existing with checking
-        STXXL_CHECK(map.erase(values1[2 * i + 1].first) == 1);
+        die_unless(map.erase(values1[2 * i + 1].first) == 1);
     }
     for (size_t i = 0; i < n_tests / 2; i++) {        // internal
         // existing without checking
         map.erase_oblivious(values2[2 * i].first);
         // existing with checking
-        STXXL_CHECK(map.erase(values2[2 * i + 1].first) == 1);
+        die_unless(map.erase(values2[2 * i + 1].first) == 1);
         // non-existing without checking
         map.erase_oblivious(values3[i].first);
         // non-existing with checking
     }
-    STXXL_CHECK(map.size() == 2 * n_values - 2 * n_tests);
+    die_unless(map.size() == 2 * n_values - 2 * n_tests);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     map.clear();
-    STXXL_CHECK(map.size() == 0);
+    die_unless(map.size() == 0);
 
     // --- find and manipulate values by []-operator
 
@@ -256,31 +259,31 @@ void basic_test()
         map.insert_oblivious(values1[i]);
     }
     // lookup of existing values
-    STXXL_CHECK(map[values1[5].first] == values1[5].second);                               // external
-    STXXL_CHECK(map[values1[n_values / 2 + 5].first] == values1[n_values / 2 + 5].second); // internal
+    die_unless(map[values1[5].first] == values1[5].second);                               // external
+    die_unless(map[values1[n_values / 2 + 5].first] == values1[n_values / 2 + 5].second); // internal
     // manipulate existing values
     ++(map[values1[7].first]);
     ++(map[values1[n_values / 2 + 7].first]);
     {
         const_iterator cit1 = cmap.find(values1[7].first);
-        STXXL_CHECK((*cit1).second == (*cit1).first + 1);
+        die_unless((*cit1).second == (*cit1).first + 1);
         const_iterator cit2 = cmap.find(values1[n_values / 2 + 7].first);
-        STXXL_CHECK((*cit2).second == (*cit2).first + 1);
+        die_unless((*cit2).second == (*cit2).first + 1);
     }
     // lookup of non-existing values
-    STXXL_CHECK(map[values2[5].first] == unordered_map::mapped_type());
+    die_unless(map[values2[5].first] == unordered_map::mapped_type());
     // assignment of non-existing values
     map[values2[7].first] = values2[7].second;
     {
         const_iterator cit = cmap.find(values2[7].first);
-        STXXL_CHECK((*cit).first == values2[7].second);
+        die_unless((*cit).first == values2[7].second);
     }
-    STXXL_CHECK(map.size() == n_values + 2);
+    die_unless(map.size() == n_values + 2);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     map.clear();
-    STXXL_CHECK(map.size() == 0);
+    die_unless(map.size() == 0);
 
     // --- additional bulk insert test
     std::cout << "additional bulk-insert...";
@@ -288,18 +291,18 @@ void basic_test()
 
     map.insert(values1.begin(), values1.begin() + n_values / 2, mem_to_sort);
     map.insert(values1.begin() + n_values / 2, values1.end(), mem_to_sort);
-    STXXL_CHECK(map.size() == n_values);
+    die_unless(map.size() == n_values);
     // lookup some random values
     std::random_shuffle(values1.begin(), values1.end());
     for (size_t i = 0; i < n_tests; i++)
-        STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
+        die_unless(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // --- test equality predicate
     unordered_map::key_equal key_eq = map.key_eq();
-    STXXL_CHECK(key_eq(42, 42));
-    STXXL_CHECK(!key_eq(42, 6 * 9));
+    die_unless(key_eq(42, 42));
+    die_unless(!key_eq(42, 6 * 9));
 
     std::cout << "\nAll tests passed" << std::endl;
 

@@ -12,7 +12,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/config.h>
@@ -30,19 +30,19 @@
 void print_malloc_stats()
 {
     struct mallinfo info = mallinfo();
-    STXXL_MSG("MALLOC statistics BEGIN");
-    STXXL_MSG("===============================================================");
-    STXXL_MSG("non-mmapped space allocated from system (bytes): " << info.arena);
-    STXXL_MSG("number of free chunks                          : " << info.ordblks);
-    STXXL_MSG("number of fastbin blocks                       : " << info.smblks);
-    STXXL_MSG("number of chunks allocated via mmap()          : " << info.hblks);
-    STXXL_MSG("total number of bytes allocated via mmap()     : " << info.hblkhd);
-    STXXL_MSG("maximum total allocated space (bytes)          : " << info.usmblks);
-    STXXL_MSG("space available in freed fastbin blocks (bytes): " << info.fsmblks);
-    STXXL_MSG("number of bytes allocated and in use           : " << info.uordblks);
-    STXXL_MSG("number of bytes allocated but not in use       : " << info.fordblks);
-    STXXL_MSG("top-most, releasable (via malloc_trim) space   : " << info.keepcost);
-    STXXL_MSG("================================================================");
+    LOG1 << "MALLOC statistics BEGIN";
+    LOG1 << "===============================================================";
+    LOG1 << "non-mmapped space allocated from system (bytes): " << info.arena;
+    LOG1 << "number of free chunks                          : " << info.ordblks;
+    LOG1 << "number of fastbin blocks                       : " << info.smblks;
+    LOG1 << "number of chunks allocated via mmap()          : " << info.hblks;
+    LOG1 << "total number of bytes allocated via mmap()     : " << info.hblkhd;
+    LOG1 << "maximum total allocated space (bytes)          : " << info.usmblks;
+    LOG1 << "space available in freed fastbin blocks (bytes): " << info.fsmblks;
+    LOG1 << "number of bytes allocated and in use           : " << info.uordblks;
+    LOG1 << "number of bytes allocated but not in use       : " << info.fordblks;
+    LOG1 << "top-most, releasable (via malloc_trim) space   : " << info.keepcost;
+    LOG1 << "================================================================";
 }
 
 int do_mallinfo(int argc, char* argv[])
@@ -88,7 +88,7 @@ int do_mallinfo(int argc, char* argv[])
 
 int do_mallinfo(int, char*[])
 {
-    STXXL_MSG("Sorry, mallinfo() statistics are not supported on this platform.");
+    LOG1 << "Sorry, mallinfo() statistics are not supported on this platform.";
     return -1;
 }
 

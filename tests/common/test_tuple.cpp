@@ -10,11 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/common/uint_types.hpp>
-#include <foxxll/verbose.hpp>
-#include <stxxl/bits/common/tuple.h>
-
 #include <sstream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
+#include <foxxll/common/uint_types.hpp>
+
+#include <stxxl/bits/common/tuple.h>
 
 using foxxll::uint40;
 
@@ -50,13 +53,13 @@ void test1()
 
     std::ostringstream oss1;
     oss1 << pair;
-    STXXL_CHECK(oss1.str() == "(5,42)");
+    die_unless(oss1.str() == "(5,42)");
 
     pair = stxxl::tuple<int, int>(1, 2);
 
     std::ostringstream oss2;
     oss2 << pair;
-    STXXL_CHECK(oss2.str() == "(1,2)");
+    die_unless(oss2.str() == "(1,2)");
 }
 
 int main(int, char**)

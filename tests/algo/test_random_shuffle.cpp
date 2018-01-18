@@ -20,6 +20,12 @@
 //! \example algo/test_random_shuffle.cpp
 //! Test \c stxxl::random_shuffle()
 
+#include <cassert>
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/defines.h>
 #include <stxxl/random_shuffle>
 #include <stxxl/vector>
 
@@ -41,30 +47,30 @@ void long_test()
     using ext_vec_type = stxxl::vector<int>;
     ext_vec_type STXXLVector(128 * STXXL_DEFAULT_BLOCK_SIZE(int) / sizeof(int));
 
-    STXXL_MSG("Filling vector with increasing values...");
+    LOG1 << "Filling vector with increasing values...";
     stxxl::generate(STXXLVector.begin(), STXXLVector.end(),
                     counter<int>(), 4);
 
     size_t i;
 
-    STXXL_MSG("Begin: ");
+    LOG1 << "Begin: ";
     for (i = 0; i < 10; i++)
-        STXXL_MSG(STXXLVector[i]);
+        LOG1 << STXXLVector[i];
 
-    STXXL_MSG("End: ");
+    LOG1 << "End: ";
     for (i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
-        STXXL_MSG(STXXLVector[i]);
+        LOG1 << STXXLVector[i];
 
-    STXXL_MSG("Permute randomly...");
+    LOG1 << "Permute randomly...";
     stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 64 * STXXL_DEFAULT_BLOCK_SIZE(int));
 
-    STXXL_MSG("Begin: ");
+    LOG1 << "Begin: ";
     for (i = 0; i < 10; i++)
-        STXXL_MSG(STXXLVector[i]);
+        LOG1 << STXXLVector[i];
 
-    STXXL_MSG("End: ");
+    LOG1 << "End: ";
     for (i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
-        STXXL_MSG(STXXLVector[i]);
+        LOG1 << STXXLVector[i];
 }
 
 void short_test()

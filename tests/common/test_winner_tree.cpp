@@ -10,13 +10,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/common/types.hpp>
-#include <foxxll/verbose.hpp>
+
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/random>
-
-#include <algorithm>
-#include <vector>
 
 //! Comparator interface for the winner tree: takes two players and decides
 //! which is smaller. In this implementation the players are the top elements
@@ -127,7 +131,7 @@ void test_vecs(size_t vecnum, bool test_rebuild)
         if (debug) std::cout << "after replay/rebuild: " << wt.to_string();
     }
 
-    STXXL_CHECK(output.size() == totalsize);
+    die_unless(output.size() == totalsize);
 
     if (debug)
     {
@@ -135,7 +139,7 @@ void test_vecs(size_t vecnum, bool test_rebuild)
             std::cout << output[i] << " ";
     }
 
-    STXXL_CHECK(output == correct);
+    die_unless(output == correct);
 }
 
 int main()

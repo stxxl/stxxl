@@ -10,10 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/logger.hpp>
+
 #include <stxxl/queue>
 #include <stxxl/random>
-
-#include <iostream>
 
 int main()
 {
@@ -35,14 +37,14 @@ int main()
     }
 
     unsigned int last_inserted = my_queue.back();
-    STXXL_MSG("last element inserted: " << last_inserted);
+    LOG1 << "last element inserted: " << last_inserted;
 
     // identify smaller element than first_inserted, search in growth-direction (front->back)
     while (!my_queue.empty())
     {
         if (last_inserted > my_queue.front())
         {
-            STXXL_MSG("found smaller element: " << my_queue.front() << " than last inserted element");
+            LOG1 << "found smaller element: " << my_queue.front() << " than last inserted element";
             break;
         }
         std::cout << my_queue.front() << " " << std::endl;

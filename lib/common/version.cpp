@@ -36,12 +36,12 @@ int version_integer()
     return STXXL_VERSION_INTEGER;
 }
 
-const char * get_library_version_string()
+std::string get_library_version_string()
 {
     return get_version_string();
 }
 
-const char * get_library_version_string_long()
+std::string get_library_version_string_long()
 {
     return get_version_string_long();
 }

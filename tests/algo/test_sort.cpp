@@ -16,9 +16,15 @@
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng.hpp>
 
 #include <stxxl/bits/common/padding.h>
+#include <stxxl/bits/defines.h>
 #include <stxxl/sort>
 #include <stxxl/vector>
 
@@ -32,7 +38,7 @@ using cmp = my_type::compare_less;
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     using vector_type = stxxl::vector<my_type>;
@@ -45,31 +51,31 @@ int main()
         v[0] = my_type(42);
         v[1] = my_type(0);
         v[2] = my_type(23);
-        STXXL_MSG("small vector unsorted " << v[0] << " " << v[1] << " " << v[2]);
+        LOG1 << "small vector unsorted " << v[0] << " " << v[1] << " " << v[2];
         //stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
         stxxl::stl_in_memory_sort(v.begin(), v.end(), cmp());
-        STXXL_MSG("small vector sorted   " << v[0] << " " << v[1] << " " << v[2]);
-        STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+        LOG1 << "small vector sorted   " << v[0] << " " << v[1] << " " << v[2];
+        die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
     }
 
     const uint64_t n_records = uint64_t(192) * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(my_type)) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;
-    STXXL_MSG("Filling vector..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
+    LOG1 << "Filling vector..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)";
     for (vector_type::size_type i = 0; i < v.size(); i++)
         v[i].key = 1 + (rnd() % 0xfffffff);
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(!stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
-    STXXL_MSG("Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...");
+    LOG1 << "Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...";
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
-    STXXL_MSG("Done, output size=" << v.size());
+    LOG1 << "Done, output size=" << v.size();
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 

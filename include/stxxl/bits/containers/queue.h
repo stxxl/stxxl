@@ -14,26 +14,27 @@
 #ifndef STXXL_CONTAINERS_QUEUE_HEADER
 #define STXXL_CONTAINERS_QUEUE_HEADER
 
-#include <foxxll/common/tmeta.hpp>
-#include <foxxll/mng/block_manager.hpp>
-#include <foxxll/mng/prefetch_pool.hpp>
-#include <foxxll/mng/read_write_pool.hpp>
-#include <foxxll/mng/typed_block.hpp>
-#include <foxxll/mng/write_pool.hpp>
-#include <stxxl/bits/deprecated.h>
-#include <stxxl/types>
-
 #include <algorithm>
 #include <deque>
 #include <queue>
 #include <utility>
 #include <vector>
 
-namespace stxxl {
+#include <tlx/define.hpp>
+#include <tlx/logger.hpp>
 
-#ifndef STXXL_VERBOSE_QUEUE
-#define STXXL_VERBOSE_QUEUE STXXL_VERBOSE2
-#endif
+#include <foxxll/common/tmeta.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
+#include <foxxll/mng/write_pool.hpp>
+
+#include <stxxl/bits/defines.h>
+#include <stxxl/bits/deprecated.h>
+#include <stxxl/types>
+
+namespace stxxl {
 
 //! \addtogroup stlcont
 //! \{
@@ -44,14 +45,16 @@ namespace stxxl {
 //!
 //! \tparam ValueType type of the contained objects (POD with no references to internal memory)
 //! \tparam BlockSize size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValueType)
-//! \tparam AllocStr parallel disk block allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
+//! \tparam AllocStr parallel disk block allocation strategy, default is \c foxxll::default_alloc_strategy
 //! \tparam SizeType size data type, default is \c external_size_type
 template <class ValueType,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+          class AllocStr = foxxll::default_alloc_strategy,
           class SizeType = external_size_type>
 class queue
 {
+    static constexpr bool debug = false;
+
 public:
     using value_type = ValueType;
     using alloc_strategy_type = AllocStr;
@@ -99,7 +102,7 @@ public:
             ? foxxll::config::get_instance()->disks_number()
             : static_cast<size_t>(D);
 
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(D)");
+        LOG << "queue[" << this << "]::queue(D)";
         pool = new pool_type(disks, disks + 2);
         init();
     }
@@ -116,7 +119,7 @@ public:
           alloc_count(0),
           bm(foxxll::block_manager::get_instance())
     {
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
+        LOG << "queue[" << this << "]::queue(sizes)";
         pool = new pool_type(p_pool_size, w_pool_size);
         init(blocks2prefetch_);
     }
@@ -135,7 +138,7 @@ public:
           alloc_count(0),
           bm(foxxll::block_manager::get_instance())
     {
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
+        LOG << "queue[" << this << "]::queue(pool)";
         init(blocks2prefetch_);
     }
 
@@ -171,17 +174,17 @@ private:
     void init(int blocks2prefetch_ = -1)
     {
         if (pool->size_write() < 2) {
-            STXXL_ERRMSG("queue: invalid configuration, not enough blocks (" << pool->size_write() <<
-                         ") in write pool, at least 2 are needed, resizing to 3");
+            LOG1 << "queue: invalid configuration, not enough blocks (" << pool->size_write() <<
+                ") in write pool, at least 2 are needed, resizing to 3";
             pool->resize_write(3);
         }
 
         if (pool->size_write() < 3) {
-            STXXL_MSG("queue: inefficient configuration, no blocks for buffered writing available");
+            LOG1 << "queue: inefficient configuration, no blocks for buffered writing available";
         }
 
         if (pool->size_prefetch() < 1) {
-            STXXL_MSG("queue: inefficient configuration, no blocks for prefetching available");
+            LOG1 << "queue: inefficient configuration, no blocks for prefetching available";
         }
 
         front_block = back_block = pool->steal();
@@ -219,17 +222,17 @@ public:
     //! Adds an element in the queue.
     void push(const value_type& val)
     {
-        if (UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
+        if (TLX_UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
         {
             // back block is filled
             if (front_block == back_block)
             {             // can not write the back block because it
                 // is the same as the front block, must keep it memory
-                STXXL_VERBOSE1("queue::push Case 1");
+                LOG << "queue::push Case 1";
             }
             else if (size() < 2 * block_type::size)
             {
-                STXXL_VERBOSE1("queue::push Case 1.5");
+                LOG << "queue::push Case 1.5";
                 // only two blocks with a gap in the beginning, move elements within memory
                 assert(bids.empty());
                 size_t gap = front_element - front_block->begin();
@@ -247,18 +250,18 @@ public:
             }
             else
             {
-                STXXL_VERBOSE1("queue::push Case 2");
+                LOG << "queue::push Case 2";
                 // write the back block
                 // need to allocate new block
                 bid_type newbid;
 
                 bm->new_block(alloc_strategy, newbid, alloc_count++);
 
-                STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << newbid);
+                LOG << "queue[" << this << "]: push block " << back_block << " @ " << newbid;
                 bids.push_back(newbid);
                 pool->write(back_block, newbid);
                 if (bids.size() <= blocks2prefetch) {
-                    STXXL_VERBOSE1("queue::push Case Hints");
+                    LOG << "queue::push Case Hints";
                     pool->hint(newbid);
                 }
             }
@@ -279,12 +282,12 @@ public:
     {
         assert(!empty());
 
-        if (UNLIKELY(front_element == front_block->begin() + (block_type::size - 1)))
+        if (TLX_UNLIKELY(front_element == front_block->begin() + (block_type::size - 1)))
         {
             // if there is only one block, it implies ...
             if (back_block == front_block)
             {
-                STXXL_VERBOSE1("queue::pop Case 3");
+                LOG << "queue::pop Case 3";
                 assert(size() == 1);
                 assert(back_element == front_element);
                 assert(bids.empty());
@@ -298,7 +301,7 @@ public:
             --m_size;
             if (m_size <= block_type::size)
             {
-                STXXL_VERBOSE1("queue::pop Case 4");
+                LOG << "queue::pop Case 4";
                 assert(bids.empty());
                 // the back_block is the next block
                 pool->add(front_block);
@@ -306,16 +309,16 @@ public:
                 front_element = back_block->begin();
                 return;
             }
-            STXXL_VERBOSE1("queue::pop Case 5");
+            LOG << "queue::pop Case 5";
 
             assert(!bids.empty());
             foxxll::request_ptr req = pool->read(front_block, bids.front());
-            STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << bids.front());
+            LOG << "queue[" << this << "]: pop block  " << front_block << " @ " << bids.front();
 
             // give prefetching hints
             for (size_t i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {
-                STXXL_VERBOSE1("queue::pop Case Hints");
+                LOG << "queue::pop Case Hints";
                 pool->hint(bids[i + 1]);
             }
 

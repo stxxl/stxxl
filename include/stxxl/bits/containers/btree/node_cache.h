@@ -13,21 +13,22 @@
 #ifndef STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 #define STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 
-#include <foxxll/common/error_handling.hpp>
-#include <foxxll/io/request.hpp>
-#include <foxxll/mng/block_manager.hpp>
-#include <foxxll/mng/typed_block.hpp>
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/containers/pager.h>
-
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
-namespace stxxl {
+#include <tlx/logger.hpp>
 
-#define STXXL_BTREE_CACHE_VERBOSE STXXL_VERBOSE2
+#include <foxxll/common/error_handling.hpp>
+#include <foxxll/io/request.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/typed_block.hpp>
+
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/containers/pager.h>
+
+namespace stxxl {
 
 // TODO:  speedup BID2node_ access using search result iterator in the methods
 
@@ -36,6 +37,8 @@ namespace btree {
 template <class NodeType, class BTreeType>
 class node_cache
 {
+    static constexpr bool debug = false;
+
 public:
     using btree_type = BTreeType;
     using node_type = NodeType;
@@ -110,10 +113,10 @@ public:
           m_bm(foxxll::block_manager::get_instance())
     {
         const size_t nnodes = cache_size_in_bytes / block_type::raw_size;
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache constructor nodes=" << nnodes);
+        LOG << "btree::node_cache constructor nodes=" << nnodes;
         if (nnodes < 3)
         {
-            STXXL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
+            FOXXLL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
         }
         m_nodes.reserve(nnodes);
         m_reqs.resize(nnodes);
@@ -149,7 +152,7 @@ public:
 
     ~node_cache()
     {
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache destructor addr=" << this);
+        LOG << "btree::node_cache destructor addr=" << this;
 
         for (const auto& it : m_bid2node)
         {
@@ -180,9 +183,9 @@ public:
                     ++i;
                     node2kick = m_pager.kick();
                     if (i == max_tries) {
-                        STXXL_ERRMSG(
-                            "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning nullptr node.");
+                        LOG1 <<
+                            "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
+                            "Returning nullptr node.";
                         return nullptr;
                     }
                     m_pager.hit(node2kick);
@@ -215,7 +218,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_new_node, need to kick node " << node2kick);
+            LOG << "btree::node_cache get_new_node, need to kick node " << node2kick;
 
             return &node;
         }
@@ -237,7 +240,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_new_node, free node " << free_node << "available");
+        LOG << "btree::node_cache get_new_node, free node " << free_node << "available";
 
         return &node;
     }
@@ -251,7 +254,7 @@ public:
         {
             // the node is in cache
             const size_t nodeindex = it->second;
-            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
+            LOG << "btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix;
             m_fixed[nodeindex] = fix;
             m_pager.hit(nodeindex);
             m_dirty[nodeindex] = true;
@@ -277,9 +280,9 @@ public:
                     ++i;
                     node2kick = m_pager.kick();
                     if (i == max_tries) {
-                        STXXL_ERRMSG(
-                            "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning nullptr node.");
+                        LOG1 <<
+                            "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
+                            "Returning nullptr node.";
                         return nullptr;
                     }
                     m_pager.hit(node2kick);
@@ -310,7 +313,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
+            LOG << "btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix;
 
             return &node;
         }
@@ -331,7 +334,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
+        LOG << "btree::node_cache get_node, free node " << free_node << "available, fix=" << fix;
 
         return &node;
     }
@@ -345,7 +348,7 @@ public:
         {
             // the node is in cache
             const size_t nodeindex = it->second;
-            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
+            LOG << "btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix;
             m_fixed[nodeindex] = fix;
             m_pager.hit(nodeindex);
 
@@ -371,9 +374,9 @@ public:
                 node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
-                    STXXL_ERRMSG(
-                        "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                    STXXL_ERRMSG("Returning nullptr node.");
+                    LOG1 <<
+                        "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
+                        "Returning nullptr node.";
                     return nullptr;
                 }
                 m_pager.hit(node2kick);
@@ -402,7 +405,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
+            LOG << "btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix;
 
             return &node;
         }
@@ -423,7 +426,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
+        LOG << "btree::node_cache get_node, free node " << free_node << "available, fix=" << fix;
 
         return &node;
     }
@@ -437,7 +440,7 @@ public:
             {
                 // the node is in the cache
                 const size_t nodeindex = it->second;
-                STXXL_BTREE_CACHE_VERBOSE("btree::node_cache delete_node " << nodeindex << " from cache.");
+                LOG << "btree::node_cache delete_node " << nodeindex << " from cache.";
                 if (m_reqs[nodeindex].valid())
                     m_reqs[nodeindex]->wait();
 
@@ -473,9 +476,9 @@ public:
                 node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
-                    STXXL_ERRMSG(
-                        "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                    STXXL_ERRMSG("Returning nullptr node.");
+                    LOG1 <<
+                        "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
+                        "Returning nullptr node.";
                     return;
                 }
                 m_pager.hit(node2kick);
@@ -505,7 +508,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            STXXL_BTREE_CACHE_VERBOSE("btree::node_cache prefetch_node, need to kick node" << node2kick << " ");
+            LOG << "btree::node_cache prefetch_node, need to kick node" << node2kick << " ";
 
             return;
         }
@@ -526,7 +529,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache prefetch_node, free node " << free_node << "available");
+        LOG << "btree::node_cache prefetch_node, free node " << free_node << "available";
 
         return;
     }
@@ -535,7 +538,7 @@ public:
     {
         assert(m_bid2node.find(bid) != m_bid2node.end());
         m_fixed[m_bid2node[bid]] = false;
-        STXXL_BTREE_CACHE_VERBOSE("btree::node_cache unfix_node,  node " << m_bid2node[bid]);
+        LOG << "btree::node_cache unfix_node,  node " << m_bid2node[bid];
     }
 
     void swap(node_cache& obj)

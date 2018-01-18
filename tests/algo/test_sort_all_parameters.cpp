@@ -13,7 +13,11 @@
 
 //#define PLAY_WITH_OPT_PREF
 
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <foxxll/mng.hpp>
+
 #include <stxxl/random>
 #include <stxxl/scan>
 #include <stxxl/sort>
@@ -37,17 +41,17 @@ void test(uint64_t data_mem, size_t memory_to_use)
     using cmp = typename T::compare_less;
 
     size_t ndisks = foxxll::config::get_instance()->disks_number();
-    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
-    STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MiB");
-    STXXL_MSG("Using " << memory_to_use / MB << " MiB");
-    STXXL_MSG("Using " << ndisks << " disks");
-    STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
-    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KiB");
+    LOG1 << "Sorting " << records_to_sort << " records of size " << sizeof(T);
+    LOG1 << "Total volume " << (records_to_sort * sizeof(T)) / MB << " MiB";
+    LOG1 << "Using " << memory_to_use / MB << " MiB";
+    LOG1 << "Using " << ndisks << " disks";
+    LOG1 << "Using " << alloc_strategy_type::name() << " allocation strategy ";
+    LOG1 << "Block size " << vector_type::block_type::raw_size / 1024 << " KiB";
 
-    STXXL_MSG("Filling vector...");
+    LOG1 << "Filling vector...";
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32_r(), 32);
 
-    STXXL_MSG("Sorting vector...");
+    LOG1 << "Sorting vector...";
 
     foxxll::stats_data before(*foxxll::stats::get_instance());
 
@@ -55,11 +59,11 @@ void test(uint64_t data_mem, size_t memory_to_use)
 
     foxxll::stats_data after(*foxxll::stats::get_instance());
 
-    STXXL_MSG("Checking order...");
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
+    LOG1 << "Checking order...";
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp()));
 
-    STXXL_MSG("Sorting: " << (after - before));
-    STXXL_MSG("Total:   " << *foxxll::stats::get_instance());
+    LOG1 << "Sorting: " << (after - before);
+    LOG1 << "Total:   " << *foxxll::stats::get_instance();
 }
 
 template <typename T, unsigned block_size>
@@ -83,8 +87,7 @@ void test_all_strategies(
         test<T, foxxll::random_cyclic, block_size>(data_mem, memory_to_use);
         break;
     default:
-        STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");
-        abort();
+        die("Unknown allocation strategy: " << strategy << ", aborting");
     }
 }
 
@@ -92,20 +95,19 @@ int main(int argc, char* argv[])
 {
     if (argc < 6)
     {
-        STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
-        return -1;
+        die("Usage: " << argv[0] <<
+            " <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
     }
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     uint64_t data_mem = foxxll::atouint64(argv[1]) * MB;
     size_t sort_mem = strtoul(argv[2], nullptr, 0) * MB;
     int strategy = atoi(argv[3]);
     int block_size_switch = atoi(argv[4]);
     stxxl::set_seed((unsigned)strtoul(argv[5], nullptr, 10));
-    STXXL_MSG("Seed " << stxxl::get_next_seed());
+    LOG1 << "Seed " << stxxl::get_next_seed();
     stxxl::srandom_number32();
 
     using my_default_type = key_with_padding<unsigned, RECORD_SIZE>;
@@ -158,7 +160,7 @@ int main(int argc, char* argv[])
         test_all_strategies<key_with_padding<unsigned, 128>, 2* MB>(data_mem, sort_mem, strategy);
         break;
     default:
-        STXXL_ERRMSG("Unknown block size: " << block_size_switch << ", aborting");
+        LOG1 << "Unknown block size: " << block_size_switch << ", aborting";
         abort();
     }
 

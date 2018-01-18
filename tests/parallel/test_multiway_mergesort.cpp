@@ -10,15 +10,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
+#include <functional>
+#include <iostream>
+#include <vector>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_mergesort.h>
 #include <stxxl/random>
-
-#include <functional>
-#include <iostream>
-#include <vector>
 
 struct Something
 {
@@ -54,7 +56,7 @@ void test_size(unsigned int size)
 
     stxxl::parallel::parallel_sort_mwms<Stable>(v.begin(), v.end(), cmp, 8);
 
-    STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend(), cmp));
+    die_unless(stxxl::is_sorted(v.cbegin(), v.cend(), cmp));
 }
 
 int main()

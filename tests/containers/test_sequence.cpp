@@ -12,7 +12,11 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <iostream>
 #include <iterator>
+
+#include <tlx/die.hpp>
+
 #include <stxxl/random>
 #include <stxxl/sequence>
 
@@ -57,13 +61,13 @@ int main(int argc, char* argv[])
             break;
         }
 
-        STXXL_CHECK(XXLDeque.empty() == STDDeque.empty());
-        STXXL_CHECK(XXLDeque.size() == STDDeque.size());
+        die_unless(XXLDeque.empty() == STDDeque.empty());
+        die_unless(XXLDeque.size() == STDDeque.size());
 
         if (XXLDeque.size() > 0)
         {
-            STXXL_CHECK(XXLDeque.back() == STDDeque.back());
-            STXXL_CHECK(XXLDeque.front() == STDDeque.front());
+            die_unless(XXLDeque.back() == STDDeque.back());
+            die_unless(XXLDeque.front() == STDDeque.front());
         }
 
         if (!(i % 1000))
@@ -74,13 +78,13 @@ int main(int argc, char* argv[])
 
             while (!stream.empty())
             {
-                STXXL_CHECK(b != STDDeque.end());
-                STXXL_CHECK(*stream == *b);
+                die_unless(b != STDDeque.end());
+                die_unless(*stream == *b);
                 ++stream;
                 ++b;
             }
 
-            STXXL_CHECK(b == STDDeque.end());
+            die_unless(b == STDDeque.end());
         }
 
         if (!(i % 1000))
@@ -91,13 +95,13 @@ int main(int argc, char* argv[])
 
             while (!stream.empty())
             {
-                STXXL_CHECK(b != STDDeque.rend());
-                STXXL_CHECK(*stream == *b);
+                die_unless(b != STDDeque.rend());
+                die_unless(*stream == *b);
                 ++stream;
                 ++b;
             }
 
-            STXXL_CHECK(b == STDDeque.rend());
+            die_unless(b == STDDeque.rend());
         }
     }
 

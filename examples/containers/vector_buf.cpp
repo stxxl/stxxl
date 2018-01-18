@@ -10,10 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+
 #include <stxxl/bits/config.h>
 #include <stxxl/vector>
-
-#include <iostream>
 
 void test_vector_element(uint64_t size)
 {
@@ -31,7 +33,7 @@ void test_vector_element(uint64_t size)
 //! [element]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
+    die_unless(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 void test_vector_iterator(uint64_t size)
@@ -51,7 +53,7 @@ void test_vector_iterator(uint64_t size)
 //! [iterator]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
+    die_unless(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 void test_vector_buffered(uint64_t size)
@@ -82,7 +84,7 @@ void test_vector_buffered(uint64_t size)
 //! [buffered]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
+    die_unless(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 void test_vector_cxx11(uint64_t size)
@@ -111,7 +113,7 @@ void test_vector_cxx11(uint64_t size)
 //! [cxx11]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK(sum == size / 1024 * (1024 * 1023 / 2));
+    die_unless(sum == size / 1024 * (1024 * 1023 / 2));
 }
 
 int main(int argc, char* argv[])

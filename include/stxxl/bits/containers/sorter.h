@@ -13,16 +13,12 @@
 #ifndef STXXL_CONTAINERS_SORTER_HEADER
 #define STXXL_CONTAINERS_SORTER_HEADER
 
+#include <algorithm>
+
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/stream/sort_stream.h>
 
-#include <algorithm>
-
 namespace stxxl {
-
-#ifndef STXXL_VERBOSE_SORTER
-#define STXXL_VERBOSE_SORTER STXXL_VERBOSE2
-#endif
 
 //! \addtogroup stlcont
 //! \{
@@ -57,12 +53,12 @@ namespace stxxl {
  * \tparam ValueType   type of the contained objects (POD with no references to internal memory)
  * \tparam CompareType type of comparison object used for sorting the runs
  * \tparam BlockSize   size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
- * \tparam AllocStr    parallel disk block allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
+ * \tparam AllocStr    parallel disk block allocation strategy, default is \c foxxll::default_alloc_strategy
  */
 template <typename ValueType,
           typename CompareType,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-          class AllocStrategy = STXXL_DEFAULT_ALLOC_STRATEGY>
+          class AllocStrategy = foxxll::default_alloc_strategy>
 class sorter
 {
 public:

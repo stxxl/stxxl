@@ -10,13 +10,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <ctime>
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/random_shuffle>
 #include <stxxl/scan>
 #include <stxxl/sort>
-
-#include <ctime>
-#include <iostream>
 
 struct comp_type : public std::less<int>
 {
@@ -57,13 +60,13 @@ int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " #log_ins");
+        LOG1 << "Usage: " << argv[0] << " #log_ins";
         return -1;
     }
 
     const int log_nins = atoi(argv[1]);
     if (log_nins > 31) {
-        STXXL_ERRMSG("This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        LOG1 << "This test can't do more than 2^31 operations, you requested 2^" << log_nins;
         return -1;
     }
 
@@ -74,46 +77,46 @@ int main(int argc, char* argv[])
     stxxl::ran32State = (unsigned int)time(nullptr);
 
     stxxl::vector<int> Values(nins);
-    STXXL_MSG("Generating " << nins << " random values");
+    LOG1 << "Generating " << nins << " random values";
     stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
 
-    STXXL_MSG("Sorting the random values");
+    LOG1 << "Sorting the random values";
     stxxl::sort(Values.begin(), Values.end(), comp_type(), 128 * 1024 * 1024);
 
-    STXXL_MSG("Deleting unique values");
+    LOG1 << "Deleting unique values";
     stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
     Values.resize(NewEnd - Values.begin());
 
-    STXXL_MSG("Randomly permute input values");
+    LOG1 << "Randomly permute input values";
     stxxl::random_shuffle(Values.begin(), Values.end(), 128 * 1024 * 1024);
 
     stxxl::vector<int>::const_iterator it = Values.begin();
-    STXXL_MSG("Inserting " << Values.size() << " random values into btree");
+    LOG1 << "Inserting " << Values.size() << " random values into btree";
     for ( ; it != Values.end(); ++it)
         BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
 
-    STXXL_MSG("Number of elements in btree: " << BTree.size());
+    LOG1 << "Number of elements in btree: " << BTree.size();
 
-    STXXL_MSG("Searching " << Values.size() << " existing elements and erasing them");
+    LOG1 << "Searching " << Values.size() << " existing elements and erasing them";
     stxxl::vector<int>::const_iterator vIt = Values.begin();
 
     for ( ; vIt != Values.end(); ++vIt)
     {
         btree_type::iterator bIt = BTree.find(*vIt);
-        STXXL_CHECK(bIt != BTree.end());
+        die_unless(bIt != BTree.end());
         // erasing non-existent element
-        STXXL_CHECK(BTree.erase((*vIt) + 1) == 0);
+        die_unless(BTree.erase((*vIt) + 1) == 0);
         // erasing existing element
-        STXXL_CHECK(BTree.erase(*vIt) == 1);
+        die_unless(BTree.erase(*vIt) == 1);
         // checking it is not there
-        STXXL_CHECK(BTree.find(*vIt) == BTree.end());
+        die_unless(BTree.find(*vIt) == BTree.end());
         // trying to erase it again
-        STXXL_CHECK(BTree.erase(*vIt) == 0);
+        die_unless(BTree.erase(*vIt) == 0);
     }
 
-    STXXL_CHECK(BTree.empty());
+    die_unless(BTree.empty());
 
-    STXXL_MSG("Test passed.");
+    LOG1 << "Test passed.";
 
     return 0;
 }

@@ -10,11 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl.h>
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/containers/hash_map/block_cache.h>
-
-#include <iostream>
 
 bool test_block_cache()
 {
@@ -66,7 +69,7 @@ bool test_block_cache()
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
 
         int expected = i_block * block_size + i_subblock * subblock_size + 1;
-        STXXL_CHECK((*subblock)[1].first == expected);
+        die_unless((*subblock)[1].first == expected);
     }
 
     // do the same again but this time with prefetching
@@ -77,7 +80,7 @@ bool test_block_cache()
         cache.prefetch_block(bids[i_block]);
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
         int expected = i_block * block_size + i_subblock * subblock_size + 1;
-        STXXL_CHECK((*subblock)[1].first == expected);
+        die_unless((*subblock)[1].first == expected);
     }
 
     // load and modify some subblocks; flush cache and check values
@@ -89,7 +92,7 @@ bool test_block_cache()
 
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
 
-        STXXL_CHECK(cache.make_dirty(bids[i_block]));
+        die_unless(cache.make_dirty(bids[i_block]));
         (*subblock)[1].first = (*subblock)[1].second + 42;
     }
     stxxl::set_seed(myseed);
@@ -99,22 +102,22 @@ bool test_block_cache()
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
 
         int expected = i_block * block_size + i_subblock * subblock_size + 1;
-        STXXL_CHECK((*subblock)[1].first == expected + 42);
+        die_unless((*subblock)[1].first == expected + 42);
     }
 
     // test retaining
     cache.clear();
 
     // not yet cached
-    STXXL_CHECK(cache.retain_block(bids[0]) == false);
+    die_unless(cache.retain_block(bids[0]) == false);
     cache.prefetch_block(bids[0]);
 
     // cached, should be retained
-    STXXL_CHECK(cache.retain_block(bids[0]) == true);
+    die_unless(cache.retain_block(bids[0]) == true);
     // release again
-    STXXL_CHECK(cache.release_block(bids[0]) == true);
+    die_unless(cache.release_block(bids[0]) == true);
     // retrain-count should be 0, release fails
-    STXXL_CHECK(cache.release_block(bids[0]) == false);
+    die_unless(cache.release_block(bids[0]) == false);
 
     // cache new block
     subblock_type* kicked_subblock = cache.get_subblock(bids[1], 0);
@@ -123,28 +126,28 @@ bool test_block_cache()
         cache.prefetch_block(bids[i + 3]);
     }
     // load kicked subblock again, should be at a different location
-    STXXL_CHECK(cache.get_subblock(bids[1], 0) != kicked_subblock);
+    die_unless(cache.get_subblock(bids[1], 0) != kicked_subblock);
 
     subblock_type* retained_subblock = cache.get_subblock(bids[1], 0);
     // now retain subblock
-    STXXL_CHECK(cache.retain_block(bids[1]) == true);
+    die_unless(cache.retain_block(bids[1]) == true);
     for (unsigned i = 0; i < cache_size + 5; i++) {
         cache.prefetch_block(bids[i + 3]);
     }
     // retained_subblock should not have been kicked
-    STXXL_CHECK(cache.get_subblock(bids[1], 0) == retained_subblock);
+    die_unless(cache.get_subblock(bids[1], 0) == retained_subblock);
     cache.clear();
 
     // test swapping
     subblock_type* a_subblock = cache.get_subblock(bids[6], 1);
     cache_type cache2(cache_size / 2);
     std::swap(cache, cache2);
-    STXXL_CHECK(cache.size() == cache_size / 2);
-    STXXL_CHECK(cache2.size() == cache_size);
-    STXXL_CHECK(cache2.get_subblock(bids[6], 1) == a_subblock);
+    die_unless(cache.size() == cache_size / 2);
+    die_unless(cache2.size() == cache_size);
+    die_unless(cache2.get_subblock(bids[6], 1) == a_subblock);
     delete block;
 
-    STXXL_MSG("Passed Block-Cache Test");
+    LOG1 << "Passed Block-Cache Test";
 
     return true;
 }

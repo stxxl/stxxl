@@ -14,6 +14,10 @@
 
 #include <algorithm>
 #include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/scan>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -44,7 +48,7 @@ void check_vector(const VectorType& v)
 
     for (size_t i = 0; i < v.size(); ++i)
     {
-        STXXL_CHECK(v[i] == value_type(i));
+        die_unless(v[i] == value_type(i));
     }
 }
 
@@ -153,40 +157,40 @@ void test_vector_buf(size_t size)
 
         for (size_t i = 0; i < size; ++i)
         {
-            STXXL_CHECK(!reader.empty());
-            STXXL_CHECK(reader.size() == size - i);
+            die_unless(!reader.empty());
+            die_unless(reader.size() == size - i);
 
             ValueType pv = *reader;
 
             ValueType v;
             reader >> v;
 
-            STXXL_CHECK(v == ValueType(i));
-            STXXL_CHECK(pv == v);
-            STXXL_CHECK(reader.size() == size - i - 1);
+            die_unless(v == ValueType(i));
+            die_unless(pv == v);
+            die_unless(reader.size() == size - i - 1);
         }
 
-        STXXL_CHECK(reader.empty());
+        die_unless(reader.empty());
 
         // rewind reader and read again
         reader.rewind();
 
         for (size_t i = 0; i < size; ++i)
         {
-            STXXL_CHECK(!reader.empty());
-            STXXL_CHECK(reader.size() == size - i);
+            die_unless(!reader.empty());
+            die_unless(reader.size() == size - i);
 
             ValueType pv = *reader;
 
             ValueType v;
             reader >> v;
 
-            STXXL_CHECK(v == ValueType(i));
-            STXXL_CHECK(pv == v);
-            STXXL_CHECK(reader.size() == size - i - 1);
+            die_unless(v == ValueType(i));
+            die_unless(pv == v);
+            die_unless(reader.size() == size - i - 1);
         }
 
-        STXXL_CHECK(reader.empty());
+        die_unless(reader.empty());
     }
     {   // read vector using vector_bufreader_reverse
         foxxll::scoped_print_timer tm("vector_bufreader_reverse");
@@ -197,40 +201,40 @@ void test_vector_buf(size_t size)
 
         for (size_t i = 0; i < size; ++i)
         {
-            STXXL_CHECK(!reader.empty());
-            STXXL_CHECK(reader.size() == size - i);
+            die_unless(!reader.empty());
+            die_unless(reader.size() == size - i);
 
             ValueType pv = *reader;
 
             ValueType v;
             reader >> v;
 
-            STXXL_CHECK(v == ValueType(size - i - 1));
-            STXXL_CHECK(pv == v);
-            STXXL_CHECK(reader.size() == size - i - 1);
+            die_unless(v == ValueType(size - i - 1));
+            die_unless(pv == v);
+            die_unless(reader.size() == size - i - 1);
         }
 
-        STXXL_CHECK(reader.empty());
+        die_unless(reader.empty());
 
         // rewind reader and read again
         reader.rewind();
 
         for (size_t i = 0; i < size; ++i)
         {
-            STXXL_CHECK(!reader.empty());
-            STXXL_CHECK(reader.size() == size - i);
+            die_unless(!reader.empty());
+            die_unless(reader.size() == size - i);
 
             ValueType pv = *reader;
 
             ValueType v;
             reader >> v;
 
-            STXXL_CHECK(v == ValueType(size - i - 1));
-            STXXL_CHECK(pv == v);
-            STXXL_CHECK(reader.size() == size - i - 1);
+            die_unless(v == ValueType(size - i - 1));
+            die_unless(pv == v);
+            die_unless(reader.size() == size - i - 1);
         }
 
-        STXXL_CHECK(reader.empty());
+        die_unless(reader.empty());
     }
     {   // read vector using C++11 for loop construct
         foxxll::scoped_print_timer tm("C++11 for loop");
@@ -239,11 +243,11 @@ void test_vector_buf(size_t size)
 
         for (auto it : vec)
         {
-            STXXL_CHECK(it == ValueType(i));
+            die_unless(it == ValueType(i));
             ++i;
         }
 
-        STXXL_CHECK(i == vec.size());
+        die_unless(i == vec.size());
     }
     {   // read vector using C++11 for loop construct
         foxxll::scoped_print_timer tm("C++11 bufreader for loop");
@@ -253,11 +257,11 @@ void test_vector_buf(size_t size)
 
         for (auto it : bufreader_type(vec))
         {
-            STXXL_CHECK(it == ValueType(i));
+            die_unless(it == ValueType(i));
             ++i;
         }
 
-        STXXL_CHECK(i == vec.size());
+        die_unless(i == vec.size());
     }
 }
 
@@ -265,16 +269,16 @@ int main(int argc, char* argv[])
 {
     int size = (argc > 1) ? atoi(argv[1]) : 1;
 
-    STXXL_MSG("Testing stxxl::vector<int> with even size");
+    LOG1 << "Testing stxxl::vector<int> with even size";
     test_vector_buf<int>(size * STXXL_DEFAULT_BLOCK_SIZE(int) / 64);
 
-    STXXL_MSG("Testing stxxl::vector<int> with odd size");
+    LOG1 << "Testing stxxl::vector<int> with odd size";
     test_vector_buf<int>(size * STXXL_DEFAULT_BLOCK_SIZE(int) / 64 + 501 + 42);
 
-    STXXL_MSG("Testing stxxl::vector<uint64_t>");
+    LOG1 << "Testing stxxl::vector<uint64_t>";
     test_vector_buf<uint64_t>(size * STXXL_DEFAULT_BLOCK_SIZE(uint64_t) / 64 + 501 + 42);
 
-    STXXL_MSG("Testing stxxl::vector<my_type>");
+    LOG1 << "Testing stxxl::vector<my_type>";
     test_vector_buf<my_type>(size * STXXL_DEFAULT_BLOCK_SIZE(my_type) / 64);
 
     return 0;

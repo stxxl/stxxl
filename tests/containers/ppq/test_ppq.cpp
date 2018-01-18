@@ -13,7 +13,13 @@
  **************************************************************************/
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
+
+#include <iostream>
 #include <limits>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/random>
 #include <stxxl/timer>
@@ -29,7 +35,7 @@ using my_cmp = my_type::compare_greater;
 
 using ppq_type = stxxl::parallel_priority_queue<
           my_type, my_cmp,
-          STXXL_DEFAULT_ALLOC_STRATEGY,
+          foxxll::default_alloc_strategy,
           STXXL_DEFAULT_BLOCK_SIZE(my_type), /* BlockSize */
           512* 64L* 1024L                    /* RamSize */
           >;
@@ -49,14 +55,14 @@ void test_simple()
         for (uint64_t i = 0; i < nelements; i++)
         {
             if ((i % (128 * 1024)) == 0)
-                STXXL_MSG("Inserting element " << i);
+                LOG1 << "Inserting element " << i;
 
             ppq.push(my_type(int(nelements - i)));
         }
-        STXXL_MSG("Max elements: " << nelements);
+        LOG1 << "Max elements: " << nelements;
     }
 
-    STXXL_CHECK(ppq.size() == nelements);
+    die_unless(ppq.size() == nelements);
 
     {
         scoped_print_timer timer("Emptying PPQ",
@@ -64,18 +70,18 @@ void test_simple()
 
         for (uint64_t i = 0; i < nelements; ++i)
         {
-            STXXL_CHECK(!ppq.empty());
-            //STXXL_MSG( ppq.top() );
-            STXXL_CHECK_EQUAL(ppq.top().key, int(i + 1));
+            die_unless(!ppq.empty());
+            //LOG1 <<  ppq.top() ;
+            die_unequal(ppq.top().key, int(i + 1));
 
             ppq.pop();
             if ((i % (128 * 1024)) == 0)
-                STXXL_MSG("Element " << i << " popped");
+                LOG1 << "Element " << i << " popped";
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), 0);
-    STXXL_CHECK(ppq.empty());
+    die_unequal(ppq.size(), 0u);
+    die_unless(ppq.empty());
 }
 
 void test_bulk_pop()
@@ -87,7 +93,7 @@ void test_bulk_pop()
 
     uint64_t nelements = volume / sizeof(my_type);
 
-    STXXL_MSG("Running bulk_pop() test. bulk_size = " << bulk_size);
+    LOG1 << "Running bulk_pop() test. bulk_size = " << bulk_size;
 
     {
         scoped_print_timer timer("Filling PPQ",
@@ -96,14 +102,14 @@ void test_bulk_pop()
         for (uint64_t i = 0; i < nelements; i++)
         {
             if ((i % (256 * 1024)) == 0)
-                STXXL_MSG("Inserting element " << i);
+                LOG1 << "Inserting element " << i;
 
             ppq.push(my_type(int(nelements - i)));
         }
-        STXXL_MSG("Max elements: " << nelements);
+        LOG1 << "Max elements: " << nelements;
     }
 
-    STXXL_CHECK(ppq.size() == nelements);
+    die_unless(ppq.size() == nelements);
 
     {
         scoped_print_timer timer("Emptying PPQ",
@@ -111,32 +117,32 @@ void test_bulk_pop()
 
         for (uint64_t i = 0; i < nelements; )
         {
-            STXXL_CHECK(!ppq.empty());
+            die_unless(!ppq.empty());
 
             std::vector<my_type> out;
             ppq.bulk_pop(out, bulk_size);
 
-            STXXL_CHECK(!out.empty());
+            die_unless(!out.empty());
 
             for (size_t j = 0; j < out.size(); ++j) {
-                //STXXL_MSG( ppq.top() );
+                //LOG1 <<  ppq.top() ;
                 if ((i % (128 * 1024)) == 0)
-                    STXXL_MSG("Element " << i << " popped");
+                    LOG1 << "Element " << i << " popped";
                 ++i;
-                STXXL_CHECK_EQUAL(out[j].key, int(i));
+                die_unequal(out[j].key, int(i));
             }
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), 0);
-    STXXL_CHECK(ppq.empty());
+    die_unequal(ppq.size(), 0u);
+    die_unless(ppq.empty());
 }
 
 void test_bulk_limit(const size_t bulk_size)
 {
     ppq_type ppq(my_cmp(), 256L * 1024L * 1024L, 4);
 
-    STXXL_MSG("Running test_bulk_limit(" << bulk_size << ")");
+    LOG1 << "Running test_bulk_limit(" << bulk_size << ")";
 
     int windex = 0;     // continuous insertion index
     int rindex = 0;     // continuous pop index
@@ -163,7 +169,7 @@ void test_bulk_limit(const size_t bulk_size)
             {
                 my_type top = ppq.top();
                 ppq.pop();
-                STXXL_CHECK_EQUAL(top.key, rindex);
+                die_unequal(top.key, rindex);
                 ++rindex;
 
                 ppq.push(my_type(windex++));
@@ -177,7 +183,7 @@ void test_bulk_limit(const size_t bulk_size)
             {
                 my_type top = ppq.limit_top();
                 ppq.limit_pop();
-                STXXL_CHECK_EQUAL(top.key, rindex);
+                die_unequal(top.key, rindex);
                 ++rindex;
 
                 ppq.limit_push(my_type(windex++));
@@ -195,7 +201,7 @@ void test_bulk_limit(const size_t bulk_size)
             // not parallel!
             for (size_t i = 0; i < work.size(); ++i)
             {
-                STXXL_CHECK_EQUAL(work[i].key, rindex);
+                die_unequal(work[i].key, rindex);
                 ++rindex;
                 ppq.bulk_push(my_type(windex++));
             }
@@ -204,18 +210,18 @@ void test_bulk_limit(const size_t bulk_size)
         }
     }
 
-    STXXL_CHECK_EQUAL(ppq.size(), static_cast<size_t>(windex - rindex));
+    die_unequal(ppq.size(), static_cast<size_t>(windex - rindex));
 
     // extract last items
     for (size_t i = 0; i < 4L * bulk_size; ++i)
     {
         my_type top = ppq.top();
         ppq.pop();
-        STXXL_CHECK_EQUAL(top.key, rindex);
+        die_unequal(top.key, rindex);
         ++rindex;
     }
 
-    STXXL_CHECK(ppq.empty());
+    die_unless(ppq.empty());
 }
 
 int main()

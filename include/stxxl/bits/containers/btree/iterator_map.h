@@ -13,12 +13,13 @@
 #ifndef STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 #define STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 
-#include <foxxll/common/error_handling.hpp>
-#include <stxxl/bits/containers/btree/iterator.h>
-
 #include <algorithm>
 #include <map>
 #include <utility>
+
+#include <foxxll/common/error_handling.hpp>
+
+#include <stxxl/bits/containers/btree/iterator.h>
 
 namespace stxxl {
 namespace btree {
@@ -26,6 +27,8 @@ namespace btree {
 template <class BTreeType>
 class iterator_map
 {
+    static constexpr bool debug = false;
+
 public:
     using btree_type = BTreeType;
     using bid_type = typename btree_type::leaf_bid_type;
@@ -88,14 +91,14 @@ public:
 
     void register_iterator(iterator_base& it)
     {
-        STXXL_VERBOSE2("btree::iterator_map register_iterator addr=" << &it <<
-                       " BID: " << it.bid << " POS: " << it.pos);
+        LOG << "btree::iterator_map register_iterator addr=" << &it <<
+            " BID: " << it.bid << " POS: " << it.pos;
         m_it2addr.insert(pair_type(Key(it.bid, it.pos), &it));
     }
     void unregister_iterator(iterator_base& it)
     {
-        STXXL_VERBOSE2("btree::iterator_map unregister_iterator addr=" << &it <<
-                       " BID: " << it.bid << " POS: " << it.pos);
+        LOG << "btree::iterator_map unregister_iterator addr=" << &it <<
+            " BID: " << it.bid << " POS: " << it.pos;
         assert(!m_it2addr.empty());
         Key key(it.bid, it.pos);
         std::pair<mmiterator_type, mmiterator_type> range =
@@ -117,7 +120,7 @@ public:
             }
         }
 
-        STXXL_THROW2(std::runtime_error, "btree::iterator_map::unregister_iterator", "Panic in btree::iterator_map, can not find and unregister iterator");
+        FOXXLL_THROW2(std::runtime_error, "btree::iterator_map::unregister_iterator", "Panic in btree::iterator_map, can not find and unregister iterator");
     }
     template <class OutputContainer>
     void find(const bid_type& bid,

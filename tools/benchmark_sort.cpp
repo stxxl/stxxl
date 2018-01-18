@@ -16,6 +16,12 @@
  * 64-bit uint and then a larger structure of 64 bytes.
  */
 
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <limits>
+#include <random>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/common/tuple.h>
@@ -23,10 +29,6 @@
 #include <stxxl/sort>
 #include <stxxl/stream>
 #include <stxxl/vector>
-
-#include <cstdint>
-#include <limits>
-#include <random>
 
 using foxxll::timestamp;
 using foxxll::external_size_type;

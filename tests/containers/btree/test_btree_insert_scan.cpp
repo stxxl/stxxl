@@ -13,6 +13,11 @@
 #include <ctime>
 #include <iostream>
 
+#include <iostream>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/scan>
 #include <stxxl/sort>
@@ -56,13 +61,13 @@ int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " #log_ins");
+        LOG1 << "Usage: " << argv[0] << " #log_ins";
         return -1;
     }
 
     const int log_nins = atoi(argv[1]);
     if (log_nins > 31) {
-        STXXL_ERRMSG("This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        LOG1 << "This test can't do more than 2^31 operations, you requested 2^" << log_nins;
         return -1;
     }
 
@@ -73,39 +78,39 @@ int main(int argc, char* argv[])
     stxxl::ran32State = (unsigned int)time(nullptr);
 
     stxxl::vector<int> Values(nins);
-    STXXL_MSG("Generating " << nins << " random values");
+    LOG1 << "Generating " << nins << " random values";
     stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
 
     stxxl::vector<int>::const_iterator it = Values.begin();
-    STXXL_MSG("Inserting " << nins << " random values into btree");
+    LOG1 << "Inserting " << nins << " random values into btree";
     for ( ; it != Values.end(); ++it)
         BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
 
-    STXXL_MSG("Sorting the random values");
+    LOG1 << "Sorting the random values";
     stxxl::sort(Values.begin(), Values.end(), comp_type(), 128 * 1024 * 1024);
 
-    STXXL_MSG("Deleting unique values");
+    LOG1 << "Deleting unique values";
     stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
     Values.resize(NewEnd - Values.begin());
 
-    STXXL_CHECK(BTree.size() == Values.size());
-    STXXL_MSG("Size without duplicates: " << Values.size());
+    die_unless(BTree.size() == Values.size());
+    LOG1 << "Size without duplicates: " << Values.size();
 
-    STXXL_MSG("Comparing content");
+    LOG1 << "Comparing content";
 
     stxxl::vector<int>::const_iterator vIt = Values.begin();
     btree_type::iterator bIt = BTree.begin();
 
     for ( ; vIt != Values.end(); ++vIt, ++bIt)
     {
-        STXXL_CHECK(*vIt == bIt->first);
-        STXXL_CHECK(double(bIt->first) + 1.0 == bIt->second);
-        STXXL_CHECK(bIt != BTree.end());
+        die_unless(*vIt == bIt->first);
+        die_unless(double(bIt->first) + 1.0 == bIt->second);
+        die_unless(bIt != BTree.end());
     }
 
-    STXXL_CHECK(bIt == BTree.end());
+    die_unless(bIt == BTree.end());
 
-    STXXL_MSG("Test passed.");
+    LOG1 << "Test passed.";
 
     return 0;
 }

@@ -18,6 +18,7 @@
 #define STXXL_PARALLEL_TYPES_HEADER
 
 #include <cstdlib>
+
 #include <foxxll/common/types.hpp>
 
 namespace stxxl {

@@ -15,11 +15,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/common/external_shared_ptr.h>
-#include <stxxl/map>
-#include <stxxl/scan>
-#include <stxxl/vector>
-
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -27,6 +22,15 @@
 #include <limits>
 #include <map>
 #include <memory>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/common/external_shared_ptr.h>
+#include <stxxl/map>
+#include <stxxl/scan>
+
+#include <stxxl/vector>
 
 struct actual_element   // 24 bytes, not a power of 2 intentionally
 {
@@ -85,14 +89,14 @@ void test_vector()
 
     // test assignment const_iterator = iterator
     vector_type::const_iterator c_it = v.begin();
-    STXXL_UNUSED(c_it);
+    tlx::unused(c_it);
 
     test_const_iterator(v);
 
     stxxl::random_number32 rnd;
     int offset = rnd();
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
     vector_type::size_type i;
@@ -106,7 +110,7 @@ void test_vector()
 
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == int64_t(i + offset));
+        die_unless(v[i].get()->key == int64_t(i + offset));
     }
 
     // fill the vector with random numbers
@@ -119,11 +123,11 @@ void test_vector()
         v[i].unwrap();
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == aep->key);
+        die_unless(v[i].get()->key == aep->key);
     }
     v.flush();
 
-    STXXL_MSG("seq read of " << v.size() << " elements");
+    LOG1 << "seq read of " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
 
@@ -133,10 +137,10 @@ void test_vector()
     std::swap(v, a);
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].get()->key == rnd());
+        die_unless(v[i].get()->key == rnd());
 
     // check again
-    STXXL_MSG("clear");
+    LOG1 << "clear";
 
     for (vector_type::iterator it = v.begin(); it != v.end(); ++it)
         it->unwrap();
@@ -147,7 +151,7 @@ void test_vector()
 
     v.resize(64 * 1024 * 1024 / sizeof(element));
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
     for (i = 0; i < v.size(); ++i)
     {
         actual_element_ptr aep(std::make_shared<actual_element>());
@@ -156,24 +160,24 @@ void test_vector()
 
         v[i] = e;
 
-        STXXL_CHECK(v[i].get()->key == aep->key);
+        die_unless(v[i].get()->key == aep->key);
     }
 
     stxxl::ran32State = 0xdeadbeef + 10;
 
-    STXXL_MSG("seq read of " << v.size() << " elements");
+    LOG1 << "seq read of " << v.size() << " elements";
 
     for (i = 0; i < v.size(); i++)
-        STXXL_CHECK(v[i].get()->key == rnd());
+        die_unless(v[i].get()->key == rnd());
 
-    STXXL_MSG("copy vector of " << v.size() << " elements");
+    LOG1 << "copy vector of " << v.size() << " elements";
 
     vector_type v_copy0(v);
-    STXXL_CHECK(v == v_copy0);
+    die_unless(v == v_copy0);
 
     vector_type v_copy1;
     v_copy1 = v;
-    STXXL_CHECK(v == v_copy1);
+    die_unless(v == v_copy1);
 
     while (v.size() != 0) {
         element e = v.back();
@@ -218,17 +222,17 @@ void test_map()
 
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
     foxxll::stats_data stats_elapsed;
-    STXXL_MSG(stats_begin);
+    LOG1 << stats_begin;
 
-    STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
-    STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB");
+    LOG1 << "Block size " << BLOCK_SIZE / 1024 << " KiB";
+    LOG1 << "Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB";
 
     for (unsigned mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *foxxll::stats::get_instance();
         const size_t el = mult * (CACHE_ELEMENTS / 8);
-        STXXL_MSG("Elements to insert " << el << " volume =" <<
-                  (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
+        LOG1 << "Elements to insert " << el << " volume =" <<
+        (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB";
         map_type* DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
         map_type& Map = *DMap;
 
@@ -247,11 +251,11 @@ void test_map()
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double writes = double(stats_elapsed.get_write_count()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
-        STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
-        STXXL_MSG(stats_elapsed);
+        LOG1 << "Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel);
+        LOG1 << stats_elapsed;
 
         stats_begin = *foxxll::stats::get_instance();
-        STXXL_MSG("Doing search");
+        LOG1 << "Doing search";
         size_t queries = el;
         stxxl::random_number32 myrandom;
         for (unsigned i = 0; i < queries; ++i)
@@ -262,16 +266,16 @@ void test_map()
             data_type data = (*result).second;
             test_data_ptr tmp = data.get();
 
-            STXXL_CHECK(tmp->a == (unsigned char)(key + 1));
+            die_unless(tmp->a == (unsigned char)(key + 1));
             for (unsigned j = 0; j < 3; ++j)
-                STXXL_CHECK(tmp->b[j] == (unsigned long)(key + 2));
-            STXXL_CHECK(tmp->c == (unsigned int)(key + 3));
+                die_unless(tmp->b[j] == (unsigned long)(key + 2));
+            die_unless(tmp->c == (unsigned int)(key + 3));
         }
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;
         double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
-        STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
-        STXXL_MSG(stats_elapsed);
+        LOG1 << "reads/logel " << reads << " readsperq " << readsperq;
+        LOG1 << stats_elapsed;
 
         while (Map.size() != 0) {
             map_type::iterator it = Map.begin();

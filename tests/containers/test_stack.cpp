@@ -19,6 +19,9 @@
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
 //! block size \b STXXL_DEFAULT_BLOCK_SIZE(T) bytes
 
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/stack>
 
 // forced instantiation
@@ -31,7 +34,7 @@ template <typename stack_type>
 void test_lvalue_correctness(stack_type& stack, int a, int b)
 {
     int i;
-    STXXL_CHECK(stack.empty());
+    die_unless(stack.empty());
     for (i = 0; i < a; ++i)
         stack.push(i);
     for (i = 0; i < b; ++i)
@@ -44,8 +47,8 @@ void test_lvalue_correctness(stack_type& stack, int a, int b)
     for (i = 0; i < b; ++i)
         stack.pop();
     if ((stack.top() != (size_t)(0xbeeff00d))) {
-        STXXL_ERRMSG("STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)");
-        STXXL_CHECK(stack.top() == (size_t)(0xbeeff00d));
+        LOG1 << "STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)";
+        die_unless(stack.top() == (size_t)(0xbeeff00d));
     }
     for (i = 0; i < a; ++i)
         stack.pop();
@@ -57,23 +60,23 @@ void simple_test(stack_type& my_stack, size_t test_size)
     for (size_t i = 0; i < test_size; i++)
     {
         my_stack.push(i);
-        STXXL_CHECK(my_stack.top() == i);
-        STXXL_CHECK(my_stack.size() == i + 1);
+        die_unless(my_stack.top() == i);
+        die_unless(my_stack.size() == i + 1);
     }
 
     for (size_t i = test_size; i > 0; )
     {
         --i;
-        STXXL_CHECK(my_stack.top() == i);
+        die_unless(my_stack.top() == i);
         my_stack.pop();
-        STXXL_CHECK(my_stack.size() == i);
+        die_unless(my_stack.size() == i);
     }
 
     for (size_t i = 0; i < test_size; i++)
     {
         my_stack.push(i);
-        STXXL_CHECK(my_stack.top() == i);
-        STXXL_CHECK(my_stack.size() == i + 1);
+        die_unless(my_stack.top() == i);
+        die_unless(my_stack.size() == i + 1);
     }
 
     // test swap
@@ -84,9 +87,9 @@ void simple_test(stack_type& my_stack, size_t test_size)
     for (size_t i = test_size; i > 0; )
     {
         --i;
-        STXXL_CHECK(my_stack.top() == i);
+        die_unless(my_stack.top() == i);
         my_stack.pop();
-        STXXL_CHECK(my_stack.size() == i);
+        die_unless(my_stack.size() == i);
     }
 
     std::stack<size_t> int_stack;
@@ -94,8 +97,8 @@ void simple_test(stack_type& my_stack, size_t test_size)
     for (size_t i = 0; i < test_size; i++)
     {
         int_stack.push(i);
-        STXXL_CHECK(int_stack.top() == i);
-        STXXL_CHECK(int_stack.size() == i + 1);
+        die_unless(int_stack.top() == i);
+        die_unless(int_stack.size() == i + 1);
     }
 
     stack_type my_stack1(int_stack);
@@ -103,12 +106,12 @@ void simple_test(stack_type& my_stack, size_t test_size)
     for (size_t i = test_size; i > 0; )
     {
         --i;
-        STXXL_CHECK(my_stack1.top() == i);
+        die_unless(my_stack1.top() == i);
         my_stack1.pop();
-        STXXL_CHECK(my_stack1.size() == i);
+        die_unless(my_stack1.size() == i);
     }
 
-    STXXL_MSG("Test 1 passed.");
+    LOG1 << "Test 1 passed.";
 
     test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2 * 20);
 }
@@ -130,7 +133,7 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " test_size_in_pages");
+        LOG1 << "Usage: " << argv[0] << " test_size_in_pages";
         return -1;
     }
     {
@@ -155,23 +158,23 @@ int main(int argc, char* argv[])
         for (size_t i = 0; i < test_size; i++)
         {
             my_stack.push(i);
-            STXXL_CHECK(my_stack.top() == i);
-            STXXL_CHECK(my_stack.size() == i + 1);
+            die_unless(my_stack.top() == i);
+            die_unless(my_stack.size() == i + 1);
         }
         my_stack.set_prefetch_aggr(10);
         for (size_t i = test_size; i > 0; )
         {
             --i;
-            STXXL_CHECK(my_stack.top() == i);
+            die_unless(my_stack.top() == i);
             my_stack.pop();
-            STXXL_CHECK(my_stack.size() == i);
+            die_unless(my_stack.size() == i);
         }
 
         for (size_t i = 0; i < test_size; i++)
         {
             my_stack.push(i);
-            STXXL_CHECK(my_stack.top() == i);
-            STXXL_CHECK(my_stack.size() == i + 1);
+            die_unless(my_stack.top() == i);
+            die_unless(my_stack.size() == i + 1);
         }
 
         // test swap
@@ -182,12 +185,12 @@ int main(int argc, char* argv[])
         for (size_t i = test_size; i > 0; )
         {
             --i;
-            STXXL_CHECK(my_stack.top() == i);
+            die_unless(my_stack.top() == i);
             my_stack.pop();
-            STXXL_CHECK(my_stack.size() == i);
+            die_unless(my_stack.size() == i);
         }
 
-        STXXL_MSG("Test 2 passed.");
+        LOG1 << "Test 2 passed.";
 
         test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2 * 20);
     }

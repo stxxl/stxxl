@@ -13,11 +13,11 @@
 #ifndef STXXL_COMMON_TUPLE_HEADER
 #define STXXL_COMMON_TUPLE_HEADER
 
-#include <foxxll/common/tmeta.hpp>
-
 #include <limits>
 #include <ostream>
 #include <type_traits>
+
+#include <foxxll/common/tmeta.hpp>
 
 namespace stxxl {
 

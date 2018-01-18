@@ -11,7 +11,9 @@
  **************************************************************************/
 
 //! [example]
+#include <iostream>
 #include <limits>
+
 #include <stxxl/sorter>
 #include <stxxl/timer>
 

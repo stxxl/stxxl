@@ -21,16 +21,20 @@ static const char* description =
     "three PQ sizes: for 256 MiB, 1 GiB and 8 GiB of RAM, with the maximum "
     "number of items set accordingly.";
 
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/priority_queue>
 #include <stxxl/random>
 #include <stxxl/timer>
-
-#include <cstdint>
-#include <iomanip>
-#include <limits>
 
 using stxxl::external_size_type;
 
@@ -83,9 +87,9 @@ struct my_cmp : public std::binary_function<ValueType, ValueType, bool>
 static inline void progress(const char* text, external_size_type i, external_size_type nelements)
 {
     if ((i % PRINTMOD) == 0)
-        STXXL_MSG(text << " " << i << " ("
-                       << std::setprecision(5)
-                       << ((double)i * 100.0 / (double)nelements) << " %)");
+        LOG1 << text << " " << i << " ("
+             << std::setprecision(5)
+             << ((double)i * 100.0 / (double)nelements) << " %)";
 }
 
 template <typename PQType>
@@ -99,7 +103,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
 
     pq.dump_sizes();
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     {
@@ -113,9 +117,9 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         }
     }
 
-    STXXL_CHECK(pq.size() == nelements);
+    die_unless(pq.size() == nelements);
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
 
     pq.dump_sizes();
 
@@ -127,8 +131,8 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
 
         for (external_size_type i = 0; i < nelements; ++i)
         {
-            STXXL_CHECK(!pq.empty());
-            STXXL_CHECK(pq.top().first == i + 1);
+            die_unless(!pq.empty());
+            die_unless(pq.top().first == i + 1);
 
             pq.pop();
 
@@ -136,7 +140,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         }
     }
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
@@ -151,7 +155,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
 
     pq.dump_sizes();
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     {
@@ -165,9 +169,9 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
         }
     }
 
-    STXXL_CHECK(pq.size() == nelements);
+    die_unless(pq.size() == nelements);
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
 
     pq.dump_sizes();
 
@@ -188,7 +192,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
             }
             else
             {
-                STXXL_CHECK(!pq.empty());
+                die_unless(!pq.empty());
                 pq.pop();
             }
 
@@ -196,7 +200,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
         }
     }
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << pq.mem_cons() << " B";
 
     pq.dump_sizes();
 
@@ -217,26 +221,26 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
 
     using pq_type = typename gen::result;
 
-    STXXL_MSG("Given PQ parameters: " << mib_for_queue << " MiB for queue, "
-                                      << mib_for_pools << " MiB for pools, " << maxvolume << " GiB maximum volume.");
+    LOG1 << "Given PQ parameters: " << mib_for_queue << " MiB for queue, "
+         << mib_for_pools << " MiB for pools, " << maxvolume << " GiB maximum volume.";
 
-    STXXL_MSG("Selected PQ parameters:");
-    STXXL_MSG("element size: " << sizeof(ValueType));
-    STXXL_MSG("block size: " << pq_type::BlockSize);
-    STXXL_MSG("insertion buffer size (N): " << pq_type::N << " items ("
-                                            << pq_type::N * sizeof(ValueType) << " B)");
-    STXXL_MSG("delete buffer size: " << pq_type::kDeleteBufferSize);
-    STXXL_MSG("maximal arity for internal mergers (AI): " << pq_type::IntKMAX);
-    STXXL_MSG("maximal arity for external mergers (AE): " << pq_type::ExtKMAX);
-    STXXL_MSG("internal groups: " << pq_type::kNumIntGroups);
-    STXXL_MSG("external groups: " << pq_type::kNumExtGroups);
-    STXXL_MSG("X : " << gen::X);
+    LOG1 << "Selected PQ parameters:";
+    LOG1 << "element size: " << sizeof(ValueType);
+    LOG1 << "block size: " << pq_type::BlockSize;
+    LOG1 << "insertion buffer size (N): " << pq_type::N << " items ("
+         << pq_type::N * sizeof(ValueType) << " B)";
+    LOG1 << "delete buffer size: " << pq_type::kDeleteBufferSize;
+    LOG1 << "maximal arity for internal mergers (AI): " << pq_type::IntKMAX;
+    LOG1 << "maximal arity for external mergers (AE): " << pq_type::ExtKMAX;
+    LOG1 << "internal groups: " << pq_type::kNumIntGroups;
+    LOG1 << "external groups: " << pq_type::kNumExtGroups;
+    LOG1 << "X : " << gen::X;
 
     if (volume == 0) volume = 2 * (mem_for_queue + mem_for_pools);
 
     external_size_type nelements = volume / sizeof(ValueType);
 
-    STXXL_MSG("Number of elements: " << nelements);
+    LOG1 << "Number of elements: " << nelements;
 
     if (opseq == 0)
     {
@@ -248,7 +252,7 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
     else if (opseq == 2)
         run_pqueue_insert_intermixed<pq_type>(nelements, mem_for_pools);
     else
-        STXXL_ERRMSG("Invalid operation sequence.");
+        LOG1 << "Invalid operation sequence.";
 
     return 1;
 }
@@ -337,7 +341,7 @@ int benchmark_pqueue(int argc, char* argv[])
 
     if (!do_benchmark_pqueue_type(type, pqconfig, size, opseq))
     {
-        STXXL_ERRMSG("Invalid (type,pqconfig) combination.");
+        LOG1 << "Invalid (type,pqconfig) combination.";
     }
 
     return 0;

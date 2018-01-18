@@ -13,13 +13,18 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
+#include <iostream>
 #include <iterator>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/deque>
 
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
-        STXXL_MSG("Usage: " << argv[0] << " #ops");
+        LOG1 << "Usage: " << argv[0] << " #ops";
         return -1;
     }
 
@@ -27,12 +32,12 @@ int main(int argc, char* argv[])
 
     stxxl::deque<int>::const_iterator b = Deque.begin();
     stxxl::deque<int>::const_iterator e = Deque.end();
-    STXXL_CHECK(b == e);
+    die_unless(b == e);
     Deque.push_front(1);
     Deque.push_front(2);
     Deque.push_front(3);
     b = Deque.begin();
-    STXXL_CHECK(b != e);
+    die_unless(b != e);
     Deque.push_back(5);
     std::copy(Deque.begin(), Deque.end(), std::ostream_iterator<int>(std::cout, " "));
 
@@ -89,20 +94,20 @@ int main(int argc, char* argv[])
             break;
         }
 
-        STXXL_CHECK(XXLDeque.empty() == STDDeque.empty());
-        STXXL_CHECK(XXLDeque.size() == STDDeque.size());
-        STXXL_CHECK(XXLDeque.end() - XXLDeque.begin() == STDDeque.end() - STDDeque.begin());
-        //STXXL_CHECK(std::equal(XXLDeque.begin(),XXLDeque.end(),STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
+        die_unless(XXLDeque.empty() == STDDeque.empty());
+        die_unless(XXLDeque.size() == STDDeque.size());
+        die_unless(XXLDeque.end() - XXLDeque.begin() == STDDeque.end() - STDDeque.begin());
+        //die_unless(std::equal(XXLDeque.begin(),XXLDeque.end(),STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
         if (XXLDeque.size() > 0)
         {
-            STXXL_CHECK(XXLDeque.back() == STDDeque.back());
-            STXXL_CHECK(XXLDeque.front() == STDDeque.front());
+            die_unless(XXLDeque.back() == STDDeque.back());
+            die_unless(XXLDeque.front() == STDDeque.front());
         }
 
         if (!(i % 100000))
         {
-            STXXL_CHECK(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin()));
-            STXXL_MSG("Operations done: " << i << " size: " << STDDeque.size());
+            die_unless(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin()));
+            LOG1 << "Operations done: " << i << " size: " << STDDeque.size();
         }
     }
 

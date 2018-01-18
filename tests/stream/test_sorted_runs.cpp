@@ -19,12 +19,16 @@
 //! \c sorted_runs data structure from sorted sequences
 //! using \c stream::from_sorted_sequences specialization of \c stream::runs_creator class
 
-#include <stxxl/stream>
-
 #include <algorithm>
 #include <functional>
 #include <limits>
 #include <vector>
+
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
+#include <stxxl/bits/defines.h>
+#include <stxxl/stream>
 
 const unsigned long long megabyte = 1024 * 1024;
 
@@ -50,7 +54,7 @@ struct Cmp : public std::binary_function<value_type, value_type, bool>
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     // special parameter type
     using InputType = stxxl::stream::from_sorted_sequences<value_type>;
@@ -70,7 +74,7 @@ int main()
     {
         unsigned run_size = rnd_max(cnt) + 1;           // random run length
         cnt -= run_size;
-        STXXL_MSG("current run size: " << run_size);
+        LOG1 << "current run size: " << run_size;
 
         std::vector<unsigned> tmp(run_size);            // create temp storage for current run
         // fill with random numbers
@@ -85,12 +89,12 @@ int main()
     }
 
     SortedRunsType Runs = SortedRuns.result();          // get sorted_runs data structure
-    STXXL_CHECK(check_sorted_runs(Runs, Cmp()));
+    die_unless(check_sorted_runs(Runs, Cmp()));
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 10 * megabyte);
     stxxl::vector<value_type, 4, stxxl::lru_pager<8> > array;
-    STXXL_MSG(input_size << " " << Runs->elements);
-    STXXL_MSG("checksum before: " << checksum_before);
+    LOG1 << input_size << " " << Runs->elements;
+    LOG1 << "checksum before: " << checksum_before;
     value_type checksum_after(0);
     for (unsigned i = 0; i < input_size; ++i)
     {
@@ -98,10 +102,10 @@ int main()
         array.push_back(*merger);
         ++merger;
     }
-    STXXL_MSG("checksum after:  " << checksum_after);
-    STXXL_CHECK(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
-    STXXL_CHECK(checksum_before == checksum_after);
-    STXXL_CHECK(merger.empty());
+    LOG1 << "checksum after:  " << checksum_after;
+    die_unless(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
+    die_unless(checksum_before == checksum_after);
+    die_unless(merger.empty());
 
     return 0;
 }

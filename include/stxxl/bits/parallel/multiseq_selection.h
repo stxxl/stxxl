@@ -19,17 +19,18 @@
 #ifndef STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 #define STXXL_PARALLEL_MULTISEQ_SELECTION_HEADER
 
-#include <foxxll/common/utils.hpp>
-#include <stxxl/bits/parallel/compiletime_settings.h>
-#include <stxxl/bits/parallel/types.h>
-#include <tlx/math/round_to_power_of_two.hpp>
-
 #include <algorithm>
+#include <cassert>
 #include <cstdlib>
 #include <functional>
 #include <queue>
 #include <utility>
 #include <vector>
+
+#include <foxxll/common/utils.hpp>
+#include <stxxl/bits/parallel/compiletime_settings.h>
+#include <stxxl/bits/parallel/types.h>
+#include <tlx/math/round_to_power_of_two.hpp>
 
 namespace stxxl {
 namespace parallel {
