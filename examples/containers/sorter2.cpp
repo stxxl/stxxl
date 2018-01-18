@@ -66,7 +66,7 @@ int main()
 
     Timer1.stop();
 
-    STXXL_MSG("push time: " << (Timer1.mseconds() / 1000));
+    LOG1 << "push time: " << (Timer1.mseconds() / 1000);
 
     foxxll::timer Timer2;
 
@@ -74,7 +74,7 @@ int main()
     int_sorter.sort();  // switch to output state and sort
     Timer2.stop();
 
-    STXXL_MSG("sort time: " << (Timer2.mseconds() / 1000));
+    LOG1 << "sort time: " << (Timer2.mseconds() / 1000);
 
     // echo sorted elements
     while (!int_sorter.empty())

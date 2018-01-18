@@ -44,7 +44,7 @@ void test_lvalue_correctness(stack_type& stack, int a, int b)
     for (i = 0; i < b; ++i)
         stack.pop();
     if ((stack.top() != (size_t)(0xbeeff00d))) {
-        STXXL_ERRMSG("STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)");
+        LOG1 << "STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)";
         STXXL_CHECK(stack.top() == (size_t)(0xbeeff00d));
     }
     for (i = 0; i < a; ++i)
@@ -108,7 +108,7 @@ void simple_test(stack_type& my_stack, size_t test_size)
         STXXL_CHECK(my_stack1.size() == i);
     }
 
-    STXXL_MSG("Test 1 passed.");
+    LOG1 << "Test 1 passed.";
 
     test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2 * 20);
 }
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " test_size_in_pages");
+        LOG1 << "Usage: " << argv[0] << " test_size_in_pages";
         return -1;
     }
     {
@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
             STXXL_CHECK(my_stack.size() == i);
         }
 
-        STXXL_MSG("Test 2 passed.");
+        LOG1 << "Test 2 passed.";
 
         test_lvalue_correctness(my_stack, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2, 4 * STXXL_DEFAULT_BLOCK_SIZE(size_t) / 4 * 2 * 20);
     }

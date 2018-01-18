@@ -32,27 +32,27 @@ const char * _()
 template <typename I>
 void dump_iterator_info(I&)
 {
-    STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
-    STXXL_MSG("  category:        " << _<typename std::iterator_traits<I>::iterator_category>());
-    STXXL_MSG("  value_type:      " << _<typename std::iterator_traits<I>::value_type>());
-    STXXL_MSG("  difference_type: " << _<typename std::iterator_traits<I>::difference_type>());
-    STXXL_MSG("  pointer:         " << _<typename std::iterator_traits<I>::pointer>());
-    STXXL_MSG("  reference:       " << _<typename std::iterator_traits<I>::reference>());
+    LOG1 << STXXL_PRETTY_FUNCTION_NAME;
+    LOG1 << "  category:        " << _<typename std::iterator_traits<I>::iterator_category>();
+    LOG1 << "  value_type:      " << _<typename std::iterator_traits<I>::value_type>();
+    LOG1 << "  difference_type: " << _<typename std::iterator_traits<I>::difference_type>();
+    LOG1 << "  pointer:         " << _<typename std::iterator_traits<I>::pointer>();
+    LOG1 << "  reference:       " << _<typename std::iterator_traits<I>::reference>();
 }
 
 template <typename C>
 void dump_container_info(C&)
 {
-    STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
-    STXXL_MSG("  value_type:      " << _<typename C::value_type>());
-    STXXL_MSG("  size_type:       " << _<typename C::size_type>());
-    STXXL_MSG("  difference_type: " << _<typename C::difference_type>());
-    STXXL_MSG("  pointer:         " << _<typename C::pointer>());
-    STXXL_MSG("  const_pointer:   " << _<typename C::const_pointer>());
-    STXXL_MSG("  reference:       " << _<typename C::reference>());
-    STXXL_MSG("  const_reference: " << _<typename C::const_reference>());
-    STXXL_MSG("  iterator:        " << _<typename C::iterator>());
-    STXXL_MSG("  const_iterator:  " << _<typename C::const_iterator>());
+    LOG1 << STXXL_PRETTY_FUNCTION_NAME;
+    LOG1 << "  value_type:      " << _<typename C::value_type>();
+    LOG1 << "  size_type:       " << _<typename C::size_type>();
+    LOG1 << "  difference_type: " << _<typename C::difference_type>();
+    LOG1 << "  pointer:         " << _<typename C::pointer>();
+    LOG1 << "  const_pointer:   " << _<typename C::const_pointer>();
+    LOG1 << "  reference:       " << _<typename C::reference>();
+    LOG1 << "  const_reference: " << _<typename C::const_reference>();
+    LOG1 << "  iterator:        " << _<typename C::iterator>();
+    LOG1 << "  const_iterator:  " << _<typename C::const_iterator>();
 }
 
 template <typename T>

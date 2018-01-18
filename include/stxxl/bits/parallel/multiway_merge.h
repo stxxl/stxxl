@@ -20,7 +20,7 @@
 #include <tlx/loser_tree.hpp>
 
 #include <foxxll/common/utils.hpp>
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel/equally_split.h>

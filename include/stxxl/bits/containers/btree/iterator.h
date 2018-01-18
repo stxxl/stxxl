@@ -14,7 +14,7 @@
 #define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
 #include <foxxll/common/types.hpp>
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <cassert>
 #include <iterator>
@@ -35,6 +35,8 @@ class normal_leaf;
 template <class BTreeType>
 class btree_iterator_base
 {
+    static constexpr bool debug = false;
+
 public:
     using btree_type = BTreeType;
     using bid_type = typename btree_type::leaf_bid_type;

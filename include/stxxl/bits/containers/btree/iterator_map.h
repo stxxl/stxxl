@@ -26,6 +26,8 @@ namespace btree {
 template <class BTreeType>
 class iterator_map
 {
+    static constexpr bool debug = false;
+
 public:
     using btree_type = BTreeType;
     using bid_type = typename btree_type::leaf_bid_type;

@@ -33,7 +33,6 @@
 #include <foxxll/mng/prefetch_pool.hpp>
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
-#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/is_heap.h>
 #include <stxxl/bits/common/rand.h>
@@ -42,6 +41,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/types>
+#include <tlx/logger.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -830,9 +830,9 @@ public:
         write_blocks = 2 * write_blocks;
 #endif
         if (pool.size_write() < write_blocks) {
-            STXXL_ERRMSG("WARNING: enlarging PPQ write pool to " <<
-                         write_blocks << " blocks = " <<
-                         write_blocks * block_size / 1024 / 1024 << " MiB");
+            LOG1 << "WARNING: enlarging PPQ write pool to " <<
+                write_blocks << " blocks = " <<
+                write_blocks * block_size / 1024 / 1024 << " MiB";
             pool.resize_write(write_blocks);
         }
     }
@@ -891,10 +891,10 @@ protected:
             if (!s_warned)
             {
                 s_warned = true;
-                STXXL_ERRMSG("ppq::external_array[" << this << "] "
-                             "writer requested to re-read block from EM.");
-                STXXL_ERRMSG("This should never occur in full-performance mode, "
-                             "verify that you run in debug mode.");
+                LOG1 << "ppq::external_array[" << this << "] "
+                    "writer requested to re-read block from EM.\n"
+                    "This should never occur in full-performance mode, "
+                    "verify that you run in debug mode.";
             }
 
             // this re-reading is not necessary for full performance builds, so
@@ -1841,11 +1841,11 @@ public:
     //! Prints statistical data.
     void print_stats() const
     {
-        STXXL_MSG("Head winner tree stats:");
+        LOG1 << "Head winner tree stats:";
         m_head.print_stats();
-        STXXL_MSG("Heaps winner tree stats:");
+        LOG1 << "Heaps winner tree stats:";
         m_heaps.print_stats();
-        STXXL_MSG("IA winner tree stats:");
+        LOG1 << "IA winner tree stats:";
         m_ia.print_stats();
     }
 };
@@ -2396,10 +2396,10 @@ public:
             }
         }
 #else
-        STXXL_ERRMSG("You are using stxxl::parallel_priority_queue without "
-                     "support for OpenMP parallelism.");
-        STXXL_ERRMSG("This is probably not what you want, so check the "
-                     "compilation settings.");
+        LOG1 << "You are using stxxl::parallel_priority_queue without "
+            "support for OpenMP parallelism.\n"
+            "This is probably not what you want, so check the "
+            "compilation settings.";
 #endif
         if (m_num_read_blocks_per_ea < 1.0) {
             STXXL_ERRMSG("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
@@ -2461,9 +2461,8 @@ public:
 
         if (m_mem_total < m_mem_left) // checks if unsigned type wrapped.
         {
-            STXXL_ERRMSG("Minimum memory requirement insufficient, "
-                         "increase PPQ's memory limit or decrease buffers.");
-            abort();
+            die("Minimum memory requirement insufficient, "
+                "increase PPQ's memory limit or decrease buffers.");
         }
 
         check_invariants();
@@ -3106,8 +3105,7 @@ public:
                         ": " << m_extract_buffer[m_extract_buffer_index]);
             return m_extract_buffer[m_extract_buffer_index];
         default:
-            STXXL_ERRMSG("Unknown extract type: " << type);
-            abort();
+            die("Unknown extract type: " << type);
         }
     }
 
@@ -3177,8 +3175,7 @@ public:
             break;
         }
         default:
-            STXXL_ERRMSG("Unknown extract type: " << type);
-            abort();
+            die("Unknown extract type: " << type);
         }
 
         m_stats.extract_min_time.stop();
@@ -3387,8 +3384,8 @@ public:
      */
     void merge_external_arrays()
     {
-        STXXL_ERRMSG("Merging external arrays. This should not happen."
-                     << " You should adjust memory assignment and/or external array level size.");
+        LOG1 << "Merging external arrays. This should not happen."
+             << " You should adjust memory assignment and/or external array level size.";
         check_external_level(0, true);
         STXXL_DEBUG("Merging all external arrays done.");
 
@@ -3467,7 +3464,7 @@ public:
             }
 
             if (new_num_read_blocks < m_num_read_blocks)
-                STXXL_ERRMSG("WARNING: could not immediately reduce read/prefetch pool!");
+                LOG1 << "WARNING: could not immediately reduce read/prefetch pool!";
         }
     }
 
@@ -3614,7 +3611,7 @@ public:
         //    STXXL_MEMDUMP(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
         //}
 
-        STXXL_MSG(m_stats);
+        LOG1 << m_stats;
         m_minima.print_stats();
     }
 
@@ -3853,8 +3850,7 @@ protected:
                 }
                 else if (limiting_ea_index == eas) {
                     // no more unaccessible EM data
-                    STXXL_MSG("Warning: refill_extract_buffer(n): "
-                              "minimum_size > # mergeable elements!");
+                    LOG1 << "Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!";
                     break;
                 }
 

@@ -87,7 +87,7 @@ int main()
         pq.pop();
         x3 = pq.top();
         pq.pop();
-        STXXL_MSG("Order: " << x0 << " " << x1 << " " << x2 << " " << x3);
+        LOG1 << "Order: " << x0 << " " << x1 << " " << x2 << " " << x3;
         STXXL_CHECK(x0 <= x1);
         STXXL_CHECK(x1 <= x2);
         STXXL_CHECK(x2 <= x3);
@@ -124,7 +124,7 @@ int main()
 
             merger.multi_merge(output.begin(), output.begin() + l);
             STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cbegin() + l));
-            STXXL_MSG("merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")");
+            LOG1 << "merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")";
         }
 
         // zero length merge on empty data structure
@@ -179,7 +179,7 @@ int main()
             size_t l = std::min<size_t>(merger.size(), B + B / 2 + 1);
             merger.multi_merge(out, out + l);
             STXXL_CHECK(stxxl::is_sorted(out, out + l));
-            STXXL_MSG("merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")");
+            LOG1 << "merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")";
         }
 
         // zero length merge on empty data structure

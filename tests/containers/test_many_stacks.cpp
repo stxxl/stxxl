@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " number_of_stacks");
+        LOG1 << "Usage: " << argv[0] << " number_of_stacks";
         return -1;
     }
 

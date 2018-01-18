@@ -111,8 +111,8 @@ int main(int argc, char** argv)
     STXXL_ASSERT(o == output.end());
 
     if (1) {
-        STXXL_MSG("Checking order...");
-        STXXL_MSG((stxxl::is_sorted(output.cbegin(), output.cend(), comparator_type()) ? "OK" : "WRONG"));
+        LOG1 << "Checking order...";
+        LOG1 << (stxxl::is_sorted(output.cbegin(), output.cend(), comparator_type()) ? "OK" : "WRONG");
     }
 
     return 0;

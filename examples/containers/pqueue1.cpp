@@ -43,12 +43,12 @@ int main()
     assert(my_pqueue.size() == 4);
 
     assert(my_pqueue.top() == 1);
-    STXXL_MSG("Smallest inserted value in my: " << my_pqueue.top());
+    LOG1 << "Smallest inserted value in my: " << my_pqueue.top();
 
     my_pqueue.pop();  // pop the 1 on top
 
     assert(my_pqueue.top() == 4);
-    STXXL_MSG("Smallest value after 1 pop(): " << my_pqueue.top());
+    LOG1 << "Smallest value after 1 pop(): " << my_pqueue.top();
 
     return 0;
 }

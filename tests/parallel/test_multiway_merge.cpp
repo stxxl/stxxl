@@ -10,10 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
 #include <iostream>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/random>
+#include <tlx/logger.hpp>
 
 struct Something
 {

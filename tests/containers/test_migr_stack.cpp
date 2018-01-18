@@ -27,12 +27,12 @@ int main()
 {
     using migrating_stack_type = stxxl::STACK_GENERATOR<size_t, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<size_t>, critical_size>::result;
 
-    STXXL_MSG("Starting test.");
+    LOG1 << "Starting test.";
 
     migrating_stack_type my_stack;
     size_t test_size = 1 * 1024 * 1024 / sizeof(int);
 
-    STXXL_MSG("Filling stack.");
+    LOG1 << "Filling stack.";
 
     for (size_t i = 0; i < test_size; i++)
     {
@@ -42,14 +42,14 @@ int main()
         STXXL_CHECK((my_stack.size() >= critical_size) == my_stack.external());
     }
 
-    STXXL_MSG("Testing swap.");
+    LOG1 << "Testing swap.";
     // test swap
     migrating_stack_type my_stack2;
     std::swap(my_stack2, my_stack);
     std::swap(my_stack2, my_stack);
 
-    STXXL_MSG("Removing elements from " <<
-              (my_stack.external() ? "external" : "internal") << " stack");
+    LOG1 << "Removing elements from " <<
+    (my_stack.external() ? "external" : "internal") << " stack";
     for (size_t i = test_size; i > 0; )
     {
         --i;
@@ -60,7 +60,7 @@ int main()
         STXXL_CHECK(my_stack.external() == (test_size >= int(critical_size)));
     }
 
-    STXXL_MSG("Test passed.");
+    LOG1 << "Test passed.";
 
     return 0;
 }

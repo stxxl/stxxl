@@ -166,7 +166,7 @@ void reader_writer_test()
         }
     }
 
-    STXXL_MSG("Passed Reader-Writer Test");
+    LOG1 << "Passed Reader-Writer Test";
 }
 
 int main()

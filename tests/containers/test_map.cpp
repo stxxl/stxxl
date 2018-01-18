@@ -45,17 +45,17 @@ int main(int argc, char** argv)
 {
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
     foxxll::stats_data stats_elapsed;
-    STXXL_MSG(stats_begin);
+    LOG1 << stats_begin;
 
-    STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
-    STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB");
+    LOG1 << "Block size " << BLOCK_SIZE / 1024 << " KiB";
+    LOG1 << "Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB";
     int max_mult = (argc > 1) ? atoi(argv[1]) : 256;
     for (int mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *foxxll::stats::get_instance();
         const size_t el = mult * (CACHE_ELEMENTS / 8);
-        STXXL_MSG("Elements to insert " << el << " volume =" <<
-                  (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
+        LOG1 << "Elements to insert " << el << " volume =" <<
+        (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB";
 
         // allocate map and insert elements
 
@@ -70,13 +70,13 @@ int main(int argc, char** argv)
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double writes = double(stats_elapsed.get_write_count()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
-        STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
-        STXXL_MSG(stats_elapsed);
+        LOG1 << "Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel);
+        LOG1 << stats_elapsed;
 
         // search for keys
 
         stats_begin = *foxxll::stats::get_instance();
-        STXXL_MSG("Doing search");
+        LOG1 << "Doing search";
         size_t queries = el / 16;
         const map_type& ConstMap = Map;
         stxxl::random_number32 myrandom;
@@ -90,8 +90,8 @@ int main(int argc, char** argv)
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;
         double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
-        STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
-        STXXL_MSG(stats_elapsed);
+        LOG1 << "reads/logel " << reads << " readsperq " << readsperq;
+        LOG1 << stats_elapsed;
 
         delete DMap;
     }

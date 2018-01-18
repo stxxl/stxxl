@@ -35,6 +35,8 @@ namespace priority_queue_local {
 template <class ValueType, class CompareType, unsigned MaxArity>
 class int_merger
 {
+    static constexpr bool debug = false;
+
 public:
     //! type of values in merger
     using value_type = ValueType;

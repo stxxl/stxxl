@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " #ins");
+        LOG1 << "Usage: " << argv[0] << " #ins";
         return -1;
     }
 
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
     {
         BTree1[rnd() % nins] = 10.1;
     }
-    STXXL_MSG("Size of map: " << BTree1.size());
+    LOG1 << "Size of map: " << BTree1.size();
 
     BTree1.clear();
 
@@ -184,20 +184,20 @@ int main(int argc, char* argv[])
         BTree1[rnd() % nins] = 10.1;
     }
 
-    STXXL_MSG("Size of map: " << BTree1.size());
+    LOG1 << "Size of map: " << BTree1.size();
 
     btree_type BTree2(comp_type(), node_cache_size, leaf_cache_size);
 
-    STXXL_MSG("Construction of BTree3 from BTree1 that has " << BTree1.size() << " elements");
+    LOG1 << "Construction of BTree3 from BTree1 that has " << BTree1.size() << " elements";
     btree_type BTree3(BTree1.begin(), BTree1.end(), comp_type(), node_cache_size, leaf_cache_size);
 
     STXXL_CHECK(BTree3 == BTree1);
 
-    STXXL_MSG("Bulk construction of BTree4 from BTree1 that has " << BTree1.size() << " elements");
+    LOG1 << "Bulk construction of BTree4 from BTree1 that has " << BTree1.size() << " elements";
     btree_type BTree4(BTree1.begin(), BTree1.end(), comp_type(), node_cache_size, leaf_cache_size, true);
 
-    STXXL_MSG("Size of BTree1: " << BTree1.size());
-    STXXL_MSG("Size of BTree4: " << BTree4.size());
+    LOG1 << "Size of BTree1: " << BTree1.size();
+    LOG1 << "Size of BTree4: " << BTree4.size();
 
     STXXL_CHECK(BTree4 == BTree1);
     STXXL_CHECK(BTree3 == BTree4);
@@ -213,14 +213,14 @@ int main(int argc, char* argv[])
 
     it = BTree4.begin();
     ++it;
-    STXXL_MSG("Size of Btree4 before erase: " << BTree4.size());
+    LOG1 << "Size of Btree4 before erase: " << BTree4.size();
     BTree4.erase(it, BTree4.end());
-    STXXL_MSG("Size of Btree4 after erase: " << BTree4.size());
+    LOG1 << "Size of Btree4 after erase: " << BTree4.size();
     STXXL_CHECK(BTree4.size() == 1);
 
-    STXXL_MSG("Size of Btree1 before erase: " << BTree1.size());
+    LOG1 << "Size of Btree1 before erase: " << BTree1.size();
     BTree1.erase(BTree1.begin(), BTree1.end());
-    STXXL_MSG("Size of Btree1 after erase: " << BTree1.size());
+    LOG1 << "Size of Btree1 after erase: " << BTree1.size();
     STXXL_CHECK(BTree1.empty());
 
     // a copy of BTree3
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
     btree_type::iterator e3 = BTree3.end();
     btree_type::iterator e4 = BTree4.end();
 
-    STXXL_MSG("Testing swapping operation (std::swap)");
+    LOG1 << "Testing swapping operation (std::swap)";
     std::swap(BTree4, BTree3);
     STXXL_CHECK(b3 == BTree4.begin());
     STXXL_CHECK(b4 == BTree3.begin());
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
 
     double sum = 0.0;
 
-    STXXL_MSG(*foxxll::stats::get_instance());
+    LOG1 << *foxxll::stats::get_instance();
 
     foxxll::timer Timer2;
     Timer2.start();
@@ -273,9 +273,9 @@ int main(int argc, char* argv[])
         sum += cit->second;
 
     Timer2.stop();
-    STXXL_MSG("Scanning with const iterator: " << Timer2.mseconds() << " msec");
+    LOG1 << "Scanning with const iterator: " << Timer2.mseconds() << " msec";
 
-    STXXL_MSG(*foxxll::stats::get_instance());
+    LOG1 << *foxxll::stats::get_instance();
 
     foxxll::timer Timer1;
     Timer1.start();
@@ -284,16 +284,16 @@ int main(int argc, char* argv[])
         sum += it->second;
 
     Timer1.stop();
-    STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec");
+    LOG1 << "Scanning with non const iterator: " << Timer1.mseconds() << " msec";
 
-    STXXL_MSG(*foxxll::stats::get_instance());
+    LOG1 << *foxxll::stats::get_instance();
 
     BTree5.disable_prefetching();
     BTree5.enable_prefetching();
     BTree5.prefetching_enabled();
     STXXL_CHECK(BTree5.prefetching_enabled());
 
-    STXXL_MSG("All tests passed successfully");
+    LOG1 << "All tests passed successfully";
 
     return 0;
 }

@@ -26,7 +26,7 @@ void test_write(const char* fn, const char* ft, size_t sz, my_type ofs)
     {
         vector_type v(f);
         v.resize(sz);
-        STXXL_MSG("writing " << v.size() << " elements");
+        LOG1 << "writing " << v.size() << " elements";
         for (size_t i = 0; i < v.size(); ++i)
             v[i] = ofs + (int)i;
     }
@@ -39,7 +39,7 @@ void test_rdwr(const char* fn, const char* ft, size_t sz, my_type ofs)
         ft, fn, foxxll::file::DIRECT | foxxll::file::RDWR);
     {
         Vector v(f);
-        STXXL_MSG("reading " << v.size() << " elements (RDWR)");
+        LOG1 << "reading " << v.size() << " elements (RDWR)";
         STXXL_CHECK(v.size() == sz);
         for (size_t i = 0; i < v.size(); ++i)
             STXXL_CHECK(v[i] == ofs + my_type(i));
@@ -53,7 +53,7 @@ void test_rdonly(const char* fn, const char* ft, size_t sz, my_type ofs)
         ft, fn, foxxll::file::DIRECT | foxxll::file::RDONLY);
     {
         Vector v(f);
-        STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
+        LOG1 << "reading " << v.size() << " elements (RDONLY)";
         STXXL_CHECK(v.size() == sz);
         for (size_t i = 0; i < v.size(); ++i)
             STXXL_CHECK(v[i] == ofs + my_type(i));
@@ -93,26 +93,26 @@ int main(int argc, char** argv)
 
     size_t start_elements = 42 * block_type::size;
 
-    STXXL_MSG("using " << ft << " file");
+    LOG1 << "using " << ft << " file";
 
     // multiple of block size
-    STXXL_MSG("running test with " << start_elements << " items");
+    LOG1 << "running test with " << start_elements << " items";
     test(fn, ft, start_elements, 100000);
 
     // multiple of page size, but not block size
-    STXXL_MSG("running test with " << start_elements << " + 4096 items");
+    LOG1 << "running test with " << start_elements << " + 4096 items";
     test(fn, ft, start_elements + 4096, 200000);
 
     // multiple of neither block size nor page size
-    STXXL_MSG("running test with " << start_elements << " + 4096 + 23 items");
+    LOG1 << "running test with " << start_elements << " + 4096 + 23 items";
     test(fn, ft, start_elements + 4096 + 23, 300000);
 
     // truncate 1 byte
     {
         foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
-        STXXL_MSG("file size is " << f.size() << " bytes");
+        LOG1 << "file size is " << f.size() << " bytes";
         f.set_size(f.size() - 1);
-        STXXL_MSG("truncated to " << f.size() << " bytes");
+        LOG1 << "truncated to " << f.size() << " bytes";
     }
 
     // will truncate after the last complete element
@@ -121,9 +121,9 @@ int main(int argc, char** argv)
     // truncate 1 more byte
     {
         foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
-        STXXL_MSG("file size is " << f.size() << " bytes");
+        LOG1 << "file size is " << f.size() << " bytes";
         f.set_size(f.size() - 1);
-        STXXL_MSG("truncated to " << f.size() << " bytes");
+        LOG1 << "truncated to " << f.size() << " bytes";
     }
 
     // will not truncate
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
     // check final size
     {
         foxxll::syscall_file f(fn, foxxll::file::DIRECT | foxxll::file::RDWR);
-        STXXL_MSG("file size is " << f.size() << " bytes");
+        LOG1 << "file size is " << f.size() << " bytes";
         STXXL_CHECK(f.size() == (start_elements + 4096 + 23 - 1) * sizeof(my_type) - 1);
     }
 

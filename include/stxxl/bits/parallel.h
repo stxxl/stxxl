@@ -23,7 +23,7 @@
  #include <omp.h>
 #endif
 
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/settings.h>
 
@@ -89,7 +89,7 @@ inline void check_sort_settings()
                 did_warn = true;  // no problem with at most 2 threads, no need to check again
             }
             else if (!omp_get_nested()) {
-                STXXL_ERRMSG("Inefficient settings detected. To get full potential from your CPU it is recommended to set OMP_NESTED=TRUE in the environment.");
+                LOG1 << "Inefficient settings detected. To get full potential from your CPU it is recommended to set OMP_NESTED=TRUE in the environment.";
                 did_warn = true;
             }
         }

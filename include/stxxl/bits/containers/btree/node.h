@@ -29,6 +29,8 @@ class node_cache;
 template <class KeyType, class KeyCmp, unsigned RawSize, class BTreeType>
 class normal_node
 {
+    static constexpr bool debug = false;
+
 public:
     using self_type = normal_node<KeyType, KeyCmp, RawSize, BTreeType>;
 

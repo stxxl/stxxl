@@ -116,15 +116,14 @@ void run_stxxl_insert_all_delete_all(uint64_t ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size());
+    LOG1 << "Records in PQ: " << PQ.size();
     if (ops != PQ.size())
     {
-        STXXL_MSG("Size does not match");
-        abort();
+        die("Size does not match");
     }
 
-    STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+    LOG1 << "Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
+        " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
@@ -141,15 +140,11 @@ void run_stxxl_insert_all_delete_all(uint64_t ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size());
-    if (!PQ.empty())
-    {
-        STXXL_MSG("PQ must be empty");
-        abort();
-    }
+    LOG1 << "Records in PQ: " << PQ.size();
+    die_unless(PQ.empty());
 
-    STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+    LOG1 << "Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
+        " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
@@ -173,15 +168,11 @@ void run_stxxl_intermixed(uint64_t ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size());
-    if (ops != PQ.size())
-    {
-        STXXL_MSG("Size does not match");
-        abort();
-    }
+    LOG1 << "Records in PQ: " << PQ.size();
+    die_unequal(ops, PQ.size());
 
-    STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+    LOG1 << "Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
+        " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
@@ -208,37 +199,36 @@ void run_stxxl_intermixed(uint64_t ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size());
-
-    STXXL_MSG("Deletions/Insertion elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+    LOG1 << "Records in PQ: " << PQ.size();
+    LOG1 << "Deletions/Insertion elapsed time: " << (Timer.mseconds() / 1000.) <<
+        " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 int main(int argc, char* argv[])
 {
-    STXXL_MSG("foxxll::pq lock size: " << BLOCK_SIZE << " bytes");
+    LOG1 << "foxxll::pq lock size: " << BLOCK_SIZE << " bytes";
 
 #if STXXL_DIRECT_IO_OFF
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");
+    LOG1 << "STXXL_DIRECT_IO_OFF is defined";
 #else
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined");
+    LOG1 << "STXXL_DIRECT_IO_OFF is NOT defined";
 #endif
 
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " version #ops");
-        STXXL_MSG("\t version = 1: insert-all-delete-all stxxl pq");
-        STXXL_MSG("\t version = 2: intermixed insert/delete stxxl pq");
+        LOG1 << "Usage: " << argv[0] << " version #ops";
+        LOG1 << "\t version = 1: insert-all-delete-all stxxl pq";
+        LOG1 << "\t version = 2: intermixed insert/delete stxxl pq";
         return -1;
     }
 
     int version = atoi(argv[1]);
     uint64_t ops = foxxll::atouint64(argv[2]);
 
-    STXXL_MSG("Running version      : " << version);
-    STXXL_MSG("Operations to perform: " << ops);
+    LOG1 << "Running version      : " << version;
+    LOG1 << "Operations to perform: " << ops;
 
     switch (version)
     {
@@ -249,6 +239,6 @@ int main(int argc, char* argv[])
         run_stxxl_intermixed(ops);
         break;
     default:
-        STXXL_MSG("Unsupported version " << version);
+        LOG1 << "Unsupported version " << version;
     }
 }

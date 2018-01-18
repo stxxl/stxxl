@@ -145,7 +145,7 @@ uint64_t internal_memory = 16 * 1024 * 1024;
 
 void test1(int rank)
 {
-    STXXL_MSG("multiplying two int64_t matrices of rank " << rank << " block order " << small_block_order);
+    LOG1 << "multiplying two int64_t matrices of rank " << rank << " block order " << small_block_order;
     using value_type = int64_t;
 
     using block_scheduler_type = foxxll::block_scheduler<
@@ -178,7 +178,7 @@ void test1(int rank)
         *mit = 1;
 
     bs.flush();
-    STXXL_MSG("start mult");
+    LOG1 << "start mult";
     matrix_stats_before.set();
     stats_before = *foxxll::stats::get_instance();
 
@@ -187,10 +187,10 @@ void test1(int rank)
 
     stats_after = *foxxll::stats::get_instance();
     matrix_stats_after.set();
-    STXXL_MSG("end mult");
+    LOG1 << "end mult";
 
-    STXXL_MSG(matrix_stats_after - matrix_stats_before);
-    STXXL_MSG(stats_after - stats_before);
+    LOG1 << matrix_stats_after - matrix_stats_before;
+    LOG1 << stats_after - stats_before;
     {
         size_t num_err = 0;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit)
@@ -216,7 +216,7 @@ void test1(int rank)
     }
 
     bs.flush();
-    STXXL_MSG("start mult");
+    LOG1 << "start mult";
     matrix_stats_before.set();
     stats_before = *foxxll::stats::get_instance();
 
@@ -225,13 +225,13 @@ void test1(int rank)
 
     stats_after = *foxxll::stats::get_instance();
     matrix_stats_after.set();
-    STXXL_MSG("end mult");
+    LOG1 << "end mult";
 
     *c *= 3;
     *c += *a;
 
-    STXXL_MSG(matrix_stats_after - matrix_stats_before);
-    STXXL_MSG(stats_after - stats_before);
+    LOG1 << matrix_stats_after - matrix_stats_before;
+    LOG1 << stats_after - stats_before;
     {
         size_t num_err = 0;
         int64_t i = 1;
@@ -283,9 +283,9 @@ void test1(int rank)
 
 void test2(int rank, int mult_algo_num, int sched_algo_num)
 {
-    STXXL_MSG("multiplying two full double matrices of rank " << rank << ", block order " << block_order
-                                                              << " using " << internal_memory << " bytes internal memory, multiplication-algo "
-                                                              << mult_algo_num << ", scheduling-algo " << sched_algo_num);
+    LOG1 << "multiplying two full double matrices of rank " << rank << ", block order " << block_order
+         << " using " << internal_memory << " bytes internal memory, multiplication-algo "
+         << mult_algo_num << ", scheduling-algo " << sched_algo_num;
 
     using value_type = double;
 
@@ -305,14 +305,14 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     foxxll::stats_data stats_before, stats_after;
     stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
-    STXXL_MSG("writing input matrices");
+    LOG1 << "writing input matrices";
     for (row_major_iterator mit = a->begin(); mit != a->end(); ++mit)
         *mit = 1;
     for (row_major_iterator mit = b->begin(); mit != b->end(); ++mit)
         *mit = 1;
 
     bs.flush();
-    STXXL_MSG("start of multiplication");
+    LOG1 << "start of multiplication";
     matrix_stats_before.set();
     stats_before = *foxxll::stats::get_instance();
 
@@ -324,10 +324,10 @@ void test2(int rank, int mult_algo_num, int sched_algo_num)
     bs.flush();
     stats_after = *foxxll::stats::get_instance();
     matrix_stats_after.set();
-    STXXL_MSG("end of multiplication");
+    LOG1 << "end of multiplication";
 
-    STXXL_MSG(matrix_stats_after - matrix_stats_before);
-    STXXL_MSG(stats_after - stats_before);
+    LOG1 << matrix_stats_after - matrix_stats_before;
+    LOG1 << stats_after - stats_before;
     {
         size_t num_err = 0;
         for (const_row_major_iterator mit = c->cbegin(); mit != c->cend(); ++mit)
@@ -409,7 +409,7 @@ int main(int argc, char** argv)
         break;
     }
 
-    STXXL_MSG("end of test");
+    LOG1 << "end of test";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 

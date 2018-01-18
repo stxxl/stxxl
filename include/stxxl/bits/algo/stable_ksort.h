@@ -223,7 +223,7 @@ void distribute(
 template <typename ExtIterator, typename KeyExtract>
 void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, size_t M)
 {
-    STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
+    LOG1 << "Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]";
     using value_type = typename ExtIterator::vector_type::value_type;
     using key_type = typename value_type::key_type;
     using block_type = typename ExtIterator::block_type;
@@ -252,9 +252,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
     const size_t est_bucket_size = (size_t)foxxll::div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
-        STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
-                     ", required for r/w buffers: " << min_num_read_write_buffers <<
-                     ", required for buckets: 2, nbuckets: " << nbuckets);
+        LOG1 << "stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
+            ", required for r/w buffers: " << min_num_read_write_buffers <<
+            ", required for buckets: 2, nbuckets: " << nbuckets;
         throw foxxll::bad_parameter("stxxl::stable_ksort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
     }
     STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
@@ -301,10 +301,9 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
             max_bucket_size_act = std::max(bucket_sizes[i], max_bucket_size_act);
             if (bucket_sizes[i] > max_bucket_size_rec)
             {
-                STXXL_ERRMSG("Bucket " << i << " is too large: " << bucket_sizes[i] <<
-                             " records, maximum: " << max_bucket_size_rec);
-                STXXL_ERRMSG("Recursion on buckets is not yet implemented, aborting.");
-                abort();
+                die("Bucket " << i << " is too large: " << bucket_sizes[i] <<
+                    " records, maximum: " << max_bucket_size_rec << "\n"
+                    "Recursion on buckets is not yet implemented, aborting.");
             }
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])

@@ -143,7 +143,7 @@ void basic_test()
     STXXL_CHECK(map.size() == n_values);
 
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // (*) all these values are stored in external memory; the remaining
     // changes will be buffered in internal memory
@@ -168,7 +168,7 @@ void basic_test()
 
     STXXL_CHECK(map.size() == 2 * n_values);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // "old" values are stored in external memory, "new" values are stored in
     // internal memory
@@ -186,7 +186,7 @@ void basic_test()
         STXXL_CHECK(cmap.find(values3[i].first) == cmap.end());
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // --- insert with overwriting
     std::cout << "Insert with overwriting...";
@@ -213,7 +213,7 @@ void basic_test()
         STXXL_CHECK((*it2).second == values2[i].second + 1);
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // --- erase: existing and non-existing values, with and without checking
     std::cout << "Erase...";
@@ -239,7 +239,7 @@ void basic_test()
     }
     STXXL_CHECK(map.size() == 2 * n_values - 2 * n_tests);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     map.clear();
     STXXL_CHECK(map.size() == 0);
@@ -277,7 +277,7 @@ void basic_test()
     }
     STXXL_CHECK(map.size() == n_values + 2);
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     map.clear();
     STXXL_CHECK(map.size() == 0);
@@ -294,7 +294,7 @@ void basic_test()
     for (size_t i = 0; i < n_tests; i++)
         STXXL_CHECK(cmap.find(values1[i].first) != cmap.end());
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 
     // --- test equality predicate
     unordered_map::key_equal key_eq = map.key_eq();

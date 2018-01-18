@@ -118,6 +118,8 @@ public:
 template <class BlockType>
 class block_cache
 {
+    static constexpr bool debug = false;
+
 public:
     using block_type = BlockType;
     using bid_type = typename block_type::bid_type;

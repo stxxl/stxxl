@@ -14,6 +14,14 @@
 #ifndef STXXL_CONTAINERS_STACK_HEADER
 #define STXXL_CONTAINERS_STACK_HEADER
 
+#include <algorithm>
+#include <stack>
+#include <type_traits>
+#include <vector>
+
+#include <tlx/define.hpp>
+#include <tlx/simple_vector.hpp>
+
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/io/request_operations.hpp>
@@ -22,14 +30,11 @@
 #include <foxxll/mng/read_write_pool.hpp>
 #include <foxxll/mng/typed_block.hpp>
 #include <foxxll/mng/write_pool.hpp>
+
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/types>
-#include <tlx/simple_vector.hpp>
 
-#include <algorithm>
-#include <stack>
-#include <type_traits>
-#include <vector>
+
 
 namespace stxxl {
 
@@ -41,7 +46,7 @@ namespace stxxl {
 template <class ValueType,
           unsigned BlocksPerPage = 4,
           size_t BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
-          class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+          class AllocStr = foxxll::default_alloc_strategy,
           class SizeType = external_size_type>
 struct stack_config_generator
 {
@@ -63,6 +68,8 @@ struct stack_config_generator
 template <class StackConfig>
 class normal_stack
 {
+    static constexpr bool debug = false;
+
 public:
     using cfg = StackConfig;
     //! type of the elements stored in the stack
@@ -162,7 +169,6 @@ public:
 
     virtual ~normal_stack()
     {
-        STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
         foxxll::block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
 
@@ -211,9 +217,9 @@ public:
         assert(cache_offset <= 2 * blocks_per_page * block_type::size);
         //assert(cache_offset >= 0);
 
-        if (UNLIKELY(cache_offset == 2 * blocks_per_page * block_type::size))  // cache overflow
+        if (TLX_UNLIKELY(cache_offset == 2 * blocks_per_page * block_type::size))  // cache overflow
         {
-            STXXL_VERBOSE2("growing, size: " << m_size);
+            LOG << "growing, size: " << m_size;
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -255,9 +261,9 @@ public:
         assert(cache_offset > 0);
         assert(m_size > 0);
 
-        if (UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
+        if (TLX_UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
-            STXXL_VERBOSE2("shrinking, size: " << m_size);
+            LOG << "shrinking, size: " << m_size;
 
             tlx::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
 
@@ -309,6 +315,8 @@ private:
 template <class StackConfig>
 class grow_shrink_stack
 {
+    static constexpr bool debug = false;
+
 public:
     using cfg = StackConfig;
     //! type of the elements stored in the stack
@@ -415,7 +423,6 @@ public:
 
     virtual ~grow_shrink_stack()
     {
-        STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
         try
         {
             if (requests[0].get())
@@ -470,9 +477,9 @@ public:
         assert(cache_offset <= blocks_per_page * block_type::size);
         //assert(cache_offset >= 0);
 
-        if (UNLIKELY(cache_offset == blocks_per_page * block_type::size))  // cache overflow
+        if (TLX_UNLIKELY(cache_offset == blocks_per_page * block_type::size))  // cache overflow
         {
-            STXXL_VERBOSE2("growing, size: " << m_size);
+            LOG << "growing, size: " << m_size;
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -513,9 +520,9 @@ public:
         assert(cache_offset > 0);
         assert(m_size > 0);
 
-        if (UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
+        if (TLX_UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
-            STXXL_VERBOSE2("shrinking, size: " << m_size);
+            LOG << "shrinking, size: " << m_size;
 
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
@@ -524,7 +531,7 @@ public:
 
             if (bids.size() > blocks_per_page)
             {
-                STXXL_VERBOSE2("prefetching, size: " << m_size);
+                LOG << "prefetching, size: " << m_size;
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page;
                 for (int i = blocks_per_page - 1; i >= 0; --i)
                     requests[i] = (overlap_buffers + i)->read(*(--cur_bid));
@@ -553,6 +560,8 @@ public:
 template <class StackConfig>
 class grow_shrink_stack2
 {
+    static constexpr bool debug = false;
+
 public:
     using cfg = StackConfig;
     //! type of the elements stored in the stack
@@ -598,7 +607,7 @@ public:
           owned_pool(nullptr),
           pool(&pool_)
     {
-        STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
+        LOG << "grow_shrink_stack2::grow_shrink_stack2(...)";
     }
 
     //! Default constructor: creates empty stack. The stack will use the pair
@@ -621,7 +630,7 @@ public:
           owned_pool(new pool_type(p_pool_, w_pool_)),
           pool(owned_pool)
     {
-        STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
+        LOG << "grow_shrink_stack2::grow_shrink_stack2(...)";
     }
 
     //! non-copyable: delete copy-constructor
@@ -655,7 +664,7 @@ public:
     {
         try
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()");
+            LOG << "grow_shrink_stack2::~grow_shrink_stack2()";
             if (!bids.empty()) {
                 const size_t last_pref = (bids.size() > pref_aggr) ? (bids.size() - pref_aggr) : 0u;
                 for (size_t i = bids.size(); i > last_pref; --i) {
@@ -709,12 +718,12 @@ public:
     //! incremented by 1, and top() is the inserted element.
     void push(const value_type& val)
     {
-        STXXL_VERBOSE3("grow_shrink_stack2::push(" << val << ")");
+        LOG << "grow_shrink_stack2::push(" << val << ")";
         assert(cache_offset <= block_type::size);
 
-        if (UNLIKELY(cache_offset == block_type::size))
+        if (TLX_UNLIKELY(cache_offset == block_type::size))
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::push(" << val << ") growing, size: " << m_size);
+            LOG << "grow_shrink_stack2::push(" << val << ") growing, size: " << m_size;
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
@@ -764,13 +773,13 @@ public:
     //! empty(). Postcondition: size() is decremented.
     void pop()
     {
-        STXXL_VERBOSE3("grow_shrink_stack2::pop()");
+        LOG << "grow_shrink_stack2::pop()";
         assert(m_size > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
-        if (UNLIKELY(cache_offset == 1 && (!bids.empty())))
+        if (TLX_UNLIKELY(cache_offset == 1 && (!bids.empty())))
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = " << m_size);
+            LOG << "grow_shrink_stack2::pop() shrinking, size = " << m_size;
 
             bid_type last_block = bids.back();
             bids.pop_back();
@@ -835,6 +844,8 @@ private:
 template <size_t CritSize, class ExternalStack, class InternalStack>
 class migrating_stack
 {
+    static constexpr bool debug = false;
+
 public:
     using cfg = typename ExternalStack::cfg;
     //! type of the elements stored in the stack
@@ -957,7 +968,7 @@ public:
         if (int_impl)
         {
             int_impl->push(val);
-            if (UNLIKELY(int_impl->size() == critical_size))
+            if (TLX_UNLIKELY(int_impl->size() == critical_size))
             {
                 // migrate to external stack
                 ext_impl = new ext_stack_type(*int_impl);
@@ -1031,7 +1042,7 @@ template <
     class IntStackType = std::stack<ValueType>,
     size_t MigrCritSize = (2* BlocksPerPage* BlockSize),
 
-    class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+    class AllocStr = foxxll::default_alloc_strategy,
     class SizeType = external_size_type
     >
 class STACK_GENERATOR

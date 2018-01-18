@@ -1481,11 +1481,11 @@ public:
         }
         catch (foxxll::io_error e)
         {
-            STXXL_ERRMSG("io_error thrown in ~vector(): " << e.what());
+            LOG1 << "io_error thrown in ~vector(): " << e.what();
         }
         catch (...)
         {
-            STXXL_ERRMSG("Exception thrown in ~vector()");
+            LOG1 << "Exception thrown in ~vector()";
         }
 
         if (!m_exported)
@@ -1504,7 +1504,7 @@ public:
                 }
                 catch (...)
                 {
-                    STXXL_ERRMSG("Exception thrown in ~vector()...set_size()");
+                    LOG1 << "Exception thrown in ~vector()...set_size()";
                 }
             }
         }

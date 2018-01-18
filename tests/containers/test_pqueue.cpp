@@ -52,11 +52,11 @@ int main()
     using pq_type = gen::result;
     using block_type = pq_type::block_type;
 
-    STXXL_MSG("Block size: " << block_type::raw_size);
-    STXXL_MSG("AI: " << gen::AI);
-    STXXL_MSG("X : " << gen::X);
-    STXXL_MSG("N : " << gen::N);
-    STXXL_MSG("AE: " << gen::AE);
+    LOG1 << "Block size: " << block_type::raw_size;
+    LOG1 << "AI: " << gen::AI;
+    LOG1 << "X : " << gen::X;
+    LOG1 << "N : " << gen::N;
+    LOG1 << "AE: " << gen::AE;
 
     const unsigned mem_for_pools = 128 * 1024 * 1024;
     foxxll::read_write_pool<block_type> pool(
@@ -68,8 +68,8 @@ int main()
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
     size_t nelements = 1024 * volume / sizeof(my_type);
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-    STXXL_MSG("Max elements: " << nelements);
+    LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
+    LOG1 << "Max elements: " << nelements;
 
     {
         scoped_print_timer timer("Filling PQ",
@@ -78,7 +78,7 @@ int main()
         for (size_t i = 0; i < nelements; i++)
         {
             if ((i % (1024 * 1024)) == 0)
-                STXXL_MSG("Inserting element " << i);
+                LOG1 << "Inserting element " << i;
             p.push(my_type(int(nelements - i)));
         }
     }
@@ -92,7 +92,7 @@ int main()
     std::swap(p, p1);
 #endif
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
 
     {
         scoped_print_timer timer("Emptying PPQ",
@@ -101,18 +101,18 @@ int main()
         for (size_t i = 0; i < nelements; ++i)
         {
             STXXL_CHECK(!p.empty());
-            //STXXL_MSG( p.top() );
+            //LOG1 <<  p.top() ;
             STXXL_CHECK(p.top().key == int(i + 1));
             p.pop();
             if ((i % (1024 * 1024)) == 0)
-                STXXL_MSG("Element " << i << " popped");
+                LOG1 << "Element " << i << " popped";
         }
     }
 
     STXXL_CHECK(p.size() == 0);
     STXXL_CHECK(p.empty());
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
 
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 

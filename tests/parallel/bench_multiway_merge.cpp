@@ -262,8 +262,8 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
 #endif // STXXL_WITH_GNU_PARALLEL
 
             default:
-                STXXL_ERRMSG("Error: method " << Method << " is not available "
-                             "in this compilation.");
+                LOG1 << "Error: method " << Method << " is not available "
+                    "in this compilation.";
                 break;
             }
         }

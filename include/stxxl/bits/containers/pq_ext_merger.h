@@ -320,7 +320,7 @@ protected:
                 (*sentinel_block)[i] = tree.cmp.min_value();
             if (arity + 1 == kMaxArity) {
                 // same memory consumption, but smaller merge width, better use arity = kMaxArity
-                STXXL_ERRMSG("inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity");
+                LOG1 << "inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity";
             }
         }
 

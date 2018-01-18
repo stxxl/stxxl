@@ -187,15 +187,15 @@ int main()
     // or materialize(sorted_stream,output.begin());
     STXXL_CHECK(o == output.end());
 
-    STXXL_MSG("input string (character,position) :");
+    LOG1 << "input string (character,position) :";
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << input[i] << "'," << i << ")");
+        LOG1 << "('" << input[i] << "'," << i << ")";
     }
-    STXXL_MSG("sorted tuples (character,position):");
+    LOG1 << "sorted tuples (character,position):";
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << output[i].first << "'," << output[i].second << ")");
+        LOG1 << "('" << output[i].first << "'," << output[i].second << ")";
     }
 
     STXXL_CHECK(output[0] == tuple_type(' ', 5));

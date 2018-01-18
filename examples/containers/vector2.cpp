@@ -47,6 +47,6 @@ int main()
         iter++;
     }
 
-    STXXL_MSG("found " << counter << " even numbers in V");
+    LOG1 << "found " << counter << " even numbers in V";
     return 0;
 }

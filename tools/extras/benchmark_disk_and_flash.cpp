@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
     catch (const std::exception& ex)
     {
         std::cout << std::endl;
-        STXXL_ERRMSG(ex.what());
+        LOG1 << ex.what();
     }
 
     for (i = 0; i < ndisks; i++)

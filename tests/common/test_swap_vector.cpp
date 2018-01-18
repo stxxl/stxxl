@@ -10,7 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/common/swap_vector.h>
 
 class Test
@@ -20,35 +22,33 @@ class Test
 public:
     Test() : m_i(-1)
     {
-        STXXL_MSG("Construct Test " << m_i);
+        LOG1 << "Construct Test " << m_i;
     }
     explicit Test(int i) : m_i(i)
     {
-        STXXL_MSG("Construct Test " << m_i);
+        LOG1 << "Construct Test " << m_i;
     }
     // Copy constructor
     Test(const Test& o)
     {
-        STXXL_ERRMSG("Copy Test " << o.m_i << " into Test " << m_i);
-        abort();
+        die("Copy Test " << o.m_i << " into Test " << m_i);
         m_i = o.m_i;
     }
     // Copy assignment
     Test& operator = (const Test& o)
     {
-        STXXL_ERRMSG("Copy-assign Test " << o.m_i << " to Test " << m_i);
-        abort();
+        die("Copy-assign Test " << o.m_i << " to Test " << m_i);
         m_i = o.m_i;
         return *this;
     }
     ~Test()
     {
-        STXXL_MSG("Destruct Test " << m_i);
+        LOG1 << "Destruct Test " << m_i;
     }
     //! swap vector with another one
     void swap(Test& obj)
     {
-        STXXL_MSG("Swap Test " << m_i << " with Test " << obj.m_i);
+        LOG1 << "Swap Test " << m_i << " with Test " << obj.m_i;
         std::swap(m_i, obj.m_i);
     }
     int get_i() const

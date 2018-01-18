@@ -33,6 +33,8 @@ class block_cache;
 template <class HashMap>
 class hash_map_iterator_base
 {
+    static constexpr bool debug = false;
+
 public:
     friend class iterator_map<HashMap>;
     friend void HashMap::erase(hash_map_const_iterator<HashMap> it);

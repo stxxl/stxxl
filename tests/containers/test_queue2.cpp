@@ -40,11 +40,11 @@ int main(int argc, char** argv)
 
     stxxl::queue<my_type> q;
 
-    STXXL_MSG("op-sequence: ( push, pop, push ) * n");
+    LOG1 << "op-sequence: ( push, pop, push ) * n";
     for (i = 0; i < nelements; ++i)
     {
         if ((i % mega) == 0)
-            STXXL_MSG("Insert " << i);
+            LOG1 << "Insert " << i;
 
         q.push(in++);
 
@@ -54,11 +54,11 @@ int main(int argc, char** argv)
 
         q.push(in++);
     }
-    STXXL_MSG("op-sequence: ( pop, push, pop ) * n");
+    LOG1 << "op-sequence: ( pop, push, pop ) * n";
     for ( ; i > 0; --i)
     {
         if ((i % mega) == 0)
-            STXXL_MSG("Remove " << i);
+            LOG1 << "Remove " << i;
 
         STXXL_CHECK(q.front() == out);
         q.pop();

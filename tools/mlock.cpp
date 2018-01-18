@@ -14,7 +14,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/config.h>
@@ -66,7 +66,7 @@ int do_mlock(int argc, char* argv[])
 
 int do_mlock(int, char*[])
 {
-    STXXL_MSG("Sorry, mlock() is not supported on this platform.");
+    LOG1 << "Sorry, mlock() is not supported on this platform.";
     return -1;
 }
 

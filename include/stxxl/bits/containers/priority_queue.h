@@ -299,31 +299,31 @@ public:
     void dump_sizes() const
     {
         size_t capacity = N;
-        STXXL_MSG("pq::size()\t= " << size());
-        STXXL_MSG("  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity);
-        STXXL_MSG("  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize);
+        LOG1 << "pq::size()\t= " << size();
+        LOG1 << "  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity;
+        LOG1 << "  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize;
         for (int i = 0; i < kNumIntGroups; ++i) {
             capacity *= IntKMAX;
-            STXXL_MSG("  grp " << i << " int" <<
-                      " grpbuf=" << current_group_buffer_size(i) <<
-                      " size=" << int_mergers[i].size() << "/" << capacity <<
-                      " (" << (int)((double)int_mergers[i].size() * 100.0 / (double)capacity) << "%)" <<
-                      " space=" << int_mergers[i].is_space_available());
+            LOG1 << "  grp " << i << " int" <<
+                " grpbuf=" << current_group_buffer_size(i) <<
+                " size=" << int_mergers[i].size() << "/" << capacity <<
+                " (" << (int)((double)int_mergers[i].size() * 100.0 / (double)capacity) << "%)" <<
+                " space=" << int_mergers[i].is_space_available();
         }
         for (int i = 0; i < kNumExtGroups; ++i) {
             capacity *= ExtKMAX;
-            STXXL_MSG("  grp " << i + kNumIntGroups << " ext" <<
-                      " grpbuf=" << current_group_buffer_size(i + kNumIntGroups) <<
-                      " size=" << ext_mergers[i]->size() << "/" << capacity <<
-                      " (" << (int)((double)ext_mergers[i]->size() * 100.0 / (double)capacity) << "%)" <<
-                      " space=" << ext_mergers[i]->is_space_available());
+            LOG1 << "  grp " << i + kNumIntGroups << " ext" <<
+                " grpbuf=" << current_group_buffer_size(i + kNumIntGroups) <<
+                " size=" << ext_mergers[i]->size() << "/" << capacity <<
+                " (" << (int)((double)ext_mergers[i]->size() * 100.0 / (double)capacity) << "%)" <<
+                " space=" << ext_mergers[i]->is_space_available();
         }
         dump_params();
     }
 
     void dump_params() const
     {
-        STXXL_MSG("params: kDeleteBufferSize=" << kDeleteBufferSize << " N=" << N << " IntKMAX=" << IntKMAX << " kNumIntGroups=" << kNumIntGroups << " ExtKMAX=" << ExtKMAX << " kNumExtGroups=" << kNumExtGroups << " BlockSize=" << BlockSize);
+        LOG1 << "params: kDeleteBufferSize=" << kDeleteBufferSize << " N=" << N << " IntKMAX=" << IntKMAX << " kNumIntGroups=" << kNumIntGroups << " ExtKMAX=" << ExtKMAX << " kNumExtGroups=" << kNumExtGroups << " BlockSize=" << BlockSize;
     }
 
     //! \}
@@ -535,7 +535,7 @@ private:
             {
                 if (inv_cmp(*v, *(v - 1)))
                 {
-                    STXXL_MSG("Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v);
+                    LOG1 << "Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v;
                 }
             }
             assert(false);
@@ -592,7 +592,7 @@ private:
             {
                 if (inv_cmp(*v, *(v - 1)))
                 {
-                    STXXL_MSG("Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1));
+                    LOG1 << "Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1);
                 }
             }
             assert(false);
@@ -629,8 +629,8 @@ private:
                 capacity *= IntKMAX;
             for (int i = 0; i < kNumExtGroups; ++i)
                 capacity *= ExtKMAX;
-            STXXL_ERRMSG("priority_queue OVERFLOW - all groups full, size=" << size() <<
-                         ", capacity(last externel group (" << kNumIntGroups + kNumExtGroups - 1 << "))=" << capacity);
+            LOG1 << "priority_queue OVERFLOW - all groups full, size=" << size() <<
+                ", capacity(last externel group (" << kNumIntGroups + kNumExtGroups - 1 << "))=" << capacity;
             dump_sizes();
 
             const size_t extLevel = level - kNumIntGroups;

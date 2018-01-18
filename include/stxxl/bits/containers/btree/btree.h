@@ -38,6 +38,8 @@ template <class KeyType,
           >
 class btree
 {
+    static constexpr bool debug = false;
+
 public:
     using key_type = KeyType;
     using data_type = DataType;

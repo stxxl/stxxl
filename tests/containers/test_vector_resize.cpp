@@ -34,11 +34,11 @@ int main()
             vector->push_back(0);
     }
     catch (std::exception& e) {
-        STXXL_ERRMSG("Caught exception: " << e.what());
+        LOG1 << "Caught exception: " << e.what();
         delete vector; // here it will crash in block_manager::delete_block(bid)
     }
 
-    STXXL_MSG("Delete done, all is well.");
+    LOG1 << "Delete done, all is well.";
 
     return 0;
 }

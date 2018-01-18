@@ -15,10 +15,10 @@
 
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
-#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/timer>
+#include <tlx/logger.hpp>
 
 #include <cstddef>
 
@@ -41,7 +41,7 @@ static const size_t printmod = 16 * 1024 * 1024;
 static inline void progress(const char* text, size_t i, size_t nelements)
 {
     if ((i % printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
+        LOG1 << text << " " << i << " (" << std::setprecision(5) << (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)";
     }
 }
 
@@ -227,8 +227,8 @@ int run_multiway_merge(size_t volume)
     const size_t size = volume / sizeof(value_type);
     const size_t num_blocks = foxxll::div_ceil(size, block_size);
 
-    STXXL_MSG("--- Running run_multiway_merge() test with " <<
-              NumEAs << " external arrays");
+    LOG1 << "--- Running run_multiway_merge() test with " <<
+        NumEAs << " external arrays";
 
     STXXL_VARDUMP(block_size);
     STXXL_VARDUMP(size);
@@ -499,14 +499,14 @@ int main(int argc, char** argv)
 
     const size_t block_size = 2 * 1024 * 1024 / sizeof(value_type);
     if (volume > 0 && volume / sizeof(value_type) < 5 * block_size + 876) {
-        STXXL_ERRMSG("The volume is too small for this test. It must be >= " <<
-                     (5 * block_size + 876) * sizeof(value_type));
+        LOG1 << "The volume is too small for this test. It must be >= " <<
+        (5 * block_size + 876) * sizeof(value_type);
         return EXIT_FAILURE;
     }
 
     if (iavolume > 0 && iavolume / sizeof(value_type) < 3) {
-        STXXL_ERRMSG("The internal array volume is too small for this test. "
-                     "It must be > " << 3);
+        LOG1 << "The internal array volume is too small for this test. "
+            "It must be > " << 3;
         return EXIT_FAILURE;
     }
 
@@ -538,7 +538,7 @@ int main(int argc, char** argv)
 
     succ = run_upper_bound_test(3 * ea_type::block_size * sizeof(value_type)) && succ;
 
-    STXXL_MSG("success = " << succ);
+    LOG1 << "success = " << succ;
 
     return succ;
 }

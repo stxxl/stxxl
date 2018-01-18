@@ -77,7 +77,7 @@ int main()
 
     std::cout << *s;
 
-    STXXL_MSG("Size of block type " << sizeof(CreateRunsAlg::block_type));
+    LOG1 << "Size of block type " << sizeof(CreateRunsAlg::block_type);
     unsigned size = MULT * 1024 * 128 / (unsigned)(sizeof(Input::value_type) * 2);
     Input in(size + 1);
     CreateRunsAlg SortedRuns(in, Cmp(), 1024 * 128 * MULT);
@@ -86,8 +86,8 @@ int main()
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), MULT * 1024 * 128);
     stxxl::vector<Input::value_type> array;
-    STXXL_MSG(size << " " << Runs->elements);
-    STXXL_MSG("CRC: " << in.crc);
+    LOG1 << size << " " << Runs->elements;
+    LOG1 << "CRC: " << in.crc;
     Input::value_type crc(0);
     for (unsigned i = 0; i < size; ++i)
     {
@@ -95,7 +95,7 @@ int main()
         array.push_back(*merger);
         ++merger;
     }
-    STXXL_MSG("CRC: " << crc);
+    LOG1 << "CRC: " << crc;
     STXXL_CHECK(stxxl::is_sorted(array.cbegin(), array.cend(), Cmp()));
     STXXL_CHECK(merger.empty());
 

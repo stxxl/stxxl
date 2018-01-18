@@ -103,7 +103,7 @@ void linear_sort_streamed(vector_type& input, vector_type& output)
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
     if (sum1 != sum2)
-        STXXL_MSG("WRONG DATA");
+        LOG1 << "WRONG DATA";
 
     STXXL_CHECK(stxxl::is_sorted(output.cbegin(), output.cend(), cmp_less_key()));
 
@@ -120,7 +120,7 @@ int main(int argc, const char** argv)
     foxxll::config::get_instance();
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     unsigned long megabytes_to_process = atoi(argv[1]);
     int p = atoi(argv[2]);

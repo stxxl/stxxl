@@ -205,17 +205,17 @@ private:
     void init(int blocks2prefetch = -1)
     {
         if (m_pool->size_write() < 2) {
-            STXXL_ERRMSG("sequence: invalid configuration, not enough blocks (" << m_pool->size_write() <<
-                         ") in write pool, at least 2 are needed, resizing to 3");
+            LOG1 << "sequence: invalid configuration, not enough blocks (" << m_pool->size_write() <<
+                ") in write pool, at least 2 are needed, resizing to 3";
             m_pool->resize_write(3);
         }
 
         if (m_pool->size_write() < 3) {
-            STXXL_MSG("sequence: inefficient configuration, no blocks for buffered writing available");
+            LOG1 << "sequence: inefficient configuration, no blocks for buffered writing available";
         }
 
         if (m_pool->size_prefetch() < 1) {
-            STXXL_MSG("sequence: inefficient configuration, no blocks for prefetching available");
+            LOG1 << "sequence: inefficient configuration, no blocks for prefetching available";
         }
 
         /// initialize empty sequence

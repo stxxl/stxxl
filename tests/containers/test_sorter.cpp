@@ -30,7 +30,7 @@ template class stxxl::sorter<my_type, Comparator>;
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     unsigned memory_to_use = 64 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     enum { block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type) };
@@ -72,7 +72,7 @@ int main()
 
         stxxl::random_number32 rnd;
 
-        STXXL_MSG("Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)");
+        LOG1 << "Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)";
 
         for (uint64_t i = 0; i < n_records; i++)
         {
@@ -84,7 +84,7 @@ int main()
         // finish input, switch to sorting stage.
         s.sort();
 
-        STXXL_MSG("Checking order...");
+        LOG1 << "Checking order...";
 
         STXXL_CHECK(!s.empty());
         STXXL_CHECK(s.size() == n_records);
@@ -98,18 +98,18 @@ int main()
         {
             STXXL_CHECK(s.size() == count);
 
-            if (!(prev <= *s)) STXXL_MSG("WRONG");
+            if (!(prev <= *s)) LOG1 << "WRONG";
             STXXL_CHECK(prev <= *s);
 
             ++s;
             --count;
         }
-        STXXL_MSG("OK");
+        LOG1 << "OK";
 
         // rewind and read output again
         s.rewind();
 
-        STXXL_MSG("Checking order again...");
+        LOG1 << "Checking order again...";
 
         STXXL_CHECK(!s.empty());
         STXXL_CHECK(s.size() == n_records);
@@ -119,16 +119,16 @@ int main()
 
         while (!s.empty())
         {
-            if (!(prev <= *s)) STXXL_MSG("WRONG");
+            if (!(prev <= *s)) LOG1 << "WRONG";
             STXXL_CHECK(prev <= *s);
 
             ++s;
         }
-        STXXL_MSG("OK");
+        LOG1 << "OK";
 
         STXXL_CHECK(s.size() == 0);
 
-        STXXL_MSG("Done");
+        LOG1 << "Done";
     }
 
     return 0;

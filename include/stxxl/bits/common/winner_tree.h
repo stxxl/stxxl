@@ -16,7 +16,7 @@
 
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/utils.hpp>
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 #include <tlx/math/integer_log2.hpp>
 
 #include <limits>
@@ -43,6 +43,8 @@ namespace stxxl {
 template <typename Comparator>
 class winner_tree
 {
+    static constexpr bool debug = false;
+
 protected:
     //! the binary tree of size 2^(k+1)-1
     std::vector<size_t> m_tree;
@@ -359,7 +361,7 @@ public:
     void print_stats() const
     {
         STXXL_VARDUMP(m_num_slots);
-        STXXL_MSG(m_stats);
+        LOG1 << m_stats;
     }
 };
 

@@ -91,7 +91,7 @@ void test_vector1()
     stxxl::random_number32 rnd;
     int offset = rnd();
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
     vector_type::size_type i;
@@ -107,7 +107,7 @@ void test_vector1()
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
     v.flush();
 
-    STXXL_MSG("seq read of " << v.size() << " elements");
+    LOG1 << "seq read of " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
 
@@ -120,7 +120,7 @@ void test_vector1()
         STXXL_CHECK(v[i].key == rnd());
 
     // check again
-    STXXL_MSG("clear");
+    LOG1 << "clear";
 
     v.clear();
 
@@ -128,17 +128,17 @@ void test_vector1()
 
     v.resize(32 * STXXL_DEFAULT_BLOCK_SIZE(element) / sizeof(element));
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
 
     stxxl::ran32State = 0xdeadbeef + 10;
 
-    STXXL_MSG("seq read of " << v.size() << " elements");
+    LOG1 << "seq read of " << v.size() << " elements";
 
     for (i = 0; i < v.size(); i++)
         STXXL_CHECK(v[i].key == rnd());
 
-    STXXL_MSG("copy vector of " << v.size() << " elements");
+    LOG1 << "copy vector of " << v.size() << " elements";
 
     vector_type v_copy0(v);
     STXXL_CHECK(v == v_copy0);

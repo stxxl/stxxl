@@ -28,6 +28,8 @@ namespace hash_map {
 template <class HashMap>
 class iterator_map
 {
+    static constexpr bool debug = false;
+
 public:
     using hash_map_type = HashMap;
     using node_type = typename hash_map_type::node_type;

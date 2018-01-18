@@ -167,7 +167,7 @@ public:
             compute_result();
             m_result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-            STXXL_MSG(*stats::get_instance());
+            LOG1 << *stats::get_instance();
 #endif //STXXL_PRINT_STAT_AFTER_RF
         }
         return m_result;
@@ -688,7 +688,7 @@ public:
             compute_result();
             m_result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-            STXXL_MSG(*stats::get_instance());
+            LOG1 << *stats::get_instance();
 #endif //STXXL_PRINT_STAT_AFTER_RF
         }
         return m_result;
@@ -921,7 +921,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
             if (cmp(blocks[j][0], sruns->runs[irun][j].value) ||
                 cmp(sruns->runs[irun][j].value, blocks[j][0]))     //!=
             {
-                STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run");
+                LOG1 << "check_sorted_runs  wrong trigger in the run";
                 delete[] blocks;
                 return false;
             }
@@ -931,7 +931,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
                 make_element_iterator(blocks, sruns->runs_sizes[irun]),
                 cmp))
         {
-            STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
+            LOG1 << "check_sorted_runs  wrong order in the run";
             delete[] blocks;
             return false;
         }
@@ -939,7 +939,7 @@ bool check_sorted_runs(const RunsType& sruns, CompareType cmp)
         delete[] blocks;
     }
 
-    STXXL_MSG("Checking runs finished successfully");
+    LOG1 << "Checking runs finished successfully";
 
     return true;
 }
@@ -1210,9 +1210,9 @@ public:
             if (recursive_merge_buffers < 2 * min_prefetch_buffers + 1 + 2) {
                 // recursive merge uses min_prefetch_buffers for input buffering and min_prefetch_buffers output buffering
                 // as well as 1 current output block and at least 2 input blocks
-                STXXL_ERRMSG("There are only m=" << recursive_merge_buffers << " blocks available for recursive merging, but "
-                                                 << min_prefetch_buffers << "+" << min_prefetch_buffers << "+1 are needed read-ahead/write-back/output, and");
-                STXXL_ERRMSG("the merger requires memory to store at least two input blocks internally. Aborting.");
+                LOG1 << "There are only m=" << recursive_merge_buffers << " blocks available for recursive merging, but "
+                     << min_prefetch_buffers << "+" << min_prefetch_buffers << "+1 are needed read-ahead/write-back/output, and";
+                LOG1 << "the merger requires memory to store at least two input blocks internally. Aborting.";
                 throw foxxll::bad_parameter(
                           "basic_runs_merger::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
@@ -1416,7 +1416,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
         while (runs_left > 0)
         {
             size_t runs2merge = std::min(runs_left, merge_factor);
-            STXXL_MSG("Merging " << runs2merge << " runs");
+            LOG1 << "Merging " << runs2merge << " runs";
 
             if (runs2merge > 1)     // non-trivial merge
             {

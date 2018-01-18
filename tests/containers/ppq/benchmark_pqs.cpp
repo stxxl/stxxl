@@ -18,7 +18,6 @@ static const char* description =
     "cycle or fill/intermixed inserts/deletes.";
 
 #include <foxxll/unused.hpp>
-#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>
@@ -27,6 +26,7 @@ static const char* description =
 #include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
+#include <tlx/logger.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -116,8 +116,8 @@ static inline void progress(const char* text, size_t i, size_t nelements)
     if (!g_progress) return;
 
     if ((i % g_printmod) == 0) {
-        STXXL_MSG(text << " " << i << " (" << std::setprecision(5) <<
-                  (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)");
+        LOG1 << text << " " << i << " (" << std::setprecision(5) <<
+        (static_cast<double>(i) * 100. / static_cast<double>(nelements)) << " %)";
     }
 }
 
@@ -660,9 +660,7 @@ void do_bulk_push_asc(ContainerType& c, bool do_parallel)
                        "Filling " + c.name() + " with bulks" + parallel_str);
 
     if (do_parallel && !c.supports_threaded_bulks()) {
-        STXXL_ERRMSG("Container " + c.name() +
-                     " does not support parallel bulks operations");
-        abort();
+        die("Container " << c.name() << " does not support parallel bulks operations");
     }
 
     for (size_t i = 0; i < num_elements / bulk_size; ++i)
@@ -728,9 +726,7 @@ void do_bulk_push_rand(ContainerType& c,
                        "Filling " + c.name() + " with bulks" + parallel_str);
 
     if (do_parallel && !c.supports_threaded_bulks()) {
-        STXXL_ERRMSG("Container " + c.name() +
-                     " does not support parallel bulks operations");
-        abort();
+        die("Container " << c.name() << " does not support parallel bulks operations");
     }
 
     // independent random generator (also: in different cache lines)
@@ -1480,8 +1476,7 @@ void do_dijkstra(ContainerType& c)
     size_t num_edges = 100 * num_nodes;
 
     if (c.name() == "sorter") {
-        STXXL_ERRMSG("Dijkstra benchmark does not work with the stxxl::sorter.");
-        abort();
+        die("Dijkstra benchmark does not work with the stxxl::sorter.");
     }
 
     std::cout << "Generating Graph" << std::endl;
@@ -1623,7 +1618,7 @@ void run_benchmark(ContainerType& c, const std::string& testset)
         //do_dijkstra(c);
     }
     else {
-        STXXL_ERRMSG("Unknown benchmark test '" << testset << "'");
+        LOG1 << "Unknown benchmark test '" << testset << "'";
     }
 }
 
@@ -1690,17 +1685,16 @@ int main(int argc, char* argv[])
 
 #if !STXXL_PARALLEL
     if (opt_parallel) {
-        STXXL_MSG("STXXL is compiled without STXXL_PARALLEL flag. "
-                  "Parallel processing cannot be used.");
+        LOG1 << "STXXL is compiled without STXXL_PARALLEL flag. "
+            "Parallel processing cannot be used.";
         return EXIT_FAILURE;
     }
 #else
     if (!omp_get_nested()) {
         omp_set_nested(1);
         if (!omp_get_nested()) {
-            STXXL_ERRMSG("Could not enable OpenMP's nested parallelism, "
-                         "however, the PPQ requires this OpenMP feature.");
-            abort();
+            die("Could not enable OpenMP's nested parallelism, "
+                "however, the PPQ requires this OpenMP feature.");
         }
     }
 
@@ -1776,7 +1770,7 @@ int main(int argc, char* argv[])
     }
 #endif
     else {
-        STXXL_MSG("Please choose a queue container type. Use -h for help.");
+        LOG1 << "Please choose a queue container type. Use -h for help.";
         return EXIT_FAILURE;
     }
 

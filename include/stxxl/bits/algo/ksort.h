@@ -355,7 +355,7 @@ bool check_ksorted_runs(RunType** runs,
     using value_type = typename BlockType::value_type;
     using request_ptr = foxxll::request_ptr;
 
-    STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
+    LOG1 << "check_ksorted_runs  Runs: " << nruns;
     size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
@@ -379,11 +379,11 @@ bool check_ksorted_runs(RunType** runs,
 
             if (off && (keyext(blocks[0][0]) < keyext(last)))
             {
-                STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
-                STXXL_MSG(" first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]));
-                STXXL_MSG(" last  value: " << last << " with key" << keyext(last));
+                LOG1 << "check_sorted_runs  wrong first value in the run " << irun;
+                LOG1 << " first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]);
+                LOG1 << " last  value: " << last << " with key" << keyext(last);
                 for (size_t k = 0; k < block_type::size; ++k)
-                    STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]));
+                    LOG1 << "Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]);
 
                 delete[] reqs;
                 delete[] blocks;
@@ -394,18 +394,18 @@ bool check_ksorted_runs(RunType** runs,
             {
                 if (keyext(blocks[j][0]) != (*runs[irun])[off + j].key)
                 {
-                    STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j));
-                    STXXL_MSG("                   trigger value: " << (*runs[irun])[off + j].key);
-                    STXXL_MSG("Data in the block:");
+                    LOG1 << "check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j);
+                    LOG1 << "                   trigger value: " << (*runs[irun])[off + j].key;
+                    LOG1 << "Data in the block:";
                     for (size_t k = 0; k < block_type::size; ++k)
-                        STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]));
+                        LOG1 << "Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]);
 
-                    STXXL_MSG("BIDS:");
+                    LOG1 << "BIDS:";
                     for (size_t k = 0; k < nblocks; ++k)
                     {
                         if (k == j)
-                            STXXL_MSG("Bad one comes next.");
-                        STXXL_MSG("BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid));
+                            LOG1 << "Bad one comes next.";
+                        LOG1 << "BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid);
                     }
 
                     delete[] reqs;
@@ -417,17 +417,17 @@ bool check_ksorted_runs(RunType** runs,
                                   make_element_iterator(blocks, nelements),
                                   key_comparison<value_type, KeyExtractor>()))
             {
-                STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
-                STXXL_MSG("Data in blocks:");
+                LOG1 << "check_sorted_runs  wrong order in the run " << irun;
+                LOG1 << "Data in blocks:";
                 for (size_t j = 0; j < nblocks; ++j)
                 {
                     for (size_t k = 0; k < block_type::size; ++k)
-                        STXXL_MSG("     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]));
+                        LOG1 << "     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]);
                 }
-                STXXL_MSG("BIDS:");
+                LOG1 << "BIDS:";
                 for (size_t k = 0; k < nblocks; ++k)
                 {
-                    STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
+                    LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
                 }
 
                 delete[] reqs;

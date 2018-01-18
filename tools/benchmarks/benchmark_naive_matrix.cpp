@@ -91,11 +91,11 @@ int main()
     }
     catch (const std::exception& ex)
     {
-        STXXL_MSG("Caught exception: " << ex.what());
+        LOG1 << "Caught exception: " << ex.what();
     }
     catch (...)
     {
-        STXXL_MSG("Caught unknown exception.");
+        LOG1 << "Caught unknown exception.";
     }
 
     return 0;

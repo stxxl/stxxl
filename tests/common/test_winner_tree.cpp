@@ -11,9 +11,9 @@
  **************************************************************************/
 
 #include <foxxll/common/types.hpp>
-#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/random>
+#include <tlx/logger.hpp>
 
 #include <algorithm>
 #include <vector>

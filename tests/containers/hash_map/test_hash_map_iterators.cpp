@@ -131,7 +131,7 @@ void cmp_with_internal_map()
         STXXL_CHECK(int_map.find(key) != int_map.end());
     }
     std::cout << "passed" << std::endl;
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -296,7 +296,7 @@ void basic_iterator_test()
     }
     std::cout << "passed" << std::endl;
 
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -370,7 +370,7 @@ void more_iterator_test()
     }
     std::cout << "passed" << std::endl;
 
-    STXXL_MSG(foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin);
+    LOG1 << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

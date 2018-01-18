@@ -28,7 +28,7 @@ using my_type = key_with_padding<unsigned, 128>;
 int main()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
-    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+    LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
     unsigned memory_to_use = 22 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     using vector_type = stxxl::vector<my_type>;
@@ -36,17 +36,17 @@ int main()
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;
-    STXXL_MSG("Filling vector... " << rnd() << " " << rnd() << " " << rnd());
+    LOG1 << "Filling vector... " << rnd() << " " << rnd() << " " << rnd();
     for (vector_type::size_type i = 0; i < v.size(); i++)
         v[i].key = (rnd() / 2) * 2;
 
-    STXXL_MSG("Checking order...");
+    LOG1 << "Checking order...";
     STXXL_CHECK(!stxxl::is_sorted(v.cbegin(), v.cend()));
 
-    STXXL_MSG("Sorting...");
+    LOG1 << "Sorting...";
     stxxl::stable_ksort(v.begin(), v.end(), my_type::key_extract(), memory_to_use);
 
-    STXXL_MSG("Checking order...");
+    LOG1 << "Checking order...";
     STXXL_CHECK(stxxl::is_sorted(v.cbegin(), v.cend()));
 
     return 0;

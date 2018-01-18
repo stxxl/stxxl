@@ -27,7 +27,7 @@ int main()
     stxxl::random_number32 rnd;
     int offset = rnd();
 
-    STXXL_MSG("write " << v.size() << " elements");
+    LOG1 << "write " << v.size() << " elements";
 
     stxxl::ran32State = 0xdeadbeef;
     vector_type::size_type i;
@@ -41,7 +41,7 @@ int main()
 
     v.flush();
 
-    STXXL_MSG("export files");
+    LOG1 << "export files";
     v.export_files("exported_");
 
     return 0;

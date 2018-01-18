@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
 {
     using vector_type = std::vector<std::pair<key_type, data_type> >;
 
-    STXXL_MSG("Node block size: " << NODE_BLOCK_SIZE << " bytes");
-    STXXL_MSG("Leaf block size: " << LEAF_BLOCK_SIZE << " bytes");
-    STXXL_MSG("Node max elements: " << NODE_MELEMENTS);
-    STXXL_MSG("Leaf max elements: " << LEAF_MELEMENTS);
+    LOG1 << "Node block size: " << NODE_BLOCK_SIZE << " bytes";
+    LOG1 << "Leaf block size: " << LEAF_BLOCK_SIZE << " bytes";
+    LOG1 << "Node max elements: " << NODE_MELEMENTS;
+    LOG1 << "Leaf max elements: " << LEAF_MELEMENTS;
 
     stxxl::random_number32 rnd;
     //stxxl::ran32State = 1141225706;
-    STXXL_MSG("Init random seed: " << stxxl::ran32State);
+    LOG1 << "Init random seed: " << stxxl::ran32State;
 
     int a = (PERCENT_CLEAR +
              PERCENT_SIZING +
@@ -90,8 +90,8 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " STEP ");
-        STXXL_MSG("Note, that STEP must be > 1000");
+        LOG1 << "Usage: " << argv[0] << " STEP ";
+        LOG1 << "Note, that STEP must be > 1000";
         return -1;
     }
     uint64_t MAX_STEP = atoi(argv[1]);
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
         if (i % (MAX_STEP / 100) == 0)
         {
-            STXXL_MSG("Step=" << i << " (" << (unsigned)stdmap.size() << ")");
+            LOG1 << "Step=" << i << " (" << (unsigned)stdmap.size() << ")";
         }
 
         // *********************************************************

@@ -11,8 +11,8 @@
  **************************************************************************/
 
 #include <foxxll/common/uint_types.hpp>
-#include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/tuple.h>
+#include <tlx/logger.hpp>
 
 #include <sstream>
 

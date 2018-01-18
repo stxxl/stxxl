@@ -19,6 +19,8 @@
 //        (free stacks buffers)
 // TODO: shuffle small input in internal memory
 
+#include <tlx/logger.hpp>
+
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/scan>
@@ -47,9 +49,11 @@ void random_shuffle(ExtIterator first,
                     ExtIterator last,
                     RandomNumberGenerator& rand,
                     size_t M,
-                    AllocStrategy AS = STXXL_DEFAULT_ALLOC_STRATEGY())
+                    AllocStrategy AS = foxxll::default_alloc_strategy())
 {
-    STXXL_UNUSED(AS);  // FIXME: Why is this not being used?
+    constexpr bool debug = false;
+    tlx::unused(AS);  // FIXME: Why is this not being used?
+
     using value_type = typename ExtIterator::value_type;
     using stack_type = typename STACK_GENERATOR<
               value_type, external, grow_shrink2, PageSize,
@@ -57,7 +61,7 @@ void random_shuffle(ExtIterator first,
               >::result;
     using block_type = typename stack_type::block_type;
 
-    STXXL_VERBOSE1("random_shuffle: Plain Version");
+    LOG << "random_shuffle: Plain Version";
     static_assert(int(BlockSize) < 0,
                   "This implementation was never tested. Please report to the stxxl developers if you have an ExtIterator that works with this implementation.");
 
@@ -65,9 +69,9 @@ void random_shuffle(ExtIterator first,
 
     // make sure we have at least 6 blocks + 1 page
     if (M < 6 * BlockSize + PageSize * BlockSize) {
-        STXXL_ERRMSG("random_shuffle: insufficient memory, " << M << " bytes supplied,");
+        LOG1 << "random_shuffle: insufficient memory, " << M << " bytes supplied,";
         M = 6 * BlockSize + PageSize * BlockSize;
-        STXXL_ERRMSG("random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)");
+        LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
     }
 
     size_t k = M / (3 * BlockSize); // number of buckets
@@ -80,7 +84,7 @@ void random_shuffle(ExtIterator first,
               >;
     temp_vector_type* temp_vector;
 
-    STXXL_VERBOSE1("random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets");
+    LOG << "random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets";
     foxxll::read_write_pool<block_type> pool(0, M / BlockSize - k);  // no read buffers and M/B-k write buffers
 
     stack_type** buckets;
@@ -113,7 +117,7 @@ void random_shuffle(ExtIterator first,
     ExtIterator it = first;
 
     for (i = 0; i < k; i++) {
-        STXXL_VERBOSE1("random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements");
+        LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
     }
 
     // shuffle each bucket
@@ -123,7 +127,7 @@ void random_shuffle(ExtIterator first,
 
         // does the bucket fit into memory?
         if (size * sizeof(value_type) < space_left) {
-            STXXL_VERBOSE1("random_shuffle: no recursion");
+            LOG << "random_shuffle: no recursion";
 
             // copy bucket into temp. array
             temp_array = new value_type[size];
@@ -146,7 +150,7 @@ void random_shuffle(ExtIterator first,
             delete[] temp_array;
         }
         else {
-            STXXL_VERBOSE1("random_shuffle: recursion");
+            LOG << "random_shuffle: recursion";
 
             // copy bucket into temp. stxxl::vector
             temp_vector = new temp_vector_type(size);
@@ -158,7 +162,7 @@ void random_shuffle(ExtIterator first,
 
             pool.resize_prefetch(0);
             space_left += PageSize * BlockSize;
-            STXXL_VERBOSE1("random_shuffle: Space left: " << space_left);
+            LOG << "random_shuffle: Space left: " << space_left;
 
             // recursive shuffle
             stxxl::random_shuffle(temp_vector->begin(),
@@ -196,6 +200,8 @@ void random_shuffle(
     RandomNumberGenerator& rand,
     size_t M)
 {
+    constexpr bool debug = false;
+
     using ExtIterator = stxxl::vector_iterator<VectorConfig>;
     using AllocStrategy = typename ExtIterator::vector_type::alloc_strategy_type;
     constexpr unsigned PageSize = ExtIterator::vector_type::page_size;
@@ -206,13 +212,13 @@ void random_shuffle(
                                                        stxxl::grow_shrink2, PageSize, BlockSize>::result;
     using block_type = typename stack_type::block_type;
 
-    STXXL_VERBOSE1("random_shuffle: Vector Version");
+    LOG << "random_shuffle: Vector Version";
 
     // make sure we have at least 6 blocks + 1 page
     if (M < 6 * BlockSize + PageSize * BlockSize) {
-        STXXL_ERRMSG("random_shuffle: insufficient memory, " << M << " bytes supplied,");
+        LOG1 << "random_shuffle: insufficient memory, " << M << " bytes supplied,";
         M = 6 * BlockSize + PageSize * BlockSize;
-        STXXL_ERRMSG("random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)");
+        LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
     }
 
     uint64_t n = last - first;          // the number of input elements
@@ -276,7 +282,7 @@ void random_shuffle(
     size_t space_left = M - k * BlockSize - PageSize * BlockSize;
 
     for (i = 0; i < k; i++) {
-        STXXL_VERBOSE1("random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements");
+        LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
     }
 
     // shuffle each bucket
@@ -286,7 +292,7 @@ void random_shuffle(
 
         // does the bucket fit into memory?
         if (size * sizeof(value_type) < space_left) {
-            STXXL_VERBOSE1("random_shuffle: no recursion");
+            LOG << "random_shuffle: no recursion";
 
             // copy bucket into temp. array
             temp_array = new value_type[(size_t)size];
@@ -310,7 +316,7 @@ void random_shuffle(
             delete[] temp_array;
         }
         else {
-            STXXL_VERBOSE1("random_shuffle: recursion");
+            LOG << "random_shuffle: recursion";
             // copy bucket into temp. stxxl::vector
             temp_vector = new temp_vector_type(size);
 
@@ -322,7 +328,7 @@ void random_shuffle(
             pool.resize_prefetch(0);
             space_left += PageSize * BlockSize;
 
-            STXXL_VERBOSE1("random_shuffle: Space left: " << space_left);
+            LOG << "random_shuffle: Space left: " << space_left;
 
             // recursive shuffle
             stxxl::random_shuffle(temp_vector->begin(),

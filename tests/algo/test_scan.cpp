@@ -65,34 +65,34 @@ int main()
 
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
 
-    STXXL_MSG("write " << (v.end() - v.begin()) << " elements ...");
+    LOG1 << "write " << (v.end() - v.begin()) << " elements ...";
 
     stxxl::generate(v.begin(), v.end(), counter<int64_t>(), 4);
 
-    STXXL_MSG("for_each_m ...");
+    LOG1 << "for_each_m ...";
     b = timestamp();
     stxxl::for_each_m(v.begin(), v.end(), square<int64_t>(), 4);
     e = timestamp();
-    STXXL_MSG("for_each_m time: " << (e - b));
+    LOG1 << "for_each_m time: " << (e - b);
 
-    STXXL_MSG("check");
+    LOG1 << "check";
     for (i = 0; i < v.size(); ++i)
     {
         STXXL_CHECK2(v[i] == int64_t(i * i), "Error at position " << i);
     }
 
-    STXXL_MSG("Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin()));
-    STXXL_MSG("Pos of value 1048576: " << (stxxl::find(v.begin(), v.end(), 1024 * 1024, 4) - v.begin()));
-    STXXL_MSG("Pos of value    1024: " << (stxxl::find(v.begin(), v.end(), 32 * 32, 4) - v.begin()));
+    LOG1 << "Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin());
+    LOG1 << "Pos of value 1048576: " << (stxxl::find(v.begin(), v.end(), 1024 * 1024, 4) - v.begin());
+    LOG1 << "Pos of value    1024: " << (stxxl::find(v.begin(), v.end(), 32 * 32, 4) - v.begin());
 
-    STXXL_MSG("generate ...");
+    LOG1 << "generate ...";
     b = timestamp();
 
     stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64_t>(555), 4);
     e = timestamp();
-    STXXL_MSG("generate: " << (e - b));
+    LOG1 << "generate: " << (e - b);
 
-    STXXL_MSG("check");
+    LOG1 << "check";
     STXXL_CHECK2(v[0] == 0, "Error at position " << 0);
 
     STXXL_CHECK2(v[v.size() - 1] == int64_t((v.size() - 1) * (v.size() - 1)),

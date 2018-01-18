@@ -13,7 +13,7 @@
 #ifndef STXXL_COMMON_SWAP_VECTOR_HEADER
 #define STXXL_COMMON_SWAP_VECTOR_HEADER
 
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <algorithm>
 #include <cassert>

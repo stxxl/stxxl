@@ -17,7 +17,7 @@
 
 #include <foxxll/common/types.hpp>
 #include <foxxll/common/utils.hpp>
-#include <foxxll/verbose.hpp>
+#include <tlx/logger.hpp>
 
 #include <stxxl/types>
 #include <tlx/math/integer_log2.hpp>

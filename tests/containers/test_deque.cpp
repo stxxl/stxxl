@@ -19,7 +19,7 @@
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
-        STXXL_MSG("Usage: " << argv[0] << " #ops");
+        LOG1 << "Usage: " << argv[0] << " #ops";
         return -1;
     }
 
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         if (!(i % 100000))
         {
             STXXL_CHECK(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin()));
-            STXXL_MSG("Operations done: " << i << " size: " << STDDeque.size());
+            LOG1 << "Operations done: " << i << " size: " << STDDeque.size();
         }
     }
 
