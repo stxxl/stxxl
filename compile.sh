@@ -14,7 +14,7 @@
 set -ex
 
 git submodule init
-git submodule update
+git submodule update --recursive
 
 CMAKE_OPTS="-DCMAKE_BUILD_TYPE=RelWithAssert -DSTXXL_BUILD_TESTS=ON -DSTXXL_BUILD_EXAMPLES=ON"
 

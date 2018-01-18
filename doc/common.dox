@@ -24,7 +24,6 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_random "random number generators"
 - \subpage common_timer "timestamp and timer function"
 - \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
-- \subpage common_counting_ptr "reference counted (shared) objects via counting_ptr"
 - \subpage common_cmdline "command line parser"
 - \subpage common_binary_buffer "serialization of variable data structures into blobs"
 - \subpage common_thread_sync "synchronization primitives for multi-threading"
@@ -35,6 +34,10 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_log2 "calculating log_2(x)"
 - \subpage common_misc_macros "miscellaneous macros"
 - \subpage common_misc_funcs "miscellaneous functions"
+
+- \ref tlx_counting_ptr "reference counted (shared) objects via tlx::counting_ptr"
+
+- \subpage tlx
 
 */
 
@@ -114,45 +117,7 @@ STXXL_MSG("measured time: " << (stop - start) << " seconds.");
 
 /** \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
 
-For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the \ref simple_vector is a good method.
-
-*/
-
-////////////////////////////////////////////////////////////////////////////////
-
-/** \page common_counting_ptr Reference Counted (Shared) Objects
-
-Some objects in STXXL are reference counted. This is usually done for large objects, which should not be copied deeply in assignments. Instead, a reference counting pointer is used, which holds a handle while the pointer exists and deletes the object once all pointers go out of scope. Examples are matrices and \ref stream::sorted_runs.
-
-The method used is called \ref counting_ptr or intrusive reference counting.  This is similar, but not identical to boost or TR1's \c shared_ptr.
-
-The \ref counting_ptr is accompanied by \ref counted_object, which contains the actual reference counter (a single integer). A reference counted object must derive from \ref counted_object :
-
-\code
-struct something : public stxxl::counted_object
-{
-};
-\endcode
-
-Code that now wishes to use pointers referencing this object, will typedef an \ref counting_ptr, which is used to increment and decrement the included reference counter automatically.
-
-\code
-typedef stxxl::counting_ptr<something> something_ptr
-{
-    // create new instance of something
-    something_ptr p1 = new something;
-    {
-        // create a new reference to the same instance (no deep copy!)
-        something_ptr p2 = p1;
-        // this block end will decrement the reference count, but not delete the object
-    }
-    // this block end will delete the object
-}
-\endcode
-
-The \ref counting_ptr can generally be used like a usual pointer or \c shared_ptr (see the docs for more).
-
-There is also \ref const_counting_ptr to return const objects (note that a const \ref counting_ptr will only render the pointer const, not the enclosed object).
+For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the \ref tlx::simple_vector is a good method.
 
 */
 
@@ -162,7 +127,7 @@ There is also \ref const_counting_ptr to return const objects (note that a const
 
 STXXL now contains a rather sophisticated command line parser for C++, \ref cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
 
-\snippet examples/common/cmdline.cpp example
+\snippet cmdline_parser_example.cpp example
 
 When running the program above without arguments, it will print:
 \verbatim
@@ -202,7 +167,7 @@ The output shows pretty much what happens. The command line parser is by default
 
 One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via \ref cmdline_parser::add_param_stringlist() and similar.
 
-\example examples/common/cmdline.cpp
+\example cmdline_parser_example.cpp
 This example is documented in \ref common_cmdline tutorial.
 
 */
@@ -235,13 +200,13 @@ To support multi-threading, some parts of STXXL use synchronization primitives t
 
 \section semaphore Semaphores
 
-Additionally stxxl::semaphore is available if counting is required.
+Additionally tlx::semaphore is available if counting is required.
 
 \section further Further Primitives: State and OnOff-Switch
 
-stxxl::state is a synchronized state switching mechanism?
+foxxll::state is a synchronized state switching mechanism?
 
-stxxl::onoff_switch is a two state semaphore thing?
+foxxll::onoff_switch is a two state semaphore thing?
 
 */
 
@@ -352,17 +317,17 @@ The first is during \b compile-time using template meta-programming magic:
 \code
 #include <stxxl/bits/common/tmeta.h>
 
-std::cout << stxxl::LOG2<10000>::floor << std::endl;
-std::cout << stxxl::LOG2<10000>::ceil << std::endl;
+std::cout << tlx::Log2<10000>::floor << std::endl;
+std::cout << tlx::Log2<10000>::ceil << std::endl;
 \endcode
 
 The second is for calculating log2(x) for \b integer arguments using simple bit shift arithmetic:
 
 \code
-#include <stxxl/bits/common/utils.h>
+#include <tlx/math/integer_log2.hpp>
 
-std::cout << stxxl::ilog2_floor(10000) << std::endl;
-std::cout << stxxl::ilog2_ceil(10000) << std::endl;
+std::cout << tlx::integer_log2_floor(10000) << std::endl;
+std::cout << tlx::integer_log2_ceil(10000) << std::endl;
 \endcode
 
 The third and probably least useful is to use conversion to \b double and \c math.h's facilities:
@@ -380,7 +345,7 @@ std::cout << stxxl::log2_ceil(10000) << std::endl;
 
 /** \page common_types Signed and Unsigned Integer Types
 
-STXXL provides a very important types: \ref stxxl::int_type. It should be used for general counting and indexing types, as it is defined to be the size of a register on the machines: on 32-bit machines it is 4 bytes size, while on a 64-bit machine it is 8 bytes in size! As a unsigned type for \ref stxxl::int_type use size_t.
+STXXL provides a very important types: \ref foxxll::int_type. It should be used for general counting and indexing types, as it is defined to be the size of a register on the machines: on 32-bit machines it is 4 bytes size, while on a 64-bit machine it is 8 bytes in size! As a unsigned type for \ref foxxll::int_type use size_t.
 
 The previous types are for general purpose counting. For real 64-bit integers, also on 32-bit machines, use uint64_t.
 
@@ -400,14 +365,14 @@ See the file common/uint_types.h
 
 /** \page common_misc_macros Miscellaneous Macros
 
-\section unused STXXL_UNUSED
+\section unused tlx::unused
 
-\ref STXXL_UNUSED is not actually a macro. It is a remedy against "unused variable" warnings, for whatever reason. Usage:
+\ref tlx::unused is not actually a macro. It is a remedy against "unused variable" warnings, for whatever reason. Usage:
 
 \code
 void function(int x)
 {
-    STXXL_UNUSED(x);
+    tlx::unused(x);
 }
 \endcode
 
@@ -442,19 +407,19 @@ See the \ref install_config documentation page on the format of accepted file si
 
 /** \page common_io_counter I/O Performance Counter
 
-The STXXL library provides various I/O performance counters (stxxl::stats class) which can be used to get an extensive set of I/O statistics. They can be accessed as follows:
+The STXXL library provides various I/O performance counters (foxxll::stats class) which can be used to get an extensive set of I/O statistics. They can be accessed as follows:
 
 \code
   // generate stats instance
-  stxxl::stats * Stats = stxxl::stats::get_instance();
+  foxxll::stats * Stats = foxxll::stats::get_instance();
 
   // start measurement here
-  stxxl::stats_data stats_begin(*Stats);
+  foxxll::stats_data stats_begin(*Stats);
 
   // some computation ...
 
   // substract current stats from stats at the beginning of the measurement
-  std::cout << (stxxl::stats_data(*Stats) - stats_begin);
+  std::cout << (foxxll::stats_data(*Stats) - stats_begin);
 \endcode
 
 The Stats ostream holds various measured I/O data:
@@ -487,12 +452,12 @@ std::cout << Stats->get_written_volume() << std::endl;  // print number of bytes
 \b Hint: There's another statistical parameter which may be in developer's interest: the maximum number of bytes (the peak) allocated in external memory during program run. This parameter can be accessed by:
 
 \code
-stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+foxxll::block_manager * bm = foxxll::block_manager::get_instance();
 // lots of external work here...
 std::cout << "max: " << bm->get_maximum_allocation() << std::endl;  // max. number of bytes allocated until now
 \endcode
 
-See \ref stxxl::stats and \ref stxxl::stats_data class reference for all provided individual functions.
+See \ref foxxll::stats and \ref foxxll::stats_data class reference for all provided individual functions.
 
 */
 
