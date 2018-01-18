@@ -132,8 +132,8 @@ public:
     {
         // reroute current pointer to some empty sentinel segment
         // with a sentinel key
-        STXXL_VERBOSE2("int_merger::free_array() deleting array " <<
-                       slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
+        LOG << "int_merger::free_array() deleting array " <<
+            slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1;
         current[slot] = &sentinel;
         current_end[slot] = &sentinel;
 
@@ -176,12 +176,12 @@ public:
 
     ~int_merger()
     {
-        STXXL_VERBOSE1("int_merger::~int_merger()");
+        LOG << "int_merger::~int_merger()";
         for (size_t i = 0; i < tree.k; ++i)
         {
             if (segment[i])
             {
-                STXXL_VERBOSE2("int_merger::~int_merger() deleting segment " << i);
+                LOG << "int_merger::~int_merger() deleting segment " << i;
                 delete[] segment[i];
                 mem_cons_ -= segment_size[i];
             }
@@ -218,7 +218,7 @@ public:
     //! requires: is_space_available() == 1
     void append_array(value_type* target, const size_t length)
     {
-        STXXL_VERBOSE2("int_merger::insert_segment(" << target << "," << length << ")");
+        LOG << "int_merger::insert_segment(" << target << "," << length << ")";
         //std::copy(target,target + length,std::ostream_iterator<ValueType>(std::cout, "\n"));
 
         if (length == 0)
@@ -282,7 +282,7 @@ protected:
         const size_t& logK = tree.logK;
         compare_type& cmp = tree.cmp;
 
-        STXXL_VERBOSE3("int_merger::multi_merge_parallel(target=" << target << ", len=" << length << ") k=" << k);
+        LOG << "int_merger::multi_merge_parallel(target=" << target << ", len=" << length << ") k=" << k;
 
         if (length == 0)
             return;
@@ -389,7 +389,7 @@ protected:
             {
                 if (is_array_empty(i) && is_array_allocated(i))
                 {
-                    STXXL_VERBOSE3("deallocated " << i);
+                    LOG << "deallocated " << i;
                     free_array(i);
                 }
             }

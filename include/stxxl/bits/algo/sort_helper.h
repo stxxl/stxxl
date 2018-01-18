@@ -111,10 +111,10 @@ count_elements_less_equal(const SequenceVector& seqs,
     for (seqs_size_type i = 0; i < seqs.size(); ++i)
     {
         iterator position = std::upper_bound(seqs[i].first, seqs[i].second, bound, cmp);
-        STXXL_VERBOSE1("less equal than " << position - seqs[i].first);
+        LOG0 << "less equal than " << position - seqs[i].first;
         count += position - seqs[i].first;
     }
-    STXXL_VERBOSE1("finished loop");
+    LOG0 << "finished loop";
     return count;
 }
 
@@ -135,13 +135,13 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
             {
                 seqs[i].first = buffers[i]->begin();            // reset iterator
                 seqs[i].second = buffers[i]->end();
-                STXXL_VERBOSE1("block ran empty " << i);
+                LOG0 << "block ran empty " << i;
             }
             else
             {
                 seqs.erase(seqs.begin() + i);                   // remove this sequence
                 buffers.erase(buffers.begin() + i);
-                STXXL_VERBOSE1("seq removed " << i);
+                LOG0 << "seq removed " << i;
                 --i;                                            // don't skip the next sequence
             }
         }

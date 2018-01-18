@@ -20,10 +20,6 @@
 
 namespace stxxl {
 
-#ifndef STXXL_VERBOSE_SORTER
-#define STXXL_VERBOSE_SORTER STXXL_VERBOSE2
-#endif
-
 //! \addtogroup stlcont
 //! \{
 

@@ -216,7 +216,7 @@ create_runs(
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
     const unsigned int log_k2 = tlx::integer_log2_floor(m2 * Blocks1->size) - log_k1 - 1;
-    STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
+    LOG1 << "log_k1: " << log_k1 << " log_k2:" << log_k2;
     const size_t k1 = size_t(1) << log_k1;
     const size_t k2 = size_t(1) << log_k2;
     size_t* bucket1 = new size_t[k1];
@@ -234,7 +234,7 @@ create_runs(
     size_t k = 0;
     const int shift1 = (int)(sizeof(key_type) * 8 - log_k1);
     const int shift2 = shift1 - log_k2;
-    STXXL_VERBOSE("shift1: " << shift1 << " shift2:" << shift2);
+    LOG1 << "shift1: " << shift1 << " shift2:" << shift2;
 
     for ( ; k < nruns; k++)
     {
@@ -477,12 +477,12 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
     const size_t n_write_buffers = 4 * disks_number;
 #else
     const size_t n_prefetch_buffers = std::max(2 * disks_number, (3 * (_m - nruns) / 4));
-    STXXL_VERBOSE("Prefetch buffers " << n_prefetch_buffers);
+    LOG1 << "Prefetch buffers " << n_prefetch_buffers;
     const size_t n_write_buffers = std::max(2 * disks_number, _m - nruns - n_prefetch_buffers);
-    STXXL_VERBOSE("Write buffers " << n_write_buffers);
+    LOG1 << "Write buffers " << n_write_buffers;
     // heuristic
     const size_t n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
-    STXXL_VERBOSE("Prefetch buffers " << n_opt_prefetch_buffers);
+    LOG1 << "Prefetch buffers " << n_opt_prefetch_buffers;
 #endif
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
@@ -555,8 +555,8 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     size_t m2 = foxxll::div_ceil(_m, 2);
     const size_t m2_rf = m2 * block_type::raw_size /
                          (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
-    STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
-                  m2_rf << " due to key size: " << sizeof(typename KeyExtractor::key_type) << " bytes");
+    LOG1 << "Reducing number of blocks in a run from " << m2 << " to " <<
+        m2_rf << " due to key size: " << sizeof(typename KeyExtractor::key_type) << " bytes";
     m2 = m2_rf;
     size_t full_runs = _n / m2;
     size_t partial_runs = ((_n % m2) ? 1 : 0);
@@ -565,7 +565,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 
     foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
-    STXXL_VERBOSE("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
+    LOG1 << "n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs;
 
     double begin = foxxll::timestamp(), after_runs_creation, end;
 
@@ -618,8 +618,8 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     while (nruns > 1)
     {
         size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
-        STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                      " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
+        LOG1 << "Starting new merge phase: nruns: " << nruns <<
+            " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns;
 
         new_runs = new run_type*[new_nruns];
 
@@ -679,7 +679,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_ksorted_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left, runs2merge, m2, keyobj)));
 #endif
-            STXXL_VERBOSE("Merging " << runs2merge << " runs");
+            LOG1 << "Merging " << runs2merge << " runs";
             merge_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left,
                                                            runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
             runs_left -= runs2merge;
@@ -695,10 +695,10 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 
     end = foxxll::timestamp();
 
-    STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
-                  after_runs_creation - begin << " s");
-    STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-    STXXL_VERBOSE(*foxxll::stats::get_instance());
+    LOG1 << "Elapsed time        : " << end - begin << " s. Run creation time: " <<
+        after_runs_creation - begin << " s";
+    LOG1 << "Time in I/O wait(rf): " << io_wait_after_rf << " s";
+    LOG1 << *foxxll::stats::get_instance();
 
     return result;
 }

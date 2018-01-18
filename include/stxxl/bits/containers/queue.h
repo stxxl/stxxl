@@ -36,10 +36,6 @@
 
 namespace stxxl {
 
-#ifndef STXXL_VERBOSE_QUEUE
-#define STXXL_VERBOSE_QUEUE STXXL_VERBOSE2
-#endif
-
 //! \addtogroup stlcont
 //! \{
 
@@ -57,6 +53,8 @@ template <class ValueType,
           class SizeType = external_size_type>
 class queue
 {
+    static constexpr bool debug = false;
+
 public:
     using value_type = ValueType;
     using alloc_strategy_type = AllocStr;
@@ -104,7 +102,7 @@ public:
             ? foxxll::config::get_instance()->disks_number()
             : static_cast<size_t>(D);
 
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(D)");
+        LOG << "queue[" << this << "]::queue(D)";
         pool = new pool_type(disks, disks + 2);
         init();
     }
@@ -121,7 +119,7 @@ public:
           alloc_count(0),
           bm(foxxll::block_manager::get_instance())
     {
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
+        LOG << "queue[" << this << "]::queue(sizes)";
         pool = new pool_type(p_pool_size, w_pool_size);
         init(blocks2prefetch_);
     }
@@ -140,7 +138,7 @@ public:
           alloc_count(0),
           bm(foxxll::block_manager::get_instance())
     {
-        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
+        LOG << "queue[" << this << "]::queue(pool)";
         init(blocks2prefetch_);
     }
 
@@ -230,11 +228,11 @@ public:
             if (front_block == back_block)
             {             // can not write the back block because it
                 // is the same as the front block, must keep it memory
-                STXXL_VERBOSE1("queue::push Case 1");
+                LOG << "queue::push Case 1";
             }
             else if (size() < 2 * block_type::size)
             {
-                STXXL_VERBOSE1("queue::push Case 1.5");
+                LOG << "queue::push Case 1.5";
                 // only two blocks with a gap in the beginning, move elements within memory
                 assert(bids.empty());
                 size_t gap = front_element - front_block->begin();
@@ -252,18 +250,18 @@ public:
             }
             else
             {
-                STXXL_VERBOSE1("queue::push Case 2");
+                LOG << "queue::push Case 2";
                 // write the back block
                 // need to allocate new block
                 bid_type newbid;
 
                 bm->new_block(alloc_strategy, newbid, alloc_count++);
 
-                STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << newbid);
+                LOG << "queue[" << this << "]: push block " << back_block << " @ " << newbid;
                 bids.push_back(newbid);
                 pool->write(back_block, newbid);
                 if (bids.size() <= blocks2prefetch) {
-                    STXXL_VERBOSE1("queue::push Case Hints");
+                    LOG << "queue::push Case Hints";
                     pool->hint(newbid);
                 }
             }
@@ -289,7 +287,7 @@ public:
             // if there is only one block, it implies ...
             if (back_block == front_block)
             {
-                STXXL_VERBOSE1("queue::pop Case 3");
+                LOG << "queue::pop Case 3";
                 assert(size() == 1);
                 assert(back_element == front_element);
                 assert(bids.empty());
@@ -303,7 +301,7 @@ public:
             --m_size;
             if (m_size <= block_type::size)
             {
-                STXXL_VERBOSE1("queue::pop Case 4");
+                LOG << "queue::pop Case 4";
                 assert(bids.empty());
                 // the back_block is the next block
                 pool->add(front_block);
@@ -311,16 +309,16 @@ public:
                 front_element = back_block->begin();
                 return;
             }
-            STXXL_VERBOSE1("queue::pop Case 5");
+            LOG << "queue::pop Case 5";
 
             assert(!bids.empty());
             foxxll::request_ptr req = pool->read(front_block, bids.front());
-            STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << bids.front());
+            LOG << "queue[" << this << "]: pop block  " << front_block << " @ " << bids.front();
 
             // give prefetching hints
             for (size_t i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {
-                STXXL_VERBOSE1("queue::pop Case Hints");
+                LOG << "queue::pop Case Hints";
                 pool->hint(bids[i + 1]);
             }
 

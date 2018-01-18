@@ -17,10 +17,6 @@
 
 #include <stxxl/vector>
 
-#ifndef STXXL_VERBOSE_MATERIALIZE
-#define STXXL_VERBOSE_MATERIALIZE STXXL_VERBOSE3
-#endif
-
 namespace stxxl {
 
 //! Stream package subnamespace.
@@ -42,7 +38,6 @@ namespace stream {
 template <typename OutputIterator, typename StreamAlgorithm>
 OutputIterator materialize(StreamAlgorithm& in, OutputIterator out)
 {
-    STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     while (!in.empty())
     {
         *out = *in;
@@ -65,7 +60,6 @@ template <typename OutputIterator, typename StreamAlgorithm>
 OutputIterator
 materialize(StreamAlgorithm& in, OutputIterator outbegin, OutputIterator outend)
 {
-    STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     while ((!in.empty()) && outend != outbegin)
     {
         *outbegin = *in;
@@ -93,7 +87,6 @@ stxxl::vector_iterator<VectorConfig> materialize(
     stxxl::vector_iterator<VectorConfig> outend,
     size_t nbuffers = 0)
 {
-    STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     using ExtIterator = stxxl::vector_iterator<VectorConfig>;
     using ConstExtIterator = stxxl::const_vector_iterator<VectorConfig>;
     using buf_ostream_type =
@@ -171,7 +164,6 @@ stxxl::vector_iterator<VectorConfig> materialize(
     stxxl::vector_iterator<VectorConfig> out,
     size_t nbuffers = 0)
 {
-    STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
     using ExtIterator = stxxl::vector_iterator<VectorConfig>;
     using ConstExtIterator = stxxl::const_vector_iterator<VectorConfig>;
     using buf_ostream_type =

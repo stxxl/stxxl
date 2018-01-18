@@ -32,6 +32,7 @@ template <typename RunCursorType,
           typename RunCursorCmpType>
 class loser_tree
 {
+    static constexpr bool debug = false;
     int logK;
     size_t k;
     size_t* entry;
@@ -75,7 +76,7 @@ public:
         logK = tlx::integer_log2_ceil(nruns);
         size_t kReg = k = size_t(1) << logK;
 
-        STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
+        LOG << "loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg;
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
         current = new RunCursorType[kReg];

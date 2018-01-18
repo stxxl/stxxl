@@ -70,8 +70,6 @@
 #define STXXL_PQ_INTERNAL_LOSER_TREE 1
 #endif
 
-#define STXXL_VERBOSE_PQ(msg) STXXL_VERBOSE2_THIS("priority_queue::" << msg)
-
 namespace stxxl {
 
 //! \defgroup stlcontinternals internals

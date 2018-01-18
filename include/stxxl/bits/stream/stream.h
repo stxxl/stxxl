@@ -208,7 +208,7 @@ auto streamify(
     stxxl::vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    STXXL_VERBOSE1("streamify for vector_iterator range is called");
+    LOG0 << "streamify for vector_iterator range is called";
     return vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
@@ -234,7 +234,7 @@ auto streamify(
     stxxl::const_vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
+    LOG0 << "streamify for const_vector_iterator range is called";
     return vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
@@ -255,6 +255,8 @@ struct streamify_traits<stxxl::const_vector_iterator<VectorConfig> >
 template <typename InputIterator>
 class vector_iterator2stream_sr
 {
+    static constexpr bool debug = false;
+
     vector_iterator2stream<InputIterator>* vec_it_stream;
     iterator2stream<InputIterator>* it_stream;
 
@@ -269,13 +271,13 @@ public:
     {
         if (end - begin < block_type::size)
         {
-            STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator>");
+            LOG << "vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator>";
             it_stream = new iterator2stream<InputIterator>(begin, end);
             vec_it_stream = nullptr;
         }
         else
         {
-            STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator>");
+            LOG << "vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator>";
             it_stream = nullptr;
             vec_it_stream = new vector_iterator2stream<InputIterator>(begin, end, nbuffers);
         }
@@ -337,7 +339,7 @@ auto streamify_sr(
     stxxl::vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
+    LOG0 << "streamify_sr for vector_iterator range is called";
     return vector_iterator2stream_sr<stxxl::vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
@@ -350,7 +352,7 @@ auto streamify_sr(
     stxxl::const_vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
+    LOG0 << "streamify_sr for const_vector_iterator range is called";
     return vector_iterator2stream_sr<
         stxxl::const_vector_iterator<VectorConfig> >(first, last, nbuffers);
 }

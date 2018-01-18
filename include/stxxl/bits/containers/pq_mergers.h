@@ -253,6 +253,8 @@ void merge4_iterator(
 template <class ArraysType, class CompareType, unsigned Arity>
 class loser_tree
 {
+    static constexpr bool debug = false;
+
 public:
     //! type of arrays container linked with loser tree
     using arrays_type = ArraysType;
@@ -470,7 +472,7 @@ public:
     //! make the tree twice as wide
     void double_k()
     {
-        STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        LOG << "double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(k > 0);
         assert(k < arity);
         assert(free_slots.empty());             // stack was free (probably not needed)
@@ -487,7 +489,7 @@ public:
         k *= 2;
         logK++;
 
-        STXXL_VERBOSE1("double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        LOG << "double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(!free_slots.empty());
         assert(k <= max_arity);
 
@@ -498,7 +500,7 @@ public:
     //! compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        STXXL_VERBOSE3("compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        LOG << "compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size();
         assert(logK > 0);
 
         // compact all nonempty segments to the left
@@ -520,8 +522,8 @@ public:
               {
               if(segment[pos])
               {
-              STXXL_VERBOSE2("int_arrays::compact_tree() deleting segment "<<pos<<
-              " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
+              LOG1 << "int_arrays::compact_tree() deleting segment "<<pos<<
+              " address: "<<segment[pos]<<" size: "<<segment_size[pos];
               delete [] segment[pos];
               segment[pos] = 0;
               mem_cons_ -= segment_size[pos];
@@ -546,7 +548,7 @@ public:
                 free_slots.push(last_empty);
         }
 
-        STXXL_VERBOSE3("compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        LOG << "compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size();
 
         // recompute loser tree information
         rebuild_loser_tree();
@@ -562,12 +564,12 @@ public:
         // because we have special mergers for k \in {1, 2, 4}
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_array_atsentinel(3)
-        STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
-                                                 << " <= #trigger=" << num_segments_trigger << " ==> "
-                                                 << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                                                 << " || "
-                                                 << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
-                                                 << " #free=" << free_slots.size());
+        LOG << "int_merger  compact? k=" << k << " #used=" << num_segments_used
+            << " <= #trigger=" << num_segments_trigger << " ==> "
+            << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+            << " || "
+            << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+            << " #free=" << free_slots.size();
         if (k > 1 &&
             ((num_segments_used <= num_segments_trigger) ||
              (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
@@ -678,7 +680,7 @@ public:
     {
         const size_t length = end - begin;
 
-        STXXL_VERBOSE3("multi_merge(length=" << length << ") from sequences k=" << k);
+        LOG << "multi_merge(length=" << length << ") from sequences k=" << k;
 
         if (begin == end)
             return;
@@ -787,6 +789,8 @@ public:
 template <class ArraysType, class CompareType, unsigned Arity>
 class parallel_merger_adapter
 {
+    static constexpr bool debug = false;
+
 public:
     //! type of arrays container linked with loser tree
     using arrays_type = ArraysType;
@@ -879,7 +883,7 @@ public:
     //! make the tree twice as wide
     void double_k()
     {
-        STXXL_VERBOSE1("double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        LOG << "double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(k > 0);
         assert(k < arity);
         assert(free_slots.empty());             // stack was free (probably not needed)
@@ -896,7 +900,7 @@ public:
         k *= 2;
         logK++;
 
-        STXXL_VERBOSE1("double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size());
+        LOG << "double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(!free_slots.empty());
         assert(k <= max_arity);
     }
@@ -904,7 +908,7 @@ public:
     //! compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        STXXL_VERBOSE3("compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        LOG << "compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size();
         assert(logK > 0);
 
         // compact all nonempty segments to the left
@@ -926,8 +930,8 @@ public:
               {
               if(segment[pos])
               {
-              STXXL_VERBOSE2("int_arrays::compact_tree() deleting segment "<<pos<<
-              " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
+              LOG << "int_arrays::compact_tree() deleting segment "<<pos<<
+              " address: "<<segment[pos]<<" size: "<<segment_size[pos];
               delete [] segment[pos];
               segment[pos] = 0;
               mem_cons_ -= segment_size[pos];
@@ -952,7 +956,7 @@ public:
                 free_slots.push(last_empty);
         }
 
-        STXXL_VERBOSE3("compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
+        LOG << "compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size();
     }
 
     //! compact tree if it got considerably smaller
@@ -965,12 +969,12 @@ public:
         // because we have special mergers for k \in {1, 2, 4}
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_array_atsentinel(3)
-        STXXL_VERBOSE3("int_merger  compact? k=" << k << " #used=" << num_segments_used
-                                                 << " <= #trigger=" << num_segments_trigger << " ==> "
-                                                 << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                                                 << " || "
-                                                 << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
-                                                 << " #free=" << free_slots.size());
+        LOG << "int_merger  compact? k=" << k << " #used=" << num_segments_used
+            << " <= #trigger=" << num_segments_trigger << " ==> "
+            << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+            << " || "
+            << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+            << " #free=" << free_slots.size();
         if (k > 1 &&
             ((num_segments_used <= num_segments_trigger) ||
              (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))

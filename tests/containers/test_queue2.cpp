@@ -12,11 +12,6 @@
 
 #define STXXL_DEFAULT_BLOCK_SIZE(T) 4096
 
-#define STXXL_VERBOSE_LEVEL 0
-
-// stxxl::queue contains deprecated funtions
-#define STXXL_NO_DEPRECATED 1
-
 #include <tlx/logger.hpp>
 
 #include <stxxl/queue>
