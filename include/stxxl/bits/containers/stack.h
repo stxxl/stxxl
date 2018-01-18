@@ -610,29 +610,6 @@ public:
         LOG << "grow_shrink_stack2::grow_shrink_stack2(...)";
     }
 
-    //! Default constructor: creates empty stack. The stack will use the pair
-    //! of prefetch_pool and write_pool for prefetching and buffered writing.
-    //! This constructor is deprecated in favor of the read_write_pool
-    //! constructor.
-    //!
-    //! \param p_pool_ prefetch pool, that will be used for block prefetching
-    //! \param w_pool_ write pool, that will be used for block writing
-    //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
-    STXXL_DEPRECATED(
-        grow_shrink_stack2(foxxll::prefetch_pool<block_type>&p_pool_,
-                           foxxll::write_pool<block_type>&w_pool_,
-                           const size_t prefetch_aggressiveness = 0)
-        )
-        : m_size(0),
-          cache_offset(0),
-          cache(new block_type),
-          pref_aggr(prefetch_aggressiveness),
-          owned_pool(new pool_type(p_pool_, w_pool_)),
-          pool(owned_pool)
-    {
-        LOG << "grow_shrink_stack2::grow_shrink_stack2(...)";
-    }
-
     //! non-copyable: delete copy-constructor
     grow_shrink_stack2(const grow_shrink_stack2&) = delete;
     //! non-copyable: delete assignment operator
