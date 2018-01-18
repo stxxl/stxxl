@@ -116,7 +116,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
 #else
             stxxl::random_number32_r rnd(1234);
 #endif
-            for (long i = 0; i < (long)seq_count; ++i)
+            for (long i = 0; i < static_cast<long>(seq_count); ++i)
             {
                 for (size_t j = 0; j < seq_items; ++j)
                     seqs[i][j] = ValueType(rnd());
@@ -289,7 +289,7 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
             << " inner_repeats=" << g_inner_repeat
             << " outer_repeats=" << g_outer_repeat
             << " time/item[ns]="
-            << spt.timer().seconds() / (double)g_inner_repeat / (double)total_size * 1e9
+            << spt.timer().seconds() / static_cast<double>(g_inner_repeat) / total_size * 1e9
             << std::endl;
     }
 
@@ -354,7 +354,7 @@ void test_seqsize(const size_t seq_num = 64)
         test_repeat<ValueType, Method>(seq_num, b);
 
     for (size_t b = 1024 * 1024 / seq_num;
-         b < 1024 * 1024 * (size_t)1024 / seq_num; b *= 2)
+         b < 1024 * 1024 * static_cast<size_t>(1024) / seq_num; b *= 2)
         test_repeat<ValueType, Method>(seq_num, b);
 }
 

@@ -30,7 +30,7 @@ struct rand_pairs
 
     std::pair<int, int> operator () ()
     {
-        int v = (int)rand_();
+        int v = static_cast<int>(rand_());
         return std::pair<int, int>(v, v);
     }
 };
@@ -40,7 +40,7 @@ struct hash_int
     size_t operator () (int key) const
     {
         // a simple integer hash function
-        return (size_t)(key * 2654435761u);
+        return static_cast<size_t>(key * 2654435761u);
     }
 };
 
@@ -71,7 +71,7 @@ struct hash_structA
     size_t operator () (const structA& key) const
     {
         // a simple integer hash function
-        return (size_t)((key.x + key.y) * 2654435761u);
+        return static_cast<size_t>((key.x + key.y) * 2654435761u);
     }
 };
 

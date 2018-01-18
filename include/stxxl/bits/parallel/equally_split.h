@@ -43,7 +43,7 @@ DiffTypeOutputIterator equally_split(DiffType n, thread_index_t p,
     for (thread_index_t i = 0; i < p; i++)
     {
         *s++ = start;
-        start += ((DiffType)i < split) ? (chunk_length + 1) : chunk_length;
+        start += (static_cast<DiffType>(i) < split) ? (chunk_length + 1) : chunk_length;
     }
     *s++ = n;
 

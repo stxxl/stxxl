@@ -89,7 +89,7 @@ static inline void progress(const char* text, external_size_type i, external_siz
     if ((i % PRINTMOD) == 0)
         LOG1 << text << " " << i << " ("
              << std::setprecision(5)
-             << ((double)i * 100.0 / (double)nelements) << " %)";
+             << (i * 100.0 / nelements) << " %)";
 }
 
 template <typename PQType>

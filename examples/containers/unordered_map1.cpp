@@ -22,7 +22,7 @@ struct HashFunctor
     size_t operator () (int key) const
     {
         // a simple integer hash function
-        return (size_t)(key * 2654435761u);
+        return static_cast<size_t>(key * 2654435761u);
     }
 };
 //! [hash]
@@ -77,7 +77,7 @@ int main()
     std::vector<unordered_map_type::value_type> value_array;
 
     for (int i = 0; i < 128; ++i)
-        value_array.push_back(std::make_pair(i, (char)i));
+        value_array.push_back(std::make_pair(i, static_cast<char>(i)));
 
     my_map.insert(value_array.begin(), value_array.end(), 8 * 1024 * 1024);
 

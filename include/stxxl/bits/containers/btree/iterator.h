@@ -119,7 +119,7 @@ protected:
         assert(btree);
         leaf_type* leaf = btree->m_leaf_cache.get_node(bid);
         assert(leaf);
-        return (reference)((*leaf)[pos]);
+        return reinterpret_cast<reference>((*leaf)[pos]);
     }
 
     const_reference const_access() const
@@ -127,7 +127,7 @@ protected:
         assert(btree);
         leaf_type const* leaf = btree->m_leaf_cache.get_const_node(bid);
         assert(leaf);
-        return (reference)((*leaf)[pos]);
+        return reinterpret_cast<const_reference>((*leaf)[pos]);
     }
 
     bool operator == (const btree_iterator_base& obj) const

@@ -234,7 +234,7 @@ create_runs(
     }
 
     size_t k = 0;
-    const int shift1 = (int)(sizeof(key_type) * 8 - log_k1);
+    const int shift1 = static_cast<int>(sizeof(key_type) * 8 - log_k1);
     const int shift2 = shift1 - log_k2;
     LOG1 << "shift1: " << shift1 << " shift2:" << shift2;
 

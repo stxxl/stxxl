@@ -37,7 +37,7 @@ int main()
     stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();
 
     // Access random element x at position p(x) in the deque
-    p = (unsigned int)(rand32() % number_of_elements);
+    p = static_cast<unsigned int>(rand32() % number_of_elements);
     x = my_deque[p];
 
     // Count number of smaller elements from the front to p(x) - 1

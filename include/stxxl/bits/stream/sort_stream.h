@@ -1441,8 +1441,8 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                 new_runs.runs_sizes[cur_out_run] = elements_in_new_run;
 
                 // calculate blocks in run
-                const size_t blocks_in_new_run = (size_t)foxxll::div_ceil(
-                    elements_in_new_run, block_type::size);
+                const size_t blocks_in_new_run = static_cast<size_t>(foxxll::div_ceil(
+                    elements_in_new_run, block_type::size));
 
                 // allocate blocks for the new runs
                 new_runs.runs[cur_out_run].resize(blocks_in_new_run);
@@ -1484,7 +1484,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
                     {
                         *out = *merger;
                         if ((cnt % block_type::size) == 0)     // have to write the trigger value
-                            new_runs.runs[cur_out_run][(size_t)(cnt / size_type(block_type::size))].value = *merger;
+                            new_runs.runs[cur_out_run][static_cast<size_t>(cnt / size_type(block_type::size))].value = *merger;
 
                         ++cnt, ++out, ++merger;
                     }

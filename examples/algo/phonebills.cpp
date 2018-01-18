@@ -73,7 +73,7 @@ struct ProduceBill
                    (last.event == 2 && e.event == 1));
 
             if (e.event == 2)            // call ended
-                sum += CT_PER_MIN * (unsigned int)(e.timestamp - last.timestamp) / 60;
+                sum += CT_PER_MIN * static_cast<unsigned int>(e.timestamp - last.timestamp) / 60;
         }
         else if (last.from != -1)
         {

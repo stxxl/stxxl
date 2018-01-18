@@ -34,7 +34,7 @@ void test_write(const char* fn, const char* ft, size_t sz, my_type ofs)
         v.resize(sz);
         LOG1 << "writing " << v.size() << " elements";
         for (size_t i = 0; i < v.size(); ++i)
-            v[i] = ofs + (int)i;
+            v[i] = ofs + static_cast<int>(i);
     }
 }
 

@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
     LOG1 << "Filling vector with min_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)";
     for (vector_type::size_type i = 0; i < v.size(); i++) {
         v[i].m_key = 0;
-        v[i].m_data = (int)(i + 1);
+        v[i].m_data = static_cast<int>(i + 1);
     }
 
     LOG1 << "Checking order...";
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
             ++aliens;
         else if (v[i].m_data != i + 1)
             ++not_stable;
-        v[i].m_data = (int)(i + 1);
+        v[i].m_data = static_cast<int>(i + 1);
     }
     LOG1 << "elements that were not in the input:     " << aliens;
     LOG1 << "elements not on their expected location: " << not_stable;
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
             ++aliens;
         else if (v[i].m_data != i + 1)
             ++not_stable;
-        v[i].m_data = (int)(i + 1);
+        v[i].m_data = static_cast<int>(i + 1);
     }
     LOG1 << "elements that were not in the input:     " << aliens;
     LOG1 << "elements not on their expected location: " << not_stable;

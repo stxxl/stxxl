@@ -82,7 +82,7 @@ int main()
 #if STXXL_PARALLEL
     #pragma omp parallel for
 #endif
-    for (int64_t i = 0; i < (int64_t)out1.size(); ++i)
+    for (int64_t i = 0; i < static_cast<int64_t>(out1.size()); ++i)
     {
         // process out[i]
     }
@@ -105,7 +105,7 @@ int main()
 #if STXXL_PARALLEL
     #pragma omp parallel for
 #endif
-    for (int64_t i = 0; i < (int64_t)out2.size(); ++i)
+    for (int64_t i = 0; i < static_cast<int64_t>(out2.size()); ++i)
     {
         // process out[i]
     }

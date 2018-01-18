@@ -41,7 +41,7 @@ struct hash_int
     size_t operator () (int key) const
     {
         // a simple integer hash function
-        return (size_t)(key * 2654435761u);
+        return static_cast<size_t>(key * 2654435761u);
     }
 };
 

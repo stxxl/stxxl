@@ -65,7 +65,7 @@ int main()
     // insert random numbers from [0,100000)
     for (size_t i = 0; i < 1000; ++i)
     {
-        int_sorter.push(TwoInteger(rand32() % 100000, (int)i));    // fill sorter container
+        int_sorter.push(TwoInteger(rand32() % 100000, static_cast<int>(i)));    // fill sorter container
     }
 
     Timer1.stop();

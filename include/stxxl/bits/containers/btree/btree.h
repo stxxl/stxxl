@@ -137,7 +137,7 @@ private:
                 ++block_it;
                 ++it;
             }
-            left_node->block().info.cur_size = (unsigned int)half;
+            left_node->block().info.cur_size = static_cast<unsigned int>(half);
             key_type left_key = (left_node->block()[half - 1]).first;
 
             block_it = right_node->block().begin();
@@ -149,7 +149,7 @@ private:
                 ++it;
             }
 
-            const size_t right_size = static_cast<size_t>(old_size - half);
+            const auto right_size = static_cast<size_t>(old_size - half);
             right_node->block().info.cur_size = right_size;
 
             key_type right_key = (right_node->block()[right_size - 1]).first;
@@ -193,8 +193,8 @@ private:
         }
 
         // now fuse or balance nodes pointed by leftIt and rightIt
-        local_bid_type left_bid = (local_bid_type)left_it->second;
-        local_bid_type right_bid = (local_bid_type)right_it->second;
+        auto left_bid = static_cast<local_bid_type>(left_it->second);
+        auto right_bid = static_cast<local_bid_type>(right_it->second);
         local_node_type* left_node = cache.get_node(left_bid, true);
         local_node_type* right_node = cache.get_node(right_bid, true);
 
@@ -223,7 +223,7 @@ private:
             m_root_node.erase(left_it);
 
             // reinsert with the new key
-            m_root_node.insert(root_node_pair_type(new_splitter, (node_bid_type)left_bid));
+            m_root_node.insert(root_node_pair_type(new_splitter, static_cast<node_bid_type>(left_bid)));
 
             cache.unfix_node(left_bid);
             cache.unfix_node(right_bid);
@@ -237,7 +237,7 @@ private:
         assert(new_leaf);
         m_end_iterator = new_leaf->end();           // initialize end() iterator
         m_root_node.insert(
-            root_node_pair_type(m_key_compare.max_value(), (node_bid_type)new_bid));
+            root_node_pair_type(m_key_compare.max_value(), static_cast<node_bid_type>(new_bid)));
     }
 
     void deallocate_children()
@@ -249,7 +249,7 @@ private:
                  it != m_root_node.end(); ++it)
             {
                 // delete from leaf cache and deallocate bid
-                m_leaf_cache.delete_node((leaf_bid_type)it->second);
+                m_leaf_cache.delete_node(static_cast<leaf_bid_type>(it->second));
             }
         }
         else
@@ -257,11 +257,11 @@ private:
             for (root_node_const_iterator_type it = m_root_node.begin();
                  it != m_root_node.end(); ++it)
             {
-                node_type* node = m_node_cache.get_node((node_bid_type)it->second);
+                node_type* node = m_node_cache.get_node(static_cast<node_bid_type>(it->second));
                 assert(node);
                 node->deallocate_children(m_height - 1);
                 // delete from node cache and deallocate bid
-                m_node_cache.delete_node((node_bid_type)it->second);
+                m_node_cache.delete_node(static_cast<node_bid_type>(it->second));
             }
         }
     }
@@ -297,7 +297,7 @@ private:
                 if (leaf->size() == max_leaf_elements)
                 {
                     // overflow, need a new block
-                    bids.push_back(key_bid_pair(leaf->back().first, (node_bid_type)new_bid));
+                    bids.push_back(key_bid_pair(leaf->back().first, static_cast<node_bid_type>(new_bid)));
 
                     leaf_type* new_leaf = m_leaf_cache.get_new_node(new_bid);
                     assert(new_leaf);
@@ -316,13 +316,13 @@ private:
         // rebalance the last leaf
         if (leaf->underflows() && !bids.empty())
         {
-            leaf_type* left_leaf = m_leaf_cache.get_node((leaf_bid_type)(bids.back().second));
+            leaf_type* left_leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(bids.back().second));
             assert(left_leaf);
             if (left_leaf->size() + leaf->size() <= leaf->max_nelements())
             {
                 // can fuse
                 leaf->fuse(*left_leaf);
-                m_leaf_cache.delete_node((leaf_bid_type)(bids.back().second));
+                m_leaf_cache.delete_node(static_cast<leaf_bid_type>(bids.back().second));
                 bids.pop_back();
                 assert(!leaf->overflows() && !leaf->underflows());
             }
@@ -339,9 +339,9 @@ private:
 
         m_end_iterator = leaf->end();                 // initialize end() iterator
 
-        bids.push_back(key_bid_pair(m_key_compare.max_value(), (node_bid_type)new_bid));
+        bids.push_back(key_bid_pair(m_key_compare.max_value(), static_cast<node_bid_type>(new_bid)));
 
-        const size_t max_node_elements = static_cast<size_t>(
+        const auto max_node_elements = static_cast<size_t>(
             max_node_size * node_fill_factor);
 
         //-tb fixes bug with only one child remaining in m_root_node
@@ -516,14 +516,14 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Inserting new value into a leaf";
-            leaf_type* leaf = m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            leaf_type* leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             std::pair<key_type, leaf_bid_type> splitter;
             std::pair<iterator, bool> result = leaf->insert(x, splitter);
             if (result.second)
                 ++m_size;
 
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             //if(key_compare::max_value() == Splitter.first)
             if (!(m_key_compare(m_key_compare.max_value(), splitter.first) ||
                   m_key_compare(splitter.first, m_key_compare.max_value())))
@@ -541,14 +541,14 @@ public:
 
         // 'it' points to a node
         LOG << "Inserting new value into a node";
-        node_type* node = m_node_cache.get_node((node_bid_type)it->second, true);
+        node_type* node = m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         std::pair<key_type, node_bid_type> splitter;
         std::pair<iterator, bool> result = node->insert(x, m_height - 1, splitter);
         if (result.second)
             ++m_size;
 
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
         //if(key_compare::max_value() == Splitter.first)
         if (!(m_key_compare(m_key_compare.max_value(), splitter.first) ||
               m_key_compare(splitter.first, m_key_compare.max_value())))
@@ -573,7 +573,7 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "btree: retrieving begin() from the first leaf";
-            leaf_type* leaf = m_leaf_cache.get_node((leaf_bid_type)it->second);
+            leaf_type* leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second));
             assert(leaf);
 
             assert(m_leaf_cache.nfixed() == 0);
@@ -583,10 +583,10 @@ public:
 
         // 'it' points to a node
         LOG << "btree: retrieving begin() from the first node";
-        node_type* node = m_node_cache.get_node((node_bid_type)it->second, true);
+        node_type* node = m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         iterator result = node->begin(m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
@@ -602,7 +602,7 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "btree: retrieving begin() from the first leaf";
-            const leaf_type* leaf = m_leaf_cache.get_const_node((leaf_bid_type)it->second);
+            const leaf_type* leaf = m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(it->second));
             assert(leaf);
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
@@ -611,10 +611,10 @@ public:
 
         // 'it' points to a node
         LOG << "btree: retrieving begin() from the first node";
-        const node_type* node = m_node_cache.get_const_node((node_bid_type)it->second, true);
+        const node_type* node = m_node_cache.get_const_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         const_iterator result = node->begin(m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
         return result;
@@ -643,10 +643,10 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Searching in a leaf";
-            leaf_type* leaf = m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            leaf_type* leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             iterator result = leaf->find(k);
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             assert(result == end() || result->first == k);
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
@@ -655,10 +655,10 @@ public:
 
         // 'it' points to a node
         LOG << "Searching in a node";
-        node_type* node = m_node_cache.get_node((node_bid_type)it->second, true);
+        node_type* node = m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         iterator result = node->find(k, m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(result == end() || result->first == k);
         assert(m_leaf_cache.nfixed() == 0);
@@ -674,10 +674,10 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Searching in a leaf";
-            const leaf_type* leaf = m_leaf_cache.get_const_node((leaf_bid_type)it->second, true);
+            const leaf_type* leaf = m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             const_iterator result = leaf->find(k);
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             assert(result == end() || result->first == k);
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
@@ -686,10 +686,10 @@ public:
 
         // 'it' points to a node
         LOG << "Searching in a node";
-        const node_type* node = m_node_cache.get_const_node((node_bid_type)it->second, true);
+        const node_type* node = m_node_cache.get_const_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         const_iterator result = node->find(k, m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(result == end() || result->first == k);
         assert(m_leaf_cache.nfixed() == 0);
@@ -705,10 +705,10 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Searching lower bound in a leaf";
-            leaf_type* leaf = m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            leaf_type* leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             iterator result = leaf->lower_bound(k);
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
             return result;
@@ -716,10 +716,10 @@ public:
 
         // 'it' points to a node
         LOG << "Searching lower bound in a node";
-        node_type* node = m_node_cache.get_node((node_bid_type)it->second, true);
+        node_type* node = m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         iterator result = node->lower_bound(k, m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
@@ -734,10 +734,10 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Searching lower bound in a leaf";
-            const leaf_type* leaf = m_leaf_cache.get_const_node((leaf_bid_type)it->second, true);
+            const leaf_type* leaf = m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             const_iterator result = leaf->lower_bound(k);
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
 
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
@@ -746,10 +746,10 @@ public:
 
         // 'it' points to a node
         LOG << "Searching lower bound in a node";
-        const node_type* node = m_node_cache.get_const_node((node_bid_type)it->second, true);
+        const node_type* node = m_node_cache.get_const_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         const_iterator result = node->lower_bound(k, m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
@@ -764,10 +764,10 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Searching upper bound in a leaf";
-            leaf_type* Leaf = m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            leaf_type* Leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(Leaf);
             iterator result = Leaf->upper_bound(k);
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
 
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
@@ -776,10 +776,10 @@ public:
 
         // 'it' points to a node
         LOG << "Searching upper bound in a node";
-        node_type* Node = m_node_cache.get_node((node_bid_type)it->second, true);
+        node_type* Node = m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
         assert(Node);
         iterator result = Node->upper_bound(k, m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
@@ -794,10 +794,10 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Searching upper bound in a leaf";
-            const leaf_type* leaf = m_leaf_cache.get_const_node((leaf_bid_type)it->second, true);
+            const leaf_type* leaf = m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             const_iterator result = leaf->upper_bound(k);
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
 
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
@@ -806,10 +806,10 @@ public:
 
         // 'it' points to a node
         LOG << "Searching upper bound in a node";
-        const node_type* node = m_node_cache.get_const_node((node_bid_type)it->second, true);
+        const node_type* node = m_node_cache.get_const_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         const_iterator result = node->upper_bound(k, m_height - 1);
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
 
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
@@ -865,11 +865,11 @@ public:
         if (m_height == 2)                // 'it' points to a leaf
         {
             LOG << "Deleting key from a leaf";
-            leaf_type* Leaf = m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            leaf_type* Leaf = m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(Leaf);
             size_type result = Leaf->erase(k);
             m_size -= result;
-            m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             assert(m_leaf_cache.nfixed() == 0);
             assert(m_node_cache.nfixed() == 0);
 
@@ -889,11 +889,11 @@ public:
         // 'it' points to a node
         LOG << "Deleting key from a node";
         assert(m_root_node.size() >= 2);
-        node_type* node = m_node_cache.get_node((node_bid_type)it->second, true);
+        node_type* node = m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
         assert(node);
         size_type result = node->erase(k, m_height - 1);
         m_size -= result;
-        m_node_cache.unfix_node((node_bid_type)it->second);
+        m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
         assert(m_leaf_cache.nfixed() == 0);
         assert(m_node_cache.nfixed() == 0);
         if (!node->underflows())

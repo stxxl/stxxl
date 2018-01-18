@@ -82,7 +82,7 @@ public:
      */
     void unwrap()
     {
-        P* p = reinterpret_cast<P*>((void*)data);
+        auto* p = reinterpret_cast<P*>(data);
         p->~P();
     }
 
@@ -91,14 +91,14 @@ public:
      */
     P get() const
     {
-        P* p = reinterpret_cast<P*>((void*)data);
+        auto* p = reinterpret_cast<P*>(const_cast<char*>(data));
         return *p;
     }
 
     bool operator == (const external_shared_ptr& x) const
     {
-        P* p1 = reinterpret_cast<P*>((void*)data);
-        P* p2 = reinterpret_cast<P*>((void*)x.data);
+        auto* p1 = reinterpret_cast<P*>(const_cast<char*>(data));
+        auto* p2 = reinterpret_cast<P*>(const_cast<char*>(x.data));
 
         return *p1 == *p2;
     }

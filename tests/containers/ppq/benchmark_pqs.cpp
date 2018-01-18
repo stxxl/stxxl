@@ -295,7 +295,7 @@ public:
     CStxxlParallePQ()
         : PQBase("Parallel PQ", "ppq"),
           pq_type(typename ValueType::compare_greater(),
-                  RAM, (float)num_prefetchers, num_write_buffers,
+                  RAM, static_cast<float>(num_prefetchers), num_write_buffers,
                   g_max_threads, single_heap_ram, extract_buffer_ram)
     { }
 
@@ -1291,7 +1291,7 @@ void do_bulk_limit(ContainerType& c, bool do_parallel)
         std::cout << "bulk-limit cycles: " << cycles << "\n";
     }
 
-    die_unequal(c.size(), (size_t)windex - rindex);
+    die_unequal(c.size(), static_cast<size_t>(windex) - rindex);
     die_unequal(c.size(), num_elements);
 
     do_bulk_postempty(c, do_parallel, rindex);
@@ -1362,7 +1362,7 @@ void do_bulk_pop_push(ContainerType& c, bool do_parallel)
         std::cout << "bulk-pop-push cycles: " << cycles << "\n";
     }
 
-    die_unequal(c.size(), (size_t)windex - rindex);
+    die_unequal(c.size(), static_cast<size_t>(windex) - rindex);
     die_unequal(c.size(), num_elements);
 
     do_bulk_postempty(c, do_parallel, rindex);
@@ -1663,7 +1663,7 @@ int main(int argc, char* argv[])
     cp.add_bytes('m', "ram", RAM,
                  "Amount of main memory in Bytes (not possible for STXXL PQ)");
 
-    cp.add_bytes('k', "bulk_size", (size_t&)bulk_size,
+    cp.add_bytes('k', "bulk_size", bulk_size,
                  "Number of elements per bulk");
 
     cp.add_bytes('u', "universe_size", value_universe_size,

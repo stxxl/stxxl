@@ -924,7 +924,7 @@ protected:
 
         // calculate minimum and maximum values
         const size_t this_block_items =
-            std::min<size_t>(block_items, m_capacity - block_index * (external_size_type)block_items);
+            std::min<size_t>(block_items, m_capacity - block_index * static_cast<external_size_type>(block_items));
 
         LOG << "ea[" << this << "]: write_block index=" << block_index <<
             " this_block_items=" << this_block_items;
@@ -1090,7 +1090,7 @@ public:
             ++i;
         }
 
-        m_end_index = std::min(m_capacity, i * (external_size_type)block_items);
+        m_end_index = std::min(m_capacity, i * static_cast<external_size_type>(block_items));
 
         return i - begin;
     }
@@ -1111,7 +1111,7 @@ public:
             update_block_pointers(i);
             ++i;
         }
-        m_end_index = std::min(m_capacity, i * (external_size_type)block_items);
+        m_end_index = std::min(m_capacity, i * static_cast<external_size_type>(block_items));
         return i - begin;
     }
 
@@ -1213,7 +1213,7 @@ protected:
     inline size_t last_block_items()
     {
         size_t mod = m_capacity % block_items;
-        return (mod > 0) ? mod : (size_t)block_items;
+        return (mod > 0) ? mod : static_cast<size_t>(block_items);
     }
 };
 
@@ -1552,12 +1552,12 @@ public:
         // threads write to. this prohibits the blocks to be written to disk
         // and read again.
 
-        double step = (double)m_ea.capacity() / (double)num_threads;
+        double step = static_cast<double>(m_ea.capacity()) / num_threads;
         m_live_boundary.resize(num_threads - 1);
 
         for (unsigned int i = 0; i < num_threads - 1; ++i)
         {
-            external_size_type index = (external_size_type)((i + 1) * step);
+            auto index = static_cast<external_size_type>((i + 1) * step);
             LOG << "hold index " << index <<
                 " in block " << index / ea_type::block_items;
             m_live_boundary[i] = iterator(this, index);
@@ -2416,7 +2416,7 @@ public:
                 (extract_buffer_ram > 0)
                 ? extract_buffer_ram / sizeof(value_type)
                 : static_cast<size_type>(
-                    (double)(m_mem_total) *
+                    static_cast<double>(m_mem_total) *
                     c_default_extract_buffer_ram_part / sizeof(value_type));
         }
 
@@ -2435,7 +2435,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-        for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
+        for (long p = 0; p < static_cast<long>(m_num_insertion_heaps); ++p)
         {
             m_proc[p] = new ProcessorData;
             m_proc[p]->insertion_heap.reserve(m_insertion_heap_capacity);
@@ -2773,7 +2773,7 @@ public:
 #if STXXL_PARALLEL
 #pragma omp parallel for
 #endif
-            for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
+            for (long p = 0; p < static_cast<long>(m_num_insertion_heaps); ++p)
             {
                 // reestablish heap property: siftUp only those items pushed
                 for (size_t index = m_proc[p]->heap_add_size; index != 0; ) {
@@ -3317,7 +3317,7 @@ protected:
 //#if STXXL_PARALLEL
 //#pragma omp parallel for
 //#endif
-        for (long p = 0; p < (long)m_num_insertion_heaps; ++p)
+        for (long p = 0; p < static_cast<long>(m_num_insertion_heaps); ++p)
         {
             heap_type& insheap = m_proc[p]->insertion_heap;
 
@@ -3504,7 +3504,7 @@ public:
         while (free_prefetch_blocks > 0 &&
                (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
-            assert((size_t)gmin_index < m_external_arrays.size());
+            assert(gmin_index < m_external_arrays.size());
 
             LOG << "Give pre-hint in EA[" << gmin_index << "] min " <<
                 m_external_arrays[gmin_index].get_next_hintable_min();
@@ -3575,7 +3575,7 @@ public:
         while (m_pool.free_size_prefetch() > 0 &&
                (gmin_index = m_hint_tree.top()) != m_hint_tree.invalid_key)
         {
-            assert((size_t)gmin_index < m_external_arrays.size());
+            assert(gmin_index < m_external_arrays.size());
 
             LOG << "Give hint in EA[" << gmin_index << "]";
             m_external_arrays[gmin_index].hint_next_block();
@@ -4042,7 +4042,7 @@ protected:
 #if STXXL_PARALLEL
         #pragma omp parallel for
 #endif
-        for (long i = 0; i < (long)m_num_insertion_heaps; ++i)
+        for (long i = 0; i < static_cast<long>(m_num_insertion_heaps); ++i)
         {
             heap_type& insheap = m_proc[i]->insertion_heap;
 
@@ -4131,7 +4131,7 @@ protected:
         // must release more RAM in IAs than the EA takes, otherwise: merge
         // external and internal arrays!
         if (int_memory < external_array_type::int_memory(size)
-            + (size_t)ceil(m_num_read_blocks_per_ea) * block_size)
+            + static_cast<size_t>(ceil(m_num_read_blocks_per_ea)) * block_size)
         {
             return merge_external_arrays();
         }

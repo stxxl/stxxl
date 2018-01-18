@@ -80,7 +80,7 @@ void short_test()
     vector_type::size_type i;
     vector_type v(2048);
     for (i = 0; i < v.size(); ++i)
-        v[i] = (int)(i / 1024 + 1);
+        v[i] = static_cast<int>(i / 1024 + 1);
 
     std::cout << v.size() << std::endl;
     std::cout << "before shuffle:" << std::endl;

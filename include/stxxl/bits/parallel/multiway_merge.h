@@ -502,7 +502,7 @@ RandomAccessIterator3 multiway_merge_3_combined(
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
         total_length += iterpair_size(*s);
 
-    if (overhang != (DiffType)(-1))
+    if (overhang != static_cast<DiffType>(-1))
     {
         DiffType unguarded_length = std::min(length, total_length - overhang);
         target_end = multiway_merge_3_variant<unguarded_iterator>
@@ -721,7 +721,7 @@ RandomAccessIterator3 multiway_merge_4_combined(
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
         total_length += iterpair_size(*s);
 
-    if (overhang != (DiffType) - 1)
+    if (overhang != static_cast<DiffType>(-1))
     {
         DiffType unguarded_length = std::min(length, total_length - overhang);
         target_end = multiway_merge_4_variant<unguarded_iterator>
@@ -1190,7 +1190,7 @@ RandomAccessIterator3 multiway_merge_loser_tree_combined(
     for (RandomAccessIteratorIterator s = seqs_begin; s != seqs_end; ++s)
         total_length += iterpair_size(*s);
 
-    if (overhang != (DiffType)(-1))
+    if (overhang != static_cast<DiffType>(-1))
     {
         DiffType unguarded_length = std::min(length, total_length - overhang);
         target_end = multiway_merge_loser_tree_unguarded
@@ -1736,7 +1736,7 @@ RandomAccessIterator3 multiway_merge(
     RandomAccessIterator3 target_end;
     if (STXXL_PARALLEL_CONDITION(
             ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
-            ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
+            (static_cast<sequence_index_t>(length) >= SETTINGS::multiway_merge_minimal_n)))
         target_end = parallel_multiway_merge<false>(
             seqs_begin, seqs_end, target, length, comp);
     else
@@ -1777,7 +1777,7 @@ RandomAccessIterator3 multiway_merge_stable(
     RandomAccessIterator3 target_end;
     if (STXXL_PARALLEL_CONDITION(
             ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
-            ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
+            (static_cast<sequence_index_t>(length) >= SETTINGS::multiway_merge_minimal_n)))
         target_end = parallel_multiway_merge<true>(
             seqs_begin, seqs_end, target, length, comp);
     else
@@ -1822,7 +1822,7 @@ RandomAccessIterator3 multiway_merge_sentinels(
 
     if (STXXL_PARALLEL_CONDITION(
             ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
-            ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
+            (static_cast<sequence_index_t>(length) >= SETTINGS::multiway_merge_minimal_n)))
         return parallel_multiway_merge<false>(
             seqs_begin, seqs_end, target, length, comp);
     else
@@ -1865,7 +1865,7 @@ RandomAccessIterator3 multiway_merge_stable_sentinels(
 
     if (STXXL_PARALLEL_CONDITION(
             ((seqs_end - seqs_begin) >= SETTINGS::multiway_merge_minimal_k) &&
-            ((sequence_index_t)length >= SETTINGS::multiway_merge_minimal_n)))
+            (static_cast<sequence_index_t>(length) >= SETTINGS::multiway_merge_minimal_n)))
         return parallel_multiway_merge<true>(
             seqs_begin, seqs_end, target, length, comp);
     else

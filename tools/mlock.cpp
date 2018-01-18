@@ -47,17 +47,17 @@ int do_mlock(int argc, char* argv[])
         return -1;
 
     // allocate and fill
-    char* c = (char*)malloc(M);
+    auto* c = static_cast<char*>(malloc(M));
     memset(c, 42, M);
 
     if (mlock(c, M) == 0)
     {
-        std::cout << "mlock(" << (void*)c << ", " << M << ") successful, press Ctrl-C to exit." << std::endl;
+        std::cout << "mlock(" << static_cast<void*>(c) << ", " << M << ") successful, press Ctrl-C to exit." << std::endl;
         while (1)
             sleep(86400);
     }
     else {
-        std::cerr << "mlock(" << (void*)c << ", " << M << ") failed: " << strerror(errno) << std::endl;
+        std::cerr << "mlock(" << static_cast<void*>(c) << ", " << M << ") failed: " << strerror(errno) << std::endl;
         return 1;
     }
 }

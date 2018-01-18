@@ -223,7 +223,7 @@ public:
     {
         if (m_size + 1 > m_capacity)
         {
-            reserve(std::max((size_type)2, 2 * m_capacity));
+            reserve(std::max(static_cast<size_type>(2), 2 * m_capacity));
         }
         using std::swap;
         swap(m_array[m_size], val);

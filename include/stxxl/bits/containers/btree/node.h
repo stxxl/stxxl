@@ -163,8 +163,8 @@ private:
         }
 
         // now fuse or balance nodes pointed by leftIt and rightIt
-        local_bid_type left_bid = (local_bid_type)leftIt->second;
-        local_bid_type right_bid = (local_bid_type)rightIt->second;
+        local_bid_type left_bid = static_cast<local_bid_type>(leftIt->second);
+        local_bid_type right_bid = static_cast<local_bid_type>(rightIt->second);
         local_node_type* left_node = cache.get_node(left_bid, true);
         local_node_type* right_node = cache.get_node(right_bid, true);
 
@@ -342,11 +342,11 @@ public:
         if (height == 2)                        // found_bid points to a leaf
         {
             LOG << "btree::normal_node Inserting new value into a leaf";
-            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)it->second, true);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             std::pair<key_type, leaf_bid_type> bot_splitter;
             std::pair<iterator, bool> result = leaf->insert(x, bot_splitter);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             //if(key_compare::max_value() == BotSplitter.first)
             if (!(m_cmp(m_cmp.max_value(), bot_splitter.first) ||
                   m_cmp(bot_splitter.first, m_cmp.max_value())))
@@ -362,11 +362,11 @@ public:
         else
         {                               // found_bid points to a node
             LOG << "btree::normal_node Inserting new value into a node";
-            node_type* node = m_btree->m_node_cache.get_node((node_bid_type)it->second, true);
+            node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
             assert(node);
             std::pair<key_type, node_bid_type> bot_splitter;
             std::pair<iterator, bool> result = node->insert(x, height - 1, bot_splitter);
-            m_btree->m_node_cache.unfix_node((node_bid_type)it->second);
+            m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(it->second));
             //if(key_compare::max_value() == BotSplitter.first)
             if (!(m_cmp(m_cmp.max_value(), bot_splitter.first) ||
                   m_cmp(bot_splitter.first, m_cmp.max_value())))
@@ -388,17 +388,17 @@ public:
         {
             assert(size() > 1);
             LOG << "btree::node retrieveing begin() from the first leaf";
-            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)first_bid);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(first_bid));
             assert(leaf);
             return leaf->begin();
         }
         else
         {                         // FirstBid points to a node
             LOG << "btree: retrieveing begin() from the first node";
-            node_type* node = m_btree->m_node_cache.get_node((node_bid_type)first_bid, true);
+            node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(first_bid), true);
             assert(node);
             iterator result = node->begin(height - 1);
-            m_btree->m_node_cache.unfix_node((node_bid_type)first_bid);
+            m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(first_bid));
             return result;
         }
     }
@@ -410,17 +410,17 @@ public:
         {
             assert(size() > 1);
             LOG << "btree::node retrieveing begin() from the first leaf";
-            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)FirstBid);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(FirstBid));
             assert(leaf);
             return leaf->begin();
         }
         else
         {                         // FirstBid points to a node
             LOG << "btree: retrieveing begin() from the first node";
-            const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)FirstBid, true);
+            const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(FirstBid), true);
             assert(node);
             const_iterator result = node->begin(height - 1);
-            m_btree->m_node_cache.unfix_node((node_bid_type)FirstBid);
+            m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(FirstBid));
             return result;
         }
     }
@@ -439,20 +439,20 @@ public:
         if (height == 2)                // found_bid points to a leaf
         {
             LOG << "Searching in a leaf";
-            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             iterator result = leaf->find(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(found_bid));
 
             return result;
         }
 
         // found_bid points to a node
         LOG << "Searching in a node";
-        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         iterator result = node->find(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
 
         return result;
     }
@@ -471,20 +471,20 @@ public:
         if (height == 2)                // found_bid points to a leaf
         {
             LOG << "Searching in a leaf";
-            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)found_bid, true);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             const_iterator result = leaf->find(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(found_bid));
 
             return result;
         }
 
         // found_bid points to a node
         LOG << "Searching in a node";
-        const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)found_bid, true);
+        const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         const_iterator result = node->find(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
 
         return result;
     }
@@ -503,20 +503,20 @@ public:
         if (height == 2)                // found_bid points to a leaf
         {
             LOG << "Searching lower bound in a leaf";
-            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             iterator result = leaf->lower_bound(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(found_bid));
 
             return result;
         }
 
         // found_bid points to a node
         LOG << "Searching lower bound in a node";
-        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         iterator result = node->lower_bound(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
 
         return result;
     }
@@ -535,20 +535,20 @@ public:
         if (height == 2)                // found_bid points to a leaf
         {
             LOG << "Searching lower bound in a leaf";
-            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)found_bid, true);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             const_iterator result = leaf->lower_bound(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(found_bid));
 
             return result;
         }
 
         // found_bid points to a node
         LOG << "Searching lower bound in a node";
-        const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)found_bid, true);
+        const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         const_iterator result = node->lower_bound(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
 
         return result;
     }
@@ -567,20 +567,20 @@ public:
         if (height == 2)                // found_bid points to a leaf
         {
             LOG << "Searching upper bound in a leaf";
-            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             iterator result = leaf->upper_bound(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(found_bid));
 
             return result;
         }
 
         // found_bid points to a node
         LOG << "Searching upper bound in a node";
-        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         iterator result = node->upper_bound(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
 
         return result;
     }
@@ -599,20 +599,20 @@ public:
         if (height == 2)                // found_bid points to a leaf
         {
             LOG << "Searching upper bound in a leaf";
-            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node((leaf_bid_type)found_bid, true);
+            const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             const_iterator result = leaf->upper_bound(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)found_bid);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(found_bid));
 
             return result;
         }
 
         // found_bid points to a node
         LOG << "Searching upper bound in a node";
-        const node_type* node = m_btree->m_node_cache.get_const_node((node_bid_type)found_bid, true);
+        const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         const_iterator result = node->upper_bound(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
 
         return result;
     }
@@ -702,10 +702,10 @@ public:
         if (height == 2)                        // 'found_bid' points to a leaf
         {
             LOG << "btree::normal_node Deleting key from a leaf";
-            leaf_type* leaf = m_btree->m_leaf_cache.get_node((leaf_bid_type)found_bid, true);
+            leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             size_type result = leaf->erase(k);
-            m_btree->m_leaf_cache.unfix_node((leaf_bid_type)it->second);
+            m_btree->m_leaf_cache.unfix_node(static_cast<leaf_bid_type>(it->second));
             if (!leaf->underflows())
                 return result;
             // no underflow or root has a special degree 1 (too few elements)
@@ -718,10 +718,10 @@ public:
 
         // 'found_bid' points to a node
         LOG << "btree::normal_node Deleting key from a node";
-        node_type* node = m_btree->m_node_cache.get_node((node_bid_type)found_bid, true);
+        node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         size_type result = node->erase(k, height - 1);
-        m_btree->m_node_cache.unfix_node((node_bid_type)found_bid);
+        m_btree->m_node_cache.unfix_node(static_cast<node_bid_type>(found_bid));
         if (!node->underflows())
             return result;
         // no underflow happened
@@ -741,7 +741,7 @@ public:
                  it != block().begin() + size(); ++it)
             {
                 // delete from leaf cache and deallocate bid
-                m_btree->m_leaf_cache.delete_node((leaf_bid_type)it->second);
+                m_btree->m_leaf_cache.delete_node(static_cast<leaf_bid_type>(it->second));
             }
         }
         else
@@ -749,11 +749,11 @@ public:
             for (block_const_iterator it = block().begin();
                  it != block().begin() + size(); ++it)
             {
-                node_type* node = m_btree->m_node_cache.get_node((node_bid_type)it->second);
+                node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(it->second));
                 assert(node);
                 node->deallocate_children(height - 1);
                 // delete from node cache and deallocate bid
-                m_btree->m_node_cache.delete_node((node_bid_type)it->second);
+                m_btree->m_node_cache.delete_node(static_cast<node_bid_type>(it->second));
             }
         }
     }

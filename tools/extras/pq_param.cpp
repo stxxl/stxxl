@@ -47,8 +47,8 @@ int main()
                 cout << "c: " << c << endl;
                 cout << "k: " << k << endl;
                 int64_t Ae = m / 2;
-                int64_t Ae1 = Ae + int64_t(sqrt((double)D(m, k, MaxS, E, B)));
-                int64_t Ae2 = Ae - int64_t(sqrt((double)D(m, k, MaxS, E, B)));
+                int64_t Ae1 = Ae + int64_t(sqrt(static_cast<double>(D(m, k, MaxS, E, B))));
+                int64_t Ae2 = Ae - int64_t(sqrt(static_cast<double>(D(m, k, MaxS, E, B))));
                 int64_t x = c * B / E;
                 int64_t N = x / 4096;
                 cout << "Ae : " << Ae << endl;

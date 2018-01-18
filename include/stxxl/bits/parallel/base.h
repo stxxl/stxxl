@@ -56,7 +56,7 @@ public:
  */
 static inline lcas_t encode2(int a, int b) // must all be non-negative, actually
 {
-    return (((lcas_t)a) << (lcas_t_bits / 2)) | (((lcas_t)b) << 0);
+    return (static_cast<lcas_t>(a) << (lcas_t_bits / 2)) | (static_cast<lcas_t>(b) << 0);
 }
 
 /*!
@@ -69,8 +69,8 @@ static inline lcas_t encode2(int a, int b) // must all be non-negative, actually
  */
 static inline void decode2(lcas_t x, int& a, int& b)
 {
-    a = (int)((x >> (lcas_t_bits / 2)) & lcas_t_mask);
-    b = (int)((x >> 0) & lcas_t_mask);
+    a = static_cast<int>((x >> (lcas_t_bits / 2)) & lcas_t_mask);
+    b = static_cast<int>((x >> 0) & lcas_t_mask);
 }
 
 /*!

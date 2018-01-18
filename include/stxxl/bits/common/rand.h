@@ -111,7 +111,7 @@ public:
             m_value = m_rnd32();
             m_pos = 0;
         }
-        return ((uint8_t*)&m_value)[m_pos];
+        return reinterpret_cast<uint8_t*>(&m_value)[m_pos];
     }
 };
 

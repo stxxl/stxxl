@@ -71,7 +71,7 @@ void run(char* buffer, file** disks, external_size_type offset, external_size_ty
                 external_size_type position = (bytes * (rand() & 0xffff)) % length;
                 reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes);
                 buf += bytes;
-                volume += (double)bytes;
+                volume += static_cast<double>(bytes);
             }
         }
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     size_t i;
 
     file** disks = new file*[ndisks];
-    unsigned* buffer = (unsigned*)foxxll::aligned_alloc<BLOCK_ALIGN>(buffer_size);
+    unsigned* buffer = static_cast<unsigned*>(foxxll::aligned_alloc<BLOCK_ALIGN>(buffer_size));
 
     for (i = 0; i < buffer_size_int; i++)
         buffer[i] = unsigned(i);
@@ -134,13 +134,13 @@ int main(int argc, char* argv[])
     }
 
     try {
-        run((char*)buffer, disks, offset, length, 1, 2 * MB, 23, 128 * 1024, 100);
-        run((char*)buffer, disks, offset, length, 1, 2 * MB, 42, 128 * 1024, 100);
+        run(reinterpret_cast<char*>(buffer), disks, offset, length, 1, 2 * MB, 23, 128 * 1024, 100);
+        run(reinterpret_cast<char*>(buffer), disks, offset, length, 1, 2 * MB, 42, 128 * 1024, 100);
         for (unsigned hdd_bytes = 4 * KB; hdd_bytes < 256 * MB; hdd_bytes <<= 1) {
             for (unsigned ssd_bytes = 128 * KB; ssd_bytes == 128 * KB; ssd_bytes <<= 1) {
                 for (unsigned hdd_blocks = 1; hdd_blocks == 1; ++hdd_blocks) {
                     for (unsigned ssd_blocks = 0; ssd_blocks <= (std::max(16U, 2 * hdd_bytes * hdd_blocks / ssd_bytes)); ++ssd_blocks) {
-                        run((char*)buffer, disks, offset, length, hdd_blocks, hdd_bytes, ssd_blocks, ssd_bytes, 100);
+                        run(reinterpret_cast<char*>(buffer), disks, offset, length, hdd_blocks, hdd_bytes, ssd_blocks, ssd_bytes, 100);
                     }
                 }
             }

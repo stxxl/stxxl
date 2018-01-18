@@ -87,7 +87,7 @@ int main()
         }
     }
 
-    die_unless(p.size() == (size_t)nelements);
+    die_unless(p.size() == static_cast<size_t>(nelements));
 
 #if 0
     // test swap

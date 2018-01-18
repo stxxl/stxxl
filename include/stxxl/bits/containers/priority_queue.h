@@ -312,7 +312,7 @@ public:
             LOG1 << "  grp " << i << " int" <<
                 " grpbuf=" << current_group_buffer_size(i) <<
                 " size=" << int_mergers[i].size() << "/" << capacity <<
-                " (" << (int)((double)int_mergers[i].size() * 100.0 / (double)capacity) << "%)" <<
+                " (" << static_cast<unsigned int>(int_mergers[i].size() * 100.0 / capacity) << "%)" <<
                 " space=" << int_mergers[i].is_space_available();
         }
         for (int i = 0; i < kNumExtGroups; ++i) {
@@ -320,7 +320,7 @@ public:
             LOG1 << "  grp " << i + kNumIntGroups << " ext" <<
                 " grpbuf=" << current_group_buffer_size(i + kNumIntGroups) <<
                 " size=" << ext_mergers[i]->size() << "/" << capacity <<
-                " (" << (int)((double)ext_mergers[i]->size() * 100.0 / (double)capacity) << "%)" <<
+                " (" << static_cast<unsigned int>(ext_mergers[i]->size() * 100.0 / capacity) << "%)" <<
                 " space=" << ext_mergers[i]->is_space_available();
         }
         dump_params();

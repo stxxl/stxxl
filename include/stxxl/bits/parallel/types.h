@@ -45,7 +45,7 @@ static const size_t lcas_t_bits = sizeof(lcas_t) * 8;
 /**
  * ::lcas_t with the right half of bits set to 1.
  */
-static const lcas_t lcas_t_mask = (((lcas_t)1 << (lcas_t_bits / 2)) - 1);
+static const lcas_t lcas_t_mask = ((static_cast<lcas_t>(1) << (lcas_t_bits / 2)) - 1);
 
 } // namespace parallel
 } // namespace stxxl

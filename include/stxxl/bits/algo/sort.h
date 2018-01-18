@@ -710,7 +710,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
     }
     else
     {
-        if (!(2 * block_type::raw_size * (size_t)sort_memory_usage_factor() <= M)) {
+        if (!(2 * block_type::raw_size * static_cast<size_t>(sort_memory_usage_factor()) <= M)) {
             throw foxxll::bad_parameter(
                       "stxxl::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
         }

@@ -185,8 +185,8 @@ struct shuffle
                 uint64_t combined = current;
                 combined = combined << 32 | *input;
                 combined = (1ul << count_bits(combined)) - 1;
-                current = (value_type)(combined >> 32);
-                next = (value_type)combined;
+                current = static_cast<value_type>(combined >> 32);
+                next = static_cast<value_type>(combined);
             }
         }
     }

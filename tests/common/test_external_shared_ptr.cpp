@@ -240,10 +240,10 @@ void test_map()
         {
             test_data_ptr test = std::make_shared<test_data>();
 
-            test->a = (unsigned char)(i + 1);
+            test->a = static_cast<unsigned char>(i + 1);
             for (unsigned j = 0; j < 3; j++)
-                test->b[j] = (unsigned long)(i + 2);
-            test->c = (unsigned int)(i + 3);
+                test->b[j] = static_cast<unsigned long>(i + 2);
+            test->c = static_cast<unsigned int>(i + 3);
 
             data_type data(test);
             Map[i] = data;
@@ -266,14 +266,14 @@ void test_map()
             data_type data = (*result).second;
             test_data_ptr tmp = data.get();
 
-            die_unless(tmp->a == (unsigned char)(key + 1));
+            die_unless(tmp->a == static_cast<unsigned char>(key + 1));
             for (unsigned j = 0; j < 3; ++j)
-                die_unless(tmp->b[j] == (unsigned long)(key + 2));
-            die_unless(tmp->c == (unsigned int)(key + 3));
+                die_unless(tmp->b[j] == static_cast<unsigned long>(key + 2));
+            die_unless(tmp->c == static_cast<unsigned int>(key + 3));
         }
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;
-        double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
+        double readsperq = double(stats_elapsed.get_read_count()) / static_cast<double>(queries);
         LOG1 << "reads/logel " << reads << " readsperq " << readsperq;
         LOG1 << stats_elapsed;
 

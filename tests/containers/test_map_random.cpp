@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 
         if (i % (MAX_STEP / 100) == 0)
         {
-            LOG1 << "Step=" << i << " (" << (unsigned)stdmap.size() << ")";
+            LOG1 << "Step=" << i << " (" << static_cast<unsigned>(stdmap.size()) << ")";
         }
 
         // *********************************************************
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
         // *********************************************************
         if (step < (percent += PERCENT_CLEAR))
         {
-            if ((unsigned)rand() % 1000 < stdmap.size())
+            if (static_cast<unsigned>(rand()) % 1000 < stdmap.size())
             {
                 stdmap.clear();
                 xxlmap.clear();
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
                 std::swap(lower, upper);
 
             vector_type v2(upper - lower);
-            for (unsigned j = 0; j < (unsigned)(upper - lower); j++)
+            for (unsigned j = 0; j < upper - lower; j++)
             {
                 v2[j].first = lower + j;
                 v2[j].second = 2 * v2[j].first;

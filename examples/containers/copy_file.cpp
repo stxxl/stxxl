@@ -103,7 +103,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
     }
 
     std::cout << "Copied in " << tm.seconds() << " at "
-              << (double)InputVector.size() / tm.seconds() / 1024 / 1024 << " MiB/s" << std::endl;
+              << static_cast<double>(InputVector.size()) / tm.seconds() / 1024 / 1024 << " MiB/s" << std::endl;
 }
 
 int main(int argc, char* argv[])

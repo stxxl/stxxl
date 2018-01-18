@@ -288,26 +288,26 @@ public:
             put<uint8_t>(uint8_t(v));
         }
         else if (v < 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 7) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 7) & 0x7F));
         }
         else if (v < 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 7) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 14) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 7) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 14) & 0x7F));
         }
         else if (v < 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 7) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 21) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 7) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 21) & 0x7F));
         }
         else {
-            put<uint8_t>((uint8_t)(((v >> 0) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 7) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 28) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 0) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 7) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 28) & 0x7F));
         }
 
         return *this;
@@ -316,7 +316,7 @@ public:
     //! Append a varint to the buffer.
     binary_buffer & put_varint(int v)
     {
-        return put_varint((uint32_t)v);
+        return put_varint(static_cast<uint32_t>(v));
     }
 
     //! Append a varint to the buffer.
@@ -326,76 +326,76 @@ public:
             put<uint8_t>(uint8_t(v));
         }
         else if (v < 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 07) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 07) & 0x7F));
         }
         else if (v < 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 14) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 14) & 0x7F));
         }
         else if (v < 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 21) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 21) & 0x7F));
         }
-        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 28) & 0x7F));
+        else if (v < static_cast<uint64_t>(128) * 128 * 128 * 128 * 128) {
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 28) & 0x7F));
         }
-        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 35) & 0x7F));
+        else if (v < static_cast<uint64_t>(128) * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 35) & 0x7F));
         }
-        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 42) & 0x7F));
+        else if (v < static_cast<uint64_t>(128) * 128 * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 42) & 0x7F));
         }
-        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 42) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 49) & 0x7F));
+        else if (v < static_cast<uint64_t>(128) * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 42) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 49) & 0x7F));
         }
-        else if (v < ((uint64_t)128) * 128 * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 42) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 49) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 56) & 0x7F));
+        else if (v < static_cast<uint64_t>(128) * 128 * 128 * 128 * 128 * 128 * 128 * 128 * 128) {
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 42) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 49) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 56) & 0x7F));
         }
         else {
-            put<uint8_t>((uint8_t)(((v >> 00) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 07) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 14) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 21) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 28) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 35) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 42) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 49) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)(((v >> 56) & 0x7F) | 0x80));
-            put<uint8_t>((uint8_t)((v >> 63) & 0x7F));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 00) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 07) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 14) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 21) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 28) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 35) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 42) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 49) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>(((v >> 56) & 0x7F) | 0x80));
+            put<uint8_t>(static_cast<uint8_t>((v >> 63) & 0x7F));
         }
 
         return *this;
@@ -404,7 +404,7 @@ public:
     //! Put a string by saving it's length followed by the data itself.
     binary_buffer & put_string(const char* data, size_t len)
     {
-        return put_varint((uint32_t)len).append(data, len);
+        return put_varint(static_cast<uint32_t>(len)).append(data, len);
     }
 
     //! Put a string by saving it's length followed by the data itself.

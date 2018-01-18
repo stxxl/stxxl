@@ -292,7 +292,7 @@ public:
     external_size_type size() const
     {
         if (oblivious_)
-            ((self_type*)this)->_make_conscious();
+            const_cast<self_type*>(this)->_make_conscious();
         return num_total_;
     }
 
@@ -698,7 +698,7 @@ public:
             if (node->deleted())
                 return this->_end<const_iterator>();
             else
-                return const_iterator((self_type*)this, i_bucket, node, 0, src_internal, false, key);
+                return const_iterator(const_cast<self_type*>(this), i_bucket, node, 0, src_internal, false, key);
         }
         // search external elements
         else {
@@ -711,7 +711,7 @@ public:
             // found in external memory
             if (i_external < bucket.n_external_ && _eq(value.first, key)) {
                 n_found_external++;
-                return const_iterator((self_type*)this, i_bucket, node, i_external, src_external, true, key);
+                return const_iterator(const_cast<self_type*>(this), i_bucket, node, i_external, src_external, true, key);
             }
             // not found in external memory
             else {
@@ -802,7 +802,7 @@ public:
 
     //! Maximum number of buckets
     internal_size_type max_bucket_count() const
-    { return (internal_size_type)(max_size() / subblock_size); }
+    { return static_cast<internal_size_type>(max_size() / subblock_size); }
 
     //! Bucket-index for values with given key.
     internal_size_type bucket_index(const key_type& k) const
@@ -811,7 +811,7 @@ public:
 public:
     //! Average number of (sub)blocks occupied by a bucket.
     float load_factor() const
-    { return (float)num_total_ / ((float)subblock_size * (float)buckets_.size()); }
+    { return static_cast<float>(num_total_) / (subblock_size * static_cast<float>(buckets_.size())); }
 
     //! Get desired load-factor
     float opt_load_factor() const { return opt_load_factor_; }
@@ -857,7 +857,7 @@ protected:
     template <class Iterator>
     Iterator _begin() const
     {
-        self_type* non_const_this = (self_type*)this;
+        self_type* non_const_this = const_cast<self_type*>(this);
 
         if (buckets_.size() == 0)
             return _end<Iterator>();
@@ -875,7 +875,7 @@ protected:
     template <class Iterator>
     Iterator _end() const
     {
-        self_type* non_const_this = (self_type*)this;
+        self_type* non_const_this = const_cast<self_type*>(this);
         return Iterator(non_const_this);
     }
 
@@ -949,8 +949,8 @@ protected:
     {
         //! TODO maybe specialize double arithmetic to integer. the old code
         //! was faulty -tb.
-        return (internal_size_type)(
-            (double)n * ((double)hash_(key) / (double)std::numeric_limits<internal_size_type>::max()));
+        return static_cast<internal_size_type>(
+            n * (static_cast<double>(hash_(key)) / std::numeric_limits<internal_size_type>::max()));
     }
 
     /*!
@@ -983,7 +983,7 @@ protected:
         subblock_type* subblock;
 
         // number of subblocks occupied by bucket
-        internal_size_type n_subblocks = (internal_size_type)(
+        internal_size_type n_subblocks = static_cast<internal_size_type>(
             bucket.n_external_ / subblock_size);
         if (bucket.n_external_ % subblock_size != 0)
             n_subblocks++;
@@ -995,8 +995,8 @@ protected:
             // number of values in i-th subblock
             internal_size_type n_values =
                 (i_subblock + 1 < n_subblocks)
-                ? (internal_size_type)subblock_size
-                : (internal_size_type)(
+                ? static_cast<internal_size_type>(subblock_size)
+                : static_cast<internal_size_type>(
                     bucket.n_external_ - i_subblock * subblock_size);
 
             //! TODO: replace with bucket.n_external_ % subblock_size
@@ -1046,9 +1046,9 @@ protected:
         external_size_type i_abs_subblock = bucket.i_subblock_ + which_subblock;
 
         /* 1. */
-        bid_type bid = bids_[bucket.i_block_ + (internal_size_type)(i_abs_subblock / subblocks_per_block)];
+        bid_type bid = bids_[bucket.i_block_ + static_cast<internal_size_type>(i_abs_subblock / subblocks_per_block)];
         /* 2. */
-        internal_size_type i_subblock_within = (internal_size_type)(i_abs_subblock % subblocks_per_block);
+        internal_size_type i_subblock_within = static_cast<internal_size_type>(i_abs_subblock % subblocks_per_block);
 
         return block_cache_.get_subblock(bid, i_subblock_within);
     }
@@ -1127,7 +1127,8 @@ protected:
 
         // determine new number of buckets from desired load_factor ...
         internal_size_type n_new;
-        n_new = (internal_size_type)ceil((double)num_total_ / ((double)subblock_size * (double)opt_load_factor()));
+        n_new = static_cast<internal_size_type>(ceil(
+            static_cast<double>(num_total_) / (subblock_size * opt_load_factor())));
 
         // ... but give the user the chance to request even more buckets
         if (n_desired > n_new)
@@ -1324,14 +1325,15 @@ public:
 
         // calculate new number of buckets
         external_size_type num_total_new = num_total_ + (l - f);         // estimated number of elements
-        external_size_type n_buckets_new = (external_size_type)ceil((double)num_total_new / ((double)subblock_size * (double)opt_load_factor()));
+        external_size_type n_buckets_new = static_cast<external_size_type>(ceil(
+            static_cast<double>(num_total_new) / (subblock_size * opt_load_factor())));
         if (n_buckets_new > max_bucket_count())
             n_buckets_new = max_bucket_count();
 
         LOG << "insert() items=" << (l - f) << " buckets_new=" << n_buckets_new;
 
         // prepare new buckets and bids
-        buckets_container_type old_buckets((internal_size_type)n_buckets_new);
+        buckets_container_type old_buckets(static_cast<internal_size_type>(n_buckets_new));
         std::swap(buckets_, old_buckets);
         // writer will allocate new blocks as necessary
         bid_container_type old_bids;
@@ -1575,8 +1577,8 @@ public:
                 max_external = b.n_external_;
         }
 
-        double avg_external = (double)sum_external / (double)buckets_.size();
-        double std_external = sqrt(((double)square_sum_external / (double)buckets_.size()) - (avg_external * avg_external));
+        double avg_external = static_cast<double>(sum_external) / buckets_.size();
+        double std_external = sqrt((static_cast<double>(square_sum_external) / buckets_.size()) - (avg_external * avg_external));
 
         o << "Bucket count         : " << buckets_.size() << std::endl;
         o << "Values total         : " << num_total_ << std::endl;
@@ -1587,7 +1589,7 @@ public:
         o << "Std external/bucket  : " << std_external << std::endl;
         o << "Load-factor          : " << load_factor() << std::endl;
         o << "Blocks allocated     : " << bids_.size() << " => " << (bids_.size() * block_type::raw_size) << " bytes" << std::endl;
-        o << "Bytes per value      : " << ((double)(bids_.size() * block_type::raw_size) / (double)num_total_) << std::endl;
+        o << "Bytes per value      : " << (static_cast<double>(bids_.size() * block_type::raw_size) / num_total_) << std::endl;
     }
 };      /* end of class hash_map */
 

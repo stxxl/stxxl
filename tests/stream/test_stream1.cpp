@@ -83,7 +83,7 @@ int main()
     std::cout << *s;
 
     LOG1 << "Size of block type " << sizeof(CreateRunsAlg::block_type);
-    unsigned size = MULT * 1024 * 128 / (unsigned)(sizeof(Input::value_type) * 2);
+    unsigned size = MULT * 1024 * 128 / static_cast<unsigned>(sizeof(Input::value_type) * 2);
     Input in(size + 1);
     CreateRunsAlg SortedRuns(in, Cmp(), 1024 * 128 * MULT);
     SortedRunsType Runs = SortedRuns.result();

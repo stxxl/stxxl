@@ -251,7 +251,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
     const size_t nmaxbuckets = m - min_num_read_write_buffers;
     const unsigned int lognbuckets = tlx::integer_log2_floor(nmaxbuckets);
     const size_t nbuckets = size_t(1) << lognbuckets;
-    const size_t est_bucket_size = (size_t)foxxll::div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
+    const size_t est_bucket_size = static_cast<size_t>(foxxll::div_ceil((last - first) / nbuckets, block_type::size));      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
         LOG1 << "stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
@@ -309,7 +309,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
-        const size_t max_bucket_size_act_bl = (size_t)foxxll::div_ceil(max_bucket_size_act, block_type::size);
+        const auto max_bucket_size_act_bl = static_cast<size_t>(foxxll::div_ceil(max_bucket_size_act, block_type::size));
         LOGC(debug_stable_ksort) << "Reducing required number of required blocks per bucket from " <<
             max_bucket_size_bl << " to " << max_bucket_size_act_bl;
         max_bucket_size_rec = max_bucket_size_act;
@@ -340,15 +340,15 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         block_type* blocks2 = new block_type[max_bucket_size_bl];
         request_ptr* reqs1 = new request_ptr[max_bucket_size_bl];
         request_ptr* reqs2 = new request_ptr[max_bucket_size_bl];
-        type_key_* refs1 = new type_key_[(size_t)max_bucket_size_rec];
-        type_key_* refs2 = new type_key_[(size_t)max_bucket_size_rec];
+        type_key_* refs1 = new type_key_[static_cast<size_t>(max_bucket_size_rec)];
+        type_key_* refs2 = new type_key_[static_cast<size_t>(max_bucket_size_rec)];
 
         // submit reading first 2 buckets (Peter's scheme)
-        size_t nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[0], block_type::size);
+        auto nbucket_blocks = static_cast<size_t>(foxxll::div_ceil(bucket_sizes[0], block_type::size));
         for (i = 0; i < nbucket_blocks; i++)
             reqs1[i] = blocks1[i].read(bucket_bids[0][i]);
 
-        nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[1], block_type::size);
+        nbucket_blocks = static_cast<size_t>(foxxll::div_ceil(bucket_sizes[1], block_type::size));
         for (i = 0; i < nbucket_blocks; i++)
             reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
 
@@ -358,7 +358,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         size_t k1 = size_t(1) << log_k1;
         size_t* bucket1 = new size_t[k1];
 
-        const unsigned int shift = (unsigned int)(sizeof(key_type) * 8 - lognbuckets);
+        const unsigned int shift = static_cast<unsigned int>(sizeof(key_type) * 8 - lognbuckets);
         const unsigned int shift1 = shift - log_k1;
 
         LOGC(debug_stable_ksort) << "Classifying " << nbuckets << " buckets, max size:" << max_bucket_size_rec <<
@@ -366,11 +366,11 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
 
         for (size_t k = 0; k < nbuckets; k++)
         {
-            nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[k], block_type::size);
+            nbucket_blocks = static_cast<size_t>(foxxll::div_ceil(bucket_sizes[k], block_type::size));
             const unsigned log_k1_k = std::max<unsigned>(
                 tlx::integer_log2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
-            k1 = (size_t)(1) << log_k1_k;
+            k1 = static_cast<size_t>(1) << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
 
             LOGC(debug_stable_ksort) << "Classifying bucket " << k << " size:" << bucket_sizes[k] <<
@@ -386,8 +386,8 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
                     bucket1, offset1, shift1, key_extract);
             }
             // last block might be non-full
-            const size_t last_block_size =
-                (size_t)(bucket_sizes[k] - (nbucket_blocks - 1) * block_type::size);
+            const auto last_block_size =
+                static_cast<size_t>(bucket_sizes[k] - (nbucket_blocks - 1) * block_type::size);
             reqs1[i]->wait();
 
             //STXXL_MSG("block_type::size: "<<block_type::size<<" last_block_size:"<<last_block_size);
@@ -428,7 +428,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
             const size_t bucket2submit = k + 2;
             if (bucket2submit < nbuckets)
             {
-                nbucket_blocks = (size_t)foxxll::div_ceil(bucket_sizes[bucket2submit], block_type::size);
+                nbucket_blocks = static_cast<size_t>(foxxll::div_ceil(bucket_sizes[bucket2submit], block_type::size));
                 for (i = 0; i < nbucket_blocks; i++)
                     reqs1[i] = blocks1[i].read(bucket_bids[bucket2submit][i]);
             }

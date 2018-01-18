@@ -637,7 +637,7 @@ public:
     //! return iterator to BID containg current element
     bids_container_iterator bid() const
     {
-        return ((vector_type*)p_vector)->bid(offset);
+        return const_cast<vector_type*>(p_vector)->bid(offset);
     }
 
     //! \}
@@ -966,7 +966,7 @@ public:
     //! \param npages Number of cached pages.
     explicit vector(const size_type n = 0, const size_t npages = pager_type::default_npages)
         : m_size(n),
-          m_bids((size_t)foxxll::div_ceil(n, block_type::size)),
+          m_bids(static_cast<size_t>(foxxll::div_ceil(n, block_type::size))),
           m_pager(npages),
           m_page_status(foxxll::div_ceil(m_bids.size(), page_size), uninitialized),
           m_page_to_slot(foxxll::div_ceil(m_bids.size(), page_size), on_disk),
@@ -1256,7 +1256,7 @@ public:
     explicit vector(foxxll::file_ptr from, const size_type size = size_type(-1),
                     const size_t npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-          m_bids((size_t)foxxll::div_ceil(m_size, size_type(block_type::size))),
+          m_bids(static_cast<size_t>(foxxll::div_ceil(m_size, size_type(block_type::size)))),
           m_pager(npages),
           m_page_status(foxxll::div_ceil(m_bids.size(), page_size), valid_on_disk),
           m_page_to_slot(foxxll::div_ceil(m_bids.size(), page_size), on_disk),
@@ -1295,7 +1295,7 @@ public:
     //! copy-constructor
     vector(const vector& obj)
         : m_size(obj.size()),
-          m_bids((size_t)foxxll::div_ceil(obj.size(), block_type::size)),
+          m_bids(static_cast<size_t>(foxxll::div_ceil(obj.size(), block_type::size))),
           m_pager(obj.numpages()),
           m_page_status(foxxll::div_ceil(m_bids.size(), page_size), uninitialized),
           m_page_to_slot(foxxll::div_ceil(m_bids.size(), page_size), on_disk),
@@ -1420,13 +1420,13 @@ public:
     //! access the element at the given vector's offset
     reference at(size_type offset)
     {
-        assert(offset < (size_type)size());
+        assert(offset < static_cast<size_type>(size()));
         return element(offset);
     }
     //! access the element at the given vector's offset
     const_reference at(size_type offset) const
     {
-        assert(offset < (size_type)size());
+        assert(offset < static_cast<size_type>(size()));
         return const_element(offset);
     }
 
@@ -2018,7 +2018,7 @@ public:
     size_type size() const
     {
         assert(m_begin <= m_iter && m_iter <= m_end);
-        return (size_type)(m_end - m_iter);
+        return static_cast<size_type>(m_end - m_iter);
     }
 
     //! Returns true once the whole range has been read.
@@ -2292,7 +2292,7 @@ public:
     size_type size() const
     {
         assert(m_begin <= m_iter && m_iter <= m_end);
-        return (size_type)(m_iter - m_begin);
+        return static_cast<size_type>(m_iter - m_begin);
     }
 
     //! Returns true once the whole range has been read.

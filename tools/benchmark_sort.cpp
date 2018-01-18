@@ -122,7 +122,7 @@ class BenchmarkSort
     static void output_result(double elapsed, external_size_type vec_size)
     {
         std::cout << "finished in " << elapsed << " seconds @ "
-                  << ((double)vec_size * sizeof(value_type) / MB / elapsed)
+                  << (static_cast<double>(vec_size) * sizeof(value_type) / MB / elapsed)
                   << " MiB/s" << std::endl;
     }
 

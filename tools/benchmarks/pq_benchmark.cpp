@@ -91,7 +91,7 @@ using block_type = pq_type::block_type;
 unsigned ran32State = 0xdeadbeef;
 inline int myrand()
 {
-    return ((int)((ran32State = 1664525 * ran32State + 1013904223) >> 1)) - 1;
+    return (static_cast<int>((ran32State = 1664525 * ran32State + 1013904223) >> 1)) - 1;
 }
 #else // a longer pseudo random sequence
 long long unsigned ran32State = 0xdeadbeef;

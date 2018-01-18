@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
         while (serv-- > 0)
         {
-            cur += (time_t)(1 + rnd(3600 * 24));
+            cur += static_cast<time_t>(1 + rnd(3600 * 24));
 
             e.to = rnd(nclients);
             e.timestamp = cur;
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
             e.event = 1;
             log.push_back(e);
 
-            cur += (time_t)(1 + rnd(1800));
+            cur += static_cast<time_t>(1 + rnd(1800));
             e.timestamp = cur;
             e.event = 2;
 

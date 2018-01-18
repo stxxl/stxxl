@@ -46,9 +46,9 @@ void test_lvalue_correctness(stack_type& stack, int a, int b)
         stack.push(i);
     for (i = 0; i < b; ++i)
         stack.pop();
-    if ((stack.top() != (size_t)(0xbeeff00d))) {
+    if ((stack.top() != static_cast<size_t>(0xbeeff00d))) {
         LOG1 << "STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)";
-        die_unless(stack.top() == (size_t)(0xbeeff00d));
+        die_unless(stack.top() == static_cast<size_t>(0xbeeff00d));
     }
     for (i = 0; i < a; ++i)
         stack.pop();

@@ -118,7 +118,7 @@ inline void determine_samples(PMWMSSorterPU<RandomAccessIterator>* d,
 
     std::vector<DiffType> es(num_samples + 2);
     equally_split(sd->starts[d->iam + 1] - sd->starts[d->iam],
-                  (thread_index_t)(num_samples + 1), es.begin());
+                  static_cast<thread_index_t>(num_samples + 1), es.begin());
 
     for (DiffType i = 0; i < num_samples; i++)
         sd->samples[d->iam * num_samples + i] = sd->source[sd->starts[d->iam] + es[i + 1]];

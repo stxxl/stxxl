@@ -59,7 +59,7 @@ void fill(ea_type& ea, size_t index, size_t n)
 
     size_t i = index;
 
-    die_unequal(ea_writer.end() - ea_writer.begin(), (ssize_t)n);
+    die_unequal(ea_writer.end() - ea_writer.begin(), static_cast<ssize_t>(n));
 
     for (ea_type::writer_type::iterator it = ea_writer.begin();
          it != ea_writer.end(); ++it)
@@ -192,7 +192,7 @@ int run_external_array_test(size_t volume)
                 ea.wait_next_blocks();
             }
 
-            die_unless((size_t)(ea.end() - ea.begin()) == ea.buffer_size());
+            die_unless(static_cast<size_t>(ea.end() - ea.begin()) == ea.buffer_size());
 
             for (ea_type::iterator it = ea.begin(); it != ea.end(); ++it) {
                 progress("Extracting element", index, N);

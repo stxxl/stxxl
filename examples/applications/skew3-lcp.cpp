@@ -150,13 +150,13 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
                 return false;
             }
             else if (prev_triple.second == this_triple.second) {
-                if (this_triple.third == (offset_type)totalSize) {
+                if (this_triple.third == static_cast<offset_type>(totalSize)) {
                     // last suffix of string must be first among those with same first character
                     std::cout << "Error: suffix array position "
                               << counter << " ordered incorrectly." << std::endl;
                     return false;
                 }
-                if (prev_triple.third != (offset_type)totalSize &&
+                if (prev_triple.third != static_cast<offset_type>(totalSize) &&
                     prev_triple.third > this_triple.third) {
                     // positions SA[i] and SA[i-1] has same first character but their suffixes are ordered incorrectly:
                     // the suffix position of SA[i] is given by ISA[SA[i]]
@@ -1226,7 +1226,7 @@ public:
 
             assert(span > offset_type(0));
 
-            offset_type tmp = (offset_type)lengthOfVector / span;
+            offset_type tmp = lengthOfVector / span;
             if ((lengthOfVector % span) != 0) {
                 end_part = lengthOfVector - (tmp * span);
                 numberOfPages = tmp + 1;
@@ -2631,8 +2631,8 @@ template <typename alphabet_type>
 static inline std::string dumpC(alphabet_type c)
 {
     std::ostringstream oss;
-    if (isalnum(static_cast<int>(c))) oss << '\'' << (char)c << '\'';
-    else oss << (int)c;
+    if (isalnum(static_cast<int>(c))) oss << '\'' << static_cast<char>(c) << '\'';
+    else oss << static_cast<int>(c);
     return oss.str();
 }
 

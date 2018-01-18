@@ -85,14 +85,14 @@ int main(int argc, char** argv)
         stxxl::random_number32 myrandom;
         for (unsigned i = 0; i < queries; ++i)
         {
-            key_type key = (key_type)(myrandom() % el);
+            key_type key = static_cast<key_type>(myrandom() % el);
             map_type::const_iterator result = ConstMap.find(key);
             die_unless((*result).second == key + 1);
             die_unless(result->second == key + 1);
         }
         stats_elapsed = foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_read_count()) / logel;
-        double readsperq = double(stats_elapsed.get_read_count()) / (double)queries;
+        double readsperq = double(stats_elapsed.get_read_count()) / static_cast<double>(queries);
         LOG1 << "reads/logel " << reads << " readsperq " << readsperq;
         LOG1 << stats_elapsed;
 

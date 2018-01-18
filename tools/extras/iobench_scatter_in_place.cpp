@@ -50,7 +50,7 @@ inline double throughput(uint64_t bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
-    return (double)bytes / (1024 * 1024) / seconds;
+    return static_cast<double>(bytes) / (1024 * 1024) / seconds;
 }
 
 int main(int argc, char* argv[])
@@ -58,9 +58,9 @@ int main(int argc, char* argv[])
     if (argc < 5)
         usage(argv[0]);
 
-    size_t num_blocks = (size_t)foxxll::atouint64(argv[1]);
-    size_t blocks_per_round = (size_t)foxxll::atouint64(argv[2]);
-    size_t block_size = (size_t)foxxll::atouint64(argv[3]);
+    size_t num_blocks = static_cast<size_t>(foxxll::atouint64(argv[1]));
+    size_t blocks_per_round = static_cast<size_t>(foxxll::atouint64(argv[2]));
+    size_t block_size = static_cast<size_t>(foxxll::atouint64(argv[3]));
     const char* filebase = argv[4];
 
     size_t num_rounds = foxxll::div_ceil(num_blocks, blocks_per_round);
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
               << block_size << ", reading chunks of "
               << blocks_per_round << " blocks" << std::endl;
 
-    char* buffer = (char*)foxxll::aligned_alloc<BLOCK_ALIGN>(block_size * blocks_per_round);
+    char* buffer = static_cast<char*>(foxxll::aligned_alloc<BLOCK_ALIGN>(block_size * blocks_per_round));
     double totaltimeread = 0, totaltimewrite = 0;
     external_size_type totalsizeread = 0, totalsizewrite = 0;
     double totaltimereadchunk = 0.0, totaltimewritechunk = 0.0;

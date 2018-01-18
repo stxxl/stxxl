@@ -474,7 +474,7 @@ public:
     template <class OutputIterator>
     void multi_merge(OutputIterator begin, OutputIterator end)
     {
-        assert((size_type)(end - begin) <= m_size);
+        assert(static_cast<size_type>(end - begin) <= m_size);
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
         multi_merge_parallel(begin, end);

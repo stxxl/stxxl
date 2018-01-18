@@ -60,7 +60,7 @@ inline unsigned initial_seed()
     struct timeval tv;
     gettimeofday(&tv, 0);
 
-    return (unsigned)(tv.tv_sec ^ tv.tv_usec ^ (getpid() << 16));
+    return static_cast<unsigned>(tv.tv_sec ^ tv.tv_usec ^ (getpid() << 16));
 #endif
 }
 

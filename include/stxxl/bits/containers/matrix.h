@@ -1100,8 +1100,8 @@ public:
 
     matrix(block_scheduler_type& bs,
            const column_vector_type& left, const row_vector_type& right)
-        : height((elem_size_type)left.size()),
-          width((elem_size_type)right.size()),
+        : height(static_cast<elem_size_type>(left.size())),
+          width(static_cast<elem_size_type>(right.size())),
           data(
               new swappable_block_matrix_type(
                   bs,

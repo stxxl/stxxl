@@ -102,7 +102,7 @@ int main(int argc, char** argv)
         const my_type::key_type num_elements = 1 * 1024 * 1024;
         const size_t records_in_block = block_size / sizeof(my_type);
         foxxll::syscall_file f(argv[2], foxxll::file::CREAT | foxxll::file::RDWR);
-        my_type* array = (my_type*)foxxll::aligned_alloc<foxxll::BlockAlignment>(block_size);
+        auto* array = static_cast<my_type*>(foxxll::aligned_alloc<foxxll::BlockAlignment>(block_size));
         memset(array, 0, block_size);
 
         my_type::key_type cur_key = num_elements;
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
             for (unsigned j = 0; j < records_in_block; j++)
                 array[j].m_key = cur_key--;
 
-            foxxll::request_ptr req = f.awrite((void*)array, uint64_t(i) * block_size, block_size);
+            foxxll::request_ptr req = f.awrite(static_cast<void*>(array), uint64_t(i) * block_size, block_size);
             req->wait();
         }
         foxxll::aligned_dealloc<foxxll::BlockAlignment>(array);

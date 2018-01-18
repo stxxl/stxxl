@@ -98,7 +98,7 @@ int main_usage(const char* arg0)
     for (unsigned int i = 0; subtools[i].name; ++i)
     {
         if (!subtools[i].shortline) continue;
-        shortlen = std::max(shortlen, (int)strlen(subtools[i].name));
+        shortlen = std::max(shortlen, static_cast<int>(strlen(subtools[i].name)));
     }
 
     for (unsigned int i = 0; subtools[i].name; ++i)

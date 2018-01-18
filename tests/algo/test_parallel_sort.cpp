@@ -128,9 +128,9 @@ int main(int argc, const char** argv)
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
-    unsigned long megabytes_to_process = atoi(argv[1]);
-    int p = atoi(argv[2]);
-    size_t memory_to_use = (size_t)(atoi(argv[3]) * megabyte);
+    auto megabytes_to_process = static_cast<unsigned int>(strtoul(argv[1], nullptr, 0));
+    auto p = static_cast<int>(strtol(argv[2], nullptr, 0));
+    auto memory_to_use = static_cast<size_t>(strtol(argv[3], nullptr, 0) * megabyte);
     run_size = memory_to_use;
     buffer_size = memory_to_use / 16;
 #ifdef STXXL_PARALLEL_MODE

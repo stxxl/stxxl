@@ -58,7 +58,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     data_type& operator * ()
     {
         CHECK_RUN_BOUNDS(pos);
-        return (data_type&)((*(array[(pos) % dim_size]))[(pos) / dim_size].bid);
+        return dynamic_cast<data_type&>((*(array[(pos) % dim_size]))[(pos) / dim_size].bid);
     }
 
     const data_type* operator -> () const
@@ -71,7 +71,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     {
         n += pos;
         CHECK_RUN_BOUNDS(n);
-        return (data_type&)((*(array[(n) % dim_size]))[(n) / dim_size].bid);
+        return dynamic_cast<data_type&>((*(array[(n) % dim_size]))[(n) / dim_size].bid);
     }
 };
 
@@ -119,22 +119,22 @@ struct runs2bid_array_adaptor2
     {
         PosType i = pos - K;
         if (i < 0)
-            return (data_type&)((*(array[(pos) % w]))[(pos) / w].bid);
+            return dynamic_cast<data_type&>((*(array[(pos) % w]))[(pos) / w].bid);
 
         PosType _w = w;
         _w--;
-        return (data_type&)((*(array[(i) % _w]))[h + (i / _w)].bid);
+        return dynamic_cast<data_type&>((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 
     const data_type& operator * () const
     {
         PosType i = pos - K;
         if (i < 0)
-            return (data_type&)((*(array[(pos) % w]))[(pos) / w].bid);
+            return dynamic_cast<data_type&>((*(array[(pos) % w]))[(pos) / w].bid);
 
         PosType _w = w;
         _w--;
-        return (data_type&)((*(array[(i) % _w]))[h + (i / _w)].bid);
+        return dynamic_cast<data_type&>((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 
     data_type* operator -> ()
@@ -148,11 +148,11 @@ struct runs2bid_array_adaptor2
         n += pos;
         PosType i = n - K;
         if (i < 0)
-            return (data_type&)((*(array[(n) % w]))[(n) / w].bid);
+            return dynamic_cast<data_type&>((*(array[(n) % w]))[(n) / w].bid);
 
         PosType _w = w;
         _w--;
-        return (data_type&)((*(array[(i) % _w]))[h + (i / _w)].bid);
+        return dynamic_cast<data_type&>((*(array[(i) % _w]))[h + (i / _w)].bid);
     }
 };
 

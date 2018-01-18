@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
     const size_t nins = 1ULL << log_nins;
 
-    stxxl::ran32State = (unsigned int)time(nullptr);
+    stxxl::ran32State = static_cast<unsigned int>(time(nullptr));
 
     stxxl::vector<int> Values(nins);
     LOG1 << "Generating " << nins << " random values";
