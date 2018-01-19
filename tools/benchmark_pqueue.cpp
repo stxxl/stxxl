@@ -59,18 +59,6 @@ struct my_type
     my_type(const key_type& k1, const key_type& k2)
         : uint32_pair_type(k1, k2)
     { }
-
-    static my_type max_value()
-    {
-        return my_type(std::numeric_limits<key_type>::max(),
-                       std::numeric_limits<key_type>::max());
-    }
-
-    static my_type min_value()
-    {
-        return my_type(std::numeric_limits<key_type>::min(),
-                       std::numeric_limits<key_type>::min());
-    }
 };
 
 namespace std {
@@ -95,11 +83,10 @@ struct my_pq_gen
 
 struct my_type_extractor
 {
-    using value_type = std::tuple<uint32_t, uint32_t>;
-
-    value_type operator() (const my_type& a) const
+    template <typename T>
+    auto operator() (T &a) const
     {
-        return std::tie(std::get<0>(a), std::get<1>(a));
+        return std::tie(std::get<0>(a));
     }
 };
 
@@ -108,7 +95,7 @@ struct my_pq_gen<my_type, mem_for_queue, maxvolume>
 {
     using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
         my_type,
-        stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater, stxxl::direction::DontCare>,
+        stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater>,
         mem_for_queue,
         maxvolume * MiB / sizeof(my_type)>;
 };
