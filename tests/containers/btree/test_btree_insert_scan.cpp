@@ -4,111 +4,58 @@
  *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2018 Manuel Penschuck <stxxl@manuel.jetzt>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <ctime>
-#include <iostream>
-
-#include <tlx/die.hpp>
-#include <tlx/logger.hpp>
-
-#include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/scan>
-#include <stxxl/sort>
-
-struct comp_type : public std::less<int>
-{
-    static int max_value()
-    {
-        return std::numeric_limits<int>::max();
-    }
-    static int min_value()
-    {
-        return std::numeric_limits<int>::min();
-    }
-};
-using btree_type = stxxl::btree::btree<
-          int, double, comp_type, 4096, 4096, foxxll::simple_random>;
-//using btree_type =  stxxl::btree::btree<int,double,comp_type,10,11,foxxll::simple_random> ;
-
-std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
-{
-    o << obj.first << " " << obj.second;
-    return o;
-}
-
-struct rnd_gen
-{
-    stxxl::random_number32 rnd;
-    int operator () ()
-    {
-        return (rnd() >> 2);
-    }
-};
-
-bool operator == (const std::pair<int, double>& a, const std::pair<int, double>& b)
-{
-    return a.first == b.first;
-}
+#include "test_btree_common.h"
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2)
+    size_t nins;
     {
-        LOG1 << "Usage: " << argv[0] << " #log_ins";
-        return -1;
-    }
-
-    const int log_nins = atoi(argv[1]);
-    if (log_nins > 31) {
-        LOG1 << "This test can't do more than 2^31 operations, you requested 2^" << log_nins;
-        return -1;
+        die_with_message_if(argc < 2, "Usage: " << argv[0] << " #log_ins");
+        const auto log_nins = foxxll::atoi64(argv[1]);
+        die_with_message_if(log_nins > 31, "This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        nins = 1ULL << log_nins;
     }
 
     btree_type BTree(1024 * 128, 1024 * 128);
 
-    const size_t nins = 1ULL << log_nins;
+    // prepare random unique keys
+    stxxl::vector<key_type> values(nins);
+    random_fill_vector(values);
 
-    stxxl::ran32State = (unsigned int)time(nullptr);
-
-    stxxl::vector<int> Values(nins);
-    LOG1 << "Generating " << nins << " random values";
-    stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
-
-    stxxl::vector<int>::const_iterator it = Values.begin();
-    LOG1 << "Inserting " << nins << " random values into btree";
-    for ( ; it != Values.end(); ++it)
-        BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
+    for (auto it = values.cbegin(); it != values.cend(); ++it)
+        BTree.insert({ *it, static_cast<payload_type>(*it + 1) });
 
     LOG1 << "Sorting the random values";
-    stxxl::sort(Values.begin(), Values.end(), comp_type(), 128 * 1024 * 1024);
+    stxxl::sort(values.begin(), values.end(), comp_type(), 128 * 1024 * 1024);
 
-    LOG1 << "Deleting unique values";
-    stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
-    Values.resize(NewEnd - Values.begin());
+    LOG1 << "Deleting duplicate values";
+    {
+        auto new_end = std::unique(values.begin(), values.end());
+        values.resize(std::distance(values.begin(), new_end));
+    }
 
-    die_unless(BTree.size() == Values.size());
-    LOG1 << "Size without duplicates: " << Values.size();
+    die_unless(BTree.size() == values.size());
+    LOG1 << "Size without duplicates: " << values.size();
 
     LOG1 << "Comparing content";
 
-    stxxl::vector<int>::const_iterator vIt = Values.begin();
     btree_type::iterator bIt = BTree.begin();
-
-    for ( ; vIt != Values.end(); ++vIt, ++bIt)
+    for (auto vIt = values.begin(); vIt != values.end(); ++vIt, ++bIt)
     {
         die_unless(*vIt == bIt->first);
-        die_unless(double(bIt->first) + 1.0 == bIt->second);
+        die_unless(static_cast<payload_type>(bIt->first + 1) == bIt->second);
         die_unless(bIt != BTree.end());
     }
 
     die_unless(bIt == BTree.end());
 
     LOG1 << "Test passed.";
-
     return 0;
 }

@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2018 Manuel Penschuck <stxxl@manuel.jetzt>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -15,136 +16,82 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/die_with_message.hpp>
+
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/timer>
 
-struct comp_type : public std::less<int>
-{
-    static int max_value()
-    {
-        return std::numeric_limits<int>::max();
-    }
-};
+#include <key_with_padding.h>
+#include <test_helpers.h>
 
-#define NODE_BLOCK_SIZE 4096
-#define LEAF_BLOCK_SIZE 128 * 1024
+constexpr size_t NODE_BLOCK_SIZE = 4096;
+constexpr size_t LEAF_BLOCK_SIZE = 128 * 1024;
 
-struct my_type
-{
-    uint64_t data;
-    char filler[24];
-};
+using key_type = uint64_t;
+using payload_type = key_with_padding<key_type, sizeof(key_type) + 24, false>;
+using comp_type = stxxl::comparator<key_type>;
 
-std::ostream& operator << (std::ostream& o, const my_type& obj)
-{
-    o << " " << obj.data;
-    return o;
-}
-
-std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
-{
-    o << obj.first << " " << obj.second;
-    return o;
-}
-using btree_type = stxxl::btree::btree<int, my_type, comp_type,
-                                       NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, foxxll::simple_random>;
+using btree_type = stxxl::btree::btree<key_type, payload_type, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, foxxll::simple_random>;
 
 // forced instantiation
-template class stxxl::btree::btree<
-        int, my_type, comp_type,
-        NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, foxxll::simple_random>;
+template class stxxl::btree::btree<key_type, payload_type, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, foxxll::simple_random>;
 
-#define node_cache_size (25 * 1024 * 1024)
-#define leaf_cache_size (6 * LEAF_BLOCK_SIZE)
+constexpr size_t node_cache_size = 25 * 1024 * 1024;
+constexpr size_t leaf_cache_size = 6 * LEAF_BLOCK_SIZE;
 
-uint64_t checksum = 0;
-
-void NC(btree_type& BTree)
+template <typename Iterator>
+uint64_t scan(btree_type& BTree, const std::string& test_key)
 {
+    foxxll::scoped_print_timer timer("Scan with " + test_key, BTree.size() * sizeof(*BTree.begin()));
+
     uint64_t sum = 0;
-    foxxll::timer Timer1;
-    Timer1.start();
-    btree_type::iterator it = BTree.begin(), end = BTree.end();
-    for ( ; it != end; ++it)
-        sum += it->second.data;
+    for (Iterator it = BTree.begin(), end = BTree.end(); it != end; ++it)
+        sum += it->second.key;
 
-    Timer1.stop();
-    LOG1 << "Scanning with non const iterator: " << Timer1.mseconds() << " msec";
-    die_unless(sum == checksum);
-}
-
-void C(btree_type& BTree)
-{
-    uint64_t sum = 0;
-    foxxll::timer Timer1;
-    Timer1.start();
-    btree_type::const_iterator it = BTree.begin(), end = BTree.end();
-    for ( ; it != end; ++it)
-        sum += it->second.data;
-
-    Timer1.stop();
-    LOG1 << "Scanning with const iterator: " << Timer1.mseconds() << " msec";
-    die_unless(sum == checksum);
+    return sum;
 }
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2)
-    {
-        LOG1 << "Usage: " << argv[0] << " #ins";
-        return -1;
-    }
+    die_with_message_if(argc < 2, "Usage: " << argv[0] << " #ins");
 
     const unsigned nins = atoi(argv[1]);
 
-    LOG1 << "Data set size  : " << nins * sizeof(std::pair<int, my_type>) << " bytes";
-    LOG1 << "Node cache size: " << node_cache_size << " bytes";
-    LOG1 << "Leaf cache size: " << leaf_cache_size << " bytes";
+    LOG1 << "values set size  : " << nins * (sizeof(key_type) + sizeof(payload_type)) << " bytes\n"
+        "Node cache size: " << node_cache_size << " bytes\n"
+        "Leaf cache size: " << leaf_cache_size << " bytes";
 
-    //stxxl::random_number32 rnd;
+    std::vector<std::pair<key_type, payload_type> > values(nins);
 
-    std::vector<std::pair<int, my_type> > Data(nins);
-
+    uint64_t checksum = 0;
     for (unsigned int i = 0; i < nins; ++i)
     {
-        Data[i].first = i;
-        Data[i].second.data = i;
+        values[i].first = i;
+        values[i].second.key = i;
         checksum += i;
     }
+
+    LOG1 << "Scan with prefetching";
     {
-        btree_type BTree1(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
-        btree_type BTree2(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
+        btree_type BTree1(values.begin(), values.end(), comp_type(), node_cache_size, leaf_cache_size, true);
+        btree_type BTree2(values.begin(), values.end(), comp_type(), node_cache_size, leaf_cache_size, true);
 
-        //LOG1 << *foxxll::stats::get_instance();
-
-        C(BTree1);
-
-        //LOG1 << *foxxll::stats::get_instance();
-
-        NC(BTree2);
-
-        //LOG1 << *foxxll::stats::get_instance();
+        die_unless(checksum == scan<btree_type::const_iterator>(BTree1, "const iterator"));
+        die_unless(checksum == scan<btree_type::iterator>(BTree2, "non-const iterator"));
     }
 
+    LOG1 << "Scan without prefetching";
     {
-        btree_type BTree1(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
-        btree_type BTree2(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
+        btree_type BTree1(values.begin(), values.end(), comp_type(), node_cache_size, leaf_cache_size, true);
+        btree_type BTree2(values.begin(), values.end(), comp_type(), node_cache_size, leaf_cache_size, true);
 
-        LOG1 << "Disabling prefetching";
         BTree1.disable_prefetching();
         BTree2.disable_prefetching();
 
-        //LOG1 << *foxxll::stats::get_instance();
-
-        C(BTree1);
-
-        //LOG1 << *foxxll::stats::get_instance();
-
-        NC(BTree2);
-
-        //LOG1 << *foxxll::stats::get_instance();
+        die_unless(checksum == scan<btree_type::const_iterator>(BTree1, "const iterator"));
+        die_unless(checksum == scan<btree_type::iterator>(BTree2, "non-const iterator"));
     }
-    LOG1 << "All tests passed successfully";
 
+    LOG1 << "All tests passed successfully";
     return 0;
 }
