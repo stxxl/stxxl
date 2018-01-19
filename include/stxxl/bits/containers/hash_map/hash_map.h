@@ -15,7 +15,6 @@
 #define STXXL_CONTAINERS_HASH_MAP_HASH_MAP_HEADER
 
 #include <foxxll/mng/block_manager.hpp>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/sort_stream.h>
 #include <stxxl/bits/stream/stream.h>
 

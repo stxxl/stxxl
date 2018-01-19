@@ -20,7 +20,6 @@
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/vector>
 
 #include <memory>
@@ -903,6 +902,93 @@ public:
         tlx::call_foreach_tuple([&result](auto & t) { result = result || t.empty(); }, in);
 
         return result;
+    }
+};
+
+
+/**
+ * Counter for creating tuple indexes for example.
+ */
+template <class ValueType>
+struct counter
+{
+public:
+    using value_type = ValueType;
+
+protected:
+    value_type m_count;
+
+public:
+    explicit counter(const value_type& start = 0)
+        : m_count(start)
+    { }
+
+    const value_type& operator * () const
+    {
+        return m_count;
+    }
+
+    counter& operator ++ ()
+    {
+        ++m_count;
+        return *this;
+    }
+
+    bool empty() const
+    {
+        return false;
+    }
+};
+
+/**
+ * Concatenates two tuple streams as streamA . streamB
+ */
+template <class StreamA, class StreamB>
+class concatenate
+{
+public:
+    using value_type = typename StreamA::value_type;
+
+private:
+    StreamA& A;
+    StreamB& B;
+
+public:
+    concatenate(StreamA& A_, StreamB& B_) : A(A_), B(B_)
+    {
+        assert(!A.empty());
+        assert(!B.empty());
+    }
+
+    const value_type& operator * () const
+    {
+        assert(!empty());
+
+        if (!A.empty()) {
+            return *A;
+        }
+        else {
+            return *B;
+        }
+    }
+
+    concatenate& operator ++ ()
+    {
+        assert(!empty());
+
+        if (!A.empty()) {
+            ++A;
+        }
+        else if (!B.empty()) {
+            ++B;
+        }
+
+        return *this;
+    }
+
+    bool empty() const
+    {
+        return (A.empty() && B.empty());
     }
 };
 
