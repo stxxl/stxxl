@@ -17,12 +17,11 @@
 #include <algorithm>
 #include <cassert>
 #include <list>
+#include <random>
 #include <utility>
 
 #include <tlx/simple_vector.hpp>
 #include <tlx/unused.hpp>
-
-#include <stxxl/bits/common/rand.h>
 
 namespace stxxl {
 
@@ -36,17 +35,18 @@ class random_pager
     using size_type = size_t;
 
     size_type num_pages;
-    random_number<random_uniform_fast> rnd;
+    std::minstd_rand randgen;
+    std::uniform_int_distribution<size_type> distr;
 
 public:
     static constexpr unsigned default_npages = npages_;
 
     explicit random_pager(size_type num_pages = default_npages)
-        : num_pages(num_pages) { }
+        : num_pages(num_pages), distr(0, num_pages - 1) { }
 
     size_type kick()
     {
-        return rnd(size());
+        return distr(randgen);
     }
 
     void hit(size_type ipage) const
