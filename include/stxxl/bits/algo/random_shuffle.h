@@ -19,6 +19,8 @@
 //        (free stacks buffers)
 // TODO: shuffle small input in internal memory
 
+#include <vector>
+
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/parallel.h>

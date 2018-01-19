@@ -43,7 +43,7 @@ struct runs2bid_array_adaptor : public two2one_dim_array_adapter_base<RunType*, 
     runs2bid_array_adaptor(RunType** a, PosType p, size_t d)
         : two2one_dim_array_adapter_base<RunType*, data_type, PosType>(a, p), dim_size(d)
     { }
-    runs2bid_array_adaptor(const self_type& a)
+    explicit runs2bid_array_adaptor(const self_type& a)
         : two2one_dim_array_adapter_base<RunType*, data_type, PosType>(a), dim_size(a.dim_size)
     { }
 

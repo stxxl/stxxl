@@ -67,7 +67,7 @@ const size_t _mem_for_queue = _RAM / 2;
 const size_t mem_for_prefetch_pool = _RAM / 4;
 const size_t mem_for_write_pool = _RAM / 4;
 
-std::string g_testset;
+std::string g_testset; // NOLINT
 
 size_t RAM = _RAM;
 size_t volume = _volume;

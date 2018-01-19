@@ -311,11 +311,11 @@ extern void * realloc(void* ptr, size_t size) noexcept
     return (char*)newptr + alignment;
 }
 
-static __attribute__ ((constructor)) void init(void)
+static __attribute__ ((constructor)) void init(void) // NOLINT
 {
     char* error;
 
-    setlocale(LC_NUMERIC, ""); /* for better readable numbers */
+    setlocale(LC_NUMERIC, "");                       /* for better readable numbers */
 
     dlerror();
 
@@ -338,7 +338,7 @@ static __attribute__ ((constructor)) void init(void)
     }
 }
 
-static __attribute__ ((destructor)) void finish(void)
+static __attribute__ ((destructor)) void finish(void) // NOLINT
 {
     fprintf(stderr, PPREFIX
             "exiting, total: %'lld, peak: %'lld, current: %'lld\n",

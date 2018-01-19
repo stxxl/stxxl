@@ -22,7 +22,7 @@
 
 #include <stxxl/map>
 
-#include "map_test_handlers.h"
+#include <map_test_handlers.h>
 
 using key_type = int;
 using data_type = int;

@@ -19,7 +19,7 @@
 #if STXXL_EXPENSIVE_ASSERTIONS
     #define STXXL_EXPENSIVE_ASSERT(condition) die_unless(condition)
 #else
-    #define STXXL_EXPENSIVE_ASSERT(condition) {}
+    #define STXXL_EXPENSIVE_ASSERT(condition) { }
 #endif
 
 #endif // !STXXL_EXPENSIVE_ASSERT_HEADER

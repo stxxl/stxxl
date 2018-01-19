@@ -26,6 +26,7 @@
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -197,7 +198,13 @@ int main(int argc, const char** argv)
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
     double generate_start = foxxll::timestamp();
 
-    stxxl::generate(input.begin(), input.end(), stxxl::random_number64(), memory_to_use / STXXL_DEFAULT_BLOCK_SIZE(my_type));
+    {
+        std::mt19937_64 randgen(p);
+        std::uniform_int_distribution<KeyType> distr;
+        stxxl::generate(input.begin(), input.end(),
+                        [&]() -> my_type { return my_type(distr(randgen)); },
+                        memory_to_use / STXXL_DEFAULT_BLOCK_SIZE(my_type));
+    }
 
     double generate_stop = foxxll::timestamp();
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;

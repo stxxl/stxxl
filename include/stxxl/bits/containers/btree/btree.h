@@ -17,6 +17,7 @@
 #include <limits>
 #include <map>
 #include <utility>
+#include <vector>
 
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/iterator_map.h>

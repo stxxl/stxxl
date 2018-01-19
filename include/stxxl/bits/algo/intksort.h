@@ -13,14 +13,15 @@
 #ifndef STXXL_ALGO_INTKSORT_HEADER
 #define STXXL_ALGO_INTKSORT_HEADER
 
+#include <algorithm>
+#include <cassert>
+#include <utility>
+
 #include <tlx/unused.hpp>
 
 #include <foxxll/common/types.hpp>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/types>
-
-#include <algorithm>
-#include <cassert>
 
 namespace stxxl {
 

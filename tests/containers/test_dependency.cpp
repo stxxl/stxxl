@@ -26,13 +26,13 @@
 struct MinimalType {
     size_t a;
 
-    MinimalType(size_t a = 0) : a(a) { }
+    explicit MinimalType(size_t a = 0) : a(a) { }
 };
 
 struct MinimalTypeWithEq : public MinimalType {
     size_t a;
 
-    MinimalTypeWithEq(size_t a = 0) : a(a) { }
+    explicit MinimalTypeWithEq(size_t a = 0) : a(a) { }
 
     bool operator == (const MinimalType o) const
     {
@@ -46,7 +46,7 @@ struct CompareLessWithMin {
     {
         return a.a < b.a;
     }
-    T min_value() const { return { 0 }; }
+    T min_value() const { return T { 0 }; }
 };
 
 template <typename T>
@@ -55,7 +55,7 @@ struct CompareLessWithMax {
     {
         return a.a < b.a;
     }
-    T max_value() const { return { std::numeric_limits<size_t>::max() }; }
+    T max_value() const { return T { std::numeric_limits<size_t>::max() }; }
 };
 
 template <typename T>
@@ -65,8 +65,8 @@ struct CompareLessWithMinMax {
         return a.a < b.a;
     }
 
-    T min_value() const { return { 0 }; }
-    T max_value() const { return { std::numeric_limits<size_t>::max() }; }
+    T min_value() const { return T { 0 }; }
+    T max_value() const { return T { std::numeric_limits<size_t>::max() }; }
 };
 
 template <typename T>

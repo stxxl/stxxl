@@ -154,7 +154,6 @@ struct random_uniform_slow
         : gen(seed), uni(0.0, 1.0)
     { }
 
-
     //! Returns a random number from [0.0, 1.0)
     inline value_type operator () () const
     {

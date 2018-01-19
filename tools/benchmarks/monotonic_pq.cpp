@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
                         + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER"
 #endif
-    ;
+    ; // NOLINT
     LOG1 << "Flags:" << Flags;
 
     unsigned long megabytes = atoi(argv[1]);

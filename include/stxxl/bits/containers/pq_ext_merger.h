@@ -93,7 +93,7 @@ public:
             return (*block)[current];
         }
 
-        sequence_state(const compare_type& cmp)
+        explicit sequence_state(const compare_type& cmp)
             : block(nullptr), current(0),
               merger(nullptr),
               cmp(cmp),

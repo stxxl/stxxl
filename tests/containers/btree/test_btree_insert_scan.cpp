@@ -13,8 +13,6 @@
 #include <ctime>
 #include <iostream>
 
-#include <iostream>
-
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 

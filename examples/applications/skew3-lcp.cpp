@@ -43,7 +43,6 @@
 #include <stxxl/timer>
 #include <stxxl/vector>
 
-
 using foxxll::external_size_type;
 
 /// Global variables, types and helpers.

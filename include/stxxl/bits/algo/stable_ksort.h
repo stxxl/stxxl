@@ -17,6 +17,7 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 #include <algorithm>
+#include <utility>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -283,8 +284,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
         last,
         nread_buffers,
         nwrite_buffers,
-        key_extract
-        );
+        key_extract);
 
     double dist_end = foxxll::timestamp(), end;
     double io_wait_after_d = foxxll::stats::get_instance()->get_io_wait_time();

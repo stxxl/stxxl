@@ -169,8 +169,8 @@ public:
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
     map(const size_t node_cache_size_in_bytes,
-        const size_t leaf_cache_size_in_bytes
-        ) : impl(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
+        const size_t leaf_cache_size_in_bytes)
+        : impl(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     { }
 
     //! A constructor
@@ -179,8 +179,8 @@ public:
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
     map(const key_compare& c_,
         const size_t node_cache_size_in_bytes,
-        const size_t leaf_cache_size_in_bytes
-        ) : impl(c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes)
+        const size_t leaf_cache_size_in_bytes)
+        : impl(c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     { }
 
     //! Constructs a map from a given input range
@@ -199,9 +199,9 @@ public:
         const size_t leaf_cache_size_in_bytes,
         const bool range_sorted = false,
         const double node_fill_factor = 0.75,
-        const double leaf_fill_factor = 0.6
-        ) : impl(b, e, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
-                 range_sorted, node_fill_factor, leaf_fill_factor)
+        const double leaf_fill_factor = 0.6)
+        : impl(b, e, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
+               range_sorted, node_fill_factor, leaf_fill_factor)
     { }
 
     //! Constructs a map from a given input range
@@ -222,9 +222,9 @@ public:
         const size_t leaf_cache_size_in_bytes,
         const bool range_sorted = false,
         const double node_fill_factor = 0.75,
-        const double leaf_fill_factor = 0.6
-        ) : impl(b, e, c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
-                 range_sorted, node_fill_factor, leaf_fill_factor)
+        const double leaf_fill_factor = 0.6)
+        : impl(b, e, c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes,
+               range_sorted, node_fill_factor, leaf_fill_factor)
     { }
 
     //! non-copyable: delete copy-constructor

@@ -66,8 +66,7 @@ int main()
     const unsigned mem_for_pools = 128 * 1024 * 1024;
     foxxll::read_write_pool<block_type> pool(
         (mem_for_pools / 2) / block_type::raw_size,
-        (mem_for_pools / 2) / block_type::raw_size
-        );
+        (mem_for_pools / 2) / block_type::raw_size);
     pq_type p(pool, comp_without_def_construct { 1 });
 
     foxxll::stats_data stats_begin(*foxxll::stats::get_instance());

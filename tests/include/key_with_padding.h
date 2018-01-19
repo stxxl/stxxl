@@ -27,7 +27,7 @@ struct key_with_padding_base {
     key_type key;
 
     key_with_padding_base() { }
-    key_with_padding_base(KeyType key) : key(key) { }
+    explicit key_with_padding_base(KeyType key) : key(key) { }
 
     bool operator < (const key_with_padding_base& o) const { return key < o.key; }
     bool operator <= (const key_with_padding_base& o) const { return key <= o.key; }
@@ -65,7 +65,7 @@ struct key_with_padding<KeyType, Size, false>
       public key_with_padding_base<KeyType>
 {
     key_with_padding() { }
-    key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key) { }
+    explicit key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key) { }
 
     // To be used with key-based algorithms
     struct key_extract : public numeric_limits_sentinels<key_with_padding>{
@@ -86,7 +86,7 @@ struct key_with_padding<KeyType, Size, true>
     KeyType key_copy;
 
     key_with_padding() { }
-    key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key), key_copy(key) { }
+    explicit key_with_padding(KeyType key) : key_with_padding_base<KeyType>(key), key_copy(key) { }
 
     // To be used with key-based algorithms
     struct key_extract : public numeric_limits_sentinels<key_with_padding>{
@@ -120,7 +120,8 @@ struct numeric_limits<key_with_padding<KeyType, Size, IncludeKeyCopy> >{
     static constexpr value_type min() { return value_type { numeric_limits<KeyType>::min() }; }
     static constexpr value_type max() { return value_type { numeric_limits<KeyType>::max() }; }
 };
-}
+
+} // namespace std
 
 static_assert(sizeof(key_with_padding<uint8_t, 1, false>) == 1, "size-mismatch in key_with_padding");
 static_assert(sizeof(key_with_padding<uint8_t, 2, false>) == 2, "size-mismatch in key_with_padding");

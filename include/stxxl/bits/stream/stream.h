@@ -218,8 +218,7 @@ auto streamify(
 template <typename VectorConfig>
 struct streamify_traits<stxxl::vector_iterator<VectorConfig> >
 {
-    using stream_type = vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >
-    ;
+    using stream_type = vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >;
 };
 
 //! Input external \c stxxl::vector const iterator range to stream converter.
@@ -244,8 +243,7 @@ auto streamify(
 template <typename VectorConfig>
 struct streamify_traits<stxxl::const_vector_iterator<VectorConfig> >
 {
-    using stream_type = vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >
-    ;
+    using stream_type = vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >;
 };
 
 //! Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .

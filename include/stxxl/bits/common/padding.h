@@ -59,6 +59,7 @@ template <>
 struct padding<0>{
     padding() { }
 };
-}
+
+} // namespace stxxl
 
 #endif // !STXXL_COMMON_PADDING_HEADER

@@ -16,6 +16,7 @@
 #define STXXL_ALGO_LOSERTREE_HEADER
 
 #include <algorithm>
+#include <utility>
 
 #include <foxxll/common/types.hpp>
 #include <foxxll/common/utils.hpp>

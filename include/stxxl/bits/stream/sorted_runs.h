@@ -16,6 +16,7 @@
 #define STXXL_STREAM_SORTED_RUNS_HEADER
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include <tlx/counting_ptr.hpp>

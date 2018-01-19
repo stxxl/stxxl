@@ -15,12 +15,13 @@
 #ifndef STXXL_CONTAINERS_DEQUE_HEADER
 #define STXXL_CONTAINERS_DEQUE_HEADER
 
-#include <stxxl/vector>
-
 #include <algorithm>
 #include <deque>
 #include <limits>
+#include <utility>
 #include <vector>
+
+#include <stxxl/vector>
 
 namespace stxxl {
 

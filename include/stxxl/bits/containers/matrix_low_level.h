@@ -17,12 +17,14 @@
 #define STXXL_BLAS 0
 #endif
 
+#include <algorithm>
+#include <complex>
+#include <utility>
+
 #include <foxxll/common/types.hpp>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/types>
 
-#include <complex>
-#include <algorithm>
 
 namespace stxxl {
 
@@ -209,9 +211,9 @@ struct low_level_matrix_multiply_and_add
 };
 
 #if STXXL_BLAS
-using blas_int =  size_t ;
-using blas_double_complex =  std::complex<double> ;
-using blas_single_complex =  std::complex<float> ;
+using blas_int =  size_t;
+using blas_double_complex =  std::complex<double>;
+using blas_single_complex =  std::complex<float>;
 
 // --- vector add (used as matrix-add) -----------------
 
