@@ -17,23 +17,20 @@
 //! \example containers/test_map_random.cpp
 //! This is an example of use of \c stxxl::map container.
 
+#include <random>
+
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/map>
 
 #include <map_test_handlers.h>
+#include <stxxl/bits/common/comparator.h>
 
 using key_type = int;
 using data_type = int;
 
-struct cmp2 : public std::less<int>
-{
-    int max_value()
-    {
-        return std::numeric_limits<int>::max();
-    }
-};
+using cmp2 = stxxl::comparator<key_type>;
 
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)
@@ -42,17 +39,22 @@ using std_map_type = std::map<key_type, data_type, cmp2>;
 using xxl_map_type = stxxl::map<key_type, data_type, cmp2,
                                 DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE>;
 
-#define PERCENT_CLEAR 1
-#define PERCENT_ERASE_BULK 9
-#define PERCENT_ERASE_KEY 90
-#define PERCENT_ERASE_ITERATOR 100
-#define PERCENT_INSERT_PAIR 100
-#define PERCENT_INSERT_BULK 100
-#define PERCENT_SIZING 100
-#define PERCENT_LOWER 100
-#define PERCENT_UPPER 200
-#define PERCENT_FIND 100
-#define PERCENT_ITERATOR 100
+constexpr size_t PERMILLE_CLEAR = 1;
+constexpr size_t PERMILLE_ERASE_BULK = 9;
+constexpr size_t PERMILLE_ERASE_KEY = 90;
+constexpr size_t PERMILLE_ERASE_ITERATOR = 100;
+constexpr size_t PERMILLE_INSERT_PAIR = 100;
+constexpr size_t PERMILLE_INSERT_BULK = 100;
+constexpr size_t PERMILLE_SIZING = 100;
+constexpr size_t PERMILLE_LOWER = 100;
+constexpr size_t PERMILLE_UPPER = 200;
+constexpr size_t PERMILLE_FIND = 100;
+constexpr size_t PERMILLE_ITERATOR = 100;
+
+static_assert(PERMILLE_CLEAR + PERMILLE_SIZING + PERMILLE_ERASE_BULK +
+              PERMILLE_ERASE_KEY + PERMILLE_ERASE_ITERATOR + PERMILLE_INSERT_PAIR +
+              PERMILLE_INSERT_BULK + PERMILLE_LOWER + PERMILLE_UPPER + PERMILLE_FIND +
+              PERMILLE_ITERATOR == 1000, "PERMILLE_ have to sum up to 1000");
 
 //#define MAX_KEY 1000
 #define MAX_KEY 10000
@@ -72,24 +74,7 @@ int main(int argc, char* argv[])
     LOG1 << "Leaf block size: " << LEAF_BLOCK_SIZE << " bytes";
     LOG1 << "Node max elements: " << NODE_MELEMENTS;
     LOG1 << "Leaf max elements: " << LEAF_MELEMENTS;
-
-    stxxl::random_number32 rnd;
-    //stxxl::ran32State = 1141225706;
     LOG1 << "Init random seed: " << stxxl::ran32State;
-
-    int a = (PERCENT_CLEAR +
-             PERCENT_SIZING +
-             PERCENT_ERASE_BULK +
-             PERCENT_ERASE_KEY +
-             PERCENT_ERASE_ITERATOR +
-             PERCENT_INSERT_PAIR +
-             PERCENT_INSERT_BULK +
-             PERCENT_LOWER +
-             PERCENT_UPPER +
-             PERCENT_FIND +
-             PERCENT_ITERATOR);
-
-    die_unless(a == 1000);
 
     if (argc < 2)
     {
@@ -97,10 +82,15 @@ int main(int argc, char* argv[])
         LOG1 << "Note, that STEP must be > 1000";
         return -1;
     }
-    uint64_t MAX_STEP = atoi(argv[1]);
+    const uint64_t MAX_STEP = atoi(argv[1]);
     die_unless(MAX_STEP > 1000);
+
     std_map_type stdmap;
     xxl_map_type xxlmap(NODE_BLOCK_SIZE * 4, LEAF_BLOCK_SIZE * 3);
+
+    std::mt19937_64 randgen;
+    std::uniform_int_distribution<size_t> distr_step(0, 999);
+    std::uniform_int_distribution<key_type> distr_key(0, MAX_KEY - 1);
 
     for (uint64_t i = 0; i < MAX_STEP; i++)
     {
@@ -109,8 +99,8 @@ int main(int argc, char* argv[])
         // of operation we will be called.
         // ***************************************************
 
-        long step = rnd() % 1000;
-        int percent = 0;
+        const auto step = distr_step(randgen);
+        size_t percent = 0;
 
         if (i % (MAX_STEP / 100) == 0)
         {
@@ -120,9 +110,9 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The clear function will be called
         // *********************************************************
-        if (step < (percent += PERCENT_CLEAR))
+        if (step < (percent += PERMILLE_CLEAR))
         {
-            if ((unsigned)rand() % 1000 < stdmap.size())
+            if (distr_step(randgen) < stdmap.size())
             {
                 stdmap.clear();
                 xxlmap.clear();
@@ -134,7 +124,7 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The size function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_SIZING))
+        else if (step < (percent += PERMILLE_SIZING))
         {
             std_map_type::size_type size1 = stdmap.size();
             xxl_map_type::size_type size2 = xxlmap.size();
@@ -144,10 +134,10 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The erase range function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_ERASE_BULK))
+        else if (step < (percent += PERMILLE_ERASE_BULK))
         {
-            key_type key1 = rand() % MAX_KEY;
-            key_type key2 = rand() % MAX_KEY;
+            auto key1 = distr_key(randgen);
+            auto key2 = distr_key(randgen);
 
             if (key1 > key2)
             {
@@ -167,9 +157,9 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The erase a key function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_ERASE_KEY))
+        else if (step < (percent += PERMILLE_ERASE_KEY))
         {
-            key_type key = rnd() % MAX_KEY;
+            const auto key = distr_key(randgen);
 
             stdmap.erase(key);
             xxlmap.erase(key);
@@ -180,9 +170,9 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The erase function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_ERASE_ITERATOR))
+        else if (step < (percent += PERMILLE_ERASE_ITERATOR))
         {
-            key_type key = rnd() % MAX_KEY;
+            const auto key = distr_key(randgen);
 
             std_map_type::iterator stditer = stdmap.find(key);
             xxl_map_type::iterator xxliter = xxlmap.find(key);
@@ -201,9 +191,9 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The insert function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_INSERT_PAIR))
+        else if (step < (percent += PERMILLE_INSERT_PAIR))
         {
-            key_type key = rnd() % MAX_KEY;
+            const auto key = distr_key(randgen);
             stdmap.insert(std::pair<key_type, data_type>(key, 2 * key));
             xxlmap.insert(std::pair<key_type, data_type>(key, 2 * key));
 
@@ -213,15 +203,16 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The bulk insert function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_INSERT_BULK))
+        else if (step < (percent += PERMILLE_INSERT_BULK))
         {
-            unsigned lower = rnd() % MAX_KEY;
-            unsigned upper = rnd() % MAX_KEY;
+            auto lower = static_cast<size_t>(distr_key(randgen));
+            auto upper = static_cast<size_t>(distr_key(randgen));
+
             if (lower > upper)
                 std::swap(lower, upper);
 
             vector_type v2(upper - lower);
-            for (unsigned j = 0; j < (unsigned)(upper - lower); j++)
+            for (size_t j = 0; j < (upper - lower); j++)
             {
                 v2[j].first = lower + j;
                 v2[j].second = 2 * v2[j].first;
@@ -230,19 +221,20 @@ int main(int argc, char* argv[])
             stdmap.insert(v2.begin(), v2.end());
             xxlmap.insert(v2.begin(), v2.end());
 
-            for (unsigned i = lower; i < upper; i++)
+            for (size_t i = lower; i < upper; i++)
                 die_unless(stxxl::there(stdmap, i, 2 * i));
 
-            for (unsigned i = lower; i < upper; i++)
+            for (size_t i = lower; i < upper; i++)
                 die_unless(stxxl::there(xxlmap, i, 2 * i));
         }
         // *********************************************************
         // The lower_bound function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_LOWER))
+        else if (step < (percent += PERMILLE_LOWER))
         {
-            key_type key1 = rand() % MAX_KEY;
-            key_type key2 = rand() % MAX_KEY;
+            auto key1 = distr_key(randgen);
+            auto key2 = distr_key(randgen);
+
             if (key1 > key2)
             {
                 std::swap(key1, key2);
@@ -264,10 +256,11 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The upper_bound function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_UPPER))
+        else if (step < (percent += PERMILLE_UPPER))
         {
-            key_type key1 = rand() % MAX_KEY;
-            key_type key2 = rand() % MAX_KEY;
+            auto key1 = distr_key(randgen);
+            auto key2 = distr_key(randgen);
+
             if (key1 > key2)
             {
                 std::swap(key1, key2);
@@ -289,10 +282,11 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The find function will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_FIND))
+        else if (step < (percent += PERMILLE_FIND))
         {
-            key_type key1 = rand() % MAX_KEY;
-            key_type key2 = rand() % MAX_KEY;
+            auto key1 = distr_key(randgen);
+            auto key2 = distr_key(randgen);
+
             if (key1 > key2)
             {
                 std::swap(key1, key2);
@@ -314,7 +308,7 @@ int main(int argc, char* argv[])
         // *********************************************************
         // The iterate functions will be called
         // *********************************************************
-        else if (step < (percent += PERCENT_ITERATOR))
+        else if (step < (percent += PERMILLE_ITERATOR))
         {
             std_map_type::const_iterator siter1 = stdmap.begin();
             xxl_map_type::const_iterator xiter1 = xxlmap.begin();

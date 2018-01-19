@@ -14,25 +14,32 @@
 
 #include <iostream>
 #include <iterator>
+#include <random>
 
 #include <tlx/die.hpp>
 
-#include <stxxl/random>
 #include <stxxl/sequence>
+
+using my_type = int;
 
 int main(int argc, char* argv[])
 {
-    uint64_t ops = (argc >= 2)
-                   ? foxxll::atouint64(argv[1]) : 16 * STXXL_DEFAULT_BLOCK_SIZE(int);
+    const uint64_t ops = (argc >= 2)
+                         ? foxxll::atouint64(argv[1])
+                         : (16 * STXXL_DEFAULT_BLOCK_SIZE(my_type));
 
-    stxxl::random_number32 random;
-    stxxl::sequence<int> XXLDeque;
-    std::deque<int> STDDeque;
+    stxxl::sequence<my_type> XXLDeque;
+    std::deque<my_type> STDDeque;
+
+    std::mt19937 randgen;
+    std::uniform_int_distribution<int> distr_op(0, 5);
+    std::uniform_int_distribution<my_type> distr_value;
 
     for (uint64_t i = 0; i < ops; ++i)
     {
-        unsigned curOP = random() % 6;
-        unsigned value = random();
+        const auto curOP = distr_op(randgen);
+        const auto value = distr_value(randgen);
+
         switch (curOP)
         {
         case 0: // make insertion a bit more likely

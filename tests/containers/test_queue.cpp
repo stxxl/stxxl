@@ -17,6 +17,7 @@
 #define STXXL_NO_DEPRECATED 1
 
 #include <queue>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -45,16 +46,10 @@ template class stxxl::queue<my_type>;
 
 int main()
 {
-#if 1
-    //stxxl::set_seed(424648671);  // works fine with a single disk, fails with two disks
-    LOG1 << "SEED=" << stxxl::get_next_seed();
-    stxxl::srandom_number32(stxxl::get_next_seed());
-    stxxl::random_number32_r rnd;
-#else
-    //stxxl::ran32State = 1028675152; // fails with two disks
-    LOG1 << "ran32State=" << stxxl::ran32State;
-    stxxl::random_number32 rnd;
-#endif
+    std::mt19937 randgen;
+    std::uniform_int_distribution<my_type> distr;
+    std::uniform_int_distribution<my_type> distr02(0, 2);
+    std::uniform_int_distribution<my_type> distr03(0, 3);
 
     unsigned cnt;
     LOG1 << "Elements in a block: " << stxxl::queue<my_type>::block_type::size;
@@ -68,7 +63,7 @@ int main()
     cnt = stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
-        my_type val = rnd();
+        my_type val = distr(randgen);
         xqueue.push(val);
         squeue.push(val);
         check(xqueue, squeue);
@@ -87,10 +82,10 @@ int main()
         if ((cnt % 1000) == 0)
             LOG1 << "Operations left: " << cnt << " queue size " << squeue.size();
 
-        int rndtmp = rnd() % 3;
+        int rndtmp = distr02(randgen);
         if (rndtmp > 0 || squeue.empty())
         {
-            my_type val = rnd();
+            my_type val = distr(randgen);
             xqueue.push(val);
             squeue.push(val);
             check(xqueue, squeue);
@@ -107,10 +102,10 @@ int main()
         if ((cnt++ % 1000) == 0)
             LOG1 << "Operations: " << cnt << " queue size " << squeue.size();
 
-        int rndtmp = rnd() % 4;
+        int rndtmp = distr03(randgen);
         if (rndtmp >= 3)
         {
-            my_type val = rnd();
+            my_type val = distr(randgen);
             xqueue.push(val);
             squeue.push(val);
             check(xqueue, squeue);
@@ -128,10 +123,10 @@ int main()
         if ((cnt % 1000) == 0)
             LOG1 << "Operations left: " << cnt << " queue size " << squeue.size();
 
-        int rndtmp = rnd() % 3;
+        int rndtmp = distr02(randgen);
         if (rndtmp > 0 || squeue.empty())
         {
-            my_type val = rnd();
+            my_type val = distr(randgen);
             xqueue.push(val);
             squeue.push(val);
             check(xqueue, squeue);
@@ -154,10 +149,10 @@ int main()
         if ((cnt % 1000) == 0)
             LOG1 << "Operations left: " << cnt << " queue size " << squeue1.size();
 
-        int rndtmp = rnd() % 3;
+        int rndtmp = distr02(randgen);
         if (rndtmp > 0 || squeue1.empty())
         {
-            my_type val = rnd();
+            my_type val = distr(randgen);
             xqueue1.push(val);
             squeue1.push(val);
             check(xqueue1, squeue1);

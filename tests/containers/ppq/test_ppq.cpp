@@ -16,15 +16,16 @@
 
 #include <iostream>
 #include <limits>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/parallel_priority_queue.h>
-#include <stxxl/random>
 #include <stxxl/timer>
 
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
 using foxxll::scoped_print_timer;
 
@@ -146,7 +147,9 @@ void test_bulk_limit(const size_t bulk_size)
 
     int windex = 0;     // continuous insertion index
     int rindex = 0;     // continuous pop index
-    stxxl::random_number32_r prng;
+
+    std::mt19937_64 randgen(seed_seq());
+    std::uniform_int_distribution<size_t> distr(0, bulk_size - 1);
 
     const size_t repeats = 8;
 
@@ -161,7 +164,7 @@ void test_bulk_limit(const size_t bulk_size)
     // extract bulk_size items, and reinsert them with higher indexes
     for (size_t r = 0; r < repeats; ++r)
     {
-        size_t this_bulk_size = bulk_size / 2 + prng() % bulk_size;
+        size_t this_bulk_size = bulk_size / 2 + distr(randgen);
 
         if (0) // simple procedure
         {

@@ -12,28 +12,15 @@
  **************************************************************************/
 
 #include <iostream>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl.h>
-#include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/comparator.h>
 
-struct rand_pairs
-{
-    stxxl::random_number32& rand_;
-
-    explicit rand_pairs(stxxl::random_number32& rand)
-        : rand_(rand)
-    { }
-
-    std::pair<int, int> operator () ()
-    {
-        int v = (int)rand_();
-        return std::pair<int, int>(v, v);
-    }
-};
+#include <test_helpers.h>
 
 struct hash_int
 {
@@ -44,11 +31,7 @@ struct hash_int
     }
 };
 
-struct cmp : public std::less<int>
-{
-    int min_value() const { return std::numeric_limits<int>::min(); }
-    int max_value() const { return std::numeric_limits<int>::max(); }
-};
+using cmp = stxxl::comparator<int>;
 
 // forced instantiation
 template class stxxl::unordered_map<int, int, hash_int, cmp, 4* 1024, 4>;
@@ -127,14 +110,21 @@ void basic_test()
     const unordered_map& cmap = map;
 
     // generate random values
-    stxxl::random_number32 rand32;
 
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
     std::vector<value_type> values3(n_values / 2);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
-    std::generate(values3.begin(), values3.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+
+    {
+        auto broadcast = [](uint64_t x) -> value_type {
+                             return {
+                                        x, x
+                             };
+                         };
+        random_fill_vector(values1, broadcast);
+        random_fill_vector(values2, broadcast);
+        random_fill_vector(values3, broadcast);
+    }
 
     // --- initial import
     std::cout << "Initial import...";
