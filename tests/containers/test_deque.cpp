@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
                 std::deque<int>::iterator STDI = STDDeque.begin() + (value % STDDeque.size());
                 *XXLI = value;
                 *STDI = value;
-                unsigned value1 = rand();
+                unsigned value1 = distr_value(randgen);
                 if (XXLI - XXLDeque.begin() == 0)
                     break;
 
