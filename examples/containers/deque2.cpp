@@ -27,7 +27,7 @@ int main()
 
     std::mt19937 randgen;
     std::uniform_int_distribution<data_type> distr_value;
-    std::uniform_int_distribution<size_t> distr_index;
+    std::uniform_int_distribution<size_t> distr_index(0, number_of_elements-1);
 
     // fill deque with random integer values
     for (uint64_t i = 0; i < number_of_elements; i++)
