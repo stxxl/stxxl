@@ -10,43 +10,30 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <ctime>
 #include <fstream>
 
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/die_with_message.hpp>
+#include <foxxll/common/utils.hpp>
+
 #include <stxxl.h>
+#include <stxxl/bits/common/comparator.h>
 
 struct LogEntry
 {
-    long long unsigned from; // callers number
-    long long unsigned to;   // destination number
-    time_t timestamp;        // time of event
-    int event;               // event type 1 - call started
-                             //            2 - call ended
-};
+    LogEntry() = default;
 
-struct cmp
-{
-    bool operator () (const LogEntry& a, const LogEntry& b) const
-    {
-        return a.timestamp < b.timestamp;
-    }
-    static LogEntry min_value()
-    {
-        LogEntry e;
-        e.timestamp = std::numeric_limits<time_t>::min();
-        return e;
-    }
-    static LogEntry max_value()
-    {
-        LogEntry e;
-        e.timestamp = std::numeric_limits<time_t>::max();
-        return e;
-    }
-};
+    LogEntry(uint64_t from, uint64_t to, double timestamp, int event)
+        : from(from), to(to), timestamp(timestamp), event(event)
+    { }
 
-using vector_type = stxxl::vector<LogEntry, 1, stxxl::random_pager<1> >;
+    uint64_t from;    // callers number
+    uint64_t to;      // destination number
+    time_t timestamp; // time of event
+    int event;        // event type 1 - call started
+                      //            2 - call ended
+};
 
 std::ostream& operator << (std::ostream& i, const LogEntry& entry)
 {
@@ -59,63 +46,60 @@ std::ostream& operator << (std::ostream& i, const LogEntry& entry)
 
 int main(int argc, char* argv[])
 {
-    if (argc < 5)
-    {
-        LOG1 << "Usage: " << argv[0] << " ncalls avcalls main logfile";
-        LOG1 << " ncalls  - number of calls";
-        LOG1 << " avcalls - average number of calls per client";
-        LOG1 << " main    - memory to use (in MiB)";
-        LOG1 << " logfile - file name of the output";
+    die_with_message_if(argc < 5, "Usage: " << argv[0] << " ncalls avcalls main logfile\n"
+                        " ncalls  - number of calls\n"
+                        " avcalls - average number of calls per client\n"
+                        " main    - memory to use (in MiB)\n"
+                        " logfile - file name of the output");
 
-        return 0;
-    }
-    size_t M = atol(argv[3]) * 1024 * 1024;
-    const uint64_t ncalls = foxxll::atouint64(argv[1]);
-    const long av_calls = atol(argv[2]);
-    const uint64_t nclients = ncalls / av_calls;
-    uint64_t calls_made = 0;
+    const size_t M = foxxll::atouint64(argv[3]) * 1024 * 1024;
+    const size_t ncalls = foxxll::atouint64(argv[1]);
+    const size_t av_calls = foxxll::atouint64(argv[2]);
+    const size_t nclients = ncalls / av_calls;
 
-    time_t now = time(nullptr);
+    size_t calls_made = 0;
 
-    vector_type log;
+    const auto now = foxxll::timestamp();
+
+    stxxl::vector<LogEntry> log;
     log.reserve(2 * ncalls);
 
-    stxxl::random_number64 rnd;
+    std::mt19937_64 randgen;
+    std::uniform_real_distribution<double> distr_timestamp(1, 24.0 * 3600);
+    std::uniform_real_distribution<double> distr_duration(1, 24.0 * 3600);
 
-    for (uint64_t number = 0;
-         number < nclients && calls_made < ncalls;
-         ++number)
+    std::uniform_int_distribution<size_t> distr_clients(0, nclients - 1);
+    std::uniform_int_distribution<size_t> distr_serv(0, av_calls - 1);
+
+    for (uint64_t number = 0; number < nclients && calls_made < ncalls; ++number)
     {
-        long long int serv = std::min<long long int>(rnd(av_calls * 2), (ncalls - calls_made));
-        LogEntry e;
-        e.from = number;
+        auto serv = std::min<size_t>(distr_serv(randgen), ncalls - calls_made);
 
-        time_t cur = now;
-
+        auto cur = now;
         while (serv-- > 0)
         {
-            cur += static_cast<time_t>(1 + rnd(3600 * 24));
+            const auto to = distr_clients(randgen);
 
-            e.to = rnd(nclients);
-            e.timestamp = cur;
+            cur += distr_timestamp(randgen);
+            log.push_back({ number, to, cur, 1 });
+
+            cur += distr_duration(randgen);
+            log.push_back({ number, to, cur, 2 });
 
             ++calls_made;
-            e.event = 1;
-            log.push_back(e);
-
-            cur += static_cast<time_t>(1 + rnd(1800));
-            e.timestamp = cur;
-            e.event = 2;
-
-            log.push_back(e);
         }
     }
 
+    // derive a stxxl::struct_comparator by providing a lambda returning
+    // a tuple of references to all relevant field of the struct (here only timestamp)
+    auto cmp = stxxl::make_struct_comparator<LogEntry>(
+        [](auto& l) { return std::tie(l.timestamp); });
+
     // sort events in order of their appereance
-    stxxl::sort(log.begin(), log.end(), cmp(), M);
+    stxxl::sort(log.begin(), log.end(), cmp, M);
 
+    // Write result
     std::fstream out(argv[4], std::ios::out);
-
     std::copy(log.begin(), log.end(), std::ostream_iterator<LogEntry>(out));
 
     LOG1 << "\n" << calls_made << " calls made.";

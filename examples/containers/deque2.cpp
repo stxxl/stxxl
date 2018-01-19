@@ -11,58 +11,46 @@
  **************************************************************************/
 
 #include <iostream>
+#include <random>
 
 #include <tlx/logger.hpp>
 
 #include <stxxl/deque>
 
+using data_type = unsigned int;
+
 int main()
 {
-    using deque = stxxl::deque<unsigned int>;
-    deque my_deque;
+    stxxl::deque<data_type> my_deque;
 
-    unsigned int random, p, x;
-    unsigned int smaller_left = 0;
-    unsigned int smaller_right = 0;
-    stxxl::random_number32 rand32;
-    uint64_t number_of_elements = 8 * 1024 * 1024;
+    const size_t number_of_elements = 8 * 1024 * 1024;
+
+    std::mt19937 randgen;
+    std::uniform_int_distribution<data_type> distr_value;
+    std::uniform_int_distribution<size_t> distr_index;
 
     // fill deque with random integer values
     for (uint64_t i = 0; i < number_of_elements; i++)
-    {
-        random = rand32();  // produce random integer from intervall [0,2^32)
-        my_deque.push_front(random);
-    }
+        my_deque.push_front(distr_value(randgen));
 
-    stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();
+    auto deque_iterator = my_deque.begin();
 
     // Access random element x at position p(x) in the deque
-    p = static_cast<unsigned int>(rand32() % number_of_elements);
-    x = my_deque[p];
+    const auto rand_idx = distr_index(randgen);
+    const auto pivot = my_deque[rand_idx];
 
     // Count number of smaller elements from the front to p(x) - 1
-    for (unsigned int j = 0; j < p; j++)
-    {
-        if (*deque_iterator < x)
-        {
-            smaller_left += 1;
-        }
-        ++deque_iterator;
-    }
+    size_t smaller_left = 0;
+    for (unsigned int j = 0; j < rand_idx; ++j, ++deque_iterator)
+        smaller_left += (*deque_iterator < pivot);
 
     ++deque_iterator;
 
     // Count number of smaller elements from p(x) + 1 to the end
-    for (uint64_t k = p + 1; k < number_of_elements - 1; k++)
-    {
-        if (*deque_iterator < x)
-        {
-            smaller_right += 1;
-        }
-        ++deque_iterator;
-    }
+    size_t smaller_right = 0;
+    for (uint64_t k = rand_idx + 1; k < number_of_elements - 1; ++k, ++deque_iterator)
+        smaller_right += (*deque_iterator < pivot);
 
     LOG1 << "smaller left: " << smaller_left << ", smaller right: " << smaller_right;
-
     return 0;
 }

@@ -1128,7 +1128,7 @@ protected:
         // determine new number of buckets from desired load_factor ...
         internal_size_type n_new;
         n_new = static_cast<internal_size_type>(ceil(
-            static_cast<double>(num_total_) / (subblock_size * opt_load_factor())));
+                                                    static_cast<double>(num_total_) / (subblock_size * opt_load_factor())));
 
         // ... but give the user the chance to request even more buckets
         if (n_desired > n_new)
@@ -1326,7 +1326,7 @@ public:
         // calculate new number of buckets
         external_size_type num_total_new = num_total_ + (l - f);         // estimated number of elements
         external_size_type n_buckets_new = static_cast<external_size_type>(ceil(
-            static_cast<double>(num_total_new) / (subblock_size * opt_load_factor())));
+                                                                               static_cast<double>(num_total_new) / (subblock_size * opt_load_factor())));
         if (n_buckets_new > max_bucket_count())
             n_buckets_new = max_bucket_count();
 

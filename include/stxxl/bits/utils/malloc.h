@@ -24,7 +24,6 @@
   #include <ostream>
 #endif
 
-
 #include <tlx/unused.hpp>
 
 namespace stxxl {

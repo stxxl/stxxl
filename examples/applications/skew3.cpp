@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -32,7 +33,6 @@
 #include <foxxll/io.hpp>
 #include <stxxl/algorithm>
 #include <stxxl/bits/common/cmdline.h>
-#include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -1229,8 +1229,10 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
         // fill input vector with random bytes
         input_vector.resize(sizelimit);
-        stxxl::random_number8_r rand8;
-        stxxl::generate(input_vector.begin(), input_vector.end(), rand8);
+
+        std::mt19937 randgen;
+        std::uniform_int_distribution<alphabet_type> distr;
+        stxxl::generate(input_vector.begin(), input_vector.end(), std::bind(distr, std::ref(randgen)));
     }
     else if (input_filename == "unary")
     {
