@@ -21,7 +21,6 @@ static const char* description =
 #include <foxxll/verbose.hpp>
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/random>

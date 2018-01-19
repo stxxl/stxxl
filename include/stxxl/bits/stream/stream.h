@@ -22,7 +22,6 @@
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/vector>
 
 #include <memory>
@@ -417,10 +416,10 @@ auto streamify(Generator gen_)
 }
 
 template <typename Input1, typename Input2, typename... Rest>
-class tuplestream;
+class make_tuplestream;
 
 template <typename Input1, typename Input2, typename... Rest>
-class tuplestream{
+class make_tuplestream{
 public:
     using value_type = std::tuple<typename Input1::value_type, typename Input2::value_type, typename Rest::value_type...>;
     using tuple_type = std::tuple<Input1&, Input2&, Rest&...>;
@@ -430,11 +429,11 @@ private:
     value_type current;
 
 public:
-    tuplestream(Input1& i1, Input2& i2, Rest&... rest)
-        : in(i1, i2, (rest) ...)
+    make_tuplestream(Input1& i1, Input2& i2, Rest&... rest)
+        : in(i1, i2, rest...)
     {
         if (!empty())
-            current = vmap_tuple_collect([](auto & t) { return *t; }, in);
+            current = tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in);
     }
 
     //! Standard stream method.
@@ -449,11 +448,11 @@ public:
     }
 
     //! Standard stream method.
-    tuplestream& operator ++ ()
+    make_tuplestream& operator ++ ()
     {
         tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
         if (!empty())
-            current = vmap_tuple_collect([](auto & t) { return *t; }, in);
+            current = tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in);
         return *this;
     }
 
@@ -469,24 +468,23 @@ template <typename Operation, typename... Inputs>
 class transform;
 
 template <typename Operation, typename... Inputs>
-class transform
-{
+class transform {
 public:
     using value_type = typename Operation::value_type;
-    using tuple_type = std::tuple<Inputs&...>;
+    using tuple_type = std::tuple<Inputs &...>;
     using tuple_value_type = std::tuple<typename Inputs::value_type...>;
 
 private:
-    Operation& op;
+    Operation &op;
     tuple_type in;
     value_type current;
 
 public:
     transform(Operation& op_, Inputs&... in_)
-        : op(op_), in((in_)...)
+        : op(op_), in(in_...)
     {
         if (!empty())
-            current = tlx::apply_tuple(std::move(op), tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
+            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
     }
 
     //! Standard stream method.
@@ -504,11 +502,8 @@ public:
     transform& operator ++ ()
     {
         tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
-        if (!empty()) {
-            current = tlx::apply_tuple(std::move(op), tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in)
-            );
-        }
-
+        if (!empty())
+            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
         return *this;
     }
 
@@ -517,6 +512,92 @@ public:
         tlx::call_foreach_tuple([&result](auto & t) { result = result || t.empty(); }, in);
 
         return result;
+    }
+};
+
+/**
+ * Counter for creating tuple indexes for example.
+ */
+template <class ValueType>
+struct counter
+{
+public:
+    using value_type = ValueType;
+
+protected:
+    value_type m_count;
+
+public:
+    explicit counter(const value_type& start = 0)
+        : m_count(start)
+    { }
+
+    const value_type& operator * () const
+    {
+        return m_count;
+    }
+
+    counter& operator ++ ()
+    {
+        ++m_count;
+        return *this;
+    }
+
+    bool empty() const
+    {
+        return false;
+    }
+};
+
+/**
+ * Concatenates two tuple streams as streamA . streamB
+ */
+template <class StreamA, class StreamB>
+class concatenate
+{
+public:
+    using value_type = typename StreamA::value_type;
+
+private:
+    StreamA& A;
+    StreamB& B;
+
+public:
+    concatenate(StreamA& A_, StreamB& B_) : A(A_), B(B_)
+    {
+        assert(!A.empty());
+        assert(!B.empty());
+    }
+
+    const value_type& operator * () const
+    {
+        assert(!empty());
+
+        if (!A.empty()) {
+            return *A;
+        }
+        else {
+            return *B;
+        }
+    }
+
+    concatenate& operator ++ ()
+    {
+        assert(!empty());
+
+        if (!A.empty()) {
+            ++A;
+        }
+        else if (!B.empty()) {
+            ++B;
+        }
+
+        return *this;
+    }
+
+    bool empty() const
+    {
+        return (A.empty() && B.empty());
     }
 };
 

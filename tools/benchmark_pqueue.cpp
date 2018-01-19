@@ -23,7 +23,6 @@ static const char* description =
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/priority_queue>
 #include <stxxl/random>
 #include <stxxl/timer>

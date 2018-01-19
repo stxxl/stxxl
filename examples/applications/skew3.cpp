@@ -75,7 +75,7 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     using index_counter_type = stxxl::stream::counter<offset_type>;
     index_counter_type index_counter;
 
-    using tuple_index_sa_type = stream::tuplestream<index_counter_type, InputSA>;
+    using tuple_index_sa_type = stream::make_tuplestream<index_counter_type, InputSA>;
     tuple_index_sa_type tuple_index_sa(index_counter, inputSA);
 
     // take (i, SA[i]) and sort to (ISA[i], i)
