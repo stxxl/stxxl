@@ -850,10 +850,10 @@ public:
 };
 
 template <typename A, typename B, typename... TT>
-class tuplestream;
+class make_tuple;
 
 template <typename A, typename B, typename... TT>
-class tuplestream{
+class make_tuple{
 public:
     using value_type = std::tuple<typename A::value_type, typename B::value_type, typename TT::value_type...>;
     using tuple_type = std::tuple<A&, B&, TT&...>;
@@ -863,7 +863,7 @@ private:
     value_type current;
 
 public:
-    tuplestream(A& a, B& b, TT&... tt)
+    make_tuple(A& a, B& b, TT&... tt)
         : in(a, b, (tt) ...)
     {
         if (!empty())
@@ -885,7 +885,7 @@ public:
     }
 
     //! Standard stream method.
-    tuplestream& operator ++ ()
+    make_tuple& operator ++ ()
     {
         tlx::call_foreach_tuple([&](auto & t) {  ++t; }, in);
         if (!empty())

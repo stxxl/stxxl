@@ -157,7 +157,7 @@ int main()
     counter_stream_type counter_stream = streamify(counter_type());
 
     // create tuple stream
-    using tuple_stream_type = stxxl::stream::tuplestream<input_stream_type, counter_stream_type>;
+    using tuple_stream_type = stxxl::stream::make_tuple<input_stream_type, counter_stream_type>;
     tuple_stream_type tuple_stream(input_stream, counter_stream);
 
     const uint64_t sorter_memory = 128 * 1024;

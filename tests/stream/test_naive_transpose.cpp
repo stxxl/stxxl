@@ -135,7 +135,7 @@ int main()
     destination_index_stream_type destination_index_stream(num_cols, num_rows);
 
     // create tuple stream: (key, value)
-    using tuple_stream_type = stxxl::stream::tuplestream<destination_index_stream_type, input_stream_type>;
+    using tuple_stream_type = stxxl::stream::make_tuple<destination_index_stream_type, input_stream_type>;
     tuple_stream_type tuple_stream(destination_index_stream, input_stream);
 
     // sort tuples by first entry (key)
