@@ -14,13 +14,15 @@
 #ifndef STXXL_CONTAINERS_PAGER_HEADER
 #define STXXL_CONTAINERS_PAGER_HEADER
 
-#include <stxxl/bits/common/rand.h>
-#include <tlx/simple_vector.hpp>
-
 #include <algorithm>
 #include <cassert>
 #include <list>
 #include <utility>
+
+#include <tlx/simple_vector.hpp>
+#include <tlx/unused.hpp>
+
+#include <stxxl/bits/common/rand.h>
 
 namespace stxxl {
 
