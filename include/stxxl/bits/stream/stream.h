@@ -6,6 +6,7 @@
  *  Copyright (C) 2003-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2018 Hung Tran <hung@ae.cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -15,8 +16,9 @@
 #ifndef STXXL_STREAM_STREAM_HEADER
 #define STXXL_STREAM_STREAM_HEADER
 
+#include <tlx/meta/apply_tuple.hpp>
+#include <tlx/meta/vmap_foreach_tuple.hpp>
 #include <tlx/meta/call_foreach_tuple.hpp>
-#include <tlx/meta/call_foreach_tuple_with_index.hpp>
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
@@ -414,464 +416,25 @@ auto streamify(Generator gen_)
     return generator2stream<Generator>(gen_);
 }
 
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM                                                      //
-////////////////////////////////////////////////////////////////////////
-
-struct Stopper { };
-
-//! Processes (up to) 6 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 6 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \tparam Input5 type of the 5th input
-//! \tparam Input6 type of the 6th input
-template <class Operation,
-          class Input1,
-          class Input2 = Stopper,
-          class Input3 = Stopper,
-          class Input4 = Stopper,
-          class Input5 = Stopper,
-          class Input6 = Stopper
-          >
-class transform
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-    Input5& i5;
-    Input6& i6;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, Input4& i4_,
-              Input5& i5_, Input5& i6_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5, *i6);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        ++i5;
-        ++i6;
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5, *i6);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() ||
-               i4.empty() || i5.empty() || i6.empty();
-    }
-};
-
-// Specializations
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (1 input stream)                                     //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes an input stream using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 1 parameter)
-//! \tparam Input1 type of the input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1
-          >
-class transform<Operation, Input1, Stopper, Stopper, Stopper, Stopper, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_) : op(o), i1(i1_)
-    {
-        if (!empty())
-            current = op(*i1);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        if (!empty())
-            current = op(*i1);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (2 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 2 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 2 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2
-          >
-class transform<Operation, Input1, Input2, Stopper, Stopper, Stopper, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_) : op(o), i1(i1_), i2(i2_)
-    {
-        if (!empty())
-            current = op(*i1, *i2);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        if (!empty())
-            current = op(*i1, *i2);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (3 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 3 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 3 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2,
-          class Input3
-          >
-class transform<Operation, Input1, Input2, Input3, Stopper, Stopper, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        if (!empty())
-            current = op(*i1, *i2, *i3);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (4 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 4 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 4 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2,
-          class Input3,
-          class Input4
-          >
-class transform<Operation, Input1, Input2, Input3, Input4, Stopper, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, Input4& i4_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() || i4.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (5 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 5 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 5 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \tparam Input5 type of the 5th input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2,
-          class Input3,
-          class Input4,
-          class Input5
-          >
-class transform<Operation, Input1, Input2, Input3, Input4, Input5, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-    Input5& i5;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, // NOLINT
-              Input4& i4_, Input5& i5_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        ++i5;
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() || i4.empty() || i5.empty();
-    }
-};
-
-template <typename A, typename B, typename... TT>
+template <typename Input1, typename Input2, typename... Rest>
 class tuplestream;
 
-template <typename A, typename B, typename... TT>
+template <typename Input1, typename Input2, typename... Rest>
 class tuplestream{
 public:
-    using value_type = std::tuple<typename A::value_type, typename B::value_type, typename TT::value_type...>;
-    using tuple_type = std::tuple<A&, B&, TT&...>;
+    using value_type = std::tuple<typename Input1::value_type, typename Input2::value_type, typename Rest::value_type...>;
+    using tuple_type = std::tuple<Input1&, Input2&, Rest&...>;
 
 private:
     tuple_type in;
     value_type current;
 
 public:
-    tuplestream(A& a, B& b, TT&... tt)
-        : in(a, b, (tt) ...)
+    tuplestream(Input1& i1, Input2& i2, Rest&... rest)
+        : in(i1, i2, (rest) ...)
     {
         if (!empty())
-            tlx::call_foreach_tuple_with_index([this](auto index, auto & t)
-                                               {
-                                                   std::get<decltype(index)::index>(current) = *t;
-                                               }, in);
+            current = vmap_tuple_collect([](auto & t) { return *t; }, in);
     }
 
     //! Standard stream method.
@@ -888,12 +451,63 @@ public:
     //! Standard stream method.
     tuplestream& operator ++ ()
     {
-        tlx::call_foreach_tuple([&](auto & t) {  ++t; }, in);
+        tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
         if (!empty())
-            tlx::call_foreach_tuple_with_index([this](auto index, auto & t)
-                                               {
-                                                   std::get<decltype(index)::index>(current) = *t;
-                                               }, in);
+            current = vmap_tuple_collect([](auto & t) { return *t; }, in);
+        return *this;
+    }
+
+    bool empty() const {
+        bool result = false;
+        tlx::call_foreach_tuple([&result](auto & t) { result = result || t.empty(); }, in);
+
+        return result;
+    }
+};
+
+template <typename Operation, typename... Inputs>
+class transform;
+
+template <typename Operation, typename... Inputs>
+class transform
+{
+public:
+    using value_type = typename Operation::value_type;
+    using tuple_type = std::tuple<Inputs&...>;
+    using tuple_value_type = std::tuple<typename Inputs::value_type...>;
+
+private:
+    Operation& op;
+    tuple_type in;
+    value_type current;
+
+public:
+    transform(Operation& op_, Inputs&... in_)
+        : op(op_), in((in_)...)
+    {
+        if (!empty())
+            current = tlx::apply_tuple(std::move(op), tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
+    }
+
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
+
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
+
+    //! Standard stream method.
+    transform& operator ++ ()
+    {
+        tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
+        if (!empty()) {
+            current = tlx::apply_tuple(std::move(op), tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in)
+            );
+        }
 
         return *this;
     }

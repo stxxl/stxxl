@@ -21,6 +21,7 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 #include <vector>
+#include <stxxl/bits/common/comparator.h>
 
 // comment if you want to use one 'sort' algorithm without producing
 // intermediate sorted runs.
@@ -84,26 +85,7 @@ struct counter
 
 using counter_type = counter<int>;
 
-struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
-{
-    using value_type = tuple_type;
-    bool operator () (const value_type& a, const value_type& b) const
-    {
-        if (std::get<0>(a) == std::get<0>(b))
-            return std::get<1>(a) < std::get<1>(b);
-
-        return std::get<0>(a) < std::get<0>(b);
-    }
-
-    value_type min_value() const
-    {
-        return std::make_tuple(std::numeric_limits<char>::min(), std::numeric_limits<int>::min());
-    }
-    value_type max_value() const
-    {
-        return  std::make_tuple(std::numeric_limits<char>::max(), std::numeric_limits<int>::max());
-    }
-};
+using cmp_type = stxxl::comparator<tuple_type>;
 
 struct cmp_int : std::binary_function<int, int, bool>
 {
@@ -177,7 +159,7 @@ int main()
 #endif
 
     using transformed_stream_type = stxxl::stream::transform<identity<std::tuple<char, int>>, sorted_stream_type>;
-    identity<std::tuple<char, int> > id;
+    identity<std::tuple<char, int>> id;
     transformed_stream_type transformed_stream(id, sorted_stream);
 
     // HERE streaming part ends (materializing)
