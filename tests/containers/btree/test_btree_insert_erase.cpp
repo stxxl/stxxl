@@ -25,8 +25,9 @@ int main(int argc, char* argv[])
 
     // prepare random unique keys
     stxxl::vector<key_type> values(nins);
+    std::mt19937_64 randgen;
     {
-        random_fill_vector(values);
+        random_fill_vector(values, randgen);
 
         LOG1 << "Sorting the random values";
         stxxl::sort(values.begin(), values.end(), comp_type(), 128 * 1024 * 1024);
@@ -38,7 +39,7 @@ int main(int argc, char* argv[])
         }
 
         LOG1 << "Randomly permute input values";
-        stxxl::random_shuffle(values.begin(), values.end(), 128 * 1024 * 1024);
+        stxxl::shuffle(values.begin(), values.end(), randgen, 128 * 1024 * 1024);
     }
 
     btree_type BTree(1024 * 128, 1024 * 128);

@@ -22,6 +22,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <random>
 
 #include <tlx/logger.hpp>
 
@@ -62,7 +63,8 @@ void long_test()
         LOG1 << STXXLVector[i];
 
     LOG1 << "Permute randomly...";
-    stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 64 * STXXL_DEFAULT_BLOCK_SIZE(int));
+    std::mt19937 randgen;
+    stxxl::shuffle(STXXLVector.begin(), STXXLVector.end(), randgen, 64 * STXXL_DEFAULT_BLOCK_SIZE(int));
 
     LOG1 << "Begin: ";
     for (i = 0; i < 10; i++)
@@ -91,7 +93,10 @@ void short_test()
     }
     std::cout << std::endl;
     v.flush();
-    stxxl::random_shuffle(v.begin() + 512, v.begin() + 512 + 1024, 64 * 1024);
+
+    std::mt19937_64 randgen;
+    stxxl::shuffle(v.begin() + 512, v.begin() + 512 + 1024, randgen, 64 * 1024);
+
     std::cout << "after shuffle:" << std::endl;
     for (i = 0; i < v.size(); ++i) {
         std::cout << v[i] << " ";
