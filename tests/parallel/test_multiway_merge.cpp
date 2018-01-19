@@ -11,12 +11,14 @@
  **************************************************************************/
 
 #include <iostream>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/parallel.h>
-#include <stxxl/random>
+
+#include <test_helpers.h>
 
 struct Something
 {
@@ -49,7 +51,10 @@ void test_vecs(unsigned int vecnum)
 
     // construct many vectors of sorted random numbers
 
-    stxxl::random_number32 rnd;
+    std::mt19937 randgen(seed_seq());
+    std::uniform_int_distribution<unsigned int> distr_size(0, 127);
+    std::uniform_int_distribution<unsigned int> distr_value(0, vecnum * 20);
+
     std::vector<std::vector<ValueType> > vec(vecnum);
 
     size_t totalsize = 0;
@@ -58,14 +63,14 @@ void test_vecs(unsigned int vecnum)
     for (size_t i = 0; i < vecnum; ++i)
     {
         // determine number of items in stream
-        size_t inum = (rnd() % 128) + 64;
+        size_t inum = distr_size(randgen) + 64;
         if (i == 3) inum = 0; // add an empty sequence
         vec[i].resize(inum);
         totalsize += inum;
 
         // pick random items
         for (size_t j = 0; j < inum; ++j)
-            vec[i][j] = ValueType(rnd() % (vecnum * 20));
+            vec[i][j] = ValueType(distr_value(randgen));
 
         std::sort(vec[i].begin(), vec[i].end());
 

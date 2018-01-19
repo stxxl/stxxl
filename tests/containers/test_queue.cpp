@@ -23,7 +23,6 @@
 #include <tlx/logger.hpp>
 
 #include <stxxl/queue>
-#include <stxxl/random>
 
 using my_type = unsigned;
 

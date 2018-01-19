@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <functional>
 #include <limits>
+#include <random>
 #include <vector>
 
 #include <tlx/die.hpp>
@@ -68,17 +69,19 @@ int main()
     CreateRunsAlg SortedRuns(c, 10 * megabyte);
     value_type checksum_before(0);
 
-    stxxl::random_number32 rnd;
-    stxxl::random_number<> rnd_max;
+    std::mt19937_64 randgen;
+    std::uniform_int_distribution<unsigned> distr_value;
+
     for (unsigned cnt = input_size; cnt > 0; )
     {
-        unsigned run_size = rnd_max(cnt) + 1;           // random run length
+        std::uniform_int_distribution<unsigned> distr_size(1, cnt);
+        unsigned run_size = distr_size(randgen);        // random run length
         cnt -= run_size;
         LOG1 << "current run size: " << run_size;
 
         std::vector<unsigned> tmp(run_size);            // create temp storage for current run
         // fill with random numbers
-        std::generate(tmp.begin(), tmp.end(), rnd _STXXL_FORCE_SEQUENTIAL);
+        std::generate(tmp.begin(), tmp.end(), std::bind(distr_value, std::ref(randgen)) _STXXL_FORCE_SEQUENTIAL);
         std::sort(tmp.begin(), tmp.end(), c);           // sort
         for (unsigned j = 0; j < run_size; ++j)
         {

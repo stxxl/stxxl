@@ -24,6 +24,7 @@
 #include <cassert>
 #include <iostream>
 #include <limits>
+#include <random>
 
 #include <foxxll/mng.hpp>
 #include <stxxl/stream>
@@ -38,22 +39,25 @@ bool verbose;
 
 struct random_generator
 {
-    using value_type = stxxl::random_number32::value_type;
+    using value_type = uint32_t;
     using size_type = size_t;
     value_type current;
     size_type count;
-    stxxl::random_number32 rnd;
+
+    std::mt19937 rnd;
+    std::uniform_int_distribution<value_type> distr;
 
     explicit random_generator(size_type _count) : count(_count)
     {
         if (verbose) cout << "Random Stream: ";
-        current = rnd();
+        current = distr(rnd);
     }
 
     value_type operator * () const
     {
         return current;
     }
+
     random_generator& operator ++ ()
     {
         count--;
@@ -61,9 +65,10 @@ struct random_generator
             cout << current << ", ";
             if (empty()) cout << endl;
         }
-        current = rnd();
+        current = distr(rnd);
         return *this;
     }
+
     bool empty() const
     {
         return (count == 0);

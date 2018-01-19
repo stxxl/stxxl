@@ -18,7 +18,6 @@
 
 #include <foxxll/mng.hpp>
 
-#include <stxxl/random>
 #include <stxxl/scan>
 #include <stxxl/sort>
 #include <stxxl/vector>
