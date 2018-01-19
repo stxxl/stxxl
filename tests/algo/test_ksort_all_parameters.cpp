@@ -12,6 +12,8 @@
  **************************************************************************/
 
 //#define PLAY_WITH_OPT_PREF
+#include <random>
+#include <vector>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -19,13 +21,11 @@
 #include <foxxll/mng.hpp>
 
 #include <stxxl/ksort>
-#include <stxxl/random>
 #include <stxxl/scan>
 #include <stxxl/vector>
 
-#include <vector>
-
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 128
@@ -50,10 +50,7 @@ void test(uint64_t data_mem, size_t memory_to_use)
     LOG1 << "Using " << alloc_strategy_type::name() << " allocation strategy ";
     LOG1 << "Block size " << vector_type::block_type::raw_size / 1024 << " KiB";
 
-    LOG1 << "Filling vector...";
-    stxxl::generate(v.begin(), v.end(), stxxl::random_number32_r(), 32);
-
-    LOG1 << "Sorting vector...";
+    random_fill_vector(v);
 
     foxxll::stats_data before(*foxxll::stats::get_instance());
 

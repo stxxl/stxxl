@@ -18,11 +18,11 @@
 
 #include <foxxll/mng.hpp>
 
-#include <stxxl/random>
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
 
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 128
@@ -47,8 +47,7 @@ void test(size_t data_mem, size_t memory_to_use)
     LOG1 << "Using " << alloc_strategy_type::name() << " allocation strategy ";
     LOG1 << "Block size " << vector_type::block_type::raw_size / 1024 << " KiB";
 
-    LOG1 << "Filling vector...";
-    std::generate(v.begin(), v.end(), stxxl::random_number64() _STXXL_FORCE_SEQUENTIAL);
+    random_fill_vector(v);
 
     LOG1 << "Sorting vector...";
 
