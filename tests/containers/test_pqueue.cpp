@@ -57,7 +57,7 @@ int main()
     using pq_type = gen::result;
     using block_type = pq_type::block_type;
 
-    LOG1 << "Block size: " << block_type::raw_size;
+    LOG1 << "Block size: " << size_t(block_type::raw_size);
     LOG1 << "AI: " << gen::AI;
     LOG1 << "X : " << gen::X;
     LOG1 << "N : " << gen::N;

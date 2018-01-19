@@ -68,10 +68,10 @@ int main(int argc, char* argv[])
 {
     using vector_type = std::vector<std::pair<key_type, data_type> >;
 
-    LOG1 << "Node block size: " << NODE_BLOCK_SIZE << " bytes";
-    LOG1 << "Leaf block size: " << LEAF_BLOCK_SIZE << " bytes";
-    LOG1 << "Node max elements: " << NODE_MELEMENTS;
-    LOG1 << "Leaf max elements: " << LEAF_MELEMENTS;
+    LOG1 << "Node block size: " << size_t(NODE_BLOCK_SIZE) << " bytes";
+    LOG1 << "Leaf block size: " << size_t(LEAF_BLOCK_SIZE) << " bytes";
+    LOG1 << "Node max elements: " << size_t(NODE_MELEMENTS);
+    LOG1 << "Leaf max elements: " << size_t(LEAF_MELEMENTS);
 
     stxxl::random_number32 rnd;
     //stxxl::ran32State = 1141225706;

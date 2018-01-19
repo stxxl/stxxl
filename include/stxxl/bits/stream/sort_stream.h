@@ -1215,7 +1215,7 @@ public:
                 "efficiency decrease block size of run storage (a parameter of the run_creator)\n"
                 "or increase the amount memory dedicated to the merger.\n"
                 "m=" << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers << "\n"
-                "memory_to_use=" << m_memory_to_use << " bytes  block_type::raw_size=" << block_type::raw_size << " bytes";
+                "memory_to_use=" << m_memory_to_use << " bytes  block_type::raw_size=" << size_t(block_type::raw_size) << " bytes";
 
             // check whether we have enough memory to merge recursively
             size_t recursive_merge_buffers = m_memory_to_use / block_type::raw_size;

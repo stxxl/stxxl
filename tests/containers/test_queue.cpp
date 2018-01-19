@@ -57,7 +57,7 @@ int main()
 #endif
 
     unsigned cnt;
-    LOG1 << "Elements in a block: " << stxxl::queue<my_type>::block_type::size;
+    LOG1 << "Elements in a block: " << size_t(stxxl::queue<my_type>::block_type::size);
 
     // FIXME: can this be raised to recommended (3, 2) without breaking "Testing special case 4" or any other tests?
     stxxl::queue<my_type> xqueue(2, 2, -1);

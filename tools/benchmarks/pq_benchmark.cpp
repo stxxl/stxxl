@@ -87,8 +87,6 @@ using pq_type = stxxl::PRIORITY_QUEUE_GENERATOR<my_record, comp_type,
 
 using block_type = pq_type::block_type;
 
-#define    BLOCK_SIZE block_type::raw_size
-
 #if 1
 unsigned ran32State = 0xdeadbeef;
 inline int myrand()
@@ -214,7 +212,7 @@ void run_stxxl_intermixed(uint64_t ops)
 
 int main(int argc, char* argv[])
 {
-    LOG1 << "foxxll::pq lock size: " << BLOCK_SIZE << " bytes";
+    LOG1 << "foxxll::pq lock size: " << size_t(block_type::raw_size) << " bytes";
 
 #if STXXL_DIRECT_IO_OFF
     LOG1 << "STXXL_DIRECT_IO_OFF is defined";
