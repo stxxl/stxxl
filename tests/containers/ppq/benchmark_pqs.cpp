@@ -25,6 +25,7 @@ static const char* description =
 #include <iostream>
 #include <limits>
 #include <queue>
+#include <random>
 #include <utility>
 
 #include <tlx/die.hpp>
@@ -36,7 +37,6 @@ static const char* description =
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
-#include <stxxl/random>
 #include <stxxl/sorter>
 #include <stxxl/timer>
 #include <tlx/logger.hpp>
@@ -48,7 +48,6 @@ static const char* description =
 #endif
 
 using foxxll::scoped_print_timer;
-using stxxl::random_number32_r;
 
 static const size_t KiB = 1024L;
 static const size_t MiB = 1024L * KiB;
@@ -102,9 +101,14 @@ size_t max_merge_buffer_ram_stat = 0;
 
 uint64_t value_universe_size = 100000000;
 
-unsigned int g_seed = 12345;
-
-random_number32_r g_rand(g_seed);
+// quick hack, but we have so many globals, it does not really matter here
+const unsigned g_seed = 12345;
+std::mt19937 g_randgen_(g_seed);
+uint32_t g_rand()
+{
+    std::uniform_int_distribution<uint32_t> distr;
+    return distr(g_randgen_);
+}
 
 // Types used for benchmarking
 using my8_type = key_with_padding<uint64_t, sizeof(uint64_t)>;
@@ -527,11 +531,11 @@ public:
  * Random Generator spaced onto different cache lines
  */
 
-class random_number32_r_bigger : public stxxl::random_number32_r
+class random_number_bigger : public std::minstd_rand
 {
 protected:
     // padding to put random number state onto different cache lines
-    char padding[32];
+    char padding[64];
 };
 
 /*
@@ -563,7 +567,7 @@ void do_push_rand(ContainerType& c, unsigned int seed)
     scoped_stats stats(c, g_testset + "|push-rand",
                        "Filling " + c.name() + " randomly");
 
-    random_number32_r datarng(seed);
+    std::minstd_rand datarng(seed);
 
     for (size_t i = 0; i < num_elements; i++)
     {
@@ -625,7 +629,7 @@ void do_pop_rand_check(ContainerType& c, unsigned int seed)
     {
         scoped_print_timer timer("Filling sorter for comparison");
 
-        random_number32_r datarng(seed);
+        std::minstd_rand datarng(seed);
 
         for (size_t i = 0; i < num_elements; ++i)
         {
@@ -735,9 +739,9 @@ void do_bulk_push_rand(ContainerType& c,
     }
 
     // independent random generator (also: in different cache lines)
-    std::vector<random_number32_r_bigger> datarng(g_max_threads);
+    std::vector<random_number_bigger> datarng(g_max_threads);
     for (unsigned int t = 0; t < g_max_threads; ++t)
-        datarng[t].set_seed(t * _seed);
+        datarng[t].seed(t * _seed);
 
     for (size_t i = 0; i < num_elements / bulk_size; ++i)
     {
@@ -867,9 +871,9 @@ void do_bulk_pop_check_rand(ContainerType& c,
                                  num_elements * sizeof(value_type));
 
         // independent random generator (also: in different cache lines)
-        std::vector<random_number32_r_bigger> datarng(g_max_threads);
+        std::vector<random_number_bigger> datarng(g_max_threads);
         for (unsigned int t = 0; t < g_max_threads; ++t)
-            datarng[t].set_seed(t * _seed);
+            datarng[t].seed(t * _seed);
 
         for (size_t i = 0; i < num_elements / bulk_size; ++i)
         {

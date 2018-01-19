@@ -18,12 +18,12 @@
 
 #include <foxxll/mng.hpp>
 
-#include <stxxl/random>
 #include <stxxl/scan>
 #include <stxxl/sort>
 #include <stxxl/vector>
 
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 4
@@ -49,7 +49,7 @@ void test(uint64_t data_mem, size_t memory_to_use)
     LOG1 << "Block size " << vector_type::block_type::raw_size / 1024 << " KiB";
 
     LOG1 << "Filling vector...";
-    stxxl::generate(v.begin(), v.end(), stxxl::random_number32_r(), 32);
+    random_fill_vector(v, [](uint64_t x) -> T { return T(static_cast<uint32_t>(x)); });
 
     LOG1 << "Sorting vector...";
 

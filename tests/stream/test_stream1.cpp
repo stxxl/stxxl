@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <random>
 #include <vector>
 
 #include <tlx/die.hpp>
@@ -27,11 +28,13 @@ struct Input
     using value_type = unsigned;
     value_type value;
     value_type rnd_value;
-    stxxl::random_number32 rnd;
+    std::mt19937 rnd;
+    std::uniform_int_distribution<unsigned> distr;
     value_type crc;
+
     explicit Input(value_type init) : value(init)
     {
-        rnd_value = rnd();
+        rnd_value = distr(rnd);
         crc = rnd_value;
     }
     bool empty() const
@@ -41,7 +44,7 @@ struct Input
     Input& operator ++ ()
     {
         --value;
-        rnd_value = rnd();
+        rnd_value = distr(rnd);
         if (!empty())
             crc += rnd_value;
 

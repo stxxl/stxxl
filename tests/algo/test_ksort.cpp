@@ -24,6 +24,7 @@
 #include <stxxl/vector>
 
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
 using KeyType = uint64_t;
 constexpr size_t RecordSize = 2 * sizeof(KeyType) + 0;
@@ -46,15 +47,9 @@ int main()
     unsigned memory_to_use = 16 * STXXL_DEFAULT_BLOCK_SIZE(my_type);
     using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<4> >;
     const uint64_t n_records = 3 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(my_type)) / sizeof(my_type);
-    vector_type v(n_records);
 
-    stxxl::random_number32 rnd;
-    LOG1 << "Filling vector... ";
-    for (vector_type::size_type i = 0; i < v.size(); i++)
-    {
-        v[i].key = rnd() + 1;
-        v[i].key_copy = v[i].key;
-    }
+    vector_type v(n_records);
+    random_fill_vector(v);
 
     LOG1 << "Checking order...";
     die_unless(!stxxl::is_sorted(v.cbegin(), v.cend()));
@@ -70,13 +65,11 @@ int main()
     {
         if (v[i].key != v[i].key_copy)
         {
-            LOG1 << "Bug at position " << i;
-            abort();
+            die("Bug at position " << i);
         }
         if (i > 0 && prev.key == v[i].key)
         {
-            LOG1 << "Duplicate at position " << i << " key=" << v[i].key;
-            //abort();
+            die("Duplicate at position " << i << " key=" << v[i].key);
         }
         prev = v[i];
     }

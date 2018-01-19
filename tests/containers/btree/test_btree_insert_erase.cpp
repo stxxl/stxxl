@@ -4,114 +4,66 @@
  *  Part of the STXXL. See http://stxxl.org
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2018 Manuel Penschuck <stxxl@manuel.jetzt>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <ctime>
-#include <iostream>
-
-#include <tlx/die.hpp>
-#include <tlx/logger.hpp>
-
-#include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/random_shuffle>
-#include <stxxl/scan>
-#include <stxxl/sort>
-
-struct comp_type : public std::less<int>
-{
-    static int max_value()
-    {
-        return std::numeric_limits<int>::max();
-    }
-    static int min_value()
-    {
-        return std::numeric_limits<int>::min();
-    }
-};
-using btree_type = stxxl::btree::btree<
-          int, double, comp_type, 4096, 4096, foxxll::simple_random>;
-//using btree_type =  stxxl::btree::btree<int,double,comp_type,10,11,foxxll::simple_random> ;
-
-std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
-{
-    o << obj.first << " " << obj.second;
-    return o;
-}
-
-struct rnd_gen
-{
-    stxxl::random_number32 rnd;
-    int operator () ()
-    {
-        return (rnd() >> 2) * 3;
-    }
-};
-
-bool operator == (const std::pair<int, double>& a, const std::pair<int, double>& b)
-{
-    return a.first == b.first;
-}
+#include "test_btree_common.h"
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2)
+    size_t nins;
     {
-        LOG1 << "Usage: " << argv[0] << " #log_ins";
-        return -1;
+        die_with_message_if(argc < 2, "Usage: " << argv[0] << " #log_ins");
+        const auto log_nins = foxxll::atoi64(argv[1]);
+        die_with_message_if(log_nins > 31, "This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        nins = 1ULL << log_nins;
     }
 
-    const int log_nins = atoi(argv[1]);
-    if (log_nins > 31) {
-        LOG1 << "This test can't do more than 2^31 operations, you requested 2^" << log_nins;
-        return -1;
+    // prepare random unique keys
+    stxxl::vector<key_type> values(nins);
+    {
+        random_fill_vector(values);
+
+        LOG1 << "Sorting the random values";
+        stxxl::sort(values.begin(), values.end(), comp_type(), 128 * 1024 * 1024);
+
+        LOG1 << "Deleting duplicate values";
+        {
+            auto new_end = std::unique(values.begin(), values.end());
+            values.resize(std::distance(values.begin(), new_end));
+        }
+
+        LOG1 << "Randomly permute input values";
+        stxxl::random_shuffle(values.begin(), values.end(), 128 * 1024 * 1024);
     }
 
     btree_type BTree(1024 * 128, 1024 * 128);
-
-    const size_t nins = 1ULL << log_nins;
-
-    stxxl::ran32State = static_cast<unsigned int>(time(nullptr));
-
-    stxxl::vector<int> Values(nins);
-    LOG1 << "Generating " << nins << " random values";
-    stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
-
-    LOG1 << "Sorting the random values";
-    stxxl::sort(Values.begin(), Values.end(), comp_type(), 128 * 1024 * 1024);
-
-    LOG1 << "Deleting unique values";
-    stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
-    Values.resize(NewEnd - Values.begin());
-
-    LOG1 << "Randomly permute input values";
-    stxxl::random_shuffle(Values.begin(), Values.end(), 128 * 1024 * 1024);
-
-    stxxl::vector<int>::const_iterator it = Values.begin();
-    LOG1 << "Inserting " << Values.size() << " random values into btree";
-    for ( ; it != Values.end(); ++it)
-        BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
-
-    LOG1 << "Number of elements in btree: " << BTree.size();
-
-    LOG1 << "Searching " << Values.size() << " existing elements and erasing them";
-    stxxl::vector<int>::const_iterator vIt = Values.begin();
-
-    for ( ; vIt != Values.end(); ++vIt)
     {
-        btree_type::iterator bIt = BTree.find(*vIt);
-        die_unless(bIt != BTree.end());
-        // erasing non-existent element
-        die_unless(BTree.erase((*vIt) + 1) == 0);
-        // erasing existing element
-        die_unless(BTree.erase(*vIt) == 1);
-        // checking it is not there
-        die_unless(BTree.find(*vIt) == BTree.end());
-        // trying to erase it again
-        die_unless(BTree.erase(*vIt) == 0);
+        LOG1 << "Inserting " << values.size() << " random values into btree";
+        for (auto it = values.cbegin(); it != values.cend(); ++it)
+            BTree.insert({ *it, static_cast<payload_type>(*it + 1) });
+        LOG1 << "Number of elements in btree: " << BTree.size();
+    }
+
+    {
+        LOG1 << "Searching " << values.size() << " existing elements and erasing them";
+        for (auto it = values.cbegin(); it != values.cend(); ++it) {
+            auto bIt = BTree.find(*it);
+
+            die_unless(bIt != BTree.end());
+            // erasing non-existent element
+            die_unless(BTree.erase((*it) + 1) == 0);
+            // erasing existing element
+            die_unless(BTree.erase(*it) == 1);
+            // checking it is not there
+            die_unless(BTree.find(*it) == BTree.end());
+            // trying to erase it again
+            die_unless(BTree.erase(*it) == 0);
+        }
     }
 
     die_unless(BTree.empty());

@@ -26,7 +26,6 @@
 #include <functional>
 #include <iostream>
 #include <limits>
-#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -38,9 +37,10 @@
 #include <stxxl/vector>
 
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
-const unsigned long long megabyte = 1024 * 1024;
-#define MAGIC 123
+constexpr size_t megabyte = 1024 * 1024;
+constexpr size_t block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 
 using KeyType = uint64_t;
 constexpr size_t RecordSize = 2 * sizeof(KeyType) + 0;
@@ -49,17 +49,14 @@ using cmp_less_key = my_type::compare_less;
 
 size_t run_size;
 size_t buffer_size;
-constexpr int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 
 using vector_type = stxxl::vector<my_type, 4, stxxl::lru_pager<8>, block_size, foxxll::default_alloc_strategy>;
 
 my_type::key_type checksum(vector_type& input)
 {
     my_type::key_type sum = 0;
-
-    for (const auto& v : input)
-        sum += v.key;
-
+    stxxl::for_each(input.cbegin(), input.cend(),
+                    [&sum](const my_type& x) { sum += x.key; });
     return sum;
 }
 
@@ -128,9 +125,9 @@ int main(int argc, const char** argv)
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     LOG1 << "STXXL_PARALLEL_MULTIWAY_MERGE";
 #endif
-    auto megabytes_to_process = static_cast<unsigned int>(strtoul(argv[1], nullptr, 0));
-    auto p = static_cast<int>(strtol(argv[2], nullptr, 0));
-    auto memory_to_use = static_cast<size_t>(strtol(argv[3], nullptr, 0) * megabyte);
+    size_t megabytes_to_process = atoll(argv[1]);
+    int p = atoi(argv[2]);
+    size_t memory_to_use = static_cast<size_t>(atoi(argv[3]) * megabyte);
     run_size = memory_to_use;
     buffer_size = memory_to_use / 16;
 #ifdef STXXL_PARALLEL_MODE
@@ -191,32 +188,18 @@ int main(int argc, const char** argv)
               << p << " thread(s), block size "
               << block_size << ", element size " << sizeof(my_type) << std::endl;
 
-    const uint64_t n_records =
-        uint64_t(megabytes_to_process) * uint64_t(megabyte) / sizeof(my_type);
+    const size_t n_records = megabytes_to_process * megabyte / sizeof(my_type);
     vector_type input(n_records);
-
-    foxxll::stats_data stats_begin(*foxxll::stats::get_instance());
-    double generate_start = foxxll::timestamp();
-
-    {
-        std::mt19937_64 randgen(p);
-        std::uniform_int_distribution<KeyType> distr;
-        stxxl::generate(input.begin(), input.end(),
-                        [&]() -> my_type { return my_type(distr(randgen)); },
-                        memory_to_use / STXXL_DEFAULT_BLOCK_SIZE(my_type));
-    }
-
-    double generate_stop = foxxll::timestamp();
-    std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
-
-    std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
+    random_fill_vector(input);
 
     die_unless(!stxxl::is_sorted(input.cbegin(), input.cend()));
 
+    // actual tests
     {
         vector_type output(n_records);
-
         linear_sort_streamed(input, output);
+    }
+    {
         linear_sort_normal(input);
     }
 

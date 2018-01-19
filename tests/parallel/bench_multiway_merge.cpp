@@ -16,6 +16,7 @@
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,7 +28,6 @@
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_merge.h>
 
@@ -109,17 +109,19 @@ void test_multiway_merge(size_t seq_count, const size_t seq_size)
 #pragma omp parallel
 #endif
         {
+            std::uniform_int_distribution<uint64_t> distr;
+
 #if STXXL_PARALLEL
-            unsigned int seed = 1234 * omp_get_thread_num();
-            stxxl::random_number32_r rnd(seed);
+            unsigned int seed = 1234 * omp_get_thread_num() + seq_count + seq_size;
+            std::mt19937_64 randgen(seed);
 #pragma omp for
 #else
-            stxxl::random_number32_r rnd(1234);
+            std::mt19937_64 randgen(1234 + seq_count + seq_size);
 #endif
             for (long i = 0; i < static_cast<long>(seq_count); ++i)
             {
                 for (size_t j = 0; j < seq_items; ++j)
-                    seqs[i][j] = ValueType(rnd());
+                    seqs[i][j] = ValueType(distr(randgen));
 
                 std::sort(seqs[i].begin(), seqs[i].end(), cmp);
             }

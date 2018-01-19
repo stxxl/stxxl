@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <iostream>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -23,16 +24,18 @@ bool test_block_cache()
 {
     using value_type = std::pair<int, int>;
 
-    const unsigned subblock_raw_size = 1024 * 8; // 8KB subblocks
-    const unsigned block_size = 128;             // 1MB blocks (=128 subblocks)
+    constexpr size_t magic1 = 0xc01ddead;
 
-    const unsigned num_blocks = 64;              // number of blocks to use for this test
-    const unsigned cache_size = 8;               // size of cache in blocks
+    constexpr unsigned subblock_raw_size = 1024 * 8; // 8KB subblocks
+    constexpr unsigned block_size = 128;             // 1MB blocks (=128 subblocks)
+
+    constexpr unsigned num_blocks = 64;              // number of blocks to use for this test
+    constexpr unsigned cache_size = 8;               // size of cache in blocks
 
     using subblock_type = foxxll::typed_block<subblock_raw_size, value_type>;
     using block_type = foxxll::typed_block<block_size* sizeof(subblock_type), subblock_type>;
 
-    const unsigned subblock_size = subblock_type::size;          // size in values
+    constexpr unsigned subblock_size = subblock_type::size;          // size in values
 
     using bid_type = block_type::bid_type;
     using bid_container_type = std::vector<bid_type>;
@@ -54,7 +57,9 @@ bool test_block_cache()
         req->wait();
     }
 
-    stxxl::random_number32 rand32;
+    std::mt19937 randgen;
+    std::uniform_int_distribution<int> distr_num(0, num_blocks - 1);
+    std::uniform_int_distribution<int> distr_size(0, block_size - 1);
 
     // create block_cache
     using cache_type = stxxl::hash_map::block_cache<block_type>;
@@ -63,8 +68,8 @@ bool test_block_cache()
     // load random subblocks and check for values
     int n_runs = cache_size * 10;
     for (int i_run = 0; i_run < n_runs; i_run++) {
-        int i_block = rand32() % num_blocks;
-        int i_subblock = rand32() % block_size;
+        int i_block = distr_num(randgen);
+        int i_subblock = distr_size(randgen);
 
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
 
@@ -74,8 +79,8 @@ bool test_block_cache()
 
     // do the same again but this time with prefetching
     for (int i_run = 0; i_run < n_runs; i_run++) {
-        int i_block = rand32() % num_blocks;
-        int i_subblock = rand32() % block_size;
+        int i_block = distr_num(randgen);
+        int i_subblock = distr_size(randgen);
 
         cache.prefetch_block(bids[i_block]);
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
@@ -84,25 +89,25 @@ bool test_block_cache()
     }
 
     // load and modify some subblocks; flush cache and check values
-    unsigned myseed = stxxl::get_next_seed();
-    stxxl::set_seed(myseed);
+    randgen.seed(magic1);
     for (int i_run = 0; i_run < n_runs; i_run++) {
-        int i_block = rand32() % num_blocks;
-        int i_subblock = rand32() % block_size;
+        int i_block = distr_num(randgen);
+        int i_subblock = distr_size(randgen);
 
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
 
         die_unless(cache.make_dirty(bids[i_block]));
         (*subblock)[1].first = (*subblock)[1].second + 42;
     }
-    stxxl::set_seed(myseed);
+
+    randgen.seed(magic1);
     for (int i_run = 0; i_run < n_runs; i_run++) {
-        int i_block = rand32() % num_blocks;
-        int i_subblock = rand32() % block_size;
+        int i_block = distr_num(randgen);
+        int i_subblock = distr_size(randgen);
         subblock_type* subblock = cache.get_subblock(bids[i_block], i_subblock);
 
         int expected = i_block * block_size + i_subblock * subblock_size + 1;
-        die_unless((*subblock)[1].first == expected + 42);
+        die_unequal((*subblock)[1].first, expected + 42);
     }
 
     // test retaining

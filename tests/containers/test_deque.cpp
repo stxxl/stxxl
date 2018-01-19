@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <iterator>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -41,15 +42,19 @@ int main(int argc, char* argv[])
     Deque.push_back(5);
     std::copy(Deque.begin(), Deque.end(), std::ostream_iterator<int>(std::cout, " "));
 
-    stxxl::random_number32 rand;
     stxxl::deque<int> XXLDeque;
     std::deque<int> STDDeque;
+
+    std::mt19937 randgen;
+    std::uniform_int_distribution<unsigned> distr_op(0, 5);
+    std::uniform_int_distribution<unsigned> distr_value;
 
     uint64_t ops = foxxll::atouint64(argv[1]);
     for (uint64_t i = 0; i < ops; ++i)
     {
-        unsigned curOP = rand() % 6;
-        unsigned value = rand();
+        unsigned curOP = distr_op(randgen);
+        unsigned value = distr_value(randgen);
+
         switch (curOP)
         {
         case 0:

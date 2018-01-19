@@ -27,6 +27,7 @@
 #include <stxxl/vector>
 
 #include <key_with_padding.h>
+#include <test_helpers.h>
 
 using my_type = key_with_padding<unsigned, 128>;
 
@@ -40,10 +41,7 @@ int main()
     const uint64_t n_records = 2 * 16 * uint64_t(STXXL_DEFAULT_BLOCK_SIZE(uint64_t)) / sizeof(my_type);
     vector_type v(n_records);
 
-    stxxl::random_number32 rnd;
-    LOG1 << "Filling vector... " << rnd() << " " << rnd() << " " << rnd();
-    for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i].key = (rnd() / 2) * 2;
+    random_fill_vector(v, [](uint64_t x) { return my_type(x << 1); });
 
     LOG1 << "Checking order...";
     die_unless(!stxxl::is_sorted(v.cbegin(), v.cend()));

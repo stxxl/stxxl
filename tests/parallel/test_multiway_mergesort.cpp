@@ -12,6 +12,7 @@
 
 #include <functional>
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include <tlx/die.hpp>
@@ -20,7 +21,7 @@
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_mergesort.h>
-#include <stxxl/random>
+#include <test_helpers.h>
 
 struct Something
 {
@@ -49,10 +50,11 @@ void test_size(unsigned int size)
     std::vector<Something> v(size);
     std::less<Something> cmp;
 
-    stxxl::random_number32 rnd;
+    std::mt19937 randgen(seed_seq());
+    std::uniform_int_distribution<unsigned int> distr;
 
     for (unsigned int i = 0; i < size; ++i)
-        v[i] = Something(rnd());
+        v[i] = Something(distr(randgen));
 
     stxxl::parallel::parallel_sort_mwms<Stable>(v.begin(), v.end(), cmp, 8);
 

@@ -13,26 +13,17 @@
 
 #include <algorithm>
 #include <cmath>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/map>
 
 using key_type = unsigned int;
 using data_type = unsigned int;
-
-struct cmp : public std::less<key_type>
-{
-    key_type min_value()
-    {
-        return std::numeric_limits<key_type>::min();
-    }
-    key_type max_value()
-    {
-        return std::numeric_limits<key_type>::max();
-    }
-};
+using cmp = stxxl::comparator<key_type>;
 
 #define BLOCK_SIZE (32 * 1024)
 #define CACHE_SIZE (2 * 1024 * 1024 / BLOCK_SIZE)
@@ -82,10 +73,13 @@ int main(int argc, char** argv)
         LOG1 << "Doing search";
         size_t queries = el / 16;
         const map_type& ConstMap = Map;
-        stxxl::random_number32 myrandom;
+
+        std::mt19937_64 randgen;
+        std::uniform_int_distribution<key_type> distr(0, el - 1);
         for (unsigned i = 0; i < queries; ++i)
         {
-            key_type key = static_cast<key_type>(myrandom() % el);
+            const key_type key = distr(randgen);
+
             map_type::const_iterator result = ConstMap.find(key);
             die_unless((*result).second == key + 1);
             die_unless(result->second == key + 1);

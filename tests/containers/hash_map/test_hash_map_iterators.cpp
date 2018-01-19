@@ -17,24 +17,10 @@
 #include <tlx/logger.hpp>
 
 #include <stxxl.h>
-#include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/containers/hash_map/hash_map.h>
 
-struct rand_pairs
-{
-    stxxl::random_number32& rand_;
-
-    explicit rand_pairs(stxxl::random_number32& rand)
-        : rand_(rand)
-    { }
-
-    std::pair<int, int> operator () ()
-    {
-        int v = rand_();
-        return std::pair<int, int>(v, v);
-    }
-};
+#include <test_helpers.h>
 
 struct hash_int
 {
@@ -45,16 +31,19 @@ struct hash_int
     }
 };
 
-struct cmp : public std::less<int>
+using cmp = stxxl::comparator<int>;
+using value_type = std::pair<int, int>;
+
+value_type broadcast_to_pair(uint64_t x)
 {
-    int min_value() const { return std::numeric_limits<int>::min(); }
-    int max_value() const { return std::numeric_limits<int>::max(); }
-};
+    return {
+               x, x
+    };
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void cmp_with_internal_map()
 {
-    using value_type = std::pair<int, int>;
     const size_t value_size = sizeof(value_type);
 
     const size_t n_values = 6000;
@@ -80,13 +69,13 @@ void cmp_with_internal_map()
     int_hash_map int_map;
 
     // generate random values
-    stxxl::random_number32 rand32;
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
     std::vector<value_type> values3(n_values);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
-    std::generate(values3.begin(), values3.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+
+    random_fill_vector(values1, broadcast_to_pair);
+    random_fill_vector(values2, broadcast_to_pair);
+    random_fill_vector(values3, broadcast_to_pair);
 
     // --- initial import: create a nice mix of externally (values1) and
     // --- internally (values2) stored values
@@ -165,12 +154,10 @@ void basic_iterator_test()
     const hash_map& cmap = map;
 
     // generate random values
-    stxxl::random_number32 rand32;
-
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+    random_fill_vector(values1, broadcast_to_pair);
+    random_fill_vector(values2, broadcast_to_pair);
 
     // --- initial import: create a nice mix of externally (values1) and
     // --- internally (values2) stored values
@@ -327,11 +314,10 @@ void more_iterator_test()
     const hash_map& cmap = map;
 
     // generate random values
-    stxxl::random_number32 rand32;
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+    random_fill_vector(values1, broadcast_to_pair);
+    random_fill_vector(values2, broadcast_to_pair);
 
     // --- initial import
     map.insert(values1.begin(), values1.end(), mem_to_sort);

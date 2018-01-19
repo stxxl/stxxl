@@ -15,6 +15,7 @@
 //! This is an example of how to use \c stxxl::sorter() container
 
 #include <limits>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -23,9 +24,9 @@
 
 #include <key_with_padding.h>
 
-using KeyType = unsigned;
+using key_type = unsigned;
 constexpr size_t RecordSize = 16;
-using my_type = key_with_padding<KeyType, RecordSize>;
+using my_type = key_with_padding<key_type, RecordSize>;
 using Comparator = my_type::compare_less;
 
 // forced instantiation
@@ -74,15 +75,14 @@ int main()
 
         sorter_type s(cmp, memory_to_use);
 
-        stxxl::random_number32 rnd;
-
         LOG1 << "Filling sorter..., input size = " << n_records << " elements (" << ((n_records * sizeof(my_type)) >> 10) << " KiB)";
 
+        std::mt19937 randgen;
+        std::uniform_int_distribution<key_type> distr(0, 0xfffffff);
         for (uint64_t i = 0; i < n_records; i++)
         {
             die_unless(s.size() == i);
-
-            s.push(my_type(1 + (rnd() % 0xfffffff)));
+            s.push(my_type(1 + distr(randgen)));
         }
 
         // finish input, switch to sorting stage.

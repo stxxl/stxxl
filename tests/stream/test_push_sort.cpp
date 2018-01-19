@@ -20,6 +20,7 @@
 //! using \c stream::use_push specialization of \c stream::runs_creator class
 
 #include <limits>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -69,11 +70,12 @@ int main()
     CreateRunsAlg SortedRuns(c, 10 * megabyte);
     value_type checksum_before(0);
 
-    stxxl::random_number32 rnd;
+    std::mt19937 rnd;
+    std::uniform_int_distribution<value_type> distr;
 
     for (unsigned cnt = input_size; cnt > 0; --cnt)
     {
-        const value_type element = rnd();
+        const auto element = distr(rnd);
         checksum_before += element;
         SortedRuns.push(element);               // push into the sorter
     }

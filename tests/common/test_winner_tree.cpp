@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include <tlx/die.hpp>
@@ -20,7 +21,6 @@
 #include <foxxll/common/types.hpp>
 
 #include <stxxl/bits/common/winner_tree.h>
-#include <stxxl/random>
 
 //! Comparator interface for the winner tree: takes two players and decides
 //! which is smaller. In this implementation the players are the top elements
@@ -59,8 +59,8 @@ void test_vecs(size_t vecnum, bool test_rebuild)
               << (test_rebuild ? "replay_on_pop()" : "rebuild()") << "\n";
 
     // construct many vectors of sorted random numbers
+    std::mt19937_64 randgen(vecnum);
 
-    stxxl::random_number32 rnd;
     std::vector<std::vector<size_t> > vec(vecnum);
 
     size_t totalsize = 0;
@@ -68,14 +68,17 @@ void test_vecs(size_t vecnum, bool test_rebuild)
 
     for (size_t i = 0; i < vecnum; ++i)
     {
+        std::uniform_int_distribution<size_t> distr1(0, 127);
+        std::uniform_int_distribution<size_t> distr2(0, vecnum * 20);
+
         // determine number of items in stream
-        size_t inum = static_cast<size_t>((rnd() % 128) + 64);
+        size_t inum = distr1(randgen);
         vec[i].resize(inum);
         totalsize += inum;
 
         // pick random items
         for (size_t j = 0; j < inum; ++j)
-            vec[i][j] = static_cast<size_t>(rnd() % (vecnum * 20));
+            vec[i][j] = distr2(randgen);
 
         std::sort(vec[i].begin(), vec[i].end());
 

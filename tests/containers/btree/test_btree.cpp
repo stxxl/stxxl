@@ -12,33 +12,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-
-#include <tlx/die.hpp>
-#include <tlx/logger.hpp>
-
-#include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/timer>
-
-struct comp_type : public std::less<int>
-{
-    static int max_value()
-    {
-        return std::numeric_limits<int>::max();
-    }
-};
-using btree_type = stxxl::btree::btree<
-          int, double, comp_type, 4096, 4096, foxxll::simple_random>;
-
-// forced instantiation
-template class stxxl::btree::btree<
-        int, double, comp_type, 4096, 4096, foxxll::simple_random>;
-
-std::ostream& operator << (std::ostream& o, const std::pair<int, double>& obj)
-{
-    o << obj.first << " " << obj.second;
-    return o;
-}
+#include "test_btree_common.h"
 
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (25 * 1024 * 1024)
@@ -53,11 +27,7 @@ int main(int argc, char* argv[])
 
     btree_type BTree1(node_cache_size, leaf_cache_size);
 
-    unsigned nins = atoi(argv[1]);
-    if (nins < 100)
-        nins = 100;
-
-    stxxl::random_number32 rnd;
+    const size_t nins = std::max<size_t>(100, atoi(argv[1]));
 
     // .begin() .end() test
     BTree1[10] = 100.;
@@ -174,9 +144,12 @@ int main(int argc, char* argv[])
     BTree1.clear();
     die_unless(BTree1.size() == 0);
 
+    std::mt19937_64 randgen;
+    std::uniform_int_distribution<> distr(0, nins - 1);
+
     for (unsigned int i = 0; i < nins / 2; ++i)
     {
-        BTree1[rnd() % nins] = 10.1;
+        BTree1[distr(randgen)] = 10.1;
     }
     LOG1 << "Size of map: " << BTree1.size();
 
@@ -184,7 +157,7 @@ int main(int argc, char* argv[])
 
     for (unsigned int i = 0; i < nins / 2; ++i)
     {
-        BTree1[rnd() % nins] = 10.1;
+        BTree1[distr(randgen)] = 10.1;
     }
 
     LOG1 << "Size of map: " << BTree1.size();
