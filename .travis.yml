@@ -1,13 +1,13 @@
 language: cpp
 dist: trusty
-sudo: false
+sudo: required
 
 env:
   global:
     # limit parallel threads (default is 32!)
     - OMP_NUM_THREADS=4
-    - TMPDIR=/tmp
-    - STXXL_TMPDIR=/tmp
+    - TMPDIR=/dev/shm/
+    - STXXL_TMPDIR=$TMPDIR
 
 matrix:
   include:
@@ -66,10 +66,7 @@ before_script:
 
   - df -h
   # checkout foxxll and tlx
-  - git submodule update --init --recursive
-
-  # checkout foxxll and tlx
-  - git submodule update --init --recursive
+  - git submodule update --init --recursive --recommend-shallow
 
   - mkdir build
   - cd build
@@ -79,8 +76,5 @@ before_script:
     -DCMAKE_C_FLAGS="$CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="$CMAKE_FLAGS"
 
 script:
-# Build the library and run tests on three IO subsystems
-- make -j2 &&
-   echo "disk=/tmp/stxxl.$$.tmp,256Mi,syscall unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
-   echo "disk=/tmp/stxxl.$$.tmp,256Mi,linuxaio unlink" > ~/.stxxl && ./tools/stxxl_tool info && ctest &&
-   echo "disk=/tmp/stxxl.$$.tmp,256Mi,memory" > ~/.stxxl && ./tools/stxxl_tool info && ctest
+- ../.travis-run.sh
+
