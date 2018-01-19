@@ -83,6 +83,36 @@ struct tuple_element<0, my_type>
 
 }
 
+template <typename ValueType, size_t mem_for_queue, external_size_type maxvolume>
+struct my_pq_gen
+{
+    using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
+        ValueType,
+        stxxl::comparator<ValueType, stxxl::direction::Greater, stxxl::direction::DontCare>,
+        mem_for_queue,
+        maxvolume * MiB / sizeof(ValueType)>;
+};
+
+struct my_type_extractor
+{
+    using value_type = std::tuple<uint32_t, uint32_t>;
+
+    value_type operator() (const my_type& a) const
+    {
+        return std::tie(std::get<0>(a), std::get<1>(a));
+    }
+};
+
+template <size_t mem_for_queue, external_size_type maxvolume>
+struct my_pq_gen<my_type, mem_for_queue, maxvolume>
+{
+    using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
+        my_type,
+        stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater, stxxl::direction::DontCare>,
+        mem_for_queue,
+        maxvolume * MiB / sizeof(my_type)>;
+};
+
 static inline void progress(const char* text, external_size_type i, external_size_type nelements)
 {
     if ((i % PRINTMOD) == 0)
@@ -213,10 +243,10 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
 {
     const size_t mem_for_queue = mib_for_queue * MiB;
     const size_t mem_for_pools = mib_for_pools * MiB;
-    using gen = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-              ValueType, stxxl::comparator<ValueType, stxxl::direction::Greater>,
+    using gen = typename my_pq_gen<
+              ValueType,
               mem_for_queue,
-              maxvolume* MiB / sizeof(ValueType)>;
+              maxvolume>::type;
 
     using pq_type = typename gen::result;
 
