@@ -41,7 +41,6 @@
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/parallel.h>
 

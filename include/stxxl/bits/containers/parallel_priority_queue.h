@@ -40,7 +40,6 @@
 
 #include <stxxl/bits/common/custom_stats.h>
 #include <stxxl/bits/common/is_heap.h>
-#include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/swap_vector.h>
 #include <stxxl/bits/common/winner_tree.h>
 #include <stxxl/bits/config.h>

@@ -39,7 +39,6 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/trigger_entry.h>
 #include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/rand.h>
 
 //#define INTERLEAVED_ALLOC
 
