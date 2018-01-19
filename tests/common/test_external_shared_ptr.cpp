@@ -22,6 +22,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -30,15 +31,18 @@
 #include <stxxl/map>
 #include <stxxl/scan>
 
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/vector>
+
+using KeyType = int64_t;
 
 struct actual_element   // 24 bytes, not a power of 2 intentionally
 {
-    int64_t key;
-    int64_t load0;
-    int64_t load1;
+    KeyType key;
+    KeyType load0;
+    KeyType load1;
 
-    actual_element& operator = (int64_t i)
+    actual_element& operator = (KeyType i)
     {
         key = i;
         load0 = i + 42;
@@ -83,6 +87,10 @@ void test_const_iterator(const my_vec_type& x)
 
 void test_vector()
 {
+    // the two mostly answered numbers if you ask a human to random pick from [1:20]
+    constexpr int magic_seed = 17;
+    constexpr int magic_seed2 = 7;
+
     // use non-randomized striping to avoid side effects on random generator
     using vector_type = stxxl::vector<element, 2, stxxl::lru_pager<2>, (2* 1024* 1024), foxxll::striping>;
     vector_type v(64 * 1024 * 1024 / sizeof(element));
@@ -93,12 +101,13 @@ void test_vector()
 
     test_const_iterator(v);
 
-    stxxl::random_number32 rnd;
-    int offset = rnd();
+    std::mt19937 randgen;
+    std::uniform_int_distribution<KeyType> distr;
+    int offset = distr(randgen);
 
     LOG1 << "write " << v.size() << " elements";
 
-    stxxl::ran32State = 0xdeadbeef;
+    randgen.seed(magic_seed);
     vector_type::size_type i;
 
     // fill the vector with increasing sequence of integer numbers
@@ -117,7 +126,7 @@ void test_vector()
     for (i = 0; i < v.size(); ++i)
     {
         actual_element_ptr aep(std::make_shared<actual_element>());
-        aep->key = rnd();
+        aep->key = distr(randgen);
         element e(aep);
 
         v[i].unwrap();
@@ -129,7 +138,7 @@ void test_vector()
 
     LOG1 << "seq read of " << v.size() << " elements";
 
-    stxxl::ran32State = 0xdeadbeef;
+    randgen.seed(magic_seed);
 
     // testing swap
     vector_type a;
@@ -137,7 +146,7 @@ void test_vector()
     std::swap(v, a);
 
     for (i = 0; i < v.size(); i++)
-        die_unless(v[i].get()->key == rnd());
+        die_unless(v[i].get()->key == distr(randgen));
 
     // check again
     LOG1 << "clear";
@@ -147,7 +156,7 @@ void test_vector()
 
     v.clear();
 
-    stxxl::ran32State = 0xdeadbeef + 10;
+    randgen.seed(magic_seed2);
 
     v.resize(64 * 1024 * 1024 / sizeof(element));
 
@@ -155,7 +164,7 @@ void test_vector()
     for (i = 0; i < v.size(); ++i)
     {
         actual_element_ptr aep(std::make_shared<actual_element>());
-        aep->key = rnd();
+        aep->key = distr(randgen);
         element e(aep);
 
         v[i] = e;
@@ -163,12 +172,12 @@ void test_vector()
         die_unless(v[i].get()->key == aep->key);
     }
 
-    stxxl::ran32State = 0xdeadbeef + 10;
+    randgen.seed(magic_seed2);
 
     LOG1 << "seq read of " << v.size() << " elements";
 
     for (i = 0; i < v.size(); i++)
-        die_unless(v[i].get()->key == rnd());
+        die_unless(v[i].get()->key == distr(randgen));
 
     LOG1 << "copy vector of " << v.size() << " elements";
 
@@ -196,18 +205,7 @@ struct test_data {
 
 using test_data_ptr = std::shared_ptr<test_data>;
 using data_type = stxxl::external_shared_ptr<test_data_ptr>;
-
-struct cmp : public std::less<key_type>
-{
-    static key_type min_value()
-    {
-        return (std::numeric_limits<key_type>::min)();
-    }
-    static key_type max_value()
-    {
-        return (std::numeric_limits<key_type>::max)();
-    }
-};
+using cmp = stxxl::comparator<key_type>;
 
 #define BLOCK_SIZE (32 * 1024)
 #define CACHE_SIZE (2 * 1024 * 1024 / BLOCK_SIZE)
@@ -227,6 +225,7 @@ void test_map()
     LOG1 << "Block size " << BLOCK_SIZE / 1024 << " KiB";
     LOG1 << "Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB";
 
+    std::mt19937_64 randgen;
     for (unsigned mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *foxxll::stats::get_instance();
@@ -257,10 +256,11 @@ void test_map()
         stats_begin = *foxxll::stats::get_instance();
         LOG1 << "Doing search";
         size_t queries = el;
-        stxxl::random_number32 myrandom;
+
+        std::uniform_int_distribution<key_type> distr(0, el - 1);
         for (unsigned i = 0; i < queries; ++i)
         {
-            key_type key = myrandom() % el;
+            const auto key = distr(randgen);
             map_type::iterator result = Map.find(key);
 
             data_type data = (*result).second;
