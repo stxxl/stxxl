@@ -21,6 +21,7 @@
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/parallel/multiway_mergesort.h>
+#include <stxxl/seed>
 #include <test_helpers.h>
 
 struct Something
@@ -50,7 +51,7 @@ void test_size(unsigned int size)
     std::vector<Something> v(size);
     std::less<Something> cmp;
 
-    std::mt19937 randgen(seed_seq());
+    std::mt19937 randgen(stxxl::seed_sequence::get_ref().get_next_seed());
     std::uniform_int_distribution<unsigned int> distr;
 
     for (unsigned int i = 0; i < size; ++i)

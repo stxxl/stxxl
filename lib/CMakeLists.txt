@@ -14,7 +14,6 @@
 
 set(LIBSTXXL_SOURCES
 
-  common/seed.cpp
   common/version.cpp
 
   )

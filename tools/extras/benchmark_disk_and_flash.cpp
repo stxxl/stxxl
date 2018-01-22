@@ -12,11 +12,14 @@
 
 #include <iomanip>
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include <tlx/logger.hpp>
 
 #include <foxxll/io.hpp>
+
+#include <stxxl/seed>
 
 using foxxll::request_ptr;
 using foxxll::file;
@@ -61,6 +64,9 @@ void run(char* buffer, file** disks, external_size_type offset, external_size_ty
     begin = timestamp();
     double volume = 0;
 
+    std::mt19937 randgen(stxxl::seed_sequence::get_ref().get_next_seed());
+    std::uniform_int_distribution<external_size_type> distr_pos(0, 0xffff);
+
     for (unsigned repeat = 0; repeat < repeats; ++repeat) {
         size_t r = 0;
         char* buf = buffer;
@@ -68,7 +74,7 @@ void run(char* buffer, file** disks, external_size_type offset, external_size_ty
         {
             for (j = 0; j < info[i].n; j++) {
                 unsigned bytes = info[i].bytes;
-                external_size_type position = (bytes * (rand() & 0xffff)) % length;
+                external_size_type position = (bytes * distr_pos(randgen)) % length;
                 reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes);
                 buf += bytes;
                 volume += static_cast<double>(bytes);

@@ -45,6 +45,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/defines.h>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/seed>
 #include <stxxl/types>
 
 #include <tlx/logger.hpp>
@@ -2386,7 +2387,7 @@ public:
           m_hint_comparator(m_external_arrays, m_inv_compare),
           m_hint_tree(4, m_hint_comparator),
 #ifndef STXXL_PARALLEL
-          m_rng(get_next_seed()),
+          m_rng(stxxl::seed_sequence::get_ref().get_next_seed()),
 #endif
           // flags
           m_limit_extract(false)

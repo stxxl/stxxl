@@ -22,6 +22,7 @@
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/containers/parallel_priority_queue.h>
+#include <stxxl/seed>
 #include <stxxl/timer>
 
 #include <key_with_padding.h>
@@ -148,7 +149,7 @@ void test_bulk_limit(const size_t bulk_size)
     int windex = 0;     // continuous insertion index
     int rindex = 0;     // continuous pop index
 
-    std::mt19937_64 randgen(seed_seq());
+    std::mt19937_64 randgen(stxxl::seed_sequence::get_ref().get_next_seed());
     std::uniform_int_distribution<size_t> distr(0, bulk_size - 1);
 
     const size_t repeats = 8;

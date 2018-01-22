@@ -34,7 +34,7 @@ static const char* description =
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/priority_queue>
-#include <stxxl/timer>
+#include <stxxl/seed>
 
 using stxxl::external_size_type;
 
@@ -178,7 +178,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
     stats_begin = *foxxll::stats::get_instance();
 
-    std::mt19937 rand(seed_seq());
+    std::mt19937 rand(stxxl::seed_sequence::get_ref().get_next_seed());
     std::uniform_int_distribution<int> distr(0, 2);
     {
         foxxll::scoped_print_timer timer("Intermixed Insert/Delete", nelements * sizeof(ValueType));
