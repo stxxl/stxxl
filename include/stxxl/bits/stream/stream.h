@@ -17,6 +17,7 @@
 #define STXXL_STREAM_STREAM_HEADER
 
 #include <tlx/meta/apply_tuple.hpp>
+#include <tlx/meta/fold_left_tuple.hpp>
 #include <tlx/meta/vmap_foreach_tuple.hpp>
 #include <tlx/meta/call_foreach_tuple.hpp>
 #include <foxxll/common/error_handling.hpp>
@@ -415,49 +416,6 @@ auto streamify(Generator gen_)
     return generator2stream<Generator>(gen_);
 }
 
-namespace detail {
-
-//! helper for reduce_vmap_foreach_tuple_with_index_impl: base case
-template <typename Functor, typename Combine, typename Arg>
-auto reduce_vmap_foreach_tuple_impl(Functor&& f, Combine&& c, Arg&& arg)
-{
-    tlx::unused(std::forward<Combine>(c));
-    return std::forward<Functor>(f)(std::forward<Arg>(arg));
-}
-
-//! helper for reduce_vmap_foreach_tuple_with_index_impl: general recursive case
-template <typename Functor, typename Combine, typename Arg, typename... MoreArgs>
-auto reduce_vmap_foreach_tuple_impl(Functor&& f, Combine&& c, Arg&& arg, MoreArgs&&... rest)
-{
-    return std::forward<Combine>(c)
-        (std::forward<Functor>(f)(std::forward<Arg>(arg)),
-         reduce_vmap_foreach_tuple_impl(std::forward<Functor>(f), std::forward<Combine>(c), std::forward<MoreArgs>(rest)...));
-}
-
-//! helper for reduce_vmap_foreach_tuple: forwards tuple entries
-template <typename Functor, typename Combine, typename Tuple, std::size_t... Is>
-auto reduce_vmap_foreach_tuple_with_index_impl(Functor&& f, Combine&& c, Tuple&& t, tlx::index_sequence<Is...>)
-{
-    return reduce_vmap_foreach_tuple_impl(std::forward<Functor>(f),
-                                          std::forward<Combine>(c),
-                                          std::get<Is>(std::forward<Tuple>(t)) ...);
-}
-
-} // namespace detail
-
-//! Call a generic functor (like a generic lambda) for each variadic template
-//! argument and unfold for reduce.
-template <typename Functor, typename Combine, typename Tuple>
-auto reduce_vmap_foreach_tuple(Functor&& f, Combine&& c, Tuple&& t)
-{
-    using Indices = tlx::make_index_sequence<
-        std::tuple_size<typename std::decay<Tuple>::type>::value>;
-    return detail::reduce_vmap_foreach_tuple_with_index_impl(
-        std::forward<Functor>(f),
-        std::forward<Combine>(c),
-        std::forward<Tuple>(t), Indices());
-}
-
 template <typename Input1, typename Input2, typename... Rest>
 class make_tuplestream;
 
@@ -503,9 +461,8 @@ public:
     }
 
     bool empty() const {
-        return reduce_vmap_foreach_tuple([](auto & t) { return t.empty(); },
-                                         [](bool a, bool b) { return a || b; },
-                                         in);
+        return tlx::fold_left_tuple([](bool a, bool b) { return a || b; }, false,
+                                    tlx::vmap_foreach_tuple([](auto & t) { return t.empty(); }, in));
     }
 };
 
@@ -555,9 +512,8 @@ public:
     }
 
     bool empty() const {
-        return reduce_vmap_foreach_tuple([](auto & t) { return t.empty(); },
-                                         [](bool a, bool b) { return a || b; },
-                                         in);
+        return tlx::fold_left_tuple([](bool a, bool b) { return a || b; }, false,
+                                    tlx::vmap_foreach_tuple([](auto & t) { return t.empty(); }, in));
     }
 };
 
