@@ -31,7 +31,7 @@
 #include <stxxl/map>
 #include <stxxl/scan>
 
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 #include <stxxl/vector>
 
 using KeyType = int64_t;

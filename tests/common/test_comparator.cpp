@@ -18,7 +18,7 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 
 using stxxl::direction;
 

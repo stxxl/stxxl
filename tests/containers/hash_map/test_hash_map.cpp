@@ -18,7 +18,7 @@
 #include <tlx/logger.hpp>
 
 #include <stxxl.h>
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 
 #include <test_helpers.h>
 

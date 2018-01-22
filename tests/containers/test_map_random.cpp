@@ -25,7 +25,7 @@
 #include <stxxl/map>
 
 #include <map_test_handlers.h>
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 
 using key_type = int;
 using data_type = int;

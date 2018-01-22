@@ -18,7 +18,7 @@
 
 #include <foxxll/common/die_with_message.hpp>
 
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 #include <stxxl/bits/containers/btree/btree.h>
 
 #include <key_with_padding.h>

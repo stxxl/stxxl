@@ -22,13 +22,11 @@
 
 #include <foxxll/common/die_with_message.hpp>
 
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/random_shuffle>
 #include <stxxl/scan>
 #include <stxxl/sort>
-
-#include <stxxl/bits/common/comparator.h>
 
 #include <test_helpers.h>
 

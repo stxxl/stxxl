@@ -17,7 +17,7 @@
 #include <iostream>
 #include <limits>
 
-#include <stxxl/bits/common/comparator.h>
+#include <stxxl/comparator>
 #include <stxxl/bits/common/padding.h>
 
 template <typename KeyType>
