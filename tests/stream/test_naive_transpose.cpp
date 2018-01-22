@@ -64,11 +64,11 @@ template <typename T>
 struct cmp_tuple_first : std::binary_function<T, T, bool>
 {
     using value_type = T;
-    using first_value_type = typename value_type::first_type;
+    using first_value_type = typename std::tuple_element<0, value_type>::type;
 
     bool operator () (const value_type& a, const value_type& b) const
     {
-        return a.first < b.first;
+        return std::get<0>(a) < std::get<0>(b);
     }
 
     value_type min_value() const
@@ -139,7 +139,7 @@ int main()
     destination_index_stream_type destination_index_stream(num_cols, num_rows);
 
     // create tuple stream: (key, value)
-    using tuple_stream_type = stxxl::stream::make_tuple<destination_index_stream_type, input_stream_type>;
+    using tuple_stream_type = stxxl::stream::make_tuplestream<destination_index_stream_type, input_stream_type>;
     tuple_stream_type tuple_stream(destination_index_stream, input_stream);
 
     // sort tuples by first entry (key)
@@ -148,7 +148,7 @@ int main()
     sorted_tuple_stream_type sorted_tuple_stream(tuple_stream, cmp_type(), memory_for_sorting);
 
     // discard the key we used for sorting, keep second entry of the tuple only (value)
-    using sorted_element_stream_type = stxxl::stream::choose<sorted_tuple_stream_type, 2>;
+    using sorted_element_stream_type = stxxl::stream::choose<sorted_tuple_stream_type, 1>;
     sorted_element_stream_type sorted_element_stream(sorted_tuple_stream);
 
     // HERE streaming part ends (materializing)

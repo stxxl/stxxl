@@ -6,6 +6,7 @@
  *  Copyright (C) 2003-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2018 Hung Tran <hung@ae.cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,12 +20,15 @@
 #include <memory>
 
 #include <tlx/define.hpp>
+#include <tlx/meta/apply_tuple.hpp>
+#include <tlx/meta/fold_left_tuple.hpp>
+#include <tlx/meta/vmap_foreach_tuple.hpp>
+#include <tlx/meta/call_foreach_tuple.hpp>
 
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
 #include <foxxll/mng/buf_ostream.hpp>
 
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/vector>
 
 namespace stxxl {
@@ -416,55 +420,79 @@ auto streamify(Generator gen_)
     return generator2stream<Generator>(gen_);
 }
 
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM                                                      //
-////////////////////////////////////////////////////////////////////////
+template <typename Input1, typename Input2, typename... Rest>
+class make_tuplestream;
 
-struct Stopper { };
-
-//! Processes (up to) 6 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 6 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \tparam Input5 type of the 5th input
-//! \tparam Input6 type of the 6th input
-template <class Operation,
-          class Input1,
-          class Input2 = Stopper,
-          class Input3 = Stopper,
-          class Input4 = Stopper,
-          class Input5 = Stopper,
-          class Input6 = Stopper
-          >
-class transform
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-    Input5& i5;
-    Input6& i6;
-
+//! Combine multiple (at least two) streams into a single tuplestream, the
+//! return type of the tuplestream is a std::tuple<> containing the entries
+//! of the initial input streams
+template <typename Input1, typename Input2, typename... Rest>
+class make_tuplestream{
 public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
+    using value_type = std::tuple<typename Input1::value_type, typename Input2::value_type, typename Rest::value_type...>;
+    using tuple_type = std::tuple<Input1&, Input2&, Rest&...>;
 
 private:
+    tuple_type in;
     value_type current;
 
 public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, Input4& i4_,
-              Input5& i5_, Input5& i6_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
+    make_tuplestream(Input1& i1, Input2& i2, Rest&... rest)
+        : in(i1, i2, rest...)
     {
         if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5, *i6);
+            current = tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in);
+    }
+
+    //! Standard stream method.
+    const value_type& operator * () const
+    {
+        return current;
+    }
+
+    const value_type* operator -> () const
+    {
+        return &current;
+    }
+
+    //! Standard stream method.
+    make_tuplestream& operator ++ ()
+    {
+        tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
+        if (!empty())
+            current = tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in);
+        return *this;
+    }
+
+    bool empty() const {
+        return tlx::fold_left_tuple([](bool a, bool b) { return a || b; }, false,
+                                    tlx::vmap_foreach_tuple([](auto & t) { return t.empty(); }, in));
+    }
+};
+
+template <typename Operation, typename... Inputs>
+class transform;
+
+//! Combine multiple (at least two) streams into a single stream, where a
+//! functor is applied to all entries.
+template <typename Operation, typename... Inputs>
+class transform {
+public:
+    using value_type = typename Operation::value_type;
+    using tuple_type = std::tuple<Inputs &...>;
+    using tuple_value_type = std::tuple<typename Inputs::value_type...>;
+
+private:
+    Operation &op;
+    tuple_type in;
+    value_type current;
+
+public:
+    transform(Operation& op_, Inputs&... in_)
+        : op(op_), in(in_...)
+    {
+        if (!empty())
+            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
     }
 
     //! Standard stream method.
@@ -481,760 +509,103 @@ public:
     //! Standard stream method.
     transform& operator ++ ()
     {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        ++i5;
-        ++i6;
+        tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
         if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5, *i6);
-
+            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
         return *this;
     }
 
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() ||
-               i4.empty() || i5.empty() || i6.empty();
+    bool empty() const {
+        return tlx::fold_left_tuple([](bool a, bool b) { return a || b; }, false,
+                                    tlx::vmap_foreach_tuple([](auto & t) { return t.empty(); }, in));
     }
 };
 
-// Specializations
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (1 input stream)                                     //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes an input stream using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 1 parameter)
-//! \tparam Input1 type of the input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1
-          >
-class transform<Operation, Input1, Stopper, Stopper, Stopper, Stopper, Stopper>
+/**
+ * Counter for creating tuple indexes for example.
+ */
+template <class ValueType>
+struct counter
 {
-    Operation& op;
-    Input1& i1;
+public:
+    using value_type = ValueType;
+
+protected:
+    value_type m_count;
 
 public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
+    explicit counter(const value_type& start = 0)
+        : m_count(start)
+    { }
 
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_) : op(o), i1(i1_)
-    {
-        if (!empty())
-            current = op(*i1);
-    }
-
-    //! Standard stream method.
     const value_type& operator * () const
     {
-        return current;
+        return m_count;
     }
 
-    const value_type* operator -> () const
+    counter& operator ++ ()
     {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        if (!empty())
-            current = op(*i1);
-
+        ++m_count;
         return *this;
     }
 
-    //! Standard stream method.
     bool empty() const
     {
-        return i1.empty();
+        return false;
     }
 };
 
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (2 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 2 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 2 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2
-          >
-class transform<Operation, Input1, Input2, Stopper, Stopper, Stopper, Stopper>
+/**
+ * Concatenates two tuple streams as streamA . streamB
+ */
+template <class StreamA, class StreamB>
+class concatenate
 {
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-
 public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
+    using value_type = typename StreamA::value_type;
 
 private:
-    value_type current;
+    StreamA& A;
+    StreamB& B;
 
 public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_) : op(o), i1(i1_), i2(i2_)
+    concatenate(StreamA& A_, StreamB& B_) : A(A_), B(B_)
     {
-        if (!empty())
-            current = op(*i1, *i2);
+        assert(!A.empty());
+        assert(!B.empty());
     }
 
-    //! Standard stream method.
     const value_type& operator * () const
     {
-        return current;
+        assert(!empty());
+
+        if (!A.empty()) {
+            return *A;
+        }
+        else {
+            return *B;
+        }
     }
 
-    const value_type* operator -> () const
+    concatenate& operator ++ ()
     {
-        return &current;
-    }
+        assert(!empty());
 
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        if (!empty())
-            current = op(*i1, *i2);
+        if (!A.empty()) {
+            ++A;
+        }
+        else if (!B.empty()) {
+            ++B;
+        }
 
         return *this;
     }
 
-    //! Standard stream method.
     bool empty() const
     {
-        return i1.empty() || i2.empty();
+        return (A.empty() && B.empty());
     }
 };
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (3 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 3 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 3 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2,
-          class Input3
-          >
-class transform<Operation, Input1, Input2, Input3, Stopper, Stopper, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        if (!empty())
-            current = op(*i1, *i2, *i3);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (4 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 4 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 4 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2,
-          class Input3,
-          class Input4
-          >
-class transform<Operation, Input1, Input2, Input3, Input4, Stopper, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, Input4& i4_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() || i4.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     TRANSFORM (5 input streams)                                    //
-////////////////////////////////////////////////////////////////////////
-
-//! Processes 5 input streams using given operation functor.
-//!
-//! \tparam Operation type of the operation (type of an
-//! adaptable functor that takes 5 parameters)
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \tparam Input5 type of the 5th input
-//! \remark This is a specialization of \c transform .
-template <class Operation,
-          class Input1,
-          class Input2,
-          class Input3,
-          class Input4,
-          class Input5
-          >
-class transform<Operation, Input1, Input2, Input3, Input4, Input5, Stopper>
-{
-    Operation& op;
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-    Input5& i5;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename Operation::value_type;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    transform(Operation& o, Input1& i1_, Input2& i2_, Input3& i3_, // NOLINT
-              Input4& i4_, Input5& i5_)
-        : op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
-    {
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    transform& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        ++i5;
-        if (!empty())
-            current = op(*i1, *i2, *i3, *i4, *i5);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() || i4.empty() || i5.empty();
-    }
-};
-
-////////////////////////////////////////////////////////////////////////
-//     MAKE TUPLE                                                     //
-////////////////////////////////////////////////////////////////////////
-
-//! Creates stream of 6-tuples from 6 input streams.
-//!
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \tparam Input5 type of the 5th input
-//! \tparam Input6 type of the 6th input
-template <class Input1,
-          class Input2,
-          class Input3 = Stopper,
-          class Input4 = Stopper,
-          class Input5 = Stopper,
-          class Input6 = Stopper
-          >
-class make_tuple
-{
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-    Input5& i5;
-    Input6& i6;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename stxxl::tuple<
-              typename Input1::value_type,
-              typename Input2::value_type,
-              typename Input3::value_type,
-              typename Input4::value_type,
-              typename Input5::value_type,
-              typename Input6::value_type
-              >;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    make_tuple(Input1& i1_,
-               Input2& i2_,
-               Input3& i3_,
-               Input4& i4_,
-               Input5& i5_,
-               Input6& i6_)
-        : i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
-    {
-        if (!empty())
-            current = value_type(*i1, *i2, *i3, *i4, *i5, *i6);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    make_tuple& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        ++i5;
-        ++i6;
-
-        if (!empty())
-            current = value_type(*i1, *i2, *i3, *i4, *i5, *i6);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() ||
-               i4.empty() || i5.empty() || i6.empty();
-    }
-};
-
-//! Creates stream of 2-tuples (pairs) from 2 input streams.
-//!
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \remark A specialization of \c make_tuple .
-template <class Input1,
-          class Input2
-          >
-class make_tuple<Input1, Input2, Stopper, Stopper, Stopper, Stopper>
-{
-    Input1& i1;
-    Input2& i2;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename stxxl::tuple<
-              typename Input1::value_type,
-              typename Input2::value_type
-              >;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    make_tuple(Input1& i1_,
-               Input2& i2_)
-        : i1(i1_), i2(i2_)
-    {
-        if (!empty())
-            current = value_type(*i1, *i2);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    make_tuple& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-
-        if (!empty())
-            current = value_type(*i1, *i2);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty();
-    }
-};
-
-//! Creates stream of 3-tuples from 3 input streams.
-//!
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \remark A specialization of \c make_tuple .
-template <class Input1,
-          class Input2,
-          class Input3
-          >
-class make_tuple<Input1, Input2, Input3, Stopper, Stopper, Stopper>
-{
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename stxxl::tuple<
-              typename Input1::value_type,
-              typename Input2::value_type,
-              typename Input3::value_type
-              >;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    make_tuple(Input1& i1_,
-               Input2& i2_,
-               Input3& i3_)
-        : i1(i1_), i2(i2_), i3(i3_)
-    {
-        if (!empty())
-            current = value_type(*i1, *i2, *i3);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    make_tuple& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-
-        if (!empty())
-            current = value_type(*i1, *i2, *i3);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty();
-    }
-};
-
-//! Creates stream of 4-tuples from 4 input streams.
-//!
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \remark A specialization of \c make_tuple .
-template <class Input1,
-          class Input2,
-          class Input3,
-          class Input4
-          >
-class make_tuple<Input1, Input2, Input3, Input4, Stopper, Stopper>
-{
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename stxxl::tuple<
-              typename Input1::value_type,
-              typename Input2::value_type,
-              typename Input3::value_type,
-              typename Input4::value_type
-              >;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    make_tuple(Input1& i1_,
-               Input2& i2_,
-               Input3& i3_,
-               Input4& i4_)
-        : i1(i1_), i2(i2_), i3(i3_), i4(i4_)
-    {
-        if (!empty())
-            current = value_type(*i1, *i2, *i3, *i4);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    make_tuple& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-
-        if (!empty())
-            current = value_type(*i1, *i2, *i3, *i4);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() ||
-               i4.empty();
-    }
-};
-
-//! Creates stream of 5-tuples from 5 input streams.
-//!
-//! \tparam Input1 type of the 1st input
-//! \tparam Input2 type of the 2nd input
-//! \tparam Input3 type of the 3rd input
-//! \tparam Input4 type of the 4th input
-//! \tparam Input5 type of the 5th input
-//! \remark A specialization of \c make_tuple .
-template <
-    class Input1,
-    class Input2,
-    class Input3,
-    class Input4,
-    class Input5
-    >
-class make_tuple<Input1, Input2, Input3, Input4, Input5, Stopper>
-{
-    Input1& i1;
-    Input2& i2;
-    Input3& i3;
-    Input4& i4;
-    Input5& i5;
-
-public:
-    //! Standard stream typedef.
-    using value_type = typename stxxl::tuple<// NOLINT
-              typename Input1::value_type,
-              typename Input2::value_type,
-              typename Input3::value_type,
-              typename Input4::value_type,
-              typename Input5::value_type
-              >;
-
-private:
-    value_type current;
-
-public:
-    //! Construction.
-    make_tuple(Input1& i1_,
-               Input2& i2_,
-               Input3& i3_,
-               Input4& i4_,
-               Input5& i5_)
-        : i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
-    {
-        if (!empty())
-            current = value_type(*i1, *i2, *i3, *i4, *i5);
-    }
-
-    //! Standard stream method.
-    const value_type& operator * () const
-    {
-        return current;
-    }
-
-    const value_type* operator -> () const
-    {
-        return &current;
-    }
-
-    //! Standard stream method.
-    make_tuple& operator ++ ()
-    {
-        ++i1;
-        ++i2;
-        ++i3;
-        ++i4;
-        ++i5;
-
-        if (!empty())
-            current = value_type(*i1, *i2, *i3, *i4, *i5);
-
-        return *this;
-    }
-
-    //! Standard stream method.
-    bool empty() const
-    {
-        return i1.empty() || i2.empty() || i3.empty() ||
-               i4.empty() || i5.empty();
-    }
-};
-
-//! \}
 
 } // namespace stream
 } // namespace stxxl

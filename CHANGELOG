@@ -1,4 +1,7 @@
-Version 1.4-dev (unreleased)
+Version 2.0-dev (unreleased)
+
+* Breaking: stxxl::stream::choose now starts index at 0 instead of 1.
+
 
 Version 1.4.1 (29 October 2014)
 

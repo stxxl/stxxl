@@ -25,6 +25,7 @@ static const char* description =
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <tuple>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
@@ -32,8 +33,8 @@ static const char* description =
 #include <foxxll/common/timer.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
+#include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/common/padding.h>
-#include <stxxl/bits/common/tuple.h>
 #include <stxxl/priority_queue>
 #include <stxxl/random>
 
@@ -44,9 +45,9 @@ using stxxl::external_size_type;
 
 // *** Integer Pair Types
 
-using uint32_pair_type = stxxl::tuple<uint32_t, uint32_t>;
+using uint32_pair_type = std::tuple<uint32_t, uint32_t>;
 
-using uint64_pair_type = stxxl::tuple<uint64_t, uint64_t>;
+using uint64_pair_type = std::tuple<uint64_t, uint64_t>;
 
 // *** Larger Structure Type
 
@@ -62,27 +63,45 @@ struct my_type
     my_type(const key_type& k1, const key_type& k2)
         : uint32_pair_type(k1, k2)
     { }
+};
 
-    static my_type max_value()
+namespace std {
+
+template<>
+struct tuple_element<0, my_type>
+{
+    using type = my_type::key_type;
+};
+
+}
+
+template <typename ValueType, size_t mem_for_queue, external_size_type maxvolume>
+struct my_pq_gen
+{
+    using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
+        ValueType,
+        stxxl::comparator<ValueType, stxxl::direction::Greater, stxxl::direction::DontCare>,
+        mem_for_queue,
+        maxvolume * MiB / sizeof(ValueType)>;
+};
+
+struct my_type_extractor
+{
+    template <typename T>
+    auto operator() (T &a) const
     {
-        return my_type(std::numeric_limits<key_type>::max(),
-                       std::numeric_limits<key_type>::max());
+        return std::tie(std::get<0>(a));
     }
 };
 
-template <typename ValueType>
-struct my_cmp : public std::binary_function<ValueType, ValueType, bool>
+template <size_t mem_for_queue, external_size_type maxvolume>
+struct my_pq_gen<my_type, mem_for_queue, maxvolume>
 {
-    bool operator () (const ValueType& a, const ValueType& b) const
-    {
-        // PQ is a max priority queue, thus compare greater
-        return a.first > b.first;
-    }
-
-    ValueType min_value() const
-    {
-        return ValueType::max_value();
-    }
+    using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
+        my_type,
+        stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater>,
+        mem_for_queue,
+        maxvolume * MiB / sizeof(my_type)>;
 };
 
 static inline void progress(const char* text, external_size_type i, external_size_type nelements)
@@ -97,7 +116,7 @@ template <typename PQType>
 void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools)
 {
     using ValueType = typename PQType::value_type;
-    using KeyType = typename ValueType::first_type;
+    using KeyType = typename std::tuple_element<0, ValueType>::type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -133,7 +152,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         for (external_size_type i = 0; i < nelements; ++i)
         {
             die_unless(!pq.empty());
-            die_unless(pq.top().first == i + 1);
+            die_unless(std::get<0>(pq.top()) == i + 1);
 
             pq.pop();
 
@@ -149,7 +168,7 @@ template <typename PQType>
 void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_pools)
 {
     using ValueType = typename PQType::value_type;
-    using KeyType = typename ValueType::first_type;
+    using KeyType = typename std::tuple_element<0, ValueType>::type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -215,10 +234,10 @@ int do_benchmark_pqueue(external_size_type volume, unsigned opseq)
 {
     const size_t mem_for_queue = mib_for_queue * MiB;
     const size_t mem_for_pools = mib_for_pools * MiB;
-    using gen = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-              ValueType, my_cmp<ValueType>,
+    using gen = typename my_pq_gen<
+              ValueType,
               mem_for_queue,
-              maxvolume* MiB / sizeof(ValueType)>;
+              maxvolume>::type;
 
     using pq_type = typename gen::result;
 
