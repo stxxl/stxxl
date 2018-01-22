@@ -61,24 +61,24 @@ static_assert(PERMILLE_CLEAR + PERMILLE_SIZING + PERMILLE_ERASE_BULK +
 
 //#define MAX_STEP 0x0001000
 
-#define NODE_BLOCK_SIZE xxl_map_type::node_block_type::raw_size
-#define LEAF_BLOCK_SIZE xxl_map_type::leaf_block_type::raw_size
-#define NODE_MELEMENTS xxl_map_type::node_block_type::size
-#define LEAF_MELEMENTS xxl_map_type::leaf_block_type::size
+constexpr size_t NODE_BLOCK_SIZE = xxl_map_type::node_block_type::raw_size;
+constexpr size_t LEAF_BLOCK_SIZE = xxl_map_type::leaf_block_type::raw_size;
+constexpr size_t NODE_MELEMENTS  = xxl_map_type::node_block_type::size;
+constexpr size_t LEAF_MELEMENTS  = xxl_map_type::leaf_block_type::size;
 
 int main(int argc, char* argv[])
 {
     using vector_type = std::vector<std::pair<key_type, data_type> >;
 
-    LOG1 << "Node block size: " << NODE_BLOCK_SIZE << " bytes";
-    LOG1 << "Leaf block size: " << LEAF_BLOCK_SIZE << " bytes";
-    LOG1 << "Node max elements: " << NODE_MELEMENTS;
-    LOG1 << "Leaf max elements: " << LEAF_MELEMENTS;
+    LOG1 << "Node block size: " << size_t(NODE_BLOCK_SIZE) << " bytes\n"
+            "Leaf block size: " <<   size_t(LEAF_BLOCK_SIZE) << " bytes\n"
+            "Node max elements: " << size_t(NODE_MELEMENTS) << "\n"
+            "Leaf max elements: " << size_t(LEAF_MELEMENTS);
 
     if (argc < 2)
     {
-        LOG1 << "Usage: " << argv[0] << " STEP ";
-        LOG1 << "Note, that STEP must be > 1000";
+        LOG1 << "Usage: " << argv[0] << " STEP\n" 
+                "Note, that STEP must be > 1000";
         return -1;
     }
     const uint64_t MAX_STEP = atoi(argv[1]);
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 
         if (i % (MAX_STEP / 100) == 0)
         {
-            LOG1 << "Step=" << i << " (" << static_cast<unsigned>(stdmap.size()) << ")";
+            LOG1 << "Step=" << i << " (" << stdmap.size() << ")";
         }
 
         // *********************************************************
