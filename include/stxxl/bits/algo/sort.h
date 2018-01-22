@@ -1011,4 +1011,3 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrderingWithMinMax cmp,
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_HEADER
-// vim: et:ts=4:sw=4

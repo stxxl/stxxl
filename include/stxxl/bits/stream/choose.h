@@ -305,4 +305,3 @@ public:
 #include <stxxl/bits/stream/unique.h>
 
 #endif // !STXXL_STREAM_CHOOSE_HEADER
-// vim: et:ts=4:sw=4

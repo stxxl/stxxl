@@ -31,4 +31,3 @@
 #endif
 
 #endif // !STXXL_DEPRECATED_HEADER
-// vim: et:ts=4:sw=4

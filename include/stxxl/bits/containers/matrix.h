@@ -1421,4 +1421,3 @@ protected:
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_MATRIX_HEADER
-// vim: et:ts=4:sw=4

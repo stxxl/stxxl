@@ -256,4 +256,3 @@ void discard(StreamAlgorithm& in)
 } // namespace stxxl
 
 #endif // !STXXL_STREAM_MATERIALIZE_HEADER
-// vim: et:ts=4:sw=4

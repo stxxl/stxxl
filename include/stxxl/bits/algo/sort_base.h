@@ -40,4 +40,3 @@ inline size_t optimal_merge_factor(size_t num_runs, size_t max_concurrent_runs)
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_BASE_HEADER
-// vim: et:ts=4:sw=4

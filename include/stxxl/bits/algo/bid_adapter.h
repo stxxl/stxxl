@@ -657,4 +657,3 @@ make_element_iterator(BlockType* blocks, SizeType offset)
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_BID_ADAPTER_HEADER
-// vim: et:ts=4:sw=4

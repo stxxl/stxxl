@@ -148,4 +148,3 @@ int main(int argc, char** argv)
         f.close_remove();
     }
 }
-// vim: et:ts=4:sw=4

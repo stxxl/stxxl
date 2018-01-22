@@ -106,4 +106,3 @@ int main()
     short_test();
     long_test();
 }
-// vim: et:ts=4:sw=4

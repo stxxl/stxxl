@@ -133,4 +133,3 @@ private:
 } // namespace stxxl
 
 #endif // !STXXL_STREAM_SORTED_RUNS_HEADER
-// vim: et:ts=4:sw=4

@@ -1714,4 +1714,3 @@ void sort(RandomAccessIterator begin,
 } // namespace stxxl
 
 #endif // !STXXL_STREAM_SORT_STREAM_HEADER
-// vim: et:ts=4:sw=4

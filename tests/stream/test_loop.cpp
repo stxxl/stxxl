@@ -290,4 +290,3 @@ int main(int argc, char** argv)
     cout << "\nIteration needed: " << i << endl;
 }
 
-// vim: et:ts=4:sw=4

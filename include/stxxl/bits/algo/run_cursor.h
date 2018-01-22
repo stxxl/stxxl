@@ -127,4 +127,3 @@ struct run_cursor_cmp
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_RUN_CURSOR_HEADER
-// vim: et:ts=4:sw=4

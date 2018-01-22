@@ -411,4 +411,3 @@ public:
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_QUEUE_HEADER
-// vim: et:ts=4:sw=4

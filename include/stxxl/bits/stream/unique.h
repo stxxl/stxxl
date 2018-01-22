@@ -130,4 +130,3 @@ public:
 } // namespace stxxl
 
 #endif // !STXXL_STREAM_UNIQUE_HEADER
-// vim: et:ts=4:sw=4

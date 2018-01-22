@@ -1092,4 +1092,3 @@ void ksort(ExtIterator first, ExtIterator last, size_t M)
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_KSORT_HEADER
-// vim: et:ts=4:sw=4

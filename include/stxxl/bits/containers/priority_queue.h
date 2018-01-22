@@ -1004,4 +1004,3 @@ void swap(stxxl::priority_queue_local::int_merger<ValueType, CompareTypeWithMin,
 } // namespace std
 
 #endif // !STXXL_CONTAINERS_PRIORITY_QUEUE_HEADER
-// vim: et:ts=4:sw=4

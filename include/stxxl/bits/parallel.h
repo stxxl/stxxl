@@ -256,4 +256,3 @@ RandomAccessIterator3 multiway_merge_stable_sentinels(
 } // namespace stxxl
 
 #endif // !STXXL_PARALLEL_HEADER
-// vim: et:ts=4:sw=4

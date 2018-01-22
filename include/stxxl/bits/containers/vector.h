@@ -2559,4 +2559,3 @@ void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr>& a,
 } // namespace std
 
 #endif // !STXXL_CONTAINERS_VECTOR_HEADER
-// vim: et:ts=4:sw=4

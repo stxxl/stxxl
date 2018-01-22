@@ -154,4 +154,3 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_SORT_HELPER_HEADER
-// vim: et:ts=4:sw=4

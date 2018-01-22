@@ -125,4 +125,3 @@ void swap(stxxl::lru_pager<npages_>& a,
 } // namespace std
 
 #endif // !STXXL_CONTAINERS_PAGER_HEADER
-// vim: et:ts=4:sw=4

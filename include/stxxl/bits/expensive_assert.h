@@ -23,4 +23,3 @@
 #endif
 
 #endif // !STXXL_EXPENSIVE_ASSERT_HEADER
-// vim: et:ts=4:sw=4

@@ -270,4 +270,3 @@ void swap(stxxl::loser_tree<RunCursorType, RunCursorCmpType>& a,
 } // namespace std
 
 #endif // !STXXL_ALGO_LOSERTREE_HEADER
-// vim: et:ts=4:sw=4

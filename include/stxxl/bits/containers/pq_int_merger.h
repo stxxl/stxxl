@@ -414,4 +414,3 @@ protected:
 } // namespace stxxl
 
 #endif // !STXXL_CONTAINERS_PQ_INT_MERGER_HEADER
-// vim: et:ts=4:sw=4

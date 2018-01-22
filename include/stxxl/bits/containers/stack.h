@@ -1077,4 +1077,3 @@ void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack>& a,
 } // namespace std
 
 #endif // !STXXL_CONTAINERS_STACK_HEADER
-// vim: et:ts=4:sw=4

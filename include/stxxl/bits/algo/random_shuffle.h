@@ -387,4 +387,3 @@ void random_shuffle(
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_RANDOM_SHUFFLE_HEADER
-// vim: et:ts=4:sw=4

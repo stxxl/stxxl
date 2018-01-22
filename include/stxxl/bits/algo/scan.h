@@ -325,4 +325,3 @@ ExtIterator find(ExtIterator begin, ExtIterator end,
 } // namespace stxxl
 
 #endif // !STXXL_ALGO_SCAN_HEADER
-// vim: et:ts=4:sw=4

@@ -195,4 +195,3 @@ int main()
     } // int_merger test
 }
 
-// vim: et:ts=4:sw=4

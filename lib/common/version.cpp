@@ -48,4 +48,3 @@ std::string get_library_version_string_long()
 
 } // namespace stxxl
 
-// vim: et:ts=4:sw=4
