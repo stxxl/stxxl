@@ -19,6 +19,7 @@
 
 #include <tlx/define.hpp>
 #include <tlx/logger.hpp>
+#include <tlx/unused.hpp>
 
 #include <stxxl/bits/algo/run_cursor.h>
 
@@ -34,6 +35,7 @@ inline void verify_sentinel_strict_weak_ordering(StrictWeakOrdering cmp)
     assert(cmp(cmp.min_value(), cmp.max_value()));
     assert(!cmp(cmp.max_value(), cmp.min_value()));
     assert(!cmp(cmp.max_value(), cmp.max_value()));
+    tlx::unused(cmp);
 }
 
 template <typename BlockType, typename ValueType = typename BlockType::value_type>
