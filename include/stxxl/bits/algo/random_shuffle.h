@@ -69,7 +69,7 @@ void random_shuffle(ExtIterator first,
     static_assert(int(BlockSize) < 0,
                   "This implementation was never tested. Please report to the stxxl developers if you have an ExtIterator that works with this implementation.");
 
-    int64_t n = last - first; // the number of input elements
+    const size_t n = last - first; // the number of input elements
 
     // make sure we have at least 6 blocks + 1 page
     if (M < 6 * BlockSize + PageSize * BlockSize) {
@@ -78,9 +78,7 @@ void random_shuffle(ExtIterator first,
         LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
     }
 
-    size_t k = M / (3 * BlockSize); // number of buckets
-
-    int64_t i, j, size = 0;
+    const size_t k = M / (3 * BlockSize); // number of buckets
 
     value_type* temp_array;
     using temp_vector_type = typename stxxl::vector<
@@ -95,7 +93,7 @@ void random_shuffle(ExtIterator first,
 
     // create and put buckets into container
     buckets = new stack_type*[k];
-    for (j = 0; j < k; j++)
+    for (size_t j = 0; j < k; j++)
         buckets[j] = new stack_type(pool, 0);
 
     ///// Reading input /////////////////////
@@ -104,7 +102,7 @@ void random_shuffle(ExtIterator first,
 
     // distribute input into random buckets
     size_t random_bucket = 0;
-    for (i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         random_bucket = rand(k);
         buckets[random_bucket]->push(*in); // reading the current input element
         ++in;                              // go to the next input element
@@ -120,14 +118,14 @@ void random_shuffle(ExtIterator first,
     ExtIterator Writer = first;
     ExtIterator it = first;
 
-    for (i = 0; i < k; i++) {
+    for (size_t i = 0; i < k; i++) {
         LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
     }
 
     // shuffle each bucket
-    for (i = 0; i < k; i++) {
+    for (size_t i = 0; i < k; i++) {
         buckets[i]->set_prefetch_aggr(PageSize);
-        size = buckets[i]->size();
+        const size_t size = buckets[i]->size();
 
         // does the bucket fit into memory?
         if (size * sizeof(value_type) < space_left) {
@@ -135,7 +133,7 @@ void random_shuffle(ExtIterator first,
 
             // copy bucket into temp. array
             temp_array = new value_type[size];
-            for (j = 0; j < size; j++) {
+            for (size_t j = 0; j < size; j++) {
                 temp_array[j] = buckets[i]->top();
                 buckets[i]->pop();
             }
@@ -145,7 +143,7 @@ void random_shuffle(ExtIterator first,
             random_shuffle(temp_array, temp_array + size, rand);
 
             // write back
-            for (j = 0; j < size; j++) {
+            for (size_t j = 0; j < size; j++) {
                 *Writer = temp_array[j];
                 ++Writer;
             }
@@ -159,7 +157,7 @@ void random_shuffle(ExtIterator first,
             // copy bucket into temp. stxxl::vector
             temp_vector = new temp_vector_type(size);
 
-            for (j = 0; j < size; j++) {
+            for (size_t j = 0; j < size; j++) {
                 (*temp_vector)[j] = buckets[i]->top();
                 buckets[i]->pop();
             }
@@ -175,7 +173,7 @@ void random_shuffle(ExtIterator first,
             pool.resize_prefetch(PageSize);
 
             // write back
-            for (j = 0; j < size; j++) {
+            for (size_t j = 0; j < size; j++) {
                 *Writer = (*temp_vector)[j];
                 ++Writer;
             }
