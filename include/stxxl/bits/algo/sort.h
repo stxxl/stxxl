@@ -215,11 +215,11 @@ create_runs(
     delete[] next_run_reads;
 }
 
-template <typename BlockType, typename RunType, typename ValueCmp>
+template <typename BlockType, typename RunType, typename CompareWithMin>
 bool check_sorted_runs(RunType** runs,
                        const size_t nruns,
                        size_t m,
-                       ValueCmp cmp)
+                       CompareWithMin cmp)
 {
     using block_type = BlockType;
     using value_type = typename block_type::value_type;
@@ -316,13 +316,13 @@ bool check_sorted_runs(RunType** runs,
     return true;
 }
 
-template <typename BlockType, typename RunType, typename ValueCmp>
+template <typename BlockType, typename RunType, typename CompareWithMin>
 void merge_runs(RunType** in_runs, size_t nruns,
-                RunType* out_run, size_t _m, ValueCmp cmp)
+                RunType* out_run, size_t _m, CompareWithMin cmp)
 {
     using block_type = BlockType;
     using run_type = RunType;
-    using value_cmp = ValueCmp;
+    using value_cmp = CompareWithMin;
     using trigger_entry_type = typename run_type::value_type;
     using prefetcher_type = foxxll::block_prefetcher<block_type, typename run_type::iterator>;
     using run_cursor_type = run_cursor2<block_type, prefetcher_type>;
@@ -685,8 +685,8 @@ sort_blocks(InputBidIterator input_bids,
  * \param cmp comparison object of \ref StrictWeakOrdering
  * \param M amount of memory for internal use (in bytes)
  */
-template <typename ExtIterator, typename StrictWeakOrdering>
-void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, size_t M)
+template <typename ExtIterator, typename StrictWeakOrderingWithMinMax>
+void sort(ExtIterator first, ExtIterator last, StrictWeakOrderingWithMinMax cmp, size_t M)
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 

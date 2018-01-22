@@ -55,7 +55,7 @@ namespace hash_map {
 template <class KeyType,
           class MappedType,
           class HashType,
-          class KeyCompareType,
+          class KeyCompareWithMinMax,
           unsigned SubBlockSize = 4*1024,
           unsigned SubBlocksPerBlock = 256,
           class AllocatorType = std::allocator<std::pair<const KeyType, MappedType> >
@@ -65,7 +65,7 @@ class hash_map
     static constexpr bool debug = false;
 
 protected:
-    using self_type = hash_map<KeyType, MappedType, HashType, KeyCompareType,
+    using self_type = hash_map<KeyType, MappedType, HashType, KeyCompareWithMinMax,
                                SubBlockSize, SubBlocksPerBlock>;
 
 public:
@@ -91,7 +91,7 @@ public:
     //! type of (mother) hash-function
     using hasher = HashType;
     //! functor that imposes a ordering on keys (but see _lt())
-    using key_compare = KeyCompareType;
+    using key_compare = KeyCompareWithMinMax;
     //! allocator template type
     using allocator_type = AllocatorType;
 

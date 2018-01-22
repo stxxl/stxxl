@@ -71,7 +71,7 @@ public:
     using tree_type = parallel_merger_adapter<self_type, CompareType, Arity>;
 #else
     //! type of embedded loser tree
-    using tree_type = loser_tree<self_type, CompareType, Arity>;
+    using tree_type = loser_tree<self_type, CompareWithMin, Arity>;
 #endif
 
     //! size type of total number of item in merger
