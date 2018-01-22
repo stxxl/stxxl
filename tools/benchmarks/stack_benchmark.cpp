@@ -23,8 +23,9 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/stack>
-#include <stxxl/timer>
 
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
 

@@ -21,8 +21,9 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/bits/containers/parallel_priority_queue.h>
-#include <stxxl/timer>
 
 #include <key_with_padding.h>
 #include <test_helpers.h>

@@ -32,13 +32,14 @@ static const char* description =
 #include <tlx/string.hpp>
 #include <tlx/unused.hpp>
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
 #include <stxxl/bits/containers/priority_queue.h>
 #include <stxxl/sorter>
-#include <stxxl/timer>
 #include <tlx/logger.hpp>
 
 #include <key_with_padding.h>

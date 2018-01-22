@@ -25,8 +25,9 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/priority_queue>
-#include <stxxl/timer>
 
 #define TOTAL_PQ_MEM_SIZE    (768 * 1024 * 1024)
 

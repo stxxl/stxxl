@@ -14,8 +14,9 @@
 #include <iostream>
 #include <limits>
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/sorter>
-#include <stxxl/timer>
 
 struct my_comparator
 {

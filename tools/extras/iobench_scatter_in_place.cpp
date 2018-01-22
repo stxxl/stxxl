@@ -19,8 +19,8 @@
 
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/timer.hpp>
 #include <foxxll/io.hpp>
-#include <stxxl/timer>
 
 using foxxll::request_ptr;
 using foxxll::file;

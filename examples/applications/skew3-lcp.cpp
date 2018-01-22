@@ -31,16 +31,17 @@
 #include <string>
 #include <vector>
 
+#include <foxxll/common/timer.hpp>
 #include <foxxll/common/uint_types.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/io.hpp>
+
 #include <stxxl/algorithm>
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/random>
 #include <stxxl/sequence>
 #include <stxxl/sorter>
 #include <stxxl/stream>
-#include <stxxl/timer>
 #include <stxxl/vector>
 
 using foxxll::external_size_type;

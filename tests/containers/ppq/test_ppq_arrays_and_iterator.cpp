@@ -20,12 +20,12 @@
 #include <tlx/logger.hpp>
 #include <tlx/string.hpp>
 
+#include <foxxll/common/timer.hpp>
 #include <foxxll/common/utils.hpp>
 #include <foxxll/mng/block_manager.hpp>
 
 #include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/parallel_priority_queue.h>
-#include <stxxl/timer>
 
 using value_type = std::pair<uint64_t, uint64_t>;
 using ea_type = stxxl::ppq_local::external_array<value_type>;

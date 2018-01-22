@@ -15,9 +15,10 @@
 
 #include <tlx/logger.hpp>
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/random>
 #include <stxxl/sorter>
-#include <stxxl/timer>
 
 struct TwoInteger
 {

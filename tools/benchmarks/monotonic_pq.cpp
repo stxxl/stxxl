@@ -28,8 +28,9 @@
 
 #define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
+#include <foxxll/common/timer.hpp>
+
 #include <stxxl/priority_queue>
-#include <stxxl/timer>
 
 const size_t mega = 1024 * 1024;
 constexpr bool debug = false;
