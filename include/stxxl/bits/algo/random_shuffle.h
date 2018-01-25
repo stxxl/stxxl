@@ -6,6 +6,7 @@
  *  Copyright (C) 2007 Manuel Krings
  *  Copyright (C) 2007 Markus Westphal <mail@markuswestphal.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2018 Manuel Penschuck <stxxl@manuel.jetzt>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,6 +20,7 @@
 //        (free stacks buffers)
 // TODO: shuffle small input in internal memory
 
+#include <random>
 #include <vector>
 
 #include <tlx/logger.hpp>
@@ -188,6 +190,34 @@ void random_shuffle(ExtIterator first,
     delete[] buckets;
 }
 
+//! External equivalent of std::shuffle
+//! \param first begin of the range to shuffle
+//! \param last end of the range to shuffle
+//! \param rubg random uniform bit generator object
+//! \param M number of bytes for internal use
+//! \param AS parallel disk block allocation strategy
+//!
+//! - BlockSize size of the block to use for external memory data structures
+//! - PageSize page size in blocks to use for external memory data structures
+template <typename ExtIterator,
+          typename RUBG,
+          size_t BlockSize,
+          unsigned PageSize,
+          typename AllocStrategy>
+void shuffle(ExtIterator first,
+             ExtIterator last,
+             RUBG& rubg,
+             size_t M,
+             AllocStrategy AS = foxxll::default_alloc_strategy())
+{
+    auto rand = [&rubg](size_t x) {
+                    std::uniform_int_distribution<size_t> distr(0, x - 1);
+                    return distr(rubg);
+                };
+
+    random_shuffle<ExtIterator, decltype(rand), BlockSize, PageSize, AllocStrategy>(first, last, rand, M, AS);
+}
+
 //! External equivalent of std::random_shuffle (specialization for stxxl::vector)
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
@@ -265,12 +295,10 @@ void random_shuffle(
     ///// Reading input /////////////////////
 
     // distribute input into random buckets
-    size_t random_bucket = 0;
     for (i = 0; i < n; ++i, ++_cur) {
-        random_bucket = rand(k);
         typename ExtIterator::value_type tmp;
         in >> tmp;
-        buckets[random_bucket]->push(tmp); // reading the current input element
+        buckets[rand(k)]->push(tmp); // reading the current input element
     }
 
     ///// Processing //////////////////////
@@ -370,16 +398,21 @@ void random_shuffle(
 //! External equivalent of std::random_shuffle (specialization for stxxl::vector)
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
+//! \param rand random number generator object (functor)
 //! \param M number of bytes for internal use
-template <typename VectorConfig>
-inline
-void random_shuffle(
+template <typename VectorConfig, typename RUBG>
+void shuffle(
     stxxl::vector_iterator<VectorConfig> first,
     stxxl::vector_iterator<VectorConfig> last,
+    RUBG& rubg,
     size_t M)
 {
-    stxxl::random_number<> rand;
-    stxxl::random_shuffle(first, last, rand, M);
+    auto rand = [&rubg](size_t x) {
+                    std::uniform_int_distribution<size_t> distr(0, x - 1);
+                    return distr(rubg);
+                };
+
+    random_shuffle<VectorConfig>(first, last, rand, M);
 }
 
 //! \}

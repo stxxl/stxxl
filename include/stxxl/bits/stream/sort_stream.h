@@ -1442,7 +1442,7 @@ void basic_runs_merger<RunsType, CompareType, AllocStr>::merge_recursively()
 
                 // calculate blocks in run
                 const size_t blocks_in_new_run = static_cast<size_t>(foxxll::div_ceil(
-                    elements_in_new_run, block_type::size));
+                                                                         elements_in_new_run, block_type::size));
 
                 // allocate blocks for the new runs
                 new_runs.runs[cur_out_run].resize(blocks_in_new_run);

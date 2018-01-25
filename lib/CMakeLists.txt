@@ -14,8 +14,6 @@
 
 set(LIBSTXXL_SOURCES
 
-  common/rand.cpp
-  common/seed.cpp
   common/version.cpp
 
   )

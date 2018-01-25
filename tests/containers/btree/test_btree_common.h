@@ -16,6 +16,7 @@
 #define STXXL_TESTS_CONTAINERS_BTREE_TEST_BTREE_COMMON_HEADER
 
 #include <iostream>
+#include <random>
 
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>

@@ -973,11 +973,12 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
                        c.name() + ": Intermixed rand insert and delete",
                        2);
 
-    random_number32_r datarng(seed);
+    std::mt19937_64 randgen(seed);
+    std::uniform_int_distribution<int64_k> distr(0, value_universe_size - 1);
 
     for (size_t i = 0; i < 2 * num_elements; ++i)
     {
-        unsigned r = datarng() % 2;
+        unsigned r = randgen() & 1;
 
         if (num_deletes < num_inserts &&
             (r > 0 || num_inserts >= (filled ? 2 * num_elements : num_elements)))
@@ -994,8 +995,7 @@ void do_rand_intermixed(ContainerType& c, unsigned int seed, bool filled)
         {
             progress("Inserting/deleting element", i, 2 * num_elements);
 
-            int64_t k = datarng() % value_universe_size;
-            c.push(value_type(k));
+            c.push(value_type(distr(randgen)));
 
             num_inserts++;
             die_unequal(c.size(), num_inserts - num_deletes);
@@ -1054,7 +1054,8 @@ void do_bulk_rand_intermixed(ContainerType& c,
                     parallel ? get_thread_num() : g_rand() % g_max_threads;
 
                 unsigned int seed = thread_num * static_cast<unsigned>(i) * _seed;
-                random_number32_r datarng(seed);
+                std::mt19937_64 randgen(seed);
+                std::uniform_int_distribution<int64_k> distr(0, value_universe_size - 1);
 
 #if STXXL_PARALLEL
                 #pragma omp for
@@ -1065,8 +1066,7 @@ void do_bulk_rand_intermixed(ContainerType& c,
                     progress("Inserting / deleting element",
                              i + j, (filled ? 3 : 2) * num_elements);
 
-                    int64_t k = datarng() % value_universe_size;
-                    c.bulk_push(value_type(k), thread_num);
+                    c.bulk_push(value_type(distr(randgen)), thread_num);
                 }
             }
 
@@ -1403,13 +1403,14 @@ public:
           edge_lengths(m),
           temp_edges(n)
     {
-        unsigned int seed = 12345;
-        random_number32_r datarng(seed);
+        std::mt19937_64 randgen(seed);
+        std::uniform_int_distribution<size_type> distr_node(0, n - 1);
+        std::uniform_int_distribution<size_type> distr;
 
         for (size_type i = 0; i < m; ++i) {
-            size_type source = datarng() % n;
-            size_type target = datarng() % n;
-            size_type length = datarng();
+            size_type source = distr_node(randgen);
+            size_type target = distr_node(randgen);
+            size_type length = distr(randgen);
             temp_edges[source].push_back(std::make_pair(target, length));
         }
 
@@ -1434,9 +1435,11 @@ public:
     void run_random_dijkstra(ContainerType& c)
     {
         unsigned int seed = 678910;
-        random_number32_r datarng(seed);
 
-        size_type source = datarng() % n;
+        std::mt19937_64 randgen(seed);
+        std::uniform_int_distribution<size_type> distr_node(0, n - 1);
+
+        size_type source = distr_node(randgen);
         c.push(value_type(source, 0));
 
         while (!c.empty())

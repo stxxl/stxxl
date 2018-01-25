@@ -22,11 +22,13 @@
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <numeric>
+#include <random>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -39,7 +41,6 @@
 
 #include <stxxl/algorithm>
 #include <stxxl/bits/common/cmdline.h>
-#include <stxxl/random>
 #include <stxxl/sequence>
 #include <stxxl/sorter>
 #include <stxxl/stream>
@@ -2649,8 +2650,10 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
         // fill input vector with random bytes
         input_vector.resize(sizelimit);
-        stxxl::random_number8_r rand8;
-        stxxl::generate(input_vector.begin(), input_vector.end(), rand8);
+
+        std::mt19937 randgen;
+        std::uniform_int_distribution<alphabet_type> distr;
+        stxxl::generate(input_vector.begin(), input_vector.end(), std::bind(distr, std::ref(randgen)));
     }
     else if (input_filename == "unary") {
         if (sizelimit == std::numeric_limits<size_type>::max()) {

@@ -36,7 +36,10 @@ static const char* description =
 #include <stxxl/bits/common/comparator.h>
 #include <stxxl/bits/common/padding.h>
 #include <stxxl/priority_queue>
-#include <stxxl/random>
+#include <stxxl/seed>
+
+#include "../tests/include/test_helpers.h"
+
 
 using stxxl::external_size_type;
 
@@ -198,15 +201,14 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
     std::cout << foxxll::stats_data(*foxxll::stats::get_instance()) - stats_begin;
     stats_begin = *foxxll::stats::get_instance();
 
-    stxxl::random_number32 rand;
-
+    std::mt19937 rand(stxxl::seed_sequence::get_ref().get_next_seed());
+    std::uniform_int_distribution<int> distr(0, 2);
     {
         foxxll::scoped_print_timer timer("Intermixed Insert/Delete", nelements * sizeof(ValueType));
 
         for (external_size_type i = 0; i < nelements; ++i)
         {
-            int o = rand() % 3;
-            if (o == 0)
+            if (distr(rand) == 0)
             {
                 pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
             }

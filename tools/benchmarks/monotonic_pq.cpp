@@ -16,6 +16,7 @@
 #include <iostream>
 #include <limits>
 #include <queue>
+#include <random>
 
 #include <tlx/logger.hpp>
 
@@ -253,12 +254,13 @@ int main(int argc, char* argv[])
     LOG1 << "Internal memory consumption of the priority queue: " << p.mem_cons() << " B";
     LOG1 << "Peak number of elements (n): " << nelements;
     LOG1 << "Max number of elements to contain: " << (uint64_t(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX);
-    srand(5);
+
     my_cmp cmp;
     my_key_type r, sum_input = 0, sum_output = 0;
     my_type least(0), last_least(0);
 
-    const my_key_type modulo = 0x10000000;
+    std::mt19937_64 randgen;
+    std::uniform_int_distribution<my_key_type> distr_key(0, 0x10000000 - 1);
 
 #if SIDE_PQ
     std::priority_queue<my_type, std::vector<my_type>, my_cmp> side_pq;
@@ -277,7 +279,7 @@ int main(int argc, char* argv[])
                  << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield);
 
         //monotone priority queue
-        r = least.key + rand() % modulo;
+        r = least.key + distr_key(randgen);
         sum_input += r;
         p.push(my_type(r));
 #if SIDE_PQ
@@ -301,7 +303,7 @@ int main(int argc, char* argv[])
         else
             last_least = least;
 
-        r = least.key + rand() % modulo;
+        r = least.key + distr_key(randgen);
         sum_input += r;
         p.push(my_type(r));
 #if SIDE_PQ
@@ -340,7 +342,7 @@ int main(int argc, char* argv[])
         else
             last_least = least;
 
-        r = least.key + rand() % modulo;
+        r = least.key + distr_key(randgen);
         sum_input += r;
         p.push(my_type(r));
 #if SIDE_PQ

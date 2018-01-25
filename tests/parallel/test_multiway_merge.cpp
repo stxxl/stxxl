@@ -17,6 +17,7 @@
 #include <tlx/logger.hpp>
 
 #include <stxxl/bits/parallel.h>
+#include <stxxl/seed>
 
 #include <test_helpers.h>
 
@@ -51,7 +52,7 @@ void test_vecs(unsigned int vecnum)
 
     // construct many vectors of sorted random numbers
 
-    std::mt19937 randgen(seed_seq());
+    std::mt19937 randgen(stxxl::seed_sequence::get_ref().get_next_seed());
     std::uniform_int_distribution<unsigned int> distr_size(0, 127);
     std::uniform_int_distribution<unsigned int> distr_value(0, vecnum * 20);
 

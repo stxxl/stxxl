@@ -18,38 +18,6 @@
     #include <omp.h>
 #endif
 
-#if __cplusplus >= 201103L
-#define STXXL_MOVE(T) std::move(T)
-#else
-#define STXXL_MOVE(T) T
-#endif
-
-#include <tlx/define.hpp>
-#include <tlx/die.hpp>
-#include <tlx/string.hpp>
-
-#include <foxxll/common/timer.hpp>
-#include <foxxll/common/types.hpp>
-#include <foxxll/io/request_operations.hpp>
-#include <foxxll/mng/block_alloc_strategy.hpp>
-#include <foxxll/mng/block_manager.hpp>
-#include <foxxll/mng/buf_ostream.hpp>
-#include <foxxll/mng/prefetch_pool.hpp>
-#include <foxxll/mng/read_write_pool.hpp>
-#include <foxxll/mng/typed_block.hpp>
-
-#include <stxxl/bits/common/custom_stats.h>
-#include <stxxl/bits/common/is_heap.h>
-#include <stxxl/bits/common/rand.h>
-#include <stxxl/bits/common/swap_vector.h>
-#include <stxxl/bits/common/winner_tree.h>
-#include <stxxl/bits/config.h>
-#include <stxxl/bits/defines.h>
-#include <stxxl/bits/parallel.h>
-#include <stxxl/types>
-
-#include <tlx/logger.hpp>
-
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -64,6 +32,31 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <tlx/define.hpp>
+#include <tlx/die.hpp>
+#include <tlx/logger.hpp>
+#include <tlx/string.hpp>
+
+#include <foxxll/common/timer.hpp>
+#include <foxxll/common/types.hpp>
+#include <foxxll/io/request_operations.hpp>
+#include <foxxll/mng/block_alloc_strategy.hpp>
+#include <foxxll/mng/block_manager.hpp>
+#include <foxxll/mng/buf_ostream.hpp>
+#include <foxxll/mng/prefetch_pool.hpp>
+#include <foxxll/mng/read_write_pool.hpp>
+#include <foxxll/mng/typed_block.hpp>
+
+#include <stxxl/bits/common/custom_stats.h>
+#include <stxxl/bits/common/is_heap.h>
+#include <stxxl/bits/common/swap_vector.h>
+#include <stxxl/bits/common/winner_tree.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/defines.h>
+#include <stxxl/bits/parallel.h>
+#include <stxxl/seed>
+#include <stxxl/types>
 
 namespace stxxl {
 namespace ppq_local {
@@ -2299,18 +2292,18 @@ protected:
         using value_type =
                   typename std::iterator_traits<RandomAccessIterator>::value_type;
 
-        value_type value = STXXL_MOVE(*(last - 1));
+        value_type value = std::move(*(last - 1));
 
         size_t index = (last - first) - 1;
         size_t parent = (index - 1) / 2;
 
         while (index > 0 && comp(*(first + parent), value))
         {
-            *(first + index) = STXXL_MOVE(*(first + parent));
+            *(first + index) = std::move(*(first + parent));
             index = parent;
             parent = (index - 1) / 2;
         }
-        *(first + index) = STXXL_MOVE(value);
+        *(first + index) = std::move(value);
 
         return index;
     }
@@ -2387,7 +2380,7 @@ public:
           m_hint_comparator(m_external_arrays, m_inv_compare),
           m_hint_tree(4, m_hint_comparator),
 #ifndef STXXL_PARALLEL
-          m_rng(get_next_seed()),
+          m_rng(stxxl::seed_sequence::get_ref().get_next_seed()),
 #endif
           // flags
           m_limit_extract(false)

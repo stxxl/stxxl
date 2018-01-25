@@ -30,8 +30,11 @@
 
 #include <stxxl/algorithm>
 
+#include <stxxl/comparator>
+
+#include <stxxl/seed>
+
 #include <stxxl/stream>
 
-#include <stxxl/random>
 
 #endif // STXXL_MAIN_HEADER

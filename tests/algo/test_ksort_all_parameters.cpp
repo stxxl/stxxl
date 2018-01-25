@@ -34,7 +34,7 @@
 constexpr size_t MB = 1024 * 1024;
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
-void test(uint64_t data_mem, size_t memory_to_use)
+void test(uint64_t data_mem, size_t memory_to_use, int seed)
 {
     uint64_t records_to_sort = data_mem / sizeof(T);
     using vector_type = stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type>;
@@ -50,7 +50,7 @@ void test(uint64_t data_mem, size_t memory_to_use)
     LOG1 << "Using " << alloc_strategy_type::name() << " allocation strategy ";
     LOG1 << "Block size " << vector_type::block_type::raw_size / 1024 << " KiB";
 
-    random_fill_vector(v);
+    random_fill_vector(v, seed);
 
     foxxll::stats_data before(*foxxll::stats::get_instance());
 
@@ -70,21 +70,22 @@ template <typename T, unsigned block_size>
 void test_all_strategies(
     uint64_t data_mem,
     size_t memory_to_use,
-    int strategy)
+    int strategy,
+    int seed)
 {
     switch (strategy)
     {
     case 0:
-        test<T, foxxll::striping, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::striping, block_size>(data_mem, memory_to_use, seed);
         break;
     case 1:
-        test<T, foxxll::simple_random, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::simple_random, block_size>(data_mem, memory_to_use, seed);
         break;
     case 2:
-        test<T, foxxll::fully_random, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::fully_random, block_size>(data_mem, memory_to_use, seed);
         break;
     case 3:
-        test<T, foxxll::random_cyclic, block_size>(data_mem, memory_to_use);
+        test<T, foxxll::random_cyclic, block_size>(data_mem, memory_to_use, seed);
         break;
     default:
         die("Unknown allocation strategy: " << strategy << ", aborting");
@@ -106,58 +107,56 @@ int main(int argc, char* argv[])
     size_t sort_mem = strtoul(argv[2], nullptr, 0) * MB;
     int strategy = atoi(argv[3]);
     int block_size_switch = atoi(argv[4]); // this is no actual block size but a switch to select a block size
-    stxxl::set_seed((unsigned)strtoul(argv[5], nullptr, 10));
-    LOG1 << "Seed " << stxxl::get_next_seed();
-    stxxl::srandom_number32();
+    int seed = static_cast<unsigned>(atoll(argv[5]));
 
     using my_default_type = key_with_padding<uint64_t, 8>;
 
     switch (block_size_switch)
     {
     case 0:
-        test_all_strategies<my_default_type, 128* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 128* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 1:
-        test_all_strategies<my_default_type, 256* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 256* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 2:
-        test_all_strategies<my_default_type, 512* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 512* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 3:
-        test_all_strategies<my_default_type, 1024* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 1024* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 4:
-        test_all_strategies<my_default_type, 2* 1024* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 2* 1024* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 5:
-        test_all_strategies<my_default_type, 4* 1024* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 4* 1024* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 6:
-        test_all_strategies<my_default_type, 8* 1024* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 8* 1024* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 7:
-        test_all_strategies<my_default_type, 16* 1024* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 16* 1024* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 8:
-        test_all_strategies<my_default_type, 640* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 640* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 9:
-        test_all_strategies<my_default_type, 768* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 768* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 10:
-        test_all_strategies<my_default_type, 896* 1024>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_default_type, 896* 1024>(data_mem, sort_mem, strategy, seed);
         break;
     case 11:
-        test_all_strategies<key_with_padding<uint64_t, 12>, 2* MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<uint64_t, 12>, 2* MB>(data_mem, sort_mem, strategy, seed);
         break;
     case 12:
-        test_all_strategies<key_with_padding<unsigned, 12>, 2* MB + 4096>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 12>, 2* MB + 4096>(data_mem, sort_mem, strategy, seed);
         break;
     case 13:
-        test_all_strategies<key_with_padding<unsigned, 20>, 2* MB + 4096>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 20>, 2* MB + 4096>(data_mem, sort_mem, strategy, seed);
         break;
     case 14:
-        test_all_strategies<key_with_padding<unsigned, 128>, 2* MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<key_with_padding<unsigned, 128>, 2* MB>(data_mem, sort_mem, strategy, seed);
         break;
     default:
         die("Unknown block size: " << block_size_switch << ", aborting");
