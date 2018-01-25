@@ -18,14 +18,24 @@
     #include <omp.h>
 #endif
 
-#if __cplusplus >= 201103L
-#define STXXL_MOVE(T) std::move(T)
-#else
-#define STXXL_MOVE(T) T
-#endif
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdlib>
+#include <ctime>
+#include <functional>
+#include <limits>
+#include <list>
+#include <mutex>
+#include <numeric>
+#include <random>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <tlx/define.hpp>
 #include <tlx/die.hpp>
+#include <tlx/logger.hpp>
 #include <tlx/string.hpp>
 
 #include <foxxll/common/timer.hpp>
@@ -47,23 +57,6 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/seed>
 #include <stxxl/types>
-
-#include <tlx/logger.hpp>
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdlib>
-#include <ctime>
-#include <functional>
-#include <limits>
-#include <list>
-#include <mutex>
-#include <numeric>
-#include <random>
-#include <string>
-#include <utility>
-#include <vector>
 
 namespace stxxl {
 namespace ppq_local {
@@ -2299,18 +2292,18 @@ protected:
         using value_type =
                   typename std::iterator_traits<RandomAccessIterator>::value_type;
 
-        value_type value = STXXL_MOVE(*(last - 1));
+        value_type value = std::move(*(last - 1));
 
         size_t index = (last - first) - 1;
         size_t parent = (index - 1) / 2;
 
         while (index > 0 && comp(*(first + parent), value))
         {
-            *(first + index) = STXXL_MOVE(*(first + parent));
+            *(first + index) = std::move(*(first + parent));
             index = parent;
             parent = (index - 1) / 2;
         }
-        *(first + index) = STXXL_MOVE(value);
+        *(first + index) = std::move(value);
 
         return index;
     }
