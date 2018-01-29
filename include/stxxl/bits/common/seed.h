@@ -41,14 +41,14 @@ public:
     //! Reset seed sequence
     void set_seed(value_type seed)
     {
-        std::unique_lock<std::mutex> mtx_;
+        std::unique_lock<std::mutex> lock(mtx_);
         prng_.seed(seed);
     }
 
     //! Get a new seed value (thread-safe)
     value_type get_next_seed()
     {
-        std::unique_lock<std::mutex> mtx_;
+        std::unique_lock<std::mutex> lock(mtx_);
         std::uniform_int_distribution<value_type> distr;
         return distr(prng_);
     }
