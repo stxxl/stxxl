@@ -470,7 +470,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
 // end of STL-style merging
 
 #else
-        STXXL_THROW_UNREACHABLE();
+        FOXXLL_THROW_UNREACHABLE();
 #endif
     }
     else

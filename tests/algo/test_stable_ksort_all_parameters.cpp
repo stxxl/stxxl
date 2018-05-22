@@ -31,7 +31,7 @@
 constexpr size_t MB = 1024 * 1024;
 
 template <typename T, typename alloc_strategy_type, size_t block_size>
-void test(size_t data_mem, size_t memory_to_use, int seed)
+void test(size_t data_mem, size_t memory_to_use, uint64_t seed)
 {
     size_t records_to_sort = data_mem / sizeof(T);
     using vector_type = stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type>;
@@ -72,7 +72,7 @@ void test_all_strategies(
     int strategy,
     int seed)
 {
-    switch (strategy, seed)
+    switch (strategy)
     {
     case 0:
         test<T, foxxll::striping, block_size>(data_mem, memory_to_use, seed);

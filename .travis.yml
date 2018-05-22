@@ -12,33 +12,31 @@ env:
 matrix:
   include:
   # gcc-5 builds
-    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
+    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON"
       addons: &gcc5
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-    - env: CMAKE_CC="gcc-5" CMAKE_CXX="g++-5" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
-      addons: *gcc5
 
   # gcc-7 builds
-    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=OFF"
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON"
       addons: &gcc7
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=ON"
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=OFF"
       addons: *gcc7
-    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=OFF"
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_OPENMP=ON"
       addons: *gcc7
-    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_OPENMP=ON -DUSE_GNU_PARALLEL=ON"
+    - env: CMAKE_CC="gcc-7" CMAKE_CXX="g++-7" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_OPENMP=OFF"
       addons: *gcc7
 
   # clang build
-    - env: CMAKE_CC="clang-3.9"   CMAKE_CXX="clang++-3.9" CMAKE_FLAGS="" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_GNU_PARALLEL=OFF"
+    - env: CMAKE_CC="clang-3.9"   CMAKE_CXX="clang++-3.9" CMAKE_FLAGS="" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert"
       addons:
         apt:
           sources:
@@ -48,7 +46,7 @@ matrix:
             - clang-3.9
             - g++-5
             - libiomp-dev
-    - env: CMAKE_CC="clang-5.0"   CMAKE_CXX="clang++-5.0" CMAKE_FLAGS="" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert -DUSE_GNU_PARALLEL=OFF"
+    - env: CMAKE_CC="clang-5.0"   CMAKE_CXX="clang++-5.0" CMAKE_FLAGS="" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithAssert"
       addons:
         apt:
           sources:

@@ -208,9 +208,9 @@ $ cmake -DCMAKE_BUILD_TYPE=Release ...
 \endverbatim
 The mode mostly changes CXXFLAGS.
 
-- Some parts of STXXL have been parallelized using the __gnu_parallel (aka MCSTL) library. Currently, with CMake one can only use the newer __gnu_parallel library by defining
+- Some parts of STXXL have been parallelized using OpenMP (with code from MCSTL and the GNU parallel library)
 \verbatim
-$ cmake -DUSE_GNU_PARALLEL=ON ...
+$ cmake -DUSE_OPENMP=ON ...
 \endverbatim
 when building. <b>Parallel is now ON by default for gcc</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
 

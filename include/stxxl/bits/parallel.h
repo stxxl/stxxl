@@ -47,23 +47,12 @@
 #define STXXL_PARALLEL_MULTIWAY_MERGE 0
 #endif
 
-#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
-#undef STXXL_PARALLEL_MULTIWAY_MERGE
-#define STXXL_PARALLEL_MULTIWAY_MERGE 0
-#endif
-
-#if !defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+#if STXXL_PARALLEL && !defined(STXXL_PARALLEL_MULTIWAY_MERGE)
 #define STXXL_PARALLEL_MULTIWAY_MERGE 1
 #endif
 
 #if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
-#endif
-
-#if STXXL_WITH_GNU_PARALLEL
-#include <parallel/algorithm>
-#else
-#include <algorithm>
 #endif
 
 #include <tlx/algorithm/multiway_merge.hpp>
@@ -73,8 +62,8 @@ namespace stxxl {
 
 inline unsigned sort_memory_usage_factor()
 {
-#if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(STXXL_PARALLEL_MODE)
-    return (__gnu_parallel::_Settings::get().sort_algorithm == __gnu_parallel::MWMS && omp_get_max_threads() > 1) ? 2 : 1;   //memory overhead for multiway mergesort
+#if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD
+    return (omp_get_max_threads() > 1) ? 2 : 1;   //memory overhead for multiway mergesort
 #else
     return 1;                                                                                                                //no overhead
 #endif
@@ -82,19 +71,8 @@ inline unsigned sort_memory_usage_factor()
 
 inline void check_sort_settings()
 {
-#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MODE) && !defined(STXXL_NO_WARN_OMP_NESTED)
-    static bool did_warn = false;
-    if (!did_warn) {
-        if (__gnu_parallel::_Settings::get().sort_algorithm != __gnu_parallel::MWMS) {
-            if (omp_get_max_threads() <= 2) {
-                did_warn = true;  // no problem with at most 2 threads, no need to check again
-            }
-            else if (!omp_get_nested()) {
-                LOG1 << "Inefficient settings detected. To get full potential from your CPU it is recommended to set OMP_NESTED=TRUE in the environment.";
-                did_warn = true;
-            }
-        }
-    }
+#if STXXL_PARALLEL && !defined(STXXL_NO_WARN_OMP_NESTED)
+    // nothing to check, maybe in future?
 #else
     // nothing to check
 #endif
@@ -102,7 +80,7 @@ inline void check_sort_settings()
 
 inline bool do_parallel_merge()
 {
-#if STXXL_PARALLEL_MULTIWAY_MERGE && defined(STXXL_PARALLEL_MODE)
+#if STXXL_PARALLEL_MULTIWAY_MERGE
     return !stxxl::SETTINGS::native_merge && omp_get_max_threads() >= 1;
 #else
     return false;
@@ -114,22 +92,8 @@ inline bool do_parallel_merge()
 //! parallelism is optional.
 namespace potentially_parallel {
 
-#if STXXL_WITH_GNU_PARALLEL
-
-using __gnu_parallel::sort;
-using __gnu_parallel::random_shuffle;
-
-#elif STXXL_PARALLEL
-
 using std::sort;
 using std::random_shuffle;
-
-#else
-
-using std::sort;
-using std::random_shuffle;
-
-#endif
 
 /*! Multi-way merging dispatcher.
  * \param seqs_begin Begin iterator of iterator pair input sequence.

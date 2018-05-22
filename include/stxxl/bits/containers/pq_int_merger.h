@@ -56,7 +56,7 @@ public:
     using tree_type = parallel_merger_adapter<self_type, CompareType, MaxArity>;
 #else
     //! type of embedded loser tree
-    using tree_type = loser_tree<self_type, CompareWithMin, MaxArity>;
+    using tree_type = loser_tree<self_type, CompareType, MaxArity>;
 #endif
 
     //! type of sequences in which the values are stored: memory arrays

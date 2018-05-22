@@ -1113,7 +1113,7 @@ private:
 
 // end of STL-style merging
 #else
-            STXXL_THROW_UNREACHABLE();
+            FOXXLL_THROW_UNREACHABLE();
 #endif //STXXL_PARALLEL_MULTIWAY_MERGE
         }
         else
@@ -1296,7 +1296,7 @@ public:
             }
 // end of STL-style merging
 #else
-            STXXL_THROW_UNREACHABLE();
+            FOXXLL_THROW_UNREACHABLE();
 #endif //STXXL_PARALLEL_MULTIWAY_MERGE
         }
         else

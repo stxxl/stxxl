@@ -77,16 +77,6 @@ option(STXXL_RUN_SLOW_TESTS "Run slow tests of extra stxxl tests and tool progra
 
 option(USE_OPENMP "Use OpenMP for multi-core parallelism" ON)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  # FIXME: autodetect, n/a with libc++
-  option(USE_GNU_PARALLEL "Use GNU parallel extensions for multi-core parallelism" ON)
-
-  # GNU parallel mode but NOT OpenMP is impossible.
-  if(USE_GNU_PARALLEL AND NOT USE_OPENMP)
-    set(USE_GNU_PARALLEL OFF)
-  endif()
-endif()
-
 option(STXXL_TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
 option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
@@ -403,12 +393,7 @@ check_cxx_source_compiles(
 ###############################################################################
 # optional OpenMP parallelization
 
-if(USE_GNU_PARALLEL AND NOT USE_OPENMP)
-  message(FATAL_ERROR "Configuration selects GNU parallel mode but not OpenMP."
-    "This is impossible.")
-endif()
-
-if(USE_OPENMP OR USE_GNU_PARALLEL)
+if(USE_OPENMP)
 
   include(FindOpenMP)
 
@@ -428,26 +413,7 @@ else()
   message(STATUS "OpenMP disabled in STXXL (no parallelism is used).")
   set(STXXL_PARALLEL 0)
 
-endif(USE_OPENMP OR USE_GNU_PARALLEL)
-
-###############################################################################
-# optional GNU parallel STL mode
-
-if(USE_GNU_PARALLEL)
-
-  if(NOT OPENMP_FOUND)
-    message(FATAL_ERROR "OpenMP not found. Try compilation without GNU parallel mode.")
-  else()
-    check_include_file_cxx(parallel/algorithm HAVE_PARALLEL_ALGORITHM_H)
-
-    if(NOT HAVE_PARALLEL_ALGORITHM_H)
-      message(FATAL_ERROR "GNU parallel mode header not found. Try compilation without parallel mode.")
-    else()
-      set(STXXL_WITH_GNU_PARALLEL 1)
-    endif()
-  endif()
-
-endif(USE_GNU_PARALLEL)
+endif(USE_OPENMP)
 
 ###############################################################################
 # test for additional includes and features used by some stxxl_tool components

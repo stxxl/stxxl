@@ -72,7 +72,7 @@ if(NOT CYGWIN AND NOT MINGW AND STXXL_BUILD_EXTRAS) #-tb too big to build on cyg
 
 endif()
 
-if(USE_GNU_PARALLEL)
+if(USE_OPENMP)
 
   stxxl_build_test(test_parallel_sort)
 
@@ -96,4 +96,4 @@ if(USE_GNU_PARALLEL)
       endforeach(MERGE)
     endforeach(SORT)
 
-endif(USE_GNU_PARALLEL)
+endif(USE_OPENMP)

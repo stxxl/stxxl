@@ -34,7 +34,7 @@
 constexpr size_t MB = 1024 * 1024;
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
-void test(uint64_t data_mem, size_t memory_to_use, int seed)
+void test(uint64_t data_mem, size_t memory_to_use, uint64_t seed)
 {
     uint64_t records_to_sort = data_mem / sizeof(T);
     using vector_type = stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type>;
