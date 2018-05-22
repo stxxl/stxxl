@@ -320,7 +320,7 @@ protected:
                 std::make_pair(current[1], current_end[1])
             };
 
-            parallel::multiway_merge_sentinels(
+            potentially_parallel::multiway_merge_sentinels(
                 seqs, seqs + 2, target, length, inv_cmp);
 
             current[0] = seqs[0].first;
@@ -346,7 +346,7 @@ protected:
                 std::make_pair(current[3], current_end[3])
             };
 
-            parallel::multiway_merge_sentinels(
+            potentially_parallel::multiway_merge_sentinels(
                 seqs, seqs + 4, target, length, inv_cmp);
 
             current[0] = seqs[0].first;
@@ -381,7 +381,7 @@ protected:
                 }
             }
 
-            parallel::multiway_merge_sentinels(
+            potentially_parallel::multiway_merge_sentinels(
                 seqs.begin(), seqs.end(), target, length, inv_cmp);
 
             for (size_t i = 0; i < seqs.size(); ++i)

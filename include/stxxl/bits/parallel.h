@@ -66,7 +66,8 @@
 #include <algorithm>
 #endif
 
-#include <stxxl/bits/parallel/multiway_merge.h>
+#include <tlx/algorithm/multiway_merge.hpp>
+#include <tlx/algorithm/parallel_multiway_merge.hpp>
 
 namespace stxxl {
 
@@ -152,10 +153,10 @@ RandomAccessIterator3 multiway_merge(
     Comparator comp)
 {
 #if STXXL_PARALLEL
-    return stxxl::parallel::multiway_merge(
+    return tlx::parallel_multiway_merge(
         seqs_begin, seqs_end, target, length, comp);
 #else
-    return stxxl::parallel::sequential_multiway_merge<false, false>(
+    return tlx::multiway_merge(
         seqs_begin, seqs_end, target, length, comp);
 #endif
 }
@@ -182,10 +183,10 @@ RandomAccessIterator3 multiway_merge_stable(
     Comparator comp)
 {
 #if STXXL_PARALLEL
-    return stxxl::parallel::multiway_merge_stable(
+    return tlx::stable_parallel_multiway_merge(
         seqs_begin, seqs_end, target, length, comp);
 #else
-    return stxxl::parallel::sequential_multiway_merge<true, false>(
+    return tlx::stable_multiway_merge(
         seqs_begin, seqs_end, target, length, comp);
 #endif
 }
@@ -213,10 +214,10 @@ RandomAccessIterator3 multiway_merge_sentinels(
     Comparator comp)
 {
 #if STXXL_PARALLEL
-    return stxxl::parallel::multiway_merge_sentinels(
+    return tlx::parallel_multiway_merge_sentinels(
         seqs_begin, seqs_end, target, length, comp);
 #else
-    return stxxl::parallel::sequential_multiway_merge<false, true>(
+    return tlx::multiway_merge_sentinels(
         seqs_begin, seqs_end, target, length, comp);
 #endif
 }
@@ -244,10 +245,10 @@ RandomAccessIterator3 multiway_merge_stable_sentinels(
     Comparator comp)
 {
 #if STXXL_PARALLEL
-    return stxxl::parallel::multiway_merge_stable_sentinels(
+    return tlx::stable_parallel_multiway_merge_sentinels(
         seqs_begin, seqs_end, target, length, comp);
 #else
-    return stxxl::parallel::sequential_multiway_merge<true, true>(
+    return tlx::stable_multiway_merge_sentinels(
         seqs_begin, seqs_end, target, length, comp);
 #endif
 }

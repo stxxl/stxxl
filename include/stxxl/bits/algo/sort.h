@@ -432,7 +432,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
 
                 LOG << "before merge " << output_size;
 
-                parallel::multiway_merge(
+                potentially_parallel::multiway_merge(
                     seqs.begin(), seqs.end(),
                     out_buffer->end() - rest, output_size, cmp);
                 // sequence iterators are progressed appropriately

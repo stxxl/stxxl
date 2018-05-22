@@ -459,7 +459,7 @@ private:
                     std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N)
                 };
 
-                parallel::multiway_merge_sentinels(
+                potentially_parallel::multiway_merge_sentinels(
                     seqs, seqs + 2, delete_buffer_current_min, length, inv_cmp);
                 // sequence iterators are progressed appropriately
 
@@ -482,7 +482,7 @@ private:
                     std::make_pair(group_buffer_current_mins[2], group_buffers[2] + N)
                 };
 
-                parallel::multiway_merge_sentinels(
+                potentially_parallel::multiway_merge_sentinels(
                     seqs, seqs + 3, delete_buffer_current_min, length, inv_cmp);
                 // sequence iterators are progressed appropriately
 
@@ -509,7 +509,7 @@ private:
                     std::make_pair(group_buffer_current_mins[3], group_buffers[3] + N)
                 };
 
-                parallel::multiway_merge_sentinels(
+                potentially_parallel::multiway_merge_sentinels(
                     seqs, seqs + 4, delete_buffer_current_min, length, inv_cmp);
                 // sequence iterators are progressed appropriately
 
