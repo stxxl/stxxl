@@ -48,7 +48,7 @@ private:
     // "waiting" request have submitted to this queue, but not yet to the OS,
     // those are "posted"
     mutex waiting_mtx, posted_mtx;
-    queue_type waiting_requests, posted_requests;
+    queue_type waiting_requests;
 
     //! max number of OS requests
     int max_events;
