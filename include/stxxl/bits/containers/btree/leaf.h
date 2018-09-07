@@ -290,9 +290,9 @@ public:
 
     void dump()
     {
-        LOG << "Dump of leaf " << this << ". Please remove comment in lines below";
+        TLX_LOG << "Dump of leaf " << this << ". Please remove comment in lines below";
         // for (unsigned i = 0; i < size(); ++i)
-        //     LOG << (*this)[i].first << " " << (*this)[i].second;
+        //     TLX_LOG << (*this)[i].first << " " << (*this)[i].second;
     }
 
     std::pair<iterator, bool> insert(
@@ -375,7 +375,7 @@ public:
         if (it.pos == size() && succ().valid())
         {
             // run to the end of the leaf
-            LOG << "btree::normal_leaf jumping to the next block";
+            TLX_LOG << "btree::normal_leaf jumping to the next block";
             it.pos = 0;
             it.bid = succ();
         }
@@ -517,7 +517,7 @@ public:
         typename std::vector<iterator_base*>::iterator it2fix = iterators2fix.begin();
         for ( ; it2fix != iterators2fix.end(); ++it2fix)
         {
-            LOG << "btree::normal_leaf updating iterator " << (*it2fix) << " (pos--)";
+            TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) << " (pos--)";
             m_btree->m_iterator_map.unregister_iterator(**it2fix);
             --((*it2fix)->pos);                          // fixing iterators
             m_btree->m_iterator_map.register_iterator(**it2fix);
@@ -530,7 +530,7 @@ public:
 
     void fuse(const normal_leaf& src)
     {
-        LOG << "btree::normal_leaf Fusing";
+        TLX_LOG << "btree::normal_leaf Fusing";
         assert(m_vcmp(src.back(), front()));
         const unsigned src_size = src.size();
 
@@ -549,7 +549,7 @@ public:
         typename std::vector<iterator_base*>::iterator it2fix = iterators2fix.begin();
         for ( ; it2fix != iterators2fix.end(); ++it2fix)
         {
-            LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
+            TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
                 " (pos+" << src_size << ")";
             m_btree->m_iterator_map.unregister_iterator(**it2fix);
             ((*it2fix)->pos) += src_size;                           // fixing iterators
@@ -560,7 +560,7 @@ public:
         m_btree->m_iterator_map.find(src.my_bid(), 0, src_size, iterators2fix);
         for (it2fix = iterators2fix.begin(); it2fix != iterators2fix.end(); ++it2fix)
         {
-            LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
+            TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
                 " (bid=" << my_bid() << ")";
             m_btree->m_iterator_map.unregister_iterator(**it2fix);
             ((*it2fix)->bid) = my_bid();                             // fixing iterators
@@ -581,7 +581,7 @@ public:
 
     key_type balance(normal_leaf& left)
     {
-        LOG << "btree::normal_leaf Balancing leaves with bids " <<
+        TLX_LOG << "btree::normal_leaf Balancing leaves with bids " <<
             left.my_bid() << " and " << my_bid();
         const unsigned total_size = left.size() + size();
         unsigned new_left_size = total_size / 2;
@@ -617,7 +617,7 @@ public:
             typename std::vector<iterator_base*>::iterator it2fix = iterators2fix1.begin();
             for ( ; it2fix != iterators2fix1.end(); ++it2fix)
             {
-                LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
+                TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
                     " (pos+" << nEl2Move << ")";
                 m_btree->m_iterator_map.unregister_iterator(**it2fix);
                 ((*it2fix)->pos) += nEl2Move;                               // fixing iterators
@@ -627,7 +627,7 @@ public:
             it2fix = iterators2fix2.begin();
             for ( ; it2fix != iterators2fix2.end(); ++it2fix)
             {
-                LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
+                TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
                     " (pos-" << new_left_size << " bid=" << my_bid() << ")";
                 m_btree->m_iterator_map.unregister_iterator(**it2fix);
                 ((*it2fix)->bid) = my_bid();                                     // fixing iterators
@@ -656,7 +656,7 @@ public:
             typename std::vector<iterator_base*>::iterator it2fix = iterators2fix1.begin();
             for ( ; it2fix != iterators2fix1.end(); ++it2fix)
             {
-                LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
+                TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
                     " (pos-" << nEl2Move << ")";
                 m_btree->m_iterator_map.unregister_iterator(**it2fix);
                 ((*it2fix)->pos) -= nEl2Move;                                 // fixing iterators
@@ -666,7 +666,7 @@ public:
             it2fix = iterators2fix2.begin();
             for ( ; it2fix != iterators2fix2.end(); ++it2fix)
             {
-                LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
+                TLX_LOG << "btree::normal_leaf updating iterator " << (*it2fix) <<
                     " (pos+" << left.size() << " bid=" << left.my_bid() << ")";
                 m_btree->m_iterator_map.unregister_iterator(**it2fix);
                 ((*it2fix)->bid) = left.my_bid();                                 // fixing iterators

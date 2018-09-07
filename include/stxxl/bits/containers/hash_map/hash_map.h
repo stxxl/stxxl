@@ -482,7 +482,7 @@ public:
             external_size_type i_external;
             value_type ext_value;
 
-            std::tie(i_external, ext_value) =  _find_key_external(bucket, key);
+            std::tie(i_external, ext_value) = _find_key_external(bucket, key);
 
             // found in external memory; add delete-node
             if (i_external < bucket.n_external_ && _eq(ext_value.first, key))
@@ -548,7 +548,7 @@ public:
     //! Reset hash-map: erase all values, invalidate all iterators
     void clear()
     {
-        LOG << "clear()";
+        TLX_LOG << "clear()";
 
         iterator_map_.fix_iterators_all2end();
         block_cache_.flush();
@@ -1111,7 +1111,7 @@ protected:
     /*  Rebuild hash-map. The desired number of buckets may be supplied. */
     void _rebuild_buckets(internal_size_type n_desired = 0)
     {
-        LOG << "_rebuild_buckets()";
+        TLX_LOG << "_rebuild_buckets()";
 
         using writer_type = buffered_writer<block_type, bid_container_type>;
         using values_stream_type = HashedValuesStream<self_type, reader_type>;
@@ -1324,7 +1324,7 @@ public:
         if (n_buckets_new > max_bucket_count())
             n_buckets_new = max_bucket_count();
 
-        LOG << "insert() items=" << (l - f) << " buckets_new=" << n_buckets_new;
+        TLX_LOG << "insert() items=" << (l - f) << " buckets_new=" << n_buckets_new;
 
         // prepare new buckets and bids
         buckets_container_type old_buckets(static_cast<internal_size_type>(n_buckets_new));

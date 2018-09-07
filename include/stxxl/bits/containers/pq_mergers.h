@@ -475,7 +475,7 @@ public:
     //! make the tree twice as wide
     void double_k()
     {
-        LOG << "double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
+        TLX_LOG << "double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(k > 0);
         assert(k < arity);
         assert(free_slots.empty());             // stack was free (probably not needed)
@@ -492,7 +492,7 @@ public:
         k *= 2;
         logK++;
 
-        LOG << "double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
+        TLX_LOG << "double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(!free_slots.empty());
         assert(k <= max_arity);
 
@@ -503,7 +503,7 @@ public:
     //! compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        LOG << "compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size();
+        TLX_LOG << "compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size();
         assert(logK > 0);
 
         // compact all nonempty segments to the left
@@ -551,7 +551,7 @@ public:
                 free_slots.push(last_empty);
         }
 
-        LOG << "compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size();
+        TLX_LOG << "compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size();
 
         // recompute loser tree information
         rebuild_loser_tree();
@@ -567,12 +567,12 @@ public:
         // because we have special mergers for k \in {1, 2, 4}
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_array_atsentinel(3)
-        LOG << "int_merger  compact? k=" << k << " #used=" << num_segments_used
-            << " <= #trigger=" << num_segments_trigger << " ==> "
-            << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-            << " || "
-            << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
-            << " #free=" << free_slots.size();
+        TLX_LOG << "int_merger  compact? k=" << k << " #used=" << num_segments_used
+                << " <= #trigger=" << num_segments_trigger << " ==> "
+                << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                << " || "
+                << ((k == 4 && !free_slots.empty() && !arrays.is_array_empty(3)) ? "yes" : "no ")
+                << " #free=" << free_slots.size();
         if (k > 1 &&
             ((num_segments_used <= num_segments_trigger) ||
              (k == 4 && !free_slots.empty() && !arrays.is_array_empty(3))))
@@ -683,7 +683,7 @@ public:
     {
         const size_t length = end - begin;
 
-        LOG << "multi_merge(length=" << length << ") from sequences k=" << k;
+        TLX_LOG << "multi_merge(length=" << length << ") from sequences k=" << k;
 
         if (begin == end)
             return;
@@ -886,7 +886,7 @@ public:
     //! make the tree twice as wide
     void double_k()
     {
-        LOG << "double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
+        TLX_LOG << "double_k (before) k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(k > 0);
         assert(k < arity);
         assert(free_slots.empty());             // stack was free (probably not needed)
@@ -903,7 +903,7 @@ public:
         k *= 2;
         logK++;
 
-        LOG << "double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
+        TLX_LOG << "double_k (after)  k=" << k << " logK=" << logK << " arity=" << arity << " max_arity=" << max_arity << " #free=" << free_slots.size();
         assert(!free_slots.empty());
         assert(k <= max_arity);
     }
@@ -911,7 +911,7 @@ public:
     //! compact nonempty segments in the left half of the tree
     void compact_tree()
     {
-        LOG << "compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size();
+        TLX_LOG << "compact_tree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size();
         assert(logK > 0);
 
         // compact all nonempty segments to the left
@@ -933,7 +933,7 @@ public:
               {
               if(segment[pos])
               {
-              LOG << "int_arrays::compact_tree() deleting segment "<<pos<<
+              TLX_LOG << "int_arrays::compact_tree() deleting segment "<<pos<<
               " address: "<<segment[pos]<<" size: "<<segment_size[pos];
               delete [] segment[pos];
               segment[pos] = 0;
@@ -959,7 +959,7 @@ public:
                 free_slots.push(last_empty);
         }
 
-        LOG << "compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size();
+        TLX_LOG << "compact_tree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size();
     }
 
     //! compact tree if it got considerably smaller
@@ -972,7 +972,8 @@ public:
         // because we have special mergers for k \in {1, 2, 4}
         // there is also a special 3-way-merger, that will be
         // triggered if k == 4 && is_array_atsentinel(3)
-        LOG << "int_merger  compact? k=" << k << " #used=" << num_segments_used
+        TLX_LOG
+            << "int_merger  compact? k=" << k << " #used=" << num_segments_used
             << " <= #trigger=" << num_segments_trigger << " ==> "
             << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
             << " || "

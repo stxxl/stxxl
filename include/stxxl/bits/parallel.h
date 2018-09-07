@@ -23,8 +23,6 @@
  #include <omp.h>
 #endif
 
-#include <tlx/logger.hpp>
-
 #include <stxxl/bits/common/settings.h>
 
 #if defined(_GLIBCXX_PARALLEL)
@@ -65,7 +63,7 @@ inline unsigned sort_memory_usage_factor()
 #if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD
     return (omp_get_max_threads() > 1) ? 2 : 1;   //memory overhead for multiway mergesort
 #else
-    return 1;                                                                                                                //no overhead
+    return 1;                                     //no overhead
 #endif
 }
 

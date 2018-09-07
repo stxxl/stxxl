@@ -23,7 +23,7 @@
 #include <random>
 #include <vector>
 
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/stream/stream.h>
@@ -65,7 +65,7 @@ void random_shuffle(ExtIterator first,
               >::result;
     using block_type = typename stack_type::block_type;
 
-    LOG << "random_shuffle: Plain Version";
+    TLX_LOG << "random_shuffle: Plain Version";
     static_assert(int(BlockSize) < 0,
                   "This implementation was never tested. Please report to the stxxl developers if you have an ExtIterator that works with this implementation.");
 
@@ -73,9 +73,9 @@ void random_shuffle(ExtIterator first,
 
     // make sure we have at least 6 blocks + 1 page
     if (M < 6 * BlockSize + PageSize * BlockSize) {
-        LOG1 << "random_shuffle: insufficient memory, " << M << " bytes supplied,";
+        TLX_LOG1 << "random_shuffle: insufficient memory, " << M << " bytes supplied,";
         M = 6 * BlockSize + PageSize * BlockSize;
-        LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
+        TLX_LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
     }
 
     const size_t k = M / (3 * BlockSize); // number of buckets
@@ -86,7 +86,7 @@ void random_shuffle(ExtIterator first,
               >;
     temp_vector_type* temp_vector;
 
-    LOG << "random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets";
+    TLX_LOG << "random_shuffle: " << M / BlockSize - k << " write buffers for " << k << " buckets";
     foxxll::read_write_pool<block_type> pool(0, M / BlockSize - k);  // no read buffers and M/B-k write buffers
 
     stack_type** buckets;
@@ -119,7 +119,7 @@ void random_shuffle(ExtIterator first,
     ExtIterator it = first;
 
     for (size_t i = 0; i < k; i++) {
-        LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
+        TLX_LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
     }
 
     // shuffle each bucket
@@ -129,7 +129,7 @@ void random_shuffle(ExtIterator first,
 
         // does the bucket fit into memory?
         if (size * sizeof(value_type) < space_left) {
-            LOG << "random_shuffle: no recursion";
+            TLX_LOG << "random_shuffle: no recursion";
 
             // copy bucket into temp. array
             temp_array = new value_type[size];
@@ -152,7 +152,7 @@ void random_shuffle(ExtIterator first,
             delete[] temp_array;
         }
         else {
-            LOG << "random_shuffle: recursion";
+            TLX_LOG << "random_shuffle: recursion";
 
             // copy bucket into temp. stxxl::vector
             temp_vector = new temp_vector_type(size);
@@ -164,7 +164,7 @@ void random_shuffle(ExtIterator first,
 
             pool.resize_prefetch(0);
             space_left += PageSize * BlockSize;
-            LOG << "random_shuffle: Space left: " << space_left;
+            TLX_LOG << "random_shuffle: Space left: " << space_left;
 
             // recursive shuffle
             stxxl::random_shuffle(temp_vector->begin(),
@@ -242,13 +242,13 @@ void random_shuffle(
                                                        stxxl::grow_shrink2, PageSize, BlockSize>::result;
     using block_type = typename stack_type::block_type;
 
-    LOG << "random_shuffle: Vector Version";
+    TLX_LOG << "random_shuffle: Vector Version";
 
     // make sure we have at least 6 blocks + 1 page
     if (M < 6 * BlockSize + PageSize * BlockSize) {
-        LOG1 << "random_shuffle: insufficient memory, " << M << " bytes supplied,";
+        TLX_LOG1 << "random_shuffle: insufficient memory, " << M << " bytes supplied,";
         M = 6 * BlockSize + PageSize * BlockSize;
-        LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
+        TLX_LOG1 << "random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)";
     }
 
     uint64_t n = last - first;          // the number of input elements
@@ -310,7 +310,7 @@ void random_shuffle(
     size_t space_left = M - k * BlockSize - PageSize * BlockSize;
 
     for (i = 0; i < k; i++) {
-        LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
+        TLX_LOG << "random_shuffle: bucket no " << i << " contains " << buckets[i]->size() << " elements";
     }
 
     // shuffle each bucket
@@ -320,7 +320,7 @@ void random_shuffle(
 
         // does the bucket fit into memory?
         if (size * sizeof(value_type) < space_left) {
-            LOG << "random_shuffle: no recursion";
+            TLX_LOG << "random_shuffle: no recursion";
 
             // copy bucket into temp. array
             temp_array = new value_type[static_cast<size_t>(size)];
@@ -344,7 +344,7 @@ void random_shuffle(
             delete[] temp_array;
         }
         else {
-            LOG << "random_shuffle: recursion";
+            TLX_LOG << "random_shuffle: recursion";
             // copy bucket into temp. stxxl::vector
             temp_vector = new temp_vector_type(size);
 
@@ -356,7 +356,7 @@ void random_shuffle(
             pool.resize_prefetch(0);
             space_left += PageSize * BlockSize;
 
-            LOG << "random_shuffle: Space left: " << space_left;
+            TLX_LOG << "random_shuffle: Space left: " << space_left;
 
             // recursive shuffle
             stxxl::random_shuffle(temp_vector->begin(),

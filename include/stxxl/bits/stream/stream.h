@@ -21,9 +21,9 @@
 
 #include <tlx/define.hpp>
 #include <tlx/meta/apply_tuple.hpp>
+#include <tlx/meta/call_foreach_tuple.hpp>
 #include <tlx/meta/fold_left_tuple.hpp>
 #include <tlx/meta/vmap_foreach_tuple.hpp>
-#include <tlx/meta/call_foreach_tuple.hpp>
 
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/mng/buf_istream.hpp>
@@ -214,7 +214,7 @@ auto streamify(
     stxxl::vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    LOG0 << "streamify for vector_iterator range is called";
+    TLX_LOG0 << "streamify for vector_iterator range is called";
     return vector_iterator2stream<stxxl::vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
@@ -239,7 +239,7 @@ auto streamify(
     stxxl::const_vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    LOG0 << "streamify for const_vector_iterator range is called";
+    TLX_LOG0 << "streamify for const_vector_iterator range is called";
     return vector_iterator2stream<stxxl::const_vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
@@ -275,13 +275,13 @@ public:
     {
         if (end - begin < block_type::size)
         {
-            LOG << "vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator>";
+            TLX_LOG << "vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator>";
             it_stream = new iterator2stream<InputIterator>(begin, end);
             vec_it_stream = nullptr;
         }
         else
         {
-            LOG << "vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator>";
+            TLX_LOG << "vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator>";
             it_stream = nullptr;
             vec_it_stream = new vector_iterator2stream<InputIterator>(begin, end, nbuffers);
         }
@@ -343,7 +343,7 @@ auto streamify_sr(
     stxxl::vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    LOG0 << "streamify_sr for vector_iterator range is called";
+    TLX_LOG0 << "streamify_sr for vector_iterator range is called";
     return vector_iterator2stream_sr<stxxl::vector_iterator<VectorConfig> >(
         first, last, nbuffers);
 }
@@ -356,7 +356,7 @@ auto streamify_sr(
     stxxl::const_vector_iterator<VectorConfig> last,
     size_t nbuffers = 0)
 {
-    LOG0 << "streamify_sr for const_vector_iterator range is called";
+    TLX_LOG0 << "streamify_sr for const_vector_iterator range is called";
     return vector_iterator2stream_sr<
         stxxl::const_vector_iterator<VectorConfig> >(first, last, nbuffers);
 }
@@ -427,21 +427,22 @@ class make_tuplestream;
 //! return type of the tuplestream is a std::tuple<> containing the entries
 //! of the initial input streams
 template <typename Input1, typename Input2, typename... Rest>
-class make_tuplestream{
+class make_tuplestream
+{
 public:
     using value_type = std::tuple<typename Input1::value_type, typename Input2::value_type, typename Rest::value_type...>;
-    using tuple_type = std::tuple<Input1&, Input2&, Rest&...>;
+    using tuple_type = std::tuple<Input1&, Input2&, Rest& ...>;
 
 private:
     tuple_type in;
     value_type current;
 
 public:
-    make_tuplestream(Input1& i1, Input2& i2, Rest&... rest)
+    make_tuplestream(Input1& i1, Input2& i2, Rest& ... rest)
         : in(i1, i2, rest...)
     {
         if (!empty())
-            current = tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in);
+            current = tlx::vmap_foreach_tuple([](auto& t) { return *t; }, in);
     }
 
     //! Standard stream method.
@@ -458,15 +459,16 @@ public:
     //! Standard stream method.
     make_tuplestream& operator ++ ()
     {
-        tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
+        tlx::call_foreach_tuple([&](auto& t) { ++t; }, in);
         if (!empty())
-            current = tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in);
+            current = tlx::vmap_foreach_tuple([](auto& t) { return *t; }, in);
         return *this;
     }
 
-    bool empty() const {
+    bool empty() const
+    {
         return tlx::fold_left_tuple([](bool a, bool b) { return a || b; }, false,
-                                    tlx::vmap_foreach_tuple([](auto & t) { return t.empty(); }, in));
+                                    tlx::vmap_foreach_tuple([](auto& t) { return t.empty(); }, in));
     }
 };
 
@@ -476,23 +478,24 @@ class transform;
 //! Combine multiple (at least two) streams into a single stream, where a
 //! functor is applied to all entries.
 template <typename Operation, typename... Inputs>
-class transform {
+class transform
+{
 public:
     using value_type = typename Operation::value_type;
-    using tuple_type = std::tuple<Inputs &...>;
+    using tuple_type = std::tuple<Inputs& ...>;
     using tuple_value_type = std::tuple<typename Inputs::value_type...>;
 
 private:
-    Operation &op;
+    Operation& op;
     tuple_type in;
     value_type current;
 
 public:
-    transform(Operation& op_, Inputs&... in_)
+    transform(Operation& op_, Inputs& ... in_)
         : op(op_), in(in_...)
     {
         if (!empty())
-            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
+            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto& t) { return *t; }, in));
     }
 
     //! Standard stream method.
@@ -509,15 +512,16 @@ public:
     //! Standard stream method.
     transform& operator ++ ()
     {
-        tlx::call_foreach_tuple([&](auto & t) { ++t; }, in);
+        tlx::call_foreach_tuple([&](auto& t) { ++t; }, in);
         if (!empty())
-            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto & t) { return *t; }, in));
+            current = tlx::apply_tuple(op, tlx::vmap_foreach_tuple([](auto& t) { return *t; }, in));
         return *this;
     }
 
-    bool empty() const {
+    bool empty() const
+    {
         return tlx::fold_left_tuple([](bool a, bool b) { return a || b; }, false,
-                                    tlx::vmap_foreach_tuple([](auto & t) { return t.empty(); }, in));
+                                    tlx::vmap_foreach_tuple([](auto& t) { return t.empty(); }, in));
     }
 };
 

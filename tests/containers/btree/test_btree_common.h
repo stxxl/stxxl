@@ -19,7 +19,6 @@
 #include <random>
 
 #include <tlx/die.hpp>
-#include <tlx/logger.hpp>
 
 #include <foxxll/common/die_with_message.hpp>
 

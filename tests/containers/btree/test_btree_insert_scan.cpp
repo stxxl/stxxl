@@ -13,6 +13,8 @@
 
 #include "test_btree_common.h"
 
+#include <tlx/logger.hpp>
+
 int main(int argc, char* argv[])
 {
     size_t nins;

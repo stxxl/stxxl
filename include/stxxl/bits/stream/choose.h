@@ -30,7 +30,7 @@ namespace stream {
 //! \tparam Input type of the input tuple stream
 //!
 //! \remark Tuple stream is a stream which \c value_type is \c std::tuple .
-template<class Input, int Which>
+template <class Input, int Which>
 class choose
 {
     Input& in;
@@ -43,21 +43,21 @@ public:
 
     //! Construction.
     explicit choose(Input& in_) : in(in_)
-    {}
+    { }
 
     //! Standard stream method.
-    const value_type& operator*() const
+    const value_type& operator * () const
     {
         return std::get<Which>(*in);
     }
 
-    const value_type* operator->() const
+    const value_type* operator -> () const
     {
         return &std::get<Which>(*in);
     }
 
     //! Standard stream method.
-    choose& operator++()
+    choose& operator ++ ()
     {
         ++in;
         return *this;
@@ -70,8 +70,7 @@ public:
     }
 };
 
-}  // namespace stream
-
-}  // namespace stxxl
+} // namespace stream
+} // namespace stxxl
 
 #endif // !STXXL_STREAM_CHOOSE_HEADER

@@ -31,8 +31,8 @@
 #include <random>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <stxxl/bits/common/comparator.h>
+#include <vector>
 
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/uint_types.hpp>
@@ -96,9 +96,9 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
     // build (ISA[i], T[i], ISA[i+1]) and sort to (i, T[SA[i]], ISA[SA[i]+1])
-    using triple_less_type = stxxl::comparator<triple_type, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>;             // comparison relation
+    using triple_less_type = stxxl::comparator<triple_type, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>; // comparison relation
 
-    typedef typename stxxl::stream::use_push<triple_type> triple_push_type; // indicator use push()
+    typedef typename stxxl::stream::use_push<triple_type> triple_push_type;                                                                  // indicator use push()
     using triple_rc_type = typename stxxl::stream::runs_creator<triple_push_type, triple_less_type>;
     using triple_rm_type = typename stxxl::stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type>;
 
@@ -299,7 +299,7 @@ void lcparray_stxxl_kasai(const StringContainer& string,
         std::vector<alphabet_type> stringRAM(string.begin(), string.end());
 
         while (!isa_sort.empty()) {
-            offset_type k = std::get<1>(*isa_sort);  // k = ISA[i]
+            offset_type k = std::get<1>(*isa_sort);   // k = ISA[i]
 
             if (k > offset_type(0)) {
                 size_type j = std::get<2>(*isa_sort); // j = SA[k-1];
@@ -696,7 +696,7 @@ public:
     /**
      * Sort skew_quad datatype.
      */
-    using less_quad_offset_type = stxxl::comparator<std::tuple<offset_type,offset_type,offset_type,offset_type>, stxxl::direction::DontCare>;
+    using less_quad_offset_type = stxxl::comparator<std::tuple<offset_type, offset_type, offset_type, offset_type>, stxxl::direction::DontCare>;
     template <typename alphabet_type>
     struct less_quad
     {
@@ -2471,7 +2471,7 @@ public:
 
                 while (!sa_pairs.empty()) {
                     const skew_pair_type& tmp = *sa_pairs; // std::get<0>(tmp) is exactly the SA12 array
-                    SA12->push_back(std::get<0>(tmp));            // save current SA^12 vector
+                    SA12->push_back(std::get<0>(tmp));     // save current SA^12 vector
                     if (std::get<0>(tmp) < mod2_pos)
                         isa1_type.push(tmp);
                     else

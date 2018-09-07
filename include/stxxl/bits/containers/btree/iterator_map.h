@@ -91,14 +91,14 @@ public:
 
     void register_iterator(iterator_base& it)
     {
-        LOG << "btree::iterator_map register_iterator addr=" << &it <<
-            " BID: " << it.bid << " POS: " << it.pos;
+        TLX_LOG << "btree::iterator_map register_iterator addr=" << &it
+                << " BID: " << it.bid << " POS: " << it.pos;
         m_it2addr.insert(pair_type(Key(it.bid, it.pos), &it));
     }
     void unregister_iterator(iterator_base& it)
     {
-        LOG << "btree::iterator_map unregister_iterator addr=" << &it <<
-            " BID: " << it.bid << " POS: " << it.pos;
+        TLX_LOG << "btree::iterator_map unregister_iterator addr=" << &it
+                << " BID: " << it.bid << " POS: " << it.pos;
         assert(!m_it2addr.empty());
         Key key(it.bid, it.pos);
         std::pair<mmiterator_type, mmiterator_type> range =

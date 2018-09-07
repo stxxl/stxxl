@@ -219,7 +219,7 @@ public:
 
         if (TLX_UNLIKELY(cache_offset == 2 * blocks_per_page * block_type::size))  // cache overflow
         {
-            LOG << "growing, size: " << m_size;
+            TLX_LOG << "growing, size: " << m_size;
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -263,7 +263,7 @@ public:
 
         if (TLX_UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
-            LOG << "shrinking, size: " << m_size;
+            TLX_LOG << "shrinking, size: " << m_size;
 
             tlx::simple_vector<foxxll::request_ptr> requests(blocks_per_page);
 
@@ -479,7 +479,7 @@ public:
 
         if (TLX_UNLIKELY(cache_offset == blocks_per_page * block_type::size))  // cache overflow
         {
-            LOG << "growing, size: " << m_size;
+            TLX_LOG << "growing, size: " << m_size;
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -522,7 +522,7 @@ public:
 
         if (TLX_UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
-            LOG << "shrinking, size: " << m_size;
+            TLX_LOG << "shrinking, size: " << m_size;
 
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
@@ -531,7 +531,7 @@ public:
 
             if (bids.size() > blocks_per_page)
             {
-                LOG << "prefetching, size: " << m_size;
+                TLX_LOG << "prefetching, size: " << m_size;
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page;
                 for (int i = blocks_per_page - 1; i >= 0; --i)
                     requests[i] = (overlap_buffers + i)->read(*(--cur_bid));
@@ -607,7 +607,7 @@ public:
           owned_pool(nullptr),
           pool(&pool_)
     {
-        LOG << "grow_shrink_stack2::grow_shrink_stack2(...)";
+        TLX_LOG << "grow_shrink_stack2::grow_shrink_stack2(...)";
     }
 
     //! non-copyable: delete copy-constructor
@@ -641,7 +641,7 @@ public:
     {
         try
         {
-            LOG << "grow_shrink_stack2::~grow_shrink_stack2()";
+            TLX_LOG << "grow_shrink_stack2::~grow_shrink_stack2()";
             if (!bids.empty()) {
                 const size_t last_pref = (bids.size() > pref_aggr) ? (bids.size() - pref_aggr) : 0u;
                 for (size_t i = bids.size(); i > last_pref; --i) {
@@ -695,12 +695,12 @@ public:
     //! incremented by 1, and top() is the inserted element.
     void push(const value_type& val)
     {
-        LOG << "grow_shrink_stack2::push(" << val << ")";
+        TLX_LOG << "grow_shrink_stack2::push(" << val << ")";
         assert(cache_offset <= block_type::size);
 
         if (TLX_UNLIKELY(cache_offset == block_type::size))
         {
-            LOG << "grow_shrink_stack2::push(" << val << ") growing, size: " << m_size;
+            TLX_LOG << "grow_shrink_stack2::push(" << val << ") growing, size: " << m_size;
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
@@ -750,13 +750,13 @@ public:
     //! empty(). Postcondition: size() is decremented.
     void pop()
     {
-        LOG << "grow_shrink_stack2::pop()";
+        TLX_LOG << "grow_shrink_stack2::pop()";
         assert(m_size > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
         if (TLX_UNLIKELY(cache_offset == 1 && (!bids.empty())))
         {
-            LOG << "grow_shrink_stack2::pop() shrinking, size = " << m_size;
+            TLX_LOG << "grow_shrink_stack2::pop() shrinking, size = " << m_size;
 
             bid_type last_block = bids.back();
             bids.pop_back();

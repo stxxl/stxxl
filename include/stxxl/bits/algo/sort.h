@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 #include <tlx/simple_vector.hpp>
 
 #include <foxxll/common/error_handling.hpp>
@@ -86,7 +86,7 @@ create_runs(
     using request_ptr = foxxll::request_ptr;
 
     using bid_type = typename block_type::bid_type;
-    LOG << "stxxl::create_runs nruns=" << nruns << " m=" << _m;
+    TLX_LOG << "stxxl::create_runs nruns=" << nruns << " m=" << _m;
 
     const size_t m2 = _m / 2;
     foxxll::block_manager* bm = foxxll::block_manager::get_instance();
@@ -112,7 +112,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        LOG << "stxxl::create_runs posting read " << Blocks1[i].elem;
+        TLX_LOG << "stxxl::create_runs posting read " << Blocks1[i].elem;
         bids1[i] = *(it++);
         read_reqs1[i] = Blocks1[i].read(bids1[i]);
     }
@@ -121,7 +121,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        LOG << "stxxl::create_runs posting read " << Blocks2[i].elem;
+        TLX_LOG << "stxxl::create_runs posting read " << Blocks2[i].elem;
         bids2[i] = *(it++);
         read_reqs2[i] = Blocks2[i].read(bids2[i]);
     }
@@ -137,9 +137,9 @@ create_runs(
             tlx::unused(next_run_size);
         }
 
-        LOG << "stxxl::create_runs start waiting read_reqs1";
+        TLX_LOG << "stxxl::create_runs start waiting read_reqs1";
         wait_all(read_reqs1, run_size);
-        LOG << "stxxl::create_runs finish waiting read_reqs1";
+        TLX_LOG << "stxxl::create_runs finish waiting read_reqs1";
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
@@ -149,15 +149,15 @@ create_runs(
              make_element_iterator(Blocks1, run_size * block_type::size),
              cmp);
 
-        LOG << "stxxl::create_runs start waiting write_reqs";
+        TLX_LOG << "stxxl::create_runs start waiting write_reqs";
         if (k > 0)
             wait_all(write_reqs, m2);
-        LOG << "stxxl::create_runs finish waiting write_reqs";
+        TLX_LOG << "stxxl::create_runs finish waiting write_reqs";
 
         size_t runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
         for (i = 0; i < m2; ++i)
         {
-            LOG << "stxxl::create_runs posting write " << Blocks1[i].elem;
+            TLX_LOG << "stxxl::create_runs posting write " << Blocks1[i].elem;
             (*run)[i].value = Blocks1[i][0];
             if (i >= runplus2size) {
                 write_reqs[i] = Blocks1[i].write((*run)[i].bid);
@@ -177,9 +177,9 @@ create_runs(
 
     run_type* run = runs[nruns - 1];
     run_size = run->size();
-    LOG << "stxxl::create_runs start waiting read_reqs1";
+    TLX_LOG << "stxxl::create_runs start waiting read_reqs1";
     wait_all(read_reqs1, run_size);
-    LOG << "stxxl::create_runs finish waiting read_reqs1";
+    TLX_LOG << "stxxl::create_runs finish waiting read_reqs1";
     for (i = 0; i < run_size; ++i)
         bm->delete_block(bids1[i]);
 
@@ -189,20 +189,20 @@ create_runs(
          make_element_iterator(Blocks1, run_size * block_type::size),
          cmp);
 
-    LOG << "stxxl::create_runs start waiting write_reqs";
+    TLX_LOG << "stxxl::create_runs start waiting write_reqs";
     wait_all(write_reqs, m2);
-    LOG << "stxxl::create_runs finish waiting write_reqs";
+    TLX_LOG << "stxxl::create_runs finish waiting write_reqs";
 
     for (i = 0; i < run_size; ++i)
     {
-        LOG << "stxxl::create_runs posting write " << Blocks1[i].elem;
+        TLX_LOG << "stxxl::create_runs posting write " << Blocks1[i].elem;
         (*run)[i].value = Blocks1[i][0];
         write_reqs[i] = Blocks1[i].write((*run)[i].bid);
     }
 
-    LOG << "stxxl::create_runs start waiting write_reqs";
+    TLX_LOG << "stxxl::create_runs start waiting write_reqs";
     wait_all(write_reqs, run_size);
-    LOG << "stxxl::create_runs finish waiting write_reqs";
+    TLX_LOG << "stxxl::create_runs finish waiting write_reqs";
 
     delete[] Blocks1;
     delete[] Blocks2;
@@ -224,7 +224,7 @@ bool check_sorted_runs(RunType** runs,
     using value_type = typename block_type::value_type;
     using request_ptr = foxxll::request_ptr;
 
-    LOG1 << "check_sorted_runs  Runs: " << nruns;
+    TLX_LOG1 << "check_sorted_runs  Runs: " << nruns;
     size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
@@ -248,11 +248,11 @@ bool check_sorted_runs(RunType** runs,
 
             if (off && cmp(blocks[0][0], last))
             {
-                LOG1 << "check_sorted_runs  wrong first value in the run " << irun;
-                LOG1 << " first value: " << blocks[0][0];
-                LOG1 << " last  value: " << last;
+                TLX_LOG1 << "check_sorted_runs  wrong first value in the run " << irun;
+                TLX_LOG1 << " first value: " << blocks[0][0];
+                TLX_LOG1 << " last  value: " << last;
                 for (size_t k = 0; k < block_type::size; ++k)
-                    LOG1 << "Element " << k << " in the block is :" << blocks[0][k];
+                    TLX_LOG1 << "Element " << k << " in the block is :" << blocks[0][k];
 
                 delete[] reqs;
                 delete[] blocks;
@@ -263,18 +263,18 @@ bool check_sorted_runs(RunType** runs,
             {
                 if (!(blocks[j][0] == (*runs[irun])[j + off].value))
                 {
-                    LOG1 << "check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off);
-                    LOG1 << "                   trigger value: " << (*runs[irun])[j + off].value;
-                    LOG1 << "Data in the block:";
+                    TLX_LOG1 << "check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off);
+                    TLX_LOG1 << "                   trigger value: " << (*runs[irun])[j + off].value;
+                    TLX_LOG1 << "Data in the block:";
                     for (size_t k = 0; k < block_type::size; ++k)
-                        LOG1 << "Element " << k << " in the block is :" << blocks[j][k];
+                        TLX_LOG1 << "Element " << k << " in the block is :" << blocks[j][k];
 
-                    LOG1 << "BIDS:";
+                    TLX_LOG1 << "BIDS:";
                     for (size_t k = 0; k < nblocks; ++k)
                     {
                         if (k == j)
-                            LOG1 << "Bad one comes next.";
-                        LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
+                            TLX_LOG1 << "Bad one comes next.";
+                        TLX_LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
                     }
 
                     delete[] reqs;
@@ -286,17 +286,17 @@ bool check_sorted_runs(RunType** runs,
                                   make_element_iterator(blocks, nelements),
                                   cmp))
             {
-                LOG1 << "check_sorted_runs  wrong order in the run " << irun;
-                LOG1 << "Data in blocks:";
+                TLX_LOG1 << "check_sorted_runs  wrong order in the run " << irun;
+                TLX_LOG1 << "Data in blocks:";
                 for (size_t j = 0; j < nblocks; ++j)
                 {
                     for (size_t k = 0; k < block_type::size; ++k)
-                        LOG1 << "     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k];
+                        TLX_LOG1 << "     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k];
                 }
-                LOG1 << "BIDS:";
+                TLX_LOG1 << "BIDS:";
                 for (size_t k = 0; k < nblocks; ++k)
                 {
-                    LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
+                    TLX_LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
                 }
 
                 delete[] reqs;
@@ -411,7 +411,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
         {
             diff_type rest = block_type::size;                        // elements still to merge for this output block
 
-            LOG << "output block " << j;
+            TLX_LOG << "output block " << j;
             do {
                 if (num_currently_mergeable < rest)
                 {
@@ -430,7 +430,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
 
                 diff_type output_size = std::min(num_currently_mergeable, rest);       // at most rest elements
 
-                LOG << "before merge " << output_size;
+                TLX_LOG << "before merge " << output_size;
 
                 potentially_parallel::multiway_merge(
                     seqs.begin(), seqs.end(),
@@ -440,7 +440,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
                 rest -= output_size;
                 num_currently_mergeable -= output_size;
 
-                LOG << "after merge";
+                TLX_LOG << "after merge";
 
                 sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
             } while (rest > 0 && seqs.size() > 0);
@@ -451,7 +451,7 @@ void merge_runs(RunType** in_runs, size_t nruns,
                 for (value_type* i = out_buffer->begin() + 1; i != out_buffer->end(); i++)
                     if (cmp(*i, *(i - 1)))
                     {
-                        LOG << "Error at position " << (i - out_buffer->begin());
+                        TLX_LOG << "Error at position " << (i - out_buffer->begin());
                     }
                 assert(false);
             }
@@ -577,7 +577,7 @@ sort_blocks(InputBidIterator input_bids,
     while (nruns > 1)
     {
         size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
-        LOG1 << "Starting new merge phase: nruns: " << nruns <<
+        TLX_LOG1 << "Starting new merge phase: nruns: " << nruns <<
             " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns;
 
         new_runs = new run_type*[new_nruns];
@@ -640,7 +640,7 @@ sort_blocks(InputBidIterator input_bids,
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_sorted_runs<block_type, run_type, value_cmp>(runs + nruns - runs_left, runs2merge, m2, cmp)));
 #endif
-            LOG1 << "Merging " << runs2merge << " runs";
+            TLX_LOG1 << "Merging " << runs2merge << " runs";
             merge_runs<block_type, run_type>(runs + nruns - runs_left,
                                              runs2merge, *(new_runs + (cur_out_run++)), _m, cmp);
             runs_left -= runs2merge;
@@ -656,9 +656,9 @@ sort_blocks(InputBidIterator input_bids,
 
     end = foxxll::timestamp();
 
-    LOG1 << "Elapsed time        : " << end - begin << " s. Run creation time: " << (after_runs_creation - begin) << " s";
-    LOG1 << "Time in I/O wait(rf): " << io_wait_after_rf << " s";
-    LOG1 << *foxxll::stats::get_instance();
+    TLX_LOG1 << "Elapsed time        : " << end - begin << " s. Run creation time: " << (after_runs_creation - begin) << " s";
+    TLX_LOG1 << "Time in I/O wait(rf): " << io_wait_after_rf << " s";
+    TLX_LOG1 << *foxxll::stats::get_instance();
 
     return result;
 }

@@ -36,8 +36,6 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 
 - \ref tlx_counting_ptr "reference counted (shared) objects via tlx::counting_ptr"
 
-- \subpage tlx
-
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,33 +273,33 @@ However, there is also \ref STXXL_ASSERT(), which can be used as a replacement f
 
 The STXXL provides several pre-defined exception macros to detect run-time errors. The basic ones are:
 
-- STXXL_THROW(exception_type, error_message)
-- STXXL_THROW2(exception_type, location, error_message)
-- STXXL_THROW_ERRNO(exception_type, error_message)
-- STXXL_THROW_INVALID_ARGUMENT(error_message)
-- STXXL_THROW_UNREACHABLE(error_message)
+- FOXXLL_THROW(exception_type, error_message)
+- FOXXLL_THROW2(exception_type, location, error_message)
+- FOXXLL_THROW_ERRNO(exception_type, error_message)
+- FOXXLL_THROW_INVALID_ARGUMENT(error_message)
+- FOXXLL_THROW_UNREACHABLE(error_message)
 
 In addition, we also defined \b conditional throw macros, which check the outcome of a function call:
 
-- STXXL_THROW_IF(expr, exception_type, error_message)
-- STXXL_THROW_NE_0(expr, exception_type, error_message)
-- STXXL_THROW_EQ_0(expr, exception_type, error_message)
-- STXXL_THROW_LT_0(expr, exception_type, error_message)
+- FOXXLL_THROW_IF(expr, exception_type, error_message)
+- FOXXLL_THROW_NE_0(expr, exception_type, error_message)
+- FOXXLL_THROW_EQ_0(expr, exception_type, error_message)
+- FOXXLL_THROW_LT_0(expr, exception_type, error_message)
 
 For checking system calls which set errno, the following macros are used to also provide strerror information for the user:
 
-- STXXL_THROW_ERRNO_IF(expr, exception_type, error_message)
-- STXXL_THROW_ERRNO_NE_0(expr, exception_type, error_message)
-- STXXL_THROW_ERRNO_EQ_0(expr, exception_type, error_message)
-- STXXL_THROW_ERRNO_LT_0(expr, exception_type, error_message)
+- FOXXLL_THROW_ERRNO_IF(expr, exception_type, error_message)
+- FOXXLL_THROW_ERRNO_NE_0(expr, exception_type, error_message)
+- FOXXLL_THROW_ERRNO_EQ_0(expr, exception_type, error_message)
+- FOXXLL_THROW_ERRNO_LT_0(expr, exception_type, error_message)
 
 For checking pthread system calls, a special macro is needed, because these do not set errno. Instead they return the errno value:
 
-- STXXL_CHECK_PTHREAD_CALL(pthread call)
+- FOXXLL_CHECK_PTHREAD_CALL(pthread call)
 
 And for WINAPI calls there is a special macro to call GetLastError and format it in a nice way:
 
-- STXXL_THROW_WIN_LASTERROR(exception_type, error_message)
+- FOXXLL_THROW_WIN_LASTERROR(exception_type, error_message)
 
 */
 

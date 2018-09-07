@@ -27,9 +27,9 @@
 #include <limits>
 #include <random>
 #include <string>
-#include <vector>
-#include <tuple>
 #include <stxxl/bits/common/comparator.h>
+#include <tuple>
+#include <vector>
 
 #include <foxxll/common/uint_types.hpp>
 #include <foxxll/io.hpp>
@@ -86,9 +86,9 @@ bool sacheck(InputT& inputT, InputSA& inputSA)
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
     // build (ISA[i], T[i], ISA[i+1]) and sort to (i, T[SA[i]], ISA[SA[i]+1])
-    using triple_less_type = stxxl::comparator<triple_type, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>;      // comparison relation
+    using triple_less_type = stxxl::comparator<triple_type, stxxl::direction::Less, stxxl::direction::DontCare, stxxl::direction::DontCare>; // comparison relation
 
-    typedef typename stream::use_push<triple_type> triple_push_type; // indicator use push()
+    typedef typename stream::use_push<triple_type> triple_push_type;                                                                         // indicator use push()
     using triple_rc_type = typename stream::runs_creator<triple_push_type, triple_less_type>;
     using triple_rm_type = typename stream::runs_merger<typename triple_rc_type::sorted_runs_type, triple_less_type>;
 
@@ -930,7 +930,7 @@ public:
             using mod12_quads_input_type = extract_mod12<make_quads_input_type>;
 
             // sort (i,t_i,t_{i+1},t_{i+2}) by (t_i,t_{i+1},t_{i+2})
-            using less_quad_offset_type = stxxl::comparator<std::tuple<offset_type,offset_type,offset_type,offset_type>, stxxl::direction::DontCare>;
+            using less_quad_offset_type = stxxl::comparator<std::tuple<offset_type, offset_type, offset_type, offset_type>, stxxl::direction::DontCare>;
             using sort_mod12_input_type = typename stream::sort<mod12_quads_input_type, less_quad_offset_type>;
 
             // name (i,t_i,t_{i+1},t_{i+2}) -> (i,n_i)
@@ -1000,10 +1000,10 @@ public:
                     const skew_pair_type& tmp = *isa_pairs;
                     if (std::get<0>(tmp) < mod2_pos) {
                         if (std::get<0>(tmp) + special < mod2_pos) // else: special sentinel tuple is dropped
-                            isa1_pair.push(tmp);            // sorter #1
+                            isa1_pair.push(tmp);                   // sorter #1
                     }
                     else {
-                        isa2_pair.push(tmp);                // sorter #2
+                        isa2_pair.push(tmp);                       // sorter #2
                     }
                     ++isa_pairs;
                 }

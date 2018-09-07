@@ -23,7 +23,7 @@
 #include <vector>
 
 #include <tlx/define.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/common/types.hpp>
@@ -1091,7 +1091,7 @@ public:
                 (*it).storage = m_from.get();
                 (*it).offset = offset;
             }
-            LOG << "reserve(): Changing size of file " << m_from << " to " << offset;
+            TLX_LOG << "reserve(): Changing size of file " << m_from << " to " << offset;
             m_from->set_size(offset);
         }
     }
@@ -1150,7 +1150,7 @@ private:
         {
             const size_t new_pages_size = foxxll::div_ceil(new_bids_size, page_size);
 
-            LOG << "shrinking from " << old_bids_size << " to " <<
+            TLX_LOG << "shrinking from " << old_bids_size << " to " <<
                 new_bids_size << " blocks = from " <<
                 m_page_status.size() << " to " <<
                 new_pages_size << " pages";
@@ -1461,7 +1461,7 @@ public:
             const size_t& page_no = m_slot_to_page[i];
             if (non_free_slots[i])
             {
-                LOG << "flush(: flushing page " << i << " at address " <<
+                TLX_LOG << "flush(: flushing page " << i << " at address " <<
                 (static_cast<uint64_t>(page_no)
                  * static_cast<uint64_t>(block_type::size)
                  * static_cast<uint64_t>(page_size));
@@ -1479,18 +1479,18 @@ public:
 
     ~vector()
     {
-        LOG << "~vector()";
+        TLX_LOG << "~vector()";
         try
         {
             flush();
         }
         catch (foxxll::io_error e)
         {
-            LOG1 << "io_error thrown in ~vector(): " << e.what();
+            TLX_LOG1 << "io_error thrown in ~vector(): " << e.what();
         }
         catch (...)
         {
-            LOG1 << "Exception thrown in ~vector()";
+            TLX_LOG1 << "Exception thrown in ~vector()";
         }
 
         if (!m_exported)
@@ -1500,16 +1500,16 @@ public:
             }
             else // file must be truncated
             {
-                LOG << "~vector(: Changing size of file " <<
-                    m_from << " to " << file_length();
-                LOG << "~vector(): size of the vector is " << size();
+                TLX_LOG << "~vector(: Changing size of file "
+                        << m_from << " to " << file_length();
+                TLX_LOG << "~vector(): size of the vector is " << size();
                 try
                 {
                     m_from->set_size(file_length());
                 }
                 catch (...)
                 {
-                    LOG1 << "Exception thrown in ~vector()...set_size()";
+                    TLX_LOG1 << "Exception thrown in ~vector()...set_size()";
                 }
             }
         }
@@ -1605,7 +1605,7 @@ private:
         if (m_page_status[page_no] == uninitialized)
             return;
 
-        LOG << "read_page(): page_no=" << page_no << " cache_slot=" << cache_slot;
+        TLX_LOG << "read_page(): page_no=" << page_no << " cache_slot=" << cache_slot;
         std::vector<foxxll::request_ptr> reqs;
         reqs.reserve(page_size);
 
@@ -1626,7 +1626,7 @@ private:
         if (!(m_page_status[page_no] & dirty))
             return;
 
-        LOG << "write_page(): page_no=" << page_no << " cache_slot=" << cache_slot;
+        TLX_LOG << "write_page(): page_no=" << page_no << " cache_slot=" << cache_slot;
 
         std::vector<foxxll::request_ptr> reqs;
         reqs.reserve(page_size);
@@ -1708,10 +1708,10 @@ private:
             // remove page from cache
             m_free_slots.push(m_page_to_slot[page_no]);
             m_page_to_slot[page_no] = on_disk;
-            LOG << "page_externally_updated(): page_no=" << page_no << " flushed from cache.";
+            TLX_LOG << "page_externally_updated(): page_no=" << page_no << " flushed from cache.";
         }
         else {
-            LOG << "page_externally_updated(): page_no=" << page_no << " no need to flush.";
+            TLX_LOG << "page_externally_updated(): page_no=" << page_no << " no need to flush.";
         }
         m_page_status[page_no] = valid_on_disk;
     }

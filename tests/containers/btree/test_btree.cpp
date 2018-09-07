@@ -14,6 +14,8 @@
 
 #include "test_btree_common.h"
 
+#include <tlx/logger.hpp>
+
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (25 * 1024 * 1024)
 

@@ -23,7 +23,7 @@
 
 namespace stxxl {
 
-//! \addtogroup mnglayer
+//! \addtogroup foxxll_mnglayer
 //!
 //! \{
 

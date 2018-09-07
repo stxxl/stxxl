@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <foxxll/common/error_handling.hpp>
 #include <foxxll/io/request.hpp>
@@ -113,7 +113,7 @@ public:
           m_bm(foxxll::block_manager::get_instance())
     {
         const size_t nnodes = cache_size_in_bytes / block_type::raw_size;
-        LOG << "btree::node_cache constructor nodes=" << nnodes;
+        TLX_LOG << "btree::node_cache constructor nodes=" << nnodes;
         if (nnodes < 3)
         {
             FOXXLL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
@@ -152,7 +152,7 @@ public:
 
     ~node_cache()
     {
-        LOG << "btree::node_cache destructor addr=" << this;
+        TLX_LOG << "btree::node_cache destructor addr=" << this;
 
         for (const auto& it : m_bid2node)
         {
@@ -183,7 +183,7 @@ public:
                     ++i;
                     node2kick = m_pager.kick();
                     if (i == max_tries) {
-                        LOG1 <<
+                        TLX_LOG1 <<
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
                             "Returning nullptr node.";
                         return nullptr;
@@ -218,7 +218,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            LOG << "btree::node_cache get_new_node, need to kick node " << node2kick;
+            TLX_LOG << "btree::node_cache get_new_node, need to kick node " << node2kick;
 
             return &node;
         }
@@ -240,7 +240,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        LOG << "btree::node_cache get_new_node, free node " << free_node << "available";
+        TLX_LOG << "btree::node_cache get_new_node, free node " << free_node << "available";
 
         return &node;
     }
@@ -254,7 +254,7 @@ public:
         {
             // the node is in cache
             const size_t nodeindex = it->second;
-            LOG << "btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix;
+            TLX_LOG << "btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix;
             m_fixed[nodeindex] = fix;
             m_pager.hit(nodeindex);
             m_dirty[nodeindex] = true;
@@ -280,7 +280,7 @@ public:
                     ++i;
                     node2kick = m_pager.kick();
                     if (i == max_tries) {
-                        LOG1 <<
+                        TLX_LOG1 <<
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
                             "Returning nullptr node.";
                         return nullptr;
@@ -313,7 +313,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            LOG << "btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix;
+            TLX_LOG << "btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix;
 
             return &node;
         }
@@ -334,7 +334,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        LOG << "btree::node_cache get_node, free node " << free_node << "available, fix=" << fix;
+        TLX_LOG << "btree::node_cache get_node, free node " << free_node << "available, fix=" << fix;
 
         return &node;
     }
@@ -348,7 +348,7 @@ public:
         {
             // the node is in cache
             const size_t nodeindex = it->second;
-            LOG << "btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix;
+            TLX_LOG << "btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix;
             m_fixed[nodeindex] = fix;
             m_pager.hit(nodeindex);
 
@@ -374,7 +374,7 @@ public:
                 node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
-                    LOG1 <<
+                    TLX_LOG1 <<
                         "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
                         "Returning nullptr node.";
                     return nullptr;
@@ -405,7 +405,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            LOG << "btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix;
+            TLX_LOG << "btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix;
 
             return &node;
         }
@@ -426,7 +426,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        LOG << "btree::node_cache get_node, free node " << free_node << "available, fix=" << fix;
+        TLX_LOG << "btree::node_cache get_node, free node " << free_node << "available, fix=" << fix;
 
         return &node;
     }
@@ -440,7 +440,7 @@ public:
             {
                 // the node is in the cache
                 const size_t nodeindex = it->second;
-                LOG << "btree::node_cache delete_node " << nodeindex << " from cache.";
+                TLX_LOG << "btree::node_cache delete_node " << nodeindex << " from cache.";
                 if (m_reqs[nodeindex].valid())
                     m_reqs[nodeindex]->wait();
 
@@ -476,7 +476,7 @@ public:
                 node2kick = m_pager.kick();
                 if (i == max_tries)
                 {
-                    LOG1 <<
+                    TLX_LOG1 <<
                         "The node cache is too small, no node can be kicked out (all nodes are fixed) !\n"
                         "Returning nullptr node.";
                     return;
@@ -508,7 +508,7 @@ public:
 
             assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-            LOG << "btree::node_cache prefetch_node, need to kick node" << node2kick << " ";
+            TLX_LOG << "btree::node_cache prefetch_node, need to kick node" << node2kick << " ";
 
             return;
         }
@@ -529,7 +529,7 @@ public:
 
         assert(size() == m_bid2node.size() + m_free_nodes.size());
 
-        LOG << "btree::node_cache prefetch_node, free node " << free_node << "available";
+        TLX_LOG << "btree::node_cache prefetch_node, free node " << free_node << "available";
 
         return;
     }
@@ -538,7 +538,7 @@ public:
     {
         assert(m_bid2node.find(bid) != m_bid2node.end());
         m_fixed[m_bid2node[bid]] = false;
-        LOG << "btree::node_cache unfix_node,  node " << m_bid2node[bid];
+        TLX_LOG << "btree::node_cache unfix_node,  node " << m_bid2node[bid];
     }
 
     void swap(node_cache& obj)

@@ -16,7 +16,7 @@
 #include <cassert>
 #include <iterator>
 
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <foxxll/common/types.hpp>
 
@@ -68,7 +68,7 @@ protected:
 
     btree_iterator_base()
     {
-        LOG << "btree_iterator_base def construct addr=" << this;
+        TLX_LOG << "btree_iterator_base def construct addr=" << this;
         make_invalid();
     }
 
@@ -77,7 +77,7 @@ protected:
                         const size_t _pos)
         : btree(_btree), bid(_bid), pos(_pos)
     {
-        LOG << "btree_iterator_base parameter construct addr=" << this;
+        TLX_LOG << "btree_iterator_base parameter construct addr=" << this;
         btree->m_iterator_map.register_iterator(*this);
     }
 
@@ -89,7 +89,7 @@ protected:
 
     btree_iterator_base(const btree_iterator_base& obj)
     {
-        LOG << "btree_iterator_base constr from" << (&obj) << " to " << this;
+        TLX_LOG << "btree_iterator_base constr from" << (&obj) << " to " << this;
         btree = obj.btree;
         bid = obj.bid;
         pos = obj.pos;
@@ -99,7 +99,7 @@ protected:
 
     btree_iterator_base& operator = (const btree_iterator_base& obj)
     {
-        LOG << "btree_iterator_base copy from" << (&obj) << " to " << this;
+        TLX_LOG << "btree_iterator_base copy from" << (&obj) << " to " << this;
         if (&obj != this)
         {
             if (btree)
@@ -165,7 +165,7 @@ protected:
 public:
     virtual ~btree_iterator_base()
     {
-        LOG << "btree_iterator_base deconst " << this;
+        TLX_LOG << "btree_iterator_base deconst " << this;
         if (btree)
             btree->m_iterator_map.unregister_iterator(*this);
     }

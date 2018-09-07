@@ -36,5 +36,4 @@
 
 #include <stxxl/stream>
 
-
 #endif // STXXL_MAIN_HEADER

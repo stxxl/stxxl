@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <stxxl/bits/containers/pq_ext_merger.h>
 #include <stxxl/bits/containers/pq_helpers.h>
@@ -119,7 +119,7 @@ public:
           insert_heap(N + 2, comp_),
           num_active_groups(0), size_(0)
     {
-        LOG << "priority_queue(pool)";
+        TLX_LOG << "priority_queue(pool)";
         init();
     }
 
@@ -141,7 +141,7 @@ public:
           insert_heap(N + 2, comp_),
           num_active_groups(0), size_(0)
     {
-        LOG << "priority_queue(pool sizes)";
+        TLX_LOG << "priority_queue(pool sizes)";
         init();
     }
 
@@ -152,7 +152,7 @@ public:
 
     virtual ~priority_queue()
     {
-        LOG << "~priority_queue()";
+        TLX_LOG << "~priority_queue()";
         if (pool_owned)
             delete pool;
 
@@ -249,7 +249,7 @@ public:
     //! \b false. Postcondition: \c size() will be decremented by 1.
     void pop()
     {
-        //LOG << "priority_queue::pop()";
+        //TLX_LOG << "priority_queue::pop()";
         assert(!insert_heap.empty());
 
         if (/*(!insert_heap.empty()) && */ cmp(*delete_buffer_current_min, insert_heap.top()))
@@ -304,12 +304,12 @@ public:
     void dump_sizes() const
     {
         size_t capacity = N;
-        LOG1 << "pq::size()\t= " << size();
-        LOG1 << "  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity;
-        LOG1 << "  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize;
+        TLX_LOG1 << "pq::size()\t= " << size();
+        TLX_LOG1 << "  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity;
+        TLX_LOG1 << "  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << kDeleteBufferSize;
         for (int i = 0; i < kNumIntGroups; ++i) {
             capacity *= IntKMAX;
-            LOG1 << "  grp " << i << " int" <<
+            TLX_LOG1 << "  grp " << i << " int" <<
                 " grpbuf=" << current_group_buffer_size(i) <<
                 " size=" << int_mergers[i].size() << "/" << capacity <<
                 " (" << static_cast<unsigned int>(int_mergers[i].size() * 100.0 / capacity) << "%)" <<
@@ -317,7 +317,7 @@ public:
         }
         for (int i = 0; i < kNumExtGroups; ++i) {
             capacity *= ExtKMAX;
-            LOG1 << "  grp " << i + kNumIntGroups << " ext" <<
+            TLX_LOG1 << "  grp " << i + kNumIntGroups << " ext" <<
                 " grpbuf=" << current_group_buffer_size(i + kNumIntGroups) <<
                 " size=" << ext_mergers[i]->size() << "/" << capacity <<
                 " (" << static_cast<unsigned int>(ext_mergers[i]->size() * 100.0 / capacity) << "%)" <<
@@ -328,7 +328,7 @@ public:
 
     void dump_params() const
     {
-        LOG1 << "params: kDeleteBufferSize=" << kDeleteBufferSize << " N=" << N << " IntKMAX=" << IntKMAX << " kNumIntGroups=" << kNumIntGroups << " ExtKMAX=" << ExtKMAX << " kNumExtGroups=" << kNumExtGroups << " BlockSize=" << BlockSize;
+        TLX_LOG1 << "params: kDeleteBufferSize=" << kDeleteBufferSize << " N=" << N << " IntKMAX=" << IntKMAX << " kNumIntGroups=" << kNumIntGroups << " ExtKMAX=" << ExtKMAX << " kNumExtGroups=" << kNumExtGroups << " BlockSize=" << BlockSize;
     }
 
     //! \}
@@ -402,7 +402,7 @@ private:
 
     void refill_delete_buffer()
     {
-        LOG << "refill_delete_buffer()";
+        TLX_LOG << "refill_delete_buffer()";
 
         size_type total_group_size = 0;
         //num_active_groups is <= 4
@@ -441,7 +441,7 @@ private:
         // which can make the assumption that
         // they find all they are asked in the buffers
         delete_buffer_current_min = delete_buffer_end - length;
-        LOG << "refill_del... Active groups = " << num_active_groups;
+        TLX_LOG << "refill_del... Active groups = " << num_active_groups;
         switch (num_active_groups)
         {
         case 0:
@@ -540,7 +540,7 @@ private:
             {
                 if (inv_cmp(*v, *(v - 1)))
                 {
-                    LOG1 << "Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v;
+                    TLX_LOG1 << "Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v;
                 }
             }
             assert(false);
@@ -551,7 +551,7 @@ private:
 
     size_type refill_group_buffer(const size_t group)
     {
-        LOG << "refill_group_buffer(" << group << ")";
+        TLX_LOG << "refill_group_buffer(" << group << ")";
 
         value_type* target;
         size_type length;
@@ -592,12 +592,12 @@ private:
         priority_queue_local::invert_order<typename Config::comparator_type, value_type, value_type> inv_cmp(cmp);
         if (!stxxl::is_sorted(group_buffer_current_mins[group], group_buffers[group] + N, inv_cmp))
         {
-            LOG << "refill_grp... length: " << length << " left_elements: " << left_elements;
+            TLX_LOG << "refill_grp... length: " << length << " left_elements: " << left_elements;
             for (value_type* v = group_buffer_current_mins[group] + 1; v < group_buffer_current_mins[group] + left_elements; ++v)
             {
                 if (inv_cmp(*v, *(v - 1)))
                 {
-                    LOG1 << "Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1);
+                    TLX_LOG1 << "Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1);
                 }
             }
             assert(false);
@@ -609,7 +609,7 @@ private:
 
     size_t make_space_available(const size_t level)
     {
-        LOG << "make_space_available(" << level << ")";
+        TLX_LOG << "make_space_available(" << level << ")";
 
         size_t finalLevel;
         assert(level < kTotalNumGroups);
@@ -634,13 +634,13 @@ private:
                 capacity *= IntKMAX;
             for (int i = 0; i < kNumExtGroups; ++i)
                 capacity *= ExtKMAX;
-            LOG1 << "priority_queue OVERFLOW - all groups full, size=" << size() <<
+            TLX_LOG1 << "priority_queue OVERFLOW - all groups full, size=" << size() <<
                 ", capacity(last externel group (" << kNumIntGroups + kNumExtGroups - 1 << "))=" << capacity;
             dump_sizes();
 
             const size_t extLevel = level - kNumIntGroups;
             const size_type segmentSize = ext_mergers[extLevel]->size();
-            LOG << "Inserting segment into last level external: " << level << " " << segmentSize;
+            TLX_LOG << "Inserting segment into last level external: " << level << " " << segmentSize;
             ext_merger_type* overflow_merger = new ext_merger_type(cmp);
             overflow_merger->set_pool(pool);
             overflow_merger->append_merger(*ext_mergers[extLevel], segmentSize);
@@ -669,13 +669,13 @@ private:
                 if (level == kNumIntGroups - 1) // from internal to external tree
                 {
                     const size_t segmentSize = int_mergers[kNumIntGroups - 1].size();
-                    LOG << "make_space... Inserting segment into first level external: " << level << " " << segmentSize;
+                    TLX_LOG << "make_space... Inserting segment into first level external: " << level << " " << segmentSize;
                     ext_mergers[0]->append_merger(int_mergers[kNumIntGroups - 1], segmentSize);
                 }
                 else // from external to external tree
                 {
                     const size_type segmentSize = ext_mergers[level - kNumIntGroups]->size();
-                    LOG << "make_space... Inserting segment into second level external: " << level << " " << segmentSize;
+                    TLX_LOG << "make_space... Inserting segment into second level external: " << level << " " << segmentSize;
                     ext_mergers[level - kNumIntGroups + 1]->append_merger(*ext_mergers[level - kNumIntGroups], segmentSize);
                 }
             }
@@ -685,7 +685,7 @@ private:
 
     void empty_insert_heap()
     {
-        LOG << "empty_insert_heap()";
+        TLX_LOG << "empty_insert_heap()";
         assert(insert_heap.size() == (N + 1));
 
         const value_type sup = get_supremum();

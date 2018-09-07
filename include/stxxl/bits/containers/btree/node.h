@@ -112,7 +112,7 @@ private:
 
         if (size() > max_nelements())           // overflow! need to split
         {
-            LOG << "btree::normal_node::insert overflow happened, splitting";
+            TLX_LOG << "btree::normal_node::insert overflow happened, splitting";
 
             bid_type new_bid;
             m_btree->m_node_cache.get_new_node(new_bid);                             // new (left) node
@@ -136,7 +136,7 @@ private:
 
             m_btree->m_node_cache.unfix_node(new_bid);
 
-            //req-ostream LOG << "btree::normal_node split leaf " << this << " splitter: " << result.first;
+            //req-ostream TLX_LOG << "btree::normal_node split leaf " << this << " splitter: " << result.first;
         }
 
         return result;
@@ -341,7 +341,7 @@ public:
 
         if (height == 2)                        // found_bid points to a leaf
         {
-            LOG << "btree::normal_node Inserting new value into a leaf";
+            TLX_LOG << "btree::normal_node Inserting new value into a leaf";
             leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(it->second), true);
             assert(leaf);
             std::pair<key_type, leaf_bid_type> bot_splitter;
@@ -353,7 +353,7 @@ public:
                 return result;
             // no overflow/splitting happened
 
-            LOG << "btree::normal_node Inserting new value in *this";
+            TLX_LOG << "btree::normal_node Inserting new value in *this";
 
             splitter = insert(std::make_pair(bot_splitter.first, bid_type(bot_splitter.second)), it);
 
@@ -361,7 +361,7 @@ public:
         }
         else
         {                               // found_bid points to a node
-            LOG << "btree::normal_node Inserting new value into a node";
+            TLX_LOG << "btree::normal_node Inserting new value into a node";
             node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(it->second), true);
             assert(node);
             std::pair<key_type, node_bid_type> bot_splitter;
@@ -373,7 +373,7 @@ public:
                 return result;
             // no overflow/splitting happened
 
-            LOG << "btree::normal_node Inserting new value in *this";
+            TLX_LOG << "btree::normal_node Inserting new value in *this";
 
             splitter = insert(bot_splitter, it);
 
@@ -387,14 +387,14 @@ public:
         if (height == 2)                        // FirstBid points to a leaf
         {
             assert(size() > 1);
-            LOG << "btree::node retrieveing begin() from the first leaf";
+            TLX_LOG << "btree::node retrieveing begin() from the first leaf";
             leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(first_bid));
             assert(leaf);
             return leaf->begin();
         }
         else
         {                         // FirstBid points to a node
-            LOG << "btree: retrieveing begin() from the first node";
+            TLX_LOG << "btree: retrieveing begin() from the first node";
             node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(first_bid), true);
             assert(node);
             iterator result = node->begin(height - 1);
@@ -409,14 +409,14 @@ public:
         if (height == 2)                        // FirstBid points to a leaf
         {
             assert(size() > 1);
-            LOG << "btree::node retrieveing begin() from the first leaf";
+            TLX_LOG << "btree::node retrieveing begin() from the first leaf";
             const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(FirstBid));
             assert(leaf);
             return leaf->begin();
         }
         else
         {                         // FirstBid points to a node
-            LOG << "btree: retrieveing begin() from the first node";
+            TLX_LOG << "btree: retrieveing begin() from the first node";
             const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(FirstBid), true);
             assert(node);
             const_iterator result = node->begin(height - 1);
@@ -438,7 +438,7 @@ public:
 
         if (height == 2)                // found_bid points to a leaf
         {
-            LOG << "Searching in a leaf";
+            TLX_LOG << "Searching in a leaf";
             leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             iterator result = leaf->find(k);
@@ -448,7 +448,7 @@ public:
         }
 
         // found_bid points to a node
-        LOG << "Searching in a node";
+        TLX_LOG << "Searching in a node";
         node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         iterator result = node->find(k, height - 1);
@@ -470,7 +470,7 @@ public:
 
         if (height == 2)                // found_bid points to a leaf
         {
-            LOG << "Searching in a leaf";
+            TLX_LOG << "Searching in a leaf";
             const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             const_iterator result = leaf->find(k);
@@ -480,7 +480,7 @@ public:
         }
 
         // found_bid points to a node
-        LOG << "Searching in a node";
+        TLX_LOG << "Searching in a node";
         const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         const_iterator result = node->find(k, height - 1);
@@ -502,7 +502,7 @@ public:
 
         if (height == 2)                // found_bid points to a leaf
         {
-            LOG << "Searching lower bound in a leaf";
+            TLX_LOG << "Searching lower bound in a leaf";
             leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             iterator result = leaf->lower_bound(k);
@@ -512,7 +512,7 @@ public:
         }
 
         // found_bid points to a node
-        LOG << "Searching lower bound in a node";
+        TLX_LOG << "Searching lower bound in a node";
         node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         iterator result = node->lower_bound(k, height - 1);
@@ -534,7 +534,7 @@ public:
 
         if (height == 2)                // found_bid points to a leaf
         {
-            LOG << "Searching lower bound in a leaf";
+            TLX_LOG << "Searching lower bound in a leaf";
             const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             const_iterator result = leaf->lower_bound(k);
@@ -544,7 +544,7 @@ public:
         }
 
         // found_bid points to a node
-        LOG << "Searching lower bound in a node";
+        TLX_LOG << "Searching lower bound in a node";
         const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         const_iterator result = node->lower_bound(k, height - 1);
@@ -566,7 +566,7 @@ public:
 
         if (height == 2)                // found_bid points to a leaf
         {
-            LOG << "Searching upper bound in a leaf";
+            TLX_LOG << "Searching upper bound in a leaf";
             leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             iterator result = leaf->upper_bound(k);
@@ -576,7 +576,7 @@ public:
         }
 
         // found_bid points to a node
-        LOG << "Searching upper bound in a node";
+        TLX_LOG << "Searching upper bound in a node";
         node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         iterator result = node->upper_bound(k, height - 1);
@@ -598,7 +598,7 @@ public:
 
         if (height == 2)                // found_bid points to a leaf
         {
-            LOG << "Searching upper bound in a leaf";
+            TLX_LOG << "Searching upper bound in a leaf";
             const leaf_type* leaf = m_btree->m_leaf_cache.get_const_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             const_iterator result = leaf->upper_bound(k);
@@ -608,7 +608,7 @@ public:
         }
 
         // found_bid points to a node
-        LOG << "Searching upper bound in a node";
+        TLX_LOG << "Searching upper bound in a node";
         const node_type* node = m_btree->m_node_cache.get_const_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         const_iterator result = node->upper_bound(k, height - 1);
@@ -701,7 +701,7 @@ public:
 
         if (height == 2)                        // 'found_bid' points to a leaf
         {
-            LOG << "btree::normal_node Deleting key from a leaf";
+            TLX_LOG << "btree::normal_node Deleting key from a leaf";
             leaf_type* leaf = m_btree->m_leaf_cache.get_node(static_cast<leaf_bid_type>(found_bid), true);
             assert(leaf);
             size_type result = leaf->erase(k);
@@ -710,14 +710,14 @@ public:
                 return result;
             // no underflow or root has a special degree 1 (too few elements)
 
-            LOG << "btree::normal_node Fusing or rebalancing a leaf";
+            TLX_LOG << "btree::normal_node Fusing or rebalancing a leaf";
             fuse_or_balance(it, m_btree->m_leaf_cache);
 
             return result;
         }
 
         // 'found_bid' points to a node
-        LOG << "btree::normal_node Deleting key from a node";
+        TLX_LOG << "btree::normal_node Deleting key from a node";
         node_type* node = m_btree->m_node_cache.get_node(static_cast<node_bid_type>(found_bid), true);
         assert(node);
         size_type result = node->erase(k, height - 1);
@@ -726,7 +726,7 @@ public:
             return result;
         // no underflow happened
 
-        LOG << "btree::normal_node Fusing or rebalancing a node";
+        TLX_LOG << "btree::normal_node Fusing or rebalancing a node";
         fuse_or_balance(it, m_btree->m_node_cache);
 
         return result;

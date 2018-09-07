@@ -228,7 +228,7 @@ public:
 
     ~block_cache()
     {
-        LOG << "hash_map::block_cache destructor addr=" << this;
+        TLX_LOG << "hash_map::block_cache destructor addr=" << this;
 
         for (typename bid_map_type::const_iterator i = bid_map_.begin();
              i != bid_map_.end(); ++i)

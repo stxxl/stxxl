@@ -22,7 +22,7 @@
 #include <foxxll/common/utils.hpp>
 
 #include <tlx/define.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <stxxl/types>
 #include <tlx/math/integer_log2.hpp>
@@ -77,7 +77,7 @@ public:
         logK = tlx::integer_log2_ceil(nruns);
         size_t kReg = k = size_t(1) << logK;
 
-        LOG << "loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg;
+        TLX_LOG << "loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg;
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
         current = new RunCursorType[kReg];

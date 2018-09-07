@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <stxxl/bits/containers/pq_mergers.h>
 #include <stxxl/types>
@@ -107,7 +107,7 @@ public:
 
         ~sequence_state()
         {
-            LOG << "ext_merger sequence_state::~sequence_state()";
+            TLX_LOG << "ext_merger sequence_state::~sequence_state()";
 
             foxxll::block_manager* bm = foxxll::block_manager::get_instance();
             bm->delete_blocks(bids.begin(), bids.end());
@@ -145,11 +145,11 @@ public:
 
             if (current == block->size)
             {
-                LOG << "ext_merger sequence_state operator++ crossing block border ";
+                TLX_LOG << "ext_merger sequence_state operator++ crossing block border ";
                 // go to the next block
                 if (bids.empty()) // if there is no next block
                 {
-                    LOG << "ext_merger sequence_state operator++ it was the last block in the sequence ";
+                    TLX_LOG << "ext_merger sequence_state operator++ it was the last block in the sequence ";
                     // swap memory area and delete other object.
                     bid_container_type to_delete;
                     std::swap(to_delete, bids);
@@ -157,17 +157,17 @@ public:
                 }
                 else
                 {
-                    LOG << "ext_merger sequence_state operator++ there is another block ";
+                    TLX_LOG << "ext_merger sequence_state operator++ there is another block ";
                     bid_type bid = bids.front();
                     bids.pop_front();
                     merger->pool->hint(bid);
                     if (!(bids.empty()))
                     {
-                        LOG << "ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next";
+                        TLX_LOG << "ext_merger sequence_state operator++ more blocks exist in a sequence, hinting the next";
                         merger->pool->hint(bids.front());
                     }
                     merger->pool->read(block, bid)->wait();
-                    //req-ostream LOG << "first element of read block " << bid << " " << *(block->begin()) << " cached in " << block;
+                    //req-ostream TLX_LOG << "first element of read block " << bid << " " << *(block->begin()) << " cached in " << block;
                     if (!(bids.empty()))
                         merger->pool->hint(bids.front());  // re-hint, reading might have made a block free
                     foxxll::block_manager::get_instance()->delete_block(bid);
@@ -229,7 +229,7 @@ public:
 
     virtual ~ext_merger()
     {
-        LOG << "ext_merger::~ext_merger()";
+        TLX_LOG << "ext_merger::~ext_merger()";
         for (size_t i = 0; i < arity; ++i)
         {
             delete states[i].block;
@@ -285,7 +285,7 @@ public:
     //! free an empty segment.
     void free_array(const size_t slot)
     {
-        LOG << "ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot));
+        TLX_LOG << "ext_merger::free_array() deleting array " << slot << " allocated=" << int(is_array_allocated(slot));
         assert(is_array_allocated(slot));
         states[slot].allocated = false;
         states[slot].make_inf();
@@ -310,7 +310,7 @@ public:
 protected:
     void init()
     {
-        LOG << "ext_merger::init()";
+        TLX_LOG << "ext_merger::init()";
 
         states = reinterpret_cast<sequence_state*>(new uint8_t[sizeof(sequence_state) * kMaxArity]);
         for (size_t i = 0; i < kMaxArity; ++i)
@@ -324,7 +324,8 @@ protected:
                 (*sentinel_block)[i] = tree.cmp.min_value();
 
             // same memory consumption, but smaller merge width, better use arity = kMaxArity
-            LOGC(arity + 1 == kMaxArity) << "inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity";
+            TLX_LOGC(arity + 1 == kMaxArity)
+                << "inefficient PQ parameters for ext_merger: arity + 1 == kMaxArity";
         }
 
         for (size_t i = 0; i < kMaxArity; ++i)
@@ -385,7 +386,7 @@ public:
     void insert_segment(bid_container_type& bidlist, block_type* first_block,
                         const size_t first_size, const size_t slot)
     {
-        LOG << "ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist.size() << " " << slot;
+        TLX_LOG << "ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist.size() << " " << slot;
         assert(!is_array_allocated(slot));
         assert(first_size > 0);
 
@@ -403,12 +404,12 @@ public:
     template <class Merger>
     void append_merger(Merger& another_merger, size_type segment_size)
     {
-        LOG << "ext_merger::append_merger(merger,...)" << this;
+        TLX_LOG << "ext_merger::append_merger(merger,...)" << this;
 
         if (segment_size == 0)
         {
             // deallocate memory ?
-            LOG << "Merged segment with zero size.";
+            TLX_LOG << "Merged segment with zero size.";
             return;
         }
 
@@ -419,11 +420,11 @@ public:
         assert(segment_size);
         size_t nblocks = static_cast<size_t>(segment_size / block_type::size);
         //assert(nblocks); // at least one block
-        LOG << "ext_merger::insert_segment nblocks=" << nblocks;
+        TLX_LOG << "ext_merger::insert_segment nblocks=" << nblocks;
         if (nblocks == 0)
         {
-            LOG << "ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " << nblocks << " blocks";
-            LOG << "THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS";
+            TLX_LOG << "ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " << nblocks << " blocks";
+            TLX_LOG << "THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS";
         }
         size_t first_size = static_cast<size_t>(segment_size % block_type::size);
         if (first_size == 0)
@@ -442,7 +443,7 @@ public:
             first_block->begin() + (block_type::size - first_size),
             first_block->end());
 
-        //req-ostream LOG << "last element of first block " << *(first_block->end() - 1);
+        //req-ostream TLX_LOG << "last element of first block " << *(first_block->end() - 1);
         assert(!tree.cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
 
         assert(pool->size_write() > 0);
@@ -455,7 +456,7 @@ public:
             //req-ostreamLOG << "last element of following block " << curbid << " " << *(b->end() - 1);
             assert(!tree.cmp(*(b->begin()), *(b->end() - 1)));
             pool->write(b, curbid);
-            LOG << "written to block " << curbid << " cached in " << b;
+            TLX_LOG << "written to block " << curbid << " cached in " << b;
         }
 
         insert_segment(bids, first_block, first_size, index);
@@ -518,16 +519,16 @@ protected:
 #if STXXL_CHECK_ORDER_IN_SORTS
             if (!is_sentinel(*seqs.back().first, cmp) && !stxxl::is_sorted(seqs.back().first, seqs.back().second, inv_cmp))
             {
-                LOG << "length " << i << " " << (seqs.back().second - seqs.back().first);
+                TLX_LOG << "length " << i << " " << (seqs.back().second - seqs.back().first);
                 for (value_type* v = seqs.back().first + 1; v < seqs.back().second; ++v)
                 {
                     if (inv_cmp(*v, *(v - 1)))
                     {
-                        LOG << "Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v;
+                        TLX_LOG << "Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v;
                     }
                     if (is_sentinel(*v, cmp))
                     {
-                        LOG << "Wrong sentinel at position " << (v - seqs.back().first);
+                        TLX_LOG << "Wrong sentinel at position " << (v - seqs.back().first);
                     }
                 }
                 assert(false);
@@ -564,17 +565,17 @@ protected:
                     if (inv_cmp(*(seqs[i].second - 1), min_last))
                         min_last = *(seqs[i].second - 1);
 
-                    LOG << "front block of seq " << i << ": len=" << seq_i_size;
+                    TLX_LOG << "front block of seq " << i << ": len=" << seq_i_size;
                 }
                 else {
-                    LOG << "front block of seq " << i << ": empty";
+                    TLX_LOG << "front block of seq " << i << ": empty";
                 }
             }
 
             assert(total_size > 0);
             assert(!is_sentinel(min_last));
 
-            LOG << " total size " << total_size << " num_seq " << seqs.size();
+            TLX_LOG << " total size " << total_size << " num_seq " << seqs.size();
 
             diff_type less_equal_than_min_last = 0;
             //locate this element in all sequences
@@ -587,7 +588,7 @@ protected:
 
                 //no element larger than min_last is merged
 
-                //req-ostream LOG << "seq " << i << ": " << (position - seqs[i].first) << " greater equal than " << min_last;
+                //req-ostream TLX_LOG << "seq " << i << ": " << (position - seqs[i].first) << " greater equal than " << min_last;
 
                 less_equal_than_min_last += (position - seqs[i].first);
             }
@@ -595,7 +596,7 @@ protected:
             // at most rest elements
             diff_type output_size = std::min(less_equal_than_min_last, rest);
 
-            LOG << "output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")";
+            TLX_LOG << "output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")";
 
             assert(output_size > 0);
 
@@ -624,7 +625,7 @@ protected:
                     if (state.bids.empty())
                     {
                         // if there is no next block
-                        LOG << "seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ";
+                        TLX_LOG << "seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ";
                         state.make_inf();
                     }
                     else
@@ -632,17 +633,17 @@ protected:
 #if STXXL_CHECK_ORDER_IN_SORTS
                         last_elem = *(seqs[i].second - 1);
 #endif
-                        LOG << "seq " << i << ": ext_merger::multi_merge(...) there is another block ";
+                        TLX_LOG << "seq " << i << ": ext_merger::multi_merge(...) there is another block ";
                         bid_type bid = state.bids.front();
                         state.bids.pop_front();
                         pool->hint(bid);
                         if (!(state.bids.empty()))
                         {
-                            LOG << "seq " << i << ": ext_merger::multi_merge(...) more blocks exist, hinting the next";
+                            TLX_LOG << "seq " << i << ": ext_merger::multi_merge(...) more blocks exist, hinting the next";
                             pool->hint(state.bids.front());
                         }
                         pool->read(state.block, bid)->wait();
-                        LOG << "seq " << i << ": first element of read block " << bid << " cached in " << state.block;
+                        TLX_LOG << "seq " << i << ": first element of read block " << bid << " cached in " << state.block;
                         if (!(state.bids.empty()))
                             pool->hint(state.bids.front());  // re-hint, reading might have made a block free
                         state.current = 0;
@@ -650,19 +651,19 @@ protected:
                         foxxll::block_manager::get_instance()->delete_block(bid);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-                        LOG << "before " << last_elem << " after " << *seqs[i].first << " newly loaded block " << bid;
+                        TLX_LOG << "before " << last_elem << " after " << *seqs[i].first << " newly loaded block " << bid;
                         if (!stxxl::is_sorted(seqs[i].first, seqs[i].second, inv_cmp))
                         {
-                            LOG << "length " << i << " " << (seqs[i].second - seqs[i].first);
+                            TLX_LOG << "length " << i << " " << (seqs[i].second - seqs[i].first);
                             for (value_type* v = seqs[i].first + 1; v < seqs[i].second; ++v)
                             {
                                 if (inv_cmp(*v, *(v - 1)))
                                 {
-                                    LOG << "Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v;
+                                    TLX_LOG << "Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v;
                                 }
                                 if (is_sentinel(*v, cmp))
                                 {
-                                    LOG << "Wrong sentinel at position " << (v - seqs[i].first);
+                                    TLX_LOG << "Wrong sentinel at position " << (v - seqs[i].first);
                                 }
                             }
                             assert(false);
@@ -678,7 +679,7 @@ protected:
             size_t seg = orig_seq_index[i];
             if (is_array_empty(seg))
             {
-                LOG << "deallocated " << seg;
+                TLX_LOG << "deallocated " << seg;
                 free_array(seg);
             }
         }

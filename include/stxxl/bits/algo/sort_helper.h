@@ -18,7 +18,7 @@
 #include <functional>
 
 #include <tlx/define.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 #include <tlx/unused.hpp>
 
 #include <stxxl/bits/algo/run_cursor.h>
@@ -113,10 +113,10 @@ count_elements_less_equal(const SequenceVector& seqs,
     for (seqs_size_type i = 0; i < seqs.size(); ++i)
     {
         iterator position = std::upper_bound(seqs[i].first, seqs[i].second, bound, cmp);
-        LOG0 << "less equal than " << position - seqs[i].first;
+        TLX_LOG0 << "less equal than " << position - seqs[i].first;
         count += position - seqs[i].first;
     }
-    LOG0 << "finished loop";
+    TLX_LOG0 << "finished loop";
     return count;
 }
 
@@ -137,13 +137,13 @@ refill_or_remove_empty_sequences(SequenceVector& seqs,
             {
                 seqs[i].first = buffers[i]->begin();            // reset iterator
                 seqs[i].second = buffers[i]->end();
-                LOG0 << "block ran empty " << i;
+                TLX_LOG0 << "block ran empty " << i;
             }
             else
             {
                 seqs.erase(seqs.begin() + i);                   // remove this sequence
                 buffers.erase(buffers.begin() + i);
-                LOG0 << "seq removed " << i;
+                TLX_LOG0 << "seq removed " << i;
                 --i;                                            // don't skip the next sequence
             }
         }

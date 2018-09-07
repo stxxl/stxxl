@@ -35,7 +35,7 @@
 
 #include <tlx/define.hpp>
 #include <tlx/die.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 #include <tlx/string.hpp>
 
 #include <foxxll/common/timer.hpp>
@@ -655,7 +655,7 @@ public:
 
         // cancel currently hinted blocks
         for (size_t i = end_block_index; i < m_unhinted_block; ++i) {
-            LOG << "ea[" << this << "]: discarding prefetch hint on block " << i;
+            TLX_LOG << "ea[" << this << "]: discarding prefetch hint on block " << i;
 
             m_requests[i]->cancel();
             m_requests[i]->wait();
@@ -829,7 +829,7 @@ public:
         write_blocks = 2 * write_blocks;
 #endif
         if (pool.size_write() < write_blocks) {
-            LOG1 << "WARNING: enlarging PPQ write pool to " <<
+            TLX_LOG1 << "WARNING: enlarging PPQ write pool to " <<
                 write_blocks << " blocks = " <<
                 write_blocks * block_size / 1024 / 1024 << " MiB";
             pool.resize_write(write_blocks);
@@ -883,14 +883,14 @@ protected:
         else
         {
             // block was already written, have to read from EM.
-            LOG << "ea[" << this << "]: "
+            TLX_LOG << "ea[" << this << "]: "
                 "read_block needs to re-read block index=" << block_index;
 
             static bool s_warned = false;
             if (!s_warned)
             {
                 s_warned = true;
-                LOG1 << "ppq::external_array[" << this << "] "
+                TLX_LOG1 << "ppq::external_array[" << this << "] "
                     "writer requested to re-read block from EM.\n"
                     "This should never occur in full-performance mode, "
                     "verify that you run in debug mode.";
@@ -919,7 +919,7 @@ protected:
         const size_t this_block_items =
             std::min<size_t>(block_items, m_capacity - block_index * static_cast<external_size_type>(block_items));
 
-        LOG << "ea[" << this << "]: write_block index=" << block_index <<
+        TLX_LOG << "ea[" << this << "]: write_block index=" << block_index <<
             " this_block_items=" << this_block_items;
 
         assert(this_block_items > 0);
@@ -946,7 +946,7 @@ public:
         // will read (prefetch) block i
         size_t i = m_unhinted_block++;
 
-        LOG << "ea[" << this << "]: prefetching block_index=" << i;
+        TLX_LOG << "ea[" << this << "]: prefetching block_index=" << i;
 
         assert(m_pool->size_write() > 0);
         assert(m_blocks[i] == nullptr);
@@ -999,7 +999,7 @@ public:
 
         // will read (prefetch) block after cancellations.
 
-        LOG << "ea[" << this << "]: pre-hint of" <<
+        TLX_LOG << "ea[" << this << "]: pre-hint of" <<
             " block_index=" << m_unhinted_block;
 
         ++m_unhinted_block;
@@ -1010,7 +1010,7 @@ public:
     void rebuild_hints_cancel()
     {
         for (size_t i = m_unhinted_block; i < m_old_unhinted_block; ++i) {
-            LOG << "ea[" << this << "]: discarding prefetch hint on"
+            TLX_LOG << "ea[" << this << "]: discarding prefetch hint on"
                 " block " << i;
             m_requests[i]->cancel();
             m_requests[i]->wait();
@@ -1028,7 +1028,7 @@ public:
     {
         for (size_t i = m_old_unhinted_block; i < m_unhinted_block; ++i)
         {
-            LOG << "ea[" << this << "]: perform real-hinting of"
+            TLX_LOG << "ea[" << this << "]: perform real-hinting of"
                 " block " << i;
 
             assert(m_pool->size_write() > 0);
@@ -1051,7 +1051,7 @@ public:
     {
         size_t begin = get_end_block_index(), i = begin;
 
-        LOG << "ea[" << this << "]: waiting for" <<
+        TLX_LOG << "ea[" << this << "]: waiting for" <<
             " block index=" << i <<
             " end_index=" << m_end_index;
 
@@ -1072,7 +1072,7 @@ public:
         // poll further hinted blocks if already done
         while (i < m_unhinted_block && m_requests[i]->poll())
         {
-            LOG << "ea[" << this << "]: poll-ok for" <<
+            TLX_LOG << "ea[" << this << "]: poll-ok for" <<
                 " block index=" << i <<
                 " end_index=" << m_end_index;
             m_requests[i]->wait();
@@ -1095,7 +1095,7 @@ public:
         size_t begin = get_end_block_index(), i = begin;
         while (i < m_unhinted_block)
         {
-            LOG << "wait_all_hinted_blocks(): ea[" << this << "]: waiting for" <<
+            TLX_LOG << "wait_all_hinted_blocks(): ea[" << this << "]: waiting for" <<
                 " block index=" << i <<
                 " end_index=" << m_end_index;
             m_requests[i]->wait();
@@ -1122,7 +1122,7 @@ public:
         assert(m_index + n <= m_end_index);
         assert(m_size >= n);
 
-        LOG << "ea[" << this << "]: remove " << n << " items";
+        TLX_LOG << "ea[" << this << "]: remove " << n << " items";
 
         if (n == 0)
             return 0;
@@ -1154,7 +1154,7 @@ public:
 
         size_t blocks_freed = block_index_after - block_index;
 
-        LOG << "ea[" << this << "]: after remove:" <<
+        TLX_LOG << "ea[" << this << "]: after remove:" <<
             " index_after=" << index_after <<
             " block_index_after=" << block_index_after <<
             " local_index_after=" << local_index_after <<
@@ -1189,7 +1189,7 @@ protected:
     //! This is necessary for the iterators to work properly.
     inline void update_block_pointers(size_t block_index)
     {
-        LOG << "ea[" << this << "]: updating block pointers for " << block_index;
+        TLX_LOG << "ea[" << this << "]: updating block pointers for " << block_index;
 
         m_block_pointers[block_index].first = m_blocks[block_index]->begin();
         if (block_index + 1 != m_num_blocks)
@@ -1288,12 +1288,12 @@ protected:
 #endif
 
         if (ref == 0) {
-            LOG << "get_block_ref block_index=" << block_index <<
+            TLX_LOG << "get_block_ref block_index=" << block_index <<
                 " ref=" << ref << " reading.";
             m_ea.read_block(block_index);
         }
         else {
-            LOG << "get_block_ref block_index=" << block_index <<
+            TLX_LOG << "get_block_ref block_index=" << block_index <<
                 " ref=" << ref;
         }
 
@@ -1314,12 +1314,12 @@ protected:
         unsigned int ref = --m_ref_count[block_index];
 
         if (ref == 0) {
-            LOG << "free_block_ref block_index=" << block_index <<
+            TLX_LOG << "free_block_ref block_index=" << block_index <<
                 " ref=" << ref << " written.";
             m_ea.write_block(block_index);
         }
         else {
-            LOG << "free_block_ref block_index=" << block_index <<
+            TLX_LOG << "free_block_ref block_index=" << block_index <<
                 " ref=" << ref;
         }
     }
@@ -1386,7 +1386,7 @@ public:
               m_live(false),
               m_index(index)
         {
-            LOG << "Construct iterator for index " << m_index;
+            TLX_LOG << "Construct iterator for index " << m_index;
         }
 
         //! copy an iterator, the new iterator is _not_ automatically live!
@@ -1395,7 +1395,7 @@ public:
               m_live(false),
               m_index(other.m_index)
         {
-            LOG << "Copy-Construct iterator for index " << m_index;
+            TLX_LOG << "Copy-Construct iterator for index " << m_index;
         }
 
         //! assign an iterator, the assigned iterator is not automatically live!
@@ -1403,7 +1403,7 @@ public:
         {
             if (&other != this)
             {
-                LOG << "Assign iterator to index " << other.m_index;
+                TLX_LOG << "Assign iterator to index " << other.m_index;
 
                 if (m_live)
                     m_writer->free_block_ref(m_block_index);
@@ -1422,7 +1422,7 @@ public:
 
             m_writer->free_block_ref(m_block_index);
 
-            LOG << "Destruction of iterator for index " << m_index <<
+            TLX_LOG << "Destruction of iterator for index " << m_index <<
                 " in block " << m_index / block_items;
         }
 
@@ -1442,7 +1442,7 @@ public:
             m_block_index = m_index / block_items;
             m_current = m_index % block_items;
 
-            LOG << "operator*() live request for index=" << m_index <<
+            TLX_LOG << "operator*() live request for index=" << m_index <<
                 " block_index=" << m_block_index <<
                 " m_current=" << m_current;
 
@@ -1551,7 +1551,7 @@ public:
         for (unsigned int i = 0; i < num_threads - 1; ++i)
         {
             auto index = static_cast<external_size_type>((i + 1) * step);
-            LOG << "hold index " << index <<
+            TLX_LOG << "hold index " << index <<
                 " in block " << index / ea_type::block_items;
             m_live_boundary[i] = iterator(this, index);
             m_live_boundary[i].make_live();
@@ -1840,11 +1840,11 @@ public:
     //! Prints statistical data.
     void print_stats() const
     {
-        LOG1 << "Head winner tree stats:";
+        TLX_LOG1 << "Head winner tree stats:";
         m_head.print_stats();
-        LOG1 << "Heaps winner tree stats:";
+        TLX_LOG1 << "Heaps winner tree stats:";
         m_heaps.print_stats();
-        LOG1 << "IA winner tree stats:";
+        TLX_LOG1 << "IA winner tree stats:";
         m_ia.print_stats();
     }
 };
@@ -2210,7 +2210,7 @@ protected:
         }
 
         if (swap_end != m_internal_arrays.end())
-            LOG0 << "cleanup_internal_arrays" <<
+            TLX_LOG0 << "cleanup_internal_arrays" <<
                 " cleaned=" << m_internal_arrays.end() - swap_end;
 
         m_internal_arrays.erase(swap_end, m_internal_arrays.end());
@@ -2270,7 +2270,7 @@ protected:
             update_hint_tree(i);
         }
 
-        LOG << "Removed " << m_external_arrays.end() - swap_end <<
+        TLX_LOG << "Removed " << m_external_arrays.end() - swap_end <<
             " empty external arrays.";
 
         m_external_arrays.erase(swap_end, m_external_arrays.end());
@@ -2394,7 +2394,7 @@ public:
             }
         }
 #else
-        LOG1 << "You are using stxxl::parallel_priority_queue without "
+        TLX_LOG1 << "You are using stxxl::parallel_priority_queue without "
             "support for OpenMP parallelism.\n"
             "This is probably not what you want, so check the "
             "compilation settings.";
@@ -2828,7 +2828,7 @@ public:
         }
 
         if (m_bulk_first_delayed_external_array != m_external_arrays.size()) {
-            LOG << "bulk_push_end: run delayed re-hinting of EAs";
+            TLX_LOG << "bulk_push_end: run delayed re-hinting of EAs";
             rebuild_hint_tree();
         }
 
@@ -2838,7 +2838,7 @@ public:
     //! Extract up to max_size values at once.
     void bulk_pop(std::vector<value_type>& out, size_t max_size)
     {
-        LOG << "bulk_pop() max_size=" << max_size;
+        TLX_LOG << "bulk_pop() max_size=" << max_size;
 
         const size_t n_elements = std::min<size_t>(max_size, size());
         assert(n_elements < m_extract_buffer_limit);
@@ -2869,7 +2869,7 @@ public:
     bool bulk_pop_limit(std::vector<value_type>& out, const value_type& limit,
                         size_t max_size = std::numeric_limits<size_t>::max())
     {
-        LOG << "bulk_pop_limit with limit=" << limit;
+        TLX_LOG << "bulk_pop_limit with limit=" << limit;
 
         convert_eb_into_ia();
 
@@ -2947,7 +2947,7 @@ public:
         }
         out.resize(output_size);
 
-        LOG << "bulk_pop_limit with" <<
+        TLX_LOG << "bulk_pop_limit with" <<
             " sequences=" << sequences.size() <<
             " output_size=" << output_size <<
             " has_full_range=" << has_full_range;
@@ -3091,15 +3091,15 @@ public:
 
         switch (type) {
         case minima_type::HEAP:
-            LOG << "heap " << index <<
+            TLX_LOG << "heap " << index <<
                 ": " << m_proc[index]->insertion_heap[0];
             return m_proc[index]->insertion_heap[0];
         case minima_type::IA:
-            LOG << "ia " << index <<
+            TLX_LOG << "ia " << index <<
                 ": " << m_internal_arrays[index].get_min();
             return m_internal_arrays[index].get_min();
         case minima_type::EB:
-            LOG << "eb " << m_extract_buffer_index <<
+            TLX_LOG << "eb " << m_extract_buffer_index <<
                 ": " << m_extract_buffer[m_extract_buffer_index];
             return m_extract_buffer[m_extract_buffer_index];
         default:
@@ -3343,7 +3343,7 @@ protected:
         const size_t back_sum = std::accumulate(
             back_size.begin(), back_size.end(), 0u);
 
-        LOG << "flush_insertion_heaps_with_limit(): back_sum = " << back_sum;
+        TLX_LOG << "flush_insertion_heaps_with_limit(): back_sum = " << back_sum;
 
         if (back_sum)
         {
@@ -3382,10 +3382,10 @@ public:
      */
     void merge_external_arrays()
     {
-        LOG1 << "Merging external arrays. This should not happen."
-             << " You should adjust memory assignment and/or external array level size.";
+        TLX_LOG1 << "Merging external arrays. This should not happen."
+                 << " You should adjust memory assignment and/or external array level size.";
         check_external_level(0, true);
-        LOG << "Merging all external arrays done.";
+        TLX_LOG << "Merging all external arrays done.";
 
         resize_read_pool();
 
@@ -3421,7 +3421,7 @@ public:
         size_t new_num_read_blocks = static_cast<size_t>(
             (m_num_read_blocks_per_ea * static_cast<float>(m_external_arrays.size())));
 
-        LOG << "resize_read_pool:" <<
+        TLX_LOG << "resize_read_pool:" <<
             " m_num_read_blocks=" << m_num_read_blocks <<
             " ea_size=" << m_external_arrays.size() <<
             " m_num_read_blocks_per_ea=" << m_num_read_blocks_per_ea <<
@@ -3462,7 +3462,7 @@ public:
             }
 
             if (new_num_read_blocks < m_num_read_blocks)
-                LOG1 << "WARNING: could not immediately reduce read/prefetch pool!";
+                TLX_LOG1 << "WARNING: could not immediately reduce read/prefetch pool!";
         }
     }
 
@@ -3499,7 +3499,7 @@ public:
         {
             assert(gmin_index < m_external_arrays.size());
 
-            LOG << "Give pre-hint in EA[" << gmin_index << "] min " <<
+            TLX_LOG << "Give pre-hint in EA[" << gmin_index << "] min " <<
                 m_external_arrays[gmin_index].get_next_hintable_min();
 
             m_external_arrays[gmin_index].rebuild_hints_prehint_next_block();
@@ -3561,7 +3561,7 @@ public:
     {
         m_stats.hint_time.start();
 
-        LOG << "hint_external_arrays()"
+        TLX_LOG << "hint_external_arrays()"
             " for free_size_prefetch=" << m_pool.free_size_prefetch();
 
         size_t gmin_index;
@@ -3570,7 +3570,7 @@ public:
         {
             assert(gmin_index < m_external_arrays.size());
 
-            LOG << "Give hint in EA[" << gmin_index << "]";
+            TLX_LOG << "Give hint in EA[" << gmin_index << "]";
             m_external_arrays[gmin_index].hint_next_block();
             ++m_num_hinted_blocks;
 
@@ -3588,28 +3588,28 @@ public:
     //! Print statistics.
     void print_stats() const
     {
-        LOG << "c_merge_sorted_heaps = " << c_merge_sorted_heaps;
-        LOG << "c_limit_extract_buffer = " << c_limit_extract_buffer;
-        LOG << "c_single_insert_limit = " << c_single_insert_limit;
+        TLX_LOG << "c_merge_sorted_heaps = " << c_merge_sorted_heaps;
+        TLX_LOG << "c_limit_extract_buffer = " << c_limit_extract_buffer;
+        TLX_LOG << "c_single_insert_limit = " << c_single_insert_limit;
 
         if (c_limit_extract_buffer) {
-            LOG << "m_extract_buffer_limit = " << m_extract_buffer_limit;
-            LOG << "m_extract_buffer_limit * sizeof(value_type) = " << tlx::format_iec_units(m_extract_buffer_limit * sizeof(value_type));
+            TLX_LOG << "m_extract_buffer_limit = " << m_extract_buffer_limit;
+            TLX_LOG << "m_extract_buffer_limit * sizeof(value_type) = " << tlx::format_iec_units(m_extract_buffer_limit * sizeof(value_type));
         }
 
 #if STXXL_PARALLEL
-        LOG << "omp_get_max_threads() = " << omp_get_max_threads();
+        TLX_LOG << "omp_get_max_threads() = " << omp_get_max_threads();
 #endif
 
-        LOG << "m_mem_for_heaps = " << tlx::format_iec_units(m_mem_for_heaps);
-        LOG << "m_mem_left = " << tlx::format_iec_units(m_mem_left);
+        TLX_LOG << "m_mem_for_heaps = " << tlx::format_iec_units(m_mem_for_heaps);
+        TLX_LOG << "m_mem_left = " << tlx::format_iec_units(m_mem_left);
 
         //if (num_extract_buffer_refills > 0) {
-        //    LOG << "total_extract_buffer_size / num_extract_buffer_refills = " << total_extract_buffer_size / num_extract_buffer_refills;
-        //    LOG << "total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type) = " << tlx::format_iec_units(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
+        //    TLX_LOG << "total_extract_buffer_size / num_extract_buffer_refills = " << total_extract_buffer_size / num_extract_buffer_refills;
+        //    TLX_LOG << "total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type) = " << tlx::format_iec_units(total_extract_buffer_size / num_extract_buffer_refills * sizeof(value_type));
         //}
 
-        LOG1 << m_stats;
+        TLX_LOG1 << m_stats;
         m_minima.print_stats();
     }
 
@@ -3628,7 +3628,7 @@ protected:
                                      std::vector<iterator_pair_type>& sequences,
                                      bool reuse_previous_lower_bounds = false)
     {
-        LOG <<
+        TLX_LOG <<
             "calculate_merge_sequences() " <<
             "reuse_previous_lower_bounds=" << reuse_previous_lower_bounds;
 
@@ -3647,7 +3647,7 @@ protected:
         const size_t gmin_index = m_external_min_tree.top();
         bool needs_limit = (gmin_index != m_external_min_tree.invalid_key);
 
-        LOG << "calculate_merge_sequences() gmin_index=" << gmin_index <<
+        TLX_LOG << "calculate_merge_sequences() gmin_index=" << gmin_index <<
             " needs_limit=" << needs_limit;
 
 // test correctness of external block min tree
@@ -3672,7 +3672,7 @@ protected:
                     const value_type& min_value =
                         m_external_arrays[i].get_next_block_min();
 
-                    LOG << "min[" << i << "]: " << min_value <<
+                    TLX_LOG << "min[" << i << "]: " << min_value <<
                         " test: " << test_gmin_value <<
                         ": " << m_inv_compare(min_value, test_gmin_value);
 
@@ -3728,7 +3728,7 @@ protected:
                 }
                 else
                 {
-                    LOG << "lower_bound [" << begin << "," << end << ")" <<
+                    TLX_LOG << "lower_bound [" << begin << "," << end << ")" <<
                         " gmin_value " << gmin_value;
 
                     end = std::lower_bound(begin, end,
@@ -3740,18 +3740,18 @@ protected:
             sizes[i] = std::distance(begin, end);
             sequences[i] = std::make_pair(begin, end);
 
-            LOG << "sequence[" << i << "] " << (i < eas ? "ea " : "ia ") <<
+            TLX_LOG << "sequence[" << i << "] " << (i < eas ? "ea " : "ia ") <<
                 begin << " - " << end <<
                 " size " << sizes[i] <<
             (needs_limit ? " with ub limit" : "");
         }
 
         if (needs_limit) {
-            LOG << "return with needs_limit: gmin_index=" << gmin_index;
+            TLX_LOG << "return with needs_limit: gmin_index=" << gmin_index;
             return gmin_index;
         }
         else {
-            LOG << "return with needs_limit: eas=" << eas;
+            TLX_LOG << "return with needs_limit: eas=" << eas;
             return eas;
         }
     }
@@ -3762,7 +3762,7 @@ protected:
     {
         if (m_extract_buffer_size == 0) return;
 
-        LOG << "convert_eb_into_ia";
+        TLX_LOG << "convert_eb_into_ia";
 
         // tb: if in limit sequence and the EB gets flushed out to EM, then we
         // have to re-merge items into the EB instead of returning the
@@ -3795,7 +3795,7 @@ protected:
     inline void refill_extract_buffer(size_t minimum_size = 0,
                                       size_t maximum_size = 0)
     {
-        LOG << "refill_extract_buffer()" <<
+        TLX_LOG << "refill_extract_buffer()" <<
             " ia_size=" << m_internal_arrays.size() <<
             " ea_size=" << m_external_arrays.size();
 
@@ -3834,13 +3834,13 @@ protected:
             bool reuse_lower_bounds = false;
             while (output_size < minimum_size)
             {
-                LOG << "refill: request more data," <<
+                TLX_LOG << "refill: request more data," <<
                     " output_size=" << output_size <<
                     " minimum_size=" << minimum_size <<
                     " limiting_ea_index=" << limiting_ea_index;
 
                 if (limiting_ea_index < eas) {
-                    LOG << "refill: limiting_ea_index";
+                    TLX_LOG << "refill: limiting_ea_index";
 
                     if (m_external_arrays[limiting_ea_index].num_hinted_blocks() == 0)
                         break;
@@ -3850,7 +3850,7 @@ protected:
                 }
                 else if (limiting_ea_index == eas) {
                     // no more unaccessible EM data
-                    LOG1 << "Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!";
+                    TLX_LOG1 << "Warning: refill_extract_buffer(n): minimum_size > # mergeable elements!";
                     break;
                 }
 
@@ -3900,7 +3900,7 @@ protected:
     //! the winner trees and hints accordingly.
     inline void wait_next_ea_blocks(const size_t ea_index)
     {
-        LOG << "wait_next_ea_blocks() ea_index=" << ea_index;
+        TLX_LOG << "wait_next_ea_blocks() ea_index=" << ea_index;
 
         size_t used_blocks =
             m_external_arrays[ea_index].wait_next_blocks();
@@ -3965,7 +3965,7 @@ protected:
         heap_type& insheap = m_proc[p]->insertion_heap;
         size_t size = insheap.size();
 
-        LOG0 <<
+        TLX_LOG0 <<
             "Flushing insertion heap array p=" << p <<
             " size=" << insheap.size() <<
             " capacity=" << insheap.capacity() <<
@@ -4094,7 +4094,7 @@ protected:
     //! Flushes the internal arrays into an external array.
     void flush_internal_arrays()
     {
-        LOG << "Flushing internal arrays" <<
+        TLX_LOG << "Flushing internal arrays" <<
             " num_arrays=" << m_internal_arrays.size();
 
         m_stats.num_internal_array_flushes++;
@@ -4143,7 +4143,7 @@ protected:
                 external_array_writer.begin(), size, m_inv_compare);
         }
 
-        LOG << "Merge done of new ea " << &ea << " size " << size;
+        TLX_LOG << "Merge done of new ea " << &ea << " size " << size;
 
         m_external_arrays.swap_back(ea);
 
@@ -4212,7 +4212,7 @@ protected:
     void check_external_level(const size_t level, const bool force_merge_all = false)
     {
         if (!force_merge_all)
-            LOG << "Checking external level " << level;
+            TLX_LOG << "Checking external level " << level;
 
         // return if EA level is not full
         if (m_external_levels[level] < c_max_external_level_size && !force_merge_all)
@@ -4242,7 +4242,7 @@ protected:
         assert(force_merge_all || c_max_external_level_size == ea_index.size());
         const size_t num_arrays_to_merge = ea_index.size();
 
-        LOG << "merging external arrays" <<
+        TLX_LOG << "merging external arrays" <<
             " level=" << level <<
             " level_size=" << level_size <<
             " sequences=" << num_arrays_to_merge <<
@@ -4273,7 +4273,7 @@ protected:
 
             while (num_arrays_to_merge != num_arrays_done)
             {
-                LOG << "num_arrays_done = " << num_arrays_done;
+                TLX_LOG << "num_arrays_done = " << num_arrays_done;
 
                 // === build hints ===
 
@@ -4314,7 +4314,7 @@ protected:
                     const size_t gmin_index = ea_index[gmin_index_index];
                     assert(gmin_index < m_external_arrays.size());
 
-                    LOG0 << "check_external_level():Give pre-hint in EA[" << gmin_index << "] min " <<
+                    TLX_LOG0 << "check_external_level():Give pre-hint in EA[" << gmin_index << "] min " <<
                         m_external_arrays[gmin_index].get_next_hintable_min();
 
                     m_external_arrays[gmin_index].rebuild_hints_prehint_next_block();
@@ -4379,7 +4379,7 @@ protected:
                     sizes[i] = std::distance(begin, end);
                     sequences[i] = std::make_pair(begin, end);
 
-                    LOG << "sequence[" << i << "] ea " <<
+                    TLX_LOG << "sequence[" << i << "] ea " <<
                         begin << " - " << end <<
                         " size " << sizes[i] <<
                     (needs_limit ? " with ub limit" : "");
@@ -4436,7 +4436,7 @@ protected:
             update_hint_tree(m_external_arrays.size() - 1);
         // else: done in bulk_push_end() -> rebuild_hint_tree()
 
-        LOG << "Merge done of new ea " << &ea;
+        TLX_LOG << "Merge done of new ea " << &ea;
 
         if (!force_merge_all)
             check_external_level(level + 1);
@@ -4505,7 +4505,7 @@ protected:
         // must free up more memory than the new array needs.
         assert(int_memory >= internal_array_type::int_memory(level_size));
 
-        LOG << "merging internal arrays" <<
+        TLX_LOG << "merging internal arrays" <<
             " level=" << level <<
             " level_size=" << level_size <<
             " sequences=" << sequences.size();

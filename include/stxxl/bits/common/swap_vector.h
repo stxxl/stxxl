@@ -17,8 +17,6 @@
 #include <cassert>
 #include <utility>
 
-#include <tlx/logger.hpp>
-
 namespace stxxl {
 
 //! \addtogroup support

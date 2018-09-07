@@ -21,7 +21,7 @@
 
 #include <foxxll/common/timer.hpp>
 #include <foxxll/common/utils.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 #include <tlx/math/integer_log2.hpp>
 
 namespace stxxl {
@@ -361,8 +361,8 @@ public:
     //! Print statistical data.
     void print_stats() const
     {
-        LOG << "m_num_slots = " << m_num_slots;
-        LOG1 << m_stats;
+        TLX_LOG << "m_num_slots = " << m_num_slots;
+        TLX_LOG1 << m_stats;
     }
 };
 

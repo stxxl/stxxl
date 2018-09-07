@@ -20,7 +20,7 @@
 #include <utility>
 
 #include <tlx/define.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
@@ -138,7 +138,7 @@ public:
                              ? foxxll::config::get_instance()->disks_number()
                              : static_cast<size_t>(D);
 
-        LOG << "sequence[" << this << "]::sequence(D)";
+        TLX_LOG << "sequence[" << this << "]::sequence(D)";
         m_pool = new pool_type(disks, disks + 2);
         init();
     }
@@ -155,7 +155,7 @@ public:
           m_alloc_count(0),
           m_bm(foxxll::block_manager::get_instance())
     {
-        LOG << "sequence[" << this << "]::sequence(sizes)";
+        TLX_LOG << "sequence[" << this << "]::sequence(sizes)";
         m_pool = new pool_type(p_pool_size, w_pool_size);
         init(blocks2prefetch);
     }
@@ -173,7 +173,7 @@ public:
           m_alloc_count(0),
           m_bm(foxxll::block_manager::get_instance())
     {
-        LOG << "sequence[" << this << "]::sequence(pool)";
+        TLX_LOG << "sequence[" << this << "]::sequence(pool)";
         init(blocks2prefetch);
     }
 
@@ -209,17 +209,17 @@ private:
     void init(int blocks2prefetch = -1)
     {
         if (m_pool->size_write() < 2) {
-            LOG1 << "sequence: invalid configuration, not enough blocks (" << m_pool->size_write() <<
+            TLX_LOG1 << "sequence: invalid configuration, not enough blocks (" << m_pool->size_write() <<
                 ") in write pool, at least 2 are needed, resizing to 3";
             m_pool->resize_write(3);
         }
 
         if (m_pool->size_write() < 3) {
-            LOG1 << "sequence: inefficient configuration, no blocks for buffered writing available";
+            TLX_LOG1 << "sequence: inefficient configuration, no blocks for buffered writing available";
         }
 
         if (m_pool->size_prefetch() < 1) {
-            LOG1 << "sequence: inefficient configuration, no blocks for prefetching available";
+            TLX_LOG1 << "sequence: inefficient configuration, no blocks for prefetching available";
         }
 
         /// initialize empty sequence
@@ -263,7 +263,7 @@ public:
         {
             if (m_size == 0)
             {
-                LOG << "sequence::push_front Case 0";
+                TLX_LOG << "sequence::push_front Case 0";
                 assert(m_front_block == m_back_block);
                 m_front_element = m_back_element = m_front_block->end() - 1;
                 *m_front_element = val;
@@ -275,11 +275,11 @@ public:
             {
                 // can not write the front block because it
                 // is the same as the back block, must keep it memory
-                LOG << "sequence::push_front Case 1";
+                TLX_LOG << "sequence::push_front Case 1";
             }
             else if (size() < 2 * block_type::size)
             {
-                LOG << "sequence::push_front Case 1.5";
+                TLX_LOG << "sequence::push_front Case 1.5";
                 // only two blocks with a gap at the end, move elements within memory
                 assert(m_bids.empty());
                 size_t gap = m_back_block->end() - (m_back_element + 1);
@@ -297,18 +297,18 @@ public:
             }
             else
             {
-                LOG << "sequence::push_front Case 2";
+                TLX_LOG << "sequence::push_front Case 2";
                 // write the front block
                 // need to allocate new block
                 bid_type newbid;
 
                 m_bm->new_block(m_alloc_strategy, newbid, m_alloc_count++);
 
-                LOG << "sequence[" << this << "]: push_front block " << m_front_block << " @ " << newbid;
+                TLX_LOG << "sequence[" << this << "]: push_front block " << m_front_block << " @ " << newbid;
                 m_bids.push_front(newbid);
                 m_pool->write(m_front_block, newbid);
                 if (m_bids.size() <= m_blocks2prefetch) {
-                    LOG << "sequence::push Case Hints";
+                    TLX_LOG << "sequence::push Case Hints";
                     m_pool->hint(newbid);
                 }
             }
@@ -336,11 +336,11 @@ public:
             {
                 // can not write the back block because it
                 // is the same as the front block, must keep it memory
-                LOG << "sequence::push_back Case 1";
+                TLX_LOG << "sequence::push_back Case 1";
             }
             else if (size() < 2 * block_type::size)
             {
-                LOG << "sequence::push_back Case 1.5";
+                TLX_LOG << "sequence::push_back Case 1.5";
                 // only two blocks with a gap in the beginning, move elements within memory
                 assert(m_bids.empty());
                 size_t gap = m_front_element - m_front_block->begin();
@@ -358,18 +358,18 @@ public:
             }
             else
             {
-                LOG << "sequence::push_back Case 2";
+                TLX_LOG << "sequence::push_back Case 2";
                 // write the back block
                 // need to allocate new block
                 bid_type newbid;
 
                 m_bm->new_block(m_alloc_strategy, newbid, m_alloc_count++);
 
-                LOG << "sequence[" << this << "]: push_back block " << m_back_block << " @ " << newbid;
+                TLX_LOG << "sequence[" << this << "]: push_back block " << m_back_block << " @ " << newbid;
                 m_bids.push_back(newbid);
                 m_pool->write(m_back_block, newbid);
                 if (m_bids.size() <= m_blocks2prefetch) {
-                    LOG << "sequence::push_back Case Hints";
+                    TLX_LOG << "sequence::push_back Case Hints";
                     m_pool->hint(newbid);
                 }
             }
@@ -397,7 +397,7 @@ public:
             // if there is only one block, it implies ...
             if (m_back_block == m_front_block)
             {
-                LOG << "sequence::pop_front Case 1";
+                TLX_LOG << "sequence::pop_front Case 1";
                 assert(size() == 1);
                 assert(m_back_element == m_front_element);
                 assert(m_bids.empty());
@@ -411,7 +411,7 @@ public:
             --m_size;
             if (m_size <= block_type::size)
             {
-                LOG << "sequence::pop_front Case 2";
+                TLX_LOG << "sequence::pop_front Case 2";
                 assert(m_bids.empty());
                 // the m_back_block is the next block
                 m_pool->add(m_front_block);
@@ -419,16 +419,16 @@ public:
                 m_front_element = m_back_block->begin();
                 return;
             }
-            LOG << "sequence::pop_front Case 3";
+            TLX_LOG << "sequence::pop_front Case 3";
 
             assert(!m_bids.empty());
             foxxll::request_ptr req = m_pool->read(m_front_block, m_bids.front());
-            LOG << "sequence[" << this << "]: pop_front block  " << m_front_block << " @ " << m_bids.front();
+            TLX_LOG << "sequence[" << this << "]: pop_front block  " << m_front_block << " @ " << m_bids.front();
 
             // give prefetching hints
             for (size_t i = 0; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
             {
-                LOG << "sequence::pop_front Case Hints";
+                TLX_LOG << "sequence::pop_front Case Hints";
                 m_pool->hint(m_bids[i + 1]);
             }
 
@@ -455,7 +455,7 @@ public:
             // if there is only one block, it implies ...
             if (m_back_block == m_front_block)
             {
-                LOG << "sequence::pop_back Case 1";
+                TLX_LOG << "sequence::pop_back Case 1";
                 assert(size() == 1);
                 assert(m_back_element == m_front_element);
                 assert(m_bids.empty());
@@ -469,7 +469,7 @@ public:
             --m_size;
             if (m_size <= block_type::size)
             {
-                LOG << "sequence::pop_back Case 2";
+                TLX_LOG << "sequence::pop_back Case 2";
                 assert(m_bids.empty());
                 // the m_front_block is the next block
                 m_pool->add(m_back_block);
@@ -478,16 +478,16 @@ public:
                 return;
             }
 
-            LOG << "sequence::pop_back Case 3";
+            TLX_LOG << "sequence::pop_back Case 3";
 
             assert(!m_bids.empty());
             foxxll::request_ptr req = m_pool->read(m_back_block, m_bids.back());
-            LOG << "sequence[" << this << "]: pop_back block  " << m_back_block << " @ " << m_bids.back();
+            TLX_LOG << "sequence[" << this << "]: pop_back block  " << m_back_block << " @ " << m_bids.back();
 
             // give prefetching hints
             for (size_t i = 1; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
             {
-                LOG << "sequence::pop_front Case Hints";
+                TLX_LOG << "sequence::pop_front Case Hints";
                 m_pool->hint(m_bids[m_bids.size() - 1 - i]);
             }
 
@@ -643,7 +643,7 @@ public:
 
                 if (m_size == 0)
                 {
-                    LOG << "sequence::stream::operator++ last block finished clean at block end";
+                    TLX_LOG << "sequence::stream::operator++ last block finished clean at block end";
                     assert(m_next_bid == m_sequence.m_bids.end());
                     assert(m_current_block == m_sequence.m_back_block);
                     // nothing to give back to sequence pool
@@ -652,7 +652,7 @@ public:
                 }
                 else if (m_size <= block_type::size)    // still items left in last partial block
                 {
-                    LOG << "sequence::stream::operator++ reached last block";
+                    TLX_LOG << "sequence::stream::operator++ reached last block";
                     assert(m_next_bid == m_sequence.m_bids.end());
                     // the m_back_block is the next block
                     if (m_current_block != m_sequence.m_front_block) // give current_block back to pool
@@ -663,21 +663,21 @@ public:
                 }
                 else if (m_current_block == m_sequence.m_front_block)
                 {
-                    LOG << "sequence::stream::operator++ first own-block case: steal block from sequence's pool";
+                    TLX_LOG << "sequence::stream::operator++ first own-block case: steal block from sequence's pool";
                     m_current_block = m_sequence.m_pool->steal();
                 }
 
-                LOG << "sequence::stream::operator++ default case: fetch next block";
+                TLX_LOG << "sequence::stream::operator++ default case: fetch next block";
 
                 assert(m_next_bid != m_sequence.m_bids.end());
                 foxxll::request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
-                LOG << "sequence[" << this << "]::stream::operator++ read block " << m_current_block << " @ " << *m_next_bid;
+                TLX_LOG << "sequence[" << this << "]::stream::operator++ read block " << m_current_block << " @ " << *m_next_bid;
 
                 // give prefetching hints
                 bid_iter_type bid = m_next_bid + 1;
                 for (size_t i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.end(); ++i, ++bid)
                 {
-                    LOG << "sequence::stream::operator++ giving prefetch hints";
+                    TLX_LOG << "sequence::stream::operator++ giving prefetch hints";
                     m_sequence.m_pool->hint(*bid);
                 }
 
@@ -774,7 +774,7 @@ public:
 
                 if (m_size == 0)
                 {
-                    LOG << "sequence::reverse_stream::operator++ last block finished clean at block begin";
+                    TLX_LOG << "sequence::reverse_stream::operator++ last block finished clean at block begin";
                     assert(m_next_bid == m_sequence.m_bids.rend());
                     assert(m_current_block == m_sequence.m_front_block);
                     // nothing to give back to sequence pool
@@ -783,7 +783,7 @@ public:
                 }
                 else if (m_size <= block_type::size)
                 {
-                    LOG << "sequence::reverse_stream::operator++ reached first block";
+                    TLX_LOG << "sequence::reverse_stream::operator++ reached first block";
                     assert(m_next_bid == m_sequence.m_bids.rend());
                     // the m_back_block is the next block
                     if (m_current_block != m_sequence.m_back_block) // give current_block back to pool
@@ -794,21 +794,21 @@ public:
                 }
                 else if (m_current_block == m_sequence.m_back_block)
                 {
-                    LOG << "sequence::reverse_stream::operator++ first own-block case: steal block from sequence's pool";
+                    TLX_LOG << "sequence::reverse_stream::operator++ first own-block case: steal block from sequence's pool";
                     m_current_block = m_sequence.m_pool->steal();
                 }
 
-                LOG << "sequence::reverse_stream::operator++ default case: fetch previous block";
+                TLX_LOG << "sequence::reverse_stream::operator++ default case: fetch previous block";
 
                 assert(m_next_bid != m_sequence.m_bids.rend());
                 foxxll::request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
-                LOG << "sequence[" << this << "]::reverse_stream::operator++ read block " << m_current_block << " @ " << *m_next_bid;
+                TLX_LOG << "sequence[" << this << "]::reverse_stream::operator++ read block " << m_current_block << " @ " << *m_next_bid;
 
                 // give prefetching hints
                 bid_iter_type bid = m_next_bid + 1;
                 for (size_t i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.rend(); ++i, ++bid)
                 {
-                    LOG << "sequence::reverse_stream::operator++ giving prefetch hints";
+                    TLX_LOG << "sequence::reverse_stream::operator++ giving prefetch hints";
                     m_sequence.m_pool->hint(*bid);
                 }
 

@@ -21,7 +21,7 @@
 #include <vector>
 
 #include <tlx/define.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 
 #include <foxxll/common/tmeta.hpp>
 #include <foxxll/mng/block_manager.hpp>
@@ -102,7 +102,7 @@ public:
             ? foxxll::config::get_instance()->disks_number()
             : static_cast<size_t>(D);
 
-        LOG << "queue[" << this << "]::queue(D)";
+        TLX_LOG << "queue[" << this << "]::queue(D)";
         pool = new pool_type(disks, disks + 2);
         init();
     }
@@ -119,7 +119,7 @@ public:
           alloc_count(0),
           bm(foxxll::block_manager::get_instance())
     {
-        LOG << "queue[" << this << "]::queue(sizes)";
+        TLX_LOG << "queue[" << this << "]::queue(sizes)";
         pool = new pool_type(p_pool_size, w_pool_size);
         init(blocks2prefetch_);
     }
@@ -138,7 +138,7 @@ public:
           alloc_count(0),
           bm(foxxll::block_manager::get_instance())
     {
-        LOG << "queue[" << this << "]::queue(pool)";
+        TLX_LOG << "queue[" << this << "]::queue(pool)";
         init(blocks2prefetch_);
     }
 
@@ -174,17 +174,17 @@ private:
     void init(int blocks2prefetch_ = -1)
     {
         if (pool->size_write() < 2) {
-            LOG1 << "queue: invalid configuration, not enough blocks (" << pool->size_write() <<
+            TLX_LOG1 << "queue: invalid configuration, not enough blocks (" << pool->size_write() <<
                 ") in write pool, at least 2 are needed, resizing to 3";
             pool->resize_write(3);
         }
 
         if (pool->size_write() < 3) {
-            LOG1 << "queue: inefficient configuration, no blocks for buffered writing available";
+            TLX_LOG1 << "queue: inefficient configuration, no blocks for buffered writing available";
         }
 
         if (pool->size_prefetch() < 1) {
-            LOG1 << "queue: inefficient configuration, no blocks for prefetching available";
+            TLX_LOG1 << "queue: inefficient configuration, no blocks for prefetching available";
         }
 
         front_block = back_block = pool->steal();
@@ -228,11 +228,11 @@ public:
             if (front_block == back_block)
             {             // can not write the back block because it
                 // is the same as the front block, must keep it memory
-                LOG << "queue::push Case 1";
+                TLX_LOG << "queue::push Case 1";
             }
             else if (size() < 2 * block_type::size)
             {
-                LOG << "queue::push Case 1.5";
+                TLX_LOG << "queue::push Case 1.5";
                 // only two blocks with a gap in the beginning, move elements within memory
                 assert(bids.empty());
                 size_t gap = front_element - front_block->begin();
@@ -250,18 +250,18 @@ public:
             }
             else
             {
-                LOG << "queue::push Case 2";
+                TLX_LOG << "queue::push Case 2";
                 // write the back block
                 // need to allocate new block
                 bid_type newbid;
 
                 bm->new_block(alloc_strategy, newbid, alloc_count++);
 
-                LOG << "queue[" << this << "]: push block " << back_block << " @ " << newbid;
+                TLX_LOG << "queue[" << this << "]: push block " << back_block << " @ " << newbid;
                 bids.push_back(newbid);
                 pool->write(back_block, newbid);
                 if (bids.size() <= blocks2prefetch) {
-                    LOG << "queue::push Case Hints";
+                    TLX_LOG << "queue::push Case Hints";
                     pool->hint(newbid);
                 }
             }
@@ -287,7 +287,7 @@ public:
             // if there is only one block, it implies ...
             if (back_block == front_block)
             {
-                LOG << "queue::pop Case 3";
+                TLX_LOG << "queue::pop Case 3";
                 assert(size() == 1);
                 assert(back_element == front_element);
                 assert(bids.empty());
@@ -301,7 +301,7 @@ public:
             --m_size;
             if (m_size <= block_type::size)
             {
-                LOG << "queue::pop Case 4";
+                TLX_LOG << "queue::pop Case 4";
                 assert(bids.empty());
                 // the back_block is the next block
                 pool->add(front_block);
@@ -309,16 +309,16 @@ public:
                 front_element = back_block->begin();
                 return;
             }
-            LOG << "queue::pop Case 5";
+            TLX_LOG << "queue::pop Case 5";
 
             assert(!bids.empty());
             foxxll::request_ptr req = pool->read(front_block, bids.front());
-            LOG << "queue[" << this << "]: pop block  " << front_block << " @ " << bids.front();
+            TLX_LOG << "queue[" << this << "]: pop block  " << front_block << " @ " << bids.front();
 
             // give prefetching hints
             for (size_t i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {
-                LOG << "queue::pop Case Hints";
+                TLX_LOG << "queue::pop Case Hints";
                 pool->hint(bids[i + 1]);
             }
 

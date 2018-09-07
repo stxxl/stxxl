@@ -20,7 +20,7 @@
 #include <utility>
 
 #include <tlx/define.hpp>
-#include <tlx/logger.hpp>
+#include <tlx/logger/core.hpp>
 #include <tlx/simple_vector.hpp>
 
 #include <foxxll/common/onoff_switch.hpp>
@@ -217,7 +217,7 @@ create_runs(
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
         (m2 * BlockType::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
     const unsigned int log_k2 = tlx::integer_log2_floor(m2 * Blocks1->size) - log_k1 - 1;
-    LOG1 << "log_k1: " << log_k1 << " log_k2:" << log_k2;
+    TLX_LOG1 << "log_k1: " << log_k1 << " log_k2:" << log_k2;
     const size_t k1 = size_t(1) << log_k1;
     const size_t k2 = size_t(1) << log_k2;
     size_t* bucket1 = new size_t[k1];
@@ -235,7 +235,7 @@ create_runs(
     size_t k = 0;
     const int shift1 = static_cast<int>(sizeof(key_type) * 8 - log_k1);
     const int shift2 = shift1 - log_k2;
-    LOG1 << "shift1: " << shift1 << " shift2:" << shift2;
+    TLX_LOG1 << "shift1: " << shift1 << " shift2:" << shift2;
 
     for ( ; k < nruns; k++)
     {
@@ -359,7 +359,7 @@ bool check_ksorted_runs(RunType** runs,
     using value_type = typename BlockType::value_type;
     using request_ptr = foxxll::request_ptr;
 
-    LOG1 << "check_ksorted_runs  Runs: " << nruns;
+    TLX_LOG1 << "check_ksorted_runs  Runs: " << nruns;
     size_t irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
@@ -383,11 +383,11 @@ bool check_ksorted_runs(RunType** runs,
 
             if (off && (keyext(blocks[0][0]) < keyext(last)))
             {
-                LOG1 << "check_sorted_runs  wrong first value in the run " << irun;
-                LOG1 << " first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]);
-                LOG1 << " last  value: " << last << " with key" << keyext(last);
+                TLX_LOG1 << "check_sorted_runs  wrong first value in the run " << irun;
+                TLX_LOG1 << " first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]);
+                TLX_LOG1 << " last  value: " << last << " with key" << keyext(last);
                 for (size_t k = 0; k < block_type::size; ++k)
-                    LOG1 << "Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]);
+                    TLX_LOG1 << "Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]);
 
                 delete[] reqs;
                 delete[] blocks;
@@ -398,18 +398,18 @@ bool check_ksorted_runs(RunType** runs,
             {
                 if (keyext(blocks[j][0]) != (*runs[irun])[off + j].key)
                 {
-                    LOG1 << "check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j);
-                    LOG1 << "                   trigger value: " << (*runs[irun])[off + j].key;
-                    LOG1 << "Data in the block:";
+                    TLX_LOG1 << "check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j);
+                    TLX_LOG1 << "                   trigger value: " << (*runs[irun])[off + j].key;
+                    TLX_LOG1 << "Data in the block:";
                     for (size_t k = 0; k < block_type::size; ++k)
-                        LOG1 << "Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]);
+                        TLX_LOG1 << "Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]);
 
-                    LOG1 << "BIDS:";
+                    TLX_LOG1 << "BIDS:";
                     for (size_t k = 0; k < nblocks; ++k)
                     {
                         if (k == j)
-                            LOG1 << "Bad one comes next.";
-                        LOG1 << "BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid);
+                            TLX_LOG1 << "Bad one comes next.";
+                        TLX_LOG1 << "BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid);
                     }
 
                     delete[] reqs;
@@ -421,17 +421,17 @@ bool check_ksorted_runs(RunType** runs,
                                   make_element_iterator(blocks, nelements),
                                   key_comparison<value_type, KeyExtractorWithMin>()))
             {
-                LOG1 << "check_sorted_runs  wrong order in the run " << irun;
-                LOG1 << "Data in blocks:";
+                TLX_LOG1 << "check_sorted_runs  wrong order in the run " << irun;
+                TLX_LOG1 << "Data in blocks:";
                 for (size_t j = 0; j < nblocks; ++j)
                 {
                     for (size_t k = 0; k < block_type::size; ++k)
-                        LOG1 << "     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]);
+                        TLX_LOG1 << "     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]);
                 }
-                LOG1 << "BIDS:";
+                TLX_LOG1 << "BIDS:";
                 for (size_t k = 0; k < nblocks; ++k)
                 {
-                    LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
+                    TLX_LOG1 << "BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid);
                 }
 
                 delete[] reqs;
@@ -478,12 +478,12 @@ void merge_runs(RunType** in_runs, size_t nruns, RunType* out_run, size_t _m, Ke
     const size_t n_write_buffers = 4 * disks_number;
 #else
     const size_t n_prefetch_buffers = std::max(2 * disks_number, (3 * (_m - nruns) / 4));
-    LOG1 << "Prefetch buffers " << n_prefetch_buffers;
+    TLX_LOG1 << "Prefetch buffers " << n_prefetch_buffers;
     const size_t n_write_buffers = std::max(2 * disks_number, _m - nruns - n_prefetch_buffers);
-    LOG1 << "Write buffers " << n_write_buffers;
+    TLX_LOG1 << "Write buffers " << n_write_buffers;
     // heuristic
     const size_t n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
-    LOG1 << "Prefetch buffers " << n_opt_prefetch_buffers;
+    TLX_LOG1 << "Prefetch buffers " << n_opt_prefetch_buffers;
 #endif
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
@@ -556,7 +556,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     size_t m2 = foxxll::div_ceil(_m, 2);
     const size_t m2_rf = m2 * block_type::raw_size /
                          (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
-    LOG1 << "Reducing number of blocks in a run from " << m2 << " to " <<
+    TLX_LOG1 << "Reducing number of blocks in a run from " << m2 << " to " <<
         m2_rf << " due to key size: " << sizeof(typename KeyExtractor::key_type) << " bytes";
     m2 = m2_rf;
     size_t full_runs = _n / m2;
@@ -566,7 +566,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 
     foxxll::block_manager* mng = foxxll::block_manager::get_instance();
 
-    LOG1 << "n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs;
+    TLX_LOG1 << "n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs;
 
     double begin = foxxll::timestamp(), after_runs_creation, end;
 
@@ -619,7 +619,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
     while (nruns > 1)
     {
         size_t new_nruns = foxxll::div_ceil(nruns, merge_factor);
-        LOG1 << "Starting new merge phase: nruns: " << nruns <<
+        TLX_LOG1 << "Starting new merge phase: nruns: " << nruns <<
             " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns;
 
         new_runs = new run_type*[new_nruns];
@@ -680,7 +680,7 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert((check_ksorted_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left, runs2merge, m2, keyobj)));
 #endif
-            LOG1 << "Merging " << runs2merge << " runs";
+            TLX_LOG1 << "Merging " << runs2merge << " runs";
             merge_runs<block_type, run_type, KeyExtractor>(runs + nruns - runs_left,
                                                            runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
             runs_left -= runs2merge;
@@ -696,10 +696,10 @@ ksort_blocks(InputBidIterator input_bids, size_t _n,
 
     end = foxxll::timestamp();
 
-    LOG1 << "Elapsed time        : " << end - begin << " s. Run creation time: " <<
+    TLX_LOG1 << "Elapsed time        : " << end - begin << " s. Run creation time: " <<
         after_runs_creation - begin << " s";
-    LOG1 << "Time in I/O wait(rf): " << io_wait_after_rf << " s";
-    LOG1 << *foxxll::stats::get_instance();
+    TLX_LOG1 << "Time in I/O wait(rf): " << io_wait_after_rf << " s";
+    TLX_LOG1 << *foxxll::stats::get_instance();
 
     return result;
 }
