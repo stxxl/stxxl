@@ -16,7 +16,7 @@
 
 #include <string>
 
-#include <tlx/die.hpp>
+#include <tlx/die/core.hpp>
 
 #include <foxxll/version.hpp>
 
@@ -91,9 +91,9 @@ inline void print_library_version_mismatch()
 {
     if (stxxl::check_library_version() != 0)
     {
-        die("version mismatch between headers" <<
-            " (" << STXXL_VERSION_STRING ") and library" <<
-            " (" << get_library_version_string() << ")");
+        tlx_die("version mismatch between headers" <<
+                " (" << STXXL_VERSION_STRING ") and library" <<
+                " (" << get_library_version_string() << ")");
     }
 }
 

@@ -17,8 +17,8 @@
 #include <iostream>
 #include <limits>
 
-#include <stxxl/comparator>
 #include <stxxl/bits/common/padding.h>
+#include <stxxl/comparator>
 
 template <typename KeyType>
 struct key_with_padding_base {

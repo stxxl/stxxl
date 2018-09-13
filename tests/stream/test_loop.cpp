@@ -289,4 +289,3 @@ int main(int argc, char** argv)
     }
     cout << "\nIteration needed: " << i << endl;
 }
-

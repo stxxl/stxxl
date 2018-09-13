@@ -18,8 +18,8 @@
 
 #include <foxxll/common/die_with_message.hpp>
 
-#include <stxxl/comparator>
 #include <stxxl/bits/containers/btree/btree.h>
+#include <stxxl/comparator>
 
 #include <key_with_padding.h>
 #include <test_helpers.h>

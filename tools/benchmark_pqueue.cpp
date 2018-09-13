@@ -40,7 +40,6 @@ static const char* description =
 
 #include "../tests/include/test_helpers.h"
 
-
 using stxxl::external_size_type;
 
 #define MiB (1024 * 1024)
@@ -70,28 +69,28 @@ struct my_type
 
 namespace std {
 
-template<>
+template <>
 struct tuple_element<0, my_type>
 {
     using type = my_type::key_type;
 };
 
-}
+} // namespace std
 
 template <typename ValueType, size_t mem_for_queue, external_size_type maxvolume>
 struct my_pq_gen
 {
     using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-        ValueType,
-        stxxl::comparator<ValueType, stxxl::direction::Greater, stxxl::direction::DontCare>,
-        mem_for_queue,
-        maxvolume * MiB / sizeof(ValueType)>;
+              ValueType,
+              stxxl::comparator<ValueType, stxxl::direction::Greater, stxxl::direction::DontCare>,
+              mem_for_queue,
+              maxvolume* MiB / sizeof(ValueType)>;
 };
 
 struct my_type_extractor
 {
     template <typename T>
-    auto operator() (T &a) const
+    auto operator () (T& a) const
     {
         return std::tie(std::get<0>(a));
     }
@@ -101,10 +100,10 @@ template <size_t mem_for_queue, external_size_type maxvolume>
 struct my_pq_gen<my_type, mem_for_queue, maxvolume>
 {
     using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-        my_type,
-        stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater>,
-        mem_for_queue,
-        maxvolume * MiB / sizeof(my_type)>;
+              my_type,
+              stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater>,
+              mem_for_queue,
+              maxvolume* MiB / sizeof(my_type)>;
 };
 
 static inline void progress(const char* text, external_size_type i, external_size_type nelements)

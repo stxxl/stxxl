@@ -163,8 +163,8 @@ int main()
     sorted_stream_type sorted_stream(tuple_stream, cmp_type(), sorter_memory);
 #endif
 
-    using transformed_stream_type = stxxl::stream::transform<identity<std::tuple<char, int>>, sorted_stream_type>;
-    identity<std::tuple<char, int>> id;
+    using transformed_stream_type = stxxl::stream::transform<identity<std::tuple<char, int> >, sorted_stream_type>;
+    identity<std::tuple<char, int> > id;
     transformed_stream_type transformed_stream(id, sorted_stream);
 
     // HERE streaming part ends (materializing)

@@ -1484,7 +1484,7 @@ public:
         {
             flush();
         }
-        catch (foxxll::io_error e)
+        catch (foxxll::io_error& e)
         {
             TLX_LOG1 << "io_error thrown in ~vector(): " << e.what();
         }

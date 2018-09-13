@@ -71,4 +71,3 @@ int do_mlock(int, char*[])
 }
 
 #endif // STXXL_HAVE_MLOCK_PROTO
-

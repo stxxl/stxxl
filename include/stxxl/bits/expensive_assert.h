@@ -13,11 +13,11 @@
 #ifndef STXXL_EXPENSIVE_ASSERT_HEADER
 #define STXXL_EXPENSIVE_ASSERT_HEADER
 
-#include <tlx/die.hpp>
+#include <tlx/die/core.hpp>
 #include <tlx/unused.hpp>
 
 #if STXXL_EXPENSIVE_ASSERTIONS
-    #define STXXL_EXPENSIVE_ASSERT(condition) die_unless(condition)
+    #define STXXL_EXPENSIVE_ASSERT(condition) tlx_die_unless(condition)
 #else
     #define STXXL_EXPENSIVE_ASSERT(condition) { }
 #endif

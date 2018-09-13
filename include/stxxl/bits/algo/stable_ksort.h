@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <utility>
 
-#include <tlx/die.hpp>
+#include <tlx/die/core.hpp>
 #include <tlx/logger/core.hpp>
 #include <tlx/math/integer_log2.hpp>
 #include <tlx/simple_vector.hpp>
@@ -308,9 +308,10 @@ void stable_ksort(ExtIterator first, ExtIterator last, KeyExtract key_extract, s
             max_bucket_size_act = std::max(bucket_sizes[i], max_bucket_size_act);
             if (bucket_sizes[i] > max_bucket_size_rec)
             {
-                die("Bucket " << i << " is too large: " << bucket_sizes[i] <<
-                    " records, maximum: " << max_bucket_size_rec << "\n"
-                    "Recursion on buckets is not yet implemented, aborting.");
+                tlx_die(
+                    "Bucket " << i << " is too large: " << bucket_sizes[i] <<
+                        " records, maximum: " << max_bucket_size_rec << "\n"
+                        "Recursion on buckets is not yet implemented, aborting.");
             }
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])

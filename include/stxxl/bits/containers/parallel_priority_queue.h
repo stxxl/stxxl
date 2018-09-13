@@ -34,7 +34,7 @@
 #include <vector>
 
 #include <tlx/define.hpp>
-#include <tlx/die.hpp>
+#include <tlx/die/core.hpp>
 #include <tlx/logger/core.hpp>
 #include <tlx/string.hpp>
 
@@ -2389,8 +2389,8 @@ public:
         if (!omp_get_nested()) {
             omp_set_nested(1);
             if (!omp_get_nested()) {
-                die("Could not enable OpenMP's nested parallelism, "
-                    "however, the PPQ requires this OpenMP feature.");
+                tlx_die("Could not enable OpenMP's nested parallelism, "
+                        "however, the PPQ requires this OpenMP feature.");
             }
         }
 #else
@@ -2400,8 +2400,8 @@ public:
             "compilation settings.";
 #endif
         if (m_num_read_blocks_per_ea < 1.0) {
-            die("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
-                " it is " << m_num_read_blocks_per_ea);
+            tlx_die("PPQ: requires num_read_blocks_per_ea >= 1.0, however,"
+                    " it is " << m_num_read_blocks_per_ea);
         }
 
         if (c_limit_extract_buffer) {
@@ -2458,8 +2458,8 @@ public:
 
         if (m_mem_total < m_mem_left) // checks if unsigned type wrapped.
         {
-            die("Minimum memory requirement insufficient, "
-                "increase PPQ's memory limit or decrease buffers.");
+            tlx_die("Minimum memory requirement insufficient, "
+                    "increase PPQ's memory limit or decrease buffers.");
         }
 
         check_invariants();
@@ -2506,13 +2506,13 @@ protected:
             num_used_read += m_external_arrays[i].num_used_blocks();
         }
 
-        die_unless(num_hinted == m_num_hinted_blocks);
-        die_unless(num_used_read == m_num_used_read_blocks);
+        tlx_die_unless(num_hinted == m_num_hinted_blocks);
+        tlx_die_unless(num_used_read == m_num_used_read_blocks);
 
-        die_unequal(m_num_used_read_blocks,
-                    m_num_read_blocks
-                    - m_pool.free_size_prefetch()
-                    - m_num_hinted_blocks);
+        tlx_die_unequal(m_num_used_read_blocks,
+                        m_num_read_blocks
+                        - m_pool.free_size_prefetch()
+                        - m_num_hinted_blocks);
 
         // test the processor local data structures
 
@@ -2523,18 +2523,18 @@ protected:
             // check that each insertion heap is a heap
 
             // TODO: remove soon, because this is very expensive
-            die_unless(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
-                                           m_proc[p]->insertion_heap.end(),
-                                           m_compare));
+            tlx_die_unless(1 || stxxl::is_heap(m_proc[p]->insertion_heap.begin(),
+                                               m_proc[p]->insertion_heap.end(),
+                                               m_compare));
 
-            die_unless(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
+            tlx_die_unless(m_proc[p]->insertion_heap.capacity() <= m_insertion_heap_capacity);
 
             heaps_size += m_proc[p]->insertion_heap.size();
             mem_used += m_proc[p]->insertion_heap.capacity() * sizeof(value_type);
         }
 
         if (!m_in_bulk_push)
-            die_unequal(m_heaps_size, heaps_size);
+            tlx_die_unequal(m_heaps_size, heaps_size);
 
         // count number of items and memory size of internal arrays
 
@@ -2550,11 +2550,11 @@ protected:
             ++ia_levels[ia->level()];
         }
 
-        die_unequal(m_internal_size, ia_size);
+        tlx_die_unequal(m_internal_size, ia_size);
         mem_used += ia_memory;
 
         for (size_t i = 0; i < kMaxInternalLevels; ++i)
-            die_unequal(m_internal_levels[i], ia_levels[i]);
+            tlx_die_unequal(m_internal_levels[i], ia_levels[i]);
 
         // count number of items in external arrays
 
@@ -2570,15 +2570,15 @@ protected:
             ++ea_levels[ea->level()];
         }
 
-        die_unequal(m_external_size, ea_size);
+        tlx_die_unequal(m_external_size, ea_size);
         mem_used += ea_memory;
 
         for (size_t i = 0; i < kMaxExternalLevels; ++i)
-            die_unequal(m_external_levels[i], ea_levels[i]);
+            tlx_die_unequal(m_external_levels[i], ea_levels[i]);
 
         // calculate mem_used so that == mem_total - mem_left
 
-        die_unequal(memory_consumption(), mem_used);
+        tlx_die_unequal(memory_consumption(), mem_used);
     }
 
     //! \}
@@ -3103,7 +3103,7 @@ public:
                 ": " << m_extract_buffer[m_extract_buffer_index];
             return m_extract_buffer[m_extract_buffer_index];
         default:
-            die("Unknown extract type: " << type);
+            tlx_die("Unknown extract type: " << type);
         }
     }
 
@@ -3173,7 +3173,7 @@ public:
             break;
         }
         default:
-            die("Unknown extract type: " << type);
+            tlx_die("Unknown extract type: " << type);
         }
 
         m_stats.extract_min_time.stop();
@@ -4471,9 +4471,9 @@ protected:
         m_internal_size += size - used;
         m_mem_left -= internal_array_type::int_memory(capacity);
 
-        die_unless(level < kMaxInternalLevels &&
-                   "Internal array level is larger than anything possible "
-                   "in this universe. Increase the size of m_internal_levels");
+        tlx_die_unless(level < kMaxInternalLevels &&
+                       "Internal array level is larger than anything possible "
+                       "in this universe. Increase the size of m_internal_levels");
 
         ++m_internal_levels[level];
 

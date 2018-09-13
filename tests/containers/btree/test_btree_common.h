@@ -22,8 +22,8 @@
 
 #include <foxxll/common/die_with_message.hpp>
 
-#include <stxxl/comparator>
 #include <stxxl/bits/containers/btree/btree.h>
+#include <stxxl/comparator>
 #include <stxxl/random_shuffle>
 #include <stxxl/scan>
 #include <stxxl/sort>
