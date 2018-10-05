@@ -64,28 +64,38 @@ endif()
 
 # please document all build options in doc/install.doc:install_build_options
 
-option(STXXL_BUILD_EXAMPLES "Build all stxxl examples" OFF)
+option(STXXL_BUILD_EXAMPLES
+  "Build all stxxl examples" OFF)
 
-option(STXXL_BUILD_TESTS "Build all stxxl test programs" OFF)
+option(STXXL_BUILD_TESTS
+  "Build all stxxl test programs" OFF)
 if(STXXL_BUILD_TESTS)
   set(STXXL_BUILD_EXAMPLES ON)
 endif()
 
-option(STXXL_BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
+option(STXXL_BUILD_EXTRAS
+  "Build all extra stxxl tests and tool programs" OFF)
 
-option(STXXL_RUN_SLOW_TESTS "Run slow tests of extra stxxl tests and tool programs" ON)
+option(STXXL_RUN_SLOW_TESTS
+  "Run slow tests of extra stxxl tests and tool programs" ON)
 
-option(USE_OPENMP "Use OpenMP for multi-core parallelism" ON)
+option(USE_OPENMP
+  "Use OpenMP for multi-core parallelism" ON)
 
-option(STXXL_TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
+option(STXXL_TRY_COMPILE_HEADERS
+  "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
-option(USE_VALGRIND "Run tests with valgrind, pre-initialize some memory buffers." OFF)
+option(USE_VALGRIND
+  "Run tests with valgrind, pre-initialize some memory buffers." OFF)
 
-option(USE_MALLOC_COUNT "Compile all programs with included malloc_count heap profiler." OFF)
+option(USE_MALLOC_COUNT
+  "Compile all programs with included malloc_count heap profiler." OFF)
 
-option(USE_GCOV "Compile and run tests with gcov for coverage analysis." OFF)
+option(USE_GCOV
+  "Compile and run tests with gcov for coverage analysis." OFF)
 
-option(STXXL_EXPENSIVE_ASSERTIONS "Enable more costly assertions for internal debugging." OFF)
+option(STXXL_EXPENSIVE_ASSERTIONS
+  "Enable more costly assertions for internal debugging." OFF)
 if(STXXL_EXPENSIVE_ASSERTIONS)
   set(STXXL_EXPENSIVE_ASSERTIONS "1") # change from ON/OFF to 1/0
 endif()
@@ -99,17 +109,24 @@ option(BUILD_SHARED_LIBS "Build shared library version of libstxxl" OFF)
 
 ### allow user to specify other installation paths
 
-set(INSTALL_BIN_DIR "bin" CACHE PATH "Installation directory for executables")
-set(INSTALL_LIB_DIR "lib" CACHE PATH "Installation directory for libraries")
-set(INSTALL_INCLUDE_DIR "include" CACHE PATH "Installation directory for header files")
-set(INSTALL_PKGCONFIG_DIR "lib/pkgconfig" CACHE PATH "Installation directory for pkg-config file")
+include(GNUInstallDirs)
+
+set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR}
+  CACHE PATH "Installation directory for executables")
+set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR}
+  CACHE PATH "Installation directory for libraries")
+set(INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}
+  CACHE PATH "Installation directory for header files")
+set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+  CACHE PATH "Installation directory for pkg-config file")
 
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR "CMake")
 else()
-  set(DEF_INSTALL_CMAKE_DIR "lib/cmake/stxxl")
+  set(DEF_INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/stxxl")
 endif()
-set(INSTALL_CMAKE_DIR "${DEF_INSTALL_CMAKE_DIR}" CACHE PATH "Installation directory for cmake files")
+set(INSTALL_CMAKE_DIR "${DEF_INSTALL_CMAKE_DIR}"
+  CACHE PATH "Installation directory for cmake files")
 
 ###############################################################################
 # enable use of "make test"
@@ -295,6 +312,8 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 
+set(STXXL_DEPEND_LIBRARIES ${STXXL_DEPEND_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
 # for testing for c++ system include files
 include(CheckIncludeFileCXX)
 
@@ -429,14 +448,24 @@ check_symbol_exists(mlock "sys/mman.h" STXXL_HAVE_MLOCK_PROTO)
 if(USE_MALLOC_COUNT)
   # malloc_count requires the linux dl (dynamic linker) library
   find_library(DL_LIBRARIES NAMES dl)
-  set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${DL_LIBRARIES})
+  set(STXXL_DEPEND_LIBRARIES ${STXXL_DEPEND_LIBRARIES} ${DL_LIBRARIES})
 endif()
+
+###############################################################################
+# find foxxll
+
+# build foxxll library as extlib
+add_subdirectory(extlib/foxxll)
+
+set(STXXL_DEPEND_LIBRARIES foxxll ${STXXL_DEPEND_LIBRARIES})
 
 ###############################################################################
 # configure environment for building
 
 # create config.h with define switches _inside binary dir_!
-configure_file(${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h)
+configure_file(
+  ${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in
+  ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h)
 
 # CXX_FLAGS required for compilation
 set(STXXL_CXX_FLAGS ${OpenMP_CXX_FLAGS})
@@ -458,12 +487,11 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "R
 
 # globally adds top-level include directories
 set(STXXL_INCLUDE_DIRS
-  ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
-include_directories(${STXXL_INCLUDE_DIRS})
+  ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/
+  ${FOXXLL_INCLUDE_DIRS})
 
 # for targets using stxxl library
-set(STXXL_EXTRA_LIBRARIES ${STXXL_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-set(STXXL_LIBRARIES stxxl foxxll ${STXXL_EXTRA_LIBRARIES})
+set(STXXL_LIBRARIES stxxl ${STXXL_DEPEND_LIBRARIES})
 
 # export STXXL_INCLUDE_DIRS and STXXL_LIBRARIES to global CACHE
 set(STXXL_CXX_FLAGS "${STXXL_CXX_FLAGS}" CACHE STRING "Compiler flags for STXXL")
@@ -472,9 +500,6 @@ set(STXXL_LIBRARIES "${STXXL_LIBRARIES}" CACHE STRING "Libraries to link for STX
 
 ###############################################################################
 # build foxxll and libstxxl
-
-# build foxxll library as extlib
-add_subdirectory(extlib/foxxll)
 
 # build libstxxl in /lib
 add_subdirectory(lib)
