@@ -88,6 +88,11 @@ public:
         return elem[i];
     }
 
+    const_reference operator[] (size_t i) const
+    {
+        return elem[i];
+    }
+
     //! Returns \c iterator pointing to the first element.
     iterator begin()
     {

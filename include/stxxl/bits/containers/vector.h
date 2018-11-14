@@ -2086,6 +2086,16 @@ public:
     {
         return bufreader_iterator(*this, m_end);
     }
+
+    const block_type& block() const
+    {
+        return m_bufin->block();
+    }
+
+    void next_block()
+    {
+        return m_bufin->next_block();
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////

@@ -96,14 +96,7 @@ public:
         record = current_blk->elem[current_elem++];
 
         if (UNLIKELY(current_elem >= block_type::size))
-        {
-            current_elem = 0;
-#ifdef BUF_ISTREAM_CHECK_END
-            not_finished = prefetcher->block_consumed(current_blk);
-#else
-            prefetcher->block_consumed(current_blk);
-#endif
-        }
+            next_block()
 
         return (*this);
     }
@@ -131,15 +124,23 @@ public:
         current_elem++;
 
         if (UNLIKELY(current_elem >= block_type::size))
-        {
-            current_elem = 0;
-#ifdef BUF_ISTREAM_CHECK_END
-            not_finished = prefetcher->block_consumed(current_blk);
-#else
-            prefetcher->block_consumed(current_blk);
-#endif
-        }
+            next_block();
         return *this;
+    }
+
+    const BlockType& block() const
+    {
+        return *current_blk;
+    }
+
+    void next_block()
+    {
+        current_elem = 0;
+#ifdef BUF_ISTREAM_CHECK_END
+        not_finished = prefetcher->block_consumed(current_blk);
+#else
+        prefetcher->block_consumed(current_blk);
+#endif
     }
 
     //! Frees used internal objects.
