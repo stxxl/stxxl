@@ -2087,11 +2087,13 @@ public:
         return bufreader_iterator(*this, m_end);
     }
 
+    //! Return reference to the current block
     const block_type& block() const
     {
         return m_bufin->block();
     }
 
+    //! Read the next block (do not intermix with operator++ !)
     void next_block()
     {
         return m_bufin->next_block();

@@ -96,7 +96,7 @@ public:
         record = current_blk->elem[current_elem++];
 
         if (UNLIKELY(current_elem >= block_type::size))
-            next_block()
+            next_block();
 
         return (*this);
     }
@@ -128,11 +128,13 @@ public:
         return *this;
     }
 
+    //! Returns reference to the current block
     const BlockType& block() const
     {
         return *current_blk;
     }
 
+    //! Reads the next block (do not intermix with operator++ !)
     void next_block()
     {
         current_elem = 0;
