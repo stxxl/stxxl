@@ -414,8 +414,11 @@ public:
         {
             block_type* b = pool->steal();
             another_merger.multi_merge(b->begin(), b->end());
+            STXXL_VERBOSE1("first element of following block " << *curbid);
+            STXXL_VERBOSE1("last element of following block " << *curbid);
             assert(!tree.cmp(*(b->begin()), *(b->end() - 1)));
             pool->write(b, *curbid);
+            STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
         }
 
         insert_segment(bids, first_block, first_size, index);
@@ -523,6 +526,8 @@ protected:
                     total_size += seq_i_size;
                     if (inv_cmp(*(seqs[i].second - 1), min_last))
                         min_last = *(seqs[i].second - 1);
+
+                    STXXL_VERBOSE1("front block of seq " << i << ": len=" << seq_i_size);
                 }
                 else {
                     STXXL_VERBOSE1("front block of seq " << i << ": empty");
@@ -531,6 +536,8 @@ protected:
 
             assert(total_size > 0);
             assert(!is_sentinel(min_last));
+
+            STXXL_VERBOSE1("total size " << total_size << " num_seq " << seqs.size());
 
             diff_type less_equal_than_min_last = 0;
             //locate this element in all sequences
@@ -543,11 +550,15 @@ protected:
 
                 //no element larger than min_last is merged
 
+                STXXL_VERBOSE1("seq " << i << ": " << (position - seqs[i].first));
+
                 less_equal_than_min_last += (position - seqs[i].first);
             }
 
             // at most rest elements
             diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);
+
+            STXXL_VERBOSE1("output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")");
 
             assert(output_size > 0);
 
@@ -594,6 +605,7 @@ protected:
                             pool->hint(state.bids.front());
                         }
                         pool->read(state.block, bid)->wait();
+                        STXXL_VERBOSE1("seq " << i << ": first element of read block " << bid << " cached in " << state.block);
                         if (!(state.bids.empty()))
                             pool->hint(state.bids.front());  // re-hint, reading might have made a block free
                         state.current = 0;
