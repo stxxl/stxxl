@@ -406,7 +406,6 @@ public:
             first_block->begin() + (block_type::size - first_size),
             first_block->end());
 
-        STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
         assert(!tree.cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
 
         assert(pool->size_write() > 0);
@@ -415,8 +414,8 @@ public:
         {
             block_type* b = pool->steal();
             another_merger.multi_merge(b->begin(), b->end());
-            STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
-            STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
+            STXXL_VERBOSE1("first element of following block " << *curbid);
+            STXXL_VERBOSE1("last element of following block " << *curbid);
             assert(!tree.cmp(*(b->begin()), *(b->end() - 1)));
             pool->write(b, *curbid);
             STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
@@ -528,7 +527,7 @@ protected:
                     if (inv_cmp(*(seqs[i].second - 1), min_last))
                         min_last = *(seqs[i].second - 1);
 
-                    STXXL_VERBOSE1("front block of seq " << i << ": front=" << *(seqs[i].first) << " back=" << *(seqs[i].second - 1) << " len=" << seq_i_size);
+                    STXXL_VERBOSE1("front block of seq " << i << ": len=" << seq_i_size);
                 }
                 else {
                     STXXL_VERBOSE1("front block of seq " << i << ": empty");
@@ -538,7 +537,7 @@ protected:
             assert(total_size > 0);
             assert(!is_sentinel(min_last));
 
-            STXXL_VERBOSE1("min_last " << min_last << " total size " << total_size << " num_seq " << seqs.size());
+            STXXL_VERBOSE1("total size " << total_size << " num_seq " << seqs.size());
 
             diff_type less_equal_than_min_last = 0;
             //locate this element in all sequences
@@ -551,7 +550,7 @@ protected:
 
                 //no element larger than min_last is merged
 
-                STXXL_VERBOSE1("seq " << i << ": " << (position - seqs[i].first) << " greater equal than " << min_last);
+                STXXL_VERBOSE1("seq " << i << ": " << (position - seqs[i].first));
 
                 less_equal_than_min_last += (position - seqs[i].first);
             }
@@ -606,7 +605,7 @@ protected:
                             pool->hint(state.bids.front());
                         }
                         pool->read(state.block, bid)->wait();
-                        STXXL_VERBOSE1("seq " << i << ": first element of read block " << bid << " " << *(state.block->begin()) << " cached in " << state.block);
+                        STXXL_VERBOSE1("seq " << i << ": first element of read block " << bid << " cached in " << state.block);
                         if (!(state.bids.empty()))
                             pool->hint(state.bids.front());  // re-hint, reading might have made a block free
                         state.current = 0;
