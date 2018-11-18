@@ -20,6 +20,7 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
+#include <memory>
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/parallel/compiletime_settings.h>
