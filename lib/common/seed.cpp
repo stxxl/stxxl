@@ -35,7 +35,7 @@ struct seed_generator_t {
     unsigned seed;
     fastmutex mtx;
 
-    seed_generator_t(unsigned s) : seed(s)
+    explicit seed_generator_t(unsigned s) : seed(s)
     { }
 };
 

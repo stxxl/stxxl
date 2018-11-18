@@ -51,7 +51,7 @@ struct my_type
     key_type key() const { return m_key; }
 
     my_type() { }
-    my_type(key_type k) : m_key(k) { }
+    explicit my_type(key_type k) : m_key(k) { }
     my_type(key_type k, key_type l) : m_key(k), m_load(l) { }
 
     void operator = (const key_type& k) { m_key = k; }

@@ -142,7 +142,8 @@ bool test_block_cache()
     STXXL_CHECK(cache.size() == cache_size / 2);
     STXXL_CHECK(cache2.size() == cache_size);
     STXXL_CHECK(cache2.get_subblock(bids[6], 1) == a_subblock);
-
+    delete block;
+    
     STXXL_MSG("Passed Block-Cache Test");
 
     return true;

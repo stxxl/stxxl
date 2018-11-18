@@ -58,7 +58,7 @@ struct ProduceBill
     unsigned sum;       // current subscribers debit
     LogEntry last;      // the last record
 
-    ProduceBill(std::ostream& o_) : out(o_), sum(0) { last.from = -1; }
+    explicit ProduceBill(std::ostream& o_) : out(o_), sum(0) { last.from = -1; }
 
     void operator () (const LogEntry& e)
     {

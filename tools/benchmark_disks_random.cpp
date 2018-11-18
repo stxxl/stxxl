@@ -39,7 +39,7 @@ struct print_number
 {
     int n;
 
-    print_number(int n) : n(n) { }
+    explicit print_number(int n) : n(n) { }
 
     void operator () (stxxl::request_ptr)
     {

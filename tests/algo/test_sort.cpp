@@ -32,7 +32,7 @@ struct my_type
     }
 
     my_type() { }
-    my_type(key_type k) : m_key(k)
+    explicit my_type(key_type k) : m_key(k)
     {
 #if STXXL_WITH_VALGRIND
         memset(m_data, 0, sizeof(m_data));

@@ -22,7 +22,7 @@ struct my_int : public stxxl::counted_object
 {
     int i;
 
-    my_int(int _i) : i(_i) { }
+    explicit my_int(int _i) : i(_i) { }
 
     // count number of destructor calls
     ~my_int()

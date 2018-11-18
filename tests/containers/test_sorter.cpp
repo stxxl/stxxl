@@ -31,7 +31,7 @@ struct my_type
     }
 
     my_type() { }
-    my_type(key_type k)
+    explicit my_type(key_type k)
         : m_key(k)
     {
 #if STXXL_WITH_VALGRIND

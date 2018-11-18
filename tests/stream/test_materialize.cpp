@@ -20,7 +20,7 @@ struct forty_two
 {
     unsigned counter, length;
 
-    forty_two(unsigned l) : counter(0), length(l) { }
+    explicit forty_two(unsigned l) : counter(0), length(l) { }
 
     bool empty() const { return !(counter < length); }
 

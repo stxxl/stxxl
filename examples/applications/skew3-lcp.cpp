@@ -213,7 +213,7 @@ private:
     value_type m_curr;
 
 public:
-    sa_index_stream_type(InputStream& input) : m_counter(0), m_input(input)
+    explicit sa_index_stream_type(InputStream& input) : m_counter(0), m_input(input)
     {
         if (!m_input.empty())
             m_curr = value_type(*m_input, m_counter++, 0);
@@ -1044,7 +1044,7 @@ public:
         value_type result;
 
     public:
-        extract_mod12(Input& A_) : A(A_), counter(0), output_counter(0)
+        explicit extract_mod12(Input& A_) : A(A_), counter(0), output_counter(0)
         {
             assert(!A.empty());
             ++A, ++counter; // skip 0 = mod0 offset
@@ -1096,7 +1096,7 @@ public:
         std::vector<std::vector<offset_type> > QTable;
 
     public:
-        sparseTable(std::vector<offset_type>& fieldVector)
+        explicit sparseTable(std::vector<offset_type>& fieldVector)
         {
             std::size_t dimI = fieldVector.size();    // y-Dimension of QTable
             std::size_t dimK = floor(log2(dimI)) + 1; // x-Dimension of QTable
@@ -2578,7 +2578,7 @@ public:
         }   //dc3-lcp()
 
     public:
-        algorithm(Input& data_in) : finished(false), rec_depth(0)
+        explicit algorithm(Input& data_in) : finished(false), rec_depth(0)
         {
             // (t_i) -> (i,t_i)
             counter_stream_type dummy;
