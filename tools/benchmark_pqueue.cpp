@@ -51,7 +51,13 @@ struct my_type : public uint32_pair_type
     typedef uint32 key_type;
 
     char data[MY_TYPE_SIZE - sizeof(uint32_pair_type)];
+
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else 
     my_type() { }
+#endif
+    
     my_type(const key_type& k1, const key_type& k2)
         : uint32_pair_type(k1, k2)
     {

@@ -21,6 +21,6 @@ if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
   endif()
 
   stxxl_test(skew3 --size 1mib random --check)
-  stxxl_test(skew3-lcp --size 1mib random --check)	
+  stxxl_test(skew3-lcp --size 1mib random --check)
 
 endif()

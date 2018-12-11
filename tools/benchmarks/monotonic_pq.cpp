@@ -40,8 +40,8 @@ typedef stxxl::uint64 my_key_type;
 struct my_type
 {
     typedef my_key_type key_type;
-
     key_type key;
+
 #if LOAD
     key_type load;
     char data[RECORD_SIZE - 2 * sizeof(key_type)];
@@ -49,24 +49,25 @@ struct my_type
     char data[RECORD_SIZE - sizeof(key_type)];
 #endif
 
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
     my_type() { }
+#endif
+     
     my_type(key_type k) : key(k) { }
 #if LOAD
     my_type(key_type k, key_type l) : key(k), load(l) { }
 #endif
 
     void operator = (const key_type& k) { key = k; }
+
 #if LOAD
-    void operator = (const my_type& mt)
-    {
-        key = mt.key;
-        load = mt.load;
-    }
     bool operator == (const my_type& mt) { return (key == mt.key) && (load = mt.load); }
 #else
-    void operator = (const my_type& mt) { key = mt.key; }
     bool operator == (const my_type& mt) { return key == mt.key; }
 #endif
+    
 };
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)

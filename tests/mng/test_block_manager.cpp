@@ -25,7 +25,7 @@ struct MyType
 {
     int integer;
     //char chars[4];
-    ~MyType() { }
+    //~MyType() { }
 };
 
 struct my_handler

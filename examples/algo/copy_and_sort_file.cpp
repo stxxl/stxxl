@@ -30,7 +30,12 @@ struct my_type
     key_type m_key;
     char m_data[128 - sizeof(key_type)];
 
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else 
     my_type() { }
+#endif
+    
     my_type(key_type k) : m_key(k) { }
 
     static my_type min_value()

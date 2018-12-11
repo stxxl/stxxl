@@ -50,16 +50,23 @@ struct my_type
     char m_data[RECORD_SIZE - 2 * sizeof(key_type)];
     key_type key() const { return m_key; }
 
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
     my_type() { }
+#endif
+    
     my_type(key_type k) : m_key(k) { }
     my_type(key_type k, key_type l) : m_key(k), m_load(l) { }
 
+    /*
     void operator = (const key_type& k) { m_key = k; }
     void operator = (const my_type& mt)
     {
         m_key = mt.m_key;
         m_load = mt.m_load;
     }
+    */
 };
 
 bool operator < (const my_type& a, const my_type& b);

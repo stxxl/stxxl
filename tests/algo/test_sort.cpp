@@ -26,12 +26,18 @@ struct my_type
 
     key_type m_key;
     char m_data[RECORD_SIZE - sizeof(key_type)];
+
     key_type key() const
     {
         return m_key;
     }
 
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else 
     my_type() { }
+#endif
+    
     my_type(key_type k) : m_key(k)
     {
 #if STXXL_WITH_VALGRIND
@@ -47,8 +53,6 @@ struct my_type
     {
         return my_type(std::numeric_limits<key_type>::max());
     }
-
-    ~my_type() { }
 };
 
 std::ostream& operator << (std::ostream& o, const my_type& obj)

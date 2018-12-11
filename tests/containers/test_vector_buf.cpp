@@ -24,16 +24,23 @@ struct my_type  // 24 bytes, not a power of 2 intentionally
     uint64 load0;
     uint64 load1;
 
-    my_type(uint64 i = 0)
+#if __cplusplus >= 201103L
+    my_type() = default;
+#else
+    my_type() { }
+#endif
+    
+    my_type(uint64 i) 
         : key(i),
           load0(i + 1),
           load1(1 + 42)
     { }
-
+    
     bool operator == (const my_type& b) const
     {
         return (key == b.key) && (load0 == b.load0) && (load1 == b.load1);
     }
+    
 };
 
 //! Verify contents of the vector

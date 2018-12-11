@@ -106,8 +106,12 @@ struct tuple
     sixth_type sixth;
 
     //! Empty constructor
+#if __cplusplus >= 201103L
+    tuple() = default; 
+#else 
     tuple() { }
-
+#endif
+    
     //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
@@ -186,8 +190,12 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     };
 
     //! Empty constructor
+#if __cplusplus >= 201103L
+    tuple() = default;
+#else 
     tuple() { }
-
+#endif
+    
     //! Initializing constructor
     tuple(first_type first_)
         : first(first_)
@@ -248,8 +256,12 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     second_type second;
 
     //! Empty constructor
+#if __cplusplus >= 201103L
+    tuple() = default;
+#else 
     tuple() { }
-
+#endif
+    
     //! Initializing constructor
     tuple(first_type first_,
           second_type second_)
@@ -322,8 +334,12 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     third_type third;
 
     //! Empty constructor
+#if __cplusplus >= 201103L
+    tuple() = default;
+#else 
     tuple() { }
-
+#endif
+    
     //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
@@ -407,8 +423,12 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     fourth_type fourth;
 
     //! Empty constructor
+#if __cplusplus >= 201103L
+    tuple() = default;
+#else 
     tuple() { }
-
+#endif
+    
     //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
@@ -503,8 +523,11 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     //! Fifth tuple component
     fifth_type fifth;
 
-    //! Empty constructor
+#if __cplusplus >= 201103L
+    tuple() = default;
+#else
     tuple() { }
+#endif
 
     //! Construct tuple from components
     tuple(first_type _first,

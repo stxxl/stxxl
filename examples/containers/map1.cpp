@@ -57,7 +57,7 @@ int main()
     iter_up = my_map.upper_bound(3);  // iter_up points to (2,b) in this case
 
     std::cout << "lower bound " << iter_low->second << ", upper bound " << iter_up->second << std::endl;
-
+    
     return 0;
 }
 //! [example]

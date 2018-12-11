@@ -36,7 +36,14 @@ struct my_record
 {
     int key;
     int data;
-    my_record() : key(0), data(0) { }
+
+#if __cplusplus >= 201103L
+    my_record() = default;
+#else 
+    my_record() { }
+#endif
+    
+    //my_record(int k, in) : key(0), data(0) { }
     my_record(int k, int d) : key(k), data(d) { }
 };
 
@@ -105,7 +112,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 
     stxxl::uint64 i;
 
-    my_record cur;
+    my_record cur(0,0);
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
@@ -164,7 +171,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
 
     stxxl::uint64 i;
 
-    my_record cur;
+    my_record cur(0,0);
 
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
@@ -224,7 +231,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
 
 int main(int argc, char* argv[])
 {
-    STXXL_MSG("stxxl::pq lock size: " << BLOCK_SIZE << " bytes");
+    //STXXL_MSG("stxxl::pq lock size: " << BLOCK_SIZE << " bytes");
 
 #if STXXL_DIRECT_IO_OFF
     STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");

@@ -82,19 +82,17 @@ std::cout << v[0] << " " << v[1000000] << std::endl;
 \endverbatim
 can lead to inconsistent results.
 
-
 \section faq_templateparam Parameterizing STXXL Containers
 
-STXXL container types like stxxl::vector can be parameterized only with a value type that is a
-<a href="http://en.wikipedia.org/wiki/Plain_old_data_structures">POD</a>
-(i. e. no virtual functions, no user-defined copy assignment/destructor, etc.)
-and does not contain references (including pointers) to internal memory.
+STXXL container types like stxxl::vector can be parameterized only with a value type that satisfies `std::is_trivial`
+(i. e. no virtual functions, no user-defined copy assignment/destructor, etc.) and does not contain references (including pointers) to internal memory.
 Usually, "complex" data types do not satisfy this requirements.
 
 This is why stxxl::vector<std::vector<T> > and stxxl::vector<stxxl::vector<T> > are invalid.
 If appropriate, use std::vector<stxxl::vector<T> >, or emulate a two-dimensional array by
 doing index calculation.
 
+See \subpage tutorial_container_datatypes "Trivial Data Types - the objects a STXXL container stores" for more details.
 
 \section faq_threadsafe Thread-Safety
 
@@ -103,7 +101,6 @@ The user layer data structures are not thread-safe.<br>
 I.e. you may access <b>different</b> \c STXXL data structures from concurrent threads without problems,
 but you should not share a data structure between threads (without implementing proper locking yourself).<br>
 This is a design choice, having the data structures thread-safe would mean a significant performance loss.
-
 
 \section faq_diskalloc Disk Allocation on Multiple Disks
 

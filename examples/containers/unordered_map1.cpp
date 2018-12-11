@@ -18,6 +18,12 @@
 //! [hash]
 struct HashFunctor
 {
+#if __cplusplus >= 201103L
+    HashFunctor() = default;
+#else 
+    HashFunctor() { }
+#endif
+    
     size_t operator () (int key) const
     {
         // a simple integer hash function
