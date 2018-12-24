@@ -116,17 +116,14 @@ namespace potentially_parallel {
 #if STXXL_WITH_GNU_PARALLEL
 
 using __gnu_parallel::sort;
-using __gnu_parallel::random_shuffle;
 
 #elif STXXL_PARALLEL
 
 using std::sort;
-using std::random_shuffle;
 
 #else
 
 using std::sort;
-using std::random_shuffle;
 
 #endif
 

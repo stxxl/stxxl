@@ -137,8 +137,13 @@ private:
         for (unsigned_type i = 0; i < diff; i++)
             perm[i] = i;
 
-        stxxl::random_number<random_uniform_fast> rnd;
-        std::random_shuffle(perm.begin(), perm.end(), rnd _STXXL_FORCE_SEQUENTIAL);
+        #if __cplusplus > 201402L
+            std::shuffle(perm.begin(), perm.end(), std::mt19937(std::random_device()()) _STXXL_FORCE_SEQUENTIAL);
+        #else
+            stxxl::random_number<random_uniform_fast> rnd;
+            std::random_shuffle(perm.begin(), perm.end(), rnd _STXXL_FORCE_SEQUENTIAL);
+        #endif
+
     }
 
 public:
