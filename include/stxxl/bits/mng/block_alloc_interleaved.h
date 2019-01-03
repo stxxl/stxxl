@@ -92,8 +92,12 @@ struct interleaved_RC : public interleaved_striping
             for (unsigned_type j = 0; j < diff; j++)
                 perms[i][j] = j;
 
-            random_number<random_uniform_fast> rnd;
-            std::random_shuffle(perms[i].begin(), perms[i].end(), rnd _STXXL_FORCE_SEQUENTIAL);
+            #if __cplusplus > 201402L
+                std::shuffle(perms[i].begin(), perms[i].end(), std::mt19937(std::random_device()()) _STXXL_FORCE_SEQUENTIAL);
+            #else
+                random_number<random_uniform_fast> rnd;
+                std::random_shuffle(perms[i].begin(), perms[i].end(), rnd _STXXL_FORCE_SEQUENTIAL);
+            #endif
         }
     }
 
