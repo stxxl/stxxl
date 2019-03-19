@@ -12,9 +12,9 @@
 
 #include <fstream>
 
+#include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
-#include <foxxll/common/die_with_message.hpp>
 #include <foxxll/common/utils.hpp>
 
 #include <stxxl.h>
@@ -46,11 +46,13 @@ std::ostream& operator << (std::ostream& i, const LogEntry& entry)
 
 int main(int argc, char* argv[])
 {
-    die_with_message_if(argc < 5, "Usage: " << argv[0] << " ncalls avcalls main logfile\n"
-                        " ncalls  - number of calls\n"
-                        " avcalls - average number of calls per client\n"
-                        " main    - memory to use (in MiB)\n"
-                        " logfile - file name of the output");
+    die_verbose_if(
+        argc < 5,
+        "Usage: " << argv[0] << " ncalls avcalls main logfile\n"
+            " ncalls  - number of calls\n"
+            " avcalls - average number of calls per client\n"
+            " main    - memory to use (in MiB)\n"
+            " logfile - file name of the output");
 
     const size_t M = foxxll::atouint64(argv[3]) * 1024 * 1024;
     const size_t ncalls = foxxll::atouint64(argv[1]);

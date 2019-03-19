@@ -16,8 +16,6 @@
 #include <tlx/die.hpp>
 #include <tlx/logger.hpp>
 
-#include <foxxll/common/die_with_message.hpp>
-
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/comparator>
 
@@ -53,7 +51,7 @@ uint64_t scan(btree_type& BTree, const std::string& test_key)
 
 int main(int argc, char* argv[])
 {
-    die_with_message_if(argc < 2, "Usage: " << argv[0] << " #ins");
+    die_verbose_if(argc < 2, "Usage: " << argv[0] << " #ins");
 
     const unsigned nins = atoi(argv[1]);
 

@@ -19,9 +19,9 @@ int main(int argc, char* argv[])
 {
     size_t nins;
     {
-        die_with_message_if(argc < 2, "Usage: " << argv[0] << " #log_ins");
+        die_verbose_if(argc < 2, "Usage: " << argv[0] << " #log_ins");
         const auto log_nins = foxxll::atoi64(argv[1]);
-        die_with_message_if(log_nins > 31, "This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        die_verbose_if(log_nins > 31, "This test can't do more than 2^31 operations, you requested 2^" << log_nins);
         nins = 1ULL << log_nins;
     }
 
