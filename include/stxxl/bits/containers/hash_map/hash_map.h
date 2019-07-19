@@ -1258,10 +1258,7 @@ protected:
      * lexicographically by <hash-value, key> Note: the hash-value has already
      * been computed.
      */
-    struct Cmp : public std::binary_function<
-                     std::pair<internal_size_type, value_type>,
-                     std::pair<internal_size_type, value_type>, bool
-                     >
+    struct Cmp
     {
         self_type& map_;
         Cmp(self_type& map) : map_(map) { }
@@ -1520,7 +1517,7 @@ protected:
 
 public:
     //! Construct an equality predicate from the comparison operator
-    struct equal_to : public std::binary_function<key_type, key_type, bool>
+    struct equal_to
     {
         //! reference to hash_map
         const self_type& m_map;
