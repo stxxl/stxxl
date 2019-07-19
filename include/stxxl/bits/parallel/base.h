@@ -33,7 +33,6 @@ namespace parallel {
  */
 template <class Predicate, typename first_argument_type, typename second_argument_type>
 class binary_negate
-    : public std::binary_function<first_argument_type, second_argument_type, bool>
 {
 protected:
     Predicate pred;
@@ -80,7 +79,7 @@ static inline void decode2(lcas_t x, int& a, int& b)
  * Constructs predicate for equality from strict weak ordering predicate
  */
 template <class Comparator, typename T1, typename T2>
-class equal_from_less : public std::binary_function<T1, T2, bool>
+class equal_from_less
 {
 private:
     Comparator& comp;
@@ -126,7 +125,7 @@ median_of_three_iterators(RandomAccessIterator a, RandomAccessIterator b,
 
 /** Similar to std::equal_to, but allows two different types. */
 template <typename T1, typename T2>
-struct equal_to : std::binary_function<T1, T2, bool>
+struct equal_to
 {
     bool operator () (const T1& t1, const T2& t2) const
     {
@@ -136,7 +135,7 @@ struct equal_to : std::binary_function<T1, T2, bool>
 
 /** Similar to std::less, but allows two different types. */
 template <typename T1, typename T2>
-struct less : std::binary_function<T1, T2, bool>
+struct less
 {
     bool operator () (const T1& t1, const T2& t2) const
     {
