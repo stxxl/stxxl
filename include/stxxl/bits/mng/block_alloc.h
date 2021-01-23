@@ -15,6 +15,7 @@
 #define STXXL_MNG_BLOCK_ALLOC_HEADER
 
 #include <algorithm>
+#include <random>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/config.h>

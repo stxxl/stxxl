@@ -34,7 +34,7 @@ STXXL_BEGIN_NAMESPACE
 
 void request_queue_impl_worker::start_thread(void* (*worker)(void*), void* arg, thread_type& t, state<thread_state>& s)
 {
-    assert(s() == NOT_RUNNING);
+    assert(s() == thread_state::NOT_RUNNING);
 #if STXXL_STD_THREADS
     t = new std::thread(worker, arg);
 #elif STXXL_BOOST_THREADS
@@ -47,7 +47,7 @@ void request_queue_impl_worker::start_thread(void* (*worker)(void*), void* arg, 
 
 void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>& s, semaphore& sem)
 {
-    assert(s() == RUNNING);
+    assert(s() == thread_state::RUNNING);
     s.set_to(thread_state::TERMINATING);
     sem++;
 #if STXXL_STD_THREADS
@@ -76,7 +76,7 @@ void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>&
 #else
     STXXL_CHECK_PTHREAD_CALL(pthread_join(t, NULL));
 #endif
-    assert(s() == TERMINATED);
+    assert(s() == thread_state::TERMINATED);
     s.set_to(thread_state::NOT_RUNNING);
 }
 

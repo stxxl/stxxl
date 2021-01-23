@@ -303,8 +303,8 @@ void stats::wait_finished(wait_op_type wait_op)
         std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
         if (waitlog)
             *waitlog << (now - last_reset) << "\t"
-                     << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
-                     << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << ((wait_op == wait_op_type::WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << ((wait_op != wait_op_type::WAIT_OP_READ) ? diff : 0.0) << "\t"
                      << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;
 #endif
     }

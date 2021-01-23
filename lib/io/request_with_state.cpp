@@ -29,7 +29,7 @@ request_with_state::~request_with_state()
 {
     STXXL_VERBOSE3_THIS("request_with_state::~(), ref_cnt: " << get_reference_count());
 
-    assert(m_state() == DONE || m_state() == READY2DIE);
+    assert(m_state() == request_state::DONE || m_state() == request_state::READY2DIE);
 
     // if(m_state() != DONE && m_state()!= READY2DIE )
     // STXXL_ERRMSG("WARNING: serious stxxl inconsistency: Request is being deleted while I/O not finished. "<<
