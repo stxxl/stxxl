@@ -58,7 +58,7 @@ wbtl_file::~wbtl_file()
 void wbtl_file::serve(void* buffer, offset_type offset, size_type bytes,
                       request::request_type type)
 {
-    if (type == request::READ)
+    if (type == request::request_type::READ)
     {
         //stats::scoped_read_timer read_timer(size());
         sread(buffer, offset, bytes);

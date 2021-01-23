@@ -30,7 +30,7 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
 
     char* cbuffer = static_cast<char*>(buffer);
 
-    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::request_type::WRITE);
 
     while (bytes > 0)
     {
@@ -45,12 +45,13 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                 " fd=" << file_des <<
                 " offset=" << offset <<
                 " buffer=" << cbuffer <<
-                " bytes=" << bytes <<
-                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " bytes=" << bytes << " type="
+                                                 << ((type == request::request_type::READ) ? "READ" : "WRITE")
+                                                 <<
                 " rc=" << rc);
         }
 
-        if (type == request::READ)
+        if (type == request::request_type::READ)
         {
 #if STXXL_MSVC
             assert(bytes <= std::numeric_limits<unsigned int>::max());

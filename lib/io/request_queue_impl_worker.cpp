@@ -42,13 +42,13 @@ void request_queue_impl_worker::start_thread(void* (*worker)(void*), void* arg, 
 #else
     STXXL_CHECK_PTHREAD_CALL(pthread_create(&t, NULL, worker, arg));
 #endif
-    s.set_to(RUNNING);
+    s.set_to(thread_state::RUNNING);
 }
 
 void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>& s, semaphore& sem)
 {
     assert(s() == RUNNING);
-    s.set_to(TERMINATING);
+    s.set_to(thread_state::TERMINATING);
     sem++;
 #if STXXL_STD_THREADS
 #if STXXL_MSVC >= 1700
@@ -77,7 +77,7 @@ void request_queue_impl_worker::stop_thread(thread_type& t, state<thread_state>&
     STXXL_CHECK_PTHREAD_CALL(pthread_join(t, NULL));
 #endif
     assert(s() == TERMINATED);
-    s.set_to(NOT_RUNNING);
+    s.set_to(thread_state::NOT_RUNNING);
 }
 
 STXXL_END_NAMESPACE

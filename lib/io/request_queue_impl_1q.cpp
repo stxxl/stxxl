@@ -43,8 +43,7 @@ struct file_offset_match
     }
 };
 
-request_queue_impl_1q::request_queue_impl_1q(int n)
-    : m_thread_state(NOT_RUNNING), m_sem(0)
+request_queue_impl_1q::request_queue_impl_1q(int n) : m_thread_state(thread_state::NOT_RUNNING), m_sem(0)
 {
     STXXL_UNUSED(n);
     start_thread(worker, static_cast<void*>(this), m_thread, m_thread_state);
@@ -54,7 +53,7 @@ void request_queue_impl_1q::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
-    if (m_thread_state() != RUNNING)
+    if (m_thread_state() != thread_state::RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
     if (!dynamic_cast<serving_request*>(req.get()))
         STXXL_ERRMSG("Incompatible request submitted to running queue.");
@@ -80,7 +79,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
-    if (m_thread_state() != RUNNING)
+    if (m_thread_state() != thread_state::RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
     if (!dynamic_cast<serving_request*>(req.get()))
         STXXL_ERRMSG("Incompatible request submitted to running queue.");
@@ -137,7 +136,7 @@ void* request_queue_impl_1q::worker(void* arg)
         }
 
         // terminate if it has been requested and queues are empty
-        if (pthis->m_thread_state() == TERMINATING) {
+        if (pthis->m_thread_state() == thread_state::TERMINATING) {
             if ((pthis->m_sem--) == 0)
                 break;
             else
@@ -145,7 +144,7 @@ void* request_queue_impl_1q::worker(void* arg)
         }
     }
 
-    pthis->m_thread_state.set_to(TERMINATED);
+    pthis->m_thread_state.set_to(thread_state::TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see

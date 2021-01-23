@@ -26,7 +26,7 @@ STXXL_BEGIN_NAMESPACE
 class request_queue : private noncopyable
 {
 public:
-    enum priority_op { READ, WRITE, NONE };
+    enum class priority_op { READ, WRITE, NONE };
 
 public:
     virtual void add_request(request_ptr& req) = 0;
