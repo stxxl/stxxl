@@ -30,7 +30,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
+struct file_offset_match
 {
     bool operator () (
         const request_ptr& a,
@@ -64,7 +64,8 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
         {
             scoped_mutex_lock Lock(m_write_mutex);
             if (std::find_if(m_write_queue.begin(), m_write_queue.end(),
-                             bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
+                             std::bind(file_offset_match(), std::placeholders::_1, req)
+                                 _STXXL_FORCE_SEQUENTIAL)
                 != m_write_queue.end())
             {
                 STXXL_ERRMSG("READ request submitted for a BID with a pending WRITE request");
@@ -80,7 +81,8 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
         {
             scoped_mutex_lock Lock(m_read_mutex);
             if (std::find_if(m_read_queue.begin(), m_read_queue.end(),
-                             bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
+                             std::bind(file_offset_match(), std::placeholders::_1, req)
+                                 _STXXL_FORCE_SEQUENTIAL)
                 != m_read_queue.end())
             {
                 STXXL_ERRMSG("WRITE request submitted for a BID with a pending READ request");

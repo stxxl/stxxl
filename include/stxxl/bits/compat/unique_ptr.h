@@ -22,12 +22,7 @@ STXXL_BEGIN_NAMESPACE
 
 template <class Type>
 struct compat_unique_ptr {
-#if __cplusplus >= 201103L && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
     typedef std::unique_ptr<Type> result;
-#else
-    // auto_ptr is inherently broken and is deprecated by unique_ptr in c++0x
-    typedef std::auto_ptr<Type> result;
-#endif
 };
 
 STXXL_END_NAMESPACE

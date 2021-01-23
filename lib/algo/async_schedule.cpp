@@ -44,7 +44,7 @@ struct sim_event
     inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { }
 };
 
-struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
+struct sim_event_cmp
 {
     inline bool operator () (const sim_event& a, const sim_event& b) const
     {
@@ -53,7 +53,7 @@ struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
 };
 
 typedef std::pair<int_type, int_type> write_time_pair;
-struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
+struct write_time_cmp
 {
     inline bool operator () (const write_time_pair& a, const write_time_pair& b) const
     {
