@@ -45,9 +45,8 @@ void syscall_file::serve(void* buffer, offset_type offset, size_type bytes,
                 " fd=" << file_des <<
                 " offset=" << offset <<
                 " buffer=" << cbuffer <<
-                " bytes=" << bytes << " type="
-                                                 << ((type == request::request_type::READ) ? "READ" : "WRITE")
-                                                 <<
+                " bytes=" << bytes << 
+                " type="  << ((type == request::request_type::READ) ? "READ" : "WRITE") <<
                 " rc=" << rc);
         }
 
