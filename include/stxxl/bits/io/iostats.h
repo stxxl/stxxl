@@ -68,7 +68,7 @@ class stats : public singleton<stats>
     stats();
 
 public:
-    enum wait_op_type {
+    enum class wait_op_type {
         WAIT_OP_ANY,
         WAIT_OP_READ,
         WAIT_OP_WRITE

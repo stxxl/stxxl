@@ -35,7 +35,6 @@ namespace parallel {
 //! Compare a pair of types lexcigraphically, ascending.
 template <typename T1, typename T2, typename Comparator>
 class lexicographic
-    : public std::binary_function<std::pair<T1, T2>, std::pair<T1, T2>, bool>
 {
 protected:
     Comparator& m_comp;
@@ -60,7 +59,6 @@ public:
 //! Compare a pair of types lexcigraphically, descending.
 template <typename T1, typename T2, typename Comparator>
 class lexicographic_rev
-    : public std::binary_function<std::pair<T1, T2>, std::pair<T1, T2>, bool>
 {
 protected:
     Comparator& m_comp;

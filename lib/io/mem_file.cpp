@@ -25,7 +25,7 @@ void mem_file::serve(void* buffer, offset_type offset, size_type bytes,
 {
     scoped_mutex_lock lock(m_mutex);
 
-    if (type == request::READ)
+    if (type == request::request_type::READ)
     {
         stats::scoped_read_timer read_timer(bytes);
         memcpy(buffer, m_ptr + offset, bytes);

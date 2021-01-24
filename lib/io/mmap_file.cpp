@@ -29,9 +29,9 @@ void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
 
     //assert(offset + bytes <= _size());
 
-    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::request_type::WRITE);
 
-    int prot = (type == request::READ) ? PROT_READ : PROT_WRITE;
+    int prot = (type == request::request_type::READ) ? PROT_READ : PROT_WRITE;
     void* mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des, offset);
     // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des, offset);
     // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
@@ -50,7 +50,7 @@ void mmap_file::serve(void* buffer, offset_type offset, size_type bytes,
     }
     else
     {
-        if (type == request::READ)
+        if (type == request::request_type::READ)
         {
             memcpy(buffer, mem, bytes);
         }

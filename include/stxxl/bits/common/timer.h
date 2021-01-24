@@ -53,7 +53,7 @@ timestamp()
                  double(Duration.fractional_seconds()) / (pow(10., Duration.num_fractional_digits()));
     return sec;
 #elif STXXL_WINDOWS
-    return GetTickCount() / 1000.0;
+    return GetTickCount64() / 1000.0;
 #else
     struct timeval tp;
     gettimeofday(&tp, NULL);

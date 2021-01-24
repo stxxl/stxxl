@@ -65,7 +65,7 @@ class wbtl_file : public disk_queued_file
     size_type curpos;
     request_ptr backend_request;
 
-    struct FirstFit : public std::binary_function<place, offset_type, bool>
+    struct FirstFit
     {
         bool operator () (
             const place& entry,

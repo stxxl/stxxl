@@ -54,7 +54,7 @@ public:
                                " linuxaio_request" <<
                                "(file=" << file << " buffer=" << buffer <<
                                " offset=" << offset << " bytes=" << bytes <<
-                               " type=" << type << ")");
+                               " type=" << ((type == request::request_type::READ) ? "READ" : "WRITE") << ")");
     }
 
     bool post();

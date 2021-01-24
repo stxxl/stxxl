@@ -50,7 +50,7 @@ void request_with_waiters::notify_waiters()
     scoped_mutex_lock lock(m_waiters_mutex);
     std::for_each(m_waiters.begin(),
                   m_waiters.end(),
-                  std::mem_fun(&onoff_switch::on)
+                  std::mem_fn(&onoff_switch::on)
                   _STXXL_FORCE_SEQUENTIAL);
 }
 

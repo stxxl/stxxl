@@ -44,14 +44,13 @@ void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
                                   " offset=" << offset <<
                                   " this=" << this <<
                                   " buffer=" << buffer <<
-                                  " bytes=" << bytes <<
-                                  " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+                                  " bytes=" << bytes << " type=" << ((type == request::request_type::READ) ? "READ" : "WRITE"));
     }
     else
     {
-        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::request_type::WRITE);
 
-        if (type == request::READ)
+        if (type == request::request_type::READ)
         {
             DWORD NumberOfBytesRead = 0;
             assert(bytes <= std::numeric_limits<DWORD>::max());
@@ -62,8 +61,8 @@ void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
                                           " this=" << this <<
                                           " offset=" << offset <<
                                           " buffer=" << buffer <<
-                                          " bytes=" << bytes <<
-                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                          " bytes=" << bytes << 
+                                          " type=" << ((type == request::request_type::READ) ? "READ" : "WRITE") <<
                                           " NumberOfBytesRead= " << NumberOfBytesRead);
             }
             else if (NumberOfBytesRead != bytes) {
@@ -81,8 +80,8 @@ void wincall_file::serve(void* buffer, offset_type offset, size_type bytes,
                                           " this=" << this <<
                                           " offset=" << offset <<
                                           " buffer=" << buffer <<
-                                          " bytes=" << bytes <<
-                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                          " bytes=" << bytes << 
+                                          " type="  << ((type == request::request_type::READ) ? "READ" : "WRITE") <<
                                           " NumberOfBytesWritten= " << NumberOfBytesWritten);
             }
             else if (NumberOfBytesWritten != bytes) {

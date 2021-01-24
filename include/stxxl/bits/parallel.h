@@ -121,12 +121,10 @@ using __gnu_parallel::random_shuffle;
 #elif STXXL_PARALLEL
 
 using std::sort;
-using std::random_shuffle;
 
 #else
 
 using std::sort;
-using std::random_shuffle;
 
 #endif
 

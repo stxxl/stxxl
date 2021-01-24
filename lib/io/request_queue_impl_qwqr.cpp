@@ -30,7 +30,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
+struct file_offset_match
 {
     bool operator () (
         const request_ptr& a,
@@ -42,8 +42,7 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
     }
 };
 
-request_queue_impl_qwqr::request_queue_impl_qwqr(int n)
-    : m_thread_state(NOT_RUNNING), m_sem(0)
+request_queue_impl_qwqr::request_queue_impl_qwqr(int n) : m_thread_state(thread_state::NOT_RUNNING), m_sem(0)
 {
     STXXL_UNUSED(n);
     start_thread(worker, static_cast<void*>(this), m_thread, m_thread_state);
@@ -53,18 +52,19 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
-    if (m_thread_state() != RUNNING)
+    if (m_thread_state() != thread_state::RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
     if (!dynamic_cast<serving_request*>(req.get()))
         STXXL_ERRMSG("Incompatible request submitted to running queue.");
 
-    if (req.get()->get_type() == request::READ)
+    if (req.get()->get_type() == request::request_type::READ)
     {
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
             scoped_mutex_lock Lock(m_write_mutex);
             if (std::find_if(m_write_queue.begin(), m_write_queue.end(),
-                             bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
+                             std::bind(file_offset_match(), std::placeholders::_1, req)
+                                 _STXXL_FORCE_SEQUENTIAL)
                 != m_write_queue.end())
             {
                 STXXL_ERRMSG("READ request submitted for a BID with a pending WRITE request");
@@ -80,7 +80,8 @@ void request_queue_impl_qwqr::add_request(request_ptr& req)
         {
             scoped_mutex_lock Lock(m_read_mutex);
             if (std::find_if(m_read_queue.begin(), m_read_queue.end(),
-                             bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
+                             std::bind(file_offset_match(), std::placeholders::_1, req)
+                                 _STXXL_FORCE_SEQUENTIAL)
                 != m_read_queue.end())
             {
                 STXXL_ERRMSG("WRITE request submitted for a BID with a pending READ request");
@@ -98,13 +99,13 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
-    if (m_thread_state() != RUNNING)
+    if (m_thread_state() != thread_state::RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
     if (!dynamic_cast<serving_request*>(req.get()))
         STXXL_ERRMSG("Incompatible request submitted to running queue.");
 
     bool was_still_in_queue = false;
-    if (req.get()->get_type() == request::READ)
+    if (req.get()->get_type() == request::request_type::READ)
     {
         scoped_mutex_lock Lock(m_read_mutex);
         queue_type::iterator pos
@@ -167,11 +168,11 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
                 pthis->m_sem++;
 
-                if (pthis->m_priority_op == WRITE)
+                if (pthis->m_priority_op == priority_op::WRITE)
                     write_phase = false;
             }
 
-            if (pthis->m_priority_op == NONE || pthis->m_priority_op == READ)
+            if (pthis->m_priority_op == priority_op::NONE || pthis->m_priority_op == priority_op::READ)
                 write_phase = false;
         }
         else
@@ -196,16 +197,16 @@ void* request_queue_impl_qwqr::worker(void* arg)
 
                 pthis->m_sem++;
 
-                if (pthis->m_priority_op == READ)
+                if (pthis->m_priority_op == priority_op::READ)
                     write_phase = true;
             }
 
-            if (pthis->m_priority_op == NONE || pthis->m_priority_op == WRITE)
+            if (pthis->m_priority_op == priority_op::NONE || pthis->m_priority_op == priority_op::WRITE)
                 write_phase = true;
         }
 
         // terminate if it has been requested and queues are empty
-        if (pthis->m_thread_state() == TERMINATING) {
+        if (pthis->m_thread_state() == thread_state::TERMINATING) {
             if ((pthis->m_sem--) == 0)
                 break;
             else
@@ -213,7 +214,7 @@ void* request_queue_impl_qwqr::worker(void* arg)
         }
     }
 
-    pthis->m_thread_state.set_to(TERMINATED);
+    pthis->m_thread_state.set_to(thread_state::TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see

@@ -38,7 +38,7 @@ class request_interface : private noncopyable
 public:
     typedef stxxl::external_size_type offset_type;
     typedef stxxl::internal_size_type size_type;
-    enum request_type { READ, WRITE };
+    enum class request_type { READ, WRITE };
 
 public:
     virtual bool add_waiter(onoff_switch* sw) = 0;

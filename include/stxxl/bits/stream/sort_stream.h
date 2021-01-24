@@ -228,7 +228,7 @@ void basic_runs_creator<Input, CompareType, BlockSize, AllocStr>::compute_result
     run.resize(cur_run_size);
     bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    disk_queues::get_instance()->set_priority_op(request_queue::priority_op::WRITE);
 
     // fill the rest of the last block with max values
     fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
@@ -515,7 +515,7 @@ protected:
         block_manager* bm = block_manager::get_instance();
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::priority_op::WRITE);
 
         // fill the rest of the last block with max values
         fill_with_max_value(m_blocks1, cur_run_size, m_cur_el);
@@ -638,7 +638,7 @@ public:
         block_manager* bm = block_manager::get_instance();
         bm->new_blocks(AllocStr(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::priority_op::WRITE);
 
         for (unsigned_type i = 0; i < cur_run_blocks; ++i)
         {
@@ -1150,7 +1150,7 @@ public:
 
         // *** test whether recursive merging is necessary
 
-        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::priority_op::WRITE);
 
         int_type disks_number = config::get_instance()->disks_number();
         unsigned_type min_prefetch_buffers = 2 * disks_number;

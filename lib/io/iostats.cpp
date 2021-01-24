@@ -260,7 +260,7 @@ void stats::wait_started(wait_op_type wait_op)
         p_begin_wait = now;
         p_waits += (acc_waits++) ? diff : 0.0;
 
-        if (wait_op == WAIT_OP_READ) {
+        if (wait_op == wait_op_type::WAIT_OP_READ) {
             diff = now - p_begin_wait_read;
             t_wait_read += double(acc_wait_read) * diff;
             p_begin_wait_read = now;
@@ -287,7 +287,7 @@ void stats::wait_finished(wait_op_type wait_op)
         p_begin_wait = now;
         p_waits += (acc_waits--) ? diff : 0.0;
 
-        if (wait_op == WAIT_OP_READ) {
+        if (wait_op == wait_op_type::WAIT_OP_READ) {
             double diff2 = now - p_begin_wait_read;
             t_wait_read += double(acc_wait_read) * diff2;
             p_begin_wait_read = now;
@@ -303,8 +303,8 @@ void stats::wait_finished(wait_op_type wait_op)
         std::ofstream* waitlog = stxxl::logger::get_instance()->waitlog_stream();
         if (waitlog)
             *waitlog << (now - last_reset) << "\t"
-                     << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
-                     << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << ((wait_op == wait_op_type::WAIT_OP_READ) ? diff : 0.0) << "\t"
+                     << ((wait_op != wait_op_type::WAIT_OP_READ) ? diff : 0.0) << "\t"
                      << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;
 #endif
     }

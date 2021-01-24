@@ -44,7 +44,7 @@ private:
     thread_type m_thread;
     semaphore m_sem;
 
-    static const priority_op m_priority_op = WRITE;
+    static const priority_op m_priority_op = priority_op::WRITE;
 
     static void * worker(void* arg);
 

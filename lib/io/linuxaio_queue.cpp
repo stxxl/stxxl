@@ -34,7 +34,7 @@ STXXL_BEGIN_NAMESPACE
 
 linuxaio_queue::linuxaio_queue(int desired_queue_length)
     : num_waiting_requests(0), num_free_events(0), num_posted_requests(0),
-      post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
+      post_thread_state(thread_state::NOT_RUNNING), wait_thread_state(thread_state::NOT_RUNNING)
 {
     if (desired_queue_length == 0) {
         // default value, 64 entries per queue (i.e. usually per disk) should
@@ -77,7 +77,7 @@ void linuxaio_queue::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
-    if (post_thread_state() != RUNNING)
+    if (post_thread_state() != thread_state::RUNNING)
         STXXL_ERRMSG("Request submitted to stopped queue.");
     if (!dynamic_cast<linuxaio_request*>(req.get()))
         STXXL_ERRMSG("Non-LinuxAIO request submitted to LinuxAIO queue.");
@@ -92,7 +92,7 @@ bool linuxaio_queue::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
-    if (post_thread_state() != RUNNING)
+    if (post_thread_state() != thread_state::RUNNING)
         STXXL_ERRMSG("Request canceled in stopped queue.");
     if (!dynamic_cast<linuxaio_request*>(req.get()))
         STXXL_ERRMSG("Non-LinuxAIO request submitted to LinuxAIO queue.");
@@ -133,7 +133,7 @@ void linuxaio_queue::post_requests()
         int num_currently_waiting_requests = num_waiting_requests--;
 
         // terminate if termination has been requested
-        if (post_thread_state() == TERMINATING && num_currently_waiting_requests == 0)
+        if (post_thread_state() == thread_state::TERMINATING && num_currently_waiting_requests == 0)
             break;
 
         scoped_mutex_lock lock(waiting_mtx);
@@ -201,7 +201,7 @@ void linuxaio_queue::wait_requests()
         int num_currently_posted_requests = num_posted_requests--;
 
         // terminate if termination has been requested
-        if (wait_thread_state() == TERMINATING && num_currently_posted_requests == 0)
+        if (wait_thread_state() == thread_state::TERMINATING && num_currently_posted_requests == 0)
             break;
 
         // wait for at least one of them to finish
@@ -233,7 +233,7 @@ void* linuxaio_queue::post_async(void* arg)
     (static_cast<linuxaio_queue*>(arg))->post_requests();
 
     self_type* pthis = static_cast<self_type*>(arg);
-    pthis->post_thread_state.set_to(TERMINATED);
+    pthis->post_thread_state.set_to(thread_state::TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
@@ -249,7 +249,7 @@ void* linuxaio_queue::wait_async(void* arg)
     (static_cast<linuxaio_queue*>(arg))->wait_requests();
 
     self_type* pthis = static_cast<self_type*>(arg);
-    pthis->wait_thread_state.set_to(TERMINATED);
+    pthis->wait_thread_state.set_to(thread_state::TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see

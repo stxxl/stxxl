@@ -44,13 +44,13 @@ void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
             " this=" << this <<
             " buffer=" << buffer <<
             " bytes=" << bytes <<
-            " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+            " type=" << ((type == request::request_type::READ) ? "READ" : "WRITE") <<
             " : " << ex.what());
     }
 
-    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::request_type::WRITE);
 
-    if (type == request::READ)
+    if (type == request::request_type::READ)
     {
         try
         {
@@ -68,7 +68,7 @@ void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
                 " this=" << this <<
                 " buffer=" << buffer <<
                 " bytes=" << bytes <<
-                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " type=" << ((type == request::request_type::READ) ? "READ" : "WRITE") <<
                 " : " << ex.what());
         }
     }
@@ -90,7 +90,7 @@ void boostfd_file::serve(void* buffer, offset_type offset, size_type bytes,
                 " this=" << this <<
                 " buffer=" << buffer <<
                 " bytes=" << bytes <<
-                " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                " type=" << ((type == request::request_type::READ) ? "READ" : "WRITE") <<
                 " : " << ex.what());
         }
     }

@@ -25,7 +25,7 @@ request_ptr linuxaio_file::aread(
     size_type bytes,
     const completion_handler& on_cmpl)
 {
-    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::READ));
+    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::request_type::READ));
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
@@ -38,7 +38,7 @@ request_ptr linuxaio_file::awrite(
     size_type bytes,
     const completion_handler& on_cmpl)
 {
-    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE));
+    request_ptr req(new linuxaio_request(on_cmpl, this, buffer, pos, bytes, request::request_type::WRITE));
 
     disk_queues::get_instance()->add_request(req, get_queue_id());
 
@@ -49,7 +49,7 @@ void linuxaio_file::serve(void* buffer, offset_type offset, size_type bytes,
                           request::request_type type)
 {
     // req need not be an linuxaio_request
-    if (type == request::READ)
+    if (type == request::request_type::READ)
         aread(buffer, offset, bytes)->wait();
     else
         awrite(buffer, offset, bytes)->wait();

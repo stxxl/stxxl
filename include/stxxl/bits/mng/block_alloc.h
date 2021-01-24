@@ -15,6 +15,7 @@
 #define STXXL_MNG_BLOCK_ALLOC_HEADER
 
 #include <algorithm>
+#include <random>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/config.h>
@@ -138,7 +139,7 @@ private:
             perm[i] = i;
 
         stxxl::random_number<random_uniform_fast> rnd;
-        std::random_shuffle(perm.begin(), perm.end(), rnd _STXXL_FORCE_SEQUENTIAL);
+        std::shuffle(perm.begin(), perm.end(), std::mt19937(std::random_device()()));
     }
 
 public:

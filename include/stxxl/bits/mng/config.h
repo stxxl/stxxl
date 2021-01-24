@@ -169,7 +169,9 @@ public:
     //! has no effect after construction of block_manager.
     inline config & add_disk(const disk_config& cfg)
     {
-        disks_list.push_back(cfg);
+        if (not is_initialized){
+            disks_list.push_back(cfg);
+        }
         return *this;
     }
 
