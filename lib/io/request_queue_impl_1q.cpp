@@ -31,7 +31,7 @@
 
 STXXL_BEGIN_NAMESPACE
 
-struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
+struct file_offset_match
 {
     bool operator () (
         const request_ptr& a,
@@ -43,8 +43,7 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
     }
 };
 
-request_queue_impl_1q::request_queue_impl_1q(int n)
-    : m_thread_state(NOT_RUNNING), m_sem(0)
+request_queue_impl_1q::request_queue_impl_1q(int n) : m_thread_state(thread_state::NOT_RUNNING), m_sem(0)
 {
     STXXL_UNUSED(n);
     start_thread(worker, static_cast<void*>(this), m_thread, m_thread_state);
@@ -54,7 +53,7 @@ void request_queue_impl_1q::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
-    if (m_thread_state() != RUNNING)
+    if (m_thread_state() != thread_state::RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
     if (!dynamic_cast<serving_request*>(req.get()))
         STXXL_ERRMSG("Incompatible request submitted to running queue.");
@@ -63,7 +62,7 @@ void request_queue_impl_1q::add_request(request_ptr& req)
     {
         scoped_mutex_lock Lock(m_queue_mutex);
         if (std::find_if(m_queue.begin(), m_queue.end(),
-                         bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
+                         std::bind(file_offset_match(), std::placeholders::_1, req) _STXXL_FORCE_SEQUENTIAL)
             != m_queue.end())
         {
             STXXL_ERRMSG("request submitted for a BID with a pending request");
@@ -80,7 +79,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
-    if (m_thread_state() != RUNNING)
+    if (m_thread_state() != thread_state::RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
     if (!dynamic_cast<serving_request*>(req.get()))
         STXXL_ERRMSG("Incompatible request submitted to running queue.");
@@ -137,7 +136,7 @@ void* request_queue_impl_1q::worker(void* arg)
         }
 
         // terminate if it has been requested and queues are empty
-        if (pthis->m_thread_state() == TERMINATING) {
+        if (pthis->m_thread_state() == thread_state::TERMINATING) {
             if ((pthis->m_sem--) == 0)
                 break;
             else
@@ -145,7 +144,7 @@ void* request_queue_impl_1q::worker(void* arg)
         }
     }
 
-    pthis->m_thread_state.set_to(TERMINATED);
+    pthis->m_thread_state.set_to(thread_state::TERMINATED);
 
 #if STXXL_STD_THREADS && STXXL_MSVC >= 1700
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see

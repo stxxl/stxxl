@@ -163,7 +163,7 @@ void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes,
 
     double op_start = timestamp();
 
-    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::request_type::WRITE);
 
     void* mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
     if (mem == MAP_FAILED)
@@ -180,7 +180,7 @@ void sim_disk_file::serve(void* buffer, offset_type offset, size_type bytes,
     }
     else
     {
-        if (type == request::READ)
+        if (type == request::request_type::READ)
         {
             memcpy(buffer, mem, bytes);
         }

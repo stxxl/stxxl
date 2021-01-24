@@ -29,7 +29,7 @@ request_with_state::~request_with_state()
 {
     STXXL_VERBOSE3_THIS("request_with_state::~(), ref_cnt: " << get_reference_count());
 
-    assert(m_state() == DONE || m_state() == READY2DIE);
+    assert(m_state() == request_state::DONE || m_state() == request_state::READY2DIE);
 
     // if(m_state() != DONE && m_state()!= READY2DIE )
     // STXXL_ERRMSG("WARNING: serious stxxl inconsistency: Request is being deleted while I/O not finished. "<<
@@ -42,9 +42,11 @@ void request_with_state::wait(bool measure_time)
 {
     STXXL_VERBOSE3_THIS("request_with_state::wait()");
 
-    stats::scoped_wait_timer wait_timer(m_type == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
+    stats::scoped_wait_timer wait_timer(
+        m_type == request_type::READ ? stats::wait_op_type::WAIT_OP_READ : stats::wait_op_type::WAIT_OP_WRITE,
+                                        measure_time);
 
-    m_state.wait_for(READY2DIE);
+    m_state.wait_for(request_state::READY2DIE);
 
     check_errors();
 }
@@ -58,11 +60,11 @@ bool request_with_state::cancel()
         request_ptr rp(this);
         if (disk_queues::get_instance()->cancel_request(rp, m_file->get_queue_id()))
         {
-            m_state.set_to(DONE);
+            m_state.set_to(request_state::DONE);
             notify_waiters();
             m_file->delete_request_ref();
             m_file = 0;
-            m_state.set_to(READY2DIE);
+            m_state.set_to(request_state::READY2DIE);
             return true;
         }
     }
@@ -75,19 +77,19 @@ bool request_with_state::poll()
 
     check_errors();
 
-    return s == DONE || s == READY2DIE;
+    return s == request_state::DONE || s == request_state::READY2DIE;
 }
 
 void request_with_state::completed(bool canceled)
 {
     STXXL_VERBOSE3_THIS("request_with_state::completed()");
-    m_state.set_to(DONE);
+    m_state.set_to(request_state::DONE);
     if (!canceled)
         m_on_complete(this);
     notify_waiters();
     m_file->delete_request_ref();
     m_file = 0;
-    m_state.set_to(READY2DIE);
+    m_state.set_to(request_state::READY2DIE);
 }
 
 STXXL_END_NAMESPACE

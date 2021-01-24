@@ -65,8 +65,7 @@ void request::check_nref_failed(bool after)
                  " this=" << this <<
                  " offset=" << m_offset <<
                  " buffer=" << m_buffer <<
-                 " bytes=" << m_bytes <<
-                 " type=" << ((m_type == READ) ? "READ" : "WRITE") <<
+                 " bytes=" << m_bytes << " type=" << ((m_type == request_type::READ) ? "READ" : "WRITE") <<
                  " file=" << m_file <<
                  " iotype=" << m_file->io_type()
                  );
@@ -83,7 +82,7 @@ std::ostream& request::print(std::ostream& out) const
     out << " Buffer address: " << static_cast<void*>(m_buffer);
     out << " File offset: " << m_offset;
     out << " Transfer size: " << m_bytes << " bytes";
-    out << " Type of transfer: " << ((m_type == READ) ? "READ" : "WRITE");
+    out << " Type of transfer: " << ((m_type == request_type::READ) ? "READ" : "WRITE");
     return out;
 }
 

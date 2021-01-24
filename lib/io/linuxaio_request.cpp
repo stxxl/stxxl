@@ -31,14 +31,14 @@ void linuxaio_request::completed(bool posted, bool canceled)
 
     if (!canceled)
     {
-        if (m_type == READ)
+        if (m_type == request_type::READ)
             stats::get_instance()->read_finished();
         else
             stats::get_instance()->write_finished();
     }
     else if (posted)
     {
-        if (m_type == READ)
+        if (m_type == request_type::READ)
             stats::get_instance()->read_canceled(m_bytes);
         else
             stats::get_instance()->write_canceled(m_bytes);
@@ -54,7 +54,7 @@ void linuxaio_request::fill_control_block()
     // indirection, so the I/O system retains a counting_ptr reference
     cb.aio_data = reinterpret_cast<__u64>(new request_ptr(this));
     cb.aio_fildes = af->file_des;
-    cb.aio_lio_opcode = (m_type == READ) ? IOCB_CMD_PREAD : IOCB_CMD_PWRITE;
+    cb.aio_lio_opcode = (m_type == request_type::READ) ? IOCB_CMD_PREAD : IOCB_CMD_PWRITE;
     cb.aio_reqprio = 0;
     cb.aio_buf = static_cast<__u64>((unsigned long)(m_buffer));
     cb.aio_nbytes = m_bytes;
@@ -78,7 +78,7 @@ bool linuxaio_request::post()
     long success = syscall(SYS_io_submit, queue->get_io_context(), 1, &cb_pointer);
     if (success == 1)
     {
-        if (m_type == READ)
+        if (m_type == request_type::READ)
             stats::get_instance()->read_started(m_bytes, now);
         else
             stats::get_instance()->write_started(m_bytes, now);

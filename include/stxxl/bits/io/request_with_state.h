@@ -30,7 +30,7 @@ class request_with_state : public request_with_waiters
 protected:
     //! states of request
     //! OP - operating, DONE - request served, READY2DIE - can be destroyed
-    enum request_state { OP = 0, DONE = 1, READY2DIE = 2 };
+    enum class request_state { OP = 0, DONE = 1, READY2DIE = 2 };
 
     state<request_state> m_state;
 
@@ -42,8 +42,7 @@ protected:
         offset_type off,
         size_type b,
         request_type t)
-        : request_with_waiters(on_cmpl, f, buf, off, b, t),
-          m_state(OP)
+        : request_with_waiters(on_cmpl, f, buf, off, b, t), m_state(request_state::OP)
     { }
 
 public:

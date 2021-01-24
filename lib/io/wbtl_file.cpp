@@ -58,7 +58,7 @@ wbtl_file::~wbtl_file()
 void wbtl_file::serve(void* buffer, offset_type offset, size_type bytes,
                       request::request_type type)
 {
-    if (type == request::READ)
+    if (type == request::request_type::READ)
     {
         //stats::scoped_read_timer read_timer(size());
         sread(buffer, offset, bytes);
@@ -304,7 +304,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
     // mapping_lock has to be aquired by caller
     sortseq::iterator space =
         std::find_if(free_space.begin(), free_space.end(),
-                     bind2nd(FirstFit(), write_block_size) _STXXL_FORCE_SEQUENTIAL);
+                     std::bind(FirstFit(), std::placeholders::_1, write_block_size) _STXXL_FORCE_SEQUENTIAL);
 
     if (space != free_space.end())
     {

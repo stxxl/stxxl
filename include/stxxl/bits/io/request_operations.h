@@ -103,7 +103,7 @@ inline bool poll_any(request_ptr req_array[], size_t count, size_t& index)
 template <class RequestIterator>
 RequestIterator wait_any(RequestIterator reqs_begin, RequestIterator reqs_end)
 {
-    stats::scoped_wait_timer wait_timer(stats::WAIT_OP_ANY);
+    stats::scoped_wait_timer wait_timer(stats::wait_op_type::WAIT_OP_ANY);
 
     onoff_switch sw;
 

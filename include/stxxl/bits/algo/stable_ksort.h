@@ -267,7 +267,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 
     int64* bucket_sizes = new int64[nbuckets];
 
-    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
+    disk_queues::get_instance()->set_priority_op(request_queue::priority_op::WRITE);
 
     stable_ksort_local::distribute(
         bucket_bids,
@@ -314,7 +314,7 @@ void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
         typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
-        disk_queues::get_instance()->set_priority_op(request_queue::READ);
+        disk_queues::get_instance()->set_priority_op(request_queue::priority_op::READ);
 
         if (first.block_offset())
         {
