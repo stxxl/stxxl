@@ -598,8 +598,8 @@ public:
     //! \}
 
 protected:
-    blocked_index_type offset;
-    const vector_type* p_vector;
+    blocked_index_type offset{0};
+    const vector_type* p_vector{nullptr};
 
 private:
     //! private constructor for initializing other iterators
@@ -609,13 +609,12 @@ private:
 
 public:
     //! constructs invalid iterator
-    const_vector_iterator()
-        : offset(0), p_vector(nullptr)
-    { }
+    const_vector_iterator() = default;
     //! copy-constructor
-    const_vector_iterator(const const_vector_iterator& a)
-        : offset(a.offset), p_vector(a.p_vector)
-    { }
+    const_vector_iterator(const const_vector_iterator& a) = default;
+    //! copy-assignment-operator
+    const_vector_iterator& operator=(const const_vector_iterator& a) = default;
+
     //! implicit conversion from mutable iterator
     const_vector_iterator(const mutable_self_type& a) // NOLINT
         : offset(a.offset), p_vector(a.p_vector)

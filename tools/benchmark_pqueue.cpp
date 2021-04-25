@@ -47,9 +47,9 @@ using stxxl::external_size_type;
 
 // *** Integer Pair Types
 
-using uint32_pair_type = std::tuple<uint32_t, uint32_t>;
+using uint32_pair_type = std::array<uint32_t, 2>;
 
-using uint64_pair_type = std::tuple<uint64_t, uint64_t>;
+using uint64_pair_type = std::array<uint64_t, 2>;
 
 // *** Larger Structure Type
 
@@ -63,7 +63,7 @@ struct my_type
 
     my_type() { }
     my_type(const key_type& k1, const key_type& k2)
-        : uint32_pair_type(k1, k2)
+        : uint32_pair_type{k1, k2}
     { }
 };
 
@@ -77,16 +77,6 @@ struct tuple_element<0, my_type>
 
 } // namespace std
 
-template <typename ValueType, size_t mem_for_queue, external_size_type maxvolume>
-struct my_pq_gen
-{
-    using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-              ValueType,
-              stxxl::comparator<ValueType, stxxl::direction::Greater, stxxl::direction::DontCare>,
-              mem_for_queue,
-              maxvolume* MiB / sizeof(ValueType)>;
-};
-
 struct my_type_extractor
 {
     template <typename T>
@@ -96,14 +86,14 @@ struct my_type_extractor
     }
 };
 
-template <size_t mem_for_queue, external_size_type maxvolume>
-struct my_pq_gen<my_type, mem_for_queue, maxvolume>
+template <typename ValueType, size_t mem_for_queue, external_size_type maxvolume>
+struct my_pq_gen
 {
     using type = typename stxxl::PRIORITY_QUEUE_GENERATOR<
-              my_type,
-              stxxl::struct_comparator<my_type, my_type_extractor, stxxl::direction::Greater>,
+              ValueType,
+              stxxl::struct_comparator<ValueType, my_type_extractor, stxxl::direction::Greater>,
               mem_for_queue,
-              maxvolume* MiB / sizeof(my_type)>;
+              maxvolume* MiB / sizeof(ValueType)>;
 };
 
 static inline void progress(const char* text, external_size_type i, external_size_type nelements)
@@ -135,7 +125,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         {
             progress("Inserting element", i, nelements);
 
-            pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
+            pq.push(ValueType{static_cast<KeyType>(nelements - i), 0});
         }
     }
 
@@ -187,7 +177,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
         {
             progress("Inserting element", i, nelements);
 
-            pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
+            pq.push(ValueType{static_cast<KeyType>(nelements - i), 0});
         }
     }
 
@@ -209,7 +199,7 @@ void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_p
         {
             if (distr(rand) == 0)
             {
-                pq.push(ValueType(static_cast<KeyType>(nelements - i), 0));
+                pq.push(ValueType{static_cast<KeyType>(nelements - i), 0});
             }
             else
             {
