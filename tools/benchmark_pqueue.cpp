@@ -47,9 +47,17 @@ using stxxl::external_size_type;
 
 // *** Integer Pair Types
 
-using uint32_pair_type = std::array<uint32_t, 2>;
+template <typename T>
+struct PairType {
+ PairType(T f, T s) : first{f}, second{s} {}
+ PairType() = default;
+ using key_type = T;
+  T first{};
+  T second{};
+};
 
-using uint64_pair_type = std::array<uint64_t, 2>;
+using uint32_pair_type = PairType<uint32_t>;
+using uint64_pair_type = PairType<uint32_t>;
 
 // *** Larger Structure Type
 
@@ -67,22 +75,12 @@ struct my_type
     { }
 };
 
-namespace std {
-
-template <>
-struct tuple_element<0, my_type>
-{
-    using type = my_type::key_type;
-};
-
-} // namespace std
-
 struct my_type_extractor
 {
     template <typename T>
     auto operator () (T& a) const
     {
-        return std::tie(std::get<0>(a));
+        return std::tie(a.first);
     }
 };
 
@@ -108,7 +106,7 @@ template <typename PQType>
 void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools)
 {
     using ValueType = typename PQType::value_type;
-    using KeyType = typename std::tuple_element<0, ValueType>::type;
+    using KeyType = typename ValueType::key_type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
@@ -144,7 +142,7 @@ void run_pqueue_insert_delete(external_size_type nelements, size_t mem_for_pools
         for (external_size_type i = 0; i < nelements; ++i)
         {
             die_unless(!pq.empty());
-            die_unless(std::get<0>(pq.top()) == i + 1);
+            die_unless(std::get<0>(my_type_extractor{}(pq.top())) == i + 1);
 
             pq.pop();
 
@@ -160,7 +158,7 @@ template <typename PQType>
 void run_pqueue_insert_intermixed(external_size_type nelements, size_t mem_for_pools)
 {
     using ValueType = typename PQType::value_type;
-    using KeyType = typename std::tuple_element<0, ValueType>::type;
+    using KeyType = typename ValueType::key_type;
 
     // construct priority queue
     PQType pq(mem_for_pools / 2, mem_for_pools / 2);
