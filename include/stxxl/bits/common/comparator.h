@@ -364,14 +364,14 @@ public:
 
     ValueType min_value() const
     {
-        ValueType result;
+        ValueType result{};
         keys(result) = impl.min_value();
         return result;
     }
 
     ValueType max_value() const
     {
-        ValueType result;
+        ValueType result{};
         keys(result) = impl.max_value();
         return result;
     }
