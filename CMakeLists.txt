@@ -216,6 +216,8 @@ endif()
 
 ###############################################################################
 # enable C++14 and more compiler features
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # more template depth for some tests and compilers
 include(CheckCXXCompilerFlag)
@@ -224,30 +226,17 @@ if(CXX_HAS_TEMPLATE_DEPTH)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
 endif()
 
-# enable C++14
-if(MSVC)
-  # MSVC 11 or greater has C++11 automatically enabled
-else()
-  # try -std= flags to enable C++14
-  check_cxx_compiler_flag(-std=c++14 CXX_HAS_STD_CXX14)
-  if(CXX_HAS_STD_CXX14)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-  else()
-    message(SEND_ERROR "Compiler does not support -std=c++14")
-  endif()
-  # on MacOSX with clang we need to use libc++ for C++14 headers
-  if(APPLE)
-    if (CMAKE_CXX_COMPILER MATCHES ".*clang[+][+]"
-        OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      check_cxx_compiler_flag(-stdlib=libc++ CXX_HAS_STDLIB_LIBCXX)
-      if(CXX_HAS_STDLIB_LIBCXX)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-      else()
-        message(SEND_ERROR "Compilation on MacOSX with clang requires libc++.")
-      endif()
+if(APPLE)
+  if (CMAKE_CXX_COMPILER MATCHES ".*clang[+][+]"
+      OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    check_cxx_compiler_flag(-stdlib=libc++ CXX_HAS_STDLIB_LIBCXX)
+    if(CXX_HAS_STDLIB_LIBCXX)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    else()
+      message(SEND_ERROR "Compilation on MacOSX with clang requires libc++.")
     endif()
-  endif(APPLE)
-endif()
+  endif()
+endif(APPLE)
 
 ###############################################################################
 # enable gcov coverage analysis with gcc

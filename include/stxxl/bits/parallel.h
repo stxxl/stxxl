@@ -91,7 +91,11 @@ inline bool do_parallel_merge()
 namespace potentially_parallel {
 
 using std::sort;
-using std::random_shuffle;
+
+template<typename... Args>
+void random_shuffle(Args&&... args ) {
+  std::shuffle(std::forward<Args>(args)...);
+}
 
 /*! Multi-way merging dispatcher.
  * \param seqs_begin Begin iterator of iterator pair input sequence.
