@@ -248,6 +248,20 @@ public:
         return m_runs_merger.empty();
     }
 
+    //! Return the number of elements in a single run of the runs_creator
+    size_t num_els_in_run() const {
+      return m_runs_creator.num_els_in_run();
+    }
+
+    //! This number of elements will be merged at one
+    size_t num_els_in_output_block() const {
+      return m_runs_merger.num_els_in_output_block();
+    }
+    //! Will the next call to operator++ block, because it needs to merge?
+    bool next_call_would_block() const {
+      return m_runs_merger.next_call_would_block();
+    }
+
     //! \}
 
     //! \name Operators
@@ -272,6 +286,14 @@ public:
         assert(m_state == STATE_OUTPUT);
         ++m_runs_merger;
         return *this;
+    }
+
+    bool next_output_would_block() const {
+      return m_runs_merger.next_output_would_block();
+    }
+
+    size_t output_block_size() const {
+      return m_runs_merger.output_block_size();
     }
 
     //! \}

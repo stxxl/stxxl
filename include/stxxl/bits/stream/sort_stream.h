@@ -718,6 +718,11 @@ public:
     {
         return m_memory_to_use;
     }
+
+    //! return number of elements in a single sort run
+    size_t num_els_in_run() const {
+      return m_el_in_run;
+    }
 };
 
 //! Input strategy for \c runs_creator class.
@@ -1341,6 +1346,12 @@ public:
     {
         return &(operator * ());
     }
+
+    bool next_output_would_block() const {
+      return m_current_ptr + 1 == m_current_end;
+    }
+
+    size_t output_block_size() const { return out_block_type::size; }
 
     //! Standard stream method.
     basic_runs_merger& operator ++ ()       // preincrement operator
