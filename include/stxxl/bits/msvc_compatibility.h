@@ -19,10 +19,12 @@
 
 #include <cmath>
 
+#if _MSC_VER < 1900
 inline double log2(double x)
 {
     return (log(x) / log(2.));
 }
+#endif // ^^^ _MSC_VER < 1900
 
 // http://msdn.microsoft.com/en-us/library/2ts7cx93.aspx
 #define snprintf _snprintf
