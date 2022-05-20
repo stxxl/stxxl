@@ -19,11 +19,6 @@
 
 #include <cmath>
 
-inline double log2(double x)
-{
-    return (log(x) / log(2.));
-}
-
 // http://msdn.microsoft.com/en-us/library/2ts7cx93.aspx
 #define snprintf _snprintf
 
