@@ -627,7 +627,13 @@ public:
 
     iterator operator () (block_type* blocks, SizeType offset) const
     {
-        return blocks[0].elem + offset;
+        // blocks[0].elem is a c-style array (value_type[blockSize]) and the
+        // elements of the following blocks are directly adjacent, so the
+        // "out-of-bounds" access (offset > blockSize, because the range
+        // spans multiple blocks) is ok concerning accessing valid memories,
+        // but we have to explicitly cast the array to a pointer to make
+        // the undefined behavior sanitizer happy.
+        return static_cast<iterator>(blocks[0].elem) + offset;
     }
 };
 
