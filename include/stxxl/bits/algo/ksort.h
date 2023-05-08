@@ -308,11 +308,7 @@ create_runs(
 template <typename BlockType,
           typename prefetcher_type,
           typename KeyExtractor>
-struct run_cursor2_cmp : public std::binary_function<
-                             run_cursor2<BlockType, prefetcher_type>,
-                             run_cursor2<BlockType, prefetcher_type>,
-                             bool
-                             >
+struct run_cursor2_cmp
 {
     using cursor_type = run_cursor2<BlockType, prefetcher_type>;
     KeyExtractor keyobj;
@@ -336,7 +332,7 @@ private:
 };
 
 template <typename RecordType, typename KeyExtractor>
-class key_comparison : public std::binary_function<RecordType, RecordType, bool>
+class key_comparison
 {
     KeyExtractor ke;
 

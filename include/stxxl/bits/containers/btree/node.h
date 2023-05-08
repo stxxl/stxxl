@@ -76,7 +76,7 @@ public:
     using node_cache_type = node_cache<normal_node, btree_type>;
 
 private:
-    struct value_compare : public std::binary_function<value_type, value_type, bool>
+    struct value_compare
     {
         key_compare comp;
 
