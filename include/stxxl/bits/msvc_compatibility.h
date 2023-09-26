@@ -15,7 +15,7 @@
 
 #include <stxxl/bits/config.h>
 
-#if STXXL_MSVC
+#if (STXXL_MSVC && _MSC_VER < 1930)
 
 #include <cmath>
 
