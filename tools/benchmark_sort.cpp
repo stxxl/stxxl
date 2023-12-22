@@ -202,7 +202,7 @@ int benchmark_sort(int argc, char* argv[])
     cp.add_param_bytes("size", length,
                        "Amount of data to sort (e.g. 1GiB)");
 
-    size_t memsize = 256 * MB;
+    std::uint64_t memsize = 256 * MB;
     cp.add_bytes('M', "ram", memsize,
                  "Amount of RAM to use when sorting, default: 256 MiB");
 

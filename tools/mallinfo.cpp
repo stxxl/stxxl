@@ -29,7 +29,7 @@
 
 void print_malloc_stats()
 {
-    struct mallinfo info = mallinfo();
+    struct mallinfo2 info = mallinfo2();
     LOG1 << "MALLOC statistics BEGIN";
     LOG1 << "===============================================================";
     LOG1 << "non-mmapped space allocated from system (bytes): " << info.arena;

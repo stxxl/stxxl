@@ -41,70 +41,70 @@ public:
     //! Returns number of bytes allocated from system not including mmapped regions.
     return_type from_system_nmmap() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.arena;
     }
 
     //! Returns number of free chunks.
     return_type free_chunks() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.ordblks;
     }
 
     //! Number of bytes allocated and in use.
     return_type used() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.uordblks;
     }
 
     //! Number of bytes allocated but not in use.
     return_type not_used() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.fordblks;
     }
 
     //! Top-most, releasable (via malloc_trim) space (bytes).
     return_type releasable() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.keepcost;
     }
 
     //! Maximum total allocated space (bytes) (always 0 ?).
     return_type max_allocated() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.usmblks;
     }
 
     //! Number of fastbin blocks.
     return_type fastbin_blocks() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.smblks;
     }
 
     //! Space available in freed fastbin blocks (bytes).
     return_type fastbin_free() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.fsmblks;
     }
 
     //! Returns number of bytes allocated from system using mmap.
     return_type from_system_mmap() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.hblkhd;
     }
 
     //! Number of chunks allocated via mmap().
     return_type mmap_chunks() const
     {
-        struct mallinfo info = mallinfo();
+        struct mallinfo2 info = mallinfo2();
         return info.hblks;
     }
 
